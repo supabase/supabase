@@ -4,19 +4,17 @@ import toast from 'react-hot-toast'
 import { boolean, number, object } from 'yup'
 
 import { useParams } from 'common'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -26,7 +24,7 @@ import {
   InputNumber,
   Toggle,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 
 const schema = object({
   JWT_EXP: number()
@@ -59,6 +57,7 @@ const AdvancedAuthSettingsForm = () => {
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const formId = 'auth-config-advanced-form'
+  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const organization = useSelectedOrganization()
@@ -110,6 +109,10 @@ const AdvancedAuthSettingsForm = () => {
         <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
+  }
+
+  if (!canReadConfig) {
+    return <NoPermission resourceText="view auth configuration settings" />
   }
 
   return (
@@ -204,9 +207,9 @@ const AdvancedAuthSettingsForm = () => {
                 <FormSectionContent loading={isLoading}>
                   {promptTeamsEnterpriseUpgrade && (
                     <UpgradeToPro
-                      primaryText="Upgrade to Teams or Enterprise"
-                      secondaryText="Max Direct Database Connections settings are only available on the Teams plan and up."
-                      buttonText="Upgrade to Teams"
+                      primaryText="Upgrade to Team or Enterprise"
+                      secondaryText="Max Direct Database Connections settings are only available on the Team Plan and up."
+                      buttonText="Upgrade to Team"
                     />
                   )}
 
@@ -225,9 +228,9 @@ const AdvancedAuthSettingsForm = () => {
                 <FormSectionContent loading={isLoading}>
                   {promptTeamsEnterpriseUpgrade && (
                     <UpgradeToPro
-                      primaryText="Upgrade to Teams or Enterprise"
-                      secondaryText="Max Request Duration settings are only available on the Teams plan and up."
-                      buttonText="Upgrade to Teams"
+                      primaryText="Upgrade to Team or Enterprise"
+                      secondaryText="Max Request Duration settings are only available on the Team Plan and up."
+                      buttonText="Upgrade to Team"
                     />
                   )}
 

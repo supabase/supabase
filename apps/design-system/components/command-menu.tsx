@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { DialogProps } from '@radix-ui/react-alert-dialog'
-import { CircleIcon, FileIcon, LaptopIcon, MoonIcon, SunIcon } from 'lucide-react'
+import { CircleIcon, LaptopIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
 import { docsConfig } from '@/config/docs'
@@ -116,9 +116,9 @@ export function CommandMenu({ ...props }: DialogProps) {
               <MoonIcon className="mr-2 h-4 w-4" strokeWidth={1} />
               Dark
             </CommandItem_Shadcn_>
-            <CommandItem_Shadcn_ onSelect={() => runCommand(() => setTheme('deep-dark'))}>
+            <CommandItem_Shadcn_ onSelect={() => runCommand(() => setTheme('classic-dark'))}>
               <MoonIcon className="mr-2 h-4 w-4" strokeWidth={1} />
-              Deep Dark
+              Classic dark
             </CommandItem_Shadcn_>
             <CommandItem_Shadcn_ onSelect={() => runCommand(() => setTheme('system'))}>
               <LaptopIcon className="mr-2 h-4 w-4" strokeWidth={1} />

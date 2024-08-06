@@ -17,15 +17,16 @@ import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-muta
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { getTables } from 'data/tables/tables-query'
-import { useUrlState } from 'hooks'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary } from 'types'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
+import ColumnEditor from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import JsonEditor from './RowEditor/JsonEditor/JsonEditor'
+import RowEditor from './RowEditor/RowEditor'
 import { TextEditor } from './RowEditor/TextEditor'
 import SchemaEditor from './SchemaEditor'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
@@ -38,6 +39,8 @@ import {
   updateColumn,
   updateTable,
 } from './SidePanelEditor.utils'
+import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
+import TableEditor from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 
 export interface SidePanelEditorProps {

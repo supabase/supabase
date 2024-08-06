@@ -1,4 +1,5 @@
 import { noop } from 'lodash'
+import toast from 'react-hot-toast'
 
 export { default as passwordStrength } from './password-strength'
 export { default as uuidv4 } from './uuid'
@@ -168,7 +169,7 @@ export const copyToClipboard = async (str: string | Promise<string>, callback = 
         .then(callback)
     }
   } else {
-    console.warn('Unable to copy to clipboard')
+    toast.error('Unable to copy to clipboard')
   }
 }
 

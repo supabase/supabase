@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { uuidv4 } from 'lib/helpers'

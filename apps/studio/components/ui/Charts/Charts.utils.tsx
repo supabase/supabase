@@ -1,9 +1,11 @@
 import dayjs from 'dayjs'
-import React, { useMemo } from 'react'
+import utc from 'dayjs/plugin/utc'
+import { FC, PropsWithChildren, useMemo } from 'react'
 import { ResponsiveContainer } from 'recharts'
+
 import { DateTimeFormats } from './Charts.constants'
 import type { CommonChartProps, StackedChartProps } from './Charts.types'
-import utc from 'dayjs/plugin/utc'
+
 dayjs.extend(utc)
 
 /**
@@ -81,7 +83,7 @@ export const useChartSize = (
   }
 ) => {
   const minHeight = sizeMap[size]
-  const Container: React.FC<React.PropsWithChildren> = useMemo(
+  const Container: FC<PropsWithChildren> = useMemo(
     () =>
       ({ children }) => (
         <ResponsiveContainer height={minHeight} minHeight={minHeight} width="100%">

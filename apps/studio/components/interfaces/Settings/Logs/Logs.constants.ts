@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
-import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
+
+import type { DatetimeHelper, FilterTableSet, LogTemplate } from './Logs.types'
 
 export const LOGS_EXPLORER_DOCS_URL =
   'https://supabase.com/docs/guides/platform/logs#querying-with-the-logs-explorer'

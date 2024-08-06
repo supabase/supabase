@@ -16,7 +16,6 @@ export async function getWarehouseTenant(
   if (!projectRef) {
     throw new Error('projectRef is required')
   }
-
   const { data, error } = await get(`/platform/projects/{ref}/analytics/warehouse/tenant`, {
     params: { path: { ref: projectRef } },
     signal,
@@ -42,7 +41,7 @@ export const useWarehouseTenantQuery = <TData = WarehouseTenantData>(
     analyticsKeys.warehouseTenant(projectRef),
     ({ signal }) => getWarehouseTenant({ projectRef }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled: enabled && !!projectRef,
       staleTime: Infinity,
       // 2H mins cache time
       cacheTime: 120 * 60 * 1000,

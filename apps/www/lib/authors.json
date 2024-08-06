@@ -453,5 +453,29 @@
     "position": "Partnerships",
     "author_url": "https://github.com/chrischandler",
     "author_image_url": "https://github.com/chrischandler.png"
+  },
+  {
+    "author_id": "bdon",
+    "author": "Brandon Liu",
+    "username": "bdon",
+    "position": "Guest Author",
+    "author_url": "https://github.com/bdon",
+    "author_image_url": "https://github.com/bdon.png"
+  },
+  {
+    "author_id": "p6l-richard",
+    "author": "Richard Poelderl",
+    "username": "p6l-richard",
+    "position": "Guest Author",
+    "author_url": "https://github.com/p6l-richard",
+    "author_image_url": "https://github.com/p6l-richard.png"
+  },
+  {
+    "author_id": "PeerRich",
+    "author": "Peer Richelsen",
+    "username": "PeerRich",
+    "position": "Guest Author",
+    "author_url": "https://github.com/PeerRich",
+    "author_image_url": "https://github.com/PeerRich.png"
   }
 ]

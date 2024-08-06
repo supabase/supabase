@@ -14,6 +14,7 @@ type PostgrestImpersonationRole =
       type: 'postgrest'
       role: 'authenticated'
       user: User
+      aal?: 'aal1' | 'aal2'
     }
 
 export type PostgrestRole = PostgrestImpersonationRole['role']
@@ -36,7 +37,7 @@ function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole
     const user = role.user
 
     return {
-      aal: 'aal1',
+      aal: role.aal ?? 'aal1',
       amr: [{ method: 'password', timestamp: nowTimestamp }],
       app_metadata: user.raw_app_meta_data,
       aud: 'authenticated',

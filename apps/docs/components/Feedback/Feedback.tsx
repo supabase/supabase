@@ -74,7 +74,7 @@ function Feedback() {
   const [modalOpen, setModalOpen] = useState(false)
   const feedbackButtonRef = useRef<HTMLButtonElement>(null)
 
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ''
   const sendTelemetryEvent = useSendTelemetryEvent()
   const { mutate: sendFeedbackComment } = useSendFeedbackMutation()
   const supabase = useSupabaseClient<Database>()

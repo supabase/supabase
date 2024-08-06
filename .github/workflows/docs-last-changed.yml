@@ -1,10 +1,8 @@
-name: "[Docs] Update last-changed dates"
+name: '[Docs] Update last-changed dates'
 
 on:
-  # Temporarily turned off until the action is validated manually
-  #
-  # schedule:
-  #   - cron: '0 0 * * *'
+  schedule:
+    - cron: '0 0 * * *'
   workflow_dispatch:
     inputs:
       reset:

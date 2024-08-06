@@ -8,10 +8,10 @@ import {
 } from 'react-data-grid'
 import { Button, IconMaximize2 } from 'ui'
 
-import { SELECT_COLUMN_KEY } from '../../constants'
-import { useTrackedState } from '../../store'
-import type { SupaRow } from '../../types'
 import { ChangeEvent, InputHTMLAttributes, SyntheticEvent } from 'react'
+import { SELECT_COLUMN_KEY } from '../../constants'
+import { useTrackedState } from '../../store/Store'
+import type { SupaRow } from '../../types'
 
 export const SelectColumn: CalculatedColumn<any, any> = {
   key: SELECT_COLUMN_KEY,

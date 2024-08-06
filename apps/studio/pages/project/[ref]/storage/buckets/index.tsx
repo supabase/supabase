@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 
-import { StorageLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import type { NextPageWithLayout } from 'types'

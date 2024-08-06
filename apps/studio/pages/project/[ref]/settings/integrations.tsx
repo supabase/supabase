@@ -1,5 +1,5 @@
 import IntegrationSettings from 'components/interfaces/Settings/Integrations/IntegrationsSettings'
-import { SettingsLayout } from 'components/layouts'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
   ScaffoldDivider,

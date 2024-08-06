@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import type { SupaRow, SupaTable } from 'components/grid'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
+import type { SupaRow, SupaTable } from 'components/grid/types'
 import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
