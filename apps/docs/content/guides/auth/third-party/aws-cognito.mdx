@@ -1,0 +1,77 @@
+---
+id: 'auth-third-party-aws-cognito'
+title: 'AWS Cognito (Amplify)'
+subtitle: 'Use AWS Cognito via Amplify or standalone with your Supabase project'
+---
+
+AWS Cognito User Pools (via AWS Amplify or on its own) can be used as a third-party authentication provider alongside Supabase Auth, or standalone, with your Supabase project.
+
+## Getting started
+
+1. First you need to add an integration to connect your Supabas eproject with your AWS Cognito User Pool. You will need the pool's ID and region.
+2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/settings/auth).
+3. Assign the `role: 'authenticated'` custom claim to all JWTs by using a Pre-Token Generation Trigger.
+4. Finally setup the Supabase client in your application.
+
+<Tabs type="underlined" queryGroup="cognito-create-client">
+
+<TabPanel id="create-client-typescript-amplify" label="TypeScript (Amplify)">
+
+```typescript
+import { fetchAuthSession } from 'aws-amplify/auth'
+
+const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
+  accessToken: async () => {
+    const tokens = await fetchAuthSession()
+
+    // Alternatively you can use tokens?.idToken instead.
+    return tokens?.accessToken
+  },
+})
+```
+
+</TabPanel>
+
+<TabPanel id="create-client-swift" label="Swift (iOS)">
+
+TODO!
+
+</TabPanel>
+
+<TabPanel id="create-client-flutter" label="Flutter">
+
+TODO!
+
+</TabPanel>
+
+</Tabs>
+
+## Use a Pre-Token Generation Trigger to assign the authenticated role
+
+Your Supabase project inspects the `role` claim present in all JWTs sent to it, to assign the correct Postgres role when using the Data API, Storage or Realtime authorization.
+
+By default, AWS Cognito JWTs (both ID token and access tokens) do not contain a `role` claim in them. If you were to send such a JWT to your Supabase project, the `anon` role would be assigned when executing the Postgres query. Most of your app's logic will be accessible by the `authenticated` role.
+
+A recommended approach to do this is to configure a [Pre-Token Generation Trigger](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-pre-token-generation.html) either `V1_0` (ID token only) or `V2_0` (both access and ID token). To do this you will need to create a new Lambda function (in any language and runtime) and assign it to the [AWS Cognito User Pool's Lambda Triggers configuration](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools-working-with-aws-lambda-triggers.html). For example, the Lambda function should look similar to this:
+
+<Tabs type="underlined" queryGroup="cognito-lambda">
+
+<TabPanel id="blocking-nodejs" label="Node.js">
+
+```javascript
+export const handler = async (event) => {
+  event.response = {
+    claimsOverrideDetails: {
+      claimsToAddOrOverride: {
+        role: 'authenticated',
+      },
+    },
+  }
+
+  return event
+}
+```
+
+</TabPanel>
+
+</Tabs>
