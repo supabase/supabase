@@ -33,14 +33,15 @@ A Hook is a primitive invoked by Supabase Auth, with an event object, at a point
   scrollable
   size="small"
   type="underlined"
+  defaultActiveId="sql"
   queryGroup="language"
 >
-<TabPanel id="postgres-what-is-a-hook" label="SQL">
+<TabPanel id="sql" label="SQL">
 
 A Postgres Hook is a Postgres Function which takes a single argument -- the event of type JSONB -- and returns a JSONB object. A Postgres Hook runs on Supabase Auth and does not leave the instance. You can read more about Postgres Functions in [the Postgres guide](/docs/guides/database/functions)
 
 </TabPanel>
-<TabPanel id="https-what-is-a-hook" label="HTTP">
+<TabPanel id="http" label="HTTP">
 A HTTP Hook is an endpoint which takes in a JSON event payload and returns a JSON response. HTTP Hooks in Supabase follow the Standard Webhooks Specification, which is a set of guidelines aligning how hooks are implemented. The specification attaches three security headers to guarantee authenticity of the payload:
 
 - `webhook-id`: the unique webhook identifier described in the preceding sections.
@@ -60,9 +61,10 @@ Sign the payload and grant permissions selectively in order to guard the integri
   scrollable
   size="small"
   type="underlined"
+  defaultActiveId="sql"
   queryGroup="language"
 >
-<TabPanel id="postgres-hook-security-model" label="SQL">
+<TabPanel id="sql" label="SQL">
 
 You will need to assign additional permissions so that Supabase Auth can access the hook as well as the tables it interacts with.
 
@@ -95,7 +97,7 @@ We recommend that you do not use any tag and explicitly grant permissions to `su
 Read more about the `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
 
 </TabPanel>
-<TabPanel id="https-hook-security-model" label="HTTP">
+<TabPanel id="http" label="HTTP">
 
 When a HTTP hook is created, the secret generated should be of the following format: `v1,whsec_<standard-base64-secret>`:
 
@@ -145,9 +147,10 @@ Runtime errors could happen when:
   scrollable
   size="small"
   type="underlined"
+  defaultActiveId="sql"
   queryGroup="language"
 >
-<TabPanel id="postgres-hook-errors" label="SQL">
+<TabPanel id="sql" label="SQL">
 
 The error is a JSON object and has the following properties:
 
@@ -170,7 +173,7 @@ Errors returned from a Postgres Hook are not retry-able. When an error is return
 
 </TabPanel>
 
-<TabPanel id="https-hook-errors" label="HTTP">
+<TabPanel id="http" label="HTTP">
 Hooks return status codes based on the nature of the response. These status codes help determine the next steps in the processing flow:
 
 | HTTP Status Code | Description                                                   | Example Usage                                  |
@@ -228,9 +231,10 @@ Edit config.toml to set up the Auth Hook locally.
   scrollable
   size="small"
   type="underlined"
+  defaultActiveId="sql"
   queryGroup="language"
 >
-<TabPanel id="postgres-connect-hook-locally" label="SQL">
+<TabPanel id="sql" label="SQL">
 Modify the `auth.hook.<hook_name>` field and set `uri` to a value of `pg-functions://postgres/<schema>/<function_name>`
 
 ```
@@ -303,7 +307,7 @@ $$;
 You can visit `SQL Editor > Templates` for hook templates.
 
 </TabPanel>
-<TabPanel id="https-connect-hook-locally" label="HTTP">
+<TabPanel id="http" label="HTTP">
 Modify the `auth.hook.<hook_name>` field and set `uri` to a valid HTTP URI. For example, the `send_sms` hook would take the following fields:
 ```
 [auth.hook.send_sms]
@@ -363,6 +367,7 @@ Example payload:
   scrollable
   size="small"
   type="underlined"
+  defaultActiveId="sql"
   queryGroup="language"
 >
 <TabPanel id="mfa-verification-attempt-json" label="JSON">
@@ -414,8 +419,6 @@ Example output:
   "message": "You have exceeded maximum number of MFA attempts."
 }
 ```
-
-**SQL Examples**
 
 <Tabs
   scrollable
@@ -583,14 +586,19 @@ Example output:
 }
 ```
 
-**SQL Examples**
-
 <Tabs
   scrollable
   size="small"
   type="underlined"
   defaultActiveId="sql-limit-failed-password-verification-attempts"
   queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql-limit-failed-password-verification-attempts"
 >
 <TabPanel id="sql-limit-failed-password-verification-attempts" label="Limit failed password verification attempts">
 
@@ -788,6 +796,8 @@ revoke all
   from authenticated, anon, public;
 ```
 
+</TabPanel>
+</Tabs>
 </TabPanel>
 </Tabs>
 
@@ -991,14 +1001,19 @@ Return these only if your hook processed the input without errors.
 
 - `claims` A json containing the updated claims after the hook has been run.
 
-**SQL Examples**
-
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
 <Tabs
   scrollable
   size="small"
   type="underlined"
   defaultActiveId="add-admin-role"
-  queryGroup="language"
 >
 <TabPanel id="add-admin-role" label="Add admin role">
 
@@ -1164,15 +1179,13 @@ revoke execute
 
 </TabPanel>
 </Tabs>
-
-**HTTP Examples**
-
+</TabPanel>
+<TabPanel id="http" label="HTTP">
 <Tabs
   scrollable
   size="small"
   type="underlined"
   defaultActiveId="http-add-metadata-claim"
-  queryGroup="language"
 >
 <TabPanel id="http-add-metadata-claim" label="Add claim">
 
@@ -1280,6 +1293,8 @@ authentication_method
 
 ````
 
+</TabPanel>
+</Tabs>
 </TabPanel>
 </Tabs>
 
@@ -1571,14 +1586,19 @@ Runs before a message is sent. Use the hook to:
 
 - No outputs are required. An empty response with a status code of 200 is taken as a successful response.
 
-**SQL Examples**
-
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
 <Tabs
   scrollable
   size="small"
   type="underlined"
   defaultActiveId="sql-send-message-via-job-queue"
-  queryGroup="language"
 >
 <TabPanel id="sql-send-message-via-job-queue" label="Queue SMS Messages">
 
@@ -1701,17 +1721,14 @@ select
 ```
 
 </TabPanel>
-
 </Tabs>
-
-**HTTP Examples**
-
+</TabPanel>
+<TabPanel id="http" label="HTTP">
 <Tabs
   scrollable
   size="small"
   type="underlined"
   defaultActiveId="http-alternate-message-provider"
-  queryGroup="language"
 >
 <TabPanel id="http-alternate-message-provider" label="Alternate message provider">
 Your company would like to use an alternate message provider. Some examples of alternate message providers include [Msg91](https://msg91.com/) for India and [Africa's Talking](https://africastalking.com/). The example uses Twilio as it is widely available and does not require a regional number.
@@ -1939,6 +1956,8 @@ Deno.serve(async (req) => {
 });
 ```
 
+</TabPanel>
+</Tabs>
 </TabPanel>
 </Tabs>
 
@@ -2269,14 +2288,19 @@ The Send Email Hook runs before an email is sent and allows for flexibility arou
 
 - No outputs are required. An empty response with a status code of 200 is taken as a successful response.
 
-**SQL Examples**
-
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
 <Tabs
   scrollable
   size="small"
   type="underlined"
   defaultActiveId="sql-queue-email-messages"
-  queryGroup="language"
 >
 <TabPanel id="sql-queue-email-messages" label="Queue Email Messages">
 Your company uses a worker to manage all emails related jobs. For performance reasons, the messaging system sends emails in batches via a job queue. Instead of sending a message immediately, messages are queued and sent in periodic intervals via `pg_cron`.
@@ -2399,17 +2423,14 @@ select
 ```
 
 </TabPanel>
-
 </Tabs>
-
-**HTTP Examples**
-
+</TabPanel>
+<TabPanel id="http" label="HTTP">
 <Tabs
   scrollable
   size="small"
   type="underlined"
   defaultActiveId="http-internationalization-for-emails"
-  queryGroup="language"
 >
 <TabPanel id="http-internationalization-for-emails" label="Add Internationalization for Email Templates">
 Your company is expanding to France and Spain. As part of expansion efforts, the company would like to deliver internationalized email templates to best support local users in their native language. Ensure that you have configured `POSTMARK_SERVER_TOKEN` and `AUTH_SEND_EMAIL_HOOK_SECRET` in your `.env` file.
@@ -2702,5 +2723,6 @@ Deno.serve(async (req) => {
 ```
 
 </TabPanel>
-
+</Tabs>
+</TabPanel>
 </Tabs>
