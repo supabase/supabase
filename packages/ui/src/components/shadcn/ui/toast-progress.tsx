@@ -1,5 +1,5 @@
-import { Progress } from '@radix-ui/react-progress'
 import { Loader2 } from 'lucide-react'
+import { Progress } from './progress'
 
 /**
  * A component to display a progress bar with a message and an optional action button. Meant to be rendered in toasts
@@ -34,7 +34,7 @@ export const ToastProgress = ({
         </p>
       </div>
       <Progress value={progress} className="w-full" />
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row gap-2 items-center">
         <small className="text-foreground-muted text-xs">
           Please do not close the browser until completed
         </small>
