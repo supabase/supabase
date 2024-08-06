@@ -1,8 +1,9 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import type { Dictionary } from 'types'
 import dayjs from 'dayjs'
 import { compact, find, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
+import type { Dictionary } from 'types'
 
+import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { minifyJSON, tryParseJson } from 'lib/helpers'
 import {
   DATETIME_TYPES,
@@ -211,4 +212,11 @@ export const generateUpdateRowPayload = (originalRow: any, field: RowField[]) =>
   })
 
   return payload
+}
+
+/**
+ * Checks if the value is truncated. The JSON types are usually truncated if they're too big to show in the editor.
+ */
+export const isValueTruncated = (value: string | null | undefined) => {
+  return value?.endsWith('...') && (value ?? '').length > MAX_CHARACTERS
 }
