@@ -243,7 +243,11 @@ export function LogDrainDestinationSheetForm({
                   formControl={form.control}
                 /> */}
                 {mode === 'create' && (
-                  <FormItemLayout layout="horizontal" label="Type">
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Type"
+                    description={LOG_DRAIN_TYPES.find((t) => t.value === type)?.description || ''}
+                  >
                     <Select
                       defaultValue={defaultType}
                       value={form.getValues('type')}
@@ -264,9 +268,6 @@ export function LogDrainDestinationSheetForm({
                           </SelectItem>
                         ))}
                       </SelectContent>
-                      <FormDescription className="mt-2">
-                        {LOG_DRAIN_TYPES.find((t) => t.value === type)?.description}
-                      </FormDescription>
                     </Select>
                   </FormItemLayout>
                 )}
@@ -381,7 +382,11 @@ export function LogDrainDestinationSheetForm({
                       name="region"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItemLayout layout="horizontal" label={'Region'}>
+                        <FormItemLayout
+                          layout="horizontal"
+                          label={'Region'}
+                          description="The Datadog region to send logs to."
+                        >
                           <FormControl_Shadcn_>
                             <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                               <SelectTrigger_Shadcn_ className="col-span-3">
