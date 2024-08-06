@@ -44,4 +44,47 @@ The payload message is a JSON string of the raw log event, prefixed with the eve
 
 To setup Datadog log drain, generate a Datadog API key [here](https://app.datadoghq.com/organization-settings/api-keys) and the location of your Datadog site.
 
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+>
+    <AccordionItem
+      header="Walkthrough"
+      id="walkthrough"
+    >
+
+    1. Generate API Key in [Datadog dashboard](https://app.datadoghq.com/organization-settings/api-keys)
+    2. Create log drain in [Supabase dashboard](https://supabase.com/dashboard/project/_/settings/log-drains)
+    3. Watch for events in the [Datadog Logs page](https://app.datadoghq.com/logs)
+
+    </AccordionItem>
+
+    <AccordionItem
+      header="Example destination configuration"
+      id="cfg"
+    >
+
+    [Grok parser](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/grok_parser?tab=matchers) matcher for extracting the timestamp to a `date` field
+    ```
+    %{date("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZ"):date}
+    ```
+
+    [Grok parser](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/grok_parser?tab=matchers) matcher for converting stringified JSON to structured JSON on the `json` field.
+    ```
+     %{data::json}
+     ```
+
+    [Remapper](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/remapper) for setting the log level.
+    ```
+    metadata.parsed.error_severity, metadata.level
+    ```
+
+    [Remapper](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/remapper) for setting the log event message.
+    ```
+    event_message
+    ```
+    </AccordionItem>
+
+</Accordion>
+
 If you are interested in other log drains, upvote them [here](https://github.com/orgs/supabase/discussions/28324)
