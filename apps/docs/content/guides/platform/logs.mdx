@@ -87,6 +87,47 @@ Edge Function log messages have a max length of 10,000 characters. If you try to
 
 ---
 
+## Working with API logs
+
+[API logs](https://supabase.com/dashboard/project/_/logs/edge-logs) run through the Cloudflare edge servers and will have attached Cloudflare metadata under the `metadata.request.cf.*` fields.
+
+### Allowed headers
+
+A strict list of request and response headers are permitted in the API logs.
+
+Request headers:
+
+- `accept`
+- `cf-connecting-ip`
+- `cf-ipcountry`
+- `host`
+- `user-agent`
+- `x-forwarded-proto`
+- `referer`
+- `content-length`
+- `x-real-ip`
+- `x-client-info`
+- `x-forwarded-user-agent`
+- `x-custom-metadata`
+- `range`
+- `prefer`
+
+Response headers:
+
+- `cf-cache-status`
+- `cf-ray`
+- `content-location`
+- `content-range`
+- `content-type`
+- `content-length`
+- `date`
+- `transfer-encoding`
+- `x-kong-proxy-latency`
+- `x-kong-upstream-latency`
+- `x-custom-metadata`
+- `sb-gateway-mode`
+- `sb-gateway-version`
+
 ## Logging Postgres queries
 
 To enable query logs for other categories of statements:
