@@ -4,6 +4,8 @@ title: 'Auth Hooks'
 subtitle: 'Use HTTP or Postgres Functions to customize your authentication flow'
 ---
 
+## Overview
+
 Supabase allows you to use HTTP or Postgres Functions to alter the default Supabase Auth flow. Developers can use hooks to add custom behavior that's not supported natively.
 
 Hooks help you:
@@ -22,8 +24,6 @@ You can use hooks at specific points along an Auth flow to perform custom behavi
 | Send Email                    | Free, Pro            |
 | MFA Verification Attempt      | Teams and Enterprise |
 | Password Verification Attempt | Teams and Enterprise |
-
-## Create a hook
 
 ### What is a hook
 
@@ -132,88 +132,9 @@ Deno.serve(async (req) => {
 </TabPanel>
 </Tabs>
 
-## Hook errors
+## Using Hooks
 
-You should return an error when facing a runtime error. Runtime errors are specific to your application and arise from specific business rules rather than programmer errors.
-
-Runtime errors could happen when:
-
-- The user does not have appropriate permissions
-- The event payload received does not have required claims.
-- The user has performed an action which violates a business rule.
-- The email or phone provider used in the webhook returned an error.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="sql"
-  queryGroup="language"
->
-<TabPanel id="sql" label="SQL">
-
-The error is a JSON object and has the following properties:
-
-- `error` An object that contains information about the error.
-  - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
-  - `message` A message to be returned in the HTTP response. Required.
-
-Here's an example:
-
-```json
-{
-  "error": {
-    "http_code": 429,
-    "message": "You can only verify a factor once every 10 seconds."
-  }
-}
-```
-
-Errors returned from a Postgres Hook are not retry-able. When an error is returned, the error is propagated from the hook to Supabase Auth and translated into a HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
-
-</TabPanel>
-
-<TabPanel id="http" label="HTTP">
-Hooks return status codes based on the nature of the response. These status codes help determine the next steps in the processing flow:
-
-| HTTP Status Code | Description                                                   | Example Usage                                  |
-| ---------------- | ------------------------------------------------------------- | ---------------------------------------------- |
-| 200, 202, 204    | Valid response, proceed                                       | Successful processing of the request           |
-| 429, 503         | Retry-able errors with Retry-after header supported           | Temporary server overload or maintenance       |
-| 403, 400         | Treated as Internal Server Errors and return a 500 Error Code | Malformed requests or insufficient permissions |
-
-Errors are responses which contain status codes 400 and above. On a retry-able error, such as an error with a `429` or `503` status code, HTTP Hooks will attempt up to three retries with a back-off of two seconds.
-
-Here’s a sample HTTP retry schedule:
-
-| Time Since Start (HH:MM:SS) | Event                   | Notes                                             |
-| --------------------------- | ----------------------- | ------------------------------------------------- |
-| 00:00:00                    | Initial Attempt         | Initial invocation begins.                        |
-| 00:00:05                    | Initial Attempt Timeout | Initial invocation must complete.                 |
-| 00:00:07                    | Retry Start #1          | After 2 sec delay, first retry begins.            |
-| 00:00:12                    | Retry Timeout #1        | First retry timeout.                              |
-| 00:00:14                    | Retry Start #2          | After 2 sec delay, second retry begins.           |
-| 00:00:19                    | Retry Timeout #2        | Second retry timeout. Returns an error on failure |
-
-Return a retry-able error by attaching a appropriate status code (`429`, `503` ) and a non-empty `retry-after` header
-
-```jsx
-return new Response(
-  JSON.stringify({
-    error: `Failed to process the request: ${error}`,
-  }),
-  { status: 429, headers: { 'Content-Type': 'application/json', 'retry-after': 'true' } }
-)
-```
-
-Note that all responses, including error responses, need a `Content-Type` of `application/json` - not specifying the appropriate `Content-Type` will result in the function returning an error response. Supabase Auth will in turn return an Internal Server Error.
-
-</TabPanel>
-</Tabs>
-
-Outside of runtime errors, both HTTP Hooks and Postgres Hooks return timeout errors. Postgres Hooks have <SharedData data="config">auth.hook_timeouts.postgres_hooks</SharedData> seconds to complete processing while HTTP Hooks should complete in <SharedData data="config">auth.hook_timeouts.http_hooks</SharedData> seconds. Both HTTP Hooks and Postgres Hooks are run in a transaction do limit the duration of execution to avoid delays in authentication process.
-
-## Developing A Hook
+### Developing
 
 Let us develop a Hook locally and then deploy it to the cloud. As a recap, here’s a list of available Hooks
 
@@ -337,15 +258,96 @@ Note that payloads are sent uncompressed (Encoding: `identity`) in order to accu
 </TabPanel>
 </Tabs>
 
-## Deploying a Hook
+### Deploying
 
 In the dashboard, navigate to [`Authentication > Hooks`](/dashboard/project/_/auth/hooks) and select the appropriate function type (SQL or HTTP) from the dropdown menu.
+
+### Error Handling
+
+You should return an error when facing a runtime error. Runtime errors are specific to your application and arise from specific business rules rather than programmer errors.
+
+Runtime errors could happen when:
+
+- The user does not have appropriate permissions
+- The event payload received does not have required claims.
+- The user has performed an action which violates a business rule.
+- The email or phone provider used in the webhook returned an error.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+
+The error is a JSON object and has the following properties:
+
+- `error` An object that contains information about the error.
+  - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
+  - `message` A message to be returned in the HTTP response. Required.
+
+Here's an example:
+
+```json
+{
+  "error": {
+    "http_code": 429,
+    "message": "You can only verify a factor once every 10 seconds."
+  }
+}
+```
+
+Errors returned from a Postgres Hook are not retry-able. When an error is returned, the error is propagated from the hook to Supabase Auth and translated into a HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
+
+</TabPanel>
+
+<TabPanel id="http" label="HTTP">
+Hooks return status codes based on the nature of the response. These status codes help determine the next steps in the processing flow:
+
+| HTTP Status Code | Description                                                   | Example Usage                                  |
+| ---------------- | ------------------------------------------------------------- | ---------------------------------------------- |
+| 200, 202, 204    | Valid response, proceed                                       | Successful processing of the request           |
+| 429, 503         | Retry-able errors with Retry-after header supported           | Temporary server overload or maintenance       |
+| 403, 400         | Treated as Internal Server Errors and return a 500 Error Code | Malformed requests or insufficient permissions |
+
+Errors are responses which contain status codes 400 and above. On a retry-able error, such as an error with a `429` or `503` status code, HTTP Hooks will attempt up to three retries with a back-off of two seconds.
+
+Here’s a sample HTTP retry schedule:
+
+| Time Since Start (HH:MM:SS) | Event                   | Notes                                             |
+| --------------------------- | ----------------------- | ------------------------------------------------- |
+| 00:00:00                    | Initial Attempt         | Initial invocation begins.                        |
+| 00:00:05                    | Initial Attempt Timeout | Initial invocation must complete.                 |
+| 00:00:07                    | Retry Start #1          | After 2 sec delay, first retry begins.            |
+| 00:00:12                    | Retry Timeout #1        | First retry timeout.                              |
+| 00:00:14                    | Retry Start #2          | After 2 sec delay, second retry begins.           |
+| 00:00:19                    | Retry Timeout #2        | Second retry timeout. Returns an error on failure |
+
+Return a retry-able error by attaching a appropriate status code (`429`, `503` ) and a non-empty `retry-after` header
+
+```jsx
+return new Response(
+  JSON.stringify({
+    error: `Failed to process the request: ${error}`,
+  }),
+  { status: 429, headers: { 'Content-Type': 'application/json', 'retry-after': 'true' } }
+)
+```
+
+Note that all responses, including error responses, need a `Content-Type` of `application/json` - not specifying the appropriate `Content-Type` will result in the function returning an error response. Supabase Auth will in turn return an Internal Server Error.
+
+</TabPanel>
+</Tabs>
+
+Outside of runtime errors, both HTTP Hooks and Postgres Hooks return timeout errors. Postgres Hooks have <SharedData data="config">auth.hook_timeouts.postgres_hooks</SharedData> seconds to complete processing while HTTP Hooks should complete in <SharedData data="config">auth.hook_timeouts.http_hooks</SharedData> seconds. Both HTTP Hooks and Postgres Hooks are run in a transaction do limit the duration of execution to avoid delays in authentication process.
 
 ## Available Hooks
 
 Each Hook description contains an example JSONSchema which you can use in conjunction with [JSONSchema Faker](https://json-schema-faker.js.org/) in order to generate a mock payload. For HTTP Hooks, you can also use [the Standard Webhooks Testing Tool](https://www.standardwebhooks.com/simulate) to simulate a request.
 
-## Hook: MFA verification attempt
+### MFA verification attempt
 
 You can add additional checks to the [Supabase MFA implementation](/docs/guides/auth/auth-mfa) with hooks. For example, you can:
 
@@ -516,7 +518,7 @@ revoke all
 </TabPanel>
 </Tabs>
 
-## Hook: Password verification attempt
+### Password verification attempt
 
 Your company wishes to increase security beyond the requirements of the default password implementation in order to fulfill security or compliance requirements. You plan to track the status of a password sign-in attempt and take action via an email or a restriction on logins where necessary.
 
@@ -801,7 +803,7 @@ revoke all
 </TabPanel>
 </Tabs>
 
-## Hook: Custom access token
+### Custom access token
 
 The custom access token hook runs before a token is issued and allows you to add additional claims based on the authentication method used.
 
@@ -1298,7 +1300,7 @@ authentication_method
 </TabPanel>
 </Tabs>
 
-## Hook: Send SMS
+### Send SMS
 
 Runs before a message is sent. Use the hook to:
 - Use a regional SMS Provider
@@ -1961,7 +1963,7 @@ Deno.serve(async (req) => {
 </TabPanel>
 </Tabs>
 
-## Hook: Send Email
+### Send Email
 
 The Send Email Hook runs before an email is sent and allows for flexibility around email sending. You can use this hook to configure a back-up email provider or add internationalization to your emails.
 
