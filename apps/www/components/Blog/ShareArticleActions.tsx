@@ -1,11 +1,19 @@
 import Link from 'next/link'
 import { IconLinkedinSolid, IconTwitterX, IconYCombinator } from 'ui'
 
-const ShareArticleActions = ({ title, slug }: { title: string; slug: string }) => (
+const ShareArticleActions = ({
+  title,
+  slug,
+  basePath = 'https://supabase.com/blog/',
+}: {
+  title: string
+  slug: string
+  basePath?: string
+}) => (
   <div className="mt-4 flex items-center space-x-4">
     <Link
       aria-label="Share on X"
-      href={`https://twitter.com/share?text=${title}&url=https://supabase.com/blog/${slug}`}
+      href={`https://twitter.com/share?text=${title}&url=${basePath}${slug}`}
       target="_blank"
       className="text-foreground-lighter hover:text-foreground"
     >
@@ -14,7 +22,7 @@ const ShareArticleActions = ({ title, slug }: { title: string; slug: string }) =
 
     <Link
       aria-label="Share on Linkedin"
-      href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${slug}&title=${title}&text=${title}`}
+      href={`https://www.linkedin.com/shareArticle?url=${basePath}${slug}&title=${title}&text=${title}`}
       target="_blank"
       className="text-foreground-lighter hover:text-foreground"
     >
@@ -22,7 +30,7 @@ const ShareArticleActions = ({ title, slug }: { title: string; slug: string }) =
     </Link>
     <Link
       aria-label="Share on Hacker News"
-      href={`https://news.ycombinator.com/submitlink?u=https://supabase.com/blog/${slug}&t=${title}`}
+      href={`https://news.ycombinator.com/submitlink?u=${basePath}${slug}&t=${title}`}
       target="_blank"
       className="text-foreground-lighter hover:text-foreground"
     >

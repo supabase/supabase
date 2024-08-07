@@ -3,6 +3,7 @@ import content from '~/data/home/content'
 import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
 import HeroFrameworks from '~/components/Hero/HeroFrameworks'
+import SectionContainer from '../components/Layouts/SectionContainer'
 
 const Products = dynamic(() => import('~/components/Products/index'))
 const Logos = dynamic(() => import('~/components/logos'))
@@ -12,7 +13,6 @@ const AdminAccess = dynamic(() => import('components/AdminAccess/index'))
 const CustomerStories = dynamic(() => import('components/CustomerStories'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 const CTABanner = dynamic(() => import('components/CTABanner/index'))
-const EventCallout = dynamic(() => import('components/EventCallout'))
 const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
 const Index = () => {
@@ -26,7 +26,6 @@ const Index = () => {
       <BuiltExamples />
       <MadeForDevelopers />
       <AdminAccess />
-      <EventCallout className="!pb-0" />
       <CustomerStories />
       <CTABanner />
       <ReactTooltip

@@ -1,6 +1,6 @@
 import React from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
@@ -17,20 +17,27 @@ import { Button } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ShareArticleActions from '../../components/Blog/ShareArticleActions'
+import { useTheme } from 'next-themes'
+import { VideoCameraIcon } from '@heroicons/react/solid'
 
 type EventType = 'webinar' | 'launch_week' | 'conference'
 
-type EventData = {
+type CTA = {
+  url: string
+  label?: string
+  target?: '_blank' | '_self'
+}
+
+interface EventData {
   title: string
   subtitle?: string
-  registration_url?: string
+  main_cta?: CTA
   description: string
   type: EventType
   duration?: string
   timezone?: string
   tags?: string[]
   date: string
-  toc_depth?: number
   speakers: string
   image?: string
   thumb?: string
@@ -93,6 +100,8 @@ export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({ p
 }
 
 const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) => {
+  const { resolvedTheme } = useTheme()
+  const isDarkMode = resolvedTheme?.includes('dark')!
   const content = event.content
   const speakersArray = event.speakers?.split(',')
   const speakers = speakersArray
@@ -108,6 +117,14 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
     description: event.meta_description ?? event.description,
     url: `https://supabase.com/events/${event.slug}`,
   }
+
+  const eventIcons = {
+    webinar: (props: any) => <VideoCameraIcon {...props} />,
+    conference: (props: any) => <VideoCameraIcon {...props} />,
+    launch_week: (props: any) => <VideoCameraIcon {...props} />,
+  }
+
+  const Icon = eventIcons[event.type]
 
   return (
     <>
@@ -140,11 +157,17 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
       />
       <DefaultLayout>
         <div className="flex flex-col w-full">
-          <header className="bg-alternative w-full">
-            <SectionContainer className="grid lg:min-h-[400px] h-full grid-cols-1 lg:grid-cols-2 gap-8 text-foreground-light">
+          <header className="relative bg-alternative w-full overflow-hidden">
+            <img
+              src={`/images/events/events-bg-${isDarkMode ? 'dark' : 'light'}.svg`}
+              alt=""
+              className="not-sr-only w-full h-full absolute inset-0 object-cover object-bottom"
+            />
+            <SectionContainer className="relative z-10 grid lg:min-h-[400px] h-full grid-cols-1 lg:grid-cols-2 gap-8 text-foreground-light">
               <div className="h-full flex flex-col justify-between">
                 <div className="flex flex-col gap-2 md:gap-3 items-start mb-8">
-                  <div className="flex flex-row text-sm">
+                  <div className="flex flex-row text-sm items-center flex-wrap">
+                    <Icon className="w-4 h-4 text-brand mr-2" />{' '}
                     <span className="uppercase text-brand font-mono">{event.type}</span>
                     <span className="mx-3 px-3 border-x">
                       {dayjs(event.date).format(`DD MMM YYYY [at] hA [${event.timezone}]`)}
@@ -161,26 +184,35 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     disabled={!IS_REGISTRATION_OPEN}
                     asChild
                   >
-                    <Link href={event.registration_url ?? '#'}>
-                      {IS_REGISTRATION_OPEN ? 'Register to this event' : 'Registrations are closed'}
+                    <Link
+                      href={event.main_cta?.url ?? '#'}
+                      target={event.main_cta?.target ? event.main_cta?.target : undefined}
+                    >
+                      {IS_REGISTRATION_OPEN
+                        ? event.main_cta?.label
+                          ? event.main_cta?.label
+                          : 'Register to this event'
+                        : 'Registrations are closed'}
                     </Link>
                   </Button>
                 </div>
                 <div className="flex flex-col">
                   <p>Share on</p>
-                  <ShareArticleActions title={meta.title} slug={meta.url} />
+                  <ShareArticleActions title={meta.title} slug={meta.url} basePath="" />
                 </div>
               </div>
-              <div className="relative w-full aspect-[2/1] lg:aspect-[3/2] overflow-auto rounded-lg border">
-                {/* <Image
-                  src={`/images/events/` + (event.thumb ? event.thumb : event.image)}
-                  fill
-                  sizes="100%"
-                  quality={100}
-                  className="object-cover"
-                  alt="event thumbnail"
-                /> */}
-              </div>
+              {!!event.image && (
+                <div className="relative w-full aspect-[2/1] lg:aspect-[3/2] overflow-auto rounded-lg border z-10">
+                  <Image
+                    src={`/images/events/` + event.image}
+                    fill
+                    sizes="100%"
+                    quality={100}
+                    className="object-cover object-center"
+                    alt={`${event.title} thumbnail`}
+                  />
+                </div>
+              )}
             </SectionContainer>
           </header>
           <SectionContainer className="grid lg:grid-cols-3 gap-12">
@@ -199,8 +231,15 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   disabled={!IS_REGISTRATION_OPEN}
                   asChild
                 >
-                  <Link href={event.registration_url ?? '#'}>
-                    {IS_REGISTRATION_OPEN ? 'Register now' : 'Registrations are closed'}
+                  <Link
+                    href={event.main_cta?.url ?? '#'}
+                    target={event.main_cta?.target ? event.main_cta?.target : undefined}
+                  >
+                    {IS_REGISTRATION_OPEN
+                      ? event.main_cta?.label
+                        ? event.main_cta?.label
+                        : 'Register now'
+                      : 'Registrations are closed'}
                   </Link>
                 </Button>
               </aside>
