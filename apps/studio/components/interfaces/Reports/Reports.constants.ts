@@ -264,7 +264,7 @@ from edge_logs f
   cross join unnest(m.request) as r
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
-where starts_with(r.path, '/storage/v1/object') 
+where starts_with(r.path, '/storage/v1/object')
   and r.method = 'GET'
   and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
 group by path, search
@@ -314,8 +314,12 @@ select
     auth.rolname,
     statements.query,
     statements.calls,
+    -- -- Postgres 13, 14, 15
     statements.total_exec_time + statements.total_plan_time as total_time,
     to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time
+    -- -- Postgres <= 12
+    -- statements.total_time,
+    -- to_char(((statements.total_time)/sum(statements.total_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   ${where || ''}
@@ -369,12 +373,12 @@ select
     queries: {
       largeObjects: {
         queryType: 'db',
-        sql: (_) => `SELECT 
+        sql: (_) => `SELECT
         SCHEMA_NAME,
         relname,
         table_size
       FROM
-        (SELECT 
+        (SELECT
           pg_catalog.pg_namespace.nspname AS SCHEMA_NAME,
           relname,
           pg_relation_size(pg_catalog.pg_class.oid) AS table_size
