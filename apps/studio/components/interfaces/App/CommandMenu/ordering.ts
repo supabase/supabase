@@ -2,6 +2,18 @@ import type { ICommandSection } from 'ui-patterns/CommandMenu/internal/CommandSe
 
 const DEFAULT_PRIORITY = 10
 
+/**
+ * Order sections in the command menu by a numbered priority. The lower the
+ * number, the higher the priority.
+ *
+ * Specify the priority when creating or updating the section by passing the
+ * option `{ sectionMeta: { priority: number } }`.
+ *
+ * The priority rankings are roughly as follows:
+ * 1. Super important, stick to top. Reserved for lint warnings, etc., right now.
+ * 2. We want to highlight this and encourage people to use it.
+ * 3. Easy access for most important features/commands.
+ */
 export function orderCommandSectionsByPriority(sections: Array<ICommandSection>) {
   return sections
     .slice()

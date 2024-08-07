@@ -27,6 +27,7 @@ export function useProjectSwitchCommand() {
           commands: projects.map(({ name, ref }) => ({
             id: `project-${ref}`,
             name,
+            value: `${name} (${ref})`,
             route: `/project/${ref}`,
             icon: () => <Forward />,
           })),

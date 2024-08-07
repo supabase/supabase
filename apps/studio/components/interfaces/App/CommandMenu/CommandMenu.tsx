@@ -11,6 +11,7 @@ import { useApiKeysCommands } from './ApiKeys'
 import { useProjectSwitchCommand } from './ProjectSwitcher'
 import { useLayoutNavCommands } from 'components/layouts/useLayoutNavCommands'
 import { useApiUrlCommand } from './ApiUrl'
+import { orderCommandSectionsByPriority } from './ordering'
 
 export default function StudioCommandMenu() {
   useAdvisorsLintCommands()
@@ -19,8 +20,12 @@ export default function StudioCommandMenu() {
   useProjectSwitchCommand()
   useBranchCommands()
   useLayoutNavCommands()
-  useDocsSearchCommands()
-  useDocsAiCommands()
+  useDocsSearchCommands({
+    options: { orderSection: orderCommandSectionsByPriority, sectionMeta: { priority: 3 } },
+  })
+  useDocsAiCommands({
+    options: { orderSection: orderCommandSectionsByPriority, sectionMeta: { priority: 3 } },
+  })
   useSupportCommands({ enabled: IS_PLATFORM })
   useChangelogCommand({ enabled: IS_PLATFORM })
   useThemeSwitcherCommands()
