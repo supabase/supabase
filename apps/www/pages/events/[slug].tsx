@@ -26,9 +26,11 @@ import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
+dayjs.extend(advancedFormat)
 
 type EventType = 'webinar' | 'launch_week' | 'conference'
 
@@ -158,6 +160,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
             {
               url: `${origin}${router.basePath}/images/events/${event.image ? event.image : event.thumb}`,
               alt: `${event.title} thumbnail`,
+              width: 1200,
+              height: 627,
             },
           ],
           videos: event.video
@@ -183,11 +187,18 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
         <div className="flex flex-col w-full">
           <header className="relative bg-alternative w-full overflow-hidden">
             <Image
-              src={`/images/events/events-bg-${isDarkMode ? 'dark' : 'light'}.svg`}
+              src="/images/events/events-bg-dark.svg"
               alt=""
               fill
               sizes="100%"
-              className="not-sr-only w-full h-full absolute inset-0 object-cover object-bottom"
+              className="not-sr-only hidden dark:block w-full h-full absolute inset-0 object-cover object-bottom"
+            />
+            <Image
+              src="/images/events/events-bg-light.svg"
+              alt=""
+              fill
+              sizes="100%"
+              className="not-sr-only block dark:hidden w-full h-full absolute inset-0 object-cover object-bottom"
             />
             <SectionContainer className="relative z-10 grid lg:min-h-[400px] h-full grid-cols-1 lg:grid-cols-2 gap-8 text-foreground-light">
               <div className="h-full flex flex-col justify-between">
@@ -196,10 +207,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     <Icon className="hidden sm:inline-block w-4 h-4 text-brand mr-2" />
                     <span className="uppercase text-brand font-mono">{event.type}</span>
                     <span className="mx-3 px-3 border-x">
-                      {dayjs(event.date)
-                        // @ts-ignore
-                        .tz(event.timezone)
-                        .format(`DD MMM YYYY [at] hA [${event.timezone}]`)}
+                      {dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY [at] hA z`)}
                     </span>
                     <span className="">Duration: {event.duration}</span>
                   </div>
