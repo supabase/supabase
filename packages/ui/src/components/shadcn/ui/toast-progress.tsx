@@ -35,7 +35,7 @@ export const ToastProgress = ({
       </div>
       <Progress value={progress} className="w-full" />
       <div className="flex flex-row gap-2 items-center">
-        <small className="text-foreground-muted text-xs">
+        <small className="text-foreground-lighter text-xs">
           Please do not close the browser until completed
         </small>
         {action}
