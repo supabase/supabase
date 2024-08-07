@@ -126,6 +126,23 @@ Response headers:
 - `sb-gateway-mode`
 - `sb-gateway-version`
 
+### Additional request metadata
+
+To attach additional metadata to a request, it is recommended to use the `User-Agent` header for purposes such as device or version identification.
+
+For example:
+
+```
+node MyApp/1.2.3 (device-id:abc123)
+Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0 MyApp/1.2.3 (Foo v1.3.2; Bar v2.2.2)
+```
+
+<Admonition type="note">
+
+Do not log Personal Identifiable Information (PII) within the `User-Agent` header, to avoid infringing data protection privacy laws. Overly fine-grained and detailed user agents may allow fingerprinting and identification of the end user through PII.
+
+</Admonition>
+
 ## Logging Postgres queries
 
 To enable query logs for other categories of statements:
