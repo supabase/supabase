@@ -180,7 +180,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     <Icon className="hidden sm:inline-block w-4 h-4 text-brand mr-2" />
                     <span className="uppercase text-brand font-mono">{event.type}</span>
                     <span className="mx-3 px-3 border-x">
-                      {dayjs(event.date).format(`DD MMM YYYY [at] hA [${event.timezone}]`)}
+                      {dayjs(event.date).format(`DD MMM YYYY [at] hA`)}
                     </span>
                     <span className="">Duration: {event.duration}</span>
                   </div>
