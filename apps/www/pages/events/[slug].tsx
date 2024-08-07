@@ -147,8 +147,6 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
       ? process.env.VERCEL_URL
       : 'https://supabase.com'
 
-  console.log(process.env.VERCEL_URL)
-
   return (
     <>
       <NextSeo
@@ -161,7 +159,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
           type: 'article',
           images: [
             {
-              url: `${origin}${router.basePath}/images/events/${event.image ? event.image : event.thumb}`,
+              url: `${origin}${router.basePath}/images/events/${event.thumb ? event.thumb : event.image}`,
               alt: `${event.title} thumbnail`,
               width: 1200,
               height: 627,
