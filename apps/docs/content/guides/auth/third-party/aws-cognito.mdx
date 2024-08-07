@@ -34,7 +34,31 @@ const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABAS
 
 <TabPanel id="create-client-swift" label="Swift (iOS)">
 
-TODO!
+```swift
+import Supabase
+import AWSPluginsCore
+
+struct UnexpectedAuthSessionError: Error {}
+
+let supabase = SupabaseClient(
+  supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
+  supabaseKey: "SUPABASE_ANON_KEY",
+  options: SupabaseClientOptions(
+    auth: SupabaseClientOptions.AuthOptions(
+      accessToken: {
+        let session = try await Amplify.Auth.fetchAuthSession()
+
+        guard let cognitoTokenProvider = session as? AuthCognitoTokensProvider else {
+          throw UnexpectedAuthSessionError()
+        }
+
+        let tokens = try cognitoTokenProvider.getCognitoTokens().get()
+        return tokens.idToken
+      }
+    )
+  )
+)
+```
 
 </TabPanel>
 
