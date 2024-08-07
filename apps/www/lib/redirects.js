@@ -1573,11 +1573,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/passwordless-login',
-    destination: '/docs/guides/auth/phone-login',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/auth/passwordless-login/phone-sms-otp-messagebird',
     destination: '/docs/guides/auth/phone-login/messagebird',
   },
