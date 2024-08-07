@@ -11,6 +11,7 @@ import { projectKeys } from './keys'
 const WHITELIST_ERRORS = [
   'The following organization members have reached their maximum limits for the number of active free projects',
   'db_pass must be longer than or equal to 4 characters',
+  'There are overdue invoices in the organization(s)',
 ]
 
 export type DbInstanceSize = components['schemas']['DesiredInstanceSize']
