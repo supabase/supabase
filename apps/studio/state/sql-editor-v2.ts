@@ -7,7 +7,9 @@ import { UpsertContentPayloadV2, upsertContent } from 'data/content/content-upse
 import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder, SnippetFolderResponse } from 'data/content/sql-folders-query'
-import { SqlSnippet, SqlSnippets } from 'data/content/sql-snippets-query'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { getQueryClient } from 'data/query-client'
+import { contentKeys } from 'data/content/keys'
 
 export type StateSnippetFolder = {
   projectRef: string
@@ -67,6 +69,7 @@ export const sqlEditorState = proxy({
   },
   limit: 100,
   order: 'inserted_at' as 'name' | 'inserted_at',
+  privateSnippetCount: 0,
 
   get sortedSnippets() {
     return Object.values(sqlEditorState.snippets)
@@ -129,6 +132,8 @@ export const sqlEditorState = proxy({
   },
 
   setOrder: (value: 'name' | 'inserted_at') => (sqlEditorState.order = value),
+
+  setPrivateSnippetCount: (value: number) => (sqlEditorState.privateSnippetCount = value),
 
   addSnippet: ({ projectRef, snippet }: { projectRef: string; snippet: Snippet }) => {
     if (snippet.id && sqlEditorState.snippets[snippet.id]?.snippet?.content === undefined) {
@@ -322,10 +327,11 @@ export const useSqlEditorV2StateSnapshot = (options?: Parameters<typeof useSnaps
 async function upsertSnippet(id: string, projectRef: string, payload: UpsertContentPayloadV2) {
   try {
     sqlEditorState.savingStates[id] = 'UPDATING'
-    await upsertContent({
-      projectRef,
-      payload,
-    })
+    await upsertContent({ projectRef, payload })
+
+    const queryClient = getQueryClient()
+    await queryClient.invalidateQueries(contentKeys.count(projectRef, 'sql'))
+
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
     sqlEditorState.savingStates[id] = 'UPDATING_FAILED'

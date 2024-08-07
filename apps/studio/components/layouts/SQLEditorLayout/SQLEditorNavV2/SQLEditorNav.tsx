@@ -9,7 +9,7 @@ import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { getContentById, useContentIdQuery } from 'data/content/content-id-query'
+import { getContentById } from 'data/content/content-id-query'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import {
   getSQLSnippetFolders,
@@ -85,6 +85,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const snippet = snapV2.snippets[id as string]?.snippet
 
   const privateSnippets = contents.filter((snippet) => snippet.visibility === 'user')
+  const numPrivateSnippets = snapV2.privateSnippetCount
   const privateSnippetsTreeState =
     folders.length === 0 && Object.keys(snapV2.snippets).length === 0
       ? [ROOT_NODE]
@@ -130,8 +131,16 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     },
   })
 
-  const { data } = useContentCountQuery({ projectRef, type: 'sql' })
-  const numPrivateSnippets = data?.count ?? 0
+  useContentCountQuery(
+    { projectRef, type: 'sql' },
+    {
+      onSuccess(data) {
+        if (projectRef !== undefined) {
+          snapV2.setPrivateSnippetCount(data.count)
+        }
+      },
+    }
+  )
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onError: (error, data) => {
@@ -188,6 +197,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const onConfirmShare = () => {
     if (!selectedSnippetToShare) return console.error('Snippet ID is required')
     snapV2.shareSnippet(selectedSnippetToShare.id, 'project')
+    snapV2.setPrivateSnippetCount(snapV2.privateSnippetCount - 1)
     setSelectedSnippetToShare(undefined)
     setShowSharedSnippets(true)
   }
@@ -195,6 +205,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const onConfirmUnshare = () => {
     if (!selectedSnippetToUnshare) return console.error('Snippet ID is required')
     snapV2.shareSnippet(selectedSnippetToUnshare.id, 'user')
+    snapV2.setPrivateSnippetCount(snapV2.privateSnippetCount + 1)
     setSelectedSnippetToUnshare(undefined)
     setShowPrivateSnippets(true)
   }
