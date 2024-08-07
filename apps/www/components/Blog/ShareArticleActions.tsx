@@ -11,34 +11,39 @@ const ShareArticleActions = ({
   slug: string
   iconSize?: number
   basePath?: string
-}) => (
-  <div className="mt-4 flex items-center gap-4">
-    <Link
-      aria-label="Share on X"
-      href={`https://twitter.com/share?text=${title}&url=${basePath}${slug}`}
-      target="_blank"
-      className="text-foreground-lighter hover:text-foreground"
-    >
-      <IconTwitterX size={iconSize} />
-    </Link>
+}) => {
+  const permalink = encodeURIComponent(`${basePath}${slug}`)
+  const encodedTitle = encodeURIComponent(title)
 
-    <Link
-      aria-label="Share on Linkedin"
-      href={`https://www.linkedin.com/shareArticle?url=${basePath}${slug}&title=${title}&text=${title}`}
-      target="_blank"
-      className="text-foreground-lighter hover:text-foreground"
-    >
-      <IconLinkedinSolid size={iconSize} />
-    </Link>
-    <Link
-      aria-label="Share on Hacker News"
-      href={`https://news.ycombinator.com/submitlink?u=${basePath}${slug}&t=${title}`}
-      target="_blank"
-      className="text-foreground-lighter hover:text-foreground"
-    >
-      <IconYCombinator size={iconSize} />
-    </Link>
-  </div>
-)
+  return (
+    <div className="mt-4 flex items-center gap-4">
+      <Link
+        aria-label="Share on X"
+        href={`https://twitter.com/intent/tweet?url=${permalink}&text=${encodedTitle}`}
+        target="_blank"
+        className="text-foreground-lighter hover:text-foreground"
+      >
+        <IconTwitterX size={iconSize} />
+      </Link>
+
+      <Link
+        aria-label="Share on Linkedin"
+        href={`https://www.linkedin.com/shareArticle?url=${permalink}&text=${encodedTitle}`}
+        target="_blank"
+        className="text-foreground-lighter hover:text-foreground"
+      >
+        <IconLinkedinSolid size={iconSize} />
+      </Link>
+      <Link
+        aria-label="Share on Hacker News"
+        href={`https://news.ycombinator.com/submitlink?u=${permalink}&t=${encodedTitle}`}
+        target="_blank"
+        className="text-foreground-lighter hover:text-foreground"
+      >
+        <IconYCombinator size={iconSize} />
+      </Link>
+    </div>
+  )
+}
 
 export default ShareArticleActions

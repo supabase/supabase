@@ -270,6 +270,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                               className="rounded-full object-cover border border-default w-full h-full"
                               alt={`${speaker.author} avatar`}
                               fill
+                              draggable={false}
                             />
                           )}
                         </div>
