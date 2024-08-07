@@ -2,7 +2,6 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useTheme } from 'next-themes'
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
@@ -112,8 +111,6 @@ export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({ p
 }
 
 const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const { resolvedTheme } = useTheme()
-  const isDarkMode = resolvedTheme?.includes('dark')!
   const content = event.content
   const speakersArray = event.speakers?.split(',')
   const speakers = speakersArray
@@ -144,7 +141,13 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
     await Telemetry.sendEvent(event, telemetryProps, router)
   }
 
-  const origin = isBrowser ? location.origin : 'https://supabase.com'
+  const origin = isBrowser
+    ? location.origin
+    : process.env.VERCEL_URL
+      ? process.env.VERCEL_URL
+      : 'https://supabase.com'
+
+  console.log(process.env.VERCEL_URL)
 
   return (
     <>
@@ -289,22 +292,26 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   <h2 className="text-foreground-light text-sm font-mono uppercase">Speakers</h2>
                   <ul className="list-none flex flex-col md:flex-row flex-wrap lg:flex-col gap-4 md:gap-8 lg:gap-4">
                     {speakers?.map((speaker) => (
-                      <li key={speaker?.author_id} className="flex gap-4">
-                        <div className="relative ring-background w-10 h-10 md:w-12 md:h-12 rounded-full ring-2">
-                          {speaker?.author_image_url && (
-                            <Image
-                              src={speaker.author_image_url}
-                              className="rounded-full object-cover border border-default w-full h-full"
-                              alt={`${speaker.author} avatar`}
-                              fill
-                              draggable={false}
-                            />
-                          )}
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <p>{speaker?.author}</p>
-                          <span className="text-xs text-foreground-light">{speaker?.position}</span>
-                        </div>
+                      <li key={speaker?.author_id}>
+                        <Link href={speaker.author_url} target="_blank" className="flex gap-4">
+                          <div className="relative ring-background w-10 h-10 md:w-12 md:h-12 rounded-full ring-2 cursor-pointer">
+                            {speaker?.author_image_url && (
+                              <Image
+                                src={speaker.author_image_url}
+                                className="rounded-full object-cover border border-default w-full h-full"
+                                alt={`${speaker.author} avatar`}
+                                fill
+                                draggable={false}
+                              />
+                            )}
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <p>{speaker?.author}</p>
+                            <span className="text-xs text-foreground-light">
+                              {speaker?.position}
+                            </span>
+                          </div>
+                        </Link>
                       </li>
                     ))}
                   </ul>
