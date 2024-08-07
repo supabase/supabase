@@ -36,7 +36,26 @@ const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABAS
 
 <TabPanel id="create-client-swift" label="Swift (iOS)">
 
-TODO!
+```swift
+import Auth0
+import Supabase
+
+extension CredentialsManager {
+  static let shared = Auth0.CredentialsManager(authentication: Auth0.authentication())
+}
+
+let supabase = SupabaseClient(
+  supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
+  supabaseKey: "SUPABASE_ANON_KEY",
+  options: SupabaseClientOptions(
+    auth: SupabaseClientOptions.AuthOptions(
+      accessToken: {
+        try await CredentialsManager.shared.credentials().idToken
+      }
+    )
+  )
+)
+```
 
 </TabPanel>
 
