@@ -97,7 +97,7 @@ const csp = [
  */
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
-  output: 'standalone',
+  output: process.env.DOCKER_CONTAINER ? 'standalone' : undefined,
   experimental: {
     webpackBuildWorker: true,
   },
