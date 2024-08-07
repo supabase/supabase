@@ -24,6 +24,15 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
+const utc = require('dayjs/plugin/utc')
+// import utc from 'dayjs/plugin/utc' // ES 2015
+
+const timezone = require('dayjs/plugin/timezone') // dependent on utc plugin
+// import timezone from 'dayjs/plugin/timezone' // ES 2015
+
+dayjs.extend(timezone)
+dayjs.extend(utc)
+
 type EventType = 'webinar' | 'launch_week' | 'conference'
 
 type CTA = {
@@ -105,6 +114,8 @@ export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({ p
 
 const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) => {
   const { resolvedTheme } = useTheme()
+  const defaultTz = dayjs.tz.guess()
+  console.log('defaultTz', defaultTz)
   const isDarkMode = resolvedTheme?.includes('dark')!
   const content = event.content
   const speakersArray = event.speakers?.split(',')
@@ -180,7 +191,10 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     <Icon className="hidden sm:inline-block w-4 h-4 text-brand mr-2" />
                     <span className="uppercase text-brand font-mono">{event.type}</span>
                     <span className="mx-3 px-3 border-x">
-                      {dayjs(event.date).format(`DD MMM YYYY [at] hA`)}
+                      {dayjs(event.date)
+                        // @ts-ignore
+                        .tz(event.timezone)
+                        .format(`DD MMM YYYY [at] hA [${event.timezone}]`)}
                     </span>
                     <span className="">Duration: {event.duration}</span>
                   </div>
