@@ -68,7 +68,7 @@ const TableEditorMenu = () => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       schema: snap.selectedSchemaName,
-      search: searchText || undefined,
+      search: searchText.trim() || undefined,
       sort,
       filterTypes: visibleTypes,
     },
@@ -163,7 +163,7 @@ const TableEditorMenu = () => {
               name="search-tables"
               aria-labelledby="Search tables"
               onChange={(e) => {
-                setSearchText(e.target.value.trim())
+                setSearchText(e.target.value)
               }}
               value={searchText}
               placeholder="Search tables..."

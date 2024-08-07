@@ -215,9 +215,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                       >
                         <div className="text-xs text-foreground p-1 leading-relaxed">
                           <p>RLS is enabled for this table, but no policies are set. </p>
-                          <p>
-                            Select queries will return an <u>empty array</u> of results.
-                          </p>
+                          <p>Select queries may return 0 results.</p>
                         </div>
                       </div>
                     </Tooltip.Content>
