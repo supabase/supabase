@@ -3,7 +3,6 @@ import content from '~/data/home/content'
 import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
 import HeroFrameworks from '~/components/Hero/HeroFrameworks'
-import SectionContainer from '../components/Layouts/SectionContainer'
 
 const Products = dynamic(() => import('~/components/Products/index'))
 const Logos = dynamic(() => import('~/components/logos'))
