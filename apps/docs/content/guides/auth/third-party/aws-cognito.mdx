@@ -64,7 +64,25 @@ let supabase = SupabaseClient(
 
 <TabPanel id="create-client-flutter" label="Flutter">
 
-TODO!
+```dart
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<void> main() async {
+  await Supabase.initialize(
+    url: 'https://<supabase-project>.supabase.co',
+    anonKey: 'SUPABASE_ANON_KEY',
+    accessToken: () async {
+      final session = await Amplify.Auth.fetchAuthSession();
+      final cognitoSession = session as CognitoAuthSession;
+      return cognitoSession.userPoolTokensResult.value.accessToken.raw;
+    },
+  );
+  runApp(const MyApp());
+}
+```
 
 </TabPanel>
 

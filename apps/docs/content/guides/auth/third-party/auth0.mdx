@@ -61,7 +61,24 @@ let supabase = SupabaseClient(
 
 <TabPanel id="create-client-flutter" label="Flutter">
 
-TODO!
+```dart 
+import 'package:auth0_flutter/auth0_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<void> main() async {
+  final auth0 = Auth0('AUTH0_DOMAIN', 'AUTH0_CLIENT_ID');
+  await Supabase.initialize(
+    url: 'https://<supabase-project>.supabase.co',
+    anonKey: 'SUPABASE_ANON_KEY',
+    accessToken: () async {
+      final credentials = await auth0.credentialsManager.credentials();
+      return credentials.accessToken;
+    },
+  );
+  runApp(const MyApp());
+}
+```
 
 </TabPanel>
 
