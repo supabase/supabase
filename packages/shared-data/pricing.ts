@@ -230,7 +230,7 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Multi-Factor Auth - TOTP',
+        title: 'Basic Multi-Factor Auth',
         plans: {
           free: true,
           pro: true,
@@ -238,12 +238,12 @@ export const pricing: Pricing = {
           enterprise: true,
         },
         tooltips: {
-          main: 'Multi-factor authentication (MFA), sometimes called two-factor authentication (2FA), using Time-based One Time Passwords.',
+          main: 'Multi-factor authentication (MFA), sometimes called two-factor authentication (2FA), using Time-based One Time Passwords (TOTP) via an Authenticator App.',
         },
         usage_based: false,
       },
       {
-        title: 'Multi-Factor Auth - Phone',
+        title: 'Advanced Multi-Factor Auth - Phone',
         plans: {
           free: false,
           pro: ['$75 per month for first project', 'then $10 per month per additional projects'],
@@ -251,12 +251,12 @@ export const pricing: Pricing = {
           enterprise: 'Custom',
         },
         tooltips: {
-          main: 'Multi-factor authentication (MFA), sometimes called two-factor authentication (2FA), using SMS.\nAdditional fees apply based on your SMS provider.',
+          main: 'Multi-factor authentication (MFA), sometimes called two-factor authentication (2FA), using SMS or WhatsApp messages.\nAdditional fees apply based on your provider.',
         },
         usage_based: false,
       },
       {
-        title: 'Third-Party Auth',
+        title: 'Third-Party MAUs',
         plans: {
           free: '50 included',
           pro: ['50 included', 'then $0.00325 per MAU'],
@@ -264,7 +264,7 @@ export const pricing: Pricing = {
           enterprise: 'Custom',
         },
         tooltips: {
-          main: 'Users who request the API through a third-party token.\nBilling is based on the sum of distinct third-party users requesting your API through the billing period. Resets every billing cycle.',
+          main: 'Users who use the Supabase platform through a third-party authentication provider (Firebase Auth, Auth0 or Cognito).\nBilling is based on the sum of distinct third-party users requesting your API through the billing period. Resets every billing cycle.',
         },
         usage_based: true,
       },
