@@ -1,5 +1,6 @@
 import { IS_PLATFORM } from 'common'
 import { useAdvisorsLintCommands } from 'components/layouts/AdvisorsLayout/Advisors.Commands'
+import { useSnippetCommands } from 'components/layouts/SQLEditorLayout/SqlEditor.Commands'
 import { CommandHeader, CommandInput, CommandList, CommandMenu } from 'ui-patterns/CommandMenu'
 import { useChangelogCommand } from 'ui-patterns/CommandMenu/prepackaged/Changelog'
 import { useDocsAiCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsAi'
@@ -19,6 +20,7 @@ export default function StudioCommandMenu() {
   useApiUrlCommand()
   useProjectSwitchCommand()
   useBranchCommands()
+  useSnippetCommands()
   useLayoutNavCommands()
   useDocsSearchCommands({
     options: { orderSection: orderCommandSectionsByPriority, sectionMeta: { priority: 3 } },

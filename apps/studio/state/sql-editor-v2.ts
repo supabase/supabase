@@ -7,7 +7,7 @@ import { UpsertContentPayloadV2, upsertContent } from 'data/content/content-upse
 import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder, SnippetFolderResponse } from 'data/content/sql-folders-query'
-import { SqlSnippet, SqlSnippets } from 'data/content/sql-snippets-query'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
 
 export type StateSnippetFolder = {
   projectRef: string
