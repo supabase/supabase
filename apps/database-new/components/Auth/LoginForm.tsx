@@ -1,28 +1,36 @@
 import { Button } from '@ui/components/Button'
 import { Github } from 'lucide-react'
-import { cookies, headers } from 'next/headers'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
 
 export default function LoginForm({ searchParams }: { searchParams?: { message?: string } }) {
+  // Function to initiate GitHub OAuth sign-in
   const signUp = async () => {
-    'use server'
+    try {
+      // Get the current origin (domain and protocol)
+      const origin = headers().get('origin')
+      // Create a Supabase client instance
+      const supabase = createClient()
+      // Initiate GitHub OAuth sign-in with Supabase
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: { redirectTo: `${origin}/auth/callback` },
+      })
 
-    const origin = headers().get('origin')
+      // Handle error if authentication fails
+      if (error) {
+        throw new Error(error.message)
+      }
 
-    const supabase = createClient()
-
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: { redirectTo: `${origin}/auth/callback` },
-    })
-
-    if (error) {
-      console.log(error.message)
-      return redirect(`/login?message=${error.message}`)
-    } else {
+      // Redirect to the GitHub OAuth URL received from Supabase
       return redirect(data.url)
+    } catch (error) {
+      // Log sign-in error to console
+      console.error('Sign-in error:', error.message)
+      // Redirect to the login page with an encoded error message in the query string
+      return redirect(`/login?message=${encodeURIComponent(error.message)}`)
     }
   }
 
@@ -30,7 +38,7 @@ export default function LoginForm({ searchParams }: { searchParams?: { message?:
     <div className="flex flex-col justify-center h-full w-full px-8 sm:max-w-sm gap-2 mx-auto">
       <form
         className="animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground"
-        action={signUp}
+        onSubmit={signUp} // Handle form submission with signUp function
       >
         <div className="flex items-center gap-x-2 justify-center mb-4">
           <span className="text-foreground-light">Sign in to</span>{' '}
@@ -41,9 +49,10 @@ export default function LoginForm({ searchParams }: { searchParams?: { message?:
           </div>
         </div>
         <div className="grid gap-2 mb-4">
-          <p className="text-center text-sm ">You need to sign in to generate a schema</p>
+          <p className="text-center text-sm">You need to sign in to generate a schema</p>
           <p className="text-center text-xs">Takes just a few seconds</p>
         </div>
+        {/* GitHub OAuth sign-in button */}
         <Button
           className="border text-sm bg-surface-100 rounded-md px-4 py-2 text-foreground mb-2 flex items-center justify-center gap-x-2"
           type="default"
@@ -53,6 +62,7 @@ export default function LoginForm({ searchParams }: { searchParams?: { message?:
           Sign in with Github
         </Button>
 
+        {/* Display error message if present in searchParams */}
         {searchParams?.message && (
           <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
             {searchParams.message}
