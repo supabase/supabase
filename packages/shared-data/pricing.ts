@@ -90,9 +90,9 @@ export const pricing: Pricing = {
         },
         plans: {
           free: false,
-          pro: '$100 per 7 days',
-          team: '$100 per 7 days',
-          enterprise: '$100 per 7 days, >28 days available',
+          pro: '$100 per month per 7 days retention',
+          team: '$100 per month per 7 days retention',
+          enterprise: '$100 per month per 7 days retention, >28 days retention available',
         },
         usage_based: false,
       },
@@ -122,7 +122,7 @@ export const pricing: Pricing = {
       {
         title: 'Bandwidth',
         tooltips: {
-          main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor) in GB throughout your billing period.',
+          main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period.',
         },
         plans: {
           free: '5 GB included',
@@ -176,6 +176,19 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'Userdata data ownership',
+        tooltips: {
+          main: 'Full ownership and access to the underlying user data including encrypted passwords.',
+        },
+        plans: {
+          free: true,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
         title: 'Social OAuth providers',
         plans: {
           free: true,
@@ -216,6 +229,45 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'Multi-Factor Auth - TOTP',
+        plans: {
+          free: true,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        tooltips: {
+          main: 'Multi-factor authentication (MFA), sometimes called two-factor authentication (2FA), using Time-based One Time Passwords.',
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Multi-Factor Auth - Phone',
+        plans: {
+          free: false,
+          pro: ['$75 per month for first project', 'then $10 per month per additional projects'],
+          team: ['$75 per month for first project', 'then $10 per month per additional projects'],
+          enterprise: 'Custom',
+        },
+        tooltips: {
+          main: 'Multi-factor authentication (MFA), sometimes called two-factor authentication (2FA), using SMS.\nAdditional fees apply based on your SMS provider.',
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Third-Party Auth',
+        plans: {
+          free: '50 included',
+          pro: ['50 included', 'then $0.00325 per MAU'],
+          team: ['50 included', 'then $0.00325 per MAU'],
+          enterprise: 'Custom',
+        },
+        tooltips: {
+          main: 'Users who request the API through a third-party token.\nBilling is based on the sum of distinct third-party users requesting your API through the billing period. Resets every billing cycle.',
+        },
+        usage_based: true,
+      },
+      {
         title: 'Single Sign-On (SAML 2.0)',
         plans: {
           free: false,
@@ -223,6 +275,7 @@ export const pricing: Pricing = {
           team: ['50 included', 'then $0.015 per MAU'],
           enterprise: 'Contact Us',
         },
+
         usage_based: false,
       },
       {
@@ -506,11 +559,9 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Log drain',
+        title: 'Log Drain',
         tooltips: {
-          main: 'Only events processed and sent to destinations are counted. Bandwidth required to export logs count towards usage.',
-          team: 'Volume discounts available.',
-          enterprise: 'Volume discounts available.',
+          main: 'Only events processed and sent to destinations are counted. Bandwidth required to export logs count towards usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
         },
         plans: {
           free: false,
