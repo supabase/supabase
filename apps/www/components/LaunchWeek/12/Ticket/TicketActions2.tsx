@@ -1,12 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import dayjs from 'dayjs'
-import NextImage from 'next/image'
 import Link from 'next/link'
 import { LW_URL, TWEET_TEXT, TWEET_TEXT_PLATINUM, TWEET_TEXT_SECRET } from '~/lib/constants'
 import { Button, cn, IconCheck } from 'ui'
 import { useParams } from '~/hooks/useParams'
-import LaunchWeekPrizeCard from '../LaunchWeekPrizeCard'
-import TicketCopy from './TicketCopy'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 
 export default function TicketActions2() {
@@ -78,10 +75,6 @@ export default function TicketActions2() {
 
   return (
     <div className="flex flex-col gap-4 ">
-      {/* <LabelBadge text="5 sets" /> */}
-      {/* <p className="text-foreground-light text-sm">
-        Boost your chances of winning Supabase LW12 Wandrd backpack and other awards.
-      </p> */}
       <div
         className={cn(
           'w-full gap-2 flex flex-col items-center',
@@ -91,7 +84,7 @@ export default function TicketActions2() {
         <div className="flex flex-row flex-wrap justify-center w-full gap-2">
           <Button
             type="secondary"
-            size="small"
+            size="tiny"
             className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] opacity-50"
             disabled
             icon={<IconCheck strokeWidth={3} />}
@@ -102,7 +95,7 @@ export default function TicketActions2() {
             onClick={() => handleShare('twitter')}
             type={userData.shared_on_twitter ? 'secondary' : 'default'}
             icon={userData.shared_on_twitter && <IconCheck strokeWidth={3} />}
-            size="small"
+            size="tiny"
             className="px-2 lg:px-3.5 h-[28px] lg:h-[34px]"
             asChild
           >
@@ -114,7 +107,7 @@ export default function TicketActions2() {
             onClick={() => handleShare('linkedin')}
             type={userData.shared_on_linkedin ? 'secondary' : 'default'}
             icon={userData.shared_on_linkedin && <IconCheck strokeWidth={3} />}
-            size="small"
+            size="tiny"
             className="px-2 lg:px-3.5 h-[28px] lg:h-[34px]"
             asChild
           >
@@ -122,7 +115,7 @@ export default function TicketActions2() {
               {userData.shared_on_linkedin ? 'Shared on Linkedin' : 'Share on Linkedin'}
             </Link>
           </Button>
-        </div>{' '}
+        </div>
       </div>
     </div>
   )
