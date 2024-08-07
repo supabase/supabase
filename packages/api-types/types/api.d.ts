@@ -3618,6 +3618,7 @@ export interface components {
       status: string
       subscription: string | null
       subtotal: number
+      payment_attempted: boolean
     }
     JoinResponse: {
       billing_email: string
