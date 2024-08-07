@@ -13,11 +13,11 @@ Users with weak passwords or compromised social login accounts are prone to mali
 - Something they know.
   Password, or access to a social-login account.
 - Something they have.
-  Access to an authenticator app (a.k.a. TOTP), mobile phone or recovery code.
+  Access to an authenticator app (a.k.a. TOTP) or mobile phone.
 
 ## Overview
 
-Supabase Auth implements only Time-based One Time Password(TOTP) multi-factor authentication. This type of multi-factor authentication uses a timed one-time password generated from an authenticator app in the control of users. The [MFA API](/docs/reference/javascript/auth-mfa-api) is enabled on all Supabase projects by default.
+Supabase Auth implements Time-based One Time Password (TOTP) and Phone One-Time-Password multi-factor authentication. This type of multi-factor authentication uses a timed one-time password generated from an authenticator app in the control of users. The [TOTP MFA API](/docs/reference/javascript/auth-mfa-api) is enabled on all Supabase projects by default while Phone MFA is available as part of the Auth Advanced MFA Add-on.
 
 Applications using MFA require two important flows:
 
@@ -102,7 +102,7 @@ Enrolling a factor for use with MFA takes three steps:
    they can type or paste into their authenticator app.
 2. Calling the `supabase.auth.mfa.challenge()` API.
    This prepares Supabase Auth to accept a verification code from the user
-   and returns a challenge ID.
+   and returns a challenge ID. In the case of Phone MFA this step also sends the verification code to the user.
 3. Calling the `supabase.auth.mfa.verify()` API.
    This verifies that the user has indeed added the secret from step (1) into
    their app and is working correctly. If the verification succeeds, the factor
@@ -567,15 +567,6 @@ If your application uses the Supabase Database, Storage or Edge Functions, just 
   size="medium"
   className="text-foreground-light mt-8 mb-6 [&>div]:space-y-4"
 >
-
-<AccordionItem
-header={<span className="text-foreground">Why is there a challenge and verify API when challenge does not do much?</span>}
-id="why-is-there-a-challenge-and-verify-api"
->
-
-TOTP is not going to be the only MFA factor Supabase Auth is going to support in the future. By separating out the challenge and verify steps, we're making the library forward compatible with new factors we may add in the future -- such as SMS or WebAuthn. For example, for SMS the `challenge` endpoint would actually send out the SMS with the authentication code. For convenience, you may use `challengeAndVerify` to create and verify a challenge in a single step.
-
-</AccordionItem>
 
 <AccordionItem
 header={<span className="text-foreground">What's inside the QR code?</span>}
