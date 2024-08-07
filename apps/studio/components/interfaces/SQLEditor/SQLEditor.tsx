@@ -58,6 +58,7 @@ import {
   compareAsModification,
   compareAsNewSnippet,
   createSqlSnippetSkeleton,
+  isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
@@ -132,6 +133,9 @@ const SQLEditor = () => {
   const [selectedDiffType, setSelectedDiffType] = useState<DiffType | undefined>(undefined)
   const [isFirstRender, setIsFirstRender] = useState(true)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
+
+  const [containsDestructiveOperations, setContainsDestructiveOperations] = useState(false)
+  const [containsUpdateWithoutWhereClause, setContainsUpdateWithoutWhereClause] = useState(false)
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
@@ -296,9 +300,13 @@ const SQLEditor = () => {
           ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
           : selectedValue || editorRef.current?.getValue()
 
-        const containsDestructiveOperations = checkDestructiveQuery(sql)
+        const destructiveOperations = checkDestructiveQuery(sql)
+        const updateWithoutWhereClause = isUpdateWithoutWhere(sql)
 
-        if (!force && containsDestructiveOperations) {
+        setContainsDestructiveOperations(destructiveOperations)
+        setContainsUpdateWithoutWhereClause(updateWithoutWhereClause)
+
+        if (!force && (containsDestructiveOperations || containsUpdateWithoutWhereClause)) {
           setIsConfirmModalOpen(true)
           return
         }
@@ -623,10 +631,18 @@ const SQLEditor = () => {
     <>
       <ConfirmModal
         visible={isConfirmModalOpen}
-        title="Destructive operation"
+        title={
+          containsDestructiveOperations
+            ? 'Destructive operation'
+            : 'Query uses UPDATE without WHERE'
+        }
         danger
-        description="We've detected a potentially destructive operation in the query. Please confirm that you would like to execute this query."
-        buttonLabel="Run destructive query"
+        description={
+          containsDestructiveOperations
+            ? 'We detected a potentially destructive operation in the query. Please confirm that you would like to execute this query.'
+            : 'Without a WHERE clause, this could update all rows in the table. Please confirm that you would like to execute this query.'
+        }
+        buttonLabel={containsDestructiveOperations ? 'Run destructive query' : 'Run update query'}
         onSelectCancel={() => {
           setIsConfirmModalOpen(false)
           // [Joshen] Somehow calling this immediately doesn't work, hence the timeout

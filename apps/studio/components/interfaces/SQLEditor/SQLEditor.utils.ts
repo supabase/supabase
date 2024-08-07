@@ -95,7 +95,14 @@ export function getDiffTypeDropdownLabel(diffType: DiffType) {
 }
 
 export function checkDestructiveQuery(sql: string) {
-  return destructiveSqlRegex.some((regex) => regex.test(removeCommentsFromSql(sql)))
+  const cleanedSql = removeCommentsFromSql(sql)
+  return destructiveSqlRegex.some((regex) => regex.test(cleanedSql))
+}
+
+// Function to check for UPDATE queries without WHERE clause
+export function isUpdateWithoutWhere(sql: string): boolean {
+  const updateWithoutWhereRegex = /^update\s+[\w.]+\s+set\s+[\w\W]+(?!where\s)/is
+  return updateWithoutWhereRegex.test(sql) && !/where\s/i.test(sql)
 }
 
 export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) =>
