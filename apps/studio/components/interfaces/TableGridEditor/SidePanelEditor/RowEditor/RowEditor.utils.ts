@@ -217,7 +217,6 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
       // truncated JSON values. If the user
       const isTruncated = isValueTruncated(field?.value)
       if (!isTruncated) {
-        console.log('passThrough')
         payload[property] = rowObject[property]
       }
     } else if (!isEqual(originalRow[property], rowObject[property])) {
