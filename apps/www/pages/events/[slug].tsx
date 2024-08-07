@@ -15,7 +15,7 @@ import { isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata } from '~/lib/posts'
-import { useTelemetryProps } from 'common'
+import { isBrowser, useTelemetryProps } from 'common'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 import gaEvents from '~/lib/gaEvents'
 
@@ -24,14 +24,11 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
-const utc = require('dayjs/plugin/utc')
-// import utc from 'dayjs/plugin/utc' // ES 2015
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 
-const timezone = require('dayjs/plugin/timezone') // dependent on utc plugin
-// import timezone from 'dayjs/plugin/timezone' // ES 2015
-
-dayjs.extend(timezone)
 dayjs.extend(utc)
+dayjs.extend(timezone)
 
 type EventType = 'webinar' | 'launch_week' | 'conference'
 
@@ -114,8 +111,6 @@ export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({ p
 
 const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) => {
   const { resolvedTheme } = useTheme()
-  const defaultTz = dayjs.tz.guess()
-  console.log('defaultTz', defaultTz)
   const isDarkMode = resolvedTheme?.includes('dark')!
   const content = event.content
   const speakersArray = event.speakers?.split(',')
@@ -147,6 +142,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
     await Telemetry.sendEvent(event, telemetryProps, router)
   }
 
+  const origin = isBrowser ? location.origin : 'https://supabase.com'
+
   return (
     <>
       <NextSeo
@@ -157,6 +154,12 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
           description: meta.description,
           url: meta.url,
           type: 'article',
+          images: [
+            {
+              url: `${origin}${router.basePath}/images/events/${event.image ? event.image : event.thumb}`,
+              alt: `${event.title} thumbnail`,
+            },
+          ],
           videos: event.video
             ? [
                 {
@@ -179,9 +182,11 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
       <DefaultLayout>
         <div className="flex flex-col w-full">
           <header className="relative bg-alternative w-full overflow-hidden">
-            <img
+            <Image
               src={`/images/events/events-bg-${isDarkMode ? 'dark' : 'light'}.svg`}
               alt=""
+              fill
+              sizes="100%"
               className="not-sr-only w-full h-full absolute inset-0 object-cover object-bottom"
             />
             <SectionContainer className="relative z-10 grid lg:min-h-[400px] h-full grid-cols-1 lg:grid-cols-2 gap-8 text-foreground-light">
