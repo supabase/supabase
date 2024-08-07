@@ -69,7 +69,7 @@ const InvoiceStatusBadge = ({ status, paymentAttempted }: InvoiceStatusBadgeProp
             ) &&
               (paymentAttempted ? (
                 <p className="text-xs text-foreground">
-                  We were not able to collect the money. Make sure you have a valid payment method
+                  We were not able to collect the payment. Make sure you have a valid payment method
                   and enough funds. Outstanding invoices may cause restrictions. You can manually
                   pay the invoice using the "Pay Now" button.
                 </p>
