@@ -6,7 +6,6 @@ import gaEvents from '~/lib/gaEvents'
 import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import AnnouncementBadge from '~/components/Announcement/Badge'
-import { ChevronRightIcon } from '@heroicons/react/outline'
 
 const Hero = () => {
   const router = useRouter()

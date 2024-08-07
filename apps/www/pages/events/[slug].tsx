@@ -1,24 +1,28 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { useTheme } from 'next-themes'
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import dayjs from 'dayjs'
 import matter from 'gray-matter'
+import { VideoCameraIcon } from '@heroicons/react/solid'
 
 import authors from 'lib/authors.json'
 import { isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata } from '~/lib/posts'
+import { useTelemetryProps } from 'common'
+import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import gaEvents from '~/lib/gaEvents'
 
 import { Button } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import ShareArticleActions from '../../components/Blog/ShareArticleActions'
-import { useTheme } from 'next-themes'
-import { VideoCameraIcon } from '@heroicons/react/solid'
+import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
 type EventType = 'webinar' | 'launch_week' | 'conference'
 
@@ -126,6 +130,12 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
 
   const Icon = eventIcons[event.type]
 
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
+  const sendTelemetryEvent = async (event: TelemetryEvent) => {
+    await Telemetry.sendEvent(event, telemetryProps, router)
+  }
+
   return (
     <>
       <NextSeo
@@ -167,7 +177,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               <div className="h-full flex flex-col justify-between">
                 <div className="flex flex-col gap-2 md:gap-3 items-start mb-8">
                   <div className="flex flex-row text-sm items-center flex-wrap">
-                    <Icon className="w-4 h-4 text-brand mr-2" />{' '}
+                    <Icon className="hidden sm:inline-block w-4 h-4 text-brand mr-2" />
                     <span className="uppercase text-brand font-mono">{event.type}</span>
                     <span className="mx-3 px-3 border-x">
                       {dayjs(event.date).format(`DD MMM YYYY [at] hA [${event.timezone}]`)}
@@ -187,6 +197,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     <Link
                       href={event.main_cta?.url ?? '#'}
                       target={event.main_cta?.target ? event.main_cta?.target : undefined}
+                      onClick={() => sendTelemetryEvent(gaEvents['www_event'])}
                     >
                       {IS_REGISTRATION_OPEN
                         ? event.main_cta?.label
@@ -196,8 +207,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     </Link>
                   </Button>
                 </div>
-                <div className="flex flex-col">
-                  <p>Share on</p>
+                <div className="flex flex-col text-sm">
+                  <span>Share on</span>
                   <ShareArticleActions title={meta.title} slug={meta.url} basePath="" />
                 </div>
               </div>
@@ -233,6 +244,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 >
                   <Link
                     href={event.main_cta?.url ?? '#'}
+                    aria-disabled={!IS_REGISTRATION_OPEN}
                     target={event.main_cta?.target ? event.main_cta?.target : undefined}
                   >
                     {IS_REGISTRATION_OPEN

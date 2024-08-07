@@ -4,20 +4,22 @@ import { IconLinkedinSolid, IconTwitterX, IconYCombinator } from 'ui'
 const ShareArticleActions = ({
   title,
   slug,
+  iconSize = 20,
   basePath = 'https://supabase.com/blog/',
 }: {
   title: string
   slug: string
+  iconSize?: number
   basePath?: string
 }) => (
-  <div className="mt-4 flex items-center space-x-4">
+  <div className="mt-4 flex items-center gap-4">
     <Link
       aria-label="Share on X"
       href={`https://twitter.com/share?text=${title}&url=${basePath}${slug}`}
       target="_blank"
       className="text-foreground-lighter hover:text-foreground"
     >
-      <IconTwitterX size={24} />
+      <IconTwitterX size={iconSize} />
     </Link>
 
     <Link
@@ -26,7 +28,7 @@ const ShareArticleActions = ({
       target="_blank"
       className="text-foreground-lighter hover:text-foreground"
     >
-      <IconLinkedinSolid size={24} />
+      <IconLinkedinSolid size={iconSize} />
     </Link>
     <Link
       aria-label="Share on Hacker News"
@@ -34,7 +36,7 @@ const ShareArticleActions = ({
       target="_blank"
       className="text-foreground-lighter hover:text-foreground"
     >
-      <IconYCombinator size={24} />
+      <IconYCombinator size={iconSize} />
     </Link>
   </div>
 )
