@@ -163,6 +163,19 @@ export const pricing: Pricing = {
         usage_based: true,
       },
       {
+        title: 'User data ownership',
+        tooltips: {
+          main: 'Full ownership and access to the underlying user data including encrypted passwords.',
+        },
+        plans: {
+          free: true,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
         title: 'Anonymous Sign-ins',
         tooltips: {
           main: 'Anonymous user requests count towards MAU, just like a permanent user.',
@@ -175,19 +188,7 @@ export const pricing: Pricing = {
         },
         usage_based: false,
       },
-      {
-        title: 'Userdata data ownership',
-        tooltips: {
-          main: 'Full ownership and access to the underlying user data including encrypted passwords.',
-        },
-        plans: {
-          free: true,
-          pro: true,
-          team: true,
-          enterprise: true,
-        },
-        usage_based: false,
-      },
+
       {
         title: 'Social OAuth providers',
         plans: {
