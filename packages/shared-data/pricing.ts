@@ -312,8 +312,8 @@ export const pricing: Pricing = {
       {
         title: 'Auth Hooks',
         plans: {
-          free: 'Custom Access Token (JWT)',
-          pro: 'Custom Access Token (JWT)',
+          free: 'Custom Access Token (JWT), Send custom email/SMS',
+          pro: 'Custom Access Token (JWT), Send custom email/SMS',
           team: 'All',
           enterprise: 'All',
         },
