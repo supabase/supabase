@@ -61,6 +61,9 @@ export const sqlEditorState = proxy({
   loaded: {} as {
     [projectRef: string]: boolean
   },
+  privateSnippetCount: {} as {
+    [projectRef: string]: number
+  },
   // Synchronous saving of folders and snippets (debounce behavior)
   needsSaving: proxySet<string>([]),
   // Stores the state of each snippet
@@ -69,26 +72,6 @@ export const sqlEditorState = proxy({
   },
   limit: 100,
   order: 'inserted_at' as 'name' | 'inserted_at',
-  privateSnippetCount: 0,
-
-  get sortedSnippets() {
-    return Object.values(sqlEditorState.snippets)
-      .map((x) => x.snippet)
-      .sort((a, b) => {
-        if (sqlEditorState.order === 'name') return a.name.localeCompare(b.name)
-        else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
-      })
-  },
-
-  get sortedFavoriteSnippets() {
-    return Object.values(sqlEditorState.favoriteSnippets)
-      .map((x) => x.snippet)
-      .sort((a, b) => {
-        if (sqlEditorState.order === 'name') return a.name.localeCompare(b.name)
-        else
-          return new Date(b.inserted_at ?? '').valueOf() - new Date(a.inserted_at ?? '').valueOf()
-      })
-  },
 
   // ========================================================================
   // ## Methods to interact the store with
@@ -133,7 +116,9 @@ export const sqlEditorState = proxy({
 
   setOrder: (value: 'name' | 'inserted_at') => (sqlEditorState.order = value),
 
-  setPrivateSnippetCount: (value: number) => (sqlEditorState.privateSnippetCount = value),
+  setPrivateSnippetCount: ({ projectRef, value }: { projectRef: string; value: number }) => {
+    sqlEditorState.privateSnippetCount[projectRef] = value
+  },
 
   addSnippet: ({ projectRef, snippet }: { projectRef: string; snippet: Snippet }) => {
     if (snippet.id && sqlEditorState.snippets[snippet.id]?.snippet?.content === undefined) {
@@ -319,6 +304,38 @@ export const getSqlEditorV2StateSnapshot = () => snapshot(sqlEditorState)
 
 export const useSqlEditorV2StateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) =>
   useSnapshot(sqlEditorState, options)
+
+export const useSnippetFolders = (projectRef: string) => {
+  const snapshot = useSqlEditorV2StateSnapshot()
+
+  return Object.values(snapshot.folders)
+    .filter((x) => x.projectRef === projectRef)
+    .map((x) => x.folder)
+}
+
+export const useSnippets = (projectRef: string) => {
+  const snapshot = useSqlEditorV2StateSnapshot()
+
+  return Object.values(snapshot.snippets)
+    .filter((x) => x.projectRef === projectRef)
+    .map((x) => x.snippet)
+    .sort((a, b) => {
+      if (snapshot.order === 'name') return a.name.localeCompare(b.name)
+      else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+    })
+}
+
+export const useFavoriteSnippets = (projectRef: string) => {
+  const snapshot = useSqlEditorV2StateSnapshot()
+
+  return Object.values(snapshot.favoriteSnippets)
+    .filter((x) => x.projectRef === projectRef)
+    .map((x) => x.snippet)
+    .sort((a, b) => {
+      if (snapshot.order === 'name') return a.name.localeCompare(b.name)
+      else return new Date(b.inserted_at ?? '').valueOf() - new Date(a.inserted_at ?? '').valueOf()
+    })
+}
 
 // ========================================================================
 // ## Below are all the asynchronous saving logic for the SQL Editor
