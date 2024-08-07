@@ -248,6 +248,20 @@ export const MOBILES: ConnectionType[] = [
       },
     ],
   },
+  {
+    key: 'ionicangular',
+    label: 'Ionic Angular',
+    icon: 'ionic-angular',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-ionic-angular',
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
 ]
 
 export const ORMS: ConnectionType[] = [

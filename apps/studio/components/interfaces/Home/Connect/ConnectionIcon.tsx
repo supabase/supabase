@@ -9,16 +9,19 @@ interface ConnectionIconProps {
 const ConnectionIcon = ({ connection }: ConnectionIconProps) => {
   const { resolvedTheme } = useTheme()
 
+  const imageFolder = ['ionic-angular'].includes(connection) ? 'icons/frameworks' : 'libraries'
+  const imageExtension = imageFolder === 'icons/frameworks' ? '' : '-icon'
+
   return (
     <Image
       className="transition-all group-hover:scale-110"
-      src={`${BASE_PATH}/img/libraries/${connection.toLowerCase()}${
+      src={`${BASE_PATH}/img/${imageFolder}/${connection.toLowerCase()}${
         ['expo', 'nextjs', 'prisma', 'drizzle', 'astro', 'remix'].includes(connection.toLowerCase())
           ? resolvedTheme?.includes('dark')
             ? '-dark'
             : ''
           : ''
-      }-icon.svg`}
+      }${imageExtension}.svg`}
       alt={`${connection} logo`}
       width={14}
       height={14}
