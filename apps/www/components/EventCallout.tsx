@@ -9,12 +9,14 @@ interface Props {
   size?: 'tiny' | 'small' | 'large'
 }
 
+const EVENT_LINK = '/events/scale-to-billions-generative-ai-humata'
+
 const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<Props>) => {
   switch (size) {
     case 'tiny':
       return (
         <Link
-          href="/events/scale-to-millions-generative-ai-humata"
+          href={EVENT_LINK}
           className={cn(
             'group flex items-center flex-wrap text-sm text-foreground-light hover:text-foreground transition-opacity',
             className
@@ -23,13 +25,13 @@ const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<
         >
           <span className="py-1 uppercase text-brand font-mono">Webinar</span>
           <span className="py-1 uppercase mx-3 px-3 border-x">21 Aug</span>
-          <span className="py-1">Scale to Millions: Generative AI/Humata</span>
+          <span className="py-1">Scale to Billions: Generative AI/Humata</span>
         </Link>
       )
     case 'small':
       return (
         <Link
-          href="/events/scale-to-millions-generative-ai-humata"
+          href={EVENT_LINK}
           className={cn(
             'group flex items-center flex-wrap text-sm text-foreground-light hover:text-foreground transition-opacity',
             className
@@ -39,17 +41,13 @@ const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<
           <VideoCameraIcon className="w-4 h-4 text-brand mr-2" />
           <span className="py-1 uppercase text-brand font-mono">Upcoming Webinar</span>
           <span className="py-1 uppercase mx-3 px-3 border-x">21 Aug</span>
-          <span className="py-1">Scale to Millions: Generative AI/Humata</span>
+          <span className="py-1">Scale to Billions: Generative AI/Humata</span>
           <ChevronRightIcon className="translate-x-0 transition-transform group-hover:translate-x-0.5 w-3 h-3 ml-1.5" />
         </Link>
       )
     case 'large':
       return (
-        <Link
-          href="/events/scale-to-millions-generative-ai-humata"
-          className={cn('w-full', className)}
-          {...props}
-        >
+        <Link href={EVENT_LINK} className={cn('w-full', className)} {...props}>
           <Panel
             outerClassName="w-full"
             innerClassName="relative p-4 lg:p-8 h-full flex flex-col md:flex-row gap-4 md:gap-8"
