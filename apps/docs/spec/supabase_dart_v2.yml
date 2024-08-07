@@ -2441,17 +2441,17 @@ functions:
           final res = await supabase.functions.invoke('hello', body: {'foo': 'baa'});
           final data = res.data;
           ```
-      - id: specifying-response-type
-        name: Specifying response type.
+      - id: specifying-method-type
+        name: Specifying method type.
         description: |
-          By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
+          By default, `invoke()` will make a POST request. You can parse the response in the following formats: `get`, `post`, `put`, `delete`, and `patch`.
         isSpotlight: true
         code: |
           ```dart
           final res = await supabase.functions.invoke(
             'hello',
             body: {'foo': 'baa'},
-            responseType: ResponseType.text,
+            method: HttpMethod.post,
           );
           final data = res.data;
           ```
