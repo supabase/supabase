@@ -1,17 +1,39 @@
+import { components } from 'api-types'
 import { NextSeo } from 'next-seo'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import router, { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
 import { IconLoader, IconSearch, Input } from 'ui'
 import { useDebounce } from 'use-debounce'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
+import { API_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
-import type { Partner } from '~/types/partners'
+import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
+export type IntegrationsDirectoryEntry = components['schemas']['IntegrationsDirectoryEntry']
+
+export const IntegrationCategory = {
+  api: 'API',
+  auth: 'Auth',
+  caching: 'Caching / Offline-First',
+  data: 'Data Platform',
+  devtools: 'DevTools',
+  fdw: 'Foreign Data Wrapper',
+  lowcode: 'Low-Code',
+  messaging: 'Messaging',
+  storage: 'Storage',
+} as const
+
+type IntegrationCategoryCode = keyof typeof IntegrationCategory
+
 export async function getStaticProps() {
+  const response = await fetch(`${API_URL}/integrations-directory`)
+  const value = (await response.json()) as components['schemas']['GetIntegrationsDirectoryResponse']
+  const entries = value.entries || []
+
   const { data: partners } = await supabase
     .from('partners')
     .select('*')
@@ -20,12 +42,32 @@ export async function getStaticProps() {
     .order('category')
     .order('title')
 
+  // Merge the two lists of partners. Integration directory data takes precedence.
+  partners?.forEach((partner) => {
+    const found = entries.find((entry) => entry.title === partner.title)
+    if (!found) {
+      const category = Object.entries(IntegrationCategory).find(([k, v]) => v === partner.category)
+      const keyCategory = (category ? category[0] : 'api') as IntegrationCategoryCode
+
+      const toInsert = {
+        ...partner,
+        approved: true,
+        category: keyCategory,
+        docs: partner.docs ?? '',
+        featured: partner.featured ?? false,
+        images: partner.images ?? [],
+        approved_at: partner.created_at,
+      }
+
+      entries.push(toInsert)
+    }
+  })
+
   return {
     props: {
-      partners,
+      partners: entries,
     },
-    // TODO: consider using Next.js' On-demand Revalidation with Supabase Database Webhooks instead
-    revalidate: 1800, // 30 minutes
+    revalidate: false,
   }
 }
 
@@ -37,7 +79,9 @@ function IntegrationPartnersPage(props: Props) {
   const initialPartners = props.partners ?? []
   const [partners, setPartners] = useState(initialPartners)
 
-  const allCategories = Array.from(new Set(initialPartners?.map((p) => p.category)))
+  const allCategories = Array.from(
+    new Set(initialPartners?.map((p) => p.category))
+  ) as IntegrationCategoryCode[]
 
   const router = useRouter()
 
@@ -48,43 +92,43 @@ function IntegrationPartnersPage(props: Props) {
   const [debouncedSearchTerm] = useDebounce(search, 300)
   const [isSearching, setIsSearching] = useState(false)
 
+  const searchPartners = useCallback(
+    (term: string) => {
+      // This code is leftover from the original implementation when the search was done on the server side. We now
+      // search on client side because the data is coming from two different sources.
+      // let query = supabase.from('partners').select('*').eq('approved', true).order('category').order('title')
+
+      // if (term.trim()) {
+      //   query = query.textSearch('tsv', `${term.trim()}`, {
+      //     type: 'websearch',
+      //     config: 'english',
+      //   })
+      // }
+
+      return initialPartners.filter((partner) =>
+        partner.title.toLowerCase().includes(term.toLowerCase())
+      )
+    },
+    [initialPartners]
+  )
+
   useEffect(() => {
-    const searchPartners = async () => {
-      setIsSearching(true)
-
-      let query = supabase
-        .from('partners')
-        .select('*')
-        .eq('approved', true)
-        .order('category')
-        .order('title')
-
-      if (search.trim()) {
-        query = query.textSearch('tsv', `${search.trim()}`, {
-          type: 'websearch',
-          config: 'english',
-        })
-      }
-
-      const { data: partners } = await query
-
-      return partners
-    }
-
-    if (search.trim() === '') {
+    if (debouncedSearchTerm.trim() === '') {
       setIsSearching(false)
       setPartners(initialPartners)
       return
     }
 
-    searchPartners().then((partners) => {
-      if (partners) {
-        setPartners(partners)
-      }
+    setIsSearching(true)
 
-      setIsSearching(false)
-    })
-  }, [debouncedSearchTerm, router])
+    const partners = searchPartners(debouncedSearchTerm)
+
+    if (partners) {
+      setPartners(partners)
+    }
+
+    setIsSearching(false)
+  }, [debouncedSearchTerm, initialPartners, router, searchPartners])
 
   return (
     <>
@@ -139,7 +183,7 @@ function IntegrationPartnersPage(props: Props) {
                         onClick={() => router.push(`#${category.toLowerCase()}`)}
                         className="text-foreground-light block text-base"
                       >
-                        {category}
+                        {IntegrationCategory[category]}
                       </button>
                     ))}
                   </div>
@@ -171,10 +215,10 @@ function IntegrationPartnersPage(props: Props) {
                     />
 
                     <PartnerLinkBox
-                      href={`/partners/integrations#become-a-partner`}
-                      title="Become a partner"
+                      href={`https://supabase.com/dashboard/org/_/integrations`}
+                      title="List your integration"
                       color="brand"
-                      description="Fill out a quick 30 second form to apply to become a partner"
+                      description="Add your entry to our Integrations Directory and become listed here"
                       icon={
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

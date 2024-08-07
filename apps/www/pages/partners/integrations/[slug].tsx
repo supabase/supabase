@@ -1,16 +1,16 @@
 import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import { CH } from '@code-hike/mdx/components'
 import { ChevronLeft, ExternalLink } from 'lucide-react'
-import { type GetStaticPaths, type GetStaticProps } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
+import { GetServerSideProps } from 'next'
 import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
+import Image from 'next/image'
+import Link from 'next/link'
 import { type Dispatch, type SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
-import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
+import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { useBreakpoint } from 'common'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
@@ -20,8 +20,10 @@ import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import { API_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 import type { Partner } from '~/types/partners'
+import { IntegrationsDirectoryEntry } from '.'
 import Error404 from '../../404'
 
 /**
@@ -47,9 +49,13 @@ function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
 function Partner({
   partner,
   overview,
+  isPreview,
 }: {
-  partner: Partner
+  partner: IntegrationsDirectoryEntry & {
+    images?: string[] // TODO: Remove once all data is migrated from Misc to Integrations Directory, as we dont store images anymore.
+  }
   overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
+  isPreview: boolean
 }) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
   const isNarrow = useBreakpoint('lg')
@@ -64,7 +70,7 @@ function Partner({
         openGraph={{
           title: `${partner.title} | Works With Supabase`,
           description: partner.description,
-          url: `https://supabase.com/partners/integrations/${partner.slug}`,
+          url: `${process.env.NEXT_PUBLIC_URL}/partners/integrations/${partner.slug}`,
           images: [
             {
               url: partner.images ? partner.images[0] : partner.logo,
@@ -179,6 +185,14 @@ function Partner({
               {isNarrow && <PartnerDetails partner={partner} />}
 
               <div className="lg:col-span-5 overflow-hidden">
+                {isPreview && (
+                  <div className="bg-surface-200 w-full p-4 mb-12 rounded-2xl border">
+                    <p className="text-sm">
+                      This is a preview page managed by the partner and has not been approved by
+                      Supabase team.
+                    </p>
+                  </div>
+                )}
                 <h2
                   className="text-foreground"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
@@ -193,15 +207,16 @@ function Partner({
 
               {!isNarrow && <PartnerDetails partner={partner} />}
             </div>
-            {partner.call_to_action_link && (
+            {/* TODO(Kamil): This has changed to be a mandatory field. Remove this guard once we move all the data. */}
+            {partner.docs && (
               <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
                     Get started with {partner.title} and Supabase.
                   </h1>
-                  <a href={partner.call_to_action_link} target="_blank" rel="noreferrer">
+                  <a href={partner.docs} target="_blank" rel="noreferrer">
                     <Button size="medium" type="secondary">
-                      Add integration
+                      See the docs
                     </Button>
                   </a>
                 </div>
@@ -214,7 +229,7 @@ function Partner({
   )
 }
 
-const PartnerDetails = ({ partner }: { partner: Partner }) => {
+const PartnerDetails = ({ partner }: { partner: IntegrationsDirectoryEntry }) => {
   const videoThumbnail = partner.video
     ? `http://img.youtube.com/vi/${partner.video}/0.jpg`
     : undefined
@@ -238,7 +253,8 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
         )}
 
         <div className="text-foreground divide-y">
-          {partner.type === 'technology' && (
+          {/* TODO(Kamil): This has changed to be a mandatory field. Remove this guard once we move all the data. */}
+          {partner.developer && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Developer</span>
               <span className="text-foreground">{partner.developer}</span>
@@ -267,7 +283,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
             </a>
           </div>
 
-          {partner.type === 'technology' && partner.docs && (
+          {partner.docs && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Documentation</span>
               <a
@@ -292,42 +308,39 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
   )
 }
 
-// This function gets called at build time
-export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: slugs } = await supabase
-    .from('partners')
-    .select('slug')
-    .eq('approved', true)
-    .eq('type', 'technology')
+export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+  let result: IntegrationsDirectoryEntry | null = null
 
-  const paths: {
-    params: { slug: string }
-    locale?: string | undefined
-  }[] =
-    slugs?.map(({ slug }) => ({
-      params: {
-        slug,
-      },
-    })) ?? []
+  const url = `${API_URL}/integrations-directory/${params!.slug}${query.preview_token ? `?preview_token=${query.preview_token}` : ''}`
+  const response = await fetch(url)
+  const entry = (await response.json()) as IntegrationsDirectoryEntry
 
-  return {
-    paths,
-    fallback: 'blocking',
+  if (!entry || response.status !== 200) {
+    let { data: partner } = await supabase
+      .from('partners')
+      .select('*')
+      .eq('approved', true)
+      .eq('slug', params!.slug as string)
+      .single()
+
+    result = partner as unknown as IntegrationsDirectoryEntry
+  } else {
+    result = entry
   }
-}
 
-// This also gets called at build time
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  let { data: partner } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('approved', true)
-    .eq('slug', params!.slug as string)
-    .single()
-
-  if (!partner) {
+  if (!result) {
     return {
       notFound: true,
+    }
+  }
+
+  // Once entry is approved, there is no point in keeping preview token in the url.
+  if (result.approved && query.preview_token) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: `${process.env.NEXT_PUBLIC_URL}/partners/integrations/${params!.slug}`,
+      },
     }
   }
 
@@ -340,7 +353,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // Parse markdown
-  const overview = await serialize(partner.overview, {
+  const overview = await serialize(result.overview, {
     mdxOptions: {
       useDynamicImport: true,
       remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
@@ -348,8 +361,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   })
 
   return {
-    props: { partner, overview },
-    revalidate: 1800, // 30 minutes
+    props: { partner: result, overview, isPreview: !!query.preview_token },
   }
 }
 
