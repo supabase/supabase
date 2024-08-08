@@ -72,7 +72,7 @@ const SpreadsheetImport = ({
   const isCompatible = selectedTable !== undefined ? incompatibleHeaders.length === 0 : true
 
   const checkInferredColumnTypes = (columnTypeMap: any) => {
-    // all of the other types can in theory be casted into a string
+    // all other types can in theory be casted into a string
     // e.g. a column with type of text can still contain the value "1", but inferColumnType() will
     // still infer it as an int8
     const stringTypes = ['text', 'varchar']
