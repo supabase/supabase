@@ -315,8 +315,8 @@ const SmtpForm = () => {
                       <AlertDescription_Shadcn_>
                         <ReactMarkdown>
                           It looks like you are using AWS SES as your SMTP provider. Some extra
-                          configuration may be needed, Please check out the AWS SES Documentation
-                          [here](https://docs.aws.amazon.com/ses/latest/dg/Welcome.html)
+                          configuration may be needed. Please check out the [AWS SES
+                          Documentation](https://docs.aws.amazon.com/ses/latest/dg/Welcome.html)
                         </ReactMarkdown>
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
