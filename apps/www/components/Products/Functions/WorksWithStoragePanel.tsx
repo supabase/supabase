@@ -1,7 +1,7 @@
 import React from 'react'
 import CodeWindow from '~/components/CodeWindow'
 
-const code = `import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+const code = `import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 Deno.serve(async (req: Request) => {
   // Create supabase client

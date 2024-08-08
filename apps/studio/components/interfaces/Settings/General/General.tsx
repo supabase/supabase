@@ -2,6 +2,18 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import Panel from 'components/ui/Panel'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -14,24 +26,10 @@ import {
   IconAlertCircle,
   IconBarChart2,
   Input,
+  WarningIcon,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import { useCheckPermissions, useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const General = () => {
   const { project } = useProjectContext()
@@ -39,7 +37,7 @@ const General = () => {
 
   // Also doubles up as a feature flag to enable display of the related alert,
   // another dedicated flag would be redundant.
-  const v2AnnouncementUrl = useFlag('v2AnnouncementUrl')
+  const v2AnnouncementUrl = useFlag('v2AnnouncementUrl') as string
 
   const v2MaintenanceWindow = project?.v2MaintenanceWindow
   const v2MaintenanceDate = v2MaintenanceWindow?.start

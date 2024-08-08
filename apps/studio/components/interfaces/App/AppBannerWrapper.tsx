@@ -4,12 +4,14 @@ import { PropsWithChildren, useMemo } from 'react'
 
 import IncidentBanner from 'components/layouts/AppLayout/IncidentBanner'
 import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
-import { RestrictrionBanner } from 'components/layouts/AppLayout/RestrictionBanner'
-import { getTheme } from 'components/ui/CodeEditor'
-import { useFlag } from 'hooks'
+import { RestrictionBanner } from 'components/layouts/AppLayout/RestrictionBanner'
+import { getTheme } from 'components/ui/CodeEditor/CodeEditor.utils'
+import { useFlag } from 'hooks/ui/useFlag'
+import { useProfile } from 'lib/profile'
 
 const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const monaco = useMonaco()
+  const { profile } = useProfile()
   const { resolvedTheme } = useTheme()
 
   const ongoingIncident = useFlag('ongoingIncident')
@@ -29,7 +31,7 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
       <div className="flex-none">
         {ongoingIncident && <IncidentBanner />}
         {showNoticeBanner && <NoticeBanner />}
-        <RestrictrionBanner />
+        {profile !== undefined && <RestrictionBanner />}
       </div>
       {children}
     </div>

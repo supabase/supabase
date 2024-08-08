@@ -600,12 +600,9 @@ functions:
           import 'package:google_sign_in/google_sign_in.dart';
           import 'package:supabase_flutter/supabase_flutter.dart';
 
-          /// Web Client ID that you registered with Google Cloud.
-          /// This will be used to perform Google sign in on Android.
-          const webClientId = 'my-web.apps.googleusercontent.com';
+          const webClientId = '<web client ID that you registered on Google Cloud, for example my-web.apps.googleusercontent.com>';
 
-          /// iOS Client ID that you registered with Google Cloud.
-          const iosClientId = 'my-ios.apps.googleusercontent.com';
+          const iosClientId = '<iOS client ID that you registered on Google Cloud, for example my-ios.apps.googleusercontent.com';
 
           final GoogleSignIn googleSignIn = GoogleSignIn(
             clientId: iosClientId,
@@ -695,6 +692,7 @@ functions:
           ```dart
           import 'package:sign_in_with_apple/sign_in_with_apple.dart';
           import 'package:supabase_flutter/supabase_flutter.dart';
+          import 'package:crypto/crypto.dart';
 
           /// Performs Apple sign in on iOS or macOS
           final rawNonce = supabase.auth.generateRawNonce();

@@ -101,7 +101,7 @@ const {
   data: { session },
   error,
 } = await supabase.auth.verifyOtp({
-  phone: '+13334445555',
+  phone: '13334445555',
   token: '123456',
   type: 'sms',
 })

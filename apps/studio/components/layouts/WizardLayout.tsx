@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import type { Organization, Project } from 'types'
 import { IconChevronRight } from 'ui'

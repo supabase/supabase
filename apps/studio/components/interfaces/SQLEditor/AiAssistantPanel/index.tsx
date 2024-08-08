@@ -1,28 +1,18 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Message as MessageType } from 'ai'
-import { useTelemetryProps } from 'common'
 import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
-import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
-import {
-  Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  cn,
-} from 'ui'
-import { AiIcon } from 'ui-patterns/Cmdk'
-import * as z from 'zod'
+import { useEffect, useRef, useState } from 'react'
 
-import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
+import { useTelemetryProps } from 'common'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
+import { Button, cn } from 'ui'
+import { AssistantChatForm } from 'ui-patterns'
+import { AiIcon } from 'ui-patterns/Cmdk'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
 
@@ -54,35 +44,31 @@ export const AiAssistantPanel = ({
   const bottomRef = useRef<HTMLDivElement>(null)
   const telemetryProps = useTelemetryProps()
 
+  const [value, setValue] = useState<string>('')
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
   const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
   const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
-
-  const FormSchema = z.object({ chat: z.string() })
-  const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
-    resolver: zodResolver(FormSchema),
-    defaultValues: { chat: '' },
-  })
   const pendingReply = loading && last(messages)?.role === 'user'
-
-  // try to scroll on each rerender to the bottom
-  useEffect(() => {
-    if (loading && bottomRef.current) {
-      setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-      }, 500)
-    }
-  })
 
   useEffect(() => {
     if (!loading) {
-      form.setValue('chat', '')
-      form.setFocus('chat')
+      setValue('')
+      if (inputRef.current) inputRef.current.focus()
     }
+
+    // Try to scroll on each rerender to the bottom
+    setTimeout(
+      () => {
+        if (bottomRef.current) {
+          bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+        }
+      },
+      loading ? 100 : 500
+    )
   }, [loading])
 
   return (
@@ -147,11 +133,18 @@ export const AiAssistantPanel = ({
         <div ref={bottomRef} className="h-1" />
       </div>
 
-      <Form_Shadcn_ {...form}>
-        <form
-          className="sticky p-5 flex-0 border-t"
-          onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
-            onSubmit(data.chat)
+      <div className="sticky p-5 flex-0 border-t">
+        <AssistantChatForm
+          textAreaRef={inputRef}
+          loading={loading}
+          disabled={loading}
+          icon={<AiIcon className="[&>div>div]:border-black dark:[&>div>div]:border-white" />}
+          placeholder="Ask a question about your SQL query"
+          value={value}
+          onValueChange={(e) => setValue(e.target.value)}
+          onSubmit={(event) => {
+            event.preventDefault()
+            onSubmit(value)
             Telemetry.sendEvent(
               {
                 category: 'sql_editor_ai_assistant',
@@ -161,34 +154,9 @@ export const AiAssistantPanel = ({
               telemetryProps,
               router
             )
-          })}
-        >
-          <FormField_Shadcn_
-            control={form.control}
-            name="chat"
-            render={({ field }) => (
-              <FormItem_Shadcn_>
-                <FormControl_Shadcn_>
-                  <div className="relative">
-                    <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-                    <Input_Shadcn_
-                      {...field}
-                      autoComplete="off"
-                      disabled={loading}
-                      autoFocus
-                      className={`bg-surface-300 dark:bg-black rounded-full pl-10 ${
-                        loading ? 'pr-10' : ''
-                      }`}
-                      placeholder="Ask a question about your SQL query"
-                    />
-                    {loading && <Loader2 className="absolute top-2 right-3 animate-spin" />}
-                  </div>
-                </FormControl_Shadcn_>
-              </FormItem_Shadcn_>
-            )}
-          />
-        </form>
-      </Form_Shadcn_>
+          }}
+        />
+      </div>
     </div>
   )
 }

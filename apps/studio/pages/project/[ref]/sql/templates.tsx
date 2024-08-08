@@ -1,5 +1,5 @@
 import SQLTemplates from 'components/interfaces/SQLEditor/SQLTemplates/SQLTemplates'
-import { SQLEditorLayout } from 'components/layouts'
+import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import type { NextPageWithLayout } from 'types'
 
 const SqlEditorWelcome: NextPageWithLayout = () => {

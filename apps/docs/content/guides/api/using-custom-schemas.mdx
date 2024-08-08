@@ -4,7 +4,19 @@ title: 'Using Custom Schemas'
 description: 'You need additional steps to use custom database schemas with data APIs.'
 ---
 
-By default, your database has a `public` schema which is automatically exposed on data APIs. You can also expose custom database schemas - to do so you need to follow these steps:
+By default, your database has a `public` schema which is automatically exposed on data APIs.
+
+## Creating custom schemas
+
+You can create your own custom schema/s by running the following SQL, substituting `myschema` with the name you want to use for your schema:
+
+```sql
+CREATE SCHEMA myschema;
+```
+
+## Exposing custom schemas
+
+You can expose custom database schemas - to do so you need to follow these steps:
 
 1. Go to [API settings](https://supabase.com/dashboard/project/_/settings/api) and add your custom schema to "Exposed schemas".
 2. Run the following SQL, substituting `myschema` with your schema name:

@@ -1,9 +1,8 @@
 import * as Sentry from '@sentry/nextjs'
-import { useIsLoggedIn, useParams, useTelemetryProps, useUser } from 'common'
+import { useTelemetryProps, useUser } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { useSelectedOrganization } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { getAnonId } from 'lib/telemetry'
@@ -11,9 +10,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 
 const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
-  const { ref } = useParams()
   const telemetryProps = useTelemetryProps()
-  const selectedOrganization = useSelectedOrganization()
   const snap = useAppStateSnapshot()
 
   useEffect(() => {
@@ -23,8 +20,6 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
         : null
     if (consent !== null) snap.setIsOptedInTelemetry(consent === 'true')
   }, [])
-
-  const isLoggedIn = useIsLoggedIn()
 
   useEffect(() => {
     function handleRouteChange(url: string) {
@@ -91,17 +86,6 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
           language: telemetryProps?.language,
         },
       })
-
-      if (isLoggedIn) {
-        post(`${API_URL}/telemetry/pageview`, {
-          ...(ref && { projectRef: ref }),
-          ...(selectedOrganization && { orgSlug: selectedOrganization.slug }),
-          referrer: referrer,
-          title: document.title,
-          path: router.route,
-          location: router.asPath,
-        })
-      }
     }
   }
 

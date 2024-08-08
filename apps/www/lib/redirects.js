@@ -1175,6 +1175,11 @@ module.exports = [
     source: '/blog/2022/08/03/supabase-beta-update-july-2022',
     destination: '/blog/supabase-beta-update-july-2022',
   },
+  {
+    permanent: true,
+    source: '/blog/supabase-aquires-oriole',
+    destination: '/blog/supabase-acquires-oriole',
+  },
 
   //  DOCS
   {
@@ -1236,6 +1241,11 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-commit',
     destination: '/docs/reference/supabase-db-pull',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/supabase-gen-types-typescript',
+    destination: '/docs/reference/supabase-gen-types',
   },
 
   {
@@ -1806,6 +1816,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/resources/supabase-cli/managing-environments',
     destination: '/docs/guides/cli/managing-environments',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/migrations/auth0',
+    destination: '/docs/guides/resources/migrating-to-supabase/auth0',
   },
   {
     permanent: true,
@@ -2410,18 +2425,8 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/launch-week',
-    destination: '/ga-week',
-  },
-  {
-    permanent: false,
     source: '/special-announcement',
     destination: '/ga-week',
-  },
-  {
-    permanent: false,
-    source: '/launch-week/tickets/:path*',
-    destination: '/ga-week/tickets/:path*',
   },
   {
     permanent: false,

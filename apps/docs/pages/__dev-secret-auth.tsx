@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { Button_Shadcn_ } from 'ui'
 import { auth } from '~/lib/userAuth'
 

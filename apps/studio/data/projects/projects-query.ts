@@ -11,13 +11,15 @@ export type ProjectsVariables = {
   ref?: string
 }
 
-export type ProjectInfo = components['schemas']['ProjectInfo']
+export type ProjectInfo = components['schemas']['ProjectInfo'] & {
+  status: components['schemas']['ResourceWithServicesStatusResponse']['status']
+}
 
 export async function getProjects(signal?: AbortSignal) {
   const { data, error } = await get('/platform/projects', { signal })
 
   if (error) handleError(error)
-  return data
+  return data as ProjectInfo[]
 }
 
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>

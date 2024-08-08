@@ -11,7 +11,7 @@ Supabase Storage offers the functionality to optimize and resize images on the f
 
 <Admonition type="note">
 
-Image Resizing is currently enabled for [Pro plan and above](https://supabase.com/pricing).
+Image Resizing is currently enabled for [Pro Plan and above](https://supabase.com/pricing).
 
 </Admonition>
 
@@ -303,7 +303,7 @@ To get started, create a `supabase-image-loader.js` file in your Next.js project
 const projectId = '' // your supabase project id
 
 export default function supabaseLoader({ src, width, quality }) {
-  return `https://${projectId}.supabase.co/storage/v1/object/public/${src}?width=${width}&quality=${quality || 75}`
+  return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&quality=${quality || 75}`
 }
 ```
 

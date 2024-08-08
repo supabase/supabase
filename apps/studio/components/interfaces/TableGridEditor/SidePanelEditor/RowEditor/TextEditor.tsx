@@ -10,10 +10,11 @@ import { Markdown } from 'components/interfaces/Markdown'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import useTable from 'hooks/misc/useTable'
 import { Button, SidePanel, cn } from 'ui'
 import ActionBar from '../ActionBar'
+import { isValueTruncated } from './RowEditor.utils'
 
 interface TextEditorProps {
   visible: boolean
@@ -40,7 +41,7 @@ export const TextEditor = ({
   const [strValue, setStrValue] = useState('')
   const [view, setView] = useState<'edit' | 'view'>('edit')
   const value = row?.[column as keyof typeof row] as unknown as string
-  const isTruncated = value?.endsWith('...') && value.length > MAX_CHARACTERS
+  const isTruncated = isValueTruncated(value)
 
   const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
 

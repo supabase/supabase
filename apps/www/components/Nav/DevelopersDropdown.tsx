@@ -54,7 +54,7 @@ const DevelopersDropdown = () => {
           </div>
         ))}
       </div>
-      <div className="bg-overlay flex flex-col w-[550px] xl:w-[480px] border-t xl:border-t-0 xl:border-l">
+      <div className="bg-surface-75 flex flex-col w-[550px] xl:w-[480px] border-t xl:border-t-0 xl:border-l">
         <div className="flex-col gap-2 py-8 px-10">
           <Link
             href="/blog"

@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useReducer, useRef } from 'react'
 import { PhoneLoginsItems } from '../Navigation/NavigationMenu/NavigationMenu.constants'
 import { IconPanel } from 'ui-patterns/IconPanel'
