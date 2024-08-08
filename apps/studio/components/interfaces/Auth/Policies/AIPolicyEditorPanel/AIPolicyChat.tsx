@@ -135,56 +135,6 @@ export const AIPolicyChat = ({
           }}
         />
       </div>
-
-      {/* <Form_Shadcn_ {...form}>
-        <form
-          id="rls-chat"
-          ref={formRef}
-          className="sticky p-5 flex-0 border-t"
-          onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
-            onSubmit(data.chat)
-            Telemetry.sendEvent(
-              {
-                category: 'rls_editor',
-                action: 'ai_suggestion_asked',
-                label: 'rls-ai-assistant',
-              },
-              telemetryProps,
-              router
-            )
-          })}
-        >
-          <FormField_Shadcn_
-            control={form.control}
-            name="chat"
-            render={({ field }) => (
-              <FormItem_Shadcn_>
-                <FormControl_Shadcn_>
-                  <div className="relative">
-                    <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-                    <ExpandingTextArea
-                      {...field}
-                      autoComplete="off"
-                      disabled={loading}
-                      autoFocus
-                      spellCheck={false}
-                      className="pl-12 text-sm rounded-[18px] max-h-96"
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' && !event.shiftKey) {
-                          event.preventDefault()
-                          formRef?.current?.requestSubmit()
-                        }
-                      }}
-                      placeholder="Ask for some changes to your policy"
-                    />
-                    {loading && <Loader2 className="absolute top-2 right-3 animate-spin" />}
-                  </div>
-                </FormControl_Shadcn_>
-              </FormItem_Shadcn_>
-            )}
-          />
-        </form>
-      </Form_Shadcn_> */}
     </div>
   )
 }
