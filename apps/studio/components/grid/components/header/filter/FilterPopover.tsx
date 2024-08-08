@@ -111,9 +111,11 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: Filte
   }, [])
 
   const onSelectApplyFilters = () => {
-    // [Joshen] Trim empty spaces in input
+    // [Joshen] Trim empty spaces in input for only UUID type columns
     const formattedFilters = filters.map((f) => {
-      return { ...f, value: f.value.trim() }
+      const column = table.columns.find((c) => c.name === f.column)
+      if (column?.format === 'uuid') return { ...f, value: f.value.trim() }
+      else return f
     })
     onApplyFilters(formattedFilters)
   }
