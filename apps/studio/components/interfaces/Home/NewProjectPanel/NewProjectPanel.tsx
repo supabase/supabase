@@ -1,11 +1,11 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button } from 'ui'
 
 import Panel from 'components/ui/Panel'
-import { useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
+import { Button } from 'ui'
 import APIKeys from './APIKeys'
 import GetStartedHero from './GetStartedHero'
 

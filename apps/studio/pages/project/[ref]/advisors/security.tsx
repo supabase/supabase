@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
@@ -7,12 +7,12 @@ import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import LinterDataGrid from 'components/interfaces/Linter/LinterDataGrid'
 import LinterFilters from 'components/interfaces/Linter/LinterFilters'
 import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
-import { FormHeader } from 'components/ui/Forms'
+import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
-import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -46,12 +46,7 @@ const ProjectLints: NextPageWithLayout = () => {
     refetchLintsQuery()
   }
 
-  let clientLints: Lint[] = []
-
-  const activeLints = useMemo(() => {
-    return [...(data ?? []), ...clientLints]?.filter((x) => x.categories.includes('SECURITY'))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
+  const activeLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
 
   useEffect(() => {
     // check the URL for an ID and set the selected lint

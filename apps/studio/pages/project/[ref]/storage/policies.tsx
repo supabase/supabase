@@ -1,4 +1,4 @@
-import { StorageLayout } from 'components/layouts'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { StoragePolicies } from 'components/to-be-cleaned/Storage'
 import type { NextPageWithLayout } from 'types'
 

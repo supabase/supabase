@@ -5,7 +5,7 @@ import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
 import remarkGfm from 'remark-gfm'
-import { ICommonMarkdown } from '~/components/reference/Reference.types'
+import type { ICommonMarkdown } from '~/components/reference/Reference.types'
 
 async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
   let markdownContent = []
@@ -17,8 +17,7 @@ async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
    */
   await Promise.all(
     sections.map(async (section) => {
-      const isSharedSection = section.meta?.shared
-      const pathName = `docs/ref${isSharedSection ? '/shared' : slug}/${section.id}.mdx`
+      const pathName = `docs/ref${slug}/${section.id}.mdx`
 
       function checkFileExists(x) {
         if (fs.existsSync(x)) {

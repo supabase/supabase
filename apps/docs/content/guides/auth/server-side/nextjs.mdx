@@ -74,7 +74,7 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
   className="text-foreground-light mt-8 mb-6"
 >
   <div className="border-b mt-3 pb-3">
-    <Accordion.Item
+    <AccordionItem
       header={<span className="text-foreground">What does the `cookies` object do?</span>}
       id="utility-cookies"
     >
@@ -85,11 +85,11 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
 
     The cookie is named `sb-<project_ref>-auth-token` by default.
 
-    </Accordion.Item>
+    </AccordionItem>
 
   </div>
   <div className="border-b mt-3 pb-3">
-    <Accordion.Item
+    <AccordionItem
       header={<span className="text-foreground">Do I need to create a new client for every route?</span>}
       id="client-deduplication"
     >
@@ -99,7 +99,7 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
         - On the server, it basically configures a `fetch` call. You need to reconfigure the fetch call anew for every request to your server, because you need the cookies from the request.
         - On the client, `createBrowserClient` already uses a singleton pattern, so you only ever create one instance, no matter how many times you call your `createClient` function.
 
-    </Accordion.Item>
+    </AccordionItem>
 
   </div>
 </Accordion>
@@ -137,7 +137,15 @@ export function createClient() {
           return cookieStore.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
         },
       },
     }
@@ -243,11 +251,19 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  const { data: user, error } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (
+    !user &&
+    !request.nextUrl.pathname.startsWith('/login') &&
+    !request.nextUrl.pathname.startsWith('/auth')
+  ) {
     // no user, potentially respond by redirecting the user to the login page
-    return NextResponse.redirect('/login')
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
@@ -401,20 +417,16 @@ Since this is a Router Handler, use the Supabase client from `@/utils/supabase/s
 
 ```ts app/auth/confirm/route.ts
 import { type EmailOtpType } from '@supabase/supabase-js'
-import { type NextRequest, NextResponse } from 'next/server'
+import { type NextRequest } from 'next/server'
 
 import { createClient } from '@/utils/supabase/server'
+import { redirect } from 'next/navigation'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
   const next = searchParams.get('next') ?? '/'
-
-  const redirectTo = request.nextUrl.clone()
-  redirectTo.pathname = next
-  redirectTo.searchParams.delete('token_hash')
-  redirectTo.searchParams.delete('type')
 
   if (token_hash && type) {
     const supabase = createClient()
@@ -424,14 +436,13 @@ export async function GET(request: NextRequest) {
       token_hash,
     })
     if (!error) {
-      redirectTo.searchParams.delete('next')
-      return NextResponse.redirect(redirectTo)
+      // redirect user to specified redirect URL or root of app
+      redirect(next)
     }
   }
 
-  // return the user to an error page with some instructions
-  redirectTo.pathname = '/error'
-  return NextResponse.redirect(redirectTo)
+  // redirect the user to an error page with some instructions
+  redirect('/error')
 }
 ```
 
@@ -569,7 +580,7 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
   className="text-foreground-light mt-8 mb-6"
 >
   <div className="border-b pb-3">
-    <Accordion.Item
+    <AccordionItem
       header={<span className="text-foreground">Why do I need so many types of clients?</span>}
       id="nextjs-clients"
     >
@@ -581,11 +592,11 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
       - **Component** - Runs on the client. Reads cookies from browser storage. Behind the scenes, `createBrowserClient` reuses the same client instance if called multiple times, so don't worry about deduplicating the client yourself.
       - **API route** - Runs on the server. Reads cookies from the request, which is passed through from `NextApiRequest`.
 
-    </Accordion.Item>
+    </AccordionItem>
 
   </div>
   <div className="border-b mt-3 pb-3">
-    <Accordion.Item
+    <AccordionItem
       header={<span className="text-foreground">What does the `cookies` object do?</span>}
       id="client-storage-cookies"
     >
@@ -594,7 +605,7 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
 
     The cookie is named `sb-<project_ref>-auth-token` by default.
 
-    </Accordion.Item>
+    </AccordionItem>
 
   </div>
 </Accordion>
@@ -616,7 +627,7 @@ export function createClient({ req, res }: GetServerSidePropsContext) {
     {
       cookies: {
         getAll() {
-          return Object.keys(req.cookies).map((name) => ({ name, value: req.cookies[name] }))
+          return Object.keys(req.cookies).map((name) => ({ name, value: req.cookies[name] || '' }))
         },
         setAll(cookiesToSet) {
           res.setHeader(
@@ -671,7 +682,7 @@ export default function createClient(req: NextApiRequest, res: NextApiResponse) 
     {
       cookies: {
         getAll() {
-          return Object.keys(req.cookies).map((name) => ({ name, value: req.cookies[name] }))
+          return Object.keys(req.cookies).map((name) => ({ name, value: req.cookies[name] || '' }))
         },
         setAll(cookiesToSet) {
           res.setHeader(

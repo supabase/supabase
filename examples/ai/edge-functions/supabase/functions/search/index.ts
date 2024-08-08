@@ -1,6 +1,6 @@
-import "https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts";
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-import { createClient } from "npm:@supabase/supabase-js@2.42.0";
+import { createClient } from "jsr:@supabase/supabase-js@2";
 import { Database } from "../_shared/database.types.ts";
 
 const supabase = createClient<Database>(

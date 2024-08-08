@@ -59,11 +59,13 @@ const nextConfig = {
       'img.youtube.com',
       'vercel.com',
       'obuldanrptloktxcffvn.supabase.co',
+      'xguihxuzqibwxjnimxev.supabase.co',
       'pbs.twimg.com',
       'res.cloudinary.com',
       's3-us-west-2.amazonaws.com',
       'supabase.com',
       'user-images.githubusercontent.com',
+      'media.licdn.com',
     ],
   },
   async headers() {
@@ -92,6 +94,15 @@ const nextConfig = {
   },
   async redirects() {
     return redirects
+  },
+  typescript: {
+    // WARNING: production builds can successfully complete even there are type errors
+    // Typechecking is checked separately via .github/workflows/typecheck.yml
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    ignoreDuringBuilds: true,
   },
 }
 

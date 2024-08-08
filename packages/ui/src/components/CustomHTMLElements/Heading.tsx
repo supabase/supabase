@@ -9,13 +9,6 @@ import {
   unHighlightSelectedTocItems,
 } from './CustomHTMLElements.utils'
 
-/**
- * [Joshen] The trick with rootMargin
- * We are shrinking the top of the root element by 20 percent, which is currently our entire page,
- * and the bottom by 35 percent. Therefore, when a header is at the top 20 percent and bottom 35 percent
- * of our page, it will not be counted as visible.
- */
-
 interface Props extends HTMLAttributes<HTMLHeadingElement> {
   tag?: string
   parseAnchors?: boolean
@@ -34,7 +27,7 @@ interface Props extends HTMLAttributes<HTMLHeadingElement> {
 const Heading = forwardRef(
   ({ tag, customAnchor, children, ...props }: React.PropsWithChildren<Props>, forwardedRef) => {
     const HeadingTag = `${tag}` as any
-    const anchor = customAnchor ? customAnchor : getAnchor(children)
+    const anchor = customAnchor ? customAnchor : getAnchor(children, props)
     const link = `#${anchor}`
 
     const { ref: viewRef } = useInView({

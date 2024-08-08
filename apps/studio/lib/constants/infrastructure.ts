@@ -1,40 +1,13 @@
+import type { CloudProvider } from 'shared-data'
+import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
+
 import type { components } from 'data/api'
-
-export type CloudProvider = 'FLY' | 'AWS'
-export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
-
-// Alias regions remain as the starting point for project creation
-// they are immediately translated to their respective cloud regions
-// and are afterward never referred to
-
-export const AWS_REGIONS = {
-  WEST_US: 'West US (North California)',
-  EAST_US: 'East US (North Virginia)',
-  CENTRAL_CANADA: 'Canada (Central)',
-  WEST_EU: 'West EU (Ireland)',
-  WEST_EU_2: 'West EU (London)',
-  // 'North EU': 'North EU',
-  CENTRAL_EU: 'Central EU (Frankfurt)',
-  SOUTH_ASIA: 'South Asia (Mumbai)',
-  SOUTHEAST_ASIA: 'Southeast Asia (Singapore)',
-  NORTHEAST_ASIA: 'Northeast Asia (Tokyo)',
-  NORTHEAST_ASIA_2: 'Northeast Asia (Seoul)',
-  OCEANIA: 'Oceania (Sydney)',
-  SOUTH_AMERICA: 'South America (São Paulo)',
-  // SOUTH_AFRICA: 'South Africa (Cape Town)',
-} as const
-
-export type AWS_REGIONS_KEYS = keyof typeof AWS_REGIONS
-
-export const FLY_REGIONS = {
-  SOUTHEAST_ASIA: 'Singapore',
-} as const
 
 export const AWS_REGIONS_DEFAULT =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.EAST_US
 
 // TO DO, change default to US region for prod
-const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
+export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
 
 export const PRICING_TIER_LABELS_ORG = {
   FREE: 'Free - $0/month',

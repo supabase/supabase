@@ -1,9 +1,9 @@
-import { TsDoc } from '../../generator/legacy/definitions'
+import type { TsDoc } from '../../generator/legacy/definitions'
 
 import { values, mapValues } from 'lodash'
-import { OpenAPIV3 } from 'openapi-types'
+import type { OpenAPIV3 } from 'openapi-types'
 import { flattenSections } from '../helpers'
-import { ICommonItem } from '~/components/reference/Reference.types'
+import type { ICommonItem } from '~/components/reference/Reference.types'
 
 export function extractTsDocNode(nodeToFind: string, definition: any) {
   const nodePath = nodeToFind.split('.')

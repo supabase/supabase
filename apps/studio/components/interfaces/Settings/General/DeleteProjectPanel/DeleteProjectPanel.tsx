@@ -1,5 +1,5 @@
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import { Alert } from 'ui'
 import DeleteProjectButton from './DeleteProjectButton'

@@ -1,7 +1,13 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown } from 'lucide-react'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -13,9 +19,6 @@ import {
 } from 'ui'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
-import { useSelectedOrganization } from 'hooks'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { IS_PLATFORM } from 'lib/constants'
 
 interface AddHookDropdownProps {
   buttonText?: string
@@ -33,7 +36,8 @@ export const AddHookDropdown = ({
     { orgSlug: organization?.slug },
     { enabled: IS_PLATFORM }
   )
-  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig } = useAuthConfigQuery({ projectRef })
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const hooks: Hook[] = HOOKS_DEFINITIONS.map((definition) => {
     return {
@@ -48,6 +52,20 @@ export const AddHookDropdown = ({
 
   const nonEnterpriseHookOptions = hooks.filter((h) => !isValidHook(h) && !h.enterprise)
   const enterpriseHookOptions = hooks.filter((h) => !isValidHook(h) && h.enterprise)
+
+  if (!canUpdateConfig) {
+    return (
+      <ButtonTooltip
+        disabled
+        type="primary"
+        tooltip={{
+          content: { side: 'bottom', text: 'You need additional permissions to add auth hooks' },
+        }}
+      >
+        {buttonText}
+      </ButtonTooltip>
+    )
+  }
 
   return (
     <DropdownMenu modal={false}>
