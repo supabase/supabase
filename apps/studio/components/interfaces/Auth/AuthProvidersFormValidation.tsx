@@ -1379,9 +1379,17 @@ const PROVIDER_SAML = {
         'You will need to use the [Supabase CLI](https://supabase.com/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it',
       type: 'boolean',
     },
+    SAML_EXTERNAL_URL: {
+      title: 'SAML metadata URL',
+      description:
+        'You may use a different SAML metadata URL from what is defined with the API External URL. Please validate that your SAML External URL can reach the Custom Domain or Project URL',
+      descriptionOptional: 'Optional',
+      type: 'string',
+    },
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
+    SAML_EXTERNAL_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'saml-icon',

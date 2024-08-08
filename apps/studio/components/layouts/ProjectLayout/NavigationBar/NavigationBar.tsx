@@ -29,7 +29,7 @@ import {
   Separator,
   Theme,
   cn,
-  themes,
+  singleThemes,
 } from 'ui'
 import { useCommandMenu } from 'ui-patterns/Cmdk'
 import { useProjectContext } from '../ProjectContext'
@@ -41,6 +41,7 @@ import {
 } from './NavigationBar.utils'
 import { NavigationIconButton } from './NavigationIconButton'
 import NavigationIconLink from './NavigationIconLink'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -73,6 +74,13 @@ const NavigationBar = () => {
     'realtime:all',
   ])
 
+  const { data } = useProjectLintsQuery({
+    projectRef: project?.ref,
+  })
+
+  const securityLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
+  const errorLints = securityLints.filter((lint) => lint.level === 'ERROR')
+
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project)
   const productRoutes = generateProductRoutes(projectRef, project, {
@@ -98,8 +106,8 @@ const NavigationBar = () => {
       <nav
         data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
         className={cn(
-          'group z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
-          'border-r bg-studio border-default data-[state=expanded]:shadow-xl',
+          'group pb-2 z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
+          'border-r bg-dash-sidebar border-default data-[state=expanded]:shadow-xl',
           'transition-width duration-200',
           'hide-scrollbar flex flex-col overflow-y-auto'
         )}
@@ -109,7 +117,7 @@ const NavigationBar = () => {
         }}
       >
         {(!navLayoutV2 || !IS_PLATFORM) && (
-          <div className="sticky top-0 mb-1 py-1 px-2 flex h-[48px] bg-studio z-10">
+          <div className="sticky top-0 mb-1 pb-1 px-2 flex h-[48px] bg-dash-sidebar z-10">
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
               className="mx-2 flex items-center h-[48px]"
@@ -152,6 +160,7 @@ const NavigationBar = () => {
               onClick={onCloseNavigationIconLink}
             />
           ))}
+
           <Separator className="my-1 bg-border-muted" />
           {otherRoutes.map((route) => {
             if (route.key === 'api' && isNewAPIDocsEnabled) {
@@ -166,6 +175,26 @@ const NavigationBar = () => {
                 >
                   Project API
                 </NavigationIconButton>
+              )
+            } else if (route.key === 'advisors') {
+              return (
+                <div className="relative">
+                  {securityLints.length > 0 && (
+                    <div
+                      className={cn(
+                        'absolute flex h-2 w-2 left-6 top-2 z-10 rounded-full',
+                        errorLints.length > 0 ? 'bg-destructive-600' : 'bg-warning-600'
+                      )}
+                    />
+                  )}
+
+                  <NavigationIconLink
+                    key={route.key}
+                    route={route}
+                    isActive={activeRoute === route.key}
+                    onClick={onCloseNavigationIconLink}
+                  />
+                </div>
               )
             } else if (route.key === 'logs') {
               // TODO: Undo this when warehouse flag is removed
@@ -210,7 +239,7 @@ const NavigationBar = () => {
                 snap.setNavigationPanelOpen(false)
               }}
               type="text"
-              icon={<Search size={ICON_SIZE} strokeWidth={2} />}
+              icon={<Search size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
               rightText={
                 <div
                   className={cn(
@@ -339,15 +368,11 @@ const NavigationBar = () => {
                     setTheme(value)
                   }}
                 >
-                  {themes
-                    .filter(
-                      (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
-                    )
-                    .map((theme: Theme) => (
-                      <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                        {theme.name}
-                      </DropdownMenuRadioItem>
-                    ))}
+                  {singleThemes.map((theme: Theme) => (
+                    <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                      {theme.name}
+                    </DropdownMenuRadioItem>
+                  ))}
                 </DropdownMenuRadioGroup>
               </DropdownMenuGroup>
               {IS_PLATFORM && (

@@ -31,7 +31,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import { useProjectContext } from './ProjectContext'
 import { RestorePaidPlanProjectNotice } from './RestorePaidPlanProjectNotice'
 

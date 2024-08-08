@@ -75,10 +75,10 @@ const DowngradeModal = ({
           <Alert
             withIcon
             variant="warning"
-            title="Downgrading to the Free plan will lead to reductions in your organization's quota"
+            title="Downgrading to the Free Plan will lead to reductions in your organization's quota"
           >
             <p>
-              If you're already past the limits of the Free plan, your projects could become
+              If you're already past the limits of the Free Plan, your projects could become
               unresponsive or enter read only mode.
             </p>
           </Alert>

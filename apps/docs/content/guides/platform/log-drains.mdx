@@ -4,7 +4,7 @@ title: 'Log Drains'
 description: 'Getting started with Supabase Log Drains'
 ---
 
-Log drains will send all logs of the Supabase stack to one or more desired destinations. It is only available for customers on Teams and Enterprise plans.
+Log drains will send all logs of the Supabase stack to one or more desired destinations. It is only available for customers on Team and Enterprise Plans.
 
 <Admonition type="note">
 
@@ -14,36 +14,77 @@ You can read about the initial announcement [here](https://github.com/orgs/supab
 
 </Admonition>
 
+## Supported Destinations
+
 The following table lists the supported destinations and the required setup configuration:
 
-| Destination        | Transport Method | Configuration                                     |
-| ------------------ | ---------------- | ------------------------------------------------- |
-| Generic Webhook    | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
-| Datadog            | HTTP             | API Key <br /> Region                             |
-| Elastic - Filebeat | HTTP             | URL <br /> Username and Password                  |
+| Destination           | Transport Method | Configuration                                     |
+| --------------------- | ---------------- | ------------------------------------------------- |
+| Generic HTTP endpoint | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
+| Datadog               | HTTP             | API Key <br /> Region                             |
 
-### Destinations And Behavior
+HTTP requests are batched with a max of 250 logs or 1 second intervals, whichever happens first. Logs are compressed via Gzip if the destination supports it.
 
-HTTP requests will be batched with a max of 250 items with at most 1 second intervals. Gzip compression will also be used if the 3rd party provider supports it.
+### Generic HTTP endpoint
 
-#### Generic Webhook
+Logs are sent as a POST request with a JSON body. Both HTTP/1 and HTTP/2 protocols are supported.
+Custom headers can optionally be configured for all requests.
 
-Logs will be sent as a JSON payload. Both HTTP1 and HTTP2 are supported. A preset configuration of Headers can be supplied for all requests.
+Note that requests are **unsigned**.
 
-Note that requests will be **unsigned**.
+<Admonition type="note">
+  Unsigned requests to HTTP endpoints are temporary and all requests will signed in the near future.
+</Admonition>
 
-:::note
-Unsigned webhook requests are temporary and all requests will be signed in the near future.
-:::
+### Datadog
 
-#### Datadog
+Logs sent to Datadog have the name of the log source set on the `service` field of the event and the source set to `Supabase`. Logs are gzipped before they are sent to Datadog.
 
-Logs sent to Datadog will have the name of the log source set on the `service` field of the event.
+The payload message is a JSON string of the raw log event, prefixed with the event timestamp.
 
-The payload message will be a stringified JSON of the raw log event, prefixed with the event timestamp.
+To setup Datadog log drain, generate a Datadog API key [here](https://app.datadoghq.com/organization-settings/api-keys) and the location of your Datadog site.
 
-#### Elastic - Filebeat
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+>
+    <AccordionItem
+      header="Walkthrough"
+      id="walkthrough"
+    >
 
-Logs will be sent to Filebeat server. See the [Filebeat documentation](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-http_endpoint.html) on how to set up the Filebeat HTTP server.
+    1. Generate API Key in [Datadog dashboard](https://app.datadoghq.com/organization-settings/api-keys)
+    2. Create log drain in [Supabase dashboard](https://supabase.com/dashboard/project/_/settings/log-drains)
+    3. Watch for events in the [Datadog Logs page](https://app.datadoghq.com/logs)
 
-The Filebeat server only handles HTTP1 requests. Basic Auth can be provided for optional user authentication.
+    </AccordionItem>
+
+    <AccordionItem
+      header="Example destination configuration"
+      id="cfg"
+    >
+
+    [Grok parser](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/grok_parser?tab=matchers) matcher for extracting the timestamp to a `date` field
+    ```
+    %{date("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZ"):date}
+    ```
+
+    [Grok parser](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/grok_parser?tab=matchers) matcher for converting stringified JSON to structured JSON on the `json` field.
+    ```
+     %{data::json}
+     ```
+
+    [Remapper](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/remapper) for setting the log level.
+    ```
+    metadata.parsed.error_severity, metadata.level
+    ```
+
+    [Remapper](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/remapper) for setting the log event message.
+    ```
+    event_message
+    ```
+    </AccordionItem>
+
+</Accordion>
+
+If you are interested in other log drains, upvote them [here](https://github.com/orgs/supabase/discussions/28324)

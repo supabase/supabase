@@ -15,7 +15,7 @@ export interface UpgradeSurveyModalProps {
   onClose: (success?: boolean) => void
 }
 
-// Upgrade survey is from free plan to pro/teams plan and from pro to teams plan
+// Upgrade survey is from Free Plan to Pro/Team Plan and from Pro to Team Plan
 const UpgradeSurveyModal = ({
   visible,
   originalPlan,

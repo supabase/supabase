@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import type { FallbackProps } from 'react-error-boundary'
 
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 
 export const ErrorBoundaryState = ({ error, resetErrorBoundary }: FallbackProps) => {
   const router = useRouter()

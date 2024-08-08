@@ -23,7 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { getMenuId } from '../app/guides/layout'
+import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 import { useBreakpoint } from 'common'
 import * as NavItems from './Navigation/NavigationMenu/NavigationMenu.constants'
 
