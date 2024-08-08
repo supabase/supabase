@@ -1,5 +1,8 @@
 import { stripIndent } from 'common-tags'
-import { checkDestructiveQuery } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import {
+  checkDestructiveQuery,
+  isUpdateWithoutWhere,
+} from 'components/interfaces/SQLEditor/SQLEditor.utils'
 
 describe(`destructive query check`, () => {
   it('drop statement matches', () => {
@@ -54,5 +57,37 @@ describe(`destructive query check`, () => {
     `)
 
     expect(match).toBe(false)
+  })
+
+  it('contains an update query with a where clause', () => {
+    const match = isUpdateWithoutWhere(stripIndent`
+      UPDATE public.countries SET name = 'New Name' WHERE id = 1;
+    `)
+
+    expect(match).toBe(false)
+  })
+
+  it('contains an update query without a where clause', () => {
+    const match = isUpdateWithoutWhere(stripIndent`
+      UPDATE public.countries SET name = 'New Name';
+    `)
+
+    expect(match).toBe(true)
+  })
+
+  it('contains an update query, with quoted identifiers with a where clause', () => {
+    const match = isUpdateWithoutWhere(stripIndent`
+      UPDATE "public"."countries" SET name = 'New Name' WHERE id = 1;
+    `)
+
+    expect(match).toBe(false)
+  })
+
+  it('contains an update query, with quoted identifiers without a where clause', () => {
+    const match = isUpdateWithoutWhere(stripIndent`
+      UPDATE "public"."countries" SET name = 'New Name';
+    `)
+
+    expect(match).toBe(true)
   })
 })
