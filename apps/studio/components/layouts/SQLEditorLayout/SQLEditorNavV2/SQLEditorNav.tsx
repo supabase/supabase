@@ -9,7 +9,7 @@ import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { getContentById, useContentIdQuery } from 'data/content/content-id-query'
+import { getContentById } from 'data/content/content-id-query'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import {
   getSQLSnippetFolders,
@@ -22,7 +22,12 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import {
+  useFavoriteSnippets,
+  useSnippetFolders,
+  useSnippets,
+  useSqlEditorV2StateSnapshot,
+} from 'state/sql-editor-v2'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -39,6 +44,7 @@ import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { useContentCountQuery } from 'data/content/content-count-query'
 
 interface SQLEditorNavProps {
   searchText: string
@@ -77,20 +83,21 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   // =======================================================
   // [Joshen] Set up favorites, shared, and private snippets
   // =======================================================
-  const folders = Object.values(snapV2.folders).map((x) => x.folder)
-  const contents = snapV2.sortedSnippets.filter((x) =>
+  const snippets = useSnippets(projectRef as string)
+  const folders = useSnippetFolders(projectRef as string)
+  const contents = snippets.filter((x) =>
     searchText.length > 0 ? x.name.toLowerCase().includes(searchText.toLowerCase()) : true
   )
   const snippet = snapV2.snippets[id as string]?.snippet
 
   const privateSnippets = contents.filter((snippet) => snippet.visibility === 'user')
-  const numPrivateSnippets = Object.keys(snapV2.snippets).length
+  const numPrivateSnippets = snapV2.privateSnippetCount[projectRef as string]
   const privateSnippetsTreeState =
-    folders.length === 0 && numPrivateSnippets === 0
+    folders.length === 0 && snippets.length === 0
       ? [ROOT_NODE]
       : formatFolderResponseForTreeView({ folders, contents: privateSnippets })
 
-  const favoriteSnippets = snapV2.sortedFavoriteSnippets
+  const favoriteSnippets = useFavoriteSnippets(projectRef as string)
   const numFavoriteSnippets = favoriteSnippets.length
   const favoritesTreeState =
     numFavoriteSnippets === 0
@@ -129,6 +136,17 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
       }
     },
   })
+
+  useContentCountQuery(
+    { projectRef, type: 'sql' },
+    {
+      onSuccess(data) {
+        if (projectRef !== undefined) {
+          snapV2.setPrivateSnippetCount({ projectRef, value: data.count })
+        }
+      },
+    }
+  )
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onError: (error, data) => {
@@ -187,6 +205,13 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     snapV2.shareSnippet(selectedSnippetToShare.id, 'project')
     setSelectedSnippetToShare(undefined)
     setShowSharedSnippets(true)
+
+    if (projectRef !== undefined) {
+      snapV2.setPrivateSnippetCount({
+        projectRef,
+        value: snapV2.privateSnippetCount[projectRef] - 1,
+      })
+    }
   }
 
   const onConfirmUnshare = () => {
@@ -194,6 +219,13 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     snapV2.shareSnippet(selectedSnippetToUnshare.id, 'user')
     setSelectedSnippetToUnshare(undefined)
     setShowPrivateSnippets(true)
+
+    if (projectRef !== undefined) {
+      snapV2.setPrivateSnippetCount({
+        projectRef,
+        value: snapV2.privateSnippetCount[projectRef] + 1,
+      })
+    }
   }
 
   const onSelectCopyPersonal = async (snippet: Snippet) => {

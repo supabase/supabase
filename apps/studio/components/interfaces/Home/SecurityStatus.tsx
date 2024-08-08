@@ -1,26 +1,21 @@
 import { CheckCircle2, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
-
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-
 import Link from 'next/link'
 import { WarningIcon } from 'ui/src/components/StatusIcon'
 
 export const SecurityStatus = () => {
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
-  const { data, isLoading } = useProjectLintsQuery({
-    projectRef: project?.ref,
-  })
+  const { data, isLoading } = useProjectLintsQuery({ projectRef: project?.ref })
 
-  const securityLints = (data ?? []).filter(
-    (lint) =>
-      lint.categories.includes('SECURITY') && (lint.level === 'ERROR' || lint.level === 'WARN')
-  )
-
-  const noIssuesFound = securityLints.length === 0
+  const securityLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
+  const errorLints = securityLints.filter((lint) => lint.level === 'ERROR')
+  const warnLints = securityLints.filter((lint) => lint.level === 'WARN')
+  const noIssuesFound = errorLints.length === 0 && warnLints.length === 0
+  const totalIssues = securityLints.length
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
@@ -33,8 +28,12 @@ export const SecurityStatus = () => {
             ) : (
               <div
                 className={cn(
-                  `w-2 h-2 rounded-full`,
-                  noIssuesFound ? 'bg-brand' : 'bg-destructive-600'
+                  'w-2 h-2 rounded-full',
+                  noIssuesFound
+                    ? 'bg-brand'
+                    : errorLints.length > 0
+                      ? 'bg-destructive-600'
+                      : 'bg-warning-600'
                 )}
               />
             )
@@ -54,7 +53,6 @@ export const SecurityStatus = () => {
           ) : (
             <WarningIcon className="shrink-0" />
           )}
-
           <div className="flex flex-col gap-y-3 -mt-1">
             {noIssuesFound ? (
               <div className="flex flex-col gap-y-1">
@@ -66,16 +64,19 @@ export const SecurityStatus = () => {
             ) : (
               <div className="flex flex-col gap-y-1">
                 <p className="text-xs">
-                  {securityLints.length} security issues requiring urgent attention
+                  {totalIssues} security issue{totalIssues > 1 ? 's' : ''} require
+                  {totalIssues > 1 ? '' : 's'}{' '}
+                  {errorLints.length > 0 ? 'urgent attention' : 'attention'}
                 </p>
                 <p className="text-xs text-foreground-light">
                   Check the Security Advisor to address them
                 </p>
               </div>
             )}
-
             <Button asChild type="default" className="w-min">
-              <Link href={`/project/${project?.ref}/database/security-advisor`}>
+              <Link
+                href={`/project/${project?.ref}/database/security-advisor${errorLints.length === 0 ? '?preset=WARN' : ''}`}
+              >
                 Head to Security Advisor
               </Link>
             </Button>

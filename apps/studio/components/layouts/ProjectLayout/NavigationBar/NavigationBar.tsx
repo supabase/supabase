@@ -78,10 +78,8 @@ const NavigationBar = () => {
     projectRef: project?.ref,
   })
 
-  const securityLints = (data ?? []).filter(
-    (lint) =>
-      lint.categories.includes('SECURITY') && (lint.level === 'ERROR' || lint.level === 'WARN')
-  )
+  const securityLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
+  const errorLints = securityLints.filter((lint) => lint.level === 'ERROR')
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project)
@@ -180,7 +178,12 @@ const NavigationBar = () => {
               return (
                 <div className="relative">
                   {securityLints.length > 0 && (
-                    <div className="absolute flex h-2 w-2 left-6 top-2 z-10 bg-destructive-600 rounded-full" />
+                    <div
+                      className={cn(
+                        'absolute flex h-2 w-2 left-6 top-2 z-10 rounded-full',
+                        errorLints.length > 0 ? 'bg-destructive-600' : 'bg-warning-600'
+                      )}
+                    />
                   )}
 
                   <NavigationIconLink
