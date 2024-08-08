@@ -7,10 +7,12 @@ import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import AnnouncementBadge from '~/components/Announcement/Badge'
 import EventCallout from '../EventCallout'
+import { useBreakpoint } from 'common'
 
 const Hero = () => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
+  const isLessThanMd = useBreakpoint()
   const sendTelemetryEvent = async (event: TelemetryEvent) => {
     await Telemetry.sendEvent(event, telemetryProps, router)
   }
@@ -31,7 +33,7 @@ const Hero = () => {
                       className="animate-fade-in"
                     />
                     <EventCallout
-                      size="small"
+                      size={isLessThanMd ? 'tiny' : 'small'}
                       className="text-center justify-center animate-fade-in delay-100 duration-500"
                     />
                   </div>
