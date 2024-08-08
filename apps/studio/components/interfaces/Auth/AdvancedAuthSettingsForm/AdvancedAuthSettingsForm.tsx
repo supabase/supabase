@@ -58,6 +58,10 @@ const schema = object({
   MFA_PHONE: string().required(),
 })
 
+function determineMFAStatus(verifyEnabled, enrollEnabled) {
+  return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
+}
+
 const AdvancedAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const {
@@ -81,26 +85,30 @@ const AdvancedAuthSettingsForm = () => {
   const isTeamsEnterprisePlan =
     isSuccessSubscription && subscription.plan.id !== 'free' && subscription.plan.id !== 'pro'
   const promptTeamsEnterpriseUpgrade = IS_PLATFORM && !isTeamsEnterprisePlan
+  console.log(subscription)
 
   const INITIAL_VALUES = {
     SITE_URL: authConfig?.SITE_URL,
     JWT_EXP: authConfig?.JWT_EXP,
     REFRESH_TOKEN_ROTATION_ENABLED: authConfig?.REFRESH_TOKEN_ROTATION_ENABLED || false,
     // TOTP is enabled by default
-    MFA_TOTP_ENROLL_ENABLED: authConfig?.MFA_TOTP_ENROLL_ENABLED || true,
-    MFA_TOTP_VERIFY_ENABLED: authConfig?.MFA_TOTP_VERIFY_ENABLED || true,
-    MFA_PHONE_ENROLL_ENABLED: authConfig?.MFA_PHONE_ENROLL_ENABLED || false,
-    MFA_PHONE_VERIFY_ENABLED: authConfig?.MFA_PHONE_VERIFY_ENABLED || false,
     MFA_PHONE_OTP_LENGTH: authConfig?.MFA_PHONE_ENROLL_ENABLED || 6,
     MFA_PHONE_TEMPLATE: authConfig?.MFA_PHONE_SMS_TEMPLATE || 'Your code is {{ .Code }}',
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     MFA_MAX_ENROLLED_FACTORS: authConfig?.MFA_MAX_ENROLLED_FACTORS || 10,
     DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE || 10,
     API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION || 10,
-    MFA_TOTP: authConfig?.MFA_TOTP || 'Enabled',
-    MFA_PHONE: authConfig?.MFA_PHONE || 'Disabled',
+    MFA_TOTP:
+      determineMFAStatus(
+        authConfig?.MFA_TOTP_ENROLL_ENABLED || true,
+        authConfig?.MFA_TOTP_VERIFY_ENABLED || true
+      ) || 'Enabled',
+    MFA_PHONE:
+      determineMFAStatus(
+        authConfig?.MFA_PHONE_ENROLL_ENABLED || false,
+        authConfig?.MFA_PHONE_VERIFY_ENABLED || false
+      ) || 'Disabled',
   }
-  // TODO: Use a map to transform Enabled / Disabled to transform MFA_TOTP_ENROLL_ENABLED etc to corresponding underlying config
 
   const MFAFactorSelectionOptions = [
     {
@@ -241,17 +249,19 @@ const AdvancedAuthSettingsForm = () => {
                     formValues={values}
                     disabled={!canUpdateConfig}
                   />
-                  <FormField
-                    name="MFA_PHONE"
-                    properties={{
-                      type: 'select',
-                      title: 'Phone',
-                      description: 'Control Use Of Phone Factors',
-                      enum: MFAFactorSelectionOptions,
-                    }}
-                    formValues={values}
-                    disabled={!canUpdateConfig}
-                  />
+                  {isTeamsEnterprisePlan && (
+                    <FormField
+                      name="MFA_PHONE"
+                      properties={{
+                        type: 'select',
+                        title: 'Phone',
+                        description: 'Control Use Of Phone Factors',
+                        enum: MFAFactorSelectionOptions,
+                      }}
+                      formValues={values}
+                      disabled={!canUpdateConfig}
+                    />
+                  )}
                   <InputNumber
                     id="MFA_MAX_ENROLLED_FACTORS"
                     size="small"
