@@ -1,27 +1,16 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useTelemetryProps } from 'common'
 import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
-import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+import { useEffect, useRef, useState } from 'react'
 
+import { useTelemetryProps } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
-import {
-  Button,
-  ExpandingTextArea,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Form_Shadcn_,
-  cn,
-} from 'ui'
+import { Button, cn } from 'ui'
+import { AssistantChatForm } from 'ui-patterns'
 import { AiIcon } from 'ui-patterns/Cmdk'
 import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
@@ -32,7 +21,6 @@ interface AIPolicyChatProps {
   loading: boolean
   onSubmit: (s: string) => void
   onDiff: (message: { id: string; content: string }) => void
-  onChange: (value: boolean) => void
 }
 
 export const AIPolicyChat = ({
@@ -41,51 +29,40 @@ export const AIPolicyChat = ({
   loading,
   onSubmit,
   onDiff,
-  onChange,
 }: AIPolicyChatProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
   const organization = useSelectedOrganization()
-  const formRef = useRef<HTMLFormElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const telemetryProps = useTelemetryProps()
+
+  const [value, setValue] = useState<string>('')
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
   const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
-
-  const FormSchema = z.object({ chat: z.string() })
-  const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
-    resolver: zodResolver(FormSchema),
-    defaultValues: { chat: '' },
-  })
-  const formChatValue = form.getValues().chat
   const pendingReply = loading && last(messages)?.role === 'user'
-
-  // try to scroll on each rerender to the bottom
-  useEffect(() => {
-    if (loading && bottomRef.current) {
-      setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-      }, 500)
-    }
-  })
 
   useEffect(() => {
     if (!loading) {
-      form.setValue('chat', '')
-      form.setFocus('chat')
+      setValue('')
+      if (inputRef.current) inputRef.current.focus()
     }
-  }, [loading])
 
-  useEffect(() => {
-    onChange(formChatValue.length === 0)
-  }, [formChatValue])
+    // Try to scroll on each rerender to the bottom
+    setTimeout(
+      () => {
+        if (bottomRef.current) {
+          bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+        }
+      },
+      loading ? 100 : 500
+    )
+  }, [loading])
 
   return (
     <div id={'ai-chat-assistant'} className="flex flex-col h-full max-w-full">
@@ -134,7 +111,32 @@ export const AIPolicyChat = ({
         <div ref={bottomRef} className="h-1" />
       </div>
 
-      <Form_Shadcn_ {...form}>
+      <div className="sticky p-5 flex-0 border-t">
+        <AssistantChatForm
+          textAreaRef={inputRef}
+          loading={loading}
+          disabled={loading}
+          icon={<AiIcon className="[&>div>div]:border-black dark:[&>div>div]:border-white" />}
+          placeholder="Ask for some changes to your policy"
+          value={value}
+          onValueChange={(e) => setValue(e.target.value)}
+          onSubmit={(event) => {
+            event.preventDefault()
+            onSubmit(value)
+            Telemetry.sendEvent(
+              {
+                category: 'rls_editor',
+                action: 'ai_suggestion_asked',
+                label: 'rls-ai-assistant',
+              },
+              telemetryProps,
+              router
+            )
+          }}
+        />
+      </div>
+
+      {/* <Form_Shadcn_ {...form}>
         <form
           id="rls-chat"
           ref={formRef}
@@ -182,7 +184,7 @@ export const AIPolicyChat = ({
             )}
           />
         </form>
-      </Form_Shadcn_>
+      </Form_Shadcn_> */}
     </div>
   )
 }
