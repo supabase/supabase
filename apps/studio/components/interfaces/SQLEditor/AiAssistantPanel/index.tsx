@@ -6,13 +6,12 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useTelemetryProps } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Button, cn } from 'ui'
+import { AiIconAnimation, Button, cn } from 'ui'
 import { AssistantChatForm } from 'ui-patterns'
-import { AiIcon } from 'ui-patterns/Cmdk'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
 
@@ -40,14 +39,13 @@ export const AiAssistantPanel = ({
   const router = useRouter()
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
-  const organization = useSelectedOrganization()
   const bottomRef = useRef<HTMLDivElement>(null)
   const telemetryProps = useTelemetryProps()
 
   const [value, setValue] = useState<string>('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const isOptedInToAI = useOrgOptedIntoAi()
   const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
@@ -138,7 +136,12 @@ export const AiAssistantPanel = ({
           textAreaRef={inputRef}
           loading={loading}
           disabled={loading}
-          icon={<AiIcon className="[&>div>div]:border-black dark:[&>div>div]:border-white" />}
+          icon={
+            <AiIconAnimation
+              allowHoverEffect
+              className="[&>div>div]:border-black dark:[&>div>div]:border-white"
+            />
+          }
           placeholder="Ask a question about your SQL query"
           value={value}
           onValueChange={(e) => setValue(e.target.value)}
