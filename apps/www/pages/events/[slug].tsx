@@ -324,7 +324,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   alt={`${event.company?.name} Logo`}
                   fill
                   sizes="100%"
-                  className="!relative object-contain dark:hidden"
+                  className="!relative object-contain object-left dark:hidden"
                   priority
                 />
               </Link>
