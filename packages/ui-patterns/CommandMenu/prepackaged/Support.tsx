@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import { useRegisterCommands, useSetCommandMenuOpen, type ICommand } from '..'
 import { BASE_PATH } from './shared/constants'
 
-const useSupportCommands = () => {
+const useSupportCommands = ({ enabled = true }: { enabled?: boolean } = {}) => {
   const setOpen = useSetCommandMenuOpen()
 
   const commands = useMemo(
@@ -41,7 +41,7 @@ const useSupportCommands = () => {
     [setOpen]
   )
 
-  useRegisterCommands('Support', commands)
+  useRegisterCommands('Support', commands, { enabled })
 }
 
 export { useSupportCommands }
