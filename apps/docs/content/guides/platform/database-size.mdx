@@ -17,7 +17,7 @@ This SQL query will show the current size of your Postgres database:
 
 ```sql
 select
-  sum(pg_database_size(pg_database.datname)) / (1024 * 1024) as db_size_mb
+  pg_size_pretty(sum(pg_database_size(pg_database.datname)))
 from pg_database;
 ```
 
@@ -30,6 +30,17 @@ Database Space is consumed primarily by your data, indexes, and materialized vie
 Depending on your billing plan, your database can go into read-only mode which can prevent you inserting and deleting data. There are instructions for managing read-only mode in the [Disk Management](#disk-management) section.
 
 </Admonition>
+
+### Disk space usage
+
+Your database size is part of the disk usage for your Supabase project, there are many components to Postgres that consume additional disk space. One of the primary components, is the [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html).
+Postgres will store database changes in log files that are cleared away after they are applied to the database. These same files are also used by [Read Replicas](/docs/guides/platform/read-replicas) or other replication methods.
+
+If you would like to determine the size of the WAL files stored on disk, Postgres provides `pg_ls_waldir` as a helper function; the following query can be run:
+
+```sql
+select pg_size_pretty(sum(size)) as wal_size from pg_ls_waldir();
+```
 
 ### Vacuum operations
 
@@ -137,3 +148,4 @@ Once you have reclaimed space, you can run the following to disable [read-only](
 ```sql
 set default_transaction_read_only = 'off';
 ```
+
