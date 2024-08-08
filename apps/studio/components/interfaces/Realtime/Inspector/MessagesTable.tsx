@@ -1,10 +1,10 @@
 import { useParams, useTelemetryProps } from 'common'
 import { isEqual } from 'lodash'
-import { Loader2, MegaphoneIcon } from 'lucide-react'
+import { ExternalLink, Loader2, MegaphoneIcon } from 'lucide-react'
 import Link from 'next/link'
-import { Key, useEffect, useState } from 'react'
-import DataGrid, { RenderRowProps, Row } from 'react-data-grid'
-import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPresence, cn } from 'ui'
+import { useEffect, useState } from 'react'
+import DataGrid, { Row } from 'react-data-grid'
+import { Button, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
 
 import ShimmerLine from 'components/ui/ShimmerLine'
 import Telemetry from 'lib/telemetry'
@@ -58,7 +58,7 @@ const NoResultAlert = ({
                 </p>
               </div>
               <Link href={`/project/${ref}/realtime/inspector`} target="_blank" rel="noreferrer">
-                <Button type="default" iconRight={<IconExternalLink />}>
+                <Button type="default" iconRight={<ExternalLink />}>
                   Open inspector
                 </Button>
               </Link>
@@ -74,7 +74,7 @@ const NoResultAlert = ({
                 <p className="text-foreground-lighter text-xs">Tables must have realtime enabled</p>
               </div>
               <Link href={`/project/${ref}/database/publications`} target="_blank" rel="noreferrer">
-                <Button type="default" iconRight={<IconExternalLink />}>
+                <Button type="default" iconRight={<ExternalLink />}>
                   Publications settings
                 </Button>
               </Link>
@@ -84,7 +84,7 @@ const NoResultAlert = ({
                 <p className="text-foreground">Not sure what to do?</p>
                 <p className="text-foreground-lighter text-xs">Browse our documentation</p>
               </div>
-              <Button type="default" iconRight={<IconExternalLink />}>
+              <Button type="default" iconRight={<ExternalLink />}>
                 <a
                   href="https://supabase.com/docs/guides/realtime"
                   target="_blank"
