@@ -101,10 +101,6 @@ const NoResultAlert = ({
   )
 }
 
-const RowRenderer = (key: Key, props: RenderRowProps<LogData, unknown>) => {
-  return <Row key={key} {...props} isRowSelected={false} selectedCellIdx={undefined} />
-}
-
 interface MessagesTableProps {
   enabled: boolean
   data?: LogData[]
@@ -167,34 +163,42 @@ const MessagesTable = ({
               className="data-grid--simple-logs h-full border-b-0"
               rowHeight={40}
               headerRowHeight={0}
-              onSelectedCellChange={({ rowIdx }) => {
-                Telemetry.sendEvent(
-                  {
-                    category: 'realtime_inspector',
-                    action: 'focused-specific-message',
-                    label: 'realtime_inspector_results',
-                  },
-                  telemetryProps,
-                  router
-                )
-
-                setFocusedLog(data[rowIdx])
-              }}
-              selectedRows={new Set([])}
               columns={ColumnRenderer}
               rowClass={(row) => {
                 return cn([
                   'font-mono tracking-tight',
                   isEqual(row, focusedLog)
                     ? 'bg-scale-800 rdg-row--focused'
-                    : ' bg-200 hover:bg-scale-300 cursor-pointer',
+                    : 'bg-200 hover:bg-scale-300 cursor-pointer',
                   isErrorLog(row) && '!bg-warning-300',
                 ])
               }}
               rows={data}
               rowKeyGetter={(row) => row.id}
               renderers={{
-                renderRow: RowRenderer,
+                renderRow(idx, props) {
+                  const { row } = props
+                  return (
+                    <Row
+                      key={idx}
+                      {...props}
+                      isRowSelected={false}
+                      selectedCellIdx={undefined}
+                      onClick={() => {
+                        Telemetry.sendEvent(
+                          {
+                            category: 'realtime_inspector',
+                            action: 'focused-specific-message',
+                            label: 'realtime_inspector_results',
+                          },
+                          telemetryProps,
+                          router
+                        )
+                        setFocusedLog(row)
+                      }}
+                    />
+                  )
+                },
                 noRowsFallback: (
                   <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
                     <NoResultAlert
