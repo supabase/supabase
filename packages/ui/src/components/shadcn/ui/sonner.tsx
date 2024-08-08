@@ -7,6 +7,8 @@ import { cn } from '../../../lib/utils'
 import { buttonVariants } from '../../Button'
 import { StatusIcon } from './../../StatusIcon'
 
+export const SONNER_DEFAULT_DURATION = 4000
+
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
@@ -22,7 +24,7 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
       theme={theme as ToasterProps['theme']}
       // pointer-events-auto is needed to fix the toast when above radix modals. Set the width to 420px to fix the toast
       // progress component (bottom row rendered in two lines).
-      className="toaster group pointer-events-auto w-[420px]"
+      className="toaster group pointer-events-auto"
       // fontFamily: 'inherit' is needed to use the same font as the rest of the app
       style={{ fontFamily: 'inherit' }}
       toastOptions={{
@@ -57,13 +59,14 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
             // unset all styles set from sonner
             'absolute right-2 top-2 rounded-md text-foreground/50 opacity-0 transition-opacity',
             'hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100',
-            'group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400',
-            'group-[.destructive]:focus:ring-offset-red-600',
+            'group-[.destructive]:text-destructive-300 group-[.destructive]:hover:text-destructive-50',
+            'group-[.destructive]:focus:ring-destructive-400 group-[.destructive]:focus:ring-offset-destructive-600',
             'left-auto transform-none bg-transparent border-0 border-transparent hover:!bg-transparent hover:border-transparent'
           ),
           content: 'grow',
           //group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-overlay
         },
+        duration: SONNER_DEFAULT_DURATION,
         closeButton: true,
         ...toastOptions,
       }}
