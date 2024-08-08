@@ -117,6 +117,7 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: Filte
       if (column?.format === 'uuid') return { ...f, value: f.value.trim() }
       else return f
     })
+    setFilters(formattedFilters)
     onApplyFilters(formattedFilters)
   }
 
