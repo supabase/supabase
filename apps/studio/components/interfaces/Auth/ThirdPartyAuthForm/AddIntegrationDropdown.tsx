@@ -1,17 +1,23 @@
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 
+import { IS_PLATFORM } from 'common'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
 import {
-  INTEGRATION_TYPES,
   getIntegrationTypeIcon,
   getIntegrationTypeLabel,
+  INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
 
 interface AddIntegrationDropdownProps {
@@ -21,9 +27,38 @@ interface AddIntegrationDropdownProps {
 
 const Providers: INTEGRATION_TYPES[] = ['firebase', 'auth0', 'awsCognito']
 
+const ProviderDropdownItem = ({
+  disabled,
+  type,
+  onSelectIntegrationType,
+}: {
+  disabled?: boolean
+  type: INTEGRATION_TYPES
+  onSelectIntegrationType: (type: INTEGRATION_TYPES) => void
+}) => {
+  return (
+    <DropdownMenuItem
+      key={type}
+      onClick={() => onSelectIntegrationType(type)}
+      className={cn('flex items-center gap-x-2 p-2', disabled && 'cursor-not-allowed')}
+      disabled={disabled}
+    >
+      <Image src={getIntegrationTypeIcon(type)} width={16} height={16} alt={`${type} icon`} />
+      <span>{getIntegrationTypeLabel(type)}</span>
+    </DropdownMenuItem>
+  )
+}
+
 export const AddIntegrationDropdown = ({
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
+  const organization = useSelectedOrganization()
+
+  const { data: subscription } = useOrgSubscriptionQuery(
+    { orgSlug: organization?.slug },
+    { enabled: IS_PLATFORM }
+  )
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -32,24 +67,47 @@ export const AddIntegrationDropdown = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {Providers.map((type) => {
-          const name = getIntegrationTypeLabel(type)
-          return (
-            <DropdownMenuItem
-              key={name}
-              onClick={() => onSelectIntegrationType(type)}
-              className="flex items-center gap-x-2 p-2"
-            >
-              <Image
-                src={getIntegrationTypeIcon(type)}
-                width={16}
-                height={16}
-                alt={`${name} icon`}
+        <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
+
+        {subscription?.plan.id === 'free' ? (
+          <>
+            <DropdownMenuSeparator />
+            <div className="bg-surface-200 -m-1 p-2">
+              <DropdownMenuLabel className="grid gap-1">
+                <p className="text-foreground-light">Pro plan (or higher) required</p>
+                <p className="text-foreground-lighter text-xs">
+                  The following providers are not available on{' '}
+                  <a
+                    target="_href"
+                    href={`/org/${organization?.slug}/billing`}
+                    className="underline"
+                  >
+                    your plan
+                  </a>
+                  .
+                </p>
+              </DropdownMenuLabel>
+              <ProviderDropdownItem
+                disabled
+                type="auth0"
+                onSelectIntegrationType={onSelectIntegrationType}
               />
-              <span>{name}</span>
-            </DropdownMenuItem>
-          )
-        })}
+              <ProviderDropdownItem
+                disabled
+                type="awsCognito"
+                onSelectIntegrationType={onSelectIntegrationType}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
+            <ProviderDropdownItem
+              type="awsCognito"
+              onSelectIntegrationType={onSelectIntegrationType}
+            />
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

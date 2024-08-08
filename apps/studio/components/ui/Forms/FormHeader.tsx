@@ -3,8 +3,8 @@ import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { Button } from 'ui'
 import { ReactNode } from 'react'
+import { Button, cn } from 'ui'
 
 const FormHeader = ({
   title,
@@ -20,7 +20,7 @@ const FormHeader = ({
   className?: string
 }) => {
   return (
-    <div className={`mb-6 flex items-center justify-between ${className}`}>
+    <div className={cn(`mb-6 flex items-center justify-between ${className}`)}>
       <div className="space-y-1">
         <h3 className="text-foreground text-xl">
           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
