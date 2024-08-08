@@ -148,6 +148,7 @@ const InputField = ({
               )}
             </>
           }
+          textAreaClassName="pr-8"
           labelOptional={field.format}
           disabled={!isEditable || isTruncated}
           error={errors[field.name]}
