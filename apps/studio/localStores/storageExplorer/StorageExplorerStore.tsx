@@ -32,7 +32,7 @@ import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { lookupMime } from 'lib/mime'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
-import { Button, ToastProgress } from 'ui'
+import { Button, SonnerProgress } from 'ui'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -498,7 +498,7 @@ class StorageExplorerStore {
     const remainingTime = this.calculateTotalRemainingTime(this.uploadProgresses)
 
     return toast(
-      <ToastProgress
+      <SonnerProgress
         progress={progress}
         message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
         progressPrefix={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) && remainingTime !== 0 ? `${this.formatTime(remainingTime)} remaining – ` : ''}`}
@@ -963,7 +963,7 @@ class StorageExplorerStore {
     this.clearSelectedItems()
 
     const toastId = toast(
-      <ToastProgress progress={0} message={`Deleting ${prefixes.length} file(s)...`} />,
+      <SonnerProgress progress={0} message={`Deleting ${prefixes.length} file(s)...`} />,
       { closeButton: false }
     )
 
@@ -982,7 +982,7 @@ class StorageExplorerStore {
       await previousPromise
       await Promise.all(nextBatch.map((batch) => batch()))
       toast(
-        <ToastProgress
+        <SonnerProgress
           progress={progress * 100}
           message={`Deleting ${prefixes.length} file(s)...`}
         />,
@@ -1028,7 +1028,7 @@ class StorageExplorerStore {
       const files = await this.getAllItemsAlongFolder(folder)
 
       toast(
-        <ToastProgress
+        <SonnerProgress
           progress={0}
           message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
         />,
@@ -1074,7 +1074,7 @@ class StorageExplorerStore {
           const previousResults = await previousPromise
           const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
           toast(
-            <ToastProgress
+            <SonnerProgress
               progress={progress * 100}
               message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
             />,
@@ -1161,7 +1161,7 @@ class StorageExplorerStore {
       const previousResults = await previousPromise
       const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
       toast(
-        <ToastProgress
+        <SonnerProgress
           progress={progress * 100}
           message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
         />,
@@ -1506,7 +1506,7 @@ class StorageExplorerStore {
     }
 
     const toastId = toast(
-      <ToastProgress progress={0} message={`Renaming folder to ${newName}`} />,
+      <SonnerProgress progress={0} message={`Renaming folder to ${newName}`} />,
       { closeButton: false }
     )
 
@@ -1565,7 +1565,7 @@ class StorageExplorerStore {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
         toast(
-          <ToastProgress progress={progress * 100} message={`Renaming folder to ${newName}`} />,
+          <SonnerProgress progress={progress * 100} message={`Renaming folder to ${newName}`} />,
           { id: toastId, closeButton: false }
         )
       }, Promise.resolve())

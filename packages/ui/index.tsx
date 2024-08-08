@@ -72,7 +72,7 @@ export * from './src/components/ThemeProvider/prefixedThemes'
 // shadcn
 export * from './src/components/shadcn/ui/dropdown-menu'
 export * from './src/components/shadcn/ui/sonner'
-export * from './src/components/shadcn/ui/toast-progress'
+export * from './src/components/shadcn/ui/sonner-progress'
 export * from './src/components/shadcn/ui/separator'
 export * from './src/components/shadcn/ui/sheet'
 export * from './src/components/shadcn/ui/badge'

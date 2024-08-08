@@ -20,7 +20,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary } from 'types'
-import { ToastProgress } from 'ui'
+import { SonnerProgress } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ColumnEditor from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
@@ -514,7 +514,7 @@ const SidePanelEditor = ({
         selectedHeaders,
         (progress: number) => {
           toast.loading(
-            <ToastProgress
+            <SonnerProgress
               progress={progress}
               message={`Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`}
             />,
@@ -536,7 +536,7 @@ const SidePanelEditor = ({
         selectedHeaders,
         (progress: number) => {
           toast.loading(
-            <ToastProgress
+            <SonnerProgress
               progress={progress}
               message={`Adding ${importContent.rows.length.toLocaleString()} rows to ${
                 selectedTable.name

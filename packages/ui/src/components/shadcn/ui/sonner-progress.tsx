@@ -12,7 +12,7 @@ import { Progress } from './progress'
  *    { id: toastId, closeButton: false }
  *  )
  */
-export const ToastProgress = ({
+export const SonnerProgress = ({
   progress,
   progressPrefix,
   action,
