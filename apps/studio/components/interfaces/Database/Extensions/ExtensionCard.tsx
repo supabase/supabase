@@ -110,12 +110,12 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                 href={
                   extensionMeta?.link.startsWith('/guides')
                     ? siteUrl === 'http://localhost:8082'
-                      ? `http://localhost:3001/docs${extensions.find(
-                          (item: any) => item.name === extension.name
-                        )?.link}`
-                      : `https://supabase.com/docs${extensions.find(
-                          (item: any) => item.name === extension.name
-                        )?.link}`
+                      ? `http://localhost:3001/docs${
+                          extensions.find((item: any) => item.name === extension.name)?.link
+                        }`
+                      : `https://supabase.com/docs${
+                          extensions.find((item: any) => item.name === extension.name)?.link
+                        }`
                     : extensions.find((item: any) => item.name === extension.name)?.link ?? ''
                 }
               >
