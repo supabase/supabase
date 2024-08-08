@@ -24,6 +24,7 @@ interface SpreadsheetImportPreviewProps {
   errors?: any[]
   selectedHeaders: string[]
   incompatibleHeaders: string[]
+  incompatibeTypeColumns: any[]
 }
 
 const SpreadsheetImportPreview = ({
@@ -32,6 +33,7 @@ const SpreadsheetImportPreview = ({
   errors = [],
   selectedHeaders,
   incompatibleHeaders,
+  incompatibeTypeColumns,
 }: SpreadsheetImportPreviewProps) => {
   const [expandPreview, setExpandPreview] = useState(false)
   const [expandedErrors, setExpandedErrors] = useState<string[]>([])
@@ -43,6 +45,7 @@ const SpreadsheetImportPreview = ({
   const previewRows = rows.slice(0, MAX_ROWS)
 
   const isCompatible = selectedTable !== undefined ? incompatibleHeaders.length === 0 : true
+  const isTypeCompatible = selectedTable !== undefined ? incompatibeTypeColumns.length === 0 : true
 
   useEffect(() => {
     setExpandPreview(true)
@@ -64,6 +67,7 @@ const SpreadsheetImportPreview = ({
             <div className="flex items-center space-x-2">
               <p className="text-sm">Preview data to be imported</p>
               {!isCompatible && <Badge variant="destructive">Data incompatible</Badge>}
+              {!isTypeCompatible && <Badge variant="destructive">Data type incompatible</Badge>}
               {errors.length > 0 && <Badge variant="warning">{errors.length} issues found</Badge>}
             </div>
             <Button
@@ -113,11 +117,11 @@ const SpreadsheetImportPreview = ({
               </div>
             )}
           </div>
-          {(!isCompatible || errors.length > 0) && (
+          {(!isCompatible || !isTypeCompatible || errors.length > 0) && (
             <div className="space-y-2 my-4">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm">Issues found in spreadsheet</p>
-                {isCompatible && (
+                {isCompatible && isTypeCompatible && (
                   <p className="text-sm text-foreground-light">
                     {selectedTable !== undefined
                       ? 'This CSV can still be imported into your table despite issues in the following rows.'
@@ -139,6 +143,32 @@ const SpreadsheetImportPreview = ({
                         The column{incompatibleHeaders.length > 1 ? 's' : ''}{' '}
                         {incompatibleHeaders.map((x) => `"${x}"`).join(', ')}{' '}
                         {incompatibleHeaders.length > 1 ? 'are' : 'is'} not present in your table
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {!isTypeCompatible && (
+                  <div className="space-y-2">
+                    <div className="flex items-start space-x-2">
+                      <div className="w-[14px] h-[14px] flex items-center justify-center translate-y-[3px]">
+                        <div className="w-[6px] h-[6px] rounded-full bg-scale-1000" />
+                      </div>
+                      <p className="text-sm">
+                        This CSV <span className="text-red-900">cannot</span> be imported into your
+                        table due to incompatible types in these columns:
+                        <br />
+                        {incompatibeTypeColumns.map((c) => (
+                          <div className="flex items-start space-x-2">
+                            <div className="w-[14px] h-[14px] flex items-center justify-center translate-y-[3px]">
+                              <div className="w-[6px] h-[6px] rounded-full bg-scale-1000" />
+                            </div>
+                            <p className="text-sm">
+                              "{c.name}": expected type of{' '}
+                              <span className="font-bold">{c.expectedFormat}</span> but found{' '}
+                              <span className="font-bold">{c.format}</span>
+                            </p>
+                          </div>
+                        ))}
                       </p>
                     </div>
                   </div>
