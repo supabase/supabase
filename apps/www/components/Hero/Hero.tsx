@@ -6,6 +6,7 @@ import gaEvents from '~/lib/gaEvents'
 import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import AnnouncementBadge from '~/components/Announcement/Badge'
+import EventCallout from '../EventCallout'
 
 const Hero = () => {
   const router = useRouter()
@@ -19,7 +20,7 @@ const Hero = () => {
       <SectionContainer className="pt-8 md:pt-16 overflow-hidden">
         <div className="relative">
           <div className="mx-auto">
-            <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
+            <div className="mx-auto max-w-3xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
               <div className="relative z-10 lg:h-auto pt-[90px] lg:pt-[90px] lg:min-h-[300px] flex flex-col items-center justify-center sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8">
                 <div className="flex flex-col items-center">
                   <div className="z-40 w-full flex flex-col gap-4 items-center justify-center -mt-4 md:-mt-8 mb-8 lg:mb-8">
@@ -27,6 +28,11 @@ const Hero = () => {
                       url="/launch-week"
                       badge="Launch Week 12"
                       announcement="Claim your ticket"
+                      className="animate-fade-in"
+                    />
+                    <EventCallout
+                      size="small"
+                      className="text-center justify-center animate-fade-in delay-100 duration-500"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
