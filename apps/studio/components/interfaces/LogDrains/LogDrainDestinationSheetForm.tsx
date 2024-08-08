@@ -482,7 +482,7 @@ export function LogDrainDestinationSheetForm({
               }
             >
               <ul className="text-right text-foreground-light">
-                <li className="text-brand-link text-base">$60 / drain / month</li>
+                <li className="text-brand-link text-base">$60 per drain per month</li>
                 <li>$0.20 per million events</li>
                 <li>$0.09 per GB egress</li>
               </ul>
