@@ -1,7 +1,6 @@
-'use client'
-
-import React from 'react'
 import {
+  IconBranching,
+  IconGitHub,
   IconMenuApi,
   IconMenuAuth,
   IconMenuCli,
@@ -26,10 +25,8 @@ import {
   IconMenuKotlin,
   IconMenuAI,
   IconMenuDevCli,
-  IconGitHub,
   IconSupport,
   IconTroubleshooting,
-  IconBranching,
 } from './MenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, className?: string) {

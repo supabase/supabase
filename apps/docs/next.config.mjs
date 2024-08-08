@@ -64,6 +64,11 @@ const nextConfig = {
     },
   },
   transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
+  experimental: {
+    outputFileTracingIncludes: {
+      '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
+    },
+  },
   /**
    * The SQL to REST API translator relies on libpg-query, which packages a
    * native Node.js module that wraps the Postgres query parser.

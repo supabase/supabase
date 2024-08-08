@@ -12,7 +12,7 @@ import { BUILD_PREVIEW_HTML, IS_PREVIEW } from '~/lib/constants'
  * rerender in prod, but this is fine because IS_PREVIEW will never change on
  * you within a single build.
  */
-const ShortcutPreviewBuild = ({ children }: PropsWithChildren) => {
+export const ShortcutPreviewBuild = ({ children }: PropsWithChildren) => {
   if (!BUILD_PREVIEW_HTML && IS_PREVIEW) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isMounted, setIsMounted] = useState(false)
@@ -27,5 +27,3 @@ const ShortcutPreviewBuild = ({ children }: PropsWithChildren) => {
 
   return children
 }
-
-export { ShortcutPreviewBuild }

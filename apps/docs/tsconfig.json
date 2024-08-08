@@ -33,7 +33,6 @@
     "**/*.ts",
     "**/*.tsx",
     "pages/guides/append-test.js",
-    "jest.config.mjs",
     ".next/types/**/*.ts",
     "./../../packages/ui/src/**/*.d.ts"
   ],
