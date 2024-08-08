@@ -17,15 +17,19 @@ import { getAllPostSlugs, getPostdata } from '~/lib/posts'
 import { isBrowser, useTelemetryProps } from 'common'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 import gaEvents from '~/lib/gaEvents'
+import { XIcon } from '@heroicons/react/outline'
+
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
 
 import { Button, Image } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
-import utc from 'dayjs/plugin/utc'
-import timezone from 'dayjs/plugin/timezone'
-import advancedFormat from 'dayjs/plugin/advancedFormat'
+import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
+import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -39,12 +43,20 @@ type CTA = {
   target?: '_blank' | '_self'
 }
 
+type CompanyType = {
+  name: string
+  website_url: string
+  logo: string
+  logo_light: string
+}
+
 interface EventData {
   title: string
   subtitle?: string
   main_cta?: CTA
   description: string
   type: EventType
+  company?: CompanyType
   duration?: string
   timezone?: string
   tags?: string[]
@@ -202,7 +214,16 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               sizes="100%"
               className="not-sr-only block dark:hidden w-full h-full absolute inset-0 object-cover object-bottom"
             />
-            <SectionContainer className="relative z-10 grid lg:min-h-[400px] h-full grid-cols-1 lg:grid-cols-2 gap-8 text-foreground-light">
+            <SectionContainer
+              className="
+                relative z-10
+                lg:min-h-[400px] h-full
+                grid grid-cols-1 lg:grid-cols-2
+                gap-8
+                text-foreground-light
+                !py-10 md:!py-16
+              "
+            >
               <div className="h-full flex flex-col justify-between">
                 <div className="flex flex-col gap-2 md:gap-3 items-start mb-8">
                   <div className="flex flex-row text-sm items-center flex-wrap">
@@ -264,7 +285,50 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               )}
             </SectionContainer>
           </header>
-          <SectionContainer className="grid lg:grid-cols-3 gap-12">
+          <SectionContainer className="grid lg:grid-cols-3 gap-12 !py-10 md:!py-16">
+            <div className="order-first lg:col-span-full flex items-center gap-4 md:gap-6 lg:mb-4">
+              <figure className="h-6">
+                <NextImage
+                  src={supabaseLogoWordmarkLight}
+                  width={160}
+                  height={30}
+                  alt="Supabase Logo"
+                  className="object-contain dark:hidden"
+                  priority
+                />
+                <NextImage
+                  src={supabaseLogoWordmarkDark}
+                  width={160}
+                  height={30}
+                  alt="Supabase Logo"
+                  className="object-contain hidden dark:block"
+                  priority
+                />
+              </figure>
+              <XIcon className="w-4 h-4 text-foreground-lighter" />
+              <Link
+                href={event.company?.website_url ?? '#'}
+                target="_blank"
+                className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90"
+              >
+                <NextImage
+                  src={`/images/events/` + event.company?.logo ?? ''}
+                  alt={`${event.company?.name} Logo`}
+                  fill
+                  sizes="100%"
+                  className="!relative object-contain object-left hidden dark:block"
+                  priority
+                />
+                <NextImage
+                  src={`/images/events/` + event.company?.logo_light ?? ''}
+                  alt={`${event.company?.name} Logo`}
+                  fill
+                  sizes="100%"
+                  className="!relative object-contain dark:hidden"
+                  priority
+                />
+              </Link>
+            </div>
             <main className="lg:col-span-2">
               <div className="prose prose-docs">
                 <h2 className="text-foreground-light text-sm font-mono uppercase">
