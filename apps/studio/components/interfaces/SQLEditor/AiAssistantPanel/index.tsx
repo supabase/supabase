@@ -139,7 +139,7 @@ export const AiAssistantPanel = ({
           icon={
             <AiIconAnimation
               allowHoverEffect
-              className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white"
+              className="[&>div>div]:border-black dark:[&>div>div]:border-white"
             />
           }
           placeholder="Ask a question about your SQL query"
