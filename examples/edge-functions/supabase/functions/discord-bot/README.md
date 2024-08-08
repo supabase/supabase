@@ -62,7 +62,11 @@ Open Discord, type `/Promise` and press **Enter**.
 
 ## Run locally
 
+First, start the bot on your local machine
 ```bash
 supabase functions serve discord-bot --no-verify-jwt --env-file ./supabase/.env.local
-ngrok http 54321
 ```
+
+To use it with Discord you'll need a Public URL. There are a couple of options. 
+1. [Tunnelmole](https://github.com/robbie-cahill/tunnelmole-client), an open source tunneling tool that will create a public URL that forwards traffic to your local development environment through a secure tunnel. View the [README](https://github.com/robbie-cahill/tunnelmole-client) for installation instructions then run `tmole 54321` 
+2. [ngrok](https://ngrok.com/) is a popular closed source tunneling tool. Go to the website to download and install it, then run `ngrok http 54321`

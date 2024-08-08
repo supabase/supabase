@@ -9,6 +9,7 @@ import prettier from 'prettier'
 
 async function generate() {
   const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
+
   const pages = await globby([
     'pages/*.js',
     'pages/*.tsx',
@@ -17,6 +18,7 @@ async function generate() {
     '_blog/*.mdx',
     '_case-studies/*.mdx',
     '_customers/*.mdx',
+    '_events/*.mdx',
     '_alternatives/*.mdx',
     '!pages/index.tsx',
     '!data/*.mdx',
@@ -31,6 +33,7 @@ async function generate() {
   const blogUrl = 'blog'
   const caseStudiesUrl = 'case-studies'
   const customerStoriesUrl = 'customers'
+  const eventsUrl = 'events'
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
@@ -46,6 +49,7 @@ async function generate() {
               .replace('_blog', `/${blogUrl}`)
               .replace('_case-studies', `/${caseStudiesUrl}`)
               .replace('_customers', `/${customerStoriesUrl}`)
+              .replace('_events', `/${eventsUrl}`)
               .replace('_alternatives', '/alternatives')
               .replace('.tsx', '')
               .replace('.mdx', '')
@@ -63,6 +67,7 @@ async function generate() {
             if (route === '/partners/[slug]') return null
             if (route === '/case-studies/[slug]') return null
             if (route === '/customers/[slug]') return null
+            if (route === '/events/[slug]') return null
             if (route === '/launch-week/ticket-image') return null
 
             /**
@@ -88,7 +93,7 @@ async function generate() {
               <url>
                   <loc>${`https://supabase.com${route}`}</loc>
                   <changefreq>weekly</changefreq>
-                  <changefreq>0.5</changefreq>
+                  <priority>0.5</priority>
               </url>
             `
           })
@@ -96,7 +101,7 @@ async function generate() {
     </urlset>
     `
 
-  const formatted = prettier.format(sitemap, {
+  const formatted = await prettier.format(sitemap, {
     ...prettierConfig,
     parser: 'html',
   })

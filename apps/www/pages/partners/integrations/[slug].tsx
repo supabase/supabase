@@ -1,22 +1,27 @@
-import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import { CH } from '@code-hike/mdx/components'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
-import { GetStaticPaths, GetStaticProps } from 'next'
-import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
-import { NextSeo } from 'next-seo'
+import { ChevronLeft, ExternalLink } from 'lucide-react'
+import { type GetStaticPaths, type GetStaticProps } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { serialize } from 'next-mdx-remote/serialize'
+import { NextSeo } from 'next-seo'
+import { type Dispatch, type SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import 'swiper/swiper.min.css'
-import { Admonition, Button, ExpandableVideo, IconChevronLeft, IconExternalLink } from 'ui'
+import 'swiper/css'
+
+import { useBreakpoint } from 'common'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import { Admonition, Button } from 'ui'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import supabase from '~/lib/supabase'
-import { Partner } from '~/types/partners'
+import supabase from '~/lib/supabaseMisc'
+import type { Partner } from '~/types/partners'
 import Error404 from '../../404'
 
 /**
@@ -47,12 +52,9 @@ function Partner({
   overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
 }) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
+  const isNarrow = useBreakpoint('lg')
 
   if (!partner) return <Error404 />
-
-  const videoThumbnail = partner.video
-    ? `http://img.youtube.com/vi/${partner.video}/0.jpg`
-    : undefined
 
   return (
     <>
@@ -90,13 +92,14 @@ function Partner({
       ) : null}
       <DefaultLayout>
         <SectionContainer>
-          <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-12 lg:col-span-2">
+          <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-10 lg:col-span-2">
             {/* Back button */}
-            <Link href="/partners/integrations">
-              <a className="text-scale-1200 hover:text-scale-1000 flex cursor-pointer items-center transition-colors">
-                <IconChevronLeft style={{ padding: 0 }} />
-                Back
-              </a>
+            <Link
+              href="/partners/integrations"
+              className="text-foreground hover:text-foreground-lighter flex cursor-pointer items-center transition-colors"
+            >
+              <ChevronLeft width={14} height={14} />
+              Back
             </Link>
 
             <div className="flex items-center space-x-4">
@@ -104,7 +107,7 @@ function Partner({
                 layout="fixed"
                 width={56}
                 height={56}
-                className="bg-scale-400 flex-shrink-f0 h-14 w-14 rounded-full"
+                className="bg-surface-200 flex-shrink-f0 h-14 w-14 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />
@@ -114,58 +117,70 @@ function Partner({
             </div>
 
             <div
-              className="bg-scale-300 py-6"
+              className="bg-gradient-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
-              <Swiper
-                initialSlide={0}
-                spaceBetween={0}
-                slidesPerView={4}
-                speed={300}
-                // slidesOffsetBefore={300}
-                centerInsufficientSlides={true}
-                breakpoints={{
-                  320: {
-                    slidesPerView: 1,
-                  },
-                  720: {
-                    slidesPerView: 2,
-                  },
-                  920: {
-                    slidesPerView: 3,
-                  },
-                  1024: {
-                    slidesPerView: 4,
-                  },
-                  1280: {
-                    slidesPerView: 5,
-                  },
-                }}
-              >
-                {partner.images?.map((image: any, i: number) => {
-                  return (
-                    <SwiperSlide key={i}>
-                      <div className="relative ml-3 mr-3 block cursor-move overflow-hidden rounded-md">
-                        <Image
-                          layout="responsive"
-                          objectFit="contain"
-                          width={1460}
-                          height={960}
-                          src={image}
-                          alt={partner.title}
-                          onClick={() => setFocusedImage(image)}
-                        />
-                      </div>
-                    </SwiperSlide>
-                  )
-                })}
-              </Swiper>
+              <SectionContainer className="!py-0 !px-3 lg:!px-12 xl:!p-0 mx-auto max-w-5xl">
+                <Swiper
+                  initialSlide={0}
+                  spaceBetween={20}
+                  slidesPerView={4}
+                  speed={300}
+                  grabCursor
+                  centeredSlides={false}
+                  centerInsufficientSlides={false}
+                  breakpoints={{
+                    320: {
+                      slidesPerView: 1.25,
+                      centeredSlides: false,
+                      spaceBetween: 10,
+                    },
+                    720: {
+                      slidesPerView: 2,
+                      centeredSlides: false,
+                      spaceBetween: 10,
+                    },
+                    920: {
+                      slidesPerView: 3,
+                      centeredSlides: false,
+                    },
+                    1024: {
+                      slidesPerView: 4,
+                    },
+                    1280: {
+                      slidesPerView: 5,
+                    },
+                  }}
+                >
+                  {partner.images?.map((image: any, i: number) => {
+                    return (
+                      <SwiperSlide key={i}>
+                        <div className="relative block overflow-hidden rounded-md">
+                          <Image
+                            layout="responsive"
+                            objectFit="contain"
+                            placeholder="blur"
+                            blurDataURL="/images/blur.png"
+                            width={1460}
+                            height={960}
+                            src={image}
+                            alt={partner.title}
+                            onClick={() => setFocusedImage(image)}
+                          />
+                        </div>
+                      </SwiperSlide>
+                    )
+                  })}
+                </Swiper>
+              </SectionContainer>
             </div>
 
-            <div className="grid lg:grid-cols-8 lg:space-x-12">
-              <div className="lg:col-span-5">
+            <div className="grid gap-y-12 lg:grid-cols-8 lg:space-x-12">
+              {isNarrow && <PartnerDetails partner={partner} />}
+
+              <div className="lg:col-span-5 overflow-hidden">
                 <h2
-                  className="text-scale-1200"
+                  className="text-foreground"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
                 >
                   Overview
@@ -176,77 +191,10 @@ function Partner({
                 </div>
               </div>
 
-              <div className="lg:col-span-3 order-first lg:order-last pt-16 lg:pt-0">
-                <div className="sticky top-20">
-                  <h2
-                    className="text-scale-1200"
-                    style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
-                  >
-                    Details
-                  </h2>
-
-                  {partner.video && (
-                    <div className="mb-6">
-                      <ExpandableVideo
-                        videoId={partner.video}
-                        imgUrl={videoThumbnail}
-                        imgOverlayText="Watch an introductory video"
-                        triggerContainerClassName="w-full"
-                      />
-                    </div>
-                  )}
-
-                  <div className="text-scale-1200 divide-y">
-                    {partner.type === 'technology' && (
-                      <div className="flex items-center justify-between py-2">
-                        <span className="text-scale-900">Developer</span>
-                        <span className="text-scale-1200">{partner.developer}</span>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between py-2">
-                      <span className="text-scale-900">Category</span>
-                      <Link href={`/partners/integrations#${partner.category.toLowerCase()}`}>
-                        <a className="text-brand hover:text-brand-300 transition-colors">
-                          {partner.category}
-                        </a>
-                      </Link>
-                    </div>
-
-                    <div className="flex items-center justify-between py-2">
-                      <span className="text-scale-900">Website</span>
-                      <a
-                        href={partner.website}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-brand hover:text-brand-300 transition-colors"
-                      >
-                        {new URL(partner.website).host}
-                      </a>
-                    </div>
-
-                    {partner.type === 'technology' && partner.docs && (
-                      <div className="flex items-center justify-between py-2">
-                        <span className="text-scale-900">Documentation</span>
-                        <a
-                          href={partner.docs}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-brand hover:text-brand-300 transition-colors"
-                        >
-                          <span className="flex items-center space-x-1">
-                            <span>Learn</span>
-                            <IconExternalLink size="small" />
-                          </span>
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              {!isNarrow && <PartnerDetails partner={partner} />}
             </div>
             {partner.call_to_action_link && (
-              <div className="bg-scale-100 dark:bg-scale-300 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
+              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
                     Get started with {partner.title} and Supabase.
@@ -263,6 +211,84 @@ function Partner({
         </SectionContainer>
       </DefaultLayout>
     </>
+  )
+}
+
+const PartnerDetails = ({ partner }: { partner: Partner }) => {
+  const videoThumbnail = partner.video
+    ? `http://img.youtube.com/vi/${partner.video}/0.jpg`
+    : undefined
+
+  return (
+    <div className="lg:col-span-3">
+      <div className="sticky top-20 flex flex-col gap-8">
+        <h2 className="text-foreground" style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
+          Details
+        </h2>
+
+        {partner.video && (
+          <div className="mb-6">
+            <ExpandableVideo
+              videoId={partner.video}
+              imgUrl={videoThumbnail}
+              imgOverlayText="Watch an introductory video"
+              triggerContainerClassName="w-full"
+            />
+          </div>
+        )}
+
+        <div className="text-foreground divide-y">
+          {partner.type === 'technology' && (
+            <div className="flex items-center justify-between py-2">
+              <span className="text-foreground-lighter">Developer</span>
+              <span className="text-foreground">{partner.developer}</span>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between py-2">
+            <span className="text-lighter">Category</span>
+            <Link
+              href={`/partners/integrations#${partner.category.toLowerCase()}`}
+              className="text-brand hover:underline transition-colors"
+            >
+              {partner.category}
+            </Link>
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <span className="text-foreground-lighter">Website</span>
+            <a
+              href={partner.website}
+              target="_blank"
+              rel="noreferrer"
+              className="text-brand hover:underline transition-colors"
+            >
+              {new URL(partner.website).host}
+            </a>
+          </div>
+
+          {partner.type === 'technology' && partner.docs && (
+            <div className="flex items-center justify-between py-2">
+              <span className="text-foreground-lighter">Documentation</span>
+              <a
+                href={partner.docs}
+                target="_blank"
+                rel="noreferrer"
+                className="text-brand hover:underline transition-colors"
+              >
+                <span className="flex items-center space-x-1">
+                  <span>Learn</span>
+                  <ExternalLink width={14} height={14} />
+                </span>
+              </a>
+            </div>
+          )}
+        </div>
+        <p className="text-foreground-light text-sm">
+          Third-party integrations and docs are managed by Supabase partners.
+        </p>
+      </div>
+    </div>
   )
 }
 
@@ -323,7 +349,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: { partner, overview },
-    revalidate: 18000, // In seconds - refresh every 5 hours
+    revalidate: 1800, // 30 minutes
   }
 }
 

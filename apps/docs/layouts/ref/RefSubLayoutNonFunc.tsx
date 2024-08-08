@@ -1,7 +1,7 @@
 import { useInView } from 'react-intersection-observer'
-import { FC } from 'react'
-import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
-import { useRouter } from 'next/router'
+import { FC, PropsWithChildren } from 'react'
+import { highlightSelectedNavItem } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
+import { useRouter } from 'next/compat/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
 
@@ -30,20 +30,14 @@ type StickyHeader = {
 
 type RefSubLayoutNonFuncType = {}
 
-const RefSubLayoutNonFunc: FC<RefSubLayoutNonFuncType> & RefSubLayoutNonFuncSubComponents = (
-  props
-) => {
+const RefSubLayoutNonFunc: FC<PropsWithChildren<RefSubLayoutNonFuncType>> &
+  RefSubLayoutNonFuncSubComponents = (props) => {
   return <div className="flex flex-col w-full divide-y">{props.children}</div>
 }
 
-const Section: FC<ISectionContainer> = (props) => {
+const Section: FC<PropsWithChildren<ISectionContainer>> = (props) => {
   return (
-    <article
-      key={props.id}
-      className={`${
-        props.singleColumn ? 'prose dark:prose-dark py-16 lg:py-32 ' : 'py-16 lg:py-32'
-      }`}
-    >
+    <article key={props.id} className={`${props.singleColumn ? 'prose py-16' : 'py-16'}`}>
       <StickyHeader {...props} />
       <div
         className={`ref-container gap-16 ${
@@ -82,7 +76,7 @@ const StickyHeader: FC<StickyHeader> = (props) => {
       id={props.slug}
       data-ref-id={props.id}
       className={[
-        'text-xl font-medium text-scale-1200 mb-8 scroll-mt-24',
+        'text-xl font-medium text-foreground mb-8 scroll-mt-24',
         props.monoFont && 'font-mono',
       ].join(' ')}
     >
@@ -93,16 +87,16 @@ const StickyHeader: FC<StickyHeader> = (props) => {
 
 interface ISectionDetails {}
 
-const Details: FC<ISectionDetails> = (props) => {
+const Details: FC<PropsWithChildren<ISectionDetails>> = (props) => {
   return <div>{props.children}</div>
 }
 
 interface ISectionExamples {}
 
-const Examples: FC<ISectionExamples> = (props) => {
+const Examples: FC<PropsWithChildren<ISectionExamples>> = (props) => {
   return (
     <div className="w-full">
-      <div className="sticky top-24">{props.children}</div>
+      <div className="sticky top-32">{props.children}</div>
     </div>
   )
 }

@@ -1,15 +1,26 @@
 # Developing Supabase
 
-1. [Getting started](#getting-started)
-   - [Install dependencies](#install-dependencies)
-2. [Local development](#local-development)
-   - [Fork the repository](#fork-the-repository)
-   - [Clone the repo](#clone-the-repo)
-   - [Running turborepo](#running-turborepo)
-     - [Shared components](#shared-components)
-     - [Installing packages](#installing-packages)
-   - [New Supabase docs](#new-supabase-docs)
-3. [Create a pull request](#create-a-pull-request)
+- [Developing Supabase](#developing-supabase)
+
+  - [Getting started](#getting-started)
+    - [Install dependencies](#install-dependencies)
+  - [Local development](#local-development)
+    - [Fork the repo](#fork-the-repo)
+    - [Clone the repo](#clone-the-repo)
+    - [Install dependencies](#install-dependencies-1)
+      - [Running sites individually](#running-sites-individually)
+      - [Shared components](#shared-components)
+      - [Installing packages](#installing-packages)
+  - [Running Docker for Supabase Studio](#running-docker-for-supabase-studio)
+    - [Prerequsites](#prerequsites)
+    - [Get Started](#get-started)
+  - [Create a pull request](#create-a-pull-request)
+  - [Issue assignment](#issue-assignment)
+  - [Common tasks](#common-tasks)
+    - [Add a redirect](#add-a-redirect)
+    - [Federated docs](#federated-docs)
+  - [Community channels](#community-channels)
+  - [Contributors](#contributors)
 
 - [Common tasks](#common-tasks)
   - [Add a redirect](#add-a-redirect)
@@ -17,31 +28,32 @@
 
 ## Getting started
 
-Thank you for expressing your interest in [Supabase](https://supabase.com) and your willingness to contribute!
+Thank you for your interest in [Supabase](https://supabase.com) and your willingness to contribute!
 
-To ensure a positive and inclusive environment, we kindly request you to read our [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md). Additionally, we encourage you to explore the existing [issues](https://github.com/supabase/supabase/issues) to see how you can make a meaningful impact. This document will guide you through the process of setting up your development environment, enabling you to successfully build and test [Supabase](https://supabase.com).
+To ensure a positive and inclusive environment, please read our [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md). We encourage you to explore the existing [issues](https://github.com/supabase/supabase/issues) to see how you can make a meaningful impact. This document will help you setup your development environment.
 
 ### Install dependencies
 
 You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
 - [Git](http://git-scm.com/)
-- [Node.js v18.x (LTS)](http://nodejs.org)
-- [npm](https://www.npmjs.com/) version 9.x.x
+- [Node.js v20.x (LTS)](http://nodejs.org)
+- [npm](https://www.npmjs.com/) version 9.x.x or higher
+- [Docker](https://docs.docker.com/get-docker/) (to run studio locally)
 
 ## Local development
 
-We are in the process of migrating this repository to monorepo, using [Turborepo](https://turborepo.org/docs).
+This repo uses [Turborepo](https://turborepo.org/docs).
 
-Eventually, all the apps will be run using [Turborepo](https://turborepo.org/docs), which will significantly improve the developer workflow.
+All of our apps are in this [Turborepo](https://turborepo.org/docs), which make it easy to share packages and config between projects.
 
-### Fork the repository
+### Fork the repo
 
-To contribute code to [Supabase](https://supabase.com), you must fork the [Supabase Repository](https://github.com/supabase/supabase).
+To contribute code to [Supabase](https://supabase.com), you must fork the [Supabase repo](https://github.com/supabase/supabase).
 
 ### Clone the repo
 
-1. Clone your GitHub forked repository:
+1. Clone your GitHub forked repo:
 
    ```sh
    git clone https://github.com/<github_username>/supabase.git
@@ -52,9 +64,7 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
    cd supabase
    ```
 
-### Running turborepo
-
-[Supabase](https://supabase.com) uses [Turborepo](https://turborepo.org/docs) to manage and run this monorepo.
+### Install dependencies
 
 1. Install the dependencies in the root of the repo.
 
@@ -62,18 +72,24 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
    npm install # install dependencies
    ```
 
-2. After that you can run the apps simultaneously with the following.
+2. Copy the example `.env.local.example` to `.env.local`
+
+   ```sh
+   cp apps/www/.env.local.example apps/www/.env.local
+   ```
+
+3. After that you can run the apps simultaneously with the following.
    ```sh
    npm run dev # start all the applications
    ```
 
 Then visit, and edit, any of the following sites:
 
-| Site                                                     | Directory    | Scope name | Description                          | Local development server   |
-| -------------------------------------------------------- | ------------ | ---------- | ------------------------------------ | -------------------------- |
-| [supabase.com](https://supabase.com)                     | `/apps/www`  | www        | The main website                     | http://localhost:3000      |
-| [supabase.com/dashboard](https://supabase.com/dashboard) | `/studio`    | studio     | Studio dashboard                     | http://localhost:8082      |
-| [supabase.com/docs](https://supabase.com/docs)           | `/apps/docs` | docs       | Guides and Reference (Next.js based) | http://localhost:3001/docs |
+| Site                                                     | Directory      | Scope name | Description                                   | Local development server   |
+| -------------------------------------------------------- | -------------- | ---------- | --------------------------------------------- | -------------------------- |
+| [supabase.com](https://supabase.com)                     | `/apps/www`    | www        | The main website                              | http://localhost:3000      |
+| [supabase.com/dashboard](https://supabase.com/dashboard) | `/apps/studio` | studio     | Studio dashboard (requires Docker, see below) | http://localhost:8082      |
+| [supabase.com/docs](https://supabase.com/docs)           | `/apps/docs`   | docs       | Guides and Reference (Next.js based)          | http://localhost:3001/docs |
 
 #### Running sites individually
 
@@ -83,14 +99,18 @@ You can run any of the sites individually by using the scope name. For example:
 npm run dev:www
 ```
 
+Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`
+
 #### Shared components
 
 The monorepo has a set of shared components under `/packages`:
 
-- `/packages/common`: Common React code, shared between all sites.
+- `/packages/ai-commands`: Helpers/Commands for AI related functions
+- `/packages/common`: Common React components, shared between all sites
 - `/packages/config`: All shared config
-- `/packages/spec`: Generates documentation using spec files.
+- `/packages/shared-data`: Shared data that can be used across all apps
 - `/packages/tsconfig`: Shared Typescript settings
+- `/packages/ui`: Common UI components
 
 #### Installing packages
 
@@ -102,25 +122,59 @@ For example:
 
 - `npm install react -w common`: installs into `./packages/common`
 - `npm install react -w www`: installs into `./apps/www`
-- `npm install react -w studio`: installs into `./studio`
+- `npm install react -w studio`: installs into `./apps/studio`
 
 You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
 
-#### New Supabase docs
-
-Following the changes to the [Supabase docs](https://supabase.com/blog/new-supabase-docs-built-with-nextjs) the following is needed to run the new docs locally:
-
-- Inside of `apps/docs` create a `.env.local` file with the following: `NEXT_PUBLIC_NEW_DOCS=true`
-
-Now when you run a local development docs server you will see the new docs site.
-
 ---
+
+## Running Docker for Supabase Studio
+
+To run Studio locally, you'll need to setup Docker in addition to your NextJS frontend.
+
+#### Prerequsites
+
+First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
+
+#### Get Started
+
+1. Navigate to the `docker` directory in your forked repo
+
+   ```sh
+   cd docker
+   ```
+
+2. Copy the example `env` file
+
+   ```sh
+   cp .env.example .env
+   ```
+
+3. Run docker
+
+   ```sh
+   docker compose up
+   ```
+
+This command initializes the containers specified in the `docker-compose.yml` file. It might take a few moments to complete, depending on your computer and internet connection.
+
+Once the `docker compose up` process completes, you should have your local version of Supabase up and running within Docker containers. You can access it at `http://localhost:8082`.
+
+Remember to keep the Docker application open as long as you're working with your local Supabase instance.
 
 ## Create a pull request
 
-After making your changes, open a pull request (PR). Once you submit your pull request, others from the Supabase team/community will review it with you.
+After making any changes, open a pull request. Once you submit your pull request, the Supabase team will review it with you.
 
-If you have an issue, like a merge conflict, or don't know how to open a pull request then check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors).
+Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors)!
+
+## Issue assignment
+
+We don't have a process for assigning issues to contributors. Please feel free to jump into any issues in this repo that you are able to help with. Our intention is to encourage anyone to help without feeling burdened by an assigned task. Life can sometimes get in the way, and we don't want to leave contributors feeling obligated to complete issues when they may have limited time or unexpected commitments.
+
+We also recognize that not having a process can sometimes lead to competing or duplicate PRs. There's no perfect solution here. We encourage you to communicate early and often on an Issue to indicate that you're actively working on it. If you see that an Issue already has a PR, try working with that author instead of drafting your own.
+
+We review PRs in the order of their submission. We try to accept the earliest one that is closest to being ready to merge.
 
 ---
 
@@ -154,7 +208,7 @@ Some things to consider:
 
 ## Community channels
 
-If you are stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+If you get stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
 
 ## Contributors
 

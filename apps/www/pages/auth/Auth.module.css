@@ -1,7 +1,0 @@
-/* .github-icon svg {
-  fill: currentColor;
-} */
-
-.github-icon {
-  @apply text-white;
-}

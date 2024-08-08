@@ -2,8 +2,7 @@
   @apply max-w-xs w-full shadow-lg rounded-md pointer-events-auto overflow-hidden py-4 px-2;
 
   @apply border border-solid;
-  @apply bg-white border-gray-300;
-  @apply dark:bg-dark-700 dark:border-gray-400;
+  @apply bg-surface-100 border-default;
 }
 
 .sbui-toast-container--sm {

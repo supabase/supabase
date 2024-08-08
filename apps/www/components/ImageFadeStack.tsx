@@ -60,15 +60,15 @@ const ImageFadeStack = ({
             <button className="text-white" onClick={() => handleNavClick(index)}>
               <div
                 className={cn(
-                  'w-2 h-2 rounded-full bg-scale-900 hover:bg-gray-300 transition-colors',
-                  currentImageIndex === index && 'bg-scale-700'
+                  'w-2 h-2 rounded-full bg-foreground-muted hover:bg-surface-100 transition-colors',
+                  currentImageIndex === index && 'bg-border-strong'
                 )}
               />
             </button>
           ))}
         <button
           onClick={() => setIsPlaying(!isPlaying)}
-          className="text-white bg-scale-1100 hover:bg-gray-1100 dark:hover:bg-gray-500 rounded-full p-0.5 transition-colors"
+          className="text-white bg-foreground-light hover:bg-overlay rounded-full p-0.5 transition-colors"
         >
           {isPlaying ? <IconPauseCircle w={12} /> : <IconPlayCircle w={12} />}
         </button>

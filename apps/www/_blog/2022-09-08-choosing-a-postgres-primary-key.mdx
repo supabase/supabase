@@ -196,7 +196,7 @@ def create_user():
     """
     Add new user to the database (using secure random numbers)
     """
-    user_id = randrange(1, MAX_RANDOM_USER_ID)
+    user_id = randbelow(1, MAX_RANDOM_USER_ID)
     user = User(id=user_id, email="new@example.com", name="new user")
     db.save(user)
 

@@ -1,3 +1,5 @@
+'use client'
+
 import { useReducer } from 'react'
 import { useFormik, FormikConfig } from 'formik'
 import { FormContextProvider } from './FormContext'
@@ -29,6 +31,9 @@ function errorReducer(state: any, action: any) {
   }
 }
 
+/**
+ * @deprecated Use ./Form_shadcn_ instead
+ */
 export default function Form({ validate, ...props }: Props) {
   const [fieldLevelErrors, dispatchErrors] = useReducer(errorReducer, null)
 
@@ -60,6 +65,7 @@ export default function Form({ validate, ...props }: Props) {
       onSubmit={formik.handleSubmit}
       className={props.className}
       style={props.style}
+      method="POST"
     >
       <FormContextProvider
         values={formik.values}

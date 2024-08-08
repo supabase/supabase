@@ -11,10 +11,9 @@ A simple Flutter application with native Google login capabilities on iOS and An
 
 - Create a new Supabase project [here](https://database.new)
 - Add your Supabase credentials to `lib/main.dart`
-- Obtain Google API client ID for [Android](https://developers.google.com/identity/sign-in/android/start-integrating#configure_a_project) and [iOS](https://developers.google.com/identity/sign-in/ios/start-integrating#get_an_oauth_client_id)
-- Add the client IDs in Supabase dashboard under `Auth -> Providers -> Google -> Authorized Client IDs` and turn on `Enable Sign in with Google`
-- Find the `clientId` variable in `lib/screens/login_screen.dart` and paste the two client IDs
-- For android open `android/app/build.gradle` file, locate `appAuthRedirectScheme` variable and replace the value with your reversed DNS form of the Android client ID. For example, if your client ID is `1234567890-abc123def456.apps.googleusercontent.com`, then the value should be `com.googleusercontent.apps.1234567890-abc123def456`
+- Obtain Google API client ID for [iOS](https://developers.google.com/identity/sign-in/ios/start-integrating#get_an_oauth_client_id), [Android](https://developers.google.com/identity/sign-in/android/start-integrating#configure_a_project), and [Web](https://developers.google.com/identity/sign-in/android/start-integrating#get_your_backend_servers_oauth_20_client_id)
+- Add all of the client IDs in Supabase dashboard under `Auth -> Providers -> Google -> Authorized Client IDs` as comma separated values and turn on `Enable Sign in with Google`
+- Find the `clientId` variable in `lib/screens/login_screen.dart` and paste the iOS and web client IDs.
 - Run the app on iOS or Android and test the login flow 🚀
 
 ## Resources

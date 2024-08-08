@@ -1,0 +1,54 @@
+{
+  "name": "ui-patterns",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "license": "MIT",
+  "sideEffects": false,
+  "scripts": {
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
+    "@supabase/sql-to-rest": "^0.1.6",
+    "cmdk": "^0.2.1",
+    "common": "*",
+    "common-tags": "^1.8.2",
+    "framer-motion": "^11.1.9",
+    "lodash": "*",
+    "lucide-react": "*",
+    "monaco-editor": "*",
+    "next-themes": "*",
+    "react-error-boundary": "^4.0.12",
+    "react-hot-toast": "*",
+    "react-markdown": "^9.0.1",
+    "react-syntax-highlighter": "^15.5.0",
+    "react-tooltip": "*",
+    "react-use": "^17.5.0",
+    "reactflow": "*",
+    "remark-gfm": "^4.0.0",
+    "sql-formatter": "^15.3.1",
+    "tsconfig": "*",
+    "ui": "*",
+    "valtio": "*"
+  },
+  "devDependencies": {
+    "@supabase/auth-helpers-react": "^0.4.2",
+    "@testing-library/dom": "^10.1.0",
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/common-tags": "^1.8.4",
+    "@types/lodash": "^4.17.5",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "api-types": "*",
+    "next-router-mock": "^0.9.13",
+    "vitest": "^2.0.3"
+  },
+  "peerDependencies": {
+    "next": "*",
+    "react": "*",
+    "react-dom": "*"
+  }
+}

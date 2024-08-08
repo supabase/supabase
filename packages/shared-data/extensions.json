@@ -1,0 +1,611 @@
+[
+  {
+    "name": "address_standardizer",
+    "comment": "Used to parse an address into constituent elements. Generally used to support geocoding address normalization step.",
+    "tags": ["Utility"],
+    "link": "https://postgis.net/docs/manual-2.5/Address_Standardizer.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "address_standardizer_data_us",
+    "comment": "Address Standardizer US dataset example",
+    "tags": ["Dataset"],
+    "link": "https://postgis.net/docs/manual-2.5/Address_Standardizer.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "amcheck",
+    "comment": "functions for verifying relation integrity",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/amcheck.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "autoinc",
+    "comment": "functions for autoincrementing fields",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/contrib-spi.html#id-1.11.7.50.6",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "bloom",
+    "comment": "bloom access method - signature file based index",
+    "tags": ["Index"],
+    "link": "https://www.postgresql.org/docs/current/bloom.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "btree_gin",
+    "comment": "support for indexing common datatypes in GIN",
+    "tags": ["Index"],
+    "link": "https://www.postgresql.org/docs/current/btree-gin.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "btree_gist",
+    "comment": "support for indexing common datatypes in GiST",
+    "tags": ["Index"],
+    "link": "https://www.postgresql.org/docs/current/btree-gist.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "citext",
+    "comment": "data type for case-insensitive character strings",
+    "tags": ["Data Type"],
+    "link": "https://www.postgresql.org/docs/current/citext.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "cube",
+    "comment": "data type for multidimensional cubes",
+    "tags": ["Data Type"],
+    "link": "https://www.postgresql.org/docs/current/cube.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "dblink",
+    "comment": "connect to other PostgreSQL databases from within a database",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/contrib-dblink-function.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "dict_int",
+    "comment": "text search dictionary template for integers",
+    "tags": ["Search"],
+    "link": "https://www.postgresql.org/docs/current/dict-int.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "dict_xsyn",
+    "comment": "text search dictionary template for extended synonym processing",
+    "tags": ["Search"],
+    "link": "https://www.postgresql.org/docs/current/dict-xsyn.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "earthdistance",
+    "comment": "calculate great-circle distances on the surface of the Earth",
+    "tags": ["Geo", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/earthdistance.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "fuzzystrmatch",
+    "comment": "determine similarities and distance between strings",
+    "tags": ["Search"],
+    "link": "https://www.postgresql.org/docs/current/fuzzystrmatch.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "hstore",
+    "comment": "data type for storing sets of (key, value) pairs",
+    "tags": ["Data Type"],
+    "link": "https://www.postgresql.org/docs/current/hstore.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "hypopg",
+    "comment": "Hypothetical indexes for PostgreSQL",
+    "tags": ["Admin", "Index"],
+    "link": "/guides/database/extensions/hypopg",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "http",
+    "comment": "HTTP client for PostgreSQL, allows web page retrieval inside the database.",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/http",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "insert_username",
+    "comment": "functions for tracking who changed a table",
+    "tags": ["Audit", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/contrib-spi.html#id-1.11.7.50.7",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "old_snapshot",
+    "comment": "utilities in support of old_snapshot_threshold",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/oldsnapshot.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "index_advisor",
+    "comment": "optimize query performance with automatic index recommendation",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/index_advisor",
+    "github_url": "https://github.com/supabase/index_advisor",
+    "product": "Index Advisor Report",
+    "product_url": "/project/{ref}/database/query-performance"
+  },
+  {
+    "name": "intarray",
+    "comment": "functions, operators, and index support for 1-D arrays of integers",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/intarray.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "isn",
+    "comment": "data types for international product numbering standards",
+    "tags": ["Data Type"],
+    "link": "https://www.postgresql.org/docs/current/isn.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "lo",
+    "comment": "Large Object maintenance",
+    "tags": ["Data Type"],
+    "link": "https://www.postgresql.org/docs/current/lo.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "ltree",
+    "comment": "data type for hierarchical tree-like structures",
+    "tags": ["Data Type"],
+    "link": "https://www.postgresql.org/docs/current/ltree.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "moddatetime",
+    "comment": "functions for tracking last modification time",
+    "tags": ["Audit", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/contrib-spi.html#id-1.11.7.50.8",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pg_cron",
+    "comment": "Job scheduler for PostgreSQL",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_cron",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pg_freespacemap",
+    "comment": "examine the free space map (FSM)",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/pgfreespacemap.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pg_graphql",
+    "comment": "pg_graphql: GraphQL support",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_graphql",
+    "github_url": "https://github.com/supabase/pg_graphql",
+    "product": "GraphiQL",
+    "product_url": "/project/{ref}/api/graphiql"
+  },
+  {
+    "name": "pg_hashids",
+    "comment": "pg_hashids",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_hashids",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pg_jsonschema",
+    "comment": "pg_jsonschema",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_jsonschema",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pg_net",
+    "comment": "Async HTTP",
+    "tags": ["Utility", "Notifications"],
+    "link": "/guides/database/extensions/pg_net",
+    "github_url": "https://github.com/supabase/pg_net",
+    "product": "Database Webhooks",
+    "product_url": "/project/{ref}/database/hooks"
+  },
+  {
+    "name": "pg_prewarm",
+    "comment": "prewarm relation data",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/pgprewarm.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pg_stat_monitor",
+    "comment": "The pg_stat_monitor is a PostgreSQL Query Performance Monitoring tool, based on PostgreSQL contrib module pg_stat_statements. pg_stat_monitor provides aggregated statistics, client information, plan details including plan, and histogram information.",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_stat_monitor",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pg_stat_statements",
+    "comment": "track execution statistics of all SQL statements executed",
+    "tags": ["Admin", "Utility"],
+    "link": "/guides/database/extensions/pg_stat_statements",
+    "github_url": null,
+    "product": "Query Performance",
+    "product_url": "/project/{ref}/database/query-performance"
+  },
+  {
+    "name": "pg_surgery",
+    "comment": "extension to perform surgery on a damaged relation",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/pgsurgery.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pg_trgm",
+    "comment": "text similarity measurement and index searching based on trigrams",
+    "tags": ["Search"],
+    "link": "https://www.postgresql.org/docs/current/pgtrgm.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pgaudit",
+    "comment": "provides auditing functionality",
+    "tags": ["Audit", "Utility"],
+    "link": "/guides/database/extensions/pgaudit",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pg_walinspect",
+    "comment": "functions to inspect contents of PostgreSQL Write-Ahead Log",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/pgwalinspect.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pgcrypto",
+    "comment": "cryptographic functions",
+    "tags": ["Utility", "Cryptography"],
+    "link": "https://www.postgresql.org/docs/current/pgcrypto.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pgjwt",
+    "comment": "JSON Web Token API for Postgresql",
+    "tags": ["Utility", "Cryptography"],
+    "link": "/guides/database/extensions/pgjwt",
+    "github_url": "https://github.com/michelp/pgjwt",
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pgroonga",
+    "comment": "Super fast and all languages supported full text search index based on Groonga",
+    "tags": ["Search"],
+    "link": "/guides/database/extensions/pgroonga",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pgroonga_database",
+    "comment": "PGroonga database management module",
+    "tags": ["Admin"],
+    "link": "https://pgroonga.github.io/reference/modules/pgroonga-database.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pgrouting",
+    "comment": "pgRouting Extension",
+    "tags": ["Geo", "Utility"],
+    "link": "/guides/database/extensions/pgrouting",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pgrowlocks",
+    "comment": "show row-level locking information",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/pgrowlocks.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pgsodium",
+    "comment": "Postgres extension for libsodium functions",
+    "tags": ["Utility", "Cryptography"],
+    "link": "/guides/database/extensions/pgsodium",
+    "github_url": "https://github.com/michelp/pgsodium",
+    "product": "Supabase Vault",
+    "product_url": "/project/{ref}/settings/vault/secrets"
+  },
+  {
+    "name": "pgstattuple",
+    "comment": "show tuple-level statistics",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/pgstattuple.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pgtap",
+    "comment": "Unit testing for PostgreSQL",
+    "tags": ["Utility", "Testing"],
+    "link": "/guides/database/extensions/pgtap",
+    "github_url": null,
+    "product": null
+  },
+  {
+    "name": "plcoffee",
+    "comment": "PL/CoffeeScript (v8) trusted procedural language",
+    "tags": ["Language"],
+    "link": "https://github.com/plv8/plv8/blob/master/doc/plv8.md#coffeescript-extension",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "pljava",
+    "comment": "PL/Java procedural language (https://tada.github.io/pljava/)",
+    "tags": ["Language"],
+    "link": "https://tada.github.io/pljava/",
+    "github_url": null,
+    "product": null
+  },
+  {
+    "name": "plls",
+    "comment": "PL/LiveScript (v8) trusted procedural language",
+    "tags": ["Language"],
+    "link": "https://github.com/plv8/plv8/blob/master/doc/plv8.md#livescript-extension",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "plpgsql",
+    "comment": "PL/pgSQL procedural language",
+    "tags": ["Language"],
+    "link": "https://www.postgresql.org/docs/current/plpgsql.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "plpgsql_check",
+    "comment": "extended check for plpgsql functions",
+    "tags": ["Utility", "Testing"],
+    "link": "/guides/database/extensions/plpgsql_check",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "plv8",
+    "comment": "PL/JavaScript (v8) trusted procedural language",
+    "tags": ["Language"],
+    "link": "/guides/database/extensions/plv8",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "postgis",
+    "comment": "PostGIS geometry and geography spatial types and functions",
+    "tags": ["Geo"],
+    "link": "/guides/database/extensions/postgis",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "postgres_fdw",
+    "comment": "foreign-data wrapper for remote PostgreSQL servers",
+    "tags": ["Admin"],
+    "link": "https://www.postgresql.org/docs/current/postgres-fdw.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "refint",
+    "comment": "functions for implementing referential integrity (obsolete)",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/contrib-spi.html#id-1.11.7.50.5",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "rum",
+    "comment": "GIN-like index for text search",
+    "tags": ["Index", "Search"],
+    "link": "/guides/database/extensions/rum",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "seg",
+    "comment": "data type for representing line segments or floating-point intervals",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/seg.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "sslinfo",
+    "comment": "information about SSL certificates",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/sslinfo.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "tablefunc",
+    "comment": "functions that manipulate whole tables, including crosstab",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/tablefunc.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "tcn",
+    "comment": "Triggered change notifications",
+    "tags": ["Utility", "Notifications"],
+    "link": "https://www.postgresql.org/docs/current/tcn.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "timescaledb",
+    "comment": "Enables scalable inserts and complex queries for time-series data",
+    "tags": ["Time Series", "Data Type", "Utility"],
+    "link": "/guides/database/extensions/timescaledb",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "tsm_system_rows",
+    "comment": "TABLESAMPLE method which accepts number of rows as a limit",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/tsm-system-rows.html",
+    "github_url": null,
+    "product": null
+  },
+  {
+    "name": "tsm_system_time",
+    "comment": "TABLESAMPLE method which accepts time in milliseconds as a limit",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/tsm-system-time.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "unaccent",
+    "comment": "text search dictionary that removes accents",
+    "tags": ["Search"],
+    "link": "https://www.postgresql.org/docs/current/unaccent.html",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "uuid-ossp",
+    "comment": "generate universally unique identifiers (UUIDs)",
+    "tags": ["Utility", "Data Type"],
+    "link": "/guides/database/extensions/uuid-ossp",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
+    "name": "vector",
+    "comment": "vector data type with similarity search",
+    "tags": ["AI", "Data Type", "Search"],
+    "link": "/guides/database/extensions/pgvector",
+    "github_url": "https://github.com/pgvector/pgvector",
+    "product": "Supabase Vector",
+    "product_url": null
+  },
+  {
+    "name": "wrappers",
+    "comment": "Foreign data wrappers developed by Supabase",
+    "tags": ["Admin", "Utility"],
+    "link": "/guides/database/extensions/wrappers/overview",
+    "github_url": "https://github.com/supabase/wrappers",
+    "product": "Supabase Wrappers",
+    "product_url": "/project/{ref}/database/wrappers"
+  }
+]

@@ -1,6 +1,6 @@
 # Open Graph (OG) Image Generator
 
-Generate  OG Images for the sites at supabase.
+Generate OG Images for the sites at supabase.
 
 ## How to use
 
@@ -20,7 +20,7 @@ If any of the required parameters are missing, you will receive a 404 response w
 
 Here is an example link that you can use to test the website:
 
-https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs&title=Example%20Title&description=Example%20Description&type=Auth&icon=google
+https://obuldanrptloktxcffvn.supabase.co/functions/v1/og-images?site=docs&title=Example%20Title&description=Example%20Description&type=Auth&icon=google
 
 This link will generate an image for the docs site with the title "Example Title", the description "Example Description", the Auth type, and the Google icon.
 
@@ -33,6 +33,7 @@ supabase start
 ```
 
 Then run the function
+
 ```bash
 supabase functions serve og-images
 ```

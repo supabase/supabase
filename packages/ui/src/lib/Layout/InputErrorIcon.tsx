@@ -13,7 +13,7 @@ export default function InputErrorIcon({ style, size }: Props) {
 
   return (
     <div className={__styles.base} style={style}>
-      <IconAlertCircle size={size} strokeWidth={2} className="" />
+      <IconAlertCircle size={size} strokeWidth={2} />
     </div>
   )
 }

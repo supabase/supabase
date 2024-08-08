@@ -11,7 +11,7 @@ const supabaseKey = 'public-anon-key'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Create a new user
-const { user, error } = await supabase.auth.signUpWithPassword({
+const { user, error } = await supabase.auth.signUp({
   email: 'example@email.com',
   password: 'example-password',
 })

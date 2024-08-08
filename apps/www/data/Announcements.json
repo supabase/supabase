@@ -1,31 +1,31 @@
 [
   {
     "type": "Announcement",
-    "title": "Launch Week 8 Hackathon Winners",
-    "description": "Announcing the winners of the Launch Week 8 Hackathon!",
-    "imgUrl": "/images/blog/lw8-hackathon-winners/hackathon-winners.png",
-    "logoUrl": "/images/blog/lw8-hackathon-winners/hackathon-winners.png",
+    "title": "Edge Functions: Node and native npm compatibility",
+    "description": "We're adding Node and native npm compatibility for Edge Functions",
+    "imgUrl": "launch-week-x/day-2/edge-runtime-thumb.png",
+    "logoUrl": "launch-week-x/day-2/edge-runtime-thumb.png",
     "organization": "Supabase",
-    "url": "/blog/launch-week-8-hackathon-winners",
+    "url": "/blog/edge-functions-node-npm",
     "postMeta": {
-      "name": "Andrew Smith",
-      "publishDate": "August 28, 2023",
-      "readLength": 3
+      "name": "laktek",
+      "publishDate": "Dec 12, 2023",
+      "readLength": 5
     },
-    "ctaText": "See the winners"
+    "ctaText": "Learn more"
   },
   {
     "type": "Announcement",
-    "title": "Supabase Launch Week 8",
-    "description": "One new feature (or more) every day during a week.",
-    "imgUrl": "/images/launchweek/8/lw8-og.jpg",
-    "logoUrl": "/images/launchweek/8/lw8-og.jpg",
+    "title": "Supabase Launch Week X Hackathon",
+    "description": "Build an Open Source Project over 10 days. 5 prize categories",
+    "imgUrl": "/images/blog/lwx-hackathon/ogimage.png",
+    "logoUrl": "/images/blog/lwx-hackathon/ogimage.png",
     "organization": "Supabase",
-    "url": "/launch-week",
+    "url": "/blog/supabase-hackathon-lwx",
     "postMeta": {
-      "name": "Paul Copplestone",
-      "publishDate": "Aug 07, 2023",
-      "readLength": 5
+      "name": "ant_wilson",
+      "publishDate": "Dec 05, 2023",
+      "readLength": 3
     },
     "ctaText": "Learn more"
   }

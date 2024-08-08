@@ -1,4 +1,4 @@
-# Supabase Create React App User Management
+# Supabase Vite User Management
 
 This example will set you up for a very common situation: users can sign up with a magic link and then update their account with public profile information, including a profile image.
 
@@ -7,12 +7,12 @@ This demonstrates how to use:
 - User signups using Supabase [Auth](https://supabase.com/auth).
 - User avatar images using Supabase [Storage](https://supabase.com/storage).
 - Public profiles restricted with [Policies](https://supabase.com/docs/guides/auth#policies).
-- Frontend using [Create React App](https://reactjs.org/docs/create-a-new-react-app.html).
+- Frontend using [Vite](https://vitejs.dev/).
 
 ## Technologies used
 
 - Frontend:
-  - [Create React App](https://reactjs.org/docs/create-a-new-react-app.html) - a React toolchain.
+  - [Vite](https://vitejs.dev/) - a React toolchain.
   - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
   - [supabase.com/dashboard](https://supabase.com/dashboard/): hosted Postgres database with restful API for usage with Supabase.js.
@@ -42,21 +42,21 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 Create a file in this folder `.env.local`
 
 ```
-REACT_APP_SUPABASE_URL=
-REACT_APP_SUPABASE_ANON_KEY=
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
 ```
 
 Populate this file with your URL and Key.
 
 ### 5. Run the application
 
-Run the application: `npm run start`. Open your browser to `https://localhost:3000/` and you are ready to go 🚀.
+Run the application: `npm run dev`. Open your browser to the url indicated in the CLI (eg `https://localhost:5173/`) and you are ready to go 🚀.
 
 ## Supabase details
 
 ### Postgres Row level security
 
-This project uses very high-level Authorization using Postgres' Role Level Security.
+This project uses very high-level Authorization using Postgres' Row Level Security.
 When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
 When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
@@ -88,11 +88,11 @@ select
 
 create policy "Users can insert their own profile." on profiles for insert
 with
-  check (auth.uid () = id);
+  check ((select auth.uid()) = id);
 
 create policy "Users can update own profile." on profiles for
 update
-  using (auth.uid () = id);
+  using ((select auth.uid()) = id);
 
 -- Set up Realtime!
 begin;

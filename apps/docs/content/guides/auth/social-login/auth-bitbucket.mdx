@@ -1,0 +1,143 @@
+---
+id: 'auth-bitbucket'
+title: 'Login with Bitbucket'
+description: 'Add Bitbucket OAuth to your Supabase project'
+---
+
+To enable Bitbucket Auth for your project, you need to set up a BitBucket OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up Bitbucket logins for your application consists of 3 parts:
+
+- Create and configure a Bitbucket OAuth Consumer on [Bitbucket](https://bitbucket.org)
+- Add your Bitbucket OAuth Consumer keys to your [Supabase Project](https://supabase.com/dashboard)
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Access your Bitbucket account
+
+- Go to [bitbucket.org](https://bitbucket.org/).
+- Click on `Login` at the top right to log in.
+
+![Bitbucket Developer Portal.](/docs/img/guides/auth-bitbucket/bitbucket-portal.png)
+
+## Find your callback URL
+
+<SocialProviderSetup provider="Bitbucket" />
+
+## Create a Bitbucket OAuth app
+
+- Click on your profile icon at the bottom left
+- Click on `All Workspaces`
+- Select a workspace and click on it to select it
+- Click on `Settings` on the left
+- Click on `OAuth consumers` on the left under `Apps and Features` (near the bottom)
+- Click `Add Consumer` at the top
+- Enter the name of your app under `Name`
+- In `Callback URL`, type the callback URL of your app
+- Check the permissions you need (Email, Read should be enough)
+- Click `Save` at the bottom
+- Click on your app name (the name of your new OAuth Consumer)
+- Copy your `Key` (`client_key`) and `Secret` (`client_secret`) codes
+
+## Add your Bitbucket credentials into your Supabase project
+
+<SocialProviderSettingsSupabase provider="Bitbucket" />
+
+## Add login code to your client app
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+<CreateClientSnippet />
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `bitbucket` as the `provider`:
+
+```js
+async function signInWithBitbucket() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'bitbucket',
+  })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `bitbucket` as the `provider`:
+
+```dart
+Future<void> signInWithBitbucket() async {
+  await supabase.auth.signInWithOAuth(OAuthProvider.bitbucket);
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Bitbucket` as the `Provider`:
+
+```kotlin
+suspend fun signInWithBitbucket() {
+	supabase.auth.signInWith(Bitbucket)
+}
+```
+
+</TabPanel>
+</Tabs>
+
+<OAuthPkceFlow />
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```js
+async function signOut() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```kotlin
+suspend fun signOut() {
+	supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Resources
+
+- [Supabase - Get started for free](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Bitbucket Account](https://bitbucket.org)

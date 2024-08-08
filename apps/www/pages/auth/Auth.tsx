@@ -1,33 +1,27 @@
-import { createClient } from '@supabase/supabase-js'
-import { Button, IconArrowUpRight, IconBriefcase, IconEye, IconLink, IconShield } from 'ui'
+import { Button, IconArrowUpRight, IconBriefcase, IconEye, IconLink, IconShield, Image } from 'ui'
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
+import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import AuthWidgetSection from '~/components/AuthWidget/AuthWidgetSection'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
 import FeatureColumn from '~/components/FeatureColumn'
-import FloatingIcons from '~/components/FloatingIcons'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import AuthProviders from '~/data/auth.json'
+import ProductsNav from '~/components/Products/ProductsNav'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 function AuthPage() {
   // base path for images
   const { basePath } = useRouter()
-
-  // supabase auth widget project details
-  const supabase = createClient(
-    'https://rsnibhkhsbfnncjmwnkj.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNTIxNDE1MywiZXhwIjoxOTMwNzkwMTUzfQ.OQEbAaTfgDdLCCht251P2JRD3QDnui6nsU8N-tZA_Mc'
-  )
 
   const meta_title = 'Auth | Built-in user management'
   const meta_description =
@@ -50,6 +44,7 @@ function AuthPage() {
         }}
       />
       <DefaultLayout>
+        <ProductsNav activePage={PRODUCT_NAMES.AUTHENTICATION} />
         <ProductHeader
           icon={Solutions['authentication'].icon}
           title={Solutions['authentication'].name}
@@ -64,24 +59,16 @@ function AuthPage() {
             "Including PostgreSQL's policy engine, for fine-grained access rules.",
           ]}
           image={[
-            <div className="header--light block w-full" key="light">
-              <Image
-                src={`${basePath}/images/product/auth/header--light.png`}
-                alt="auth header"
-                layout="responsive"
-                width="1372"
-                height="1074"
-              />
-            </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
-              <Image
-                src={`${basePath}/images/product/auth/header--dark.png`}
-                alt="auth header"
-                layout="responsive"
-                width="1372"
-                height="1074"
-              />
-            </div>,
+            <Image
+              src={{
+                light: `${basePath}/images/product/auth/header--light.png`,
+                dark: `${basePath}/images/product/auth/header--dark.png`,
+              }}
+              alt="auth header"
+              layout="responsive"
+              width="1372"
+              height="1074"
+            />,
           ]}
           documentation_url={'/docs/guides/auth'}
         />
@@ -97,7 +84,7 @@ function AuthPage() {
                       viewBox="0 0 32.58 31.77"
                       width={21}
                       height={21}
-                      className="text-gray-800 dark:text-white"
+                      className="text-foreground-light"
                     >
                       <path
                         fill="currentColor"
@@ -108,7 +95,7 @@ function AuthPage() {
                   {AuthProviders.map((auth, i) => {
                     return (
                       <div className="flex w-fit items-center" key={i}>
-                        <Image
+                        <NextImage
                           src={`${basePath}/images/product/auth/${auth.name}-icon.svg`}
                           alt={`${auth.name} auth login icon`}
                           key={auth.name}
@@ -143,13 +130,13 @@ function AuthPage() {
               <h4 className="h4">Own your data</h4>
               <p className="p text-base">
                 User data stored in your Supabase database so you never have to worry about 3rd
-                party privacy issues. Host your data in 8 different locations.
+                party privacy issues. Host your data in 12 different locations.
               </p>
             </div>
           </div>
         </SectionContainer>
 
-        <SectionContainer className="-mb-48">
+        <SectionContainer>
           <APISection
             title="Simple APIs"
             // @ts-ignore
@@ -193,10 +180,9 @@ function AuthPage() {
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
-              <div className="section--bg border-t border-b border-gray-100 dark:border-gray-600"></div>
+              <div className="section--bg border-t border-b border-control"></div>
             </div>
             <div className="section-container pt-12 pb-0">
-              <FloatingIcons />
               <div className="overflow-x-hidden">
                 <SectionContainer className="mb-0 pb-8">
                   <GithubExamples />
@@ -218,13 +204,15 @@ function AuthPage() {
               </p>
               <p className="p">Policies can be written in SQL or using the dashboard online.</p>
 
-              <Link href="/docs/guides/auth#policy-examples">
-                <a>
-                  <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
-                    Explore documentation
-                  </Button>
-                </a>
-              </Link>
+              <Button
+                asChild
+                size="small"
+                type="default"
+                className="mt-4"
+                icon={<IconArrowUpRight />}
+              >
+                <Link href="/docs/guides/auth#policy-examples">Explore documentation</Link>
+              </Button>
             </div>
             <div className="col-span-12 lg:col-span-6 lg:col-start-7">
               <SplitCodeBlockCarousel
