@@ -138,14 +138,14 @@ jobs:
   update-remote-repo:
     needs:
       - settings
-      # - publish
+      - publish
     runs-on: ubuntu-latest
     env:
       service_to_update: 'studio'
       cli_repo_owner: supabase
       cli_repo: cli
       cli_repo_main_branch: 'develop'
-      cli_repo_pr_title: 'fix: Bump studio to the latest image version'
+      cli_repo_pr_title: 'chore: Bump studio to the latest image version'
       github_user: 'Ivan Bot'
       github_user_email: 'vasilov.ivan@gmail.com'
 
@@ -156,7 +156,7 @@ jobs:
           git config --global user.email '${{ env.github_user_email }}'
 
       - name: Checkout remote repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: '${{ env.cli_repo_owner }}/${{ env.cli_repo }}'
           token: ${{ secrets.USER_ACCESS_TOKEN }}
@@ -177,7 +177,7 @@ jobs:
         run: |
           cd '${{ env.cli_repo }}'
           git add .
-          git commit -m "Update ${{ env.service_to_update }} version to ${{ needs.settings.outputs.image_version }}"
+          git commit -m "chore: Update ${{ env.service_to_update }} version to ${{ needs.settings.outputs.image_version }}"
 
       - name: Push changes
         run: |
