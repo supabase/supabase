@@ -1,0 +1,151 @@
+---
+id: 'prisma-error-management'
+title: 'Prisma error troubleshooting'
+description: 'Prisma error troubleshooting'
+breadcrumb: 'ORM Quickstarts'
+---
+
+# Addressing Prisma Errors:
+
+<Admonition type="note">
+
+This only addresses common Prisma errors. A full list of errors can be found in [Prisma's official docs](https://www.prisma.io/docs/orm/reference/error-reference)
+
+</Admonition>
+
+Prisma, unlike other libraries, uses [query parameters for configurations](https://www.prisma.io/docs/orm/overview/databases/postgresql#arguments).
+
+Some can be used to address specific errors and can be appended to end of your connection string like so:
+
+```md
+.../postgres?KEY1=VALUE&KEY2=VALUE&KEY3=VALUE
+```
+
+## Errors
+
+### Can't reach database server at:
+
+Prisma attempted to form a connection with Postgres or the Supavisor pooler, but was unable to before the request expired.
+
+### Likely causes:
+
+#### Database strain:
+
+Check your [Reports Dashboard](https://supabase.com/dashboard/project/_/reports/database) to see if memory, CPU, or IO is strained.
+
+If your database is under stress, [optimize your queries](https://supabase.com/docs/guides/database/query-optimization) or consider increasing your [compute size](https://supabase.com/docs/guides/platform/compute-add-ons)
+
+#### Malformed connection string:
+
+Double check your connection string to make sure it matches the one in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
+
+#### Transient networking errors:
+
+If the above causes are not clear, it's possible that networking interference is disrupting the connection.
+
+Consider changing the `connect_timeout` to `30s`. This gives Prisma more time to form new connections.
+
+```md
+.../postgres?connect_timeout=30
+```
+
+## `Timed out fetching a new connection from the connection pool`:
+
+The error refers to Prisma's internal pooler and not the Supavisor pooler. Prisma is unable to allocate connections to pending queries fast enough to meet demand.
+
+#### Potential causes:
+
+- The server hosting Prisma is overwhelmed. By default, Prisma creates `2 * num_cpus / 2` connections. Increasing the `connection_limit` too much can cause resource strain, degrading performance
+- If you are using Supavisor, its pool size may be too low
+- Queries are executing too slowly
+
+#### Solutions:
+
+If the `connection_limit` was explicitly increased, reduce to be around the default value `2 * num_cpus / 2` or remove the setting from your connection string.
+
+If you are connecting with Supavisor, increase the pool size in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+
+Optimize your queries
+
+Increase `pool_timeout`
+
+```md
+.../postgres?pool_timeout=30
+```
+
+## `... prepared statement "" already exists`
+
+#### Context
+
+Supavisor in transaction mode (port 6543) does not support `prepared statements`, which Prisma will try to create in the background.
+
+#### Solution:
+
+Add `pgbouncer=true` to the connection string. Despite the settings odd name, it only disables prepared statements and nothing else.
+
+```md
+.../postgres?pgbouncer=true
+```
+
+## `Server has closed the connection`
+
+According to this [GitHub Issue for Prisma](https://github.com/prisma/prisma/discussions/7389), it may be related to large return values for queries. Try to limit the total amount of rows returned for particularly large requests.
+
+## `Drift detected: Your database schema is not in sync with your migration history`
+
+Prisma will try to act as the source of truth for your database structures. If a `CREATE`, `DROP`, or `ALTER` command was run outside of a Prisma Migration, it may invalidate Prisma's model of the database. To correct the situation, it may try to recreate your database, purging data in the process. To circumvent this issue, try [baselining your migrations](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining).
+
+## `Max client connections reached`
+
+When working in transaction mode (port 6543), The error "Max client connections reached" occurs when clients try to form more connections with the pooler than it can support. For example, if you were using a compute size that supported 200 max clients, and tried to form 201 connections with the pooler, the 201th connection would receive the error message.
+
+When working in session mode (port 5432), the max amount of clients is restricted to the "Pool Size" value in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+
+If the "Pool Size" is set to 15, even if the pooler can handle 200 client connections, it will still be effectively capped at 15 for each unique ["database-role+database" combination](https://github.com/orgs/supabase/discussions/21566). If there are 16 connection attempts, only the first 15 will be accepted. The 16th connection will queue in the pooler for up to a minute. It will encounter a "Max client connections reached" error and be rejected If no other clients disconnect voluntarily during this time.
+
+# How to fix the error
+
+### 1. If you are using session mode, consider using transaction mode, instead:
+
+Transaction mode typically enables higher query throughput and supports more clients than session mode. It's especially suitable for serverless applications like those deployed on Supabase Edge Functions, Vercel Functions, or AWS Lambda. For a more in-depth explanation, check out the [Supavisor FAQ](https://github.com/orgs/supabase/discussions/21566)
+
+Transaction mode does not support prepared statements. They're pre-parsed queries that some libraries may create for moderate performance benefits. You should look at how to disable prepared statements ([guide](https://github.com/orgs/supabase/discussions/28239)) for your connection library to prevent the following error from occurring:
+
+> ... prepared statement "statement_name" already exists"
+
+### 2. Reduce the number of connections created by your application servers
+
+A single client-server can establish multiple connections with a pooler. For instance, using the Prisma library, you could hypothetically set the connection_limit configuration to spawn 1000 client connections. Here's an example:
+
+```js
+datasource db {
+  provider = "postgresql"
+  url  = "postgres://[db-user].[project-ref]:[db-password]@aws-0-[aws-region].pooler.supabase.com:6543/[db-name]?pgbouncer=true&connection_limit=1000
+}
+```
+
+Typically, a server doesn't need that many connections. Starting with fewer, like five or three, or even just one, is often sufficient. In serverless setups, begin with `connection_limit=1`, increasing cautiously if needed to avoid maxing out connections.
+
+The way this is done differs across libraries. In Prisma, the `connection_limit=1` parameter is used, but in another library, such as Drizzle or SQLAlchemy, the configurations would be different.
+
+### 3. Increase your pool size
+
+If the pooler lacks sufficient direct connections (due to a small pool size), it may struggle to allocate database connections to clients, leading to an overflow in the queue of waiting clients. This overflow could result in exceeding the client connection limits.
+
+Typically, when using the REST API, you can increase your "Pool Size" in the [Dashboard](https://supabase.com/dashboard/project/_/settings/database) to 40% of your total database connections, and up to 80% if you're not using the REST API. For example, if your instance supported 60 direct connections, you could cautiously raise the pool size to 24 if you were relying on the REST API or 48 if you were not.
+
+However, the recommended maximums provided are imperfect estimates and it may be possible that your usage patterns may allow for higher values. It's also possible that you'd end up using too many database connections, preventing critical servers from interacting with your database.
+
+It's best to tailor the number based on your current usage. For more insight into how to determine the best size for your application, check out the [Supavisor FAQ](https://github.com/orgs/supabase/discussions/21566).
+
+### 4. Disconnect Appropriately
+
+If your connection framework allows for it, you should free up unused connections.
+
+### 5. Decrease Query Time
+
+Reduce query complexity or add [strategic indexes](https://supabase.com/docs/guides/database/postgres/indexes) to your tables to speed up queries.
+
+### 6. Increase Compute Size
+
+Sometimes the best option is to increase your compute size, which also increases your max client size and query execution speed

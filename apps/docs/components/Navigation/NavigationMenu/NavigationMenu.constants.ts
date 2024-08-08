@@ -696,6 +696,31 @@ export const database: NavMenuConstant = {
       ],
     },
     {
+      name: 'ORM Quickstarts',
+      url: undefined,
+      items: [
+        {
+          name: 'Prisma',
+          url: '/guides/database/prisma',
+          items: [
+            {
+              name: 'Prisma error management',
+              url: '/guides/database/prisma-error-managment',
+            },
+          ],
+        },
+        {
+          name: 'Drizzle',
+          url: '/guides/database/drizzle',
+        },
+        {
+          name: 'Postgres.js',
+          url: '/guides/database/postgres-js',
+        },
+        { name: 'SQLAlchemy', url: '/guides/database/postgres/sqlalchemy' },
+      ],
+    },
+    {
       name: 'Working with your database (basics)',
       url: undefined,
       items: [
@@ -743,6 +768,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Partitioning your tables',
           url: '/guides/database/partitions',
+        },
+        {
+          name: 'Managing Connections',
+          url: '/guides/database/connection-management',
         },
       ],
     },

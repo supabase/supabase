@@ -1,0 +1,217 @@
+---
+id: 'prisma'
+title: 'Prisma'
+description: 'Prisma Quickstart'
+breadcrumb: 'ORM Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Create a custom user for Prisma">
+      In the [SQL Editor](https://supabase.com/dashboard/project/_/sql/new), define a Prisma db-user and give it full priveleges over the public schema:
+      <Admonition type="note" label="password manager">
+        For security, consider using a [password generator](https://bitwarden.com/password-generator/) for the Prisma role
+      </Admonition>
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```sql
+        -- Create custom user
+        create user "prisma" with password 'custom_password' bypassrls createdb;
+
+        -- extend prisma's priveleges to postgres
+        grant "prisma" to "postgres";
+
+        -- Grant it necessary permissions over the relevant schemas (public)
+        grant usage on schema public to prisma;
+        grant create on schema public to prisma;
+        grant all on all tables in schema public to prisma;
+        grant all on all routines in schema public to prisma;
+        grant all on all sequences in schema public to prisma;
+        alter default privileges for role postgres in schema public grant all on tables to prisma;
+        alter default privileges for role postgres in schema public grant all on routines to prisma;
+        alter default privileges for role postgres in schema public grant all on sequences to prisma;
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={2}>
+        <StepHikeCompact.Details title="Create a Prisma Project">
+        Create a new prisma Project on your computer
+        </StepHikeCompact.Details>
+
+        <StepHikeCompact.Code>
+
+            Create a new directory
+            ```bash Terminal
+                mkdir hello-prisma
+                cd hello-prisma
+            ```
+
+            Initiate a new Prisma project
+            ```bash
+                npm init -y
+                npm install prisma typescript ts-node @types/node --save-dev
+
+                npx tsc --init
+
+                npx prisma
+                npx prisma init
+            ```
+
+        </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Get your connection credentials">
+    Go to the [Database Settings](https://supabase.com/dashboard/project/_/settings/database) and get your Supavisor connection string ending in `5432`.
+    ![Session Mode](/docs/img/database/session_mode.png)
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      Example Connection String:
+      ```md
+        postgres://postgres.qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+      ```
+      Copy your string and change its db-user to `prisma`
+      ```md
+        postgres://prisma.qjqzlvutjxbyodxrrvhb...
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Add your connection information to your .env file">
+      Create `DATABASE_URL` and `DIRECT_URL` variables in your `.env` file
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+            <Tabs>
+
+                <TabPanel id="serverless" label="serverless deployments">
+                    For serverless setups, use Supavisor on port 6543 for the `DATABASE_URL`. It also requires two flags appended to the end of the string: "pgbouncer=true&connection_limit=1"
+
+                    ```text .env
+                        # Used for Prisma Migrations
+                        DIRECT_URL="postgres://prisma.qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
+
+                        # Used in your application
+                        DATABASE_URL="postgres://prisma.qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+                    ```
+                </TabPanel>
+                <TabPanel id="serverful" label="server-based deployments">
+
+                    ```text .env
+                        # Used for Prisma Migrations
+                        DIRECT_URL="postgres://prisma.qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
+
+                        # Used in your application
+                        DATABASE_URL="postgres://prisma.qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
+                    ```
+                </TabPanel>
+
+            </Tabs>
+
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Create your migrations">
+
+    If you have already modified your Supabase database, synchronize it with your migration file. Otherwise create new tables for your database
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    <Tabs>
+
+          <TabPanel id="new-projects" label="New Projects">
+            Create new tables in your prisma.schema file
+
+            ```ts prisma/schema.prisma
+                      model Post {
+                        id        Int     @id @default(autoincrement())
+                        title     String
+                        content   String?
+                        published Boolean @default(false)
+                        author    User?   @relation(fields: [authorId], references: [id])
+                        authorId  Int?
+                      }
+
+                      model User {
+                        id    Int     @id @default(autoincrement())
+                        email String  @unique
+                        name  String?
+                        posts Post[]
+                      }
+            ```
+
+            commit your migration
+            ```bash
+              npx prisma migrate dev --name first_prisma_migration
+            ```
+          </TabPanel>
+
+          <TabPanel id="established-projects" label="Populated Projects">
+            Synchronize your changes from your project:
+            ```bash
+              npx prisma db pull
+            ```
+
+            Create a migraton file
+            ```bash
+              mkdir -p prisma/migrations/0_init_supabase
+            ```
+
+            Synchronize the migrations
+            ```bash
+              npx prisma migrate diff \
+              --from-empty \
+              --to-schema-datamodel prisma/schema.prisma \
+              --script > prisma/migrations/0_init_supabase/migration.sql
+            ```
+            <Admonition type="note" label="conflict management">
+              If there are any conflicts, reference the [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) for more details
+            </Admonition>
+
+            ```bash
+              npx prisma migrate resolve --applied 0_init_supabase
+            ```
+
+        </TabPanel>
+
+    </Tabs>
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Run the development server, go to http://localhost:3000/notes in a browser and you should see the list of notes.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      npm run dev
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+````
