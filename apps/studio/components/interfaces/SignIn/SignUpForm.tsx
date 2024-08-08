@@ -1,7 +1,7 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as yup from 'yup'
 
 import { useSignUpMutation } from 'data/misc/signup-mutation'

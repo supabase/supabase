@@ -4,12 +4,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { cn } from '@/lib/utils'
-import { Button } from 'ui'
-import { Calendar } from 'ui'
 import {
+  Button,
+  Calendar,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
@@ -17,9 +18,10 @@ import {
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
 } from 'ui'
-import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
-import { toast } from 'ui'
 
 const FormSchema = z.object({
   dob: z.date({
@@ -33,8 +35,7 @@ export default function CalendarForm() {
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: 'You submitted the following values:',
+    toast('You submitted the following values:', {
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>

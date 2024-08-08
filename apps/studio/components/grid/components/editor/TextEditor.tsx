@@ -2,7 +2,7 @@ import { PostgresTable } from '@supabase/postgres-meta'
 import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'

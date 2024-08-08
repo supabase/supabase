@@ -3,7 +3,7 @@ import { observer, useLocalObservable } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, createContext, useContext, useEffect, useState } from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {

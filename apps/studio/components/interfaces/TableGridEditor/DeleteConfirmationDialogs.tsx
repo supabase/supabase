@@ -1,6 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import type { SupaRow } from 'components/grid/types'

@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
@@ -27,8 +27,8 @@ import {
   Input,
   InputNumber,
   Toggle,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 import FormField from '../AuthProvidersForm/FormField'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.

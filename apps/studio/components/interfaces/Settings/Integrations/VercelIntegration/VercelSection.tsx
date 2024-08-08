@@ -1,7 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'

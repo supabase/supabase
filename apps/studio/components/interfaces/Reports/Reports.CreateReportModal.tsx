@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useContentInsertMutation } from 'data/content/content-insert-mutation'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'

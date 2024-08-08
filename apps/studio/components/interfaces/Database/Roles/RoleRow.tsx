@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import {
   Button,
   Collapsible,
@@ -17,8 +17,8 @@ import {
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { PgRole } from 'data/database-roles/database-roles-query'
 import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
+import { PgRole } from 'data/database-roles/database-roles-query'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface RoleRowProps {

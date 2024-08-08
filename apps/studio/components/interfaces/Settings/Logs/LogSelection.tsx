@@ -1,6 +1,6 @@
 import { MousePointerClick, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { Loading } from 'components/ui/Loading'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'

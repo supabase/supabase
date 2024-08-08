@@ -1,6 +1,6 @@
 import { ExternalLink, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'

@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { noop } from 'lodash'
 import { Eye, Unlock } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Alert, Button, Modal } from 'ui'
 
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'

@@ -1,7 +1,7 @@
+import * as Sentry from '@sentry/nextjs'
 import { Github } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import * as Sentry from '@sentry/nextjs'
+import { toast } from 'sonner'
 
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'

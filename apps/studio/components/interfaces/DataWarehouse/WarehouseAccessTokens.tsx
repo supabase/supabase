@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { MoreVertical, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { TooltipContent } from '@radix-ui/react-tooltip'
 import { useParams } from 'common'

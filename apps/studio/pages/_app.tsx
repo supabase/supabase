@@ -33,8 +33,8 @@ import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { ErrorInfo, useEffect, useMemo, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import toast from 'react-hot-toast'
-import { PortalToast, Toaster } from 'ui'
+import { toast } from 'sonner'
+import { SonnerToaster } from 'ui'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
@@ -83,7 +83,7 @@ loader.config({
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const snap = useAppStateSnapshot()
   const queryClient = useRootQueryClient()
-  const consentToastId = useRef<string>()
+  const consentToastId = useRef<string | number>()
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
   const [supabase] = useState(() =>
@@ -182,6 +182,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                               </FeaturePreviewContextProvider>
                             </AppBannerWrapper>
                           </CommandMenuWrapper>
+                          <SonnerToaster position="top-right" />
                         </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
@@ -189,8 +190,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 </PageTelemetry>
 
                 {!isTestEnv && <HCaptchaLoadedStore />}
-                {!isTestEnv && <Toaster />}
-                <PortalToast />
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </FlagProvider>
             </ProfileProvider>

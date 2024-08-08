@@ -1,5 +1,5 @@
 import { copyToClipboard } from 'lib/helpers'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { StorageItem, StorageItemWithColumn } from '../Storage.types'
 
 export const copyPathToFolder = (openedFolders: StorageItem[], item: StorageItemWithColumn) => {

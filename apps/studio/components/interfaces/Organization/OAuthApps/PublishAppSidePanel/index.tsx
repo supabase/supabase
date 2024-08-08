@@ -1,7 +1,7 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {

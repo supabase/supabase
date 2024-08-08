@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
 import { delete_, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
 import { accessTokenKeys } from './keys'
 

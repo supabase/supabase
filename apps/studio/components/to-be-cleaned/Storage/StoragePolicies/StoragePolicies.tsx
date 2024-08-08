@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { filter, find, get, isEmpty } from 'lodash'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { IconLoader } from 'ui'
 
 import PolicyEditorModal from 'components/interfaces/Auth/Policies/PolicyEditorModal'

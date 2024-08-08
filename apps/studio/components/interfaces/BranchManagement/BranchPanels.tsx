@@ -15,8 +15,8 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode, useState } from 'react'
-import toast from 'react-hot-toast'
 import { useInView } from 'react-intersection-observer'
+import { toast } from 'sonner'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'

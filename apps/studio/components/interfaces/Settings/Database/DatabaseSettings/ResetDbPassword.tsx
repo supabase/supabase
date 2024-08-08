@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Button, Input, Modal } from 'ui'
 
 import {

@@ -3,7 +3,7 @@ import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } fr
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'

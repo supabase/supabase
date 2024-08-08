@@ -1,6 +1,6 @@
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'

@@ -1,14 +1,15 @@
-import { CommandProvider } from '@ui-patterns/CommandMenu'
-import { ThemeProvider } from 'common'
-import { PortalToast } from 'ui'
-import { PromoToast } from 'ui-patterns'
 import { type PropsWithChildren } from 'react'
 
+import { ThemeProvider } from 'common'
+import { SonnerToaster } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { PromoToast } from 'ui-patterns/PromoToast'
 import SiteLayout from '~/layouts/SiteLayout'
 import { AuthContainer } from './auth/auth.client'
 import { DocsCommandMenu } from './command'
 import { QueryClientProvider } from './data/queryClient.client'
 import { ShortcutPreviewBuild } from './envs/staging.client'
+import { TriggerConsentToast } from './helpers.consent'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { ScrollRestoration } from './ui/helpers.scroll.client'
 import { ThemeSandbox } from './ui/theme.client'
@@ -27,7 +28,6 @@ function GlobalProviders({ children }: PropsWithChildren) {
             <CommandProvider>
               <div className="flex flex-col">
                 <SiteLayout>
-                  <PortalToast />
                   <PromoToast />
                   {children}
                   <DocsCommandMenu />
@@ -35,6 +35,8 @@ function GlobalProviders({ children }: PropsWithChildren) {
                 <ThemeSandbox />
               </div>
             </CommandProvider>
+            <SonnerToaster position="top-right" />
+            <TriggerConsentToast />
           </ThemeProvider>
         </AuthContainer>
       </QueryClientProvider>

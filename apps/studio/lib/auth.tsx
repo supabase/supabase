@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { AuthProvider as AuthProviderInternal, gotrueClient } from 'common'
 import { PropsWithChildren, useCallback, useEffect } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
 import { clearLocalStorage } from './local-storage'

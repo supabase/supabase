@@ -1,12 +1,12 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
+import { replicaKeys } from 'data/read-replicas/keys'
 import { Database } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useParams } from 'common'
-import { useQueryClient } from '@tanstack/react-query'
-import { replicaKeys } from 'data/read-replicas/keys'
 import { REPLICA_STATUS } from './InstanceConfiguration.constants'
 
 interface RestartReplicaConfirmationModalProps {

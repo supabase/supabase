@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 export { default as passwordStrength } from './password-strength'
 export { default as uuidv4 } from './uuid'

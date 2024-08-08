@@ -1303,61 +1303,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "toast-demo": {
-      name: "toast-demo",
-      type: "components:example",
-      registryDependencies: ["toast"],
-      component: React.lazy(() => import("@/registry/default/example/toast-demo")),
-      source: "",
-      files: ["registry/default/example/toast-demo.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "toast-destructive": {
-      name: "toast-destructive",
-      type: "components:example",
-      registryDependencies: ["toast"],
-      component: React.lazy(() => import("@/registry/default/example/toast-destructive")),
-      source: "",
-      files: ["registry/default/example/toast-destructive.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "toast-simple": {
-      name: "toast-simple",
-      type: "components:example",
-      registryDependencies: ["toast"],
-      component: React.lazy(() => import("@/registry/default/example/toast-simple")),
-      source: "",
-      files: ["registry/default/example/toast-simple.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "toast-with-action": {
-      name: "toast-with-action",
-      type: "components:example",
-      registryDependencies: ["toast"],
-      component: React.lazy(() => import("@/registry/default/example/toast-with-action")),
-      source: "",
-      files: ["registry/default/example/toast-with-action.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "toast-with-title": {
-      name: "toast-with-title",
-      type: "components:example",
-      registryDependencies: ["toast"],
-      component: React.lazy(() => import("@/registry/default/example/toast-with-title")),
-      source: "",
-      files: ["registry/default/example/toast-with-title.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
     "toggle-group-demo": {
       name: "toggle-group-demo",
       type: "components:example",

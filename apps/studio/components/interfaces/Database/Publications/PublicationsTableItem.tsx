@@ -7,7 +7,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import Table from 'components/to-be-cleaned/Table'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 interface PublicationsTableItemProps {
   table: PostgresTable

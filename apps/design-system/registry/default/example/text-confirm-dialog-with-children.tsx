@@ -1,15 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { Button, useToast } from 'ui'
 import { UserPlus } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
+
+import { Button } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 const TextConfirmModalWithChildren = () => {
   const [visible, setVisible] = useState(false)
   const [loading, setLoading] = useState(false)
-
-  const { toast } = useToast()
 
   function onVisibleChange() {
     setVisible(!visible)
@@ -20,10 +20,7 @@ const TextConfirmModalWithChildren = () => {
     setTimeout(() => {
       setLoading(false)
       setVisible(false)
-      toast({
-        title: 'Updated project',
-        description: 'Friday, February 10, 2023 at 5:57 PM',
-      })
+      toast('Updated project', { description: 'Friday, February 10, 2023 at 5:57 PM' })
     }, 3000)
   }
 

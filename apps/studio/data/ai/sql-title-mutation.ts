@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { isResponseOk, post } from 'lib/common/fetch'
 import { BASE_PATH } from 'lib/constants'

@@ -792,36 +792,6 @@ export const examples: Registry = [
     files: ['example/textarea-with-text.tsx'],
   },
   {
-    name: 'toast-demo',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-demo.tsx'],
-  },
-  {
-    name: 'toast-destructive',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-destructive.tsx'],
-  },
-  {
-    name: 'toast-simple',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-simple.tsx'],
-  },
-  {
-    name: 'toast-with-action',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-with-action.tsx'],
-  },
-  {
-    name: 'toast-with-title',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-with-title.tsx'],
-  },
-  {
     name: 'toggle-group-demo',
     type: 'components:example',
     registryDependencies: ['toggle-group'],

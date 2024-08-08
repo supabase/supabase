@@ -1,11 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import pgMeta from '@supabase/pg-meta'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
 import { sqlKeys } from 'data/sql/keys'
+import type { ResponseError } from 'types'
 
 export type DatabaseFunctionCreateVariables = {
   projectRef: string

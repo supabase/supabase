@@ -1,6 +1,6 @@
 import { post } from 'lib/common/fetch'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 export default async function passwordStrength(value: string) {
   let message: string = ''

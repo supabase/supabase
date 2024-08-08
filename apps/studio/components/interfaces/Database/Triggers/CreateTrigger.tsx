@@ -2,8 +2,8 @@ import { has, isEmpty, mapValues, union, without } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { createContext, useContext, useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
 import SVG from 'react-inlinesvg'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -13,7 +13,6 @@ import {
   IconTerminal,
   Input,
   Listbox,
-  Modal,
   SidePanel,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'

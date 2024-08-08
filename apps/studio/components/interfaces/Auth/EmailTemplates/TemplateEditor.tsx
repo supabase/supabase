@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
