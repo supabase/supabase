@@ -33,7 +33,7 @@ services:
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.43.11
+    image: supabase/storage-api:v1.0.6
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
