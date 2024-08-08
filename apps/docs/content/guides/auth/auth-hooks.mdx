@@ -4,9 +4,9 @@ title: 'Auth Hooks'
 subtitle: 'Use HTTP or Postgres Functions to customize your authentication flow'
 ---
 
-## Overview
+## What is a hook
 
-A hook is an endpoint that allows you to alter the default Supabase Auth flow at specific execution points, which can be configured as a HTTPS endpoint or a Postgres Function. Developers can use hooks to add custom behavior that's not supported natively.
+A hook is an endpoint that allows you to alter the default Supabase Auth flow at specific execution points. Developers can use hooks to add custom behavior that's not supported natively.
 
 Hooks help you:
 
@@ -18,43 +18,35 @@ Hooks help you:
 
 The following hooks are available:
 
-| Hook                                                                                                                          | Description                                                 | Available on Plan    |
-| ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------- |
-| [Custom Access Token](/docs/guides/auth/auth-hooks?queryGroups=language&language=sql#custom-access-token)                     | Add additional claims to the user's access token returned   | Free, Pro            |
-| [Send SMS](/docs/guides/auth/auth-hooks?queryGroups=language&language=sql#send-sms)                                           | Use a custom SMS provider to send authentication messages   | Free, Pro            |
-| [Send Email](/docs/guides/auth/auth-hooks?queryGroups=language&language=sql#send-email)                                       | Use a custom email provider to send authentication messages | Free, Pro            |
-| [MFA Verification Attempt](/docs/guides/auth/auth-hooks?queryGroups=language&language=sql#mfa-verification-attempt)           | Add additional checks to the MFA verification flow          | Teams and Enterprise |
-| [Password Verification Attempt](/docs/guides/auth/auth-hooks?queryGroups=language&language=sql#password-verification-attempt) | Add additional checks to the password verification flow     | Teams and Enterprise |
+| Hook                                                                                   | Available on Plan    |
+| -------------------------------------------------------------------------------------- | -------------------- |
+| [Custom Access Token](/docs/guides/auth/hooks/custom-access-token)                     | Free, Pro            |
+| [Send SMS](/docs/guides/auth/hooks/send-sms)                                           | Free, Pro            |
+| [Send Email](/docs/guides/auth/hooks/send-email)                                       | Free, Pro            |
+| [MFA Verification Attempt](/docs/guides/auth/hooks/mfa-verification-attempt)           | Teams and Enterprise |
+| [Password Verification Attempt](/docs/guides/auth/hooks/password-verification-attempt) | Teams and Enterprise |
 
-### What is a hook
-
-A Hook is a primitive invoked by Supabase Auth, with an event object, at a point in the flow. The Hook returns an object which provides instructions on how Supabase Auth should continue processing. While the Hook interface is protocol agnostic, platform support is limited to Postgres (SQL) and HTTP Hooks. Pick the Hook corresponding to the medium (PL/pgSQL or JavaScript) that you are most familiar with.
+Supabase supports 2 ways to [configure a hook](/dashboard/project/_/auth/hooks) in your project:
 
 <Tabs
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="sql"
-  queryGroup="language"
+  defaultActiveId="postgres-function"
 >
-<TabPanel id="sql" label="SQL">
+<TabPanel id="postgres-function" label="Postgres Function">
 
-A Postgres Hook is a Postgres Function which takes a single argument -- the event of type JSONB -- and returns a JSONB object. A Postgres Hook runs on Supabase Auth and does not leave the instance. You can read more about Postgres Functions in [the Postgres guide](/docs/guides/database/functions)
+A [postgres function](/docs/guides/database/functions) can be configured as a hook. The function should take in a single argument -- the event of type JSONB -- and return a JSONB object. Since the postgres function runs on your database, the request does not leave your project's instance.
 
 </TabPanel>
-<TabPanel id="http" label="HTTP">
-A HTTP Hook is an endpoint which takes in a JSON event payload and returns a JSON response. HTTP Hooks in Supabase follow the Standard Webhooks Specification, which is a set of guidelines aligning how hooks are implemented. The specification attaches three security headers to guarantee authenticity of the payload:
+<TabPanel id="http" label="HTTP Endpoint">
 
-- `webhook-id`: the unique webhook identifier described in the preceding sections.
-- `webhook-timestamp`: integer UNIX timestamp (seconds since epoch).
-- `webhook-signature`: the signatures of this webhook. This is generated from body of the hook.
-
-You can use any HTTP endpoint as a Hook, including an endpoint on your application. For convenience, a Supabase Edge Function is used for demonstration.
+A HTTP Hook is an endpoint which takes in a JSON event payload and returns a JSON response. You can use any HTTP endpoint as a Hook, including an endpoint in your application. The easiest way to create a HTTP hook is to create a [Supabase Edge Function](/docs/guides/functions/quickstart).
 
 </TabPanel>
 </Tabs>
 
-### Hook Security Model
+## Security Model
 
 Sign the payload and grant permissions selectively in order to guard the integrity of the payload.
 
@@ -99,6 +91,14 @@ Read more about the `security definer` tag [in our database guide](/docs/guides/
 
 </TabPanel>
 <TabPanel id="http" label="HTTP">
+
+HTTP Hooks in Supabase follow the [Standard Webhooks Specification](https://www.standardwebhooks.com/), which is a set of guidelines aligning how hooks are implemented. The specification attaches three security headers to guarantee the integrity of the payload:
+
+- `webhook-id`: the unique webhook identifier described in the preceding sections.
+- `webhook-timestamp`: integer UNIX timestamp (seconds since epoch).
+- `webhook-signature`: the signatures of this webhook. This is generated from body of the hook.
+
+When the request is made to the HTTP hook, you should use the [Standard Webhooks libraries](https://github.com/standard-webhooks/standard-webhooks/tree/main/libraries) to verify these headers.
 
 When a HTTP hook is created, the secret generated should be of the following format: `v1,whsec_<standard-base64-secret>`:
 
@@ -147,7 +147,7 @@ Let us develop a Hook locally and then deploy it to the cloud. As a recap, hereâ
 | MFA Verification Attempt      | `mfa_verification_attempt`      | Each time a user tries to verify an MFA factor.    | Returns a decision on whether to reject the attempt and future ones, or to allow the user to keep trying. |
 | Password Verification Attempt | `password_verification_attempt` | Each time a user tries to sign in with a password. | Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying.   |
 
-Edit config.toml to set up the Auth Hook locally.
+Edit `config.toml` to set up the Auth Hook locally.
 
 <Tabs
   scrollable
@@ -234,7 +234,7 @@ Modify the `auth.hook.<hook_name>` field and set `uri` to a valid HTTP URI. For 
 ```
 [auth.hook.send_sms]
 enabled = true
-uri = "http://host.docker.internal:54321/functions/v1/sms_sender"
+uri = "http://host.docker.internal:54321/functions/v1/send_sms"
 secret = "env(SEND_SMS_HOOK_SECRET)"
 ```
 
@@ -242,8 +242,8 @@ secret = "env(SEND_SMS_HOOK_SECRET)"
 
 Fill in the Hook Secret in `supabase/functions/.env`
 
-```jsx
-SEND_SMS_HOOK_SECRET = '<base64_standard_secret>'
+```bash
+SEND_SMS_HOOK_SECRET='v1,whsec_<base64_standard_secret>'
 ```
 
 Start the function locally:
@@ -254,7 +254,7 @@ supabase functions serve send-sms --no-verify-jwt
 
 Disable JWT verification via the `--no-verify-jwt` to accommodate hooks which are run before a JWT is issued. Payload authenticity is instead protected via the appended security headers associated with the Standard Webhooks Standard.
 
-Note that payloads are sent uncompressed (Encoding: `identity`) in order to accurately track Content Length. In addition, there is a 20KB payload limit to guard against payload stuffing attacks.
+Note that payloads are sent uncompressed in order to accurately track Content Length. In addition, there is a 20KB payload limit to guard against payload stuffing attacks.
 
 </TabPanel>
 </Tabs>
