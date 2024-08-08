@@ -16,6 +16,8 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
+import FormField from '../AuthProvidersForm/FormField'
+
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -52,6 +54,8 @@ const schema = object({
   API_MAX_REQUEST_DURATION: number()
     .min(5, 'Must be 5 or larger')
     .max(30, 'Must be a value no greater than 30'),
+  MFA_TOTP: string().required(),
+  MFA_PHONE: string().required(),
 })
 
 const AdvancedAuthSettingsForm = () => {
@@ -93,10 +97,29 @@ const AdvancedAuthSettingsForm = () => {
     MFA_MAX_ENROLLED_FACTORS: authConfig?.MFA_MAX_ENROLLED_FACTORS || 10,
     DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE || 10,
     API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION || 10,
+    MFA_TOTP: authConfig?.MFA_TOTP || 'Enabled',
+    MFA_PHONE: authConfig?.MFA_PHONE || 'Disabled',
   }
+  // TODO: Use a map to transform Enabled / Disabled to transform MFA_TOTP_ENROLL_ENABLED etc to corresponding underlying config
+
+  const MFAFactorSelectionOptions = [
+    {
+      label: 'Enabled',
+      value: 'Enabled',
+    },
+    {
+      label: 'Verify Enabled',
+      value: 'Verify Enabled',
+    },
+    {
+      label: 'Disabled',
+      value: 'Disabled',
+    },
+  ]
 
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
+    // TODO: Transform the original config based on the enabled disabled toggles
 
     if (!isTeamsEnterprisePlan) {
       delete payload.DB_MAX_POOL_SIZE
@@ -148,6 +171,7 @@ const AdvancedAuthSettingsForm = () => {
               title="Advanced Settings"
               description="These settings rarely need to be changed."
             />
+
             <FormPanel
               disabled={true}
               footer={
@@ -206,44 +230,34 @@ const AdvancedAuthSettingsForm = () => {
                 header={<FormSectionLabel>Multi-Factor Authentication (MFA)</FormSectionLabel>}
               >
                 <FormSectionContent loading={isLoading}>
+                  <FormField
+                    name="MFA_TOTP"
+                    properties={{
+                      type: 'select',
+                      title: 'TOTP',
+                      description: 'Control Use Of TOTP Factors',
+                      enum: MFAFactorSelectionOptions,
+                    }}
+                    formValues={values}
+                    disabled={!canUpdateConfig}
+                  />
+                  <FormField
+                    name="MFA_PHONE"
+                    properties={{
+                      type: 'select',
+                      title: 'Phone',
+                      description: 'Control Use Of Phone Factors',
+                      enum: MFAFactorSelectionOptions,
+                    }}
+                    formValues={values}
+                    disabled={!canUpdateConfig}
+                  />
                   <InputNumber
                     id="MFA_MAX_ENROLLED_FACTORS"
                     size="small"
                     label="Maximum number of per-user MFA factors"
                     descriptionText="How many MFA factors can be enrolled at once per user."
                     actions={<span className="mr-3 text-foreground-lighter">factors</span>}
-                    disabled={!canUpdateConfig}
-                  />
-                  <Toggle
-                    id="MFA_TOTP_ENROLL_ENABLED"
-                    size="small"
-                    label="Allow Enrollment of TOTP factors for MFA"
-                    layout="flex"
-                    descriptionText="Control whether users can enroll new TOTP factors"
-                    disabled={!canUpdateConfig}
-                  />
-                  <Toggle
-                    id="MFA_TOTP_VERIFY_ENABLED"
-                    size="small"
-                    label="Control whether users can perform MFA Authentication with a TOTP factor"
-                    layout="flex"
-                    descriptionText="Allow verification"
-                    disabled={!canUpdateConfig}
-                  />
-                  <Toggle
-                    id="MFA_PHONE_ENROLL_ENABLED"
-                    size="small"
-                    label="Allow Enrollment of Phone factors for MFA"
-                    layout="flex"
-                    descriptionText="Control whether users can enroll new Phone factors"
-                    disabled={!canUpdateConfig}
-                  />
-                  <Toggle
-                    id="MFA_PHONE_VERIFY_ENABLED"
-                    size="small"
-                    label="Control whether users can perform MFA Authentication with a Phone factor"
-                    layout="flex"
-                    descriptionText="Allow verification"
                     disabled={!canUpdateConfig}
                   />
                   <InputNumber
@@ -253,13 +267,17 @@ const AdvancedAuthSettingsForm = () => {
                     descriptionText="Number of digits in OTP"
                     disabled={!canUpdateConfig}
                   />
-                  <Input
-                    id="MFA_PHONE_TEMPLATE"
-                    size="small"
-                    label="Template For MFA Phone Verification"
-                    descriptionText="Content of MFA Phone Template"
+                  <FormField
+                    name="MFA_PHONE_TEMPLATE"
+                    properties={{
+                      title: 'Phone Verification Message',
+                      type: 'multiline-string',
+                      description: 'To format the OTP code use `{{ .Code }}`',
+                    }}
+                    formValues={values}
                     disabled={!canUpdateConfig}
                   />
+                  {/* TODO: Decide whether to do conditional display of message and otp length */}
                 </FormSectionContent>
               </FormSection>
 

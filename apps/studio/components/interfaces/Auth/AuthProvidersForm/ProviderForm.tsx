@@ -65,8 +65,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           initialValues[key] = configValue
             ? configValue
             : provider.properties[key].type === 'boolean'
-              ? false
-              : ''
+            ? false
+            : ''
         }
       }
     })
@@ -161,6 +161,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         onSubmit={onSubmit}
       >
         {({ handleReset, initialValues, values }: any) => {
+          console.log('new entry')
+          console.log(provider.properties)
           const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
