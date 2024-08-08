@@ -315,7 +315,7 @@ Hooks return status codes based on the nature of the response. These status code
 
 Errors are responses which contain status codes 400 and above. On a retry-able error, such as an error with a `429` or `503` status code, HTTP Hooks will attempt up to three retries with a back-off of two seconds.
 
-Here’s a sample HTTP retry schedule:
+Here's a sample HTTP retry schedule:
 
 | Time Since Start (HH:MM:SS) | Event                   | Notes                                             |
 | --------------------------- | ----------------------- | ------------------------------------------------- |
@@ -353,27 +353,27 @@ Each Hook description contains an example JSONSchema which you can use in conjun
     {
       name: 'Custom Access Token',
       description: 'Customize the access token issued by Supabase Auth',
-      href: '/guides/auth/hooks/custom-access-token-hook',
+      href: '/guides/auth/auth-hooks/custom-access-token-hook',
     },
     {
       name: 'Send SMS',
       description: 'Use a custom SMS provider to send authentication messages',
-      href: '/guides/auth/hooks/send-sms-hook',
+      href: '/guides/auth/auth-hooks/send-sms-hook',
     },
     {
       name: 'Send Email',
       description: 'Use a custom email provider to send authentication messages',
-      href: '/guides/auth/hooks/send-email-hook',
+      href: '/guides/auth/auth-hooks/send-email-hook',
     },
     {
       name: 'MFA Verification',
       description: 'Add additional checks to the MFA verification flow',
-      href: '/guides/auth/hooks/mfa-verification-hook',
+      href: '/guides/auth/auth-hooks/mfa-verification-hook',
     },
     {
       name: 'Password verification',
       description: 'Add additional checks to the password verification flow',
-      href: '/guides/auth/hooks/password-verification-hook',
+      href: '/guides/auth/auth-hooks/password-verification-hook',
     },
   ].map((x) => (
     <div className="col-span-4" key={x.href}>
