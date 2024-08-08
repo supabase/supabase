@@ -1,8 +1,8 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
+import { partition, debounce } from 'lodash'
 import { ExternalLink, Search } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
@@ -66,6 +66,12 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
+  const debouncedParamsUpdate = useMemo(() => {
+    return debounce((updatedParams: typeof params) => {
+      setParams(updatedParams)
+    }, 314)
+  }, [setParams])
+
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
@@ -126,10 +132,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               size="small"
               placeholder="Filter tables and policies"
               className="block w-64 text-sm placeholder-border-muted"
-              value={searchString || ''}
+              defaultValue={searchString || ''}
               onChange={(e) => {
                 const str = e.target.value
-                setParams({ ...params, search: str === '' ? undefined : str })
+                debouncedParamsUpdate({ ...params, search: str === '' ? undefined : str })
               }}
               icon={<Search size={14} />}
             />
