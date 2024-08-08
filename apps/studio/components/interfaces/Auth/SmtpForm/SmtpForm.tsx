@@ -32,6 +32,7 @@ import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 import ReactMarkdown from 'react-markdown'
+import Link from 'next/link'
 
 const SmtpForm = () => {
   const { ref: projectRef } = useParams()
@@ -313,11 +314,14 @@ const SmtpForm = () => {
                       <IconAlertTriangle strokeWidth={2} />
                       <AlertTitle_Shadcn_>AWS SES Configuartion</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        <ReactMarkdown>
-                          It looks like you are using AWS SES as your SMTP provider. Some extra
-                          configuration may be needed. Please check out the [AWS SES
-                          Documentation](https://docs.aws.amazon.com/ses/latest/dg/Welcome.html)
-                        </ReactMarkdown>
+                        It looks like you are using AWS SES as your SMTP provider. Some extra
+                        configuration may be needed. Please check out the{' '}
+                        <Link
+                          className="underline"
+                          href="https://docs.aws.amazon.com/ses/latest/dg/Welcome.html"
+                        >
+                          AWS SES Documentation
+                        </Link>
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   )}
