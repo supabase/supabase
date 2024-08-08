@@ -2,6 +2,7 @@
 import { remarkCodeHike } from '@code-hike/mdx'
 import nextMdx from '@next/mdx'
 import os from 'node:os'
+import { fileURLToPath } from 'node:url'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
@@ -64,16 +65,16 @@ const nextConfig = {
     },
   },
   transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
-  /**
-   * The SQL to REST API translator relies on libpg-query, which packages a
-   * native Node.js module that wraps the Postgres query parser.
-   *
-   * The default webpack config can't load native modules, so we need a custom
-   * loader for it, which calls process.dlopen to load C++ Addons.
-   *
-   * See https://github.com/eisberg-labs/nextjs-node-loader
-   */
-  webpack: (config) => {
+  webpack: (config, { defaultLoaders, webpack }) => {
+    /**
+     * The SQL to REST API translator relies on libpg-query, which packages a
+     * native Node.js module that wraps the Postgres query parser.
+     *
+     * The default webpack config can't load native modules, so we need a custom
+     * loader for it, which calls process.dlopen to load C++ Addons.
+     *
+     * See https://github.com/eisberg-labs/nextjs-node-loader
+     */
     config.module.rules.push({
       test: /\.node$/,
       use: [
@@ -86,6 +87,40 @@ const nextConfig = {
         },
       ],
     })
+    /**
+     * The search web worker imports @electric-sql/pglite. This is
+     * automatically bundled by Webpack but not transpiled, so it must be
+     * explicitly transpiled to avoid an error.
+     *
+     * Credit to https://github.com/vercel/next.js/issues/65361#issuecomment-2106302238
+     */
+    config.module.rules.push({
+      test: /\.+(js|jsx|mjs|ts|tsx)$/,
+      use: defaultLoaders.babel,
+      include: fileURLToPath(import.meta.resolve('@electric-sql/pglite')),
+      type: 'javascript/auto',
+    })
+    /**
+     * `pglite` conditionally loads node modules `fs`, `module`, `path`, and
+     * `stream/promises`, which webpack tries unsuccessfully to bundle for the
+     * browser.
+     *
+     * These must be ignored to build successfully.
+     */
+    ;(config.plugins ??= []).push(
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^(?:fs|path|module|stream\/promises)$/,
+        contextRegExp: /pglite\/dist$/,
+      })
+    )
+    /**
+     * Ignore node-specific modules used by transformers.js
+     */
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      sharp$: false,
+      'onnxruntime-node$': false,
+    }
     return config
   },
   async headers() {

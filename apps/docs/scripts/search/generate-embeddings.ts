@@ -3,6 +3,9 @@ import dotenv from 'dotenv'
 import { parseArgs } from 'node:util'
 import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
+
+import { setupSingletonExtractor } from 'ui-patterns/CommandMenu/prepackaged/DocsSearchLocal/DocsSearchLocal.shared.llm'
+
 import type { Json, Section } from '../helpers.mdx'
 import { fetchSources } from './sources'
 
@@ -15,6 +18,12 @@ const args = parseArgs({
     },
   },
 })
+
+/**
+ * Embeddings are historically generated with OpenAI. There is now an
+ * additional local pipeline to test local embeddings.
+ */
+const getExtractor = setupSingletonExtractor()
 
 async function generateEmbeddings() {
   const shouldRefresh = Boolean(args.values.refresh)
@@ -176,6 +185,9 @@ async function generateEmbeddings() {
 
           const [responseData] = embeddingResponse.data
 
+          const extractor = await getExtractor()
+          const featureArray = (await extractor.extract(input)).tolist()[0]
+
           const { error: insertPageSectionError } = await supabaseClient
             .from('page_section')
             .insert({
@@ -185,6 +197,7 @@ async function generateEmbeddings() {
               content,
               token_count: embeddingResponse.usage.total_tokens,
               embedding: responseData.embedding,
+              hf_embedding: featureArray,
               rag_ignore: ragIgnore,
             })
             .select()

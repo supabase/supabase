@@ -3,13 +3,11 @@ import { ApplicationError, UserError, clippy } from 'ai-commands/edge'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
-export const runtime = 'edge'
-
 const openAiKey = process.env.OPENAI_API_KEY
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string
 const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
 
-export default async function handler(req: NextRequest) {
+export async function POST(req: NextRequest) {
   if (!openAiKey) {
     return new Response(
       JSON.stringify({
@@ -48,20 +46,7 @@ export default async function handler(req: NextRequest) {
     )
   }
 
-  const { method } = req
-
-  switch (method) {
-    case 'POST':
-      return handlePost(req)
-    default:
-      return new Response(
-        JSON.stringify({ data: null, error: { message: `Method ${method} Not Allowed` } }),
-        {
-          status: 405,
-          headers: { 'Content-Type': 'application/json', Allow: 'POST' },
-        }
-      )
-  }
+  return handlePost(req)
 }
 
 async function handlePost(request: NextRequest) {
