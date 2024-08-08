@@ -129,7 +129,6 @@ export const AIPolicyEditorPanel = memo(function ({
   // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
   const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
   const [assistantVisible, setAssistantPanel] = useState<boolean>(false)
-  const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState<boolean>(true)
   const [incomingChange, setIncomingChange] = useState<string>()
   // Used for confirmation when closing the panel with unsaved changes
   const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState<boolean>(false)
@@ -253,12 +252,7 @@ export const AIPolicyEditorPanel = memo(function ({
           })
         : false
 
-    if (
-      policyCreateUnsaved ||
-      policyUpdateUnsaved ||
-      messages.length > 0 ||
-      !isAssistantChatInputEmpty
-    ) {
+    if (policyCreateUnsaved || policyUpdateUnsaved || messages.length > 0) {
       setIsClosingPolicyEditorPanel(true)
     } else {
       onSelectCancel()
@@ -849,7 +843,6 @@ export const AIPolicyEditorPanel = memo(function ({
                           })
                         }
                         onDiff={updateEditorWithCheckForDiff}
-                        onChange={setIsAssistantChatInputEmpty}
                         loading={isLoading || isDebugSqlLoading}
                       />
                     </TabsContent_Shadcn_>

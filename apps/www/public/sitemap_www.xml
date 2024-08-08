@@ -1749,6 +1749,24 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/blog/hardening-supabase</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/range-columns</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-js-on-jsr</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/customers/berriai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -1846,6 +1864,12 @@
 
   <url>
     <loc>https://supabase.com/customers/xendit</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/events/scale-to-billions-generative-ai-humata</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
