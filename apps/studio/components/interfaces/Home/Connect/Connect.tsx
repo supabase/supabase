@@ -2,16 +2,24 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Plug } from 'lucide-react'
 import { useState } from 'react'
+
+import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
+import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import {
   Button,
   DIALOG_PADDING_X,
+  DIALOG_PADDING_X_SMALL,
   DIALOG_PADDING_Y,
+  Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  Dialog,
   IconExternalLink,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -19,13 +27,6 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-
-import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
-import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { useCheckPermissions } from 'hooks'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
 import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
@@ -164,14 +165,12 @@ const Connect = () => {
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <Button type="primary">
-            <span className="flex items-center gap-2 px-3">
-              <Plug size={14} className="rotate-90" /> <span>Connect</span>
-            </span>
+          <Button type="primary" icon={<Plug className="rotate-90" />}>
+            <span>Connect</span>
           </Button>
         </DialogTrigger>
         <DialogContent className={cn('sm:max-w-5xl p-0')}>
-          <DialogHeader className="pb-0">
+          <DialogHeader className="pb-3">
             <DialogTitle>Connect to your project</DialogTitle>
             <DialogDescription>
               Get the connection strings and environment variables for your app
@@ -182,7 +181,7 @@ const Connect = () => {
             defaultValue="direct"
             onValueChange={(value) => handleConnectionType(value)}
           >
-            <TabsList_Shadcn_ className={cn('flex gap-4', DIALOG_PADDING_X)}>
+            <TabsList_Shadcn_ className={cn('flex gap-4', DIALOG_PADDING_X_SMALL)}>
               <TabsTrigger_Shadcn_ key="direct" value="direct" className="px-0">
                 Connection String
               </TabsTrigger_Shadcn_>
@@ -267,7 +266,7 @@ const Connect = () => {
             <TabsContent_Shadcn_
               key="direct"
               value="direct"
-              className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
+              className={cn(DIALOG_PADDING_X_SMALL, DIALOG_PADDING_Y, '!mt-0')}
             >
               <DatabaseConnectionString appearance="minimal" />
             </TabsContent_Shadcn_>

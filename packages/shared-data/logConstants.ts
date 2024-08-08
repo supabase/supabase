@@ -7,6 +7,7 @@ const schemas = [
       { path: 'timestamp', type: 'datetime' },
       { path: 'event_message', type: 'string' },
       { path: 'identifier', type: 'string' },
+      { path: 'metadata.load_balancer_redirect_identifier', type: 'string' },
       { path: 'metadata.request.cf.asOrganization', type: 'string' },
       { path: 'metadata.request.cf.asn', type: 'number' },
       { path: 'metadata.request.cf.botManagement.corporateProxy', type: 'boolean' },
@@ -222,6 +223,7 @@ const schemas = [
     fields: [
       { path: 'event_message', type: 'string' },
       { path: 'id', type: 'string' },
+      { path: 'identifier', type: 'string' },
       { path: 'timestamp', type: 'datetime' },
       { path: 'metadata.host', type: 'string' },
     ],

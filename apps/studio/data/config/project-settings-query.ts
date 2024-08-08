@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import type { components } from 'data/api'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
@@ -34,7 +35,7 @@ export async function getProjectSettings(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data as unknown as ProjectSettings
 }
 

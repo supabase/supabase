@@ -168,7 +168,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
               {isLoadingIndexAdvisorResult && <GenericSkeletonLoader />}
               {isErrorIndexAdvisorResult && (
                 <AlertError
-                  ref={project?.ref}
+                  projectRef={project?.ref}
                   error={indexAdvisorError}
                   subject="Failed to retrieve result from index advisor"
                 />

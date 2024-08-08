@@ -1,17 +1,17 @@
-import SVG from 'react-inlinesvg'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { Fragment } from 'react'
-import { Button, IconBook, IconBookOpen } from 'ui'
+import SVG from 'react-inlinesvg'
 
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import { Button, IconBook, IconBookOpen } from 'ui'
 import { navigateToSection } from './Content/Content.utils'
 import { DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
-import { BASE_PATH } from 'lib/constants'
 
 const Separator = () => <div className="border-t !mt-3 pb-1 mx-3" />
 

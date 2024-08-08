@@ -9,9 +9,9 @@ import { configKeys } from './keys'
 export type ProjectPostgrestConfigUpdateVariables = {
   projectRef: string
   dbSchema: string
-  maxRows: string
+  maxRows: number
   dbExtraSearchPath: string
-  dbPool: string | null
+  dbPool: number | null
 }
 
 export async function updateProjectPostgrestConfig({

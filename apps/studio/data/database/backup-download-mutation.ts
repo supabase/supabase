@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { Backup } from './backup-restore-mutation'
 
@@ -23,7 +23,7 @@ export async function downloadBackup({ ref, backup }: BackupDownloadVariables) {
       status: 'deprecated',
     },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

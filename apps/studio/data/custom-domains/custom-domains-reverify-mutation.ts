@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-
-import { post } from 'data/fetchers'
 import { toast } from 'react-hot-toast'
+
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { customDomainKeys } from './keys'
 
@@ -14,7 +14,7 @@ export async function reverifyCustomDomain({ projectRef }: CustomDomainReverifyV
     params: { path: { ref: projectRef } },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

@@ -122,7 +122,7 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
 function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
-  const isLaunchWeek7 = props.blog.launchweek === 7
+  const isLaunchWeek7 = props.blog.launchweek === '7'
   const isLaunchWeekX = props.blog.launchweek?.toString().toLocaleLowerCase() === 'x'
   const isGAWeek = props.blog.launchweek?.toString().toLocaleLowerCase() === '11'
 

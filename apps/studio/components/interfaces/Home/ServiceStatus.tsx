@@ -1,12 +1,13 @@
-import { useParams } from 'common'
 import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 
+import { useParams } from 'common'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
 import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
-import { useIsFeatureEnabled, useSelectedProject } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 
 const ServiceStatus = () => {
   const { ref } = useParams()
@@ -123,7 +124,7 @@ const ServiceStatus = () => {
             ) : (
               <div
                 className={`w-2 h-2 rounded-full ${
-                  allServicesOperational ? 'bg-brand' : 'bg-amber-900'
+                  allServicesOperational ? 'bg-brand' : 'bg-warning'
                 }`}
               />
             )
@@ -132,7 +133,7 @@ const ServiceStatus = () => {
           {isBranch ? 'Preview Branch' : 'Project'} Status
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
           <div
             key={service.name}
@@ -153,7 +154,7 @@ const ServiceStatus = () => {
             ) : service.isSuccess ? (
               <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
             ) : (
-              <AlertTriangle className="text-amber-900" size={18} strokeWidth={1.5} />
+              <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
             )}
           </div>
         ))}

@@ -12,13 +12,14 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { LogsEndpointParams } from '../Settings/Logs'
+import type { LogsEndpointParams } from '../Settings/Logs/Logs.types'
 import type { BaseReportParams, ReportQueryType } from './Reports.types'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]
   title: string
   description?: string
+  error?: string | Object | null
   tooltip?: string
   className?: string
   renderer: (props: ReportWidgetRendererProps) => ReactNode
@@ -43,13 +44,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
   const projectRef = ref as string
 
   return (
-    <Panel
-      noMargin
-      noHideOverflow
-      className={cn('pb-0', props.className)}
-      bodyClassName="h-full"
-      wrapWithLoading={false}
-    >
+    <Panel noMargin noHideOverflow className={cn('pb-0', props.className)} wrapWithLoading={false}>
       <Panel.Content className="space-y-4">
         <div className="flex flex-row items-start justify-between">
           <div className="gap-2">

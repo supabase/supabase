@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
+import { projectKeys } from 'data/projects/keys'
 import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
-import { projectKeys } from 'data/projects/keys'
 
 export type BranchCreateVariables = {
   projectRef: string
@@ -30,7 +30,7 @@ export async function createBranch({
     },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

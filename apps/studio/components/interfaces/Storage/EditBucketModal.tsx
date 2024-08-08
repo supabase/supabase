@@ -112,7 +112,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
           }, [visible])
 
           return (
-            <div className="space-y-4 py-4">
+            <>
               <Modal.Content>
                 <Input
                   disabled
@@ -242,23 +242,16 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                   </div>
                 </Collapsible.Content>
               </Collapsible>
-              <div className="w-full border-t border-default !mt-0" />
-              <Modal.Content>
-                <div className="flex items-center space-x-2 justify-end">
-                  <Button type="default" disabled={isUpdating} onClick={() => onClose()}>
-                    Cancel
-                  </Button>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={isUpdating}
-                    disabled={isUpdating}
-                  >
-                    Save
-                  </Button>
-                </div>
+              <Modal.Separator />
+              <Modal.Content className="flex items-center space-x-2 justify-end">
+                <Button type="default" disabled={isUpdating} onClick={() => onClose()}>
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit" loading={isUpdating} disabled={isUpdating}>
+                  Save
+                </Button>
               </Modal.Content>
-            </div>
+            </>
           )
         }}
       </Form>

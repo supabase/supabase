@@ -27,7 +27,9 @@ Some common solutions for this issue are:
 - [Upgrading](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance) to a [larger compute add-on](../platform/compute-add-ons) in order to serve higher volumes of traffic.
 - [Optimizing the queries](../platform/performance#examining-query-performance) being executed.
 - [Using fewer Postgres connections](../platform/performance#configuring-clients-to-use-fewer-connections) can reduce the amount of resources needed on the project.
-- [Restarting](https://supabase.com/dashboard/project/_/settings/general) the database. This only temporarily solves the issue by terminating any ongoing workloads that might be tying up your compute resources.
+- [Restarting](https://supabase.com/dashboard/project/_/settings/general) the project. This only temporarily solves the issue by terminating any ongoing workloads that might be tying up your compute resources.
+  - All databases of the project, including [Read replicas](/docs/guides/platform/read-replicas), will be restarted.
+  - If you only want to restart a specific Read Replica, you can do so from the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure).
 
 If your [Disk IO budget](../platform/compute-add-ons#disk-io) has been drained, you will need to either wait for it to be replenished the next day, or upgrade to a larger compute add-on to increase the budget available to your project.
 

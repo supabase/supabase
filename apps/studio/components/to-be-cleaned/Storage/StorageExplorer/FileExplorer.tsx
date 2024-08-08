@@ -1,26 +1,25 @@
-import { useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
+import { useEffect, useRef } from 'react'
 
-import { STORAGE_VIEWS, CONTEXT_MENU_KEYS } from '../Storage.constants'
-import ItemContextMenu from './ItemContextMenu'
-import FolderContextMenu from './FolderContextMenu'
+import { noop } from 'lodash'
+import { CONTEXT_MENU_KEYS, STORAGE_VIEWS } from '../Storage.constants'
+import type { StorageColumn, StorageItem, StorageItemWithColumn } from '../Storage.types'
 import ColumnContextMenu from './ColumnContextMenu'
 import FileExplorerColumn from './FileExplorerColumn'
-import { noop } from 'lodash'
-import type { StorageColumn } from '../Storage.types'
+import FolderContextMenu from './FolderContextMenu'
+import ItemContextMenu from './ItemContextMenu'
 
 export interface FileExplorerProps {
   view: string
-  columns: any[]
-  openedFolders: any[]
-  selectedItems: any[]
-  selectedFilePreview: any
+  columns: StorageColumn[]
+  openedFolders: StorageItem[]
+  selectedItems: StorageItemWithColumn[]
+  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
   itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
   onSelectColumnEmptySpace: (index: number) => void
   onColumnLoadMore: (index: number, column: StorageColumn) => void
-  onCopyUrl: (name: string, url: string) => void
 }
 
 const FileExplorer = ({
@@ -28,13 +27,12 @@ const FileExplorer = ({
   columns = [],
   openedFolders = [],
   selectedItems = [],
-  selectedFilePreview = {},
+  selectedFilePreview,
   itemSearchString,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,
   onColumnLoadMore = noop,
-  onCopyUrl = noop,
 }: FileExplorerProps) => {
   const fileExplorerRef = useRef<any>(null)
 
@@ -53,7 +51,7 @@ const FileExplorer = ({
       className="file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full"
     >
       <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
-      <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} onCopyUrl={onCopyUrl} />
+      <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
       <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />
       {view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">
@@ -71,7 +69,6 @@ const FileExplorer = ({
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
               onColumnLoadMore={onColumnLoadMore}
-              onCopyUrl={onCopyUrl}
             />
           ))}
         </div>
@@ -90,7 +87,6 @@ const FileExplorer = ({
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
               onColumnLoadMore={onColumnLoadMore}
-              onCopyUrl={onCopyUrl}
             />
           )}
         </>

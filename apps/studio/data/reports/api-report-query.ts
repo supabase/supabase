@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import { LogsEndpointParams } from 'components/interfaces/Settings/Logs'
+import type { LogsEndpointParams } from 'components/interfaces/Settings/Logs/Logs.types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
@@ -14,8 +14,8 @@ export const useApiReport = () => {
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
-  // [Joshen] TODO: Once API support is out
-  const showReadReplicasUI = false // project?.is_read_replicas_enabled
+  const identifier = state.selectedDatabaseId
+  const [filters, setFilters] = useState<ReportFilterItem[]>([])
 
   const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.api.queries>(
     PRESET_CONFIG.api.queries,
@@ -37,7 +37,7 @@ export const useApiReport = () => {
     topSlowRoutes,
     networkTraffic,
   ]
-  const [filters, setFilters] = useState<ReportFilterItem[]>([])
+
   const addFilter = (filter: ReportFilterItem) => {
     // use a deep equal when comparing objects.
     if (filters.some((f) => isEqual(f, filter))) return
@@ -62,43 +62,54 @@ export const useApiReport = () => {
     })
   }
 
+  // [Joshen] Keeping database selector separate from filter state, and merging them here for simplicity
+  const formattedFilters: ReportFilterItem[] = [
+    ...filters,
+    ...(identifier !== undefined && identifier !== project?.ref
+      ? [{ key: 'identifier', value: `'${identifier}'`, compare: 'is' } as ReportFilterItem]
+      : []),
+  ]
+
   useEffect(() => {
     // update sql for each query
     if (totalRequests.changeQuery) {
-      totalRequests.changeQuery(PRESET_CONFIG.api.queries.totalRequests.sql(filters))
+      totalRequests.changeQuery(PRESET_CONFIG.api.queries.totalRequests.sql(formattedFilters))
     }
     if (topRoutes.changeQuery) {
-      topRoutes.changeQuery(PRESET_CONFIG.api.queries.topRoutes.sql(filters))
+      topRoutes.changeQuery(PRESET_CONFIG.api.queries.topRoutes.sql(formattedFilters))
     }
     if (errorCounts.changeQuery) {
-      errorCounts.changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(filters))
+      errorCounts.changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(formattedFilters))
     }
 
     if (topErrorRoutes.changeQuery) {
-      topErrorRoutes.changeQuery(PRESET_CONFIG.api.queries.topErrorRoutes.sql(filters))
+      topErrorRoutes.changeQuery(PRESET_CONFIG.api.queries.topErrorRoutes.sql(formattedFilters))
     }
     if (responseSpeed.changeQuery) {
-      responseSpeed.changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(filters))
+      responseSpeed.changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(formattedFilters))
     }
 
     if (topSlowRoutes.changeQuery) {
-      topSlowRoutes.changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(filters))
+      topSlowRoutes.changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(formattedFilters))
     }
 
     if (networkTraffic.changeQuery) {
-      networkTraffic.changeQuery(PRESET_CONFIG.api.queries.networkTraffic.sql(filters))
+      networkTraffic.changeQuery(PRESET_CONFIG.api.queries.networkTraffic.sql(formattedFilters))
     }
-  }, [JSON.stringify(filters)])
+  }, [JSON.stringify(formattedFilters)])
 
   const handleRefresh = async () => {
     activeHooks.forEach((hook) => hook.runQuery())
   }
+
   const handleSetParams = (params: Partial<LogsEndpointParams>) => {
     activeHooks.forEach((hook) => {
       hook.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
     })
   }
+
   const isLoading = activeHooks.some((hook) => hook.isLoading)
+
   return {
     data: {
       totalRequests: totalRequests.logData,
@@ -117,6 +128,15 @@ export const useApiReport = () => {
       topErrorRoutes: topErrorRoutes.params,
       topSlowRoutes: topSlowRoutes.params,
       networkTraffic: networkTraffic.params,
+    },
+    error: {
+      totalRequest: totalRequests.error,
+      errorCounts: errorCounts.error,
+      responseSpeed: responseSpeed.error,
+      topRoutes: topRoutes.error,
+      topErrorRoute: topErrorRoutes.error,
+      topSlowRoutes: topSlowRoutes.error,
+      networkTraffic: networkTraffic.error,
     },
     mergeParams: handleSetParams,
     filters,

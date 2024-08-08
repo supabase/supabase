@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
-import { DatetimeHelper } from '../Settings/Logs'
+
+import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
 
 export const LAYOUT_COLUMN_COUNT = 24
@@ -39,17 +40,19 @@ export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true)
     .map((filter) => {
       const splitKey = filter.key.split('.')
       const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
+      const filterKey = filter.key.includes('.') ? normalizedKey : filter.key
+
       if (filter.compare === 'matches') {
-        return `REGEXP_CONTAINS(${normalizedKey}, '${filter.value}')`
+        return `REGEXP_CONTAINS(${filterKey}, '${filter.value}')`
       } else if (filter.compare === 'is') {
-        return `${normalizedKey} = ${filter.value}`
+        return `${filterKey} = ${filter.value}`
       }
     })
     .join(' AND ')
   if (prepend) {
     return 'WHERE ' + conditions
   } else {
-    return conditions
+    return 'AND ' + conditions
   }
 }
 
@@ -278,6 +281,8 @@ limit 12
         queryType: 'db',
         sql: (_params, where, orderBy) => `
 -- Most frequently called queries
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,
@@ -303,6 +308,8 @@ select
         queryType: 'db',
         sql: (_, where, orderBy) => `
 -- Most time consuming queries
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,
@@ -319,6 +326,8 @@ select
         queryType: 'db',
         sql: (_params, where, orderBy) => `
 -- Slowest queries by max execution time
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,

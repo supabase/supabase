@@ -1,5 +1,3 @@
-import { NextPageWithLayout } from 'types'
-
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
@@ -12,12 +10,13 @@ import {
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
-import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
-import { ReportsLayout } from 'components/layouts'
+import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useApiReport } from 'data/reports/api-report-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { NextPageWithLayout } from 'types'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
@@ -59,6 +58,7 @@ export const ApiReport: NextPageWithLayout = () => {
         params={report.params.totalRequests}
         title="Total Requests"
         data={report.data.totalRequests || []}
+        error={report.error.totalRequest}
         renderer={TotalRequestsChartRenderer}
         append={TopApiRoutesRenderer}
         appendProps={{ data: report.data.topRoutes || [], params: report.params.topRoutes }}
@@ -69,6 +69,7 @@ export const ApiReport: NextPageWithLayout = () => {
         title="Response Errors"
         tooltip="Error responses with 4XX or 5XX status codes"
         data={report.data.errorCounts || []}
+        error={report.error.errorCounts}
         renderer={ErrorCountsChartRenderer}
         appendProps={{
           data: report.data.topErrorRoutes || [],
@@ -82,6 +83,7 @@ export const ApiReport: NextPageWithLayout = () => {
         title="Response Speed"
         tooltip="Average response speed (in miliseconds) of a request"
         data={report.data.responseSpeed || []}
+        error={report.error.responseSpeed}
         renderer={ResponseSpeedChartRenderer}
         appendProps={{ data: report.data.topSlowRoutes || [], params: report.params.topSlowRoutes }}
         append={TopApiRoutesRenderer}
@@ -90,6 +92,7 @@ export const ApiReport: NextPageWithLayout = () => {
       <ReportWidget
         isLoading={report.isLoading}
         params={report.params.networkTraffic}
+        error={report.error.networkTraffic}
         title="Network Traffic"
         tooltip="Ingress and egress of requests and responses respectively"
         data={report.data.networkTraffic || []}

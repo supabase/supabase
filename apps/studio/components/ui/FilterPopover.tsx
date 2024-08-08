@@ -17,7 +17,7 @@ export const FilterPopover = ({
   activeOptions = [],
   valueKey,
   labelKey,
-  name,
+  name = 'default',
   variant = 'rectangular',
   onSaveFilters,
   disabled,
@@ -27,6 +27,9 @@ export const FilterPopover = ({
 
   const formattedOptions = activeOptions.map((option) => {
     const base = options.find((x) => x[valueKey] === option)
+    if (!base || !base[labelKey]) {
+      return ''
+    }
     return base[labelKey]
   })
 

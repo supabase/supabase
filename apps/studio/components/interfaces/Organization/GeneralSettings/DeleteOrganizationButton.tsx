@@ -4,7 +4,8 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Button, Form, Input, Modal } from 'ui'
 
 const DeleteOrganizationButton = () => {
@@ -16,7 +17,12 @@ const DeleteOrganizationButton = () => {
   const [value, setValue] = useState('')
 
   const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const { mutateAsync: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation()
+  const { mutate: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted ${orgName}`)
+      router.push('/projects')
+    },
+  })
 
   const onValidate = (values: any) => {
     const errors: any = {}
@@ -35,12 +41,7 @@ const DeleteOrganizationButton = () => {
     }
     if (!orgSlug) return console.error('Org slug is required')
 
-    try {
-      await deleteOrganization({ slug: orgSlug })
-    } finally {
-      toast.success(`Successfully deleted ${orgName}`)
-      router.push('/projects')
-    }
+    deleteOrganization({ slug: orgSlug })
   }
 
   return (
@@ -58,7 +59,7 @@ const DeleteOrganizationButton = () => {
         onCancel={() => setIsOpen(false)}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-sm text-foreground">Delete organization</h5>
+            <span>Delete organization</span>
             <span className="text-xs text-foreground-lighter">Are you sure?</span>
           </div>
         }
@@ -70,7 +71,7 @@ const DeleteOrganizationButton = () => {
           validate={onValidate}
         >
           {() => (
-            <div className="space-y-4 py-3">
+            <>
               <Modal.Content>
                 <p className="text-sm text-foreground-lighter">
                   This action <span className="text-foreground">cannot</span> be undone. This will
@@ -106,7 +107,7 @@ const DeleteOrganizationButton = () => {
                   I understand, delete this organization
                 </Button>
               </Modal.Content>
-            </div>
+            </>
           )}
         </Form>
       </Modal>

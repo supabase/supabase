@@ -4,13 +4,16 @@ import { Check, Copy } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Children, ReactNode, useState } from 'react'
 import * as CopyToClipboard from 'react-copy-to-clipboard'
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { Button, cn } from 'ui'
+import { Light as SyntaxHighlighter, SyntaxHighlighterProps } from 'react-syntax-highlighter'
+import { cn } from '../../lib/utils/cn'
+import { Button } from '../Button/Button'
 import { monokaiCustomTheme } from './CodeBlock.utils'
 
+import curl from 'highlightjs-curl'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
 import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
+import http from 'react-syntax-highlighter/dist/cjs/languages/hljs/http'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
@@ -20,28 +23,52 @@ import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 
 export interface CodeBlockProps {
   title?: ReactNode
-  language?: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
+  language?:
+    | 'js'
+    | 'jsx'
+    | 'sql'
+    | 'py'
+    | 'bash'
+    | 'ts'
+    | 'dart'
+    | 'json'
+    | 'csharp'
+    | 'kotlin'
+    | 'curl'
+    | 'http'
   linesToHighlight?: number[]
+  highlightBorder?: boolean
+  styleConfig?: {
+    lineNumber?: string
+    highlightBackgroundColor?: string
+    highlightBorderColor?: string
+  }
   hideCopy?: boolean
   hideLineNumbers?: boolean
   className?: string
   value?: string
+  theme?: any
   children?: string
+  renderer?: SyntaxHighlighterProps['renderer']
 }
 
 export const CodeBlock = ({
   title,
   language,
   linesToHighlight = [],
+  highlightBorder,
+  styleConfig,
   className,
   value,
+  theme,
   children,
   hideCopy = false,
   hideLineNumbers = false,
+  renderer,
 }: CodeBlockProps) => {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
-  const monokaiTheme = monokaiCustomTheme(isDarkTheme)
+  const monokaiTheme = theme ?? monokaiCustomTheme(isDarkTheme)
 
   const [copied, setCopied] = useState(false)
 
@@ -77,6 +104,8 @@ export const CodeBlock = ({
   SyntaxHighlighter.registerLanguage('csharp', csharp)
   SyntaxHighlighter.registerLanguage('json', json)
   SyntaxHighlighter.registerLanguage('kotlin', kotlin)
+  SyntaxHighlighter.registerLanguage('curl', curl)
+  SyntaxHighlighter.registerLanguage('http', http)
 
   const large = false
   // don't show line numbers if bash == lang
@@ -112,7 +141,16 @@ export const CodeBlock = ({
             lineProps={(lineNumber) => {
               if (linesToHighlight.includes(lineNumber)) {
                 return {
-                  style: { display: 'block', backgroundColor: 'hsl(var(--background-selection))' },
+                  style: {
+                    display: 'block',
+                    backgroundColor: styleConfig?.highlightBackgroundColor
+                      ? styleConfig?.highlightBackgroundColor
+                      : 'hsl(var(--background-selection))',
+                    borderLeft: highlightBorder
+                      ? `1px solid ${styleConfig?.highlightBorderColor ? styleConfig?.highlightBorderColor : 'hsl(var(--foreground-default)'})`
+                      : null,
+                  },
+                  class: 'hljs-line-highlight',
                 }
               }
               return {}
@@ -125,12 +163,13 @@ export const CodeBlock = ({
               paddingLeft: '4px',
               paddingRight: '4px',
               marginRight: '12px',
-              color: '#828282',
+              color: styleConfig?.lineNumber ?? '#828282',
               textAlign: 'center',
               fontSize: large ? 14 : 12,
               paddingTop: '4px',
               paddingBottom: '4px',
             }}
+            renderer={renderer}
           >
             {codeValue}
           </SyntaxHighlighter>

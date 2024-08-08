@@ -23,8 +23,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   await Supabase.initialize(
-    url: ${projectKeys.apiUrl ?? 'your-project-url'},
-    anonKey: ${projectKeys.anonKey ?? 'your-anon-key'},
+    url: '${projectKeys.apiUrl ?? 'your-project-url'}',
+    anonKey: '${projectKeys.anonKey ?? 'your-anon-key'}',
   );
   runApp(MyApp());
 }

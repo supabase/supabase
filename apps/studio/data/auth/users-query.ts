@@ -48,7 +48,7 @@ export async function getUsers(
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

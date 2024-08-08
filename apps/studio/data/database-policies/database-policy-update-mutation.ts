@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
 
@@ -36,7 +36,7 @@ export async function updateDatabasePolicy({
     headers,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

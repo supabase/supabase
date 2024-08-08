@@ -1,4 +1,4 @@
-import { ident, literal } from 'pg-format'
+import { ident, literal } from './pg-format'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { SCHEMAS_SQL } from './sql/schemas'
 import { z } from 'zod'

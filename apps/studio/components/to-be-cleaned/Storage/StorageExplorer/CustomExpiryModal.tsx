@@ -4,10 +4,7 @@ import { Button, Form, Input, Listbox, Modal } from 'ui'
 
 import { DATETIME_FORMAT } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-
-export interface CustomExpiryModalProps {
-  onCopyUrl: (name: string, url: string) => void
-}
+import { useCopyUrl } from './useCopyUrl'
 
 const unitMap = {
   days: 3600 * 24,
@@ -16,8 +13,9 @@ const unitMap = {
   years: 3600 * 24 * 365,
 }
 
-const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
+const CustomExpiryModal = () => {
   const storageExplorerStore = useStorageStore()
+  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
   const { getFileUrl, selectedFileCustomExpiry, setSelectedFileCustomExpiry } = storageExplorerStore
 
   const visible = selectedFileCustomExpiry !== undefined
@@ -38,10 +36,10 @@ const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
         initialValues={{ expiresIn: '', units: 'days' }}
         onSubmit={async (values: any, { setSubmitting }: any) => {
           setSubmitting(true)
-          onCopyUrl(
-            selectedFileCustomExpiry.name,
-            await getFileUrl(
-              selectedFileCustomExpiry,
+          await onCopyUrl(
+            selectedFileCustomExpiry!.name,
+            getFileUrl(
+              selectedFileCustomExpiry!,
               values.expiresIn * unitMap[values.units as 'days' | 'weeks' | 'months' | 'years']
             )
           )
@@ -58,51 +56,47 @@ const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
       >
         {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => (
           <>
-            <div className="pt-4 pb-2">
-              <Modal.Content>
-                <p className="text-sm text-foreground-light mb-2">
-                  Enter the duration for which the URL will be valid for:
-                </p>
-                <div className="flex items-center space-x-2">
-                  <Input disabled={isSubmitting} type="number" id="expiresIn" className="w-full" />
-                  <Listbox id="units" className="w-[150px]">
-                    <Listbox.Option id="days" label="days" value="days">
-                      days
-                    </Listbox.Option>
-                    <Listbox.Option id="weeks" label="weeks" value="weeks">
-                      weeks
-                    </Listbox.Option>
-                    <Listbox.Option id="months" label="months" value="months">
-                      months
-                    </Listbox.Option>
-                    <Listbox.Option id="years" label="years" value="years">
-                      years
-                    </Listbox.Option>
-                  </Listbox>
-                </div>
-                {values.expiresIn !== '' && (
-                  <p className="text-sm text-foreground-light mt-2">
-                    URL will expire on{' '}
-                    {dayjs().add(values.expiresIn, values.units).format(DATETIME_FORMAT)}
-                  </p>
-                )}
-              </Modal.Content>
-            </div>
-            <Modal.Separator />
             <Modal.Content>
-              <div className="flex items-center justify-end space-x-2 pt-1 pb-3">
-                <Button type="default" onClick={() => onClose()}>
-                  Cancel
-                </Button>
-                <Button
-                  disabled={values.expiresIn === '' || isSubmitting}
-                  loading={isSubmitting}
-                  htmlType="submit"
-                  type="primary"
-                >
-                  Get signed URL
-                </Button>
+              <p className="text-sm text-foreground-light mb-2">
+                Enter the duration for which the URL will be valid for:
+              </p>
+              <div className="flex items-center space-x-2">
+                <Input disabled={isSubmitting} type="number" id="expiresIn" className="w-full" />
+                <Listbox id="units" className="w-[150px]">
+                  <Listbox.Option id="days" label="days" value="days">
+                    days
+                  </Listbox.Option>
+                  <Listbox.Option id="weeks" label="weeks" value="weeks">
+                    weeks
+                  </Listbox.Option>
+                  <Listbox.Option id="months" label="months" value="months">
+                    months
+                  </Listbox.Option>
+                  <Listbox.Option id="years" label="years" value="years">
+                    years
+                  </Listbox.Option>
+                </Listbox>
               </div>
+              {values.expiresIn !== '' && (
+                <p className="text-sm text-foreground-light mt-2">
+                  URL will expire on{' '}
+                  {dayjs().add(values.expiresIn, values.units).format(DATETIME_FORMAT)}
+                </p>
+              )}
+            </Modal.Content>
+            <Modal.Separator />
+            <Modal.Content className="flex items-center justify-end space-x-2">
+              <Button type="default" onClick={() => onClose()}>
+                Cancel
+              </Button>
+              <Button
+                disabled={values.expiresIn === '' || isSubmitting}
+                loading={isSubmitting}
+                htmlType="submit"
+                type="primary"
+              >
+                Get signed URL
+              </Button>
             </Modal.Content>
           </>
         )}

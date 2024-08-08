@@ -3,7 +3,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ToastLoader } from 'components/ui/ToastLoader'
@@ -18,15 +17,16 @@ import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-muta
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { getTables } from 'data/tables/tables-query'
-import { useUrlState } from 'hooks'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary } from 'types'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
+import ColumnEditor from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import JsonEditor from './RowEditor/JsonEditor/JsonEditor'
+import RowEditor from './RowEditor/RowEditor'
 import { TextEditor } from './RowEditor/TextEditor'
 import SchemaEditor from './SchemaEditor'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
@@ -39,6 +39,8 @@ import {
   updateColumn,
   updateTable,
 } from './SidePanelEditor.utils'
+import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
+import TableEditor from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 
 export interface SidePanelEditorProps {
@@ -176,6 +178,8 @@ const SidePanelEditor = ({
     if (payload !== undefined && configuration !== undefined) {
       try {
         await saveRow(payload, isNewRecord, configuration, () => {})
+      } catch (error) {
+        // [Joshen] No error handler required as error is handled within saveRow
       } finally {
         resolve()
       }
@@ -246,11 +250,8 @@ const SidePanelEditor = ({
       }
 
       await Promise.all([
-        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(tableKeys.table(project?.ref, selectedTable!.id)),
-        queryClient.invalidateQueries(
-          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
-        ),
+        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [
             'table-definition',
@@ -260,6 +261,11 @@ const SidePanelEditor = ({
         ),
         queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
       ])
+
+      await queryClient.invalidateQueries(
+        sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+      )
+
       setIsEdited(false)
       snap.closeSidePanel()
     }
@@ -609,7 +615,7 @@ const SidePanelEditor = ({
       <JsonEditor
         visible={snap.sidePanel?.type === 'json'}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
-        jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.jsonString) || ''}
+        jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.value) || ''}
         backButtonLabel="Cancel"
         applyButtonLabel="Save changes"
         readOnly={!editable}
@@ -618,6 +624,8 @@ const SidePanelEditor = ({
       />
       <TextEditor
         visible={snap.sidePanel?.type === 'cell'}
+        column={(snap.sidePanel?.type === 'cell' && snap.sidePanel.value?.column) || ''}
+        row={(snap.sidePanel?.type === 'cell' && snap.sidePanel.value?.row) || {}}
         closePanel={onClosePanel}
         onSaveField={onSaveColumnValue}
       />

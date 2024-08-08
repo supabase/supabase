@@ -45,6 +45,16 @@ async function uploadFile(file) {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+// Upload file using standard upload
+Future<void> uploadFile(File file) async {
+  await supabase.storage.from('bucket_name').upload('file_path', file);
+}
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -101,6 +111,17 @@ await supabase.storage.from('bucket_name').upload('file_path', file, {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+await supabase.storage.from('bucket_name').upload(
+      'file_path',
+      file,
+      fileOptions: const FileOptions(upsert: true),
+    );
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -145,6 +166,17 @@ const supabase = createClient('your_project_url', 'your_supabase_api_key')
 await supabase.storage.from('bucket_name').upload('file_path', file, {
   contentType: 'image/jpeg',
 })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+await supabase.storage.from('bucket_name').upload(
+      'file_path',
+      file,
+      fileOptions: const FileOptions(contentType: 'image/jpeg'),
+    );
 ```
 
 </TabPanel>

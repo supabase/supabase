@@ -16,12 +16,12 @@ export const DIALOG_PADDING_X = 'px-7'
 const DialogPaddingVariants = cva('', {
   variants: {
     padding: {
-      default: `${DIALOG_PADDING_Y} ${DIALOG_PADDING_X}`,
+      medium: `${DIALOG_PADDING_Y} ${DIALOG_PADDING_X}`,
       small: `${DIALOG_PADDING_Y_SMALL} ${DIALOG_PADDING_X_SMALL}`,
     },
   },
   defaultVariants: {
-    padding: 'default',
+    padding: 'small',
   },
 })
 
@@ -41,10 +41,8 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      // 'z-50 fixed h-full w-full left-0 top-0',
-      // 'bg-alternative/90 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-      'bg-alternative/90 backdrop-blur-sm',
-      'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-open:animate-overlay-show data-closed:animate-overlay-hide',
+      'bg-black/40 backdrop-blur-sm',
+      'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-closed:animate-overlay-hide',
       className
     )}
     {...props}
@@ -56,12 +54,12 @@ const DialogContentVariants = cva(
   cn(
     'my-8',
     'relative z-50 grid w-full border shadow-md dark:shadow-sm duration-200',
-    'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+    'data-[state=open]:animate-in data-[state=closed]:animate-out',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-    'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%',
+    'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',
     'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
     'sm:rounded-lg md:w-full',
-    'bg-overlay'
+    'bg-dash-sidebar'
   ),
   {
     variants: {
@@ -84,10 +82,13 @@ const DialogContentVariants = cva(
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> &
-    VariantProps<typeof DialogContentVariants> & { hideClose?: boolean }
->(({ className, children, size, hideClose, ...props }, ref) => (
+    VariantProps<typeof DialogContentVariants> & {
+      hideClose?: boolean
+      dialogOverlayProps?: React.ComponentPropsWithoutRef<typeof DialogOverlay>
+    }
+>(({ className, children, size, hideClose, dialogOverlayProps, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay>
+    <DialogOverlay {...dialogOverlayProps}>
       <DialogPrimitive.Content
         ref={ref}
         className={cn(DialogContentVariants({ size }), className)}
@@ -95,7 +96,7 @@ const DialogContent = React.forwardRef<
       >
         {children}
         {!hideClose && (
-          <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted">
+          <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted">
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
@@ -109,7 +110,7 @@ DialogContent.displayName = DialogPrimitive.Content.displayName
 const DialogHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof DialogPaddingVariants>
->(({ className, padding = 'default', ...props }, ref) => (
+>(({ className, padding, ...props }, ref) => (
   <div
     ref={ref}
     {...props}
@@ -173,7 +174,7 @@ const DialogClose = React.forwardRef<
   <DialogPrimitive.Close
     ref={ref}
     className={cn(
-      'rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+      'opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
       className
     )}
     {...props}
@@ -190,7 +191,7 @@ const DialogSection = React.forwardRef<
   <div
     ref={ref}
     {...props}
-    className={cn('px-5 py-3', DialogPaddingVariants({ padding }), className)}
+    className={cn(DialogPaddingVariants({ padding }), 'overflow-hidden', className)}
   >
     {children}
   </div>
@@ -201,7 +202,7 @@ const DialogSectionSeparator = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, children, ...props }, ref) => (
-  <div ref={ref} {...props} className={cn('w-full h-px bg-border-overlay', className)} />
+  <div ref={ref} {...props} className={cn('w-full h-px bg-border', className)} />
 ))
 DialogSectionSeparator.displayName = 'DialogSectionSeparator'
 

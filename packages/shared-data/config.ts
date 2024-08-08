@@ -99,6 +99,20 @@ const config = {
       },
     },
   },
+  branching: {
+    inactivity_period_in_minutes: {
+      value: 5,
+    },
+  },
+  pausing: {
+    /**
+     * Inactivity period after which projects may be paused.
+     */
+    free_tier: {
+      value: '1',
+      unit: 'week'
+    }
+  }
 } as const
 
 export default config

@@ -3,7 +3,6 @@ import toast from 'react-hot-toast'
 
 // import { post } from 'lib/common/fetch'
 import { handleError, post } from 'data/fetchers'
-import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 
 export type SendUpgradeFeedbackVariables = {

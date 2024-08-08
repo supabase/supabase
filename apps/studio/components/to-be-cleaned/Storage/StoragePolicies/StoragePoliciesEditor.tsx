@@ -108,8 +108,8 @@ const StoragePoliciesEditor = ({
   const selectedRoles = policyFormFields.roles
 
   return (
-    <div>
-      <div className="mb-8 space-y-8 py-6">
+    <>
+      <div className="space-y-4 py-4">
         <Modal.Content>
           <PolicyName
             name={policyFormFields.name}
@@ -137,7 +137,7 @@ const StoragePoliciesEditor = ({
         </Modal.Content>
       </div>
       <PolicyEditorFooter onViewTemplates={onViewTemplates} onReviewPolicy={onReviewPolicy} />
-    </div>
+    </>
   )
 }
 

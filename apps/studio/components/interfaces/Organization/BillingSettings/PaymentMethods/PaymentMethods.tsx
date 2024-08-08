@@ -4,6 +4,24 @@ import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+
+import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
+import NoPermission from 'components/ui/NoPermission'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { organizationKeys } from 'data/organizations/keys'
+import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
+import { getURL } from 'lib/helpers'
 import {
   Alert,
   Badge,
@@ -17,23 +35,6 @@ import {
   IconMoreHorizontal,
   IconPlus,
 } from 'ui'
-
-import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
-import NoPermission from 'components/ui/NoPermission'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { organizationKeys } from 'data/organizations/keys'
-import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { getURL } from 'lib/helpers'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
 
@@ -138,15 +139,18 @@ const PaymentMethods = () => {
                   >
                     <FormSection>
                       <FormSectionContent fullWidth loading={false}>
-                        {(paymentMethods?.length ?? 0) === 0 ? (
+                        {(paymentMethods?.data?.length ?? 0) === 0 ? (
                           <div className="flex items-center space-x-2 opacity-50">
                             <IconCreditCard />
                             <p className="text-sm">No payment methods</p>
                           </div>
                         ) : (
                           <div className="space-y-3">
-                            {paymentMethods?.map((paymentMethod) => {
-                              const isActive = subscription?.payment_method_id === paymentMethod.id
+                            {paymentMethods?.data?.map((paymentMethod) => {
+                              const isActive = paymentMethod.is_default
+
+                              if (!paymentMethod.card) return null
+
                               return (
                                 <div
                                   key={paymentMethod.id}
@@ -161,7 +165,7 @@ const PaymentMethods = () => {
                                       width="32"
                                     />
                                     <p className="prose text-sm font-mono">
-                                      **** **** **** {paymentMethod.card.last4}
+                                      **** **** **** {paymentMethod.card!.last4}
                                     </p>
                                     <p className="text-sm tabular-nums">
                                       Expires: {paymentMethod.card.exp_month}/
@@ -177,20 +181,17 @@ const PaymentMethods = () => {
                                         </Button>
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">
-                                        {subscription?.plan.id !== 'free' &&
-                                          subscription?.payment_method_type === 'card' && (
-                                            <>
-                                              <DropdownMenuItem
-                                                key="make-default"
-                                                onClick={() =>
-                                                  setSelectedMethodForUse(paymentMethod)
-                                                }
-                                              >
-                                                <p>Use this card</p>
-                                              </DropdownMenuItem>
-                                              <DropdownMenuSeparator />
-                                            </>
-                                          )}
+                                        {subscription?.payment_method_type === 'card' && (
+                                          <>
+                                            <DropdownMenuItem
+                                              key="make-default"
+                                              onClick={() => setSelectedMethodForUse(paymentMethod)}
+                                            >
+                                              <p>Use this card</p>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                          </>
+                                        )}
                                         <DropdownMenuItem
                                           key="delete-method"
                                           onClick={() => setSelectedMethodToDelete(paymentMethod)}
