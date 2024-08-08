@@ -101,7 +101,8 @@ export function checkDestructiveQuery(sql: string) {
 
 // Function to check for UPDATE queries without WHERE clause
 export function isUpdateWithoutWhere(sql: string): boolean {
-  const updateWithoutWhereRegex = /^update\s+[\w.]+\s+set\s+[\w\W]+(?!where\s)/is
+  const updateWithoutWhereRegex =
+    /^update\s+(?:"[\w.]+"\."[\w.]+"|[\w.]+)\s+set\s+[\w\W]+?(?!\s*where\s)/is
   return updateWithoutWhereRegex.test(sql) && !/where\s/i.test(sql)
 }
 

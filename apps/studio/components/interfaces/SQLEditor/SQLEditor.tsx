@@ -306,7 +306,7 @@ const SQLEditor = () => {
         setContainsDestructiveOperations(destructiveOperations)
         setContainsUpdateWithoutWhereClause(updateWithoutWhereClause)
 
-        if (!force && (containsDestructiveOperations || containsUpdateWithoutWhereClause)) {
+        if (!force && (destructiveOperations || updateWithoutWhereClause)) {
           setIsConfirmModalOpen(true)
           return
         }
