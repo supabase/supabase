@@ -26,7 +26,7 @@ Supabase Auth will send a payload containing these fields to your hook:
   type="underlined"
   defaultActiveId="mfa-verification-attempt-json"
 >
-  <TabPanel id="mfa-verification-attempt-json" label="JSON">
+<TabPanel id="mfa-verification-attempt-json" label="JSON">
 
 ```json
 {
@@ -36,28 +36,28 @@ Supabase Auth will send a payload containing these fields to your hook:
 }
 ```
 
-  </TabPanel>
-  <TabPanel id="mfa-verification-attempt-json-schema" label="JSON Schema">
-  ```json
-  {
-    "type": "object",
-    "properties": {
-      "user_id": {
-        "type": "string",
-        "x-faker": "random.uuid"
-      },
-      "valid": {
-        "type": "boolean",
-        "x-faker": "random.boolean"
-      }
+</TabPanel>
+
+<TabPanel id="mfa-verification-attempt-json-schema" label="JSON Schema">
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "x-faker": "random.uuid"
     },
-    "required": [
-      "user_id",
-      "valid"
-    ]
-  }
-  ```
-  </TabPanel>
+    "valid": {
+      "type": "boolean",
+      "x-faker": "random.boolean"
+    }
+  },
+  "required": ["user_id", "valid"]
+}
+```
+
+</TabPanel>
 </Tabs>
 
 **Outputs**

@@ -19,6 +19,7 @@ The Send Email Hook runs before an email is sent and allows for flexibility arou
   type="underlined"
 >
 <TabPanel id="send-email-json" label="JSON">
+
 ```json
 {
   "user": {
@@ -70,8 +71,10 @@ The Send Email Hook runs before an email is sent and allows for flexibility arou
   }
 }
 ```
+
 </TabPanel>
 <TabPanel id="send-email-json-schema" label="JSON Schema">
+
 ```json
 {
   "type": "object",
@@ -85,16 +88,11 @@ The Send Email Hook runs before an email is sent and allows for flexibility arou
         },
         "aud": {
           "type": "string",
-          "enum": [
-            "authenticated"
-          ]
+          "enum": ["authenticated"]
         },
         "role": {
           "type": "string",
-          "enum": [
-            "anon",
-            "authenticated"
-          ]
+          "enum": ["anon", "authenticated"]
         },
         "email": {
           "type": "string",
@@ -111,17 +109,13 @@ The Send Email Hook runs before an email is sent and allows for flexibility arou
           "properties": {
             "provider": {
               "type": "string",
-              "enum": [
-                "email"
-              ]
+              "enum": ["email"]
             },
             "providers": {
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "email"
-                ]
+                "enum": ["email"]
               },
               "minItems": 1,
               "maxItems": 1
@@ -189,9 +183,7 @@ The Send Email Hook runs before an email is sent and allows for flexibility arou
               },
               "provider": {
                 "type": "string",
-                "enum": [
-                  "email"
-                ]
+                "enum": ["email"]
               },
               "last_sign_in_at": {
                 "type": "string",
@@ -279,11 +271,7 @@ The Send Email Hook runs before an email is sent and allows for flexibility arou
         },
         "email_action_type": {
           "type": "string",
-          "enum": [
-            "signup",
-            "login",
-            "reset_password"
-          ]
+          "enum": ["signup", "login", "reset_password"]
         },
         "site_url": {
           "type": "string",
@@ -317,12 +305,10 @@ The Send Email Hook runs before an email is sent and allows for flexibility arou
       ]
     }
   },
-  "required": [
-    "user",
-    "email_data"
-  ]
+  "required": ["user", "email_data"]
 }
 ```
+
 </TabPanel>
 </Tabs>
 

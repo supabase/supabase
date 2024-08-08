@@ -51,6 +51,7 @@ Optional Claims: `jti`, `iss`, `nbf`, `app_metadata`, `user_metadata`, `amr`
 ```
 </TabPanel>
 <TabPanel id="custom-access-token-json-schema" label="JSON Schema">
+
 ```json
 {
   "type": "object",
@@ -98,18 +99,11 @@ Optional Claims: `jti`, `iss`, `nbf`, `app_metadata`, `user_metadata`, `amr`
         },
         "role": {
           "type": "string",
-          "enum": [
-            "anon",
-            "authenticated"
-          ]
+          "enum": ["anon", "authenticated"]
         },
         "aal": {
           "type": "string",
-          "enum": [
-            "aal1",
-            "aal2",
-            "aal3"
-          ]
+          "enum": ["aal1", "aal2", "aal3"]
         },
         "amr": {
           "type": "array",
@@ -138,10 +132,7 @@ Optional Claims: `jti`, `iss`, `nbf`, `app_metadata`, `user_metadata`, `amr`
                 "x-faker": "date.past"
               }
             },
-            "required": [
-              "method",
-              "timestamp"
-            ]
+            "required": ["method", "timestamp"]
           }
         },
         "session_id": {
@@ -187,13 +178,10 @@ Optional Claims: `jti`, `iss`, `nbf`, `app_metadata`, `user_metadata`, `amr`
       ]
     }
   },
-  "required": [
-    "user_id",
-    "claims",
-    "authentication_method"
-  ]
+  "required": ["user_id", "claims", "authentication_method"]
 }
 ```
+
 </TabPanel>
 </Tabs>
 

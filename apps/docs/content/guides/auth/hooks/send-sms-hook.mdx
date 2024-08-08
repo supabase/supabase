@@ -23,6 +23,7 @@ Runs before a message is sent. Use the hook to:
   type="underlined"
 >
 <TabPanel id="send-sms-json" label="JSON">
+
 ```json
 {
   "user": {
@@ -66,10 +67,11 @@ Runs before a message is sent. Use the hook to:
     "otp": "561166"
   }
 }
-````
+```
 
 </TabPanel>
 <TabPanel id="send-sms-json-schema" label="JSON Schema">
+
 ```json
 {
   "type": "object",
@@ -83,16 +85,11 @@ Runs before a message is sent. Use the hook to:
         },
         "aud": {
           "type": "string",
-          "enum": [
-            "authenticated"
-          ]
+          "enum": ["authenticated"]
         },
         "role": {
           "type": "string",
-          "enum": [
-            "anon",
-            "authenticated"
-          ]
+          "enum": ["anon", "authenticated"]
         },
         "email": {
           "type": "string",
@@ -134,17 +131,13 @@ Runs before a message is sent. Use the hook to:
           "properties": {
             "provider": {
               "type": "string",
-              "enum": [
-                "phone"
-              ]
+              "enum": ["phone"]
             },
             "providers": {
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "phone"
-                ]
+                "enum": ["phone"]
               }
             }
           }
@@ -195,11 +188,7 @@ Runs before a message is sent. Use the hook to:
               },
               "provider": {
                 "type": "string",
-                "enum": [
-                  "phone",
-                  "email",
-                  "google"
-                ]
+                "enum": ["phone", "email", "google"]
               },
               "last_sign_in_at": {
                 "type": "string",
@@ -274,17 +263,13 @@ Runs before a message is sent. Use the hook to:
           }
         }
       },
-      "required": [
-        "otp"
-      ]
+      "required": ["otp"]
     }
   },
-  "required": [
-    "user",
-    "sms"
-  ]
+  "required": ["user", "sms"]
 }
 ```
+
 </TabPanel>
 </Tabs>
 
