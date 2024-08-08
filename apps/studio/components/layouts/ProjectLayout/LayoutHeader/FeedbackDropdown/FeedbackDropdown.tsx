@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
-import { FeedbackWidget } from './FeedbackWidget'
+import FeedbackWidget from './FeedbackWidget'
 
 const FeedbackDropdown = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -8,7 +8,14 @@ const FeedbackDropdown = () => {
   const [screenshot, setScreenshot] = useState<string>()
 
   return (
-    <Popover_Shadcn_ modal={false} open={isOpen} onOpenChange={(e) => setIsOpen(e)}>
+    <Popover_Shadcn_
+      modal={false}
+      open={isOpen}
+      onOpenChange={(e) => {
+        setIsOpen(e)
+        if (!e) setScreenshot(undefined)
+      }}
+    >
       <PopoverTrigger_Shadcn_ asChild>
         <Button asChild onClick={() => setIsOpen((isOpen) => !isOpen)} type="outline">
           <span className="hidden md:flex">Feedback</span>

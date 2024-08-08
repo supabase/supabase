@@ -2,7 +2,7 @@ import { toPng } from 'html-to-image'
 import { Camera, Image as ImageIcon, Upload, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ChangeEvent, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   Button,
@@ -26,13 +26,16 @@ interface FeedbackWidgetProps {
   setScreenshot: (value: string | undefined) => void
 }
 
-export const FeedbackWidget = ({
+const FeedbackWidget = ({
   feedback,
   screenshot,
   onClose,
   setFeedback,
   setScreenshot,
 }: FeedbackWidgetProps) => {
+  const FEEDBACK_STORAGE_KEY = 'feedback_content'
+  const SCREENSHOT_STORAGE_KEY = 'screenshot'
+
   const router = useRouter()
   const { ref, slug } = useParams()
   const uploadButtonRef = useRef(null)
@@ -44,6 +47,8 @@ export const FeedbackWidget = ({
     onSuccess: () => {
       setFeedback('')
       setScreenshot(undefined)
+      localStorage.removeItem(FEEDBACK_STORAGE_KEY)
+      localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
       toast.success(
         'Feedback sent. Thank you!\n\nPlease be aware that we do not provide responses to feedback. If you require assistance or a reply, consider submitting a support ticket.',
         { duration: 8000 }
@@ -56,9 +61,33 @@ export const FeedbackWidget = ({
     },
   })
 
+  useEffect(() => {
+    const storedFeedback = localStorage.getItem(FEEDBACK_STORAGE_KEY)
+    if (storedFeedback) {
+      setFeedback(storedFeedback)
+    }
+
+    const storedScreenshot = localStorage.getItem(SCREENSHOT_STORAGE_KEY)
+    if (storedScreenshot) {
+      setScreenshot(storedScreenshot)
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem(FEEDBACK_STORAGE_KEY, feedback)
+  }, [feedback])
+
+  useEffect(() => {
+    if (screenshot) {
+      localStorage.setItem(SCREENSHOT_STORAGE_KEY, screenshot)
+    }
+  }, [screenshot])
+
   const clearFeedback = () => {
     setFeedback('')
     setScreenshot(undefined)
+    localStorage.removeItem(FEEDBACK_STORAGE_KEY)
+    localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
   }
 
   const captureScreenshot = async () => {
@@ -75,6 +104,7 @@ export const FeedbackWidget = ({
     await timeout(100)
     toPng(document.body, { filter })
       .then((dataUrl: any) => {
+        localStorage.setItem(SCREENSHOT_STORAGE_KEY, dataUrl)
         setScreenshot(dataUrl)
       })
       .catch(() => toast.error('Failed to capture screenshot'))
@@ -92,6 +122,7 @@ export const FeedbackWidget = ({
       const dataUrl = event.target?.result
       if (typeof dataUrl === 'string') {
         setScreenshot(dataUrl)
+        localStorage.setItem(SCREENSHOT_STORAGE_KEY, dataUrl)
       }
     }
     reader.readAsDataURL(file)
@@ -109,6 +140,7 @@ export const FeedbackWidget = ({
         const dataUrl = event.target?.result
         if (typeof dataUrl === 'string') {
           setScreenshot(dataUrl)
+          localStorage.setItem(SCREENSHOT_STORAGE_KEY, dataUrl)
         }
       }
       reader.readAsDataURL(blob)
@@ -135,9 +167,6 @@ export const FeedbackWidget = ({
       })
     }
 
-    setFeedback('')
-    setScreenshot(undefined)
-
     return onClose()
   }
 
@@ -155,7 +184,13 @@ export const FeedbackWidget = ({
       <div className="w-full h-px bg-border" />
       <div className="w-80 space-y-3 px-3 py-2 pb-4">
         <div className="flex justify-between space-x-2">
-          <Button type="default" onClick={onClose}>
+          <Button
+            type="default"
+            onClick={() => {
+              clearFeedback()
+              onClose()
+            }}
+          >
             Cancel
           </Button>
           <div className="flex items-center space-x-2">
@@ -250,3 +285,5 @@ export const FeedbackWidget = ({
     </div>
   )
 }
+
+export default FeedbackWidget
