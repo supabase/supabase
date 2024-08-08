@@ -1,13 +1,19 @@
 import { useQuery } from '@tanstack/react-query'
+import { Dispatch, SetStateAction, useState } from 'react'
+
 import {
   EXPLORER_DATEPICKER_HELPERS,
   genQueryParams,
   getDefaultHelper,
-} from 'components/interfaces/Settings/Logs'
-import { Dispatch, SetStateAction, useState } from 'react'
-import { LogsEndpointParams, Logs, LogData } from 'components/interfaces/Settings/Logs/Logs.types'
-import { API_URL } from 'lib/constants'
+} from 'components/interfaces/Settings/Logs/Logs.constants'
+import type {
+  LogData,
+  Logs,
+  LogsEndpointParams,
+} from 'components/interfaces/Settings/Logs/Logs.types'
 import { get, isResponseOk } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+
 export interface LogsQueryHook {
   params: LogsEndpointParams
   isLoading: boolean
@@ -17,11 +23,13 @@ export interface LogsQueryHook {
   changeQuery: (newQuery?: string) => void
   runQuery: () => void
   setParams: Dispatch<SetStateAction<LogsEndpointParams>>
+  enabled?: boolean
 }
 
 const useLogsQuery = (
   projectRef: string,
-  initialParams: Partial<LogsEndpointParams> = {}
+  initialParams: Partial<LogsEndpointParams> = {},
+  enabled = true
 ): LogsQueryHook => {
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
@@ -35,9 +43,10 @@ const useLogsQuery = (
       : defaultHelper.calcTo(),
   })
 
-  const enabled = typeof projectRef !== 'undefined' && Boolean(params.sql)
+  const _enabled = enabled && typeof projectRef !== 'undefined' && Boolean(params.sql)
 
   const queryParams = genQueryParams(params as any)
+
   const {
     data,
     error: rqError,
@@ -51,7 +60,7 @@ const useLogsQuery = (
         signal,
       }),
     {
-      enabled,
+      enabled: _enabled,
       refetchOnWindowFocus: false,
     }
   )
@@ -67,7 +76,7 @@ const useLogsQuery = (
 
   return {
     params,
-    isLoading: (enabled && isLoading) || isRefetching,
+    isLoading: (_enabled && isLoading) || isRefetching,
     logData: isResponseOk(data) && data.result ? data.result : [],
     error,
     changeQuery,

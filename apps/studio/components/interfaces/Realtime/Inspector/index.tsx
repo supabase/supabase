@@ -25,6 +25,7 @@ export const RealtimeInspector = () => {
     token: '', // will be filled out by RealtimeTokensPopover
     schema: 'public',
     table: '*',
+    isChannelPrivate: false,
     filter: undefined,
     bearer: null,
     enablePresence: true,
@@ -32,7 +33,7 @@ export const RealtimeInspector = () => {
     enableBroadcast: true,
   })
 
-  const { logData, sendMessage } = useRealtimeMessages(realtimeConfig)
+  const { logData, sendMessage } = useRealtimeMessages(realtimeConfig, setRealtimeConfig)
 
   return (
     <div className="flex flex-col grow h-full">

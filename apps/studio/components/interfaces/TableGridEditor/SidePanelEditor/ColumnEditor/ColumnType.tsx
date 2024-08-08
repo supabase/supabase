@@ -20,9 +20,9 @@ import {
   POSTGRES_DATA_TYPE_OPTIONS,
   RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '../SidePanelEditor.constants'
-import { PostgresDataTypeOption } from '../SidePanelEditor.types'
+import type { PostgresDataTypeOption } from '../SidePanelEditor.types'
 import { ListPlus } from 'lucide-react'
-import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 
 interface ColumnTypeProps {
   value: string

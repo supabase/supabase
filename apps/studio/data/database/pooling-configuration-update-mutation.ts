@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { components } from 'data/api'
-import { patch } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
 export type PoolingConfigurationUpdateVariables = {
@@ -22,7 +22,7 @@ export async function updatePoolingConfiguration({
     body: { default_pool_size, pool_mode },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

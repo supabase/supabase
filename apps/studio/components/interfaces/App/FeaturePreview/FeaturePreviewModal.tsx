@@ -26,7 +26,7 @@ const FeaturePreviewModal = () => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
       name: 'Supabase Assistant for RLS policies',
       content: <RLSAIAssistantPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/19594',
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/21882',
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
@@ -87,7 +87,7 @@ const FeaturePreviewModal = () => {
       onCancel={handleCloseFeaturePreviewModal}
     >
       {FEATURE_PREVIEWS.length > 0 ? (
-        <div className="flex border-t">
+        <div className="flex">
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
               {FEATURE_PREVIEWS.map((feature) => {

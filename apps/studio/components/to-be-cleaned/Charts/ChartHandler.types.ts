@@ -3,7 +3,6 @@ export interface ChartData {
   yAxisLimit?: number
   maximum?: number
   total: number
-  totalAverage: number
   totalGrouped: Attribute
   data: DataPoint[]
 }

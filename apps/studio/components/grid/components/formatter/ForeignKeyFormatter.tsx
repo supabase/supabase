@@ -1,15 +1,15 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
-import { PropsWithChildren } from 'react'
-import { RenderCellProps } from 'react-data-grid'
+import type { PropsWithChildren } from 'react'
+import type { RenderCellProps } from 'react-data-grid'
 import { Button, IconArrowRight } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableQuery } from 'data/tables/table-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { SupaRow } from '../../types'
-import { NullValue } from '../common'
+import type { SupaRow } from '../../types'
+import { NullValue } from '../common/NullValue'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
   projectRef?: string

@@ -1,8 +1,10 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { del } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
+
+// [Joshen] This is a duplicate of organization-member-invite-delete-mutation, to remove one of them
 
 export type OrganizationJoinDeclineVariables = {
   slug: string
@@ -17,7 +19,7 @@ export async function declineJoinOrganization({
     // @ts-ignore [Joshen] API spec might be wrong here
     params: { path: { slug }, query: { invited_id } },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get } from 'lib/common/fetch'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { serviceStatusKeys } from './keys'
 
 export type EdgeFunctionServiceStatusVariables = {

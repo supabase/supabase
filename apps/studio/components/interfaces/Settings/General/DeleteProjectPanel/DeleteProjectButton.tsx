@@ -2,15 +2,17 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Input } from 'ui'
+import toast from 'react-hot-toast'
 
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { Button, Input } from 'ui'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 export interface DeleteProjectButtonProps {
   type?: 'danger' | 'default'
@@ -18,7 +20,6 @@ export interface DeleteProjectButtonProps {
 
 const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
   const router = useRouter()
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
 
@@ -31,7 +32,25 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
   const [message, setMessage] = useState<string>('')
   const [selectedReasons, setSelectedReasons] = useState<string[]>([])
 
-  const { mutateAsync: deleteProject, isLoading: isDeleting } = useProjectDeleteMutation()
+  const { mutate: deleteProject, isLoading: isDeleting } = useProjectDeleteMutation({
+    onSuccess: async () => {
+      if (!isFree) {
+        try {
+          await sendExitSurvey({
+            projectRef,
+            message,
+            reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+            exitAction: 'delete',
+          })
+        } catch (error) {
+          // [Joshen] In this case we don't raise any errors if the exit survey fails to send since it shouldn't block the user
+        }
+      }
+
+      toast.success(`Successfully deleted ${project?.name}`)
+      router.push(`/projects`)
+    },
+  })
   const { mutateAsync: sendExitSurvey, isLoading: isSending } = useSendDowngradeFeedbackMutation()
   const isSubmitting = isDeleting || isSending
 
@@ -64,31 +83,11 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
 
   async function handleDeleteProject() {
     if (project === undefined) return
-
     if (!isFree && selectedReasons.length === 0) {
-      return ui.setNotification({
-        category: 'error',
-        duration: 4000,
-        message: 'Please select at least one reason for deleting your project',
-      })
+      return toast.error('Please select at least one reason for deleting your project')
     }
 
-    try {
-      await deleteProject({ projectRef: project.ref })
-
-      if (!isFree) {
-        await sendExitSurvey({
-          projectRef,
-          message,
-          reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-          exitAction: 'delete',
-        })
-      }
-
-      ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
-      router.push(`/projects`)
-    } finally {
-    }
+    deleteProject({ projectRef: project.ref })
   }
 
   return (
@@ -120,13 +119,15 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
       <TextConfirmModal
         visible={isOpen}
         loading={isSubmitting}
-        size={isFree ? 'small' : 'xlarge'}
+        size={isFree ? 'small' : 'medium'}
         title={`Confirm deletion of ${project?.name}`}
-        alert={
-          isFree
+        variant="destructive"
+        alert={{
+          title: isFree
             ? 'This action cannot be undone.'
-            : `This will permanently delete the ${project?.name} project and all of its data, and cannot be undone`
-        }
+            : `This will permanently delete the ${project?.name}`,
+          description: !isFree ? `All project data will be lost, and cannot be undone` : '',
+        }}
         text={
           isFree
             ? `This will permanently delete the ${project?.name} project and all of its data.`

@@ -42,7 +42,7 @@
 			const fileExt = file.name.split('.').pop()
 			const filePath = `${Math.random()}.${fileExt}`
 
-			let { error } = await supabase.storage.from('avatars').upload(filePath, file)
+			const { error } = await supabase.storage.from('avatars').upload(filePath, file)
 
 			if (error) {
 				throw error

@@ -1,7 +1,16 @@
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { Button, Modal } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTrigger,
+  Modal,
+} from 'ui'
 
 import {
   EdgeFunctionsListItem,
@@ -13,7 +22,7 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -44,9 +53,18 @@ const PageLayout: NextPageWithLayout = () => {
                   <span className="text-sm text-foreground-lighter">{`${functions.length} function${
                     functions.length > 1 ? 's' : ''
                   } deployed`}</span>
-                  <Button type="primary" onClick={() => setShowTerminalInstructions(true)}>
-                    Deploy a new function
-                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button type="primary" onClick={() => setShowTerminalInstructions(true)}>
+                        Deploy a new function
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent size={'large'}>
+                      <DialogSection padding="small">
+                        <TerminalInstructions />
+                      </DialogSection>
+                    </DialogContent>
+                  </Dialog>
                 </div>
                 <Table
                   head={
@@ -74,27 +92,10 @@ const PageLayout: NextPageWithLayout = () => {
           </>
         )}
       </div>
-      <Modal
-        size="xlarge"
-        visible={showTerminalInstructions}
-        onCancel={() => setShowTerminalInstructions(false)}
-        header={<h3>Deploying an edge function to your project</h3>}
-        customFooter={
-          <div className="w-full flex items-center justify-end">
-            <Button type="primary" size="tiny" onClick={() => setShowTerminalInstructions(false)}>
-              Confirm
-            </Button>
-          </div>
-        }
-      >
-        <div className="py-4">
-          <TerminalInstructions removeBorder />
-        </div>
-      </Modal>
     </>
   )
 }
 
 PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
 
-export default observer(PageLayout)
+export default PageLayout

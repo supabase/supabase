@@ -1,4 +1,4 @@
-import { ContentFileProps } from 'components/interfaces/Home/Connect/Connect.types'
+import type { ContentFileProps } from 'components/interfaces/Home/Connect/Connect.types'
 
 import {
   ConnectTabs,
@@ -8,7 +8,7 @@ import {
 } from 'components/interfaces/Home/Connect/ConnectTabs'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
-const ContentFile = ({ projectKeys }: ContentFileProps) => {
+const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
   return (
     <ConnectTabs>
       <ConnectTabTriggers>
@@ -20,10 +20,10 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 # Connect to Supabase via connection pooling with Supavisor.
-DATABASE_URL="postgres://postgres.[your-supabase-project]:[password]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DATABASE_URL="${connectionStringPooler.transaction}?pgbouncer=true"
 
 # Direct connection to the database. Used for migrations.
-DIRECT_URL="postgres://postgres:[password]@db.[your-supabase-project].supabase.co:5432/postgres"
+DIRECT_URL="${connectionStringPooler.session}"
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>
@@ -31,6 +31,10 @@ DIRECT_URL="postgres://postgres:[password]@db.[your-supabase-project].supabase.c
       <ConnectTabContent value="prisma/schema.prisma">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")

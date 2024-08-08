@@ -1,5 +1,5 @@
-import { Button, cn } from 'ui'
 import { ComponentProps, ReactNode, forwardRef } from 'react'
+import { Button, cn } from 'ui'
 
 export const NavigationIconButton = forwardRef<
   HTMLButtonElement,
@@ -23,7 +23,7 @@ export const NavigationIconButton = forwardRef<
         props.className
       )}
     >
-      <div className="absolute left-2 text-foreground-lighter">{icon}</div>
+      <div className="absolute left-2 text-foreground-muted">{icon}</div>
       <span
         className={cn(
           'absolute left-7 group-data-[state=expanded]:left-10',

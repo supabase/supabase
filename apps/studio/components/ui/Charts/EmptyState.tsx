@@ -1,4 +1,4 @@
-import { IconBarChart2 } from 'ui'
+import { BarChart2 } from 'lucide-react'
 
 interface EmptyStateProps {
   title?: string
@@ -17,7 +17,7 @@ const EmptyState = ({
       border-dashed border-control py-4 text-center
     "
   >
-    <IconBarChart2 className="text-foreground-light" />
+    <BarChart2 size={20} className="text-foreground-light" />
     <div>
       <p className="text-xs text-foreground-light">{title}</p>
       <p className="text-xs text-foreground-light">{message}</p>

@@ -125,7 +125,7 @@ const CardButton = ({
       {icon && <ImageContainer>{icon}</ImageContainer>}
       <div className="flex h-full w-full flex-col space-y-2">
         {typeof title === 'string' ? (
-          <h5 className={`text-foreground ${titleClass}`}>{title}</h5>
+          <h5 className={`text-foreground pr-5 ${titleClass}`}>{title}</h5>
         ) : (
           title
         )}

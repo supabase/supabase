@@ -1,15 +1,15 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import dayjs from 'dayjs'
-import { observer } from 'mobx-react-lite'
-import { Button, IconAlertCircle } from 'ui'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { FormPanel } from 'components/ui/Forms'
+import dayjs from 'dayjs'
+import { AlertCircle } from 'lucide-react'
+
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useCheckPermissions } from 'hooks'
-import { Timezone } from './PITR.types'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button } from 'ui'
+import type { Timezone } from './PITR.types'
 import { TimezoneSelection } from './TimezoneSelection'
 
 interface PITRStatusProps {
@@ -54,14 +54,13 @@ const PITRStatus = ({
         footer={
           <div className="flex items-center justify-between p-6">
             <div className="flex items-center space-x-4">
-              <IconAlertCircle className="text-foreground-light" size={18} strokeWidth={1.5} />
+              <AlertCircle className="text-foreground-light" size={18} strokeWidth={1.5} />
               <span className="text-foreground-light text-sm">
                 You'll be able to pick the right date and time when you begin
               </span>
             </div>
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
-                {/* [Joshen TODO] Double check if this is intentional */}
                 <Button
                   disabled={hasReadReplicas || !canTriggerPhysicalBackup}
                   onClick={() => onSetConfiguration()}
@@ -118,4 +117,4 @@ const PITRStatus = ({
   )
 }
 
-export default observer(PITRStatus)
+export default PITRStatus

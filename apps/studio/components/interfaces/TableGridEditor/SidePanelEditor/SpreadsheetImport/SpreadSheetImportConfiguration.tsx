@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { useState } from 'react'
 import { Button, Collapsible, IconChevronDown, SidePanel } from 'ui'
-import { SpreadsheetData } from './SpreadsheetImport.types'
+import type { SpreadsheetData } from './SpreadsheetImport.types'
 
 interface SpreadSheetImportConfigurationProps {
   spreadsheetData: SpreadsheetData

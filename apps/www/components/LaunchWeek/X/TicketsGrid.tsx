@@ -35,7 +35,7 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
 
         return (
           <Link
-            href={`/launch-week/tickets/${user.username}`}
+            href={`/launch-week/x/tickets/${user.username}`}
             key={`${user.username}-000${i}`}
             onClick={() => window.scrollTo(0, 0)}
             legacyBehavior
@@ -63,9 +63,9 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
                 <Image
                   src={imgUrl}
                   alt={user.username ?? ''}
-                  layout="fill"
-                  objectFit="cover"
-                  objectPosition="center"
+                  fill
+                  sizes="100%"
+                  className="object-cover object-center"
                   placeholder="blur"
                   blurDataURL="/images/launchweek/lwx/tickets/placeholder.png"
                 />

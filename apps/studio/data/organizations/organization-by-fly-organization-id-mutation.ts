@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type OrganizationByFlyOrgIdVariables = {
   flyOrganizationId: string
@@ -17,7 +17,7 @@ export async function getOrganizationByFlyOrgId({
   const { data, error } = await get('/platform/organizations/fly/{fly_organization_id}', {
     params: { path: { fly_organization_id: flyOrganizationId } },
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data as { slug: string }
 }
 

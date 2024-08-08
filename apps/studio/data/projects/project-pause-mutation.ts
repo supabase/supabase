@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 
 export type ProjectPauseVariables = {
   ref: string
@@ -12,7 +12,7 @@ export async function pauseProject({ ref }: ProjectPauseVariables) {
   const { data, error } = await post('/platform/projects/{ref}/pause', {
     params: { path: { ref } },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

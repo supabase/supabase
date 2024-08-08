@@ -1,7 +1,9 @@
+import { Sha256 } from '@aws-crypto/sha256-browser'
+import type { NextRouter } from 'next/router'
+
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { NextRouter } from 'next/router'
-import { User } from 'types'
+import type { User } from 'types'
 
 export interface TelemetryProps {
   screenResolution?: string
@@ -74,49 +76,20 @@ const sendIdentify = (user: User, gaProps?: TelemetryProps) => {
 }
 
 /**
- * Sends data to Mixpanel.
- * @deprecated use sendEvent instead.
+ * Generates a unique identifier for an anonymous user based on their gotrue id.
  */
-const sendActivity = (
-  event: {
-    activity: string
-    source: string
-    projectRef?: string
-    orgSlug?: string
-    data?: object
-  },
-  router: NextRouter
-) => {
-  if (!IS_PLATFORM) return
-
-  const consent =
-    typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null
-  if (consent !== 'true') return
-
-  const { activity, source, projectRef, orgSlug, data } = event
-
-  const properties = {
-    activity,
-    source,
-    page: {
-      path: router.route,
-      location: router.asPath,
-      referrer: document?.referrer || '',
-      title: document?.title || '',
-    },
-    ...(data && { data }),
-    ...(projectRef && { projectRef }),
-    ...(orgSlug && { orgSlug }),
-  }
-  return post(`${API_URL}/telemetry/activity`, properties)
+export const getAnonId = async (id: string) => {
+  const hash = new Sha256()
+  hash.update(id)
+  const u8Array = await hash.digest()
+  const binString = Array.from(u8Array, (byte) => String.fromCodePoint(byte)).join('')
+  const b64encoded = btoa(binString)
+  return b64encoded
 }
 
 const Telemetry = {
   sendEvent,
   sendIdentify,
-  sendActivity,
 }
 
 export default Telemetry

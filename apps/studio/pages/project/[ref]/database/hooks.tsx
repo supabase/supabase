@@ -6,15 +6,16 @@ import { useParams } from 'common'
 import DeleteHookModal from 'components/interfaces/Database/Hooks/DeleteHookModal'
 import EditHookPanel from 'components/interfaces/Database/Hooks/EditHookPanel'
 import HooksList from 'components/interfaces/Database/Hooks/HooksList/HooksList'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import type { NextPageWithLayout } from 'types'
 
 const HooksPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -101,6 +102,10 @@ const HooksPage: NextPageWithLayout = () => {
       <ScaffoldContainer className="h-full">
         <ScaffoldSection className="h-full">
           <div className="col-span-12">
+            <FormHeader
+              title="Database Webhooks"
+              description="Send real-time data from your database to another system whenever a table event occurs"
+            />
             <HooksList createHook={createHook} editHook={editHook} deleteHook={deleteHook} />
           </div>
         </ScaffoldSection>

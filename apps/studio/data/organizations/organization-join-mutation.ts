@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationJoinVariables = {
@@ -10,11 +10,13 @@ export type OrganizationJoinVariables = {
   token: string
 }
 
+// [Joshen TODO] Should be deprecated now - double check before deleting
+
 export async function joinOrganization({ slug, token }: OrganizationJoinVariables) {
   const { data, error } = await post('/platform/organizations/{slug}/members/join', {
     params: { path: { slug }, query: { token } },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

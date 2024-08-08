@@ -1,12 +1,13 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { Filter, Query, SupaTable } from 'components/grid'
+import { Query } from 'components/grid/query/Query'
+import type { Filter, SupaTable } from 'components/grid/types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { formatFilterValue } from './utils'
 
 export type TableRowDeleteAllVariables = {

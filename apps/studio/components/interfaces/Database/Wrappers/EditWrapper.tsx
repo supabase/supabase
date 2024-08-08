@@ -1,52 +1,40 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormPanel,
-  FormsContainer,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import Loading from 'components/ui/Loading'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import { FormsContainer } from 'components/ui/Forms/FormsContainer'
+import { Loading } from 'components/ui/Loading'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
-import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
-import {
-  Button,
-  Form,
-  IconArrowLeft,
-  IconEdit,
-  IconExternalLink,
-  IconLoader,
-  IconTrash,
-  Input,
-} from 'ui'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useImmutableValue } from 'hooks/misc/useImmutableValue'
+import { ArrowLeft, Edit, ExternalLink, Trash } from 'lucide-react'
+import { Button, Form, IconLoader, Input } from 'ui'
 import InputField from './InputField'
-import { WRAPPERS } from './Wrappers.constants'
+import WrapperTableEditor from './WrapperTableEditor'
 import {
   convertKVStringArrayToJson,
   formatWrapperTables,
+  getWrapperMetaForWrapper,
   makeValidateRequired,
 } from './Wrappers.utils'
-import WrapperTableEditor from './WrapperTableEditor'
 
 const EditWrapper = () => {
   const formId = 'edit-wrapper-form'
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { ui } = useStore()
   const { ref, id } = useParams()
   const { project } = useProjectContext()
 
@@ -64,14 +52,11 @@ const EditWrapper = () => {
   const foundWrapper = wrappers.find((w) => Number(w.id) === Number(id))
   // this call to useImmutableValue should be removed if the redirect after update is also removed
   const wrapper = useImmutableValue(foundWrapper)
-  const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
+  const wrapperMeta = getWrapperMetaForWrapper(wrapper)
 
   const { mutate: updateFDW, isLoading: isSaving } = useFDWUpdateMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated ${wrapperMeta?.label} foreign data wrapper`,
-      })
+      toast.success(`Successfully updated ${wrapperMeta?.label} foreign data wrapper`)
       setWrapperTables([])
 
       const hasNewSchema = wrapperTables.some((table) => table.is_new_schema)
@@ -186,14 +171,16 @@ const EditWrapper = () => {
           >
             <Link href={`/project/${ref}/database/wrappers`}>
               <div className="flex items-center space-x-2">
-                <IconArrowLeft strokeWidth={1.5} size={14} />
+                <ArrowLeft strokeWidth={1.5} size={14} />
                 <p className="text-sm">Back</p>
               </div>
             </Link>
           </div>
-          <h3 className="mb-2 text-xl text-foreground">Edit wrapper: {wrapper.name}</h3>
+          <h3 className="mb-2 text-xl text-foreground">
+            Edit {wrapperMeta.label} wrapper: {wrapper.name}
+          </h3>
           <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
                 href="https://supabase.github.io/wrappers/stripe/"
                 target="_blank"
@@ -241,7 +228,7 @@ const EditWrapper = () => {
                         connectionString: project?.connectionString,
                         id: secret.id,
                       })
-                      return { [option.name]: value[0].decrypted_secret }
+                      return { [option.name]: value[0]?.decrypted_secret ?? '' }
                     } else {
                       return { [option.name]: '' }
                     }
@@ -311,14 +298,16 @@ const EditWrapper = () => {
                   header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
                 >
                   <FormSectionContent loading={false}>
-                    {wrapperMeta.server.options.map((option) => (
-                      <InputField
-                        key={option.name}
-                        option={option}
-                        loading={option.encrypted ? loadingSecrets : false}
-                        error={formErrors[option.name]}
-                      />
-                    ))}
+                    {wrapperMeta.server.options
+                      .filter((option) => !option.hidden)
+                      .map((option) => (
+                        <InputField
+                          key={option.name}
+                          option={option}
+                          loading={option.encrypted ? loadingSecrets : false}
+                          error={formErrors[option.name]}
+                        />
+                      ))}
                   </FormSectionContent>
                 </FormSection>
                 <FormSection
@@ -342,7 +331,7 @@ const EditWrapper = () => {
                     ) : (
                       <div className="space-y-2">
                         {wrapperTables.map((table, i) => {
-                          const label = wrapperMeta.tables[table.index].label
+                          const target = table?.table ?? table.object
 
                           return (
                             <div
@@ -351,10 +340,13 @@ const EditWrapper = () => {
                             >
                               <div>
                                 <p className="text-sm">
-                                  {table.schema_name}.{table.table_name}
+                                  {table.schema_name}.{table.table_name}{' '}
+                                </p>
+                                <p className="text-sm text-foreground-light mt-1">
+                                  Target: {target}
                                 </p>
                                 <p className="text-sm text-foreground-light">
-                                  {label}:{' '}
+                                  Columns:{' '}
                                   {table.columns.map((column: any) => column.name).join(', ')}
                                 </p>
                               </div>
@@ -362,7 +354,7 @@ const EditWrapper = () => {
                                 <Button
                                   type="default"
                                   className="px-1"
-                                  icon={<IconEdit />}
+                                  icon={<Edit />}
                                   onClick={() => {
                                     setIsEditingTable(true)
                                     setSelectedTableToEdit({ ...table, tableIndex: i })
@@ -371,7 +363,7 @@ const EditWrapper = () => {
                                 <Button
                                   type="default"
                                   className="px-1"
-                                  icon={<IconTrash />}
+                                  icon={<Trash />}
                                   onClick={() => {
                                     setWrapperTables((prev) => prev.filter((_, j) => j !== i))
                                   }}
@@ -414,4 +406,4 @@ const EditWrapper = () => {
   )
 }
 
-export default observer(EditWrapper)
+export default EditWrapper

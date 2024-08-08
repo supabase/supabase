@@ -4,8 +4,8 @@
 
 @import '~ui/build/css/source/global.css';
 @import '~ui/build/css/themes/dark.css';
-@import '~ui/build/css/themes/deep-dark.css';
 @import '~ui/build/css/themes/light.css';
+@import '~ui/build/css/themes/classic-dark.css';
 
 @layer utilities {
   .btn-primary {
@@ -253,4 +253,8 @@ div[data-radix-portal]:not(.portal--toast) {
 // to do: remove this CSS and do the same thing in a reusable tooltip component
 [data-radix-popper-content-wrapper] {
   @apply z-50 #{!important};
+}
+
+.settings-container {
+  @apply mx-auto max-w-4xl xl:max-w-6xl;
 }

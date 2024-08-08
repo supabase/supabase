@@ -1,14 +1,16 @@
-import { PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { Query } from 'components/grid/query/Query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SparkBar from 'components/ui/SparkBar'
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
 import { updateDatabaseColumn } from 'data/database-columns/database-column-update-mutation'
+import type { Constraint } from 'data/database/constraints-query'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { entityTypeKeys } from 'data/entity-types/keys'
@@ -22,18 +24,15 @@ import { getTable } from 'data/tables/table-query'
 import { updateTable as updateTableMutation } from 'data/tables/table-update-mutation'
 import { getTables } from 'data/tables/tables-query'
 import { getViews } from 'data/views/views-query'
-import { useStore } from 'hooks'
 import { timeout, tryParseJson } from 'lib/helpers'
-import { IMetaStore } from 'stores/pgmeta/MetaStore'
 import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
 } from './ColumnEditor/ColumnEditor.utils'
-import { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
-import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
+import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
+import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
-import { ImportContent } from './TableEditor/TableEditor.types'
-import { Constraint } from 'data/database/constraints-query'
+import type { ImportContent } from './TableEditor/TableEditor.types'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -42,31 +41,33 @@ export interface UseEncryptedColumnsArgs {
   schemaName?: string
   tableName?: string
 }
-
-const listEncryptedColumns = async (meta: IMetaStore, schema: string, table: string) => {
+const listEncryptedColumns = async (
+  projectRef: string,
+  connectionString: string | undefined = undefined,
+  schema: string,
+  table: string
+) => {
   if (!table) return []
 
-  const views = await getViews({
-    projectRef: meta.projectRef,
-    connectionString: meta.connectionString,
-    schema,
-  })
+  const views = await getViews({ projectRef, connectionString, schema })
   const decryptedView = views.find((view) => view.name === `decrypted_${table}`)
   if (!decryptedView) return []
 
-  const encryptedColumns = await meta.query(
-    `SELECT column_name as name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'decrypted_${table}' and column_name like 'decrypted_%'`
-  )
-  if (!encryptedColumns.error) {
-    return encryptedColumns.map((column: any) => column.name.split('decrypted_')[1])
-  } else {
-    console.error('Error fetching encrypted columns', encryptedColumns.error)
+  try {
+    const encryptedColumns = await executeSql({
+      projectRef,
+      connectionString,
+      sql: `SELECT column_name as name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'decrypted_${table}' and column_name like 'decrypted_%'`,
+    })
+    return encryptedColumns.result.map((column: any) => column.name.split('decrypted_')[1])
+  } catch (error) {
+    console.error('Error fetching encrypted columns', error)
     return []
   }
 }
 
 export function useEncryptedColumns({ schemaName, tableName }: UseEncryptedColumnsArgs) {
-  const { meta } = useStore()
+  const { project } = useProjectContext()
   const [encryptedColumns, setEncryptedColumns] = useState<string[]>([])
 
   useEffect(() => {
@@ -74,7 +75,12 @@ export function useEncryptedColumns({ schemaName, tableName }: UseEncryptedColum
 
     const getEncryptedColumns = async () => {
       if (schemaName !== undefined && tableName !== undefined) {
-        const columns = await listEncryptedColumns(meta, schemaName, tableName)
+        const columns = await listEncryptedColumns(
+          project?.ref!,
+          project?.connectionString,
+          schemaName,
+          tableName
+        )
 
         if (isMounted) {
           setEncryptedColumns(columns)
@@ -160,8 +166,7 @@ export const getAddForeignKeySQL = ({
         const onUpdateSql = getOnUpdateSql(updateAction)
         return `
       ALTER TABLE "${table.schema}"."${table.name}"
-      ADD CONSTRAINT "${table.schema}_${table.name}_${relation.columns.map((x) => x.source).join('_')}_fkey"
-      FOREIGN KEY (${relation.columns.map((column) => `"${column.source}"`).join(',')})
+      ADD FOREIGN KEY (${relation.columns.map((column) => `"${column.source}"`).join(',')})
       REFERENCES "${relation.schema}"."${relation.table}" (${relation.columns.map((column) => `"${column.target}"`).join(',')})
       ${onUpdateSql}
       ${onDeleteSql}
@@ -269,12 +274,14 @@ export const createColumn = async ({
   payload,
   selectedTable,
   primaryKey,
+  foreignKeyRelations = [],
 }: {
   projectRef: string
   connectionString: string | undefined
   payload: CreateColumnPayload
   selectedTable: PostgresTable
   primaryKey?: Constraint
+  foreignKeyRelations?: ForeignKey[]
 }) => {
   const toastId = toast.loading(`Creating column "${payload.name}"...`)
   try {
@@ -311,6 +318,17 @@ export const createColumn = async ({
         primaryKeyColumns
       )
     }
+
+    // Then add the foreign key constraints here
+    if (foreignKeyRelations.length > 0) {
+      await addForeignKey({
+        projectRef,
+        connectionString,
+        table: { schema: column.schema, name: column.table },
+        foreignKeys: foreignKeyRelations,
+      })
+    }
+
     toast.success(`Successfully created column "${column.name}"`, { id: toastId })
   } catch (error: any) {
     toast.error(`An error occurred while creating the column "${payload.name}"`, { id: toastId })
@@ -325,6 +343,8 @@ export const updateColumn = async ({
   payload,
   selectedTable,
   primaryKey,
+  foreignKeyRelations = [],
+  existingForeignKeyRelations = [],
   skipPKCreation,
   skipSuccessMessage = false,
 }: {
@@ -334,14 +354,16 @@ export const updateColumn = async ({
   payload: UpdateColumnPayload
   selectedTable: PostgresTable
   primaryKey?: Constraint
+  foreignKeyRelations?: ForeignKey[]
+  existingForeignKeyRelations?: ForeignKeyConstraint[]
   skipPKCreation?: boolean
   skipSuccessMessage?: boolean
 }) => {
   try {
     const { isPrimaryKey, ...formattedPayload } = payload
     const column = await updateDatabaseColumn({
-      projectRef: projectRef,
-      connectionString: connectionString,
+      projectRef,
+      connectionString,
       id,
       payload: formattedPayload,
     })
@@ -374,6 +396,18 @@ export const updateColumn = async ({
         )
       }
     }
+
+    // Then update foreign keys
+    if (foreignKeyRelations.length > 0) {
+      await updateForeignKeys({
+        projectRef,
+        connectionString,
+        table: { schema: column.schema, name: column.table },
+        foreignKeys: foreignKeyRelations,
+        existingForeignKeyRelations,
+      })
+    }
+
     if (!skipSuccessMessage) toast.success(`Successfully updated column "${column.name}"`)
   } catch (error: any) {
     return { error }
@@ -762,43 +796,13 @@ export const updateTable = async ({
   }
 
   // Foreign keys will get updated here accordingly
-  const relationsToAdd = foreignKeyRelations.filter((x) => typeof x.id === 'string')
-  if (relationsToAdd.length > 0) {
-    await addForeignKey({
-      projectRef,
-      connectionString,
-      table: updatedTable,
-      foreignKeys: relationsToAdd,
-    })
-  }
-
-  const relationsToRemove = foreignKeyRelations.filter((x) => x.toRemove)
-  if (relationsToRemove.length > 0) {
-    await removeForeignKey({
-      projectRef,
-      connectionString,
-      table: updatedTable,
-      foreignKeys: relationsToRemove,
-    })
-  }
-
-  const remainingRelations = foreignKeyRelations.filter(
-    (x) => typeof x.id === 'number' && !x.toRemove
-  )
-  const relationsToUpdate = remainingRelations.filter((x) => {
-    const existingRelation = existingForeignKeyRelations.find((y) => x.id === y.id)
-    if (existingRelation !== undefined) {
-      return checkIfRelationChanged(existingRelation as unknown as ForeignKeyConstraint, x)
-    } else return false
+  await updateForeignKeys({
+    projectRef,
+    connectionString,
+    table: updatedTable,
+    foreignKeys: foreignKeyRelations,
+    existingForeignKeyRelations,
   })
-  if (relationsToUpdate.length > 0) {
-    await updateForeignKey({
-      projectRef,
-      connectionString,
-      table: updatedTable,
-      foreignKeys: relationsToUpdate,
-    })
-  }
 
   const queryClient = getQueryClient()
 
@@ -853,7 +857,7 @@ export const insertRowsViaSpreadsheet = async (
               formattedRow[header] = tryParseJson(row[header])
             } else if (row[header] === '') {
               // if the cell is empty string, convert it to NULL
-              formattedRow[header] = null
+              formattedRow[header] = column?.is_nullable ? null : ''
             } else {
               formattedRow[header] = row[header]
             }
@@ -902,6 +906,8 @@ export const insertTableRows = async (
       const column = table.columns?.find((c) => c.name === header)
       if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
         formattedRow[header] = tryParseJson(row[header])
+      } else if (row[header] === '') {
+        formattedRow[header] = column?.is_nullable ? null : ''
       } else {
         formattedRow[header] = row[header]
       }
@@ -938,4 +944,55 @@ export const insertTableRows = async (
     onProgressUpdate(insertProgress * 100)
   }
   return { error: insertError }
+}
+
+const updateForeignKeys = async ({
+  projectRef,
+  connectionString,
+  table,
+  foreignKeys,
+  existingForeignKeyRelations,
+}: {
+  projectRef: string
+  connectionString?: string
+  table: { schema: string; name: string }
+  foreignKeys: ForeignKey[]
+  existingForeignKeyRelations: ForeignKeyConstraint[]
+}) => {
+  // Foreign keys will get updated here accordingly
+  const relationsToAdd = foreignKeys.filter((x) => typeof x.id === 'string')
+  if (relationsToAdd.length > 0) {
+    await addForeignKey({
+      projectRef,
+      connectionString,
+      table,
+      foreignKeys: relationsToAdd,
+    })
+  }
+
+  const relationsToRemove = foreignKeys.filter((x) => x.toRemove)
+  if (relationsToRemove.length > 0) {
+    await removeForeignKey({
+      projectRef,
+      connectionString,
+      table,
+      foreignKeys: relationsToRemove,
+    })
+  }
+
+  const remainingRelations = foreignKeys.filter((x) => typeof x.id === 'number' && !x.toRemove)
+  const relationsToUpdate = remainingRelations.filter((x) => {
+    const existingRelation = existingForeignKeyRelations.find((y) => x.id === y.id)
+    if (existingRelation !== undefined) {
+      return checkIfRelationChanged(existingRelation as unknown as ForeignKeyConstraint, x)
+    } else return false
+  })
+  if (relationsToUpdate.length > 0) {
+    await updateForeignKey({
+      projectRef,
+      connectionString,
+      table,
+      foreignKeys: relationsToUpdate,
+    })
+  }
 }

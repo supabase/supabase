@@ -1,3 +1,4 @@
+import { PostgresPolicy } from '@supabase/postgres-meta'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import { Badge, HoverCard, HoverCardContent, HoverCardTrigger, Input, cn } from 'ui'
@@ -7,25 +8,45 @@ import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import CardButton from 'components/ui/CardButton'
 import CopyButton from 'components/ui/CopyButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
-import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModal.constants'
-import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
+import {
+  getGeneralPolicyTemplates,
+  getRealtimePolicyTemplates,
+} from '../PolicyEditorModal/PolicyEditorModal.constants'
 
 interface PolicyTemplatesProps {
+  schema: string
+  table: string
+  selectedPolicy?: PostgresPolicy
   selectedTemplate?: string
-  onSelectTemplate: (template: { id: string; content: string }) => void
+  onSelectTemplate: (template: any) => void
 }
 
-export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTemplatesProps) => {
+export const PolicyTemplates = ({
+  schema,
+  table,
+  selectedPolicy,
+  selectedTemplate,
+  onSelectTemplate,
+}: PolicyTemplatesProps) => {
   const [search, setSearch] = useState('')
-  const templates = getGeneralPolicyTemplates('schema_name', 'table_name')
+
+  const templates =
+    schema === 'realtime'
+      ? getRealtimePolicyTemplates()
+      : getGeneralPolicyTemplates(schema, table.length > 0 ? table : 'table_name')
+
+  const baseTemplates =
+    selectedPolicy !== undefined
+      ? templates.filter((t) => t.command === selectedPolicy.command)
+      : templates
   const filteredTemplates =
     search.length > 0
-      ? templates.filter(
+      ? baseTemplates.filter(
           (template) =>
             template.name.toLowerCase().includes(search.toLowerCase()) ||
             template.command.toLowerCase().includes(search.toLowerCase())
         )
-      : templates
+      : baseTemplates
 
   return (
     <div className="h-full px-content py-content flex flex-col gap-3">
@@ -48,35 +69,40 @@ export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTe
       <div className="flex flex-col gap-1.5">
         {filteredTemplates.map((template) => {
           return (
-            <HoverCard key={template.id} openDelay={100} closeDelay={0}>
+            <HoverCard key={template.id} openDelay={100} closeDelay={100}>
               <HoverCardTrigger>
                 <CardButton
                   title={template.name}
                   titleClass="text-sm"
                   className={cn(
-                    'transition',
+                    'transition w-full',
                     template.id === selectedTemplate
                       ? '!border-stronger bg-surface-200 hover:!border-stronger'
                       : ''
                   )}
                   key={template.id}
-                  onClick={() => onSelectTemplate({ id: template.id, content: template.statement })}
+                  onClick={() => onSelectTemplate(template)}
                   hideChevron
                   fixedHeight={false}
                   icon={
                     <div className="min-w-16">
                       <Badge
-                        className="!rounded font-mono"
-                        color={
+                        className={cn(
+                          '!rounded font-mono',
+                          template.command === 'UPDATE'
+                            ? 'bg-blue-400 text-blue-900 border border-blue-800'
+                            : ''
+                        )}
+                        variant={
                           template.command === 'ALL'
-                            ? 'scale'
+                            ? 'outline'
                             : template.command === 'SELECT'
-                              ? 'green'
+                              ? 'brand'
                               : template.command === 'UPDATE'
-                                ? 'blue'
+                                ? 'default'
                                 : template.command === 'DELETE'
-                                  ? 'tomato'
-                                  : 'yellow'
+                                  ? 'destructive'
+                                  : 'warning'
                         }
                       >
                         {template.command}
@@ -91,7 +117,7 @@ export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTe
                 hideWhenDetached
                 side="left"
                 align="center"
-                className="w-96 flex"
+                className="w-[500px] flex"
                 animate="slide-in"
               >
                 <SimpleCodeBlock
