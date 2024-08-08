@@ -45,8 +45,7 @@ interface LogsPreviewHook {
 function useLogsPreview(
   projectRef: string,
   table: LogsTableName,
-  filterOverride?: Filters,
-  enabled?: boolean
+  filterOverride?: Filters
 ): LogsPreviewHook {
   const defaultHelper = getDefaultHelper(PREVIEWER_DATEPICKER_HELPERS)
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
@@ -90,7 +89,6 @@ function useLogsPreview(
       return get<Logs>(uri, { signal })
     },
     {
-      enabled: enabled ?? true,
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
         if (!isResponseOk(lastPage) || (lastPage.result?.length ?? 0) === 0) {

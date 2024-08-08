@@ -89,8 +89,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   } = useLogsQuery(
     projectRef,
     {
-      iso_timestamp_start: its,
-      iso_timestamp_end: ite,
+      iso_timestamp_start: its ? (its as string) : undefined,
+      iso_timestamp_end: ite ? (ite as string) : undefined,
     },
     sourceType === 'logs'
   )
