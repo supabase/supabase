@@ -92,7 +92,6 @@ const InputField = ({
         data-testid={`${field.name}-input`}
         layout="horizontal"
         label={field.name}
-        inputClassName="pr-32"
         value={field.value ?? ''}
         descriptionText={
           <>
