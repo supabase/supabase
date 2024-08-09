@@ -14,9 +14,12 @@ import { Meetup } from '~/components/LaunchWeek/12/LWMeetups'
 import LWStickyNav from '~/components/LaunchWeek/12/Releases/LWStickyNav'
 import LWHeader from '~/components/LaunchWeek/12/Releases/LWHeader'
 import MainStage from '~/components/LaunchWeek/12/Releases/MainStage'
-import CTABanner from '../../components/CTABanner'
 
 const BuildStage = dynamic(() => import('~/components/LaunchWeek/12/Releases/BuildStage'))
+const CTABanner = dynamic(() => import('~/components/CTABanner'))
+const LaunchWeekPrizeSection = dynamic(
+  () => import('~/components/LaunchWeek/12/LaunchWeekPrizeSection')
+)
 const LW12Meetups = dynamic(() => import('~/components/LaunchWeek/12/LWMeetups'))
 const TicketingFlow = dynamic(() => import('~/components/LaunchWeek/12/Ticket/TicketingFlow'))
 
@@ -105,8 +108,11 @@ export default function LaunchWeekIndex({ meetups }: Props) {
           <SectionContainer id="meetups" className="scroll-mt-[60px] lw-nav-anchor -mt-24 !pt-24">
             <LW12Meetups meetups={meetups} className="pt-24" />
           </SectionContainer>
-          <SectionContainer className="!pb-8 lw-nav-anchor" id="ticket">
+          <SectionContainer className="!py-8 lw-nav-anchor" id="ticket">
             <TicketingFlow />
+          </SectionContainer>
+          <SectionContainer className="!pt-8" id="awards">
+            <LaunchWeekPrizeSection />
           </SectionContainer>
           <CTABanner />
         </DefaultLayout>

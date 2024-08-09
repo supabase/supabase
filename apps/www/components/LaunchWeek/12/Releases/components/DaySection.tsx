@@ -149,7 +149,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
               {day.hasCountdown && <CountdownComponent date={day.published_at} showCard={false} />}
             </div>
             <div>
-              <Skeleton className="w-full h-4 max-w-xs rounded-full will-change-contents" />
+              <Skeleton className="w-full h-3 max-w-xs rounded-full will-change-contents" />
             </div>
           </div>
         )}
