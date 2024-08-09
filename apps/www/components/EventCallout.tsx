@@ -41,8 +41,10 @@ const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<
           <VideoCameraIcon className="w-4 h-4 text-brand mr-2" />
           <span className="py-1 uppercase text-brand font-mono">Upcoming Webinar</span>
           <span className="py-1 uppercase mx-3 px-3 border-x">21 Aug</span>
-          <span className="py-1">Scale to Billions: Generative AI/Humata</span>
-          <ChevronRightIcon className="translate-x-0 transition-transform group-hover:translate-x-0.5 w-3 h-3 ml-1.5" />
+          <span className="py-1 inline-flex items-center">
+            Scale to Billions: Generative AI/Humata{' '}
+            <ChevronRightIcon className="translate-x-0 transition-transform group-hover:translate-x-0.5 w-3 h-3 ml-1.5" />
+          </span>
         </Link>
       )
     case 'large':
