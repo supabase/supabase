@@ -131,7 +131,7 @@ const NavigationBar = () => {
             </Link>
           </div>
         )}
-        <ul className="flex flex-col gap-y-1 justify-start px-2">
+        <ul className="flex flex-col gap-y-1 justify-start px-2 mb-4">
           <NavigationIconLink
             isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
             route={{
@@ -221,7 +221,7 @@ const NavigationBar = () => {
           })}
         </ul>
 
-        <ul className="flex flex-col px-2 gap-y-1">
+        <ul className="flex flex-col px-2 gap-y-1 mt-auto">
           {settingsRoutes.map((route) => (
             <NavigationIconLink
               key={route.key}
