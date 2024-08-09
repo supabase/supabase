@@ -105,8 +105,8 @@ export default function LaunchWeekIndex({ meetups }: Props) {
           <LWHeader />
           <MainStage className="relative z-10" />
           <BuildStage />
-          <SectionContainer id="meetups" className="scroll-mt-[60px] lw-nav-anchor -mt-24 !pt-24">
-            <LW12Meetups meetups={meetups} className="pt-24" />
+          <SectionContainer id="meetups" className="scroll-mt-[60px] lw-nav-anchor">
+            <LW12Meetups meetups={meetups} />
           </SectionContainer>
           <SectionContainer className="!py-8 lw-nav-anchor" id="ticket">
             <TicketingFlow />
