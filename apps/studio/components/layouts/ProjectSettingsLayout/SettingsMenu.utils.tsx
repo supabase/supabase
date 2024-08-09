@@ -31,6 +31,9 @@ export const generateSettingsMenu = (
   const logDrainsEnabled = features?.logDrains ?? true
   const billingEnabled = features?.billing ?? true
 
+  // If user is in self hosted mode, show log drains, otherwise show only if they are enabled
+  const showLogDrains = IS_PLATFORM ? logDrainsEnabled : true
+
   return [
     {
       title: 'Project Settings',

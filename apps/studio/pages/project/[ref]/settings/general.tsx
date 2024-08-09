@@ -12,6 +12,9 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { IS_PLATFORM } from 'common'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -20,6 +23,13 @@ const ProjectSettings: NextPageWithLayout = () => {
   const isBranch = !!project?.parent_project_ref
   const { projectsTransfer: projectTransferEnabled, projectSettingsCustomDomains } =
     useIsFeatureEnabled(['projects:transfer', 'project_settings:custom_domains'])
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!IS_PLATFORM) {
+      router.push(`/project/default/settings/log-drains`)
+    }
+  }, [router])
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
