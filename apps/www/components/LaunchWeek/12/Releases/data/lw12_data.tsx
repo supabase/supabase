@@ -73,7 +73,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     links: [
       {
         type: 'xSpace',
-        href: 'https://supabase.link/',
+        href: 'https://supabase.link/lw12-xspace-1',
       },
     ],
     steps: [],
@@ -90,7 +90,12 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     published_at: '2024-08-13T08:00:00.000-07:00',
     title: '',
     description: '',
-    links: [],
+    links: [
+      {
+        type: 'xSpace',
+        href: 'https://supabase.link/lw12-xspace-2',
+      },
+    ],
     steps: [],
   },
   {
@@ -105,7 +110,12 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     published_at: '2024-08-14T08:00:00.000-07:00',
     title: '',
     description: '',
-    links: [],
+    links: [
+      {
+        type: 'xSpace',
+        href: 'https://supabase.link/lw12-xspace-3',
+      },
+    ],
     steps: [],
   },
   {
@@ -120,7 +130,12 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     published_at: '2024-08-15T08:00:00.000-07:00',
     title: '',
     description: '',
-    links: [],
+    links: [
+      {
+        type: 'xSpace',
+        href: 'https://supabase.link/lw12-xspace-4',
+      },
+    ],
     steps: [],
   },
   {
@@ -135,7 +150,12 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     published_at: '2024-08-16T08:00:00.000-07:00',
     title: '',
     description: '',
-    links: [],
+    links: [
+      {
+        type: 'xSpace',
+        href: 'https://supabase.link/lw12-xspace-5',
+      },
+    ],
     steps: [],
   },
 ]
