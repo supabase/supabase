@@ -2249,7 +2249,7 @@ functions:
       ```html
       <Image src={data.totp.qr_code} alt={data.totp.uri} layout="fill"></Image>
       ```
-      - The `challenge` and `verify` steps are separated when using Phone factors as the user will need time to receive and input the code obtanied from the SMS in challenge.
+      - The `challenge` and `verify` steps are separated when using Phone factors as the user will need time to receive and input the code obtained from the SMS in challenge.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
