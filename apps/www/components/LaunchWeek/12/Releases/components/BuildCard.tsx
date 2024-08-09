@@ -9,7 +9,7 @@ import { useBreakpoint } from 'common'
 import { AdventDay } from '../data'
 import { AdventLink } from '../data/lw12_build_stage'
 
-const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
+const BuildCard = ({ day, index }: { day: AdventDay; index: number }) => {
   const isTablet = useBreakpoint(1024)
   const tiltRef = useRef<HTMLDivElement>(null)
   const hiddenRef = useRef<HTMLDivElement>(null)
@@ -116,4 +116,4 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
   )
 }
 
-export default AdventCard
+export default BuildCard

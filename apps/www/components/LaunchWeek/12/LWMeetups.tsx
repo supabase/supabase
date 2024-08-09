@@ -138,7 +138,7 @@ const LWMeetups = ({ meetups, className }: { meetups?: Meetup[]; className?: str
                     <span>{meetup.title}</span>
                   </Link>
                   {i !== meets.length - 1 && (
-                    <span className="ml-0 text-foreground-muted text-4xl">-</span>
+                    <span className="ml-0 bg-foreground-muted text-4xl my-auto h-1 w-1 rounded-full flex" />
                   )}
                 </>
               )

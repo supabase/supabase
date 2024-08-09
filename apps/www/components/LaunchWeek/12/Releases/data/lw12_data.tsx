@@ -29,6 +29,8 @@ export interface StepProps {
   bg_layers?: {
     img?: string
     mobileImg?: string
+    imgLight?: string
+    mobileImgLight?: string
     className?: string
   }[]
   steps?: StepProps[] | []
@@ -68,15 +70,29 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     published_at: '2024-08-12T08:00:00.000-07:00',
     videoId: '',
     videoThumbnail: '',
-    title: 'Lorem ipsum',
-    description: 'Lorem ipsum',
+    title: 'TBD',
+    description: 'TBD',
     links: [
       {
         type: 'xSpace',
         href: 'https://supabase.link/lw12-xspace-1',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        blog: '/blog/studio-introducing-assistant',
+        bg_layers: [
+          {
+            img: '/images/launchweek/12/d1/postgresnew-dark.png',
+            mobileImg: '/images/launchweek/12/d1/postgresnew-dark-mobile.png',
+            imgLight: '/images/launchweek/12/d1/postgresnew-light.png',
+            mobileImgLight: '/images/launchweek/12/d1/postgresnew-light-mobile.png',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-2',
