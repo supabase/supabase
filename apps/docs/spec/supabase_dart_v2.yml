@@ -1403,7 +1403,7 @@ functions:
         name: Unsubscribe from auth subscription
         code: |
           ```dart
-          final authSubscription = supabase.auth.onAuthStateChange((event, session) {});
+          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {});
 
           authSubscription.cancel();
           ```
@@ -2491,8 +2491,8 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name');
+            .from('countries')
+            .select();
           ```
         data:
           sql: |
