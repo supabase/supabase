@@ -70,7 +70,7 @@ export const AiAssistantPanel = ({
   }, [loading])
 
   return (
-    <div className="flex flex-col h-full min-w-[400px] w-[400px] border-l border-control">
+    <div className="flex flex-col h-full border-l border-control">
       <div
         className={cn(
           'overflow-auto flex-1',
@@ -91,7 +91,7 @@ export const AiAssistantPanel = ({
             </Button>
           }
         >
-          <div className="flex flex-row justify-between">
+          <div className="flex flex-row justify-between space-x-2">
             <Button
               type="default"
               className="w-min"
