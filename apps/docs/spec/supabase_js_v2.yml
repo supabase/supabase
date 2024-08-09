@@ -2234,21 +2234,22 @@ functions:
     notes: |
       This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
-      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+      Currently, there is support for time-based one-time password (TOTP) and phone verification code as the 2nd factor. Recovery codes are not supported but users can enroll multiple factors, with an upper limit of 10.
 
-      Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
+      Having a 2nd factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup factor.
   - id: mfa-enroll
     title: 'mfa.enroll()'
     $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'
     notes: |
-      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - Use `totp` or `phone` as the `factorType` and use the returned `id` to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
-      - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/javascript/auth-mfa-challengeandverify).
-      - To generate a QR code for the `totp` secret in nextjs, you can do the following:
-      ```
+      - To create and verify a TOTP challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/javascript/auth-mfa-challengeandverify).
+      - To generate a QR code for the `totp` secret in Next.js, you can do the following:
+      ```html
       <Image src={data.totp.qr_code} alt={data.totp.uri} layout="fill"></Image>
       ```
+      - The `challenge` and `verify` steps are separated when using Phone factors as the user will need time to receive and input the code obtained from the SMS in challenge.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
@@ -2264,6 +2265,7 @@ functions:
           // The challenge can be verified by entering the code generated from the authenticator app.
           // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
           const { id, type, totp: { qr_code, secret, uri }, friendly_name } = data
+          const challenge = await supabase.auth.mfa.challenge({ factorId: id });
           ```
         response: |
           ```json
@@ -2281,12 +2283,41 @@ functions:
             error: null
           }
           ```
+      - id: enroll-phone-factor
+        name: Enroll a Phone Factor
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.enroll({
+            factorType: 'phone',
+            friendlyName: 'your_friendly_name',
+            phone: '+12345678',
+          })
+
+          // Use the id to create a challenge and send an SMS with a code to the user.
+          const { id, type, friendly_name, phone } = data
+
+          const challenge = await supabase.auth.mfa.challenge({ factorId: id });
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'phone',
+              friendly_name?: 'Important app',
+              phone: '+5787123456'
+            },
+            error: null
+          }
+          ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
     $ref: '@supabase/auth-js.GoTrueMFAApi.challenge'
     notes: |
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
+      - A phone factor sends a code to the user upon challenge. The channel defaults to `sms` unless otherwise specified.
     examples:
       - id: create-mfa-challenge
         name: Create a challenge for a factor
@@ -2295,6 +2326,47 @@ functions:
           ```js
           const { data, error } = await supabase.auth.mfa.challenge({
             factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225'
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'totp',
+              expires_at: 1700000000
+            },
+            error: null
+          }
+          ```
+      - id: create-mfa-phone-challenge
+        name: Create a challenge for a phone factor
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'phone',
+              expires_at: 1700000000
+            },
+            error: null
+          }
+          ```
+      - id: create-mfa-phone-challenge-whatsapp
+        name: Create a challenge for a phone factor (WhatsApp)
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            channel: 'whatsapp',
           })
           ```
         response: |
@@ -2387,6 +2459,7 @@ functions:
     title: 'mfa.challengeAndVerify()'
     $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
+      - Intended for use with only TOTP factors.
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
       - Executes [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify) in a single step.
     examples:
@@ -2486,7 +2559,7 @@ functions:
     $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
-      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
+      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP) or Phone factor.
       - If the user has a verified factor, the `nextLevel` field will return `aal2`, else, it will return `aal1`.
     examples:
       - id: get-aal
@@ -3111,7 +3184,7 @@ functions:
             { phone_confirm: true }
           )
           ```
-  - id: mfa-list-factors
+  - id: mfa-list-factors-admin
     title: 'mfa.listFactors()'
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
     examples:
