@@ -230,11 +230,9 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     isLocked || policies.length > 0 ? (
                       <div
                         className={cn(
-                          'flex items-center justify-center',
-                          policies.length > 9
-                            ? 'h-[16px] px-1 rounded-full'
-                            : 'h-[16px] w-[16px] rounded-full',
-                          'bg-border-stronger'
+                          'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
+                          policies.length > 9 ? ' px-1' : 'w-[16px]',
+                          ''
                         )}
                       >
                         <span className="text-[11px] text-foreground font-mono text-center">
