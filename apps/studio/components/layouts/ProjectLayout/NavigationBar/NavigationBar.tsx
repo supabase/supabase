@@ -31,7 +31,7 @@ import {
   cn,
   singleThemes,
 } from 'ui'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
@@ -53,7 +53,7 @@ const NavigationBar = () => {
   const { project } = useProjectContext()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const { setIsOpen } = useCommandMenu()
+  const setCommandMenuOpen = useSetCommandMenuOpen()
   const snap = useAppStateSnapshot()
 
   const signOut = useSignOut()
@@ -78,10 +78,8 @@ const NavigationBar = () => {
     projectRef: project?.ref,
   })
 
-  const securityLints = (data ?? []).filter(
-    (lint) =>
-      lint.categories.includes('SECURITY') && (lint.level === 'ERROR' || lint.level === 'WARN')
-  )
+  const securityLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
+  const errorLints = securityLints.filter((lint) => lint.level === 'ERROR')
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project)
@@ -118,7 +116,7 @@ const NavigationBar = () => {
           if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
         }}
       >
-        <ul className="flex flex-col gap-y-1 justify-start px-2">
+        <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
           {(!navLayoutV2 || !IS_PLATFORM) && (
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
@@ -180,7 +178,12 @@ const NavigationBar = () => {
               return (
                 <div className="relative">
                   {securityLints.length > 0 && (
-                    <div className="absolute flex h-2 w-2 left-6 top-2 z-10 bg-destructive-600 rounded-full" />
+                    <div
+                      className={cn(
+                        'absolute flex h-2 w-2 left-6 top-2 z-10 rounded-full',
+                        errorLints.length > 0 ? 'bg-destructive-600' : 'bg-warning-600'
+                      )}
+                    />
                   )}
 
                   <NavigationIconLink
@@ -230,7 +233,7 @@ const NavigationBar = () => {
             <NavigationIconButton
               size="tiny"
               onClick={() => {
-                setIsOpen(true)
+                setCommandMenuOpen(true)
                 snap.setNavigationPanelOpen(false)
               }}
               type="text"

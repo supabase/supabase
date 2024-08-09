@@ -60,7 +60,7 @@ const PolicyTableRow = ({
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
           )}
-          {!table.rls_enabled && (
+          {!table.rls_enabled && !isLocked && (
             <Alert_Shadcn_ variant="warning">
               <WarningIcon />
               <AlertTitle_Shadcn_>
