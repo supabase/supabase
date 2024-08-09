@@ -243,7 +243,7 @@ const AdvancedAuthSettingsForm = () => {
                     properties={{
                       type: 'select',
                       title: 'TOTP',
-                      description: 'Control Use Of TOTP Factors',
+                      description: 'Control use of TOTP factors',
                       enum: MFAFactorSelectionOptions,
                     }}
                     formValues={values}
@@ -280,7 +280,7 @@ const AdvancedAuthSettingsForm = () => {
                   <FormField
                     name="MFA_PHONE_TEMPLATE"
                     properties={{
-                      title: 'Phone Verification Message',
+                      title: 'Phone verification message',
                       type: 'multiline-string',
                       description: 'To format the OTP code use `{{ .Code }}`',
                     }}
