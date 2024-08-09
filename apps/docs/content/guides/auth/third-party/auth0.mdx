@@ -90,10 +90,10 @@ Your Supabase project inspects the `role` claim present in all JWTs sent to it, 
 
 By default, Auth0 JWTs (both access token and ID token) do not contain a `role` claim in them. If you were to send such a JWT to your Supabase project, the `anon` role would be assigned when executing the Postgres query. Most of your app's logic will be accessible by the `authenticated` role.
 
-A recommended approach to do this is to configure the [`onExecuteCredentialsExchange ` Auth0 Action](https://auth0.com/docs/secure/tokens/json-web-tokens/create-custom-claims#create-custom-claims) which will add the custom claim:
+A recommended approach to do this is to configure the [`onExecutePostLogin` Auth0 Action](https://auth0.com/docs/secure/tokens/json-web-tokens/create-custom-claims#create-custom-claims) which will add the custom claim:
 
 ```javascript
-exports.onExecuteCredentialsExchange = async (event, api) => {
+exports.onExecutePostLogin = async (event, api) => {
   api.accessToken.setCustomClaim('role', 'authenticated')
 }
 ```
