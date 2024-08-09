@@ -42,7 +42,7 @@ const DatabaseProductMenu = () => {
           columnLevelPrivileges,
         })}
       />
-      <div className="px-3">
+      <div className="px-3 pb-3">
         <Alert_Shadcn_>
           <AlertTitle_Shadcn_ className="text-sm">
             Replication section has been renamed
