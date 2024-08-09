@@ -8,7 +8,7 @@ import { AlertTitle_Shadcn_, Alert_Shadcn_, Button, CriticalIcon, WarningIcon } 
 /**
  * Shown on projects in organization which are above their qouta
  */
-export const RestrictrionBanner = () => {
+export const RestrictionBanner = () => {
   const project = useSelectedProject()
   const { data } = useOrganizationsQuery()
   const currentOrg = data?.find((org) => org.id === project?.organization_id)

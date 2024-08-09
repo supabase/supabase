@@ -1,29 +1,17 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Message as MessageType } from 'ai'
-import { useTelemetryProps } from 'common'
 import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
-import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+import { useEffect, useRef, useState } from 'react'
 
+import { useTelemetryProps } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
-import {
-  ExpandingTextArea,
-  Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Form_Shadcn_,
-  cn,
-} from 'ui'
-import { AiIcon } from 'ui-patterns/Cmdk'
+import { AiIconAnimation, Button, cn } from 'ui'
+import { AssistantChatForm } from 'ui-patterns'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
 
@@ -51,42 +39,35 @@ export const AiAssistantPanel = ({
   const router = useRouter()
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
-  const organization = useSelectedOrganization()
   const bottomRef = useRef<HTMLDivElement>(null)
   const telemetryProps = useTelemetryProps()
 
-  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const [value, setValue] = useState<string>('')
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  const isOptedInToAI = useOrgOptedIntoAi()
   const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
-
-  const FormSchema = z.object({ chat: z.string() })
-  const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
-    resolver: zodResolver(FormSchema),
-    defaultValues: { chat: '' },
-  })
   const pendingReply = loading && last(messages)?.role === 'user'
-
-  // try to scroll on each rerender to the bottom
-  useEffect(() => {
-    if (loading && bottomRef.current) {
-      setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-      }, 500)
-    }
-  })
 
   useEffect(() => {
     if (!loading) {
-      form.setValue('chat', '')
-      form.setFocus('chat')
+      setValue('')
+      if (inputRef.current) inputRef.current.focus()
     }
-  }, [loading])
 
-  const formRef = useRef<HTMLFormElement>(null)
+    // Try to scroll on each rerender to the bottom
+    setTimeout(
+      () => {
+        if (bottomRef.current) {
+          bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+        }
+      },
+      loading ? 100 : 500
+    )
+  }, [loading])
 
   return (
     <div className="flex flex-col h-full min-w-[400px] w-[400px] border-l border-control">
@@ -150,12 +131,23 @@ export const AiAssistantPanel = ({
         <div ref={bottomRef} className="h-1" />
       </div>
 
-      <Form_Shadcn_ {...form}>
-        <form
-          ref={formRef}
-          className="sticky p-5 flex-0 border-t"
-          onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
-            onSubmit(data.chat)
+      <div className="sticky p-5 flex-0 border-t">
+        <AssistantChatForm
+          textAreaRef={inputRef}
+          loading={loading}
+          disabled={loading}
+          icon={
+            <AiIconAnimation
+              allowHoverEffect
+              className="[&>div>div]:border-black dark:[&>div>div]:border-white"
+            />
+          }
+          placeholder="Ask a question about your SQL query"
+          value={value}
+          onValueChange={(e) => setValue(e.target.value)}
+          onSubmit={(event) => {
+            event.preventDefault()
+            onSubmit(value)
             Telemetry.sendEvent(
               {
                 category: 'sql_editor_ai_assistant',
@@ -165,39 +157,9 @@ export const AiAssistantPanel = ({
               telemetryProps,
               router
             )
-          })}
-        >
-          <FormField_Shadcn_
-            control={form.control}
-            name="chat"
-            render={({ field }) => (
-              <FormItem_Shadcn_ asChild>
-                <FormControl_Shadcn_>
-                  <div className="relative">
-                    <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-                    <ExpandingTextArea
-                      {...field}
-                      autoComplete="off"
-                      disabled={loading}
-                      autoFocus
-                      spellCheck={false}
-                      className="pl-12 text-sm rounded-[18px] max-h-96"
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' && !event.shiftKey) {
-                          event.preventDefault()
-                          formRef?.current?.requestSubmit()
-                        }
-                      }}
-                      placeholder="Ask a question about your SQL query"
-                    />
-                    {loading && <Loader2 className="absolute top-2 right-3 animate-spin" />}
-                  </div>
-                </FormControl_Shadcn_>
-              </FormItem_Shadcn_>
-            )}
-          />
-        </form>
-      </Form_Shadcn_>
+          }}
+        />
+      </div>
     </div>
   )
 }

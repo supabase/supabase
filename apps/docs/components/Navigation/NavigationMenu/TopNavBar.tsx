@@ -1,13 +1,13 @@
-import { FC, memo, useState } from 'react'
-import Link from 'next/link'
+import { Command, Search, Menu } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import Image from 'next/image'
+import Link from 'next/link'
+import type { FC } from 'react'
+import { memo, useState } from 'react'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { SearchButton } from 'ui-patterns/Cmdk'
 import { Button, buttonVariants, cn } from 'ui'
-import { Command, Search, Menu } from 'lucide-react'
-
-import Image from 'next/image'
+import { CommandMenuTrigger, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
@@ -17,6 +17,7 @@ const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   return (
     <>
@@ -35,26 +36,18 @@ const TopNavBar: FC = () => {
             </div>
 
             <div className="flex gap-2 items-center">
-              <SearchButton
-                className="flex-grow md:w-44 xl:w-56 h-[30px]
-                          focus-visible:!outline-4 
-                          focus-visible:outline-offset-1
-                          focus-visible:outline-brand-600"
-              >
-                <div
-                  className="
-                    flex
-                    group
-                    items-center
-                    justify-between
-                    bg-surface-100/75
-                    hover:bg-opacity-100
-                    hover:border-strong
-                    border
-                    transition
-                    pl-1.5 md:pl-2 pr-1 w-full h-full rounded-md
-                    text-foreground-lighter
-                  "
+              <CommandMenuTrigger>
+                <button
+                  className={cn(
+                    'group',
+                    'flex-grow md:w-44 xl:w-56 h-[30px] rounded-md',
+                    'pl-1.5 md:pl-2 pr-1',
+                    'flex items-center justify-between',
+                    'bg-surface-100/75 text-foreground-lighter border',
+                    'hover:bg-opacity-100 hover:border-strong',
+                    'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
+                    'transition'
+                  )}
                 >
                   <div className="flex items-center space-x-2 text-foreground-muted">
                     <Search size={18} strokeWidth={2} />
@@ -71,8 +64,8 @@ const TopNavBar: FC = () => {
                       <span className="text-[12px]">K</span>
                     </div>
                   </div>
-                </div>
-              </SearchButton>
+                </button>
+              </CommandMenuTrigger>
               <button
                 title="Menu dropdown button"
                 className={cn(

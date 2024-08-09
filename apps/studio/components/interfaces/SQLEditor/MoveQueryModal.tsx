@@ -10,7 +10,7 @@ import { getContentById } from 'data/content/content-id-query'
 import { useContentUpsertV2Mutation } from 'data/content/content-upsert-v2-mutation'
 import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
 import { Snippet, SnippetDetail } from 'data/content/sql-folders-query'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useSnippetFolders, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -83,7 +83,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
     defaultValues: { name: '' },
   })
 
-  const folders = Object.values(snapV2.folders).map((x) => x.folder)
+  const folders = useSnippetFolders(ref as string)
   const selectedFolder =
     selectedId === 'root'
       ? 'Root of the editor'

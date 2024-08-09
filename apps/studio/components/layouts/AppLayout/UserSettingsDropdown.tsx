@@ -1,10 +1,11 @@
+import { User } from 'lucide-react'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useSignOut } from 'lib/auth'
 import { useProfile } from 'lib/profile'
-import { useTheme } from 'next-themes'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,15 +20,14 @@ import {
   singleThemes,
   Theme,
 } from 'ui'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
-import { User } from 'lucide-react'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 const UserSettingsDropdown = () => {
   const signOut = useSignOut()
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const { profile } = useProfile()
-  const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
+  const setCommandMenuOpen = useSetCommandMenuOpen()
   const { theme, setTheme } = useTheme()
 
   const onClickLogout = async () => {

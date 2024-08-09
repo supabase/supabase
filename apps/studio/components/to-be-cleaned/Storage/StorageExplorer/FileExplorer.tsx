@@ -20,7 +20,6 @@ export interface FileExplorerProps {
   onSelectAllItemsInColumn: (index: number) => void
   onSelectColumnEmptySpace: (index: number) => void
   onColumnLoadMore: (index: number, column: StorageColumn) => void
-  onCopyUrl: (name: string, url: string) => void
 }
 
 const FileExplorer = ({
@@ -34,7 +33,6 @@ const FileExplorer = ({
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,
   onColumnLoadMore = noop,
-  onCopyUrl = noop,
 }: FileExplorerProps) => {
   const fileExplorerRef = useRef<any>(null)
 
@@ -53,7 +51,7 @@ const FileExplorer = ({
       className="file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full"
     >
       <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
-      <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} onCopyUrl={onCopyUrl} />
+      <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
       <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />
       {view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">
@@ -71,7 +69,6 @@ const FileExplorer = ({
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
               onColumnLoadMore={onColumnLoadMore}
-              onCopyUrl={onCopyUrl}
             />
           ))}
         </div>
@@ -90,7 +87,6 @@ const FileExplorer = ({
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
               onColumnLoadMore={onColumnLoadMore}
-              onCopyUrl={onCopyUrl}
             />
           )}
         </>

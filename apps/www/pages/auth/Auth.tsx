@@ -130,7 +130,7 @@ function AuthPage() {
               <h4 className="h4">Own your data</h4>
               <p className="p text-base">
                 User data stored in your Supabase database so you never have to worry about 3rd
-                party privacy issues. Host your data in 8 different locations.
+                party privacy issues. Host your data in 12 different locations.
               </p>
             </div>
           </div>

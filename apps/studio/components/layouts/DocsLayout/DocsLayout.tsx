@@ -32,9 +32,9 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   const getPage = () => {
     if (router.pathname.endsWith('graphiql')) return 'graphiql'
 
-    const { page, resource } = router.query
-    if (!page && !resource) return 'introduction'
-    return (page || resource || '') as string
+    const { page, rpc, resource } = router.query
+    if (!page && !resource && !rpc) return 'introduction'
+    return (page || rpc || resource || '') as string
   }
 
   if (error) {

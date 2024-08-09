@@ -47,8 +47,8 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const q = searchParams.get('q')
-  const activeCategory = searchParams.get('category')
+  const q = searchParams?.get('q')
+  const activeCategory = searchParams?.get('category')
   const isMobile = useBreakpoint(1023)
   const is2XL = useBreakpoint(1535)
 
@@ -119,7 +119,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
 
   const handleSearchByText = (text: string) => {
     setSearchTerm(text)
-    searchParams.has('q') && router.replace('/blog', undefined, { shallow: true, scroll: false })
+    searchParams?.has('q') && router.replace('/blog', undefined, { shallow: true, scroll: false })
     router.replace(`/blog?q=${text}`, undefined, { shallow: true, scroll: false })
     if (text.length < 1) router.replace('/blog', undefined, { shallow: true, scroll: false })
 

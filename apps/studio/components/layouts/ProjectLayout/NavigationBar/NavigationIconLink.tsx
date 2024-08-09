@@ -16,7 +16,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
     const snap = useAppStateSnapshot()
 
     const iconClasses = [
-      'absolute left-0 top-0 flex rounded items-center h-10 w-10 items-center justify-center text-foreground-muted', // Layout
+      'absolute left-0 top-0 flex rounded items-center h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
       'group-hover/item:text-foreground-light',
       isActive && '!text-foreground',
       'transition-colors',

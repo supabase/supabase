@@ -2,10 +2,9 @@
 
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { type SupabaseClient } from '@supabase/supabase-js'
-import { X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
-import { useCommandMenu } from '@ui-patterns/Cmdk'
+import { useSetCommandMenuOpen } from '@ui-patterns/CommandMenu'
 import { GenericSkeletonLoader } from '@ui-patterns/ShimmeringLoader'
 import { type DocsSearchResult } from 'common'
 import { Button, cn } from 'ui'
@@ -13,7 +12,7 @@ import { Button, cn } from 'ui'
 import ButtonCard from '~/components/ButtonCard'
 
 function SearchButton() {
-  const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
+  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   return (
     <Button type="primary" size="small" onClick={() => setCommandMenuOpen(true)}>

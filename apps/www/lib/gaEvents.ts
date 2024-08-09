@@ -85,6 +85,11 @@ const TelemetryEvents: TelemetryEventType = {
     category: 'www_pricing_comparison',
     label: 'enterprise',
   },
+  www_event_main_cta: {
+    action: 'click',
+    category: 'www_event_page',
+    label: 'main_cta',
+  },
 }
 
 export default TelemetryEvents

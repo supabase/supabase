@@ -1,12 +1,12 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { isEqual } from 'lodash'
-import { Play } from 'lucide-react'
+import { ChevronDown, Clipboard, Download, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import toast from 'react-hot-toast'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CSVButton from 'components/ui/CSVButton'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
@@ -19,8 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconChevronDown,
-  IconClipboard,
-  IconDownload,
   IconEye,
   IconEyeOff,
   ResizableHandle,
@@ -39,6 +37,8 @@ import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
+import { createPortal } from 'react-dom'
+import { Item, Menu, useContextMenu } from 'react-contexify'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -87,13 +87,18 @@ const LogTable = ({
   showHeader = true,
   showHistogramToggle = true,
 }: Props) => {
-  const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
-  const firstRow: LogData | undefined = data?.[0] as LogData
   const { profile } = useProfile()
+  const { show: showContextMenu } = useContextMenu()
+
+  const [cellPosition, setCellPosition] = useState<any>()
+  const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
+
   const canCreateLogQuery = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'log_sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
+
+  const firstRow: LogData | undefined = data?.[0] as LogData
 
   // move timestamp to the first column
   function getFirstRow() {
@@ -110,20 +115,19 @@ const LogTable = ({
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
+  const LOGS_EXPLORER_CONTEXT_MENU_ID = 'logs-explorer-context-menu'
   const DEFAULT_COLUMNS = columnNames.map((v: keyof LogData, idx) => {
+    const column = `logs-column-${idx}`
     const result: Column<LogData> = {
-      key: `logs-column-${idx}`,
+      key: column,
       name: v as string,
       resizable: true,
-      renderCell: (props) => {
-        const value = props.row?.[v]
-        if (value && typeof value === 'object') {
-          return JSON.stringify(value)
-        } else if (value === null) {
-          return 'NULL'
-        } else {
-          return String(value)
-        }
+      renderCell: ({ row }: any) => {
+        return (
+          <span onContextMenu={(e) => showContextMenu(e, { id: LOGS_EXPLORER_CONTEXT_MENU_ID })}>
+            {formatCellValue(row?.[v])}
+          </span>
+        )
       },
       renderHeaderCell: (props) => {
         return <div className="flex items-center">{v}</div>
@@ -212,6 +216,23 @@ const LogTable = ({
     []
   )
 
+  const formatCellValue = (value: any) => {
+    return value && typeof value === 'object'
+      ? JSON.stringify(value)
+      : value === null
+        ? 'NULL'
+        : String(value)
+  }
+
+  const onCopyCell = () => {
+    if (cellPosition) {
+      const { row, column } = cellPosition
+      const cellValue = row?.[column.name] ?? ''
+      const value = formatCellValue(cellValue)
+      copyToClipboard(value)
+    }
+  }
+
   const copyResultsToClipboard = () => {
     copyToClipboard(stringData, () => {
       toast.success('Results copied to clipboard')
@@ -234,17 +255,17 @@ const LogTable = ({
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" iconRight={<IconChevronDown />}>
+            <Button type="text" iconRight={<ChevronDown size={14} />}>
               Results {data && data.length ? `(${data.length})` : ''}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
             <DropdownMenuItem onClick={downloadCSV} className="space-x-2">
-              <IconDownload size="tiny" />
+              <Download size={14} />
               <div>Download CSV</div>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={copyResultsToClipboard} className="space-x-2">
-              <IconClipboard size="tiny" />
+              <Clipboard size={14} />
               <div>Copy to clipboard</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -262,7 +283,7 @@ const LogTable = ({
         <div className="flex items-center gap-2">
           <Button
             type="default"
-            icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
+            icon={isHistogramShowing ? <Eye /> : <EyeOff />}
             onClick={onHistogramToggle}
           >
             Histogram
@@ -272,34 +293,21 @@ const LogTable = ({
 
       <div className="space-x-2">
         {IS_PLATFORM && (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
-              <Button
-                type="default"
-                onClick={onSave}
-                disabled={!canCreateLogQuery || !hasEditorValue}
-              >
-                Save query
-              </Button>
-            </Tooltip.Trigger>
-            {!canCreateLogQuery && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to save your query
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            )}
-          </Tooltip.Root>
+          <ButtonTooltip
+            type="default"
+            onClick={onSave}
+            disabled={!canCreateLogQuery || !hasEditorValue}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canCreateLogQuery
+                  ? 'You need additional permissions to save your query'
+                  : undefined,
+              },
+            }}
+          >
+            Save query
+          </ButtonTooltip>
         )}
         <Button
           title="run-logs-query"
@@ -376,6 +384,7 @@ const LogTable = ({
               headerRowHeight={queryType ? 0 : 28}
               onSelectedCellChange={(row) => {
                 setFocusedLog(row.row as LogData)
+                setCellPosition(row)
               }}
               selectedRows={new Set([])}
               columns={columns}
@@ -403,6 +412,16 @@ const LogTable = ({
                 ) : null,
               }}
             />
+            {typeof window !== 'undefined' &&
+              createPortal(
+                <Menu id={LOGS_EXPLORER_CONTEXT_MENU_ID} animation={false}>
+                  <Item onClick={onCopyCell}>
+                    <Clipboard size={14} />
+                    <span className="ml-2 text-xs">Copy cell content</span>
+                  </Item>
+                </Menu>,
+                document.body
+              )}
           </ResizablePanel>
           <ResizableHandle />
           {focusedLog && (

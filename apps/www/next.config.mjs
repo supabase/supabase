@@ -59,11 +59,13 @@ const nextConfig = {
       'img.youtube.com',
       'vercel.com',
       'obuldanrptloktxcffvn.supabase.co',
+      'xguihxuzqibwxjnimxev.supabase.co',
       'pbs.twimg.com',
       'res.cloudinary.com',
       's3-us-west-2.amazonaws.com',
       'supabase.com',
       'user-images.githubusercontent.com',
+      'media.licdn.com',
     ],
   },
   async headers() {

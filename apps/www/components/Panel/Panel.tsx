@@ -13,6 +13,7 @@ interface Props {
   shimmerFromColor?: string
   shimmerToColor?: string
   style?: any
+  innerStyle?: any
   hasMotion?: boolean
 }
 
@@ -28,6 +29,7 @@ const Panel = ({
   hasMotion = false,
   children,
   style,
+  innerStyle,
 }: PropsWithChildren<Props>) => {
   const outerRef = useRef(null)
   const innerRef = useRef(null)
@@ -94,6 +96,7 @@ const Panel = ({
           'relative z-10 w-full h-full rounded-xl bg-surface-75 overflow-hidden text-foreground-light',
           innerClassName
         )}
+        style={innerStyle}
       >
         {children}
         <div

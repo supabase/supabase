@@ -18,7 +18,7 @@ import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 const org = 'supabase'
 const repo = 'wrappers'
 const branch = 'main'
-const docsDir = 'docs'
+const docsDir = 'docs/catalog'
 const externalSite = 'https://supabase.github.io/wrappers'
 
 // Each external docs page is mapped to a local page
@@ -80,6 +80,13 @@ const pageMap = [
     remoteFile: 'mssql.md',
   },
   {
+    slug: 'paddle',
+    meta: {
+      title: 'Paddle',
+    },
+    remoteFile: 'paddle.md',
+  },
+  {
     slug: 'redis',
     meta: {
       title: 'Redis',
@@ -92,6 +99,13 @@ const pageMap = [
       title: 'AWS S3',
     },
     remoteFile: 's3.md',
+  },
+  {
+    slug: 'snowflake',
+    meta: {
+      title: 'Snowflake',
+    },
+    remoteFile: 'snowflake.md',
   },
   {
     slug: 'stripe',

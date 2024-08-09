@@ -48,7 +48,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const fixedFees = useMemo(() => {
     return (upcomingInvoice?.lines || [])
-      .filter((item) => item !== computeCredits && !item.breakdown)
+      .filter((item) => item !== computeCredits && (!item.breakdown || !item.breakdown.length))
       .sort((a, b) => {
         // Prorations should be below regular usage fees
         return Number(a.proration) - Number(b.proration)

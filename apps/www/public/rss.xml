@@ -5,9 +5,37 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 25 Jun 2024 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 15 Jul 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-js-on-jsr</guid>
+  <title>Announcing Supabase on JSR</title>
+  <link>https://supabase.com/blog/supabase-js-on-jsr</link>
+  <description>Supabase is now available on the open source JavaScript Registry (JSR).</description>
+  <pubDate>Mon, 15 Jul 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/range-columns</guid>
+  <title>Simplifying Time-Based Queries with Range Columns</title>
+  <link>https://supabase.com/blog/range-columns</link>
+  <description>Learn how to use range columns in Postgres to simplify time-based queries and add constraints to prevent overlaps.</description>
+  <pubDate>Wed, 10 Jul 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/hardening-supabase</guid>
+  <title>Supabase Security Suite</title>
+  <link>https://supabase.com/blog/hardening-supabase</link>
+  <description>Learn how to use range columns in Postgres to simplify time-based queries and add constraints to prevent overlaps.</description>
+  <pubDate>Wed, 10 Jul 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-realtime-location-sharing-with-maplibre</guid>
+  <title>Postgres Realtime location sharing with MapLibre</title>
+  <link>https://supabase.com/blog/postgres-realtime-location-sharing-with-maplibre</link>
+  <description>Use Supabase Realtime to draw live location data onto the map with MapLibre GL JS.</description>
+  <pubDate>Wed, 03 Jul 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgis-generate-vector-tiles</guid>
   <title>Generate Vector Tiles with PostGIS</title>
   <link>https://supabase.com/blog/postgis-generate-vector-tiles</link>
@@ -478,7 +506,7 @@
 </item>
 <item>
   <guid>https://supabase.com/blog/organization-based-billing</guid>
-  <title>Organization-based Billing, Project Transfers, Team plan</title>
+  <title>Organization-based Billing, Project Transfers, Team Plan</title>
   <link>https://supabase.com/blog/organization-based-billing</link>
   <description>Introducing the new Organization-based Billing</description>
   <pubDate>Wed, 30 Aug 2023 22:00:00 GMT</pubDate>

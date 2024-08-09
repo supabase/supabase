@@ -795,6 +795,10 @@ export interface paths {
      */
     patch: operations['ContentController_updateContent']
   }
+  '/platform/projects/{ref}/content/count': {
+    /** Gets the count of a user's content by type */
+    get: operations['ContentController_getContentCount']
+  }
   '/platform/projects/{ref}/content/folders': {
     /** Gets project's content root folder */
     get: operations['ContentFoldersController_getRootFolder']
@@ -1626,6 +1630,10 @@ export interface paths {
      */
     patch: operations['ContentController_updateContent']
   }
+  '/v0/projects/{ref}/content/count': {
+    /** Gets the count of a user's content by type */
+    get: operations['ContentController_getContentCount']
+  }
   '/v0/projects/{ref}/content/item/{id}': {
     /** Gets project's content by the given id */
     get: operations['ContentController_getContentById']
@@ -1868,7 +1876,7 @@ export interface paths {
   '/v1/projects/{ref}/config/auth/third-party-auth': {
     /** [Alpha] Lists all third-party auth integrations */
     get: operations['ThirdPartyAuthController_listTPAForProject']
-    /** [Alpha] Creates a new third-party auth integration */
+    /** Creates a new third-party auth integration */
     post: operations['ThirdPartyAuthController_createTPAForProject']
   }
   '/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}': {
@@ -2283,6 +2291,8 @@ export interface components {
       mailer_templates_reauthentication_content: string | null
       mailer_templates_recovery_content: string | null
       mfa_max_enrolled_factors: number | null
+      mfa_totp_enroll_enabled: boolean | null
+      mfa_totp_verify_enabled: boolean | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       password_required_characters: string | null
@@ -3134,6 +3144,9 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }
+    GetContentCountResponse: {
+      count: number
+    }
     GetMetricsBody: {
       /** @enum {string} */
       interval: '1d' | '3d' | '7d'
@@ -3452,6 +3465,8 @@ export interface components {
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: string
       MAILER_TEMPLATES_RECOVERY_CONTENT: string
       MFA_MAX_ENROLLED_FACTORS: number
+      MFA_TOTP_ENROLL_ENABLED: boolean
+      MFA_TOTP_VERIFY_ENABLED: boolean
       PASSWORD_HIBP_ENABLED: boolean
       PASSWORD_MIN_LENGTH: number
       PASSWORD_REQUIRED_CHARACTERS: string
@@ -3603,6 +3618,7 @@ export interface components {
       status: string
       subscription: string | null
       subtotal: number
+      payment_attempted: boolean
     }
     JoinResponse: {
       billing_email: string
@@ -4451,6 +4467,7 @@ export interface components {
         | 'rls_references_user_metadata'
         | 'materialized_view_in_api'
         | 'foreign_table_in_api'
+        | 'unsupported_reg_types'
         | 'auth_otp_long_expiry'
         | 'auth_otp_short_length'
       remediation: Record<string, never>
@@ -5407,6 +5424,8 @@ export interface components {
       mailer_templates_reauthentication_content?: string
       mailer_templates_recovery_content?: string
       mfa_max_enrolled_factors?: number
+      mfa_totp_enroll_enabled?: boolean
+      mfa_totp_verify_enabled?: boolean
       password_hibp_enabled?: boolean
       password_min_length?: number
       /** @enum {string} */
@@ -5647,6 +5666,8 @@ export interface components {
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT?: string
       MAILER_TEMPLATES_RECOVERY_CONTENT?: string
       MFA_MAX_ENROLLED_FACTORS?: number
+      MFA_TOTP_ENROLL_ENABLED?: boolean
+      MFA_TOTP_VERIFY_ENABLED?: boolean
       PASSWORD_HIBP_ENABLED?: boolean
       PASSWORD_MIN_LENGTH?: number
       /** @enum {string} */
@@ -11649,6 +11670,29 @@ export interface operations {
       }
     }
   }
+  /** Gets the count of a user's content by type */
+  ContentController_getContentCount: {
+    parameters: {
+      query: {
+        type: string
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetContentCountResponse']
+        }
+      }
+      /** @description Failed to retrieve user's content count */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets project's content root folder */
   ContentFoldersController_getRootFolder: {
     parameters: {
@@ -14249,7 +14293,7 @@ export interface operations {
       }
     }
   }
-  /** [Alpha] Creates a new third-party auth integration */
+  /** Creates a new third-party auth integration */
   ThirdPartyAuthController_createTPAForProject: {
     parameters: {
       path: {

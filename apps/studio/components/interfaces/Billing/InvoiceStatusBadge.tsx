@@ -5,6 +5,7 @@ import { InvoiceStatus } from './Invoices.types'
 
 interface InvoiceStatusBadgeProps {
   status: InvoiceStatus
+  paymentAttempted: boolean
 }
 
 const invoiceStatusMapping: Record<
@@ -40,7 +41,7 @@ const invoiceStatusMapping: Record<
   },
 }
 
-const InvoiceStatusBadge = ({ status }: InvoiceStatusBadgeProps) => {
+const InvoiceStatusBadge = ({ status, paymentAttempted }: InvoiceStatusBadgeProps) => {
   const statusMapping = invoiceStatusMapping[status]
 
   return (
@@ -63,13 +64,22 @@ const InvoiceStatusBadge = ({ status }: InvoiceStatusBadgeProps) => {
               'w-[300px] space-y-2 border border-background',
             ].join(' ')}
           >
-            {[InvoiceStatus.OPEN, InvoiceStatus.UNCOLLECTIBLE].includes(status) && (
-              <p className="text-xs text-foreground">
-                We were not able to collect the money. Make sure you have a valid payment method and
-                enough funds. Outstanding invoices may cause restrictions. You can manually pay the
-                using the "Pay Now" button.
-              </p>
-            )}
+            {[InvoiceStatus.OPEN, InvoiceStatus.ISSUED, InvoiceStatus.UNCOLLECTIBLE].includes(
+              status
+            ) &&
+              (paymentAttempted ? (
+                <p className="text-xs text-foreground">
+                  We were not able to collect the payment. Make sure you have a valid payment method
+                  and enough funds. Outstanding invoices may cause restrictions. You can manually
+                  pay the invoice using the "Pay Now" button.
+                </p>
+              ) : (
+                <p className="text-xs text-foreground">
+                  The invoice will soon be charged for. In case you pay via invoice instead of card,
+                  please make sure to make the payment in a timely manner. You can also pay the
+                  invoice using your card now using the "Pay Now" button.
+                </p>
+              ))}
 
             {status === InvoiceStatus.DRAFT && (
               <p className="text-xs text-foreground">

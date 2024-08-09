@@ -1,7 +1,5 @@
 'use client'
 
-// make a function that returns a component
-
 import styles from './ai-icon-animation-style.module.css'
 import { useEffect, useState } from 'react'
 import { cn } from '../../lib/utils/cn'

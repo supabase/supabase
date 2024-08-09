@@ -236,11 +236,18 @@ themeFiles.map(function (filePath, i) {
   fileName = fileName === 'concept-one' ? 'dark' : fileName
 
   const selector = isCombinedDark
-    ? `[data-theme='classic-dark'],
+    ? `[data-theme='deep-dark'],
+.deep-dark,
+[data-theme='classic-dark'],
 .classic-dark,
 [data-theme='dark'],
 .dark`
-    : `[data-theme='${fileName}'],
+    : fileName === 'dark'
+      ? `[data-theme='deep-dark'],
+.deep-dark,
+[data-theme='${fileName}'],
+.${fileName}`
+      : `[data-theme='${fileName}'],
 .${fileName}`
 
   let configTailwindFilesByType = []

@@ -14,6 +14,7 @@ import { useOrganizationUpdateMutation } from 'data/organizations/organization-u
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from 'lib/constants'
 import { Collapsible, Form, IconChevronRight, Input, Toggle, cn } from 'ui'
@@ -24,10 +25,10 @@ const GeneralSettings = () => {
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
   const selectedOrganization = useSelectedOrganization()
-  const { name, opt_in_tags } = selectedOrganization ?? {}
+  const { name } = selectedOrganization ?? {}
 
   const formId = 'org-general-settings'
-  const isOptedIntoAi = opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL)
+  const isOptedIntoAi = useOrgOptedIntoAi()
   const initialValues = { name: name ?? '', isOptedIntoAi }
 
   const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')

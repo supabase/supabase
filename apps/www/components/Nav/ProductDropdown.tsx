@@ -11,6 +11,8 @@ import MenuItem from './MenuItem'
 import ComparisonsData from 'data/Comparisons'
 import CustomersData from 'data/CustomerStories'
 import SolutionsData from 'data/Solutions'
+import EventCallout from '../EventCallout'
+import Panel from '../Panel'
 
 const ProductDropdown = () => {
   const { basePath } = useRouter()
@@ -66,22 +68,29 @@ const ProductDropdown = () => {
             ))}
           </ul>
         </div>
-        <div className="col-span-2">
-          <p className="text-foreground-lighter text-xs uppercase tracking-widest font-mono mb-6">
-            {ComparisonsData.label}
-          </p>
-          <ul className="flex flex-col gap-2">
-            {ComparisonsData.comparisons.map((link) => (
-              <li key={link.text}>
-                <TextLink
-                  chevronAnimation="fadeIn"
-                  url={link.url}
-                  label={link.text}
-                  className="mt-0 hover:text-foreground focus-visible:text-foreground focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
-                />
-              </li>
-            ))}
-          </ul>
+        <div className="col-span-2 grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-2">
+          <div>
+            <p className="text-foreground-lighter text-xs uppercase tracking-widest font-mono mb-6">
+              {ComparisonsData.label}
+            </p>
+            <ul className="flex flex-col gap-2">
+              {ComparisonsData.comparisons.map((link) => (
+                <li key={link.text}>
+                  <TextLink
+                    chevronAnimation="fadeIn"
+                    url={link.url}
+                    label={link.text}
+                    className="mt-0 hover:text-foreground focus-visible:text-foreground focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <Panel outerClassName="rounded-md" innerClassName="bg-surface-100 rounded-md">
+              <EventCallout className="px-4 py-2" />
+            </Panel>
+          </div>
         </div>
       </div>
     </div>

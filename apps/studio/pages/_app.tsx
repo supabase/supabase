@@ -35,17 +35,16 @@ import { ErrorInfo, useEffect, useMemo, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import toast from 'react-hot-toast'
 import { PortalToast, Toaster } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import {
-  AppBannerWrapper,
-  CommandMenuWrapper,
-  RouteValidationWrapper,
-} from 'components/interfaces/App'
+import { AppBannerWrapper, RouteValidationWrapper } from 'components/interfaces/App'
+import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
 import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
@@ -167,16 +166,23 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <PageTelemetry>
                   <TooltipProvider>
                     <RouteValidationWrapper>
-                      <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+                      <ThemeProvider
+                        defaultTheme="system"
+                        themes={['dark', 'light', 'classic-dark']}
+                        enableSystem
+                        disableTransitionOnChange
+                      >
                         <AppBannerContextProvider>
-                          <CommandMenuWrapper>
+                          <CommandProvider>
                             <AppBannerWrapper>
                               <FeaturePreviewContextProvider>
                                 {getLayout(<Component {...pageProps} />)}
+                                <StudioCommandMenu />
+                                <GenerateSql />
                                 <FeaturePreviewModal />
                               </FeaturePreviewContextProvider>
                             </AppBannerWrapper>
-                          </CommandMenuWrapper>
+                          </CommandProvider>
                         </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>

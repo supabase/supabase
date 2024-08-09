@@ -559,19 +559,46 @@ If your application uses the Supabase Database, Storage or Edge Functions, just 
 
 ## Frequently asked questions
 
-### Why is there a challenge and verify API when challenge does not do much?
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6 [&>div]:space-y-4"
+>
+
+<AccordionItem
+header={<span className="text-foreground">Why is there a challenge and verify API when challenge does not do much?</span>}
+id="why-is-there-a-challenge-and-verify-api"
+>
 
 TOTP is not going to be the only MFA factor Supabase Auth is going to support in the future. By separating out the challenge and verify steps, we're making the library forward compatible with new factors we may add in the future -- such as SMS or WebAuthn. For example, for SMS the `challenge` endpoint would actually send out the SMS with the authentication code. For convenience, you may use `challengeAndVerify` to create and verify a challenge in a single step.
 
-### What's inside the QR code?
+</AccordionItem>
+
+<AccordionItem
+header={<span className="text-foreground">What's inside the QR code?</span>}
+id="what-is-inside-the-qr-code"
+>
 
 The TOTP QR code encodes a URI with the `otpauth` scheme. It was [initially introduced by Google Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format) but is now universally accepted by all authenticator apps.
 
-### How long is the TOTP code valid for?
+</AccordionItem>
+
+<AccordionItem
+header={<span className="text-foreground">How long is the TOTP code valid for?</span>}
+id="how-long-is-the-totp-code-valid-for"
+>
 
 In our TOTP implementation, each generated code remains valid for one interval, which spans 30 seconds. To account for minor time discrepancies, we allow for a one-interval clock skew. This ensures that users can successfully authenticate within this timeframe, even if there are slight variations in system clocks.
 
-### How do I check _when_ a user went through MFA?
+</AccordionItem>
+
+<AccordionItem
+header={<span className="text-foreground">How do I check when a user went through MFA?</span>}
+id="how-do-i-check-when-a-user-went-through-mfa"
+>
 
 Access tokens issued by Supabase Auth contain an `amr` (Authentication Methods Reference) claim. It is an array of objects that indicate what authentication methods the user has used so far.
 
@@ -617,6 +644,7 @@ Currently recognized authentication methods are:
   link).
 - `totp` - a TOTP additional factor.
 - `sso/saml` - any Single Sign On (SAML) method.
+- `anonymous` - any anonymous sign in.
 
 The following additional claims are available when using PKCE flow:
 
@@ -626,3 +654,7 @@ The following additional claims are available when using PKCE flow:
 - `email_change` - any login resulting from a change in email.
 
 More authentication methods will be added over time as we increase the number of authentication methods supported by Supabase.
+
+</AccordionItem>
+
+</Accordion>

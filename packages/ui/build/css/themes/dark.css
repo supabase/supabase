@@ -1,3 +1,5 @@
+[data-theme='deep-dark'],
+.deep-dark,
 [data-theme='dark'],
 .dark {
   --helpers-os-appearance: Dark;

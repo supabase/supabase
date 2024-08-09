@@ -28,6 +28,12 @@ const NavigationMenuRefList = ({
   }
 
   const filteredSections = commonSections.filter((section) => {
+    if (section.type === 'category') {
+      section.items = section.items.filter((item) => {
+        return !item.excludes?.includes(id)
+      })
+    }
+
     return !section.excludes?.includes(id)
   })
 

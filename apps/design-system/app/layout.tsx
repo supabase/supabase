@@ -21,7 +21,11 @@ export default async function Layout({ children }: RootLayoutProps) {
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={inter.className}>
-        <ThemeProvider themes={['dark', 'light', 'deep-dark']} defaultTheme="system" enableSystem>
+        <ThemeProvider
+          themes={['dark', 'light', 'classic-dark']}
+          defaultTheme="system"
+          enableSystem
+        >
           <div vaul-drawer-wrapper="">
             <div className="relative flex min-h-screen flex-col bg-background">{children}</div>
           </div>

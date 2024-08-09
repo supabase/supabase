@@ -8,7 +8,7 @@ import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constant
 
 export type LogDrainUpdateVariables = {
   projectRef: string
-  token: string
+  token?: string
   name: string
   description?: string
   type: LogDrainType
@@ -16,12 +16,16 @@ export type LogDrainUpdateVariables = {
 }
 
 export async function updateLogDrain(payload: LogDrainUpdateVariables) {
+  if (!payload.token) {
+    throw new Error('Token is required')
+  }
+
   const { data, error } = await put('/platform/projects/{ref}/analytics/log-drains/{token}', {
     params: { path: { ref: payload.projectRef, token: payload.token } },
     body: {
       name: payload.name,
       description: payload.description,
-      config: payload.config as any,
+      config: payload.config,
     },
   })
 

@@ -51,8 +51,7 @@ import {
   Separator,
   cn,
 } from 'ui'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
-import { TextHighlighter } from 'ui-patterns/Cmdk/Command.utils'
+import { TextHighlighterBase as TextHighlighter } from 'ui-patterns/CommandMenu'
 import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
@@ -180,7 +179,6 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
     allowSupportAccess: false,
   }
 
-  const { site } = useCommandMenu()
   const router = useRouter()
 
   const onFilesUpload = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -318,48 +316,11 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
     switch (pageType) {
       case PageType.Markdown:
       case PageType.Reference:
-        if (site === 'docs') {
-          return link
-        } else if (site === 'website') {
-          return `/docs${link}`
-        } else {
-          return `https://supabase.com/docs${link}`
-        }
+        return `https://supabase.com/docs${link}`
       case PageType.Integration:
-        if (site === 'website') {
-          return link
-        } else {
-          return `https://supabase.com${link}`
-        }
+        return `https://supabase.com${link}`
       case PageType.GithubDiscussion:
         return link
-      default:
-        throw new Error(`Unknown page type '${pageType}'`)
-    }
-  }
-
-  async function handleLinkClick(pageType: PageType, link: string) {
-    switch (pageType) {
-      case PageType.Markdown:
-      case PageType.Reference:
-        if (site === 'docs') {
-          await router.push(link)
-        } else if (site === 'website') {
-          await router.push(`/docs${link}`)
-        } else {
-          window.open(`https://supabase.com/docs${link}`, '_blank')
-        }
-        break
-      case PageType.Integration:
-        if (site === 'website') {
-          router.push(link)
-        } else {
-          window.open(`https://supabase.com${link}`, '_blank')
-        }
-        break
-      case PageType.GithubDiscussion:
-        window.open(link, '_blank')
-        break
       default:
         throw new Error(`Unknown page type '${pageType}'`)
     }

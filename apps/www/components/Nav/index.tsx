@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
 import { useWindowSize } from 'react-use'
 
-import { Button, buttonVariants, cn } from 'ui'
+import { Announcement, Button, buttonVariants, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -21,6 +21,8 @@ import MobileMenu from './MobileMenu'
 import MenuItem from './MenuItem'
 import { menu } from '~/data/nav'
 import RightClickBrandLogo from './RightClickBrandLogo'
+import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
+import LW12CountdownBanner from 'ui/src/layout/banners/LW12CountdownBanner/LW12CountdownBanner'
 
 interface Props {
   hideNavbar: boolean
@@ -35,10 +37,13 @@ const Nav = (props: Props) => {
   const isUserLoading = useIsUserLoading()
 
   const isHomePage = router.pathname === '/'
+  const isDarkLaunchWeek = useDarkLaunchWeeks()
   const isGAWeekSection = router.pathname.includes('/ga-week')
-  const isLaunchWeekPage = router.pathname.includes('launch-week') || isGAWeekSection
+  const isLaunchWeekPage =
+    router.pathname.includes('launch-week') || isGAWeekSection || isDarkLaunchWeek
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
   const isLaunchWeek11Page = router.pathname === '/ga-week'
+  const hasStickySubnav = isLaunchWeekXPage || isLaunchWeek11Page
   const showLaunchWeekNavMode = (isLaunchWeekPage || isLaunchWeek11Page) && !open
 
   React.useEffect(() => {
@@ -63,26 +68,18 @@ const Nav = (props: Props) => {
 
   return (
     <>
+      <Announcement>
+        <LW12CountdownBanner />
+      </Announcement>
       <div
-        className={cn(
-          'sticky top-0 z-40 transform',
-          (isLaunchWeekXPage || isLaunchWeek11Page) && 'relative'
-        )}
+        className={cn('sticky top-0 z-40 transform', hasStickySubnav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
       >
-        <div
-          className={cn(
-            'absolute inset-0 h-full w-full opacity-80 bg-background',
-            !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
-            showLaunchWeekNavMode && '!bg-transparent transition-all',
-            isGAWeekSection && 'dark:!bg-alternative'
-          )}
-        />
         <nav
           className={cn(
             `relative z-40 border-default border-b backdrop-blur-sm transition-opacity`,
-            showLaunchWeekNavMode ? '!opacity-100 !border-[#e0d2f430]' : '',
-            isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : ''
+            showLaunchWeekNavMode && 'border-muted border-b bg-alternative/50'
+            // isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : ''
           )}
         >
           <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
@@ -121,11 +118,7 @@ const Nav = (props: Props) => {
                           >
                             {menuItem.title}
                           </NavigationMenuTrigger>
-                          <NavigationMenuContent
-                          // className={cn('rounded-xl', menuItem.dropdownContainerClassName)}
-                          >
-                            {menuItem.dropdown}
-                          </NavigationMenuContent>
+                          <NavigationMenuContent>{menuItem.dropdown}</NavigationMenuContent>
                         </NavigationMenuItem>
                       ) : (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>

@@ -2,7 +2,7 @@ const SectionHeader = (props: any) => {
   return (
     <div className={props.className}>
       <div className="space-y-4">
-        <span className="text-muted block font-mono text-xs uppercase tracking-widest">
+        <span className="text-foreground-lighter block font-mono text-xs uppercase tracking-widest">
           {props.subtitle}
         </span>
         <h3 className="h2">

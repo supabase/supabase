@@ -23,9 +23,10 @@ const ExpandingTextArea = forwardRef<HTMLTextAreaElement, ExpandingTextAreaProps
      */
     useEffect(() => {
       if (textAreaRef) {
-        if (!value && textAreaRef && textAreaRef.current) {
+        if (textAreaRef.current && !value) {
           textAreaRef.current.style.height = '40px'
         } else if (textAreaRef && textAreaRef.current) {
+          textAreaRef.current.style.height = 'auto'
           const newHeight = textAreaRef.current.scrollHeight + 'px'
           textAreaRef.current.style.height = newHeight
         }

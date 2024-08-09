@@ -35,6 +35,7 @@ import { SharedData } from './SharedData'
 
 // Partials
 import HuggingFaceDeployment from './MDX/ai/quickstart_hf_deployment.mdx'
+import AuthErrorCodesTable from './MDX/auth_error_codes_table.mdx'
 import AuthRateLimits from './MDX/auth_rate_limits.mdx'
 import DatabaseSetup from './MDX/database_setup.mdx'
 import GetSessionWarning from './MDX/get_session_warning.mdx'
@@ -90,6 +91,7 @@ const components = {
   ),
   AppleSecretGenerator,
   AuthProviders,
+  AuthErrorCodesTable,
   AuthRateLimits,
   AuthSmsProviderConfig,
   Button,

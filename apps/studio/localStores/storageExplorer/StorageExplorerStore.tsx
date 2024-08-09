@@ -65,7 +65,7 @@ const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's completed"
 
 class StorageExplorerStore {
-  private projectRef: string = ''
+  projectRef: string = ''
   view: STORAGE_VIEWS = STORAGE_VIEWS.COLUMNS
   sortBy: STORAGE_SORT_BY = STORAGE_SORT_BY.NAME
   sortByOrder: STORAGE_SORT_BY_ORDER = STORAGE_SORT_BY_ORDER.ASC
