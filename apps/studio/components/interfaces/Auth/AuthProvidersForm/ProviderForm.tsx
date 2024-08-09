@@ -65,8 +65,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           initialValues[key] = configValue
             ? configValue
             : provider.properties[key].type === 'boolean'
-            ? false
-            : ''
+              ? false
+              : ''
         }
       }
     })
