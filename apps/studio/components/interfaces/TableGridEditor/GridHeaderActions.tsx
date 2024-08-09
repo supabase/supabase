@@ -21,7 +21,7 @@ import useEntityType from 'hooks/misc/useEntityType'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
@@ -228,9 +228,19 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                   className="group"
                   icon={
                     isLocked || policies.length > 0 ? (
-                      <span className="text-right text-xs rounded-xl px-[6px] bg-foreground-lighter/30 text-brand-1100">
-                        {policies.length}
-                      </span>
+                      <div
+                        className={cn(
+                          'flex items-center justify-center',
+                          policies.length > 9
+                            ? 'h-[16px] px-1 rounded-full'
+                            : 'h-[16px] w-[16px] rounded-full',
+                          'bg-border-stronger'
+                        )}
+                      >
+                        <span className="text-[11px] text-foreground font-mono text-center">
+                          {policies.length}
+                        </span>
+                      </div>
                     ) : (
                       <PlusCircle strokeWidth={1.5} />
                     )
