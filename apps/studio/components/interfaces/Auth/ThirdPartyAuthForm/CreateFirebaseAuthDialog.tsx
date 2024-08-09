@@ -7,6 +7,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useCreateThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-create-mutation'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -25,7 +26,6 @@ import {
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useFlag } from 'hooks/ui/useFlag'
 
 interface CreateFirebaseAuthIntegrationProps {
   visible: boolean
@@ -73,7 +73,7 @@ export const CreateFirebaseAuthIntegrationDialog = ({
 
   const isAvailable =
     typeof allowedProjectIDs === 'string'
-      ? allowedProjectIDs.split(',').includes(projectRef)
+      ? allowedProjectIDs.split(',').includes(projectRef!)
       : !!allowedProjectIDs
 
   useEffect(() => {
@@ -109,21 +109,7 @@ export const CreateFirebaseAuthIntegrationDialog = ({
 
         <Separator />
         <DialogSection>
-          {!isAvailable && (
-            <p className="text-sm text-foreground-light pb-2">
-              Third-party Auth with Firebase is currently in a private alpha release.{' '}
-              <a
-                className="underline"
-                href="https://forms.supabase.com/third-party-auth-with-firebase"
-                target="_blank"
-              >
-                Please submit your interest for it
-              </a>{' '}
-              and someone from the Supabase team will reach out. You can also try it out via the
-              CLI.
-            </p>
-          )}
-          {isAvailable && (
+          {isAvailable ? (
             <Form_Shadcn_ {...form}>
               <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 {/* Enabled flag can't be changed for now because there's no update API call for integrations */}
@@ -179,25 +165,23 @@ export const CreateFirebaseAuthIntegrationDialog = ({
                 </Alert_Shadcn_>
               </form>
             </Form_Shadcn_>
+          ) : (
+            <p className="text-sm text-foreground-light pb-2">
+              Third-party Auth with Firebase is currently in a private alpha release.{' '}
+              <a
+                className="underline"
+                href="https://forms.supabase.com/third-party-auth-with-firebase"
+                target="_blank"
+              >
+                Please submit your interest for it
+              </a>{' '}
+              and someone from the Supabase team will reach out. You can also try it out via the
+              CLI.
+            </p>
           )}
         </DialogSection>
         <DialogFooter>
-          {!isAvailable && (
-            <>
-              <Button disabled={isLoading} type="default" onClick={() => onClose()}>
-                Cancel
-              </Button>
-              <Button
-                htmlType="submit"
-                onClick={() => {
-                  window.location.href = 'https://forms.supabase.com/third-party-auth-with-firebase'
-                }}
-              >
-                Register interest
-              </Button>
-            </>
-          )}
-          {isAvailable && (
+          {isAvailable ? (
             <>
               {!isCreating && (
                 <div className="flex-1">
@@ -212,6 +196,17 @@ export const CreateFirebaseAuthIntegrationDialog = ({
               </Button>
               <Button form={FORM_ID} htmlType="submit" disabled={isLoading} loading={isLoading}>
                 {isCreating ? 'Create connection' : 'Update connection'}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button disabled={isLoading} type="default" onClick={() => onClose()}>
+                Cancel
+              </Button>
+              <Button onClick={() => onClose()} asChild>
+                <a href="https://forms.supabase.com/third-party-auth-with-firebase" target="_blank">
+                  Register interest
+                </a>
               </Button>
             </>
           )}
