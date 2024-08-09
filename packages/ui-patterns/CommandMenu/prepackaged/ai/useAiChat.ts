@@ -172,6 +172,7 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
     eventSourceRef.current = undefined
     setIsResponding(false)
     setHasError(false)
+    setCurrentMessageIndex(1)
     dispatchMessage({
       type: 'reset',
     })

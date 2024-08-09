@@ -65,6 +65,7 @@ const nextConfig = {
       's3-us-west-2.amazonaws.com',
       'supabase.com',
       'user-images.githubusercontent.com',
+      'media.licdn.com',
     ],
   },
   async headers() {

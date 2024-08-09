@@ -17,10 +17,11 @@ import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
@@ -31,14 +32,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import {
-  AiIconAnimation,
-  Loading,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-  cn,
-} from 'ui'
+import { AiIconAnimation, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
@@ -61,6 +55,8 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { lintKeys } from 'data/lint/keys'
+import { useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 
 // Load the monaco editor client-side only (does not behave well server-side)
@@ -89,6 +85,7 @@ const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRole = useGetImpersonatedRole()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
+  const queryClient = useQueryClient()
   const enableFolders = useFlag('sqlFolderOrganization')
 
   const { mutate: formatQuery } = useFormatQueryMutation()
@@ -116,8 +113,7 @@ const SQLEditor = () => {
   const [isAiOpen, setIsAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
 
-  const selectedOrganization = useSelectedOrganization()
-  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const isOptedInToAI = useOrgOptedIntoAi()
   const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
@@ -178,6 +174,9 @@ const SQLEditor = () => {
 
       // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
       refetchEntityDefinitions()
+
+      // revalidate lint query
+      queryClient.invalidateQueries(lintKeys.lint(ref))
     },
     onError(error: any, vars) {
       if (id) {

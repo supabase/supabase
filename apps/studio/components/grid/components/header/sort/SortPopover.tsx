@@ -69,6 +69,11 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayPr
   const [sorts, setSorts] = useState<Sort[]>(initialSorts)
 
   const columns = table.columns!.filter((x) => {
+    // exclude json/jsonb columns from sorting. Sorting by json fields in PG is only possible if you provide key from
+    // the JSON object.
+    if (x.dataType === 'json' || x.dataType === 'jsonb') {
+      return false
+    }
     const found = sorts.find((y) => y.column == x.name)
     return !found
   })

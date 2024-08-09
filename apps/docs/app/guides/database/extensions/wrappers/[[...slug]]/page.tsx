@@ -18,7 +18,7 @@ import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 const org = 'supabase'
 const repo = 'wrappers'
 const branch = 'main'
-const docsDir = 'docs'
+const docsDir = 'docs/catalog'
 const externalSite = 'https://supabase.github.io/wrappers'
 
 // Each external docs page is mapped to a local page

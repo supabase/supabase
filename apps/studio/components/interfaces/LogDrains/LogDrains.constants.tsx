@@ -1,33 +1,29 @@
-import { Computer, DogIcon, WebhookIcon } from 'lucide-react'
+import { BracesIcon, DogIcon } from 'lucide-react'
 
 const iconProps = { size: 24, strokeWidth: 1.5, className: 'text-foreground-light' }
 
 export const LOG_DRAIN_TYPES = [
   {
     value: 'webhook',
-    name: 'Webhook',
-    description: 'Forward logs to a custom HTTP endpoint',
-    icon: <WebhookIcon {...iconProps} />,
+    name: 'HTTP Endpoint',
+    description: 'Forward logs as a POST request to a custom HTTP endpoint',
+    icon: <BracesIcon {...iconProps} />,
   },
   {
     value: 'datadog',
-    name: 'Data dog',
+    name: 'Datadog',
     description: 'Datadog is a monitoring service for cloud-scale applications',
     icon: <DogIcon {...iconProps} />,
-  },
-  {
-    value: 'elastic',
-    name: 'Elastic Filebeat',
-    description: 'Filebeat is a lightweight shipper for forwarding and centralizing log data',
-    icon: <Computer {...iconProps} />,
   },
 ] as const
 
 export const LOG_DRAIN_SOURCE_VALUES = LOG_DRAIN_TYPES.map((source) => source.value)
 
-// Added postgres and bigquery here because the generated api types require them but they're not available yet.
-// Once we add them they can be removed from this type and added to the LOG_DRAIN_TYPES array.
-export type LogDrainType = (typeof LOG_DRAIN_TYPES)[number]['value'] | 'postgres' | 'bigquery'
+export type LogDrainType =
+  | (typeof LOG_DRAIN_TYPES)[number]['value']
+  | 'postgres'
+  | 'bigquery'
+  | 'elastic'
 
 export const DATADOG_REGIONS = [
   {
@@ -59,12 +55,6 @@ export const DATADOG_REGIONS = [
 export type LogDrainDatadogConfig = {
   api_key: string
   region: string
-}
-
-export type LogDrainElasticConfig = {
-  url: string
-  username: string
-  password: string
 }
 
 export type LogDrainWebhookConfig = {
