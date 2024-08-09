@@ -2333,6 +2333,7 @@ functions:
           {
             data: {
               id: '<ID>',
+              type: 'totp',
               expires_at: 1700000000
             },
             error: null
