@@ -74,6 +74,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     description: 'TBD',
     links: [
       {
+        type: 'video',
+        href: '',
+      },
+      {
         type: 'xSpace',
         href: 'https://supabase.link/lw12-xspace-1',
       },
