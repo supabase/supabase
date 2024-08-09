@@ -366,9 +366,15 @@ export async function GET(req: Request, res: Response) {
                           "role"
                         </span>
                         <span>:</span>
-                        <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_STRING }}>
-                          "{user.role}"
-                        </span>
+                        {user.role ? (
+                          <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_STRING }}>
+                            "{user.role}"
+                          </span>
+                        ) : (
+                          <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_NULL }}>
+                            null
+                          </span>
+                        )}
                         <span>,</span>
                       </span>
                     </div>
@@ -379,9 +385,15 @@ export async function GET(req: Request, res: Response) {
                           "company"
                         </span>
                         <span>:</span>
-                        <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_STRING }}>
-                          "{user.company}"
-                        </span>
+                        {user.company ? (
+                          <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_STRING }}>
+                            "{user.company}"
+                          </span>
+                        ) : (
+                          <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_NULL }}>
+                            null
+                          </span>
+                        )}
                         <span>,</span>
                       </span>
                     </div>
@@ -392,9 +404,15 @@ export async function GET(req: Request, res: Response) {
                           "location"
                         </span>
                         <span>:</span>
-                        <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_STRING }}>
-                          "{user.location}"
-                        </span>
+                        {user.location ? (
+                          <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_STRING }}>
+                            "{user.location}"
+                          </span>
+                        ) : (
+                          <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_NULL }}>
+                            null
+                          </span>
+                        )}
                         <span>,</span>
                       </span>
                     </div>

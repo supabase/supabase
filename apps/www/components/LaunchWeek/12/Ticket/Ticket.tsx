@@ -52,9 +52,9 @@ export default function Ticket() {
   .single()
 `
 
-  const HAS_ROLE = user.role
-  const HAS_COMPANY = user.company
-  const HAS_LOCATION = user.location
+  const HAS_ROLE = true // user.role
+  const HAS_COMPANY = true // user.company
+  const HAS_LOCATION = true // user.location
 
   // Keep following indentation for proper json layout with conditionals
   const responseJson = codeBlock`
@@ -63,7 +63,10 @@ export default function Ticket() {
     "name": "${user.name}",
     "username": "${username}",
     "ticket_number": "${ticketNumber}",
-  ${HAS_ROLE && `  "role": "${user.role}",\n`}${HAS_COMPANY && `  "company": "${user.company}",\n`}${HAS_LOCATION && `  "location": "${user.location}",\n`}},
+    "role": ${user.role ? `"${user.role}"` : 'null'},
+    "company": ${user.company ? `"${user.company}"` : 'null'},
+    "location": ${user.location ? `"${user.location}"` : 'null'},
+  },
   "error": null
 }
 `
