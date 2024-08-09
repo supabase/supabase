@@ -2291,7 +2291,7 @@ functions:
           const { data, error } = await supabase.auth.mfa.enroll({
             factorType: 'phone',
             friendlyName: 'your_friendly_name',
-            phone_number: '+12345678',
+            phone: '+12345678',
           })
 
           // Use the id to create a challenge and send an SMS with a code to the user.
@@ -2352,6 +2352,7 @@ functions:
           {
             data: {
               id: '<ID>',
+              type: 'phone',
               expires_at: 1700000000
             },
             error: null
