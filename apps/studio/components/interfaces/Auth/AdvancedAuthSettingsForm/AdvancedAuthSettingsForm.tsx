@@ -37,10 +37,6 @@ const schema = object({
   SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number()
     .min(0, 'Must be a value more than 0')
     .required('Must have a Reuse Interval value'),
-  MFA_TOTP_ENROLL_ENABLED: boolean().required(),
-  MFA_TOTP_VERIFY_ENABLED: boolean().required(),
-  MFA_PHONE_ENROLL_ENABLED: boolean().required(),
-  MFA_PHONE_VERIFY_ENABLED: boolean().required(),
   MFA_PHONE_OTP_LENGTH: number()
     .min(6, 'Must be a value 6 or larger')
     .max(30, 'must be a value no greater than 30'),
@@ -84,15 +80,21 @@ const AdvancedAuthSettingsForm = () => {
 
   const isTeamsEnterprisePlan =
     isSuccessSubscription && subscription.plan.id !== 'free' && subscription.plan.id !== 'pro'
+  const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
+  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
+
+  const hasPurchasedAuthMFAAddOn =
+    subscription?.project_addons &&
+    subscription.project_addons.length > 0 &&
+    subscription.project_addons[0].addons.some((addon) => addon.type === 'auth_mfa_phone')
   const promptTeamsEnterpriseUpgrade = IS_PLATFORM && !isTeamsEnterprisePlan
-  console.log(subscription)
 
   const INITIAL_VALUES = {
     SITE_URL: authConfig?.SITE_URL,
     JWT_EXP: authConfig?.JWT_EXP,
     REFRESH_TOKEN_ROTATION_ENABLED: authConfig?.REFRESH_TOKEN_ROTATION_ENABLED || false,
     // TOTP is enabled by default
-    MFA_PHONE_OTP_LENGTH: authConfig?.MFA_PHONE_ENROLL_ENABLED || 6,
+    MFA_PHONE_OTP_LENGTH: authConfig?.MFA_PHONE_OTP_LENGTH || 6,
     MFA_PHONE_TEMPLATE: authConfig?.MFA_PHONE_SMS_TEMPLATE || 'Your code is {{ .Code }}',
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     MFA_MAX_ENROLLED_FACTORS: authConfig?.MFA_MAX_ENROLLED_FACTORS || 10,
@@ -100,14 +102,22 @@ const AdvancedAuthSettingsForm = () => {
     API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION || 10,
     MFA_TOTP:
       determineMFAStatus(
-        authConfig?.MFA_TOTP_ENROLL_ENABLED || true,
-        authConfig?.MFA_TOTP_VERIFY_ENABLED || true
+        authConfig?.MFA_TOTP_VERIFY_ENABLED ?? true,
+        authConfig?.MFA_TOTP_ENROLL_ENABLED ?? true
       ) || 'Enabled',
     MFA_PHONE:
       determineMFAStatus(
-        authConfig?.MFA_PHONE_ENROLL_ENABLED || false,
-        authConfig?.MFA_PHONE_VERIFY_ENABLED || false
+        authConfig?.MFA_PHONE_VERIFY_ENABLED || false,
+        authConfig?.MFA_PHONE_ENROLL_ENABLED || false
       ) || 'Disabled',
+  }
+
+  function MfaStatusToState(status) {
+    return status === 'Enabled'
+      ? { verifyEnabled: true, enrollEnabled: true }
+      : status === 'Verify Enabled'
+      ? { verifyEnabled: true, enrollEnabled: false }
+      : { verifyEnabled: false, enrollEnabled: false }
   }
 
   const MFAFactorSelectionOptions = [
@@ -126,8 +136,25 @@ const AdvancedAuthSettingsForm = () => {
   ]
 
   const onSubmit = (values: any, { resetForm }: any) => {
-    const payload = { ...values }
-    // TODO: Transform the original config based on the enabled disabled toggles
+    let payload = { ...values }
+    const { verifyEnabled: MFA_TOTP_VERIFY_ENABLED, enrollEnabled: MFA_TOTP_ENROLL_ENABLED } =
+      MfaStatusToState(values.MFA_TOTP)
+    if (isProPlanAndUp) {
+      const { verifyEnabled: MFA_PHONE_VERIFY_ENABLED, enrollEnabled: MFA_PHONE_ENROLL_ENABLED } =
+        MfaStatusToState(values.MFA_PHONE)
+      payload = {
+        ...payload,
+        MFA_PHONE_ENROLL_ENABLED,
+        MFA_PHONE_VERIFY_ENABLED,
+      }
+    }
+    payload = {
+      ...payload,
+      MFA_TOTP_ENROLL_ENABLED,
+      MFA_TOTP_VERIFY_ENABLED,
+    }
+    delete payload.MFA_TOTP
+    delete payload.MFA_PHONE
 
     if (!isTeamsEnterprisePlan) {
       delete payload.DB_MAX_POOL_SIZE
@@ -249,19 +276,7 @@ const AdvancedAuthSettingsForm = () => {
                     formValues={values}
                     disabled={!canUpdateConfig}
                   />
-                  {isTeamsEnterprisePlan && (
-                    <FormField
-                      name="MFA_PHONE"
-                      properties={{
-                        type: 'select',
-                        title: 'Phone',
-                        description: 'Control Use Of Phone Factors',
-                        enum: MFAFactorSelectionOptions,
-                      }}
-                      formValues={values}
-                      disabled={!canUpdateConfig}
-                    />
-                  )}
+
                   <InputNumber
                     id="MFA_MAX_ENROLLED_FACTORS"
                     size="small"
@@ -270,12 +285,36 @@ const AdvancedAuthSettingsForm = () => {
                     actions={<span className="mr-3 text-foreground-lighter">factors</span>}
                     disabled={!canUpdateConfig}
                   />
+                </FormSectionContent>
+              </FormSection>
+              <FormSection header={<FormSectionLabel>Advanced MFA</FormSectionLabel>}>
+                <FormSectionContent loading={isLoading}>
+                  {!promptProPlanUpgrade ? (
+                    <></>
+                  ) : (
+                    <UpgradeToPro
+                      primaryText="Upgrade to Pro"
+                      secondaryText="Advanced MFA requires the Pro Plan"
+                    />
+                  )}
+                  <FormField
+                    name="MFA_PHONE"
+                    properties={{
+                      type: 'select',
+                      title: 'Phone',
+                      description: 'Control use of phone factors',
+                      enum: MFAFactorSelectionOptions,
+                    }}
+                    formValues={values}
+                    disabled={!canUpdateConfig || !isProPlanAndUp}
+                  />
+
                   <InputNumber
                     id="MFA_PHONE_OTP_LENGTH"
                     size="small"
                     label="Phone OTP Length"
                     descriptionText="Number of digits in OTP"
-                    disabled={!canUpdateConfig}
+                    disabled={!canUpdateConfig || !isProPlanAndUp}
                   />
                   <FormField
                     name="MFA_PHONE_TEMPLATE"
@@ -285,9 +324,8 @@ const AdvancedAuthSettingsForm = () => {
                       description: 'To format the OTP code use `{{ .Code }}`',
                     }}
                     formValues={values}
-                    disabled={!canUpdateConfig}
+                    disabled={!canUpdateConfig || !isProPlanAndUp}
                   />
-                  {/* TODO: Decide whether to do conditional display of message and otp length */}
                 </FormSectionContent>
               </FormSection>
 
