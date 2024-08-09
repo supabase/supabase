@@ -116,7 +116,7 @@ const NavigationBar = () => {
           if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
         }}
       >
-        <ul className="flex flex-col gap-y-1 justify-start px-2">
+        <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
           {(!navLayoutV2 || !IS_PLATFORM) && (
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
