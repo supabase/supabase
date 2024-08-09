@@ -24,10 +24,9 @@ import {
   Alert_Shadcn_,
   Form,
   InputNumber,
-  Input,
   Toggle,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 
 const schema = object({
   JWT_EXP: number()
@@ -54,8 +53,31 @@ const schema = object({
   MFA_PHONE: string().required(),
 })
 
-function determineMFAStatus(verifyEnabled, enrollEnabled) {
+function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
+}
+
+const MFAFactorSelectionOptions = [
+  {
+    label: 'Enabled',
+    value: 'Enabled',
+  },
+  {
+    label: 'Verify Enabled',
+    value: 'Verify Enabled',
+  },
+  {
+    label: 'Disabled',
+    value: 'Disabled',
+  },
+]
+
+const MfaStatusToState = (status: (typeof MFAFactorSelectionOptions)[number]['value']) => {
+  return status === 'Enabled'
+    ? { verifyEnabled: true, enrollEnabled: true }
+    : status === 'Verify Enabled'
+      ? { verifyEnabled: true, enrollEnabled: false }
+      : { verifyEnabled: false, enrollEnabled: false }
 }
 
 const AdvancedAuthSettingsForm = () => {
@@ -83,10 +105,10 @@ const AdvancedAuthSettingsForm = () => {
   const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
-  const hasPurchasedAuthMFAAddOn =
-    subscription?.project_addons &&
-    subscription.project_addons.length > 0 &&
-    subscription.project_addons[0].addons.some((addon) => addon.type === 'auth_mfa_phone')
+  const projectAddons = subscription?.project_addons.find((addon) => addon.ref === projectRef)
+  const hasPurchasedAuthMFAAddOn = projectAddons?.addons.some(
+    (addon) => addon.type === 'auth_mfa_phone'
+  )
   const promptTeamsEnterpriseUpgrade = IS_PLATFORM && !isTeamsEnterprisePlan
 
   const INITIAL_VALUES = {
@@ -111,29 +133,6 @@ const AdvancedAuthSettingsForm = () => {
         authConfig?.MFA_PHONE_ENROLL_ENABLED || false
       ) || 'Disabled',
   }
-
-  function MfaStatusToState(status) {
-    return status === 'Enabled'
-      ? { verifyEnabled: true, enrollEnabled: true }
-      : status === 'Verify Enabled'
-      ? { verifyEnabled: true, enrollEnabled: false }
-      : { verifyEnabled: false, enrollEnabled: false }
-  }
-
-  const MFAFactorSelectionOptions = [
-    {
-      label: 'Enabled',
-      value: 'Enabled',
-    },
-    {
-      label: 'Verify Enabled',
-      value: 'Verify Enabled',
-    },
-    {
-      label: 'Disabled',
-      value: 'Disabled',
-    },
-  ]
 
   const onSubmit = (values: any, { resetForm }: any) => {
     let payload = { ...values }
@@ -199,6 +198,9 @@ const AdvancedAuthSettingsForm = () => {
         useEffect(() => {
           if (isSuccess) resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
         }, [isSuccess])
+
+        const hasUpgradedPhoneMFA =
+          INITIAL_VALUES.MFA_PHONE === 'Disabled' && values.MFA_PHONE !== INITIAL_VALUES.MFA_PHONE
 
         return (
           <>
@@ -289,9 +291,7 @@ const AdvancedAuthSettingsForm = () => {
               </FormSection>
               <FormSection header={<FormSectionLabel>Advanced MFA</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
-                  {!promptProPlanUpgrade ? (
-                    <></>
-                  ) : (
+                  {promptProPlanUpgrade && (
                     <UpgradeToPro
                       primaryText="Upgrade to Pro"
                       secondaryText="Advanced MFA requires the Pro Plan"
@@ -326,6 +326,14 @@ const AdvancedAuthSettingsForm = () => {
                     formValues={values}
                     disabled={!canUpdateConfig || !isProPlanAndUp}
                   />
+                  {hasUpgradedPhoneMFA && (
+                    <Alert_Shadcn_ variant="warning">
+                      <WarningIcon />
+                      <AlertTitle_Shadcn_>
+                        Enabling phone MFA will add additional charge of 75$ per month.
+                      </AlertTitle_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
                 </FormSectionContent>
               </FormSection>
 
