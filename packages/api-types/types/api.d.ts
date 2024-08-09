@@ -2131,6 +2131,7 @@ export interface components {
       | 'pitr_14'
       | 'pitr_28'
       | 'ipv4_default'
+      | 'auth_mfa_phone_default'
     AmiSearchOptions: {
       search_tags?: Record<string, never>
     }
@@ -2697,10 +2698,15 @@ export interface components {
       data_api_use_api_schema?: boolean
       db_pass: string
       db_pricing_tier_id?: string
+      /**
+       * @description Provider region description
+       * @example Southeast Asia (Singapore)
+       */
       db_region: string
       db_sql?: string
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
       name: string
+      /** @deprecated */
       org_id?: number
       organization_slug?: string
     }
@@ -4356,7 +4362,7 @@ export interface components {
       selected_addons: components['schemas']['SelectedAddonResponse'][]
     }
     /** @enum {string} */
-    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4'
+    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4' | 'auth_mfa_phone'
     /** @enum {string} */
     ProjectAddonVariantPricingType: 'fixed' | 'usage'
     ProjectAddonVariantResponse: {
