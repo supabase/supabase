@@ -1403,7 +1403,7 @@ functions:
         name: Unsubscribe from auth subscription
         code: |
           ```dart
-          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {});
+          final authSubscription = supabase.auth.onAuthStateChange((event, session) {});
 
           authSubscription.cancel();
           ```
