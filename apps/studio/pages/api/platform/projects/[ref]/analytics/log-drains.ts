@@ -44,10 +44,51 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      }).then((res) => {
+      }).then(async (res) => {
         // TODO: create rules
-        return res
+        if (!res || typeof res.body !== 'string') {
+          return
+        }
+
+        const backend = JSON.parse(res.body)
+
+        return backend
       })
+      const sourcesGetUrl = new URL(PROJECT_ANALYTICS_URL)
+      sourcesGetUrl.pathname = '/api/sources'
+      const sources = await get(sourcesGetUrl.toString(), {
+        headers: {
+          'x-api-key': process.env.LOGFLARE_API_KEY,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      }).then((res) => JSON.parse(res.body))
+
+      const params = sources.map((source: { name: string; id: number }) => {
+        const name = (source.name as string).toLowerCase()
+        if (name.includes('realtime')) {
+          return {
+            backend_id: postResult.id,
+            lql_string: 'metadata.project:default',
+            source_id: source.id,
+          }
+        } else {
+          return { backend_id: postResult.id, lql_string: 'project:default', source_id: source.id }
+        }
+      })
+      const rulesPostUrl = new URL(PROJECT_ANALYTICS_URL)
+      rulesPostUrl.pathname = '/api/sources'
+      await Promise.all(
+        params.map((param: any) =>
+          post(rulesPostUrl.toString(), param, {
+            headers: {
+              'x-api-key': process.env.LOGFLARE_API_KEY,
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+          })
+        )
+      )
       return res.status(201).json(postResult)
 
     default:
