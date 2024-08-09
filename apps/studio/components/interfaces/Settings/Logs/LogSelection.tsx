@@ -21,6 +21,7 @@ import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExp
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
+import PgUpgradeSelectionRenderer from './LogSelectionRenderers/PgUpgradeSelectionRenderer'
 import type { LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat, isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
 
@@ -115,6 +116,11 @@ const LogSelection = ({
         if (!fullLog) return null
         if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <AuthSelectionRenderer log={fullLog} />
+
+      case 'pg_upgrade':
+        if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
+        return <PgUpgradeSelectionRenderer log={fullLog} />
 
       default:
         if (queryType && fullLog && isDefaultLogPreviewFormat(fullLog)) {

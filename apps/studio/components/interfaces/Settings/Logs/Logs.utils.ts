@@ -205,6 +205,9 @@ limit 100
     case 'supavisor_logs':
       return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit 100`
 
+    case 'pg_upgrade_logs':
+      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit 100`
+
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
   ${where}

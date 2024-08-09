@@ -88,6 +88,7 @@ export type QueryType =
   | 'supavisor'
   | 'postgrest'
   | 'warehouse'
+  | 'pg_upgrade'
 
 export type Mode = 'simple' | 'custom'
 
