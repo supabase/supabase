@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  supabase_flutter: ^2.3.0
+  supabase_auth_ui: ^0.5.0
   uuid: ^4.3.3
 
 dev_dependencies:

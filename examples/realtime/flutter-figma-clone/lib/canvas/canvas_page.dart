@@ -1,11 +1,11 @@
 import 'dart:math';
 
-import 'package:canvas/canvas/canvas_object.dart';
 import 'package:canvas/canvas/canvas_painter.dart';
 import 'package:canvas/main.dart';
+import 'package:canvas/models/canvas_object.dart';
 import 'package:canvas/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 import 'package:uuid/uuid.dart';
 
 /// Different input modes users can perform
@@ -27,7 +27,15 @@ enum _DrawMode {
 
 /// Interactive art board page to draw and collaborate with other users.
 class CanvasPage extends StatefulWidget {
-  const CanvasPage({super.key});
+  static route(String roomId) =>
+      MaterialPageRoute(builder: (context) => CanvasPage(roomId));
+
+  const CanvasPage(
+    this.roomId, {
+    super.key,
+  });
+
+  final String roomId;
 
   @override
   State<CanvasPage> createState() => _CanvasPageState();
@@ -215,46 +223,52 @@ class _CanvasPageState extends State<CanvasPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+          leadingWidth: 300,
+          backgroundColor: Colors.grey[900],
+          leading: Row(
+            children: _DrawMode.values
+                .map((mode) => IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _currentMode = mode;
+                        });
+                      },
+                      icon: Icon(mode.iconData),
+                      color: _currentMode == mode ? Colors.green : Colors.white,
+                    ))
+                .toList(),
+          ),
+          // Displays the list of users currently drawing on the canvas
+          actions: [
+            ...[..._userCursors.values.map((e) => e.id), _myId]
+                .map(
+                  (id) => Align(
+                    widthFactor: 0.8,
+                    child: CircleAvatar(
+                      backgroundColor: RandomColor.getRandomFromId(id),
+                      child: Text(id.substring(0, 2)),
+                    ),
+                  ),
+                )
+                .toList(),
+            const SizedBox(width: 20),
+          ]),
       body: MouseRegion(
         onHover: (event) {
           _syncCanvasObject(event.position);
         },
-        child: Stack(
-          children: [
-            // The main canvas
-            GestureDetector(
-              onPanDown: _onPanDown,
-              onPanUpdate: _onPanUpdate,
-              onPanEnd: onPanEnd,
-              child: CustomPaint(
-                size: MediaQuery.of(context).size,
-                painter: CanvasPainter(
-                  userCursors: _userCursors,
-                  canvasObjects: _canvasObjects,
-                ),
-              ),
+        child: GestureDetector(
+          onPanDown: _onPanDown,
+          onPanUpdate: _onPanUpdate,
+          onPanEnd: onPanEnd,
+          child: CustomPaint(
+            size: MediaQuery.of(context).size,
+            painter: CanvasPainter(
+              userCursors: _userCursors,
+              canvasObjects: _canvasObjects,
             ),
-
-            // Buttons to change the current mode.
-            Positioned(
-              top: 0,
-              left: 0,
-              child: Row(
-                children: _DrawMode.values
-                    .map((mode) => IconButton(
-                          iconSize: 48,
-                          onPressed: () {
-                            setState(() {
-                              _currentMode = mode;
-                            });
-                          },
-                          icon: Icon(mode.iconData),
-                          color: _currentMode == mode ? Colors.green : null,
-                        ))
-                    .toList(),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
