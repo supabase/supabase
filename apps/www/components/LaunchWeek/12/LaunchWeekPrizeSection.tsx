@@ -29,6 +29,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     draggable={false}
                     width={300}
                     height={300}
+                    quality={100}
                     className="block absolute mx-auto object-cover inset-x-0 lg:inset-x-auto lg:object-top w-auto lg:w-[90%] h-full opacity-90 dark:opacity-50 pointer-events-none"
                   />
                 </div>
@@ -37,8 +38,15 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     <LabelBadge text="5 pieces" />
                     <p className="text-foreground">Win Wandrd Backpack</p>
                     <p className="text-foreground-lighter text-sm">
-                      Share your ticket to increase your chances of winning a Wandrd backpack and
-                      other limited swag.
+                      Share your ticket to increase your chances of winning a{' '}
+                      <a
+                        className="text-foreground hover:underline"
+                        href="https://eu.wandrd.com/products/prvke?variant=39360658473002"
+                        target="_blank"
+                      >
+                        Wandrd backpack
+                      </a>{' '}
+                      and other limited swag.
                     </p>
                   </div>
                 </div>
@@ -57,6 +65,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                       draggable={false}
                       width={300}
                       height={300}
+                      quality={100}
                       className="absolute object-cover inset-0 object-right lg:object-right w-full h-full opacity-100 pointer-events-none"
                     />
                   </div>

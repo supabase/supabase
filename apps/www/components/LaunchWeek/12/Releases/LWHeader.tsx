@@ -12,12 +12,12 @@ const LWHeader = ({ className }: { className?: string }) => {
         </div>
         <div className="absolute inset-0 w-full h-full bg-[linear-gradient(to_top,#060809)_0%,transparent_100%)]" />
       </div>
-      <SectionContainer className="h-full flex flex-col items-start gap-4 !max-w-none lg:!container !pb-4 md:!pb-10">
-        <h1 className="text-4xl tracking-tight font-medium uppercase">
+      <SectionContainer className="h-full flex flex-col items-start gap-3 !max-w-none lg:!container !pb-4 md:!pb-10">
+        <h1 className="text-3xl font-medium uppercase">
           Launch Week <span className="font-mono">12</span>
         </h1>
         <p className="text-foreground-lighter md:text-xl max-w-xs md:max-w-md">
-          Join us for a week of new features and find new ways to level up your development.
+          Join us for a week of new features and find new ways to level up your development
         </p>
       </SectionContainer>
     </div>
