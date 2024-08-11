@@ -76,8 +76,8 @@ const MfaStatusToState = (status: (typeof MFAFactorSelectionOptions)[number]['va
   return status === 'Enabled'
     ? { verifyEnabled: true, enrollEnabled: true }
     : status === 'Verify Enabled'
-      ? { verifyEnabled: true, enrollEnabled: false }
-      : { verifyEnabled: false, enrollEnabled: false }
+    ? { verifyEnabled: true, enrollEnabled: false }
+    : { verifyEnabled: false, enrollEnabled: false }
 }
 
 const AdvancedAuthSettingsForm = () => {
@@ -115,13 +115,16 @@ const AdvancedAuthSettingsForm = () => {
     SITE_URL: authConfig?.SITE_URL,
     JWT_EXP: authConfig?.JWT_EXP,
     REFRESH_TOKEN_ROTATION_ENABLED: authConfig?.REFRESH_TOKEN_ROTATION_ENABLED || false,
-    // TOTP is enabled by default
     MFA_PHONE_OTP_LENGTH: authConfig?.MFA_PHONE_OTP_LENGTH || 6,
-    MFA_PHONE_TEMPLATE: authConfig?.MFA_PHONE_SMS_TEMPLATE || 'Your code is {{ .Code }}',
+    MFA_PHONE_TEMPLATE: authConfig?.MFA_PHONE_TEMPLATE || 'Your code is {{ .Code }}',
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     MFA_MAX_ENROLLED_FACTORS: authConfig?.MFA_MAX_ENROLLED_FACTORS || 10,
     DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE || 10,
     API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION || 10,
+    // TOTP is enabled by default. Auth environment variables are distinct from UI state - we use MFA_TOTP and MFA_PHONE to hold the derivedUI state.
+    // MFA_TOTP_VERIFY_ENABLED and MFA_TOTP_ENROLL_ENABLED -> Enabled
+    // MFA_TOTP_VERIFY_ENABLED and !MFA_TOTP_ENROLL_ENABLED -> Verify Enabled
+    // !MFA_TOTP_VERIFY_ENABLED and !MFA_TOTP_ENROLL_ENABLED -> Disabled
     MFA_TOTP:
       determineMFAStatus(
         authConfig?.MFA_TOTP_VERIFY_ENABLED ?? true,
@@ -138,6 +141,8 @@ const AdvancedAuthSettingsForm = () => {
     let payload = { ...values }
     const { verifyEnabled: MFA_TOTP_VERIFY_ENABLED, enrollEnabled: MFA_TOTP_ENROLL_ENABLED } =
       MfaStatusToState(values.MFA_TOTP)
+    // MFA (Phone) is only available on Pro Plans and up. We translate the UI state, MFA_PHONE and MFA_TOTP into the underlying
+    // Auth config state - MFA_PHONE_*_ENABLED and MFA_TOTP_*_ENABLED.
     if (isProPlanAndUp) {
       const { verifyEnabled: MFA_PHONE_VERIFY_ENABLED, enrollEnabled: MFA_PHONE_ENROLL_ENABLED } =
         MfaStatusToState(values.MFA_PHONE)
@@ -271,8 +276,8 @@ const AdvancedAuthSettingsForm = () => {
                     name="MFA_TOTP"
                     properties={{
                       type: 'select',
-                      title: 'TOTP',
-                      description: 'Control use of TOTP factors',
+                      title: 'TOTP (App Authenticator)',
+                      description: 'Control use of TOTP (App Authenticator) factors',
                       enum: MFAFactorSelectionOptions,
                     }}
                     formValues={values}
