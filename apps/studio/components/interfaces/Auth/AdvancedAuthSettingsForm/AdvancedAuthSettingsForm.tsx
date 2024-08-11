@@ -76,8 +76,8 @@ const MfaStatusToState = (status: (typeof MFAFactorSelectionOptions)[number]['va
   return status === 'Enabled'
     ? { verifyEnabled: true, enrollEnabled: true }
     : status === 'Verify Enabled'
-    ? { verifyEnabled: true, enrollEnabled: false }
-    : { verifyEnabled: false, enrollEnabled: false }
+      ? { verifyEnabled: true, enrollEnabled: false }
+      : { verifyEnabled: false, enrollEnabled: false }
 }
 
 const AdvancedAuthSettingsForm = () => {
@@ -136,6 +136,16 @@ const AdvancedAuthSettingsForm = () => {
         authConfig?.MFA_PHONE_ENROLL_ENABLED || false
       ) || 'Disabled',
   }
+
+  // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
+  const sendSMSHookIsEnabled =
+    authConfig?.HOOK_SEND_SMS_URI !== null && authConfig?.HOOK_SEND_SMS_ENABLED === true
+  const hasValidMFAPhoneProvider =
+    authConfig?.EXTERNAL_PHONE_ENABLED === true &&
+    (authConfig?.SMS_PROVIDER === 'twilio' || authConfig?.SMS_PROVIDER === 'vonage')
+  const hasValidMFAProvider = hasValidMFAPhoneProvider || sendSMSHookIsEnabled
+  const phoneMFAIsEnabled =
+    INITIAL_VALUES.MFA_PHONE === 'Enabled' || INITIAL_VALUES.MFA_PHONE === 'Verify Enabled'
 
   const onSubmit = (values: any, { resetForm }: any) => {
     let payload = { ...values }
@@ -313,6 +323,15 @@ const AdvancedAuthSettingsForm = () => {
                     formValues={values}
                     disabled={!canUpdateConfig || !isProPlanAndUp}
                   />
+                  {!hasValidMFAProvider && phoneMFAIsEnabled && (
+                    <Alert_Shadcn_ variant="warning">
+                      <WarningIcon />
+                      <AlertTitle_Shadcn_>
+                        Please configure a valid phone provider. Only Twilio, Vonage, and Send SMS
+                        Hooks are supported at this time.
+                      </AlertTitle_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
 
                   <InputNumber
                     id="MFA_PHONE_OTP_LENGTH"
