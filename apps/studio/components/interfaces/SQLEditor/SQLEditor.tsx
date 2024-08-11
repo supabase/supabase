@@ -1,16 +1,20 @@
 import type { Monaco } from '@monaco-editor/react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
 import { motion } from 'framer-motion'
+import { Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
+import { format } from 'sql-formatter'
 
 import { useParams, useTelemetryProps } from 'common'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
@@ -26,13 +30,19 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
-import { format } from 'sql-formatter'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { AiIconAnimation, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
+import {
+  AiIconAnimation,
+  ImperativePanelHandle,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  cn,
+} from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
@@ -55,9 +65,6 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { lintKeys } from 'data/lint/keys'
-import { useQueryClient } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -612,6 +619,8 @@ const SQLEditor = () => {
     }
   }, [selectedDiffType, sourceSqlDiff])
 
+  const aiPanelRef = useRef<ImperativePanelHandle>(null)
+
   return (
     <>
       <ConfirmModal
@@ -631,134 +640,148 @@ const SQLEditor = () => {
         }}
       />
 
-      <div className="flex h-full">
-        <ResizablePanelGroup
-          className="h-full relative"
-          direction="vertical"
-          autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
-        >
-          {(isAiOpen || isDiffOpen) && !hasHipaaAddon && (
-            <AISchemaSuggestionPopover
-              onClickSettings={() => {
-                appSnap.setShowAiSettingsModal(true)
-              }}
-            >
-              {isDiffOpen ? (
-                <motion.div
-                  key="ask-ai-input-container"
-                  layoutId="ask-ai-input-container"
-                  variants={{ visible: { borderRadius: 0, x: 0 }, hidden: { x: 100 } }}
-                  initial={isFirstRender ? 'visible' : 'hidden'}
-                  animate="visible"
-                  className={cn(
-                    'flex flex-row items-center gap-3 justify-end px-2 py-2 w-full z-10',
-                    'bg-brand-200 border-b border-brand-400  !shadow-none'
-                  )}
-                >
-                  {debugSolution && (
-                    <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-brand-600">
-                      {debugSolution}
-                    </div>
-                  )}
-                  <DiffActionBar
-                    loading={isAcceptDiffLoading}
-                    selectedDiffType={selectedDiffType || DiffType.Modification}
-                    onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
-                    onAccept={acceptAiHandler}
-                    onCancel={discardAiHandler}
-                  />
-                </motion.div>
-              ) : null}
-            </AISchemaSuggestionPopover>
-          )}
-          <ResizablePanel collapsible collapsedSize={10} minSize={20}>
-            <div className="flex-grow overflow-y-auto border-b h-full">
-              {!isAiOpen && (
-                <motion.button
-                  layoutId="ask-ai-input-icon"
-                  transition={{ duration: 0.1 }}
-                  onClick={() => setIsAiOpen(!isAiOpen)}
-                  className={cn(
-                    'group absolute z-10 rounded-lg right-[24px] top-4 transition-all duration-200 ease-out'
-                  )}
-                >
-                  <AiIconAnimation loading={false} allowHoverEffect />
-                </motion.button>
-              )}
+      <ResizablePanelGroup
+        className="flex h-full"
+        direction="horizontal"
+        autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_PANEL_SPLIT_SIZE}
+      >
+        <ResizablePanel minSize={30}>
+          <ResizablePanelGroup
+            className="h-full relative"
+            direction="vertical"
+            autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
+          >
+            {(isAiOpen || isDiffOpen) && !hasHipaaAddon && (
+              <AISchemaSuggestionPopover
+                onClickSettings={() => {
+                  appSnap.setShowAiSettingsModal(true)
+                }}
+              >
+                {isDiffOpen ? (
+                  <motion.div
+                    key="ask-ai-input-container"
+                    layoutId="ask-ai-input-container"
+                    variants={{ visible: { borderRadius: 0, x: 0 }, hidden: { x: 100 } }}
+                    initial={isFirstRender ? 'visible' : 'hidden'}
+                    animate="visible"
+                    className={cn(
+                      'flex flex-row items-center gap-3 justify-end px-2 py-2 w-full z-10',
+                      'bg-brand-200 border-b border-brand-400  !shadow-none'
+                    )}
+                  >
+                    {debugSolution && (
+                      <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-brand-600">
+                        {debugSolution}
+                      </div>
+                    )}
+                    <DiffActionBar
+                      loading={isAcceptDiffLoading}
+                      selectedDiffType={selectedDiffType || DiffType.Modification}
+                      onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
+                      onAccept={acceptAiHandler}
+                      onCancel={discardAiHandler}
+                    />
+                  </motion.div>
+                ) : null}
+              </AISchemaSuggestionPopover>
+            )}
+            <ResizablePanel collapsible collapsedSize={10} minSize={20}>
+              <div className="flex-grow overflow-y-auto border-b h-full">
+                {!isAiOpen && (
+                  <motion.button
+                    layoutId="ask-ai-input-icon"
+                    transition={{ duration: 0.1 }}
+                    onClick={() => aiPanelRef.current?.expand()}
+                    className={cn(
+                      'group absolute z-10 rounded-lg right-[24px] top-4 transition-all duration-200 ease-out'
+                    )}
+                  >
+                    <AiIconAnimation loading={false} allowHoverEffect />
+                  </motion.button>
+                )}
 
-              {isLoading ? (
-                <div className="flex h-full w-full items-center justify-center">
-                  <Loader2 className="animate-spin text-brand" />
-                </div>
-              ) : (
-                <>
-                  {isDiffOpen && (
+                {isLoading ? (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Loader2 className="animate-spin text-brand" />
+                  </div>
+                ) : (
+                  <>
+                    {isDiffOpen && (
+                      <motion.div
+                        className="w-full h-full"
+                        variants={{
+                          visible: { opacity: 1, filter: 'blur(0px)' },
+                          hidden: { opacity: 0, filter: 'blur(10px)' },
+                        }}
+                        initial="hidden"
+                        animate="visible"
+                      >
+                        <DiffEditor
+                          theme="supabase"
+                          language="pgsql"
+                          original={defaultSqlDiff.original}
+                          modified={defaultSqlDiff.modified}
+                          onMount={(editor) => {
+                            diffEditorRef.current = editor
+                          }}
+                          options={{ fontSize: 13 }}
+                        />
+                      </motion.div>
+                    )}
                     <motion.div
-                      className="w-full h-full"
+                      key={id}
                       variants={{
                         visible: { opacity: 1, filter: 'blur(0px)' },
                         hidden: { opacity: 0, filter: 'blur(10px)' },
                       }}
                       initial="hidden"
-                      animate="visible"
+                      animate={isDiffOpen ? 'hidden' : 'visible'}
+                      className="w-full h-full"
                     >
-                      <DiffEditor
-                        theme="supabase"
-                        language="pgsql"
-                        original={defaultSqlDiff.original}
-                        modified={defaultSqlDiff.modified}
-                        onMount={(editor) => {
-                          diffEditorRef.current = editor
-                        }}
-                        options={{ fontSize: 13 }}
+                      <MonacoEditor
+                        autoFocus
+                        id={id}
+                        editorRef={editorRef}
+                        monacoRef={monacoRef}
+                        executeQuery={executeQuery}
+                        onHasSelection={setHasSelection}
                       />
                     </motion.div>
-                  )}
-                  <motion.div
-                    key={id}
-                    variants={{
-                      visible: { opacity: 1, filter: 'blur(0px)' },
-                      hidden: { opacity: 0, filter: 'blur(10px)' },
-                    }}
-                    initial="hidden"
-                    animate={isDiffOpen ? 'hidden' : 'visible'}
-                    className="w-full h-full"
-                  >
-                    <MonacoEditor
-                      autoFocus
-                      id={id}
-                      editorRef={editorRef}
-                      monacoRef={monacoRef}
-                      executeQuery={executeQuery}
-                      onHasSelection={setHasSelection}
-                    />
-                  </motion.div>
-                </>
-              )}
-            </div>
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel collapsible collapsedSize={10} minSize={20}>
-            {isLoading ? (
-              <div className="flex h-full w-full items-center justify-center">
-                <Loader2 className="animate-spin text-brand" />
+                  </>
+                )}
               </div>
-            ) : (
-              <UtilityPanel
-                id={id}
-                isExecuting={isExecuting}
-                isDisabled={isDiffOpen}
-                isDebugging={isDebugSqlLoading}
-                hasSelection={hasSelection}
-                prettifyQuery={prettifyQuery}
-                executeQuery={executeQuery}
-                onDebug={onDebug}
-              />
-            )}
-          </ResizablePanel>
-        </ResizablePanelGroup>
-
-        {isAiOpen && (
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel collapsible collapsedSize={10} minSize={20}>
+              {isLoading ? (
+                <div className="flex h-full w-full items-center justify-center">
+                  <Loader2 className="animate-spin text-brand" />
+                </div>
+              ) : (
+                <UtilityPanel
+                  id={id}
+                  isExecuting={isExecuting}
+                  isDisabled={isDiffOpen}
+                  isDebugging={isDebugSqlLoading}
+                  hasSelection={hasSelection}
+                  prettifyQuery={prettifyQuery}
+                  executeQuery={executeQuery}
+                  onDebug={onDebug}
+                />
+              )}
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel
+          ref={aiPanelRef}
+          collapsible
+          collapsedSize={0}
+          minSize={21}
+          maxSize={40}
+          onCollapse={() => setIsAiOpen(false)}
+          onExpand={() => setIsAiOpen(true)}
+        >
           <AiAssistantPanel
             messages={messages}
             selectedMessage={selectedMessage}
@@ -772,10 +795,10 @@ const SQLEditor = () => {
             }
             onClearHistory={() => setChatId(uuidv4())}
             onDiff={updateEditorWithCheckForDiff}
-            onClose={() => setIsAiOpen(false)}
+            onClose={() => aiPanelRef.current?.collapse()}
           />
-        )}
-      </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </>
   )
 }

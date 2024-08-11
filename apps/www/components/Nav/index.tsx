@@ -37,13 +37,10 @@ const Nav = (props: Props) => {
   const isUserLoading = useIsUserLoading()
 
   const isHomePage = router.pathname === '/'
-  const isDarkLaunchWeek = useDarkLaunchWeeks()
-  const isGAWeekSection = router.pathname.includes('/ga-week')
-  const isLaunchWeekPage =
-    router.pathname.includes('launch-week') || isGAWeekSection || isDarkLaunchWeek
+  const isLaunchWeekPage = router.pathname.includes('/launch-week')
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
   const isLaunchWeek11Page = router.pathname === '/ga-week'
-  const hasStickySubnav = isLaunchWeekXPage || isLaunchWeek11Page
+  const hasStickySubnav = isLaunchWeekXPage || isLaunchWeek11Page || isLaunchWeekPage
   const showLaunchWeekNavMode = (isLaunchWeekPage || isLaunchWeek11Page) && !open
 
   React.useEffect(() => {
@@ -79,7 +76,6 @@ const Nav = (props: Props) => {
           className={cn(
             `relative z-40 border-default border-b backdrop-blur-sm transition-opacity`,
             showLaunchWeekNavMode && 'border-muted border-b bg-alternative/50'
-            // isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : ''
           )}
         >
           <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
@@ -87,19 +83,6 @@ const Nav = (props: Props) => {
               <div className="flex items-center">
                 <div className="flex items-center flex-shrink-0">
                   <RightClickBrandLogo />
-
-                  {!isGAWeekSection &&
-                    !isLaunchWeek11Page &&
-                    isLaunchWeekPage &&
-                    !isLaunchWeekXPage && (
-                      <Link
-                        href="/launch-week"
-                        as="/launch-week"
-                        className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
-                      >
-                        Launch Week
-                      </Link>
-                    )}
                 </div>
                 <NavigationMenu
                   delayDuration={0}
