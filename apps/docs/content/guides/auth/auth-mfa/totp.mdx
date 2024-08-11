@@ -4,9 +4,10 @@ title: 'Multi-Factor Authentication (TOTP)'
 description: 'Add an additional layer of security to your apps with Supabase Auth multi-factor authentication.'
 ---
 
-## Overview
+## What is TOTP MFA
 
-Supabase Auth implements Time-based One Time Password (TOTP) and Phone One-Time-Password multi-factor authentication. This type of multi-factor authentication uses a timed one-time password generated from an authenticator app in the control of users. The [TOTP MFA API](/docs/reference/javascript/auth-mfa-api) is enabled on all Supabase projects by default while Phone MFA is available as part of the Auth Advanced MFA Add-on.
+TOTP multi-factor authentication involves a timed one-time password generated from an authenticator app in the control of users. The [TOTP MFA API](/docs/reference/javascript/auth-mfa-api) is enabled on all Supabase projects by default. Enrollment involves the display of a QR Code which a user can scan to capture a secret required to generate the one time password for subsequent authentication.
+The TOTP QR code was [initially introduced by Google Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format) but is now universally accepted by all authenticator apps. It uses a uri following the `otpauth` scheme such as:
 
 ## Adding TOTP MFA to your app
 
@@ -241,8 +242,6 @@ export function UnenrollMFA() {
 header={<span className="text-foreground">What's inside the QR code?</span>}
 id="what-is-inside-the-qr-code"
 >
-
-The TOTP QR code encodes a URI with the `otpauth` scheme. It was [initially introduced by Google Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format) but is now universally accepted by all authenticator apps.
 
 </AccordionItem>
 

@@ -17,7 +17,7 @@ Users with weak passwords or compromised social login accounts are prone to mali
 
 ## Overview
 
-Supabase Auth implements Time-based One Time Password (TOTP) and Phone One-Time-Password multi-factor authentication. This type of multi-factor authentication uses a timed one-time password generated from an authenticator app in the control of users. The [TOTP MFA API](/docs/reference/javascript/auth-mfa-api) is enabled on all Supabase projects by default while Phone MFA is available as part of the Auth Advanced MFA Add-on.
+Supabase Auth implements Time-based One Time Password (TOTP) and MFA via phone messaging.
 
 Applications using MFA require two important flows:
 
@@ -109,13 +109,11 @@ Enrolling a factor for use with MFA takes three steps:
    immediately becomes active for the user account. If not, you should repeat
    steps 2 and 3.
 
-
 ### Add unenrollment flow
 
 An unenrollment flow provides a UI for users to manage and unenroll factors linked to their accounts. Most applications do so via a factor management page where users can view and unlink selected factors.
 
 When a user unenrolls a factor, call `supabase.auth.mfa.unenroll()` with the ID of the factor. For example, call `supabase.auth.mfa.unenroll({factorId: "d30fd651-184e-4748-a928-0a4b9be1d429"})` to unenroll a factor with ID `d30fd651-184e-4748-a928-0a4b9be1d429`.
-
 
 ### Add challenge step to login
 
