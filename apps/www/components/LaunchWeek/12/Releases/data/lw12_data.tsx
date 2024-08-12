@@ -64,7 +64,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Mon',
     shipped: true,
     isToday: true,
-    blog: '#',
+    blog: '/blog/postgres-new',
     hasCountdown: false,
     date: '12 August',
     published_at: '2024-08-12T08:00:00.000-07:00',
@@ -81,7 +81,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     links: [
       {
         type: 'video',
-        href: '',
+        href: 'ooWaPVvljlU',
       },
       {
         type: 'xSpace',
@@ -90,8 +90,8 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     ],
     steps: [
       {
-        title: '',
-        blog: '/blog/studio-introducing-assistant',
+        title: 'postgres.new: in-browser Postgres with an AI interface',
+        blog: '/blog/postgres-new',
         bg_layers: [
           {
             img: '/images/launchweek/12/d1/postgresnew-dark.png',
