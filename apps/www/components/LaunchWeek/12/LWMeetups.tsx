@@ -50,6 +50,7 @@ const LWMeetups = ({ meetups, className }: { meetups?: Meetup[]; className?: str
               .select('*')
               .eq('launch_week', 'lw12')
               .neq('is_published', false)
+              .order('start_at')
 
             setMeets(
               newMeets?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))!
