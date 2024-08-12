@@ -27,7 +27,6 @@ import {
   SelectValue_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
-  cn,
 } from 'ui'
 
 import { z } from 'zod'
@@ -39,7 +38,7 @@ import { ExternalLink, TrashIcon } from 'lucide-react'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import Link from 'next/link'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
-import { FormDescription } from '@ui/components/shadcn/ui/form'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -152,7 +151,7 @@ export function LogDrainDestinationSheetForm({
       description: defaultValues?.description || '',
       type: defaultType,
       http: defaultValues?.config?.http || 'http2',
-      gzip: defaultValues?.config?.gzip || true,
+      gzip: mode === 'create' ? true : defaultValues?.config?.gzip || false,
       headers: DEFAULT_HEADERS,
       url: defaultValues?.config?.url || '',
       api_key: defaultValues?.config?.api_key || '',
@@ -236,12 +235,12 @@ export function LogDrainDestinationSheetForm({
                   label="Name"
                   formControl={form.control}
                 />
-                {/* <LogDrainFormItem
+                <LogDrainFormItem
                   value="description"
                   placeholder="My Destination"
                   label="Description"
                   formControl={form.control}
-                /> */}
+                />
                 {mode === 'create' && (
                   <FormItemLayout
                     layout="horizontal"
@@ -308,11 +307,11 @@ export function LogDrainDestinationSheetForm({
                       />
                     </div>
 
-                    {/* <FormField_Shadcn_
+                    <FormField_Shadcn_
                       control={form.control}
                       name="gzip"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="space-y-2">
+                        <FormItem_Shadcn_ className="space-y-2 px-4">
                           <div className="flex gap-2 items-center">
                             <FormControl_Shadcn_>
                               <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -324,7 +323,7 @@ export function LogDrainDestinationSheetForm({
                           </div>
                         </FormItem_Shadcn_>
                       )}
-                    /> */}
+                    />
 
                     <div className="border-t">
                       <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">

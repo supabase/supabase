@@ -176,7 +176,7 @@ const NavigationBar = () => {
               )
             } else if (route.key === 'advisors') {
               return (
-                <div className="relative">
+                <div className="relative" key={route.key}>
                   {securityLints.length > 0 && (
                     <div
                       className={cn(
@@ -187,7 +187,6 @@ const NavigationBar = () => {
                   )}
 
                   <NavigationIconLink
-                    key={route.key}
                     route={route}
                     isActive={activeRoute === route.key}
                     onClick={onCloseNavigationIconLink}

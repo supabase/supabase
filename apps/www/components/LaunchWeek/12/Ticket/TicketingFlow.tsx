@@ -14,7 +14,7 @@ import TicketForm from './TicketForm'
 import CountdownComponent from '../Countdown'
 import TicketPresence from './TicketPresence'
 import TicketActions from './TicketActions'
-import LW12Background from '../LW12Background'
+// import LW12Background from '../LW12Background'
 import TicketCopy from './TicketCopy'
 import TicketActions2 from './TicketActions2'
 
@@ -86,24 +86,9 @@ const TicketingFlow = () => {
                     !isGameMode && !hasTicket && 'opacity-100 visible'
                   )}
                 >
-                  <div>
-                    <CountdownComponent
-                      date={LW12_LAUNCH_DATE}
-                      showCard={false}
-                      className="[&_*]:leading-4 text-foreground-lighter"
-                      size="large"
-                    />
-                  </div>
                   <div className="flex flex-col md:items-center gap-6">
-                    <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-6 uppercase text-2xl tracking-wider">
-                      <h2 className="text-foreground">
-                        <strong className="font-medium">Launch Week</strong> 12
-                      </h2>
-                      <span className="h-full border-r border-foreground hidden md:inline" />
-                      <p className="text-foreground-light">{LW12_DATE}</p>
-                    </div>
                     <p className="text-foreground-lighter text-lg ">
-                      Join us for a week of new features and level up your development
+                      Join for a chance to win swag.
                     </p>
                   </div>
                   <TicketForm />
@@ -119,8 +104,6 @@ const TicketingFlow = () => {
                 >
                   <div className="w-full lg:w-auto h-full mt-3 md:mt-6 xl:mt-0 max-w-lg flex flex-col items-center justify-center gap-3">
                     <TicketContainer />
-                    {/* {!hasPlatinumTicket && <TicketPresence />} */}
-                    {/* // not sure why this was only non platinum */}
                     <TicketPresence />
                     <TicketCopy />
                   </div>
@@ -159,10 +142,6 @@ const TicketingFlow = () => {
                       </div>
                     )}
                     <TicketActions2 />
-                    <div className="w-full my-3">
-                      <TicketActions />
-                    </div>
-                    <CountdownComponent date={LW12_LAUNCH_DATE} showCard={false} />
                   </div>
                 </m.div>
               )}
@@ -181,12 +160,6 @@ const TicketingFlow = () => {
           </LazyMotion>
         </div>
       </SectionContainer>
-      <LW12Background
-        className={cn(
-          'opacity-100 transition-opacity',
-          hasTicket || (isGameMode && 'opacity-80 dark:opacity-60')
-        )}
-      />
     </>
   )
 }

@@ -44,7 +44,7 @@ const CLSPreview = () => {
           <li>
             <Markdown
               className="text-foreground-light"
-              content={`Grant access to a new UI for granting and/or revoking column-level privileges [here](/project/${ref}/database/column-privileges).`}
+              content={`Grant access to a new UI for granting and/or revoking column-level privileges [here](${BASE_PATH}/project/${ref}/database/column-privileges).`}
             />
           </li>
         </ul>

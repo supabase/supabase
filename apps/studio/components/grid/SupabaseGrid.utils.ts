@@ -120,6 +120,7 @@ export function parseSupaTable(
     comment: table.comment,
     schema: table.schema,
     columns: supaColumns,
+    estimateRowCount: table.live_rows_estimate,
   }
 }
 
