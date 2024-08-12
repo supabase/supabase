@@ -151,7 +151,7 @@ export function LogDrainDestinationSheetForm({
       description: defaultValues?.description || '',
       type: defaultType,
       http: defaultValues?.config?.http || 'http2',
-      gzip: mode === 'create' ? true : defaultValues?.config?.gzip,
+      gzip: mode === 'create' ? true : defaultValues?.config?.gzip || false,
       headers: DEFAULT_HEADERS,
       url: defaultValues?.config?.url || '',
       api_key: defaultValues?.config?.api_key || '',
