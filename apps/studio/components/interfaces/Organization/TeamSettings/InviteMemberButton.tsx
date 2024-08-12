@@ -87,8 +87,8 @@ export const InviteMemberButton = () => {
     { enabled: canReadSubscriptions }
   )
   const currentPlan = subscription?.plan
-  const isOptedIntoProjectLevelPermissions = true
-  // useIsOptedIntoProjectLevelPermissions(slug as string) && currentPlan?.id === 'enterprise'
+  const isOptedIntoProjectLevelPermissions =
+    useIsOptedIntoProjectLevelPermissions(slug as string) && currentPlan?.id === 'enterprise'
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
   const hasOrgRole =
@@ -350,7 +350,7 @@ export const InviteMemberButton = () => {
                                     return (
                                       <CommandItem_Shadcn_
                                         key={project.ref}
-                                        value={project.name}
+                                        value={`${project.ref}-${project.name}`}
                                         onSelect={() => {
                                           form.setValue('projectRef', project.ref)
                                           setProjectDropdownOpen(false)
