@@ -21,7 +21,6 @@ import MobileMenu from './MobileMenu'
 import MenuItem from './MenuItem'
 import { menu } from '~/data/nav'
 import RightClickBrandLogo from './RightClickBrandLogo'
-import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 import LW12CountdownBanner from 'ui/src/layout/banners/LW12CountdownBanner/LW12CountdownBanner'
 
 interface Props {

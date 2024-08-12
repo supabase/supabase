@@ -68,7 +68,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     date: '12 August',
     published_at: '2024-08-12T08:00:00.000-07:00',
-    videoId: '',
+    videoId: 'ooWaPVvljlU',
     videoThumbnail: '',
     title: 'postgres.new: in-browser Postgres with an AI interface',
     description: (

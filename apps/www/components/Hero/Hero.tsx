@@ -24,9 +24,9 @@ const Hero = () => {
                 <div className="flex flex-col items-center">
                   <div className="z-40 w-full flex flex-col gap-4 items-center justify-center -mt-4 md:-mt-8 mb-8 lg:mb-8">
                     <AnnouncementBadge
-                      url="/launch-week"
+                      url="/launch-week#day-1"
                       badge="Launch Week 12"
-                      announcement="Claim your ticket"
+                      announcement="Day 1: postgres.new"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
