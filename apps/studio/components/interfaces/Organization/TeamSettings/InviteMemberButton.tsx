@@ -87,8 +87,8 @@ export const InviteMemberButton = () => {
     { enabled: canReadSubscriptions }
   )
   const currentPlan = subscription?.plan
-  const isOptedIntoProjectLevelPermissions =
-    useIsOptedIntoProjectLevelPermissions(slug as string) && currentPlan?.id === 'enterprise'
+  const isOptedIntoProjectLevelPermissions = true
+  // useIsOptedIntoProjectLevelPermissions(slug as string) && currentPlan?.id === 'enterprise'
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
   const hasOrgRole =
@@ -336,7 +336,23 @@ export const InviteMemberButton = () => {
                             </Button>
                           </PopoverTrigger_Shadcn_>
                           <PopoverContent_Shadcn_ sameWidthAsTrigger className="p-0">
-                            <Command_Shadcn_>
+                            <Command_Shadcn_
+                              // [Joshen] Let's update this to use keywords in CommandItem once cmdk is updated
+                              filter={(value, search) => {
+                                const project = orgProjects.find((project) => project.ref === value)
+                                const projectName = project?.name.toLowerCase()
+                                if (
+                                  projectName !== undefined &&
+                                  projectName.includes(search.toLowerCase())
+                                ) {
+                                  return 1
+                                } else if (value.includes(search)) {
+                                  return 1
+                                } else {
+                                  return 0
+                                }
+                              }}
+                            >
                               <CommandInput_Shadcn_ placeholder="Search project..." />
                               <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
                               <CommandGroup_Shadcn_>
@@ -350,9 +366,9 @@ export const InviteMemberButton = () => {
                                     return (
                                       <CommandItem_Shadcn_
                                         key={project.ref}
-                                        value={`${project.ref}-${project.name}`}
-                                        onSelect={() => {
-                                          form.setValue('projectRef', project.ref)
+                                        value={project.ref}
+                                        onSelect={(ref) => {
+                                          form.setValue('projectRef', ref)
                                           setProjectDropdownOpen(false)
                                         }}
                                       >
