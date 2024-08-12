@@ -61,9 +61,9 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     return (
       <ContextMenu_Shadcn_ modal={false}>
         <ContextMenuTrigger_Shadcn_ asChild>
-          <span className="font-mono text-xs w-full whitespace-pre">
+          <div className="flex items-center h-full font-mono text-xs w-full whitespace-pre">
             {JSON.stringify(row[column])}
-          </span>
+          </div>
         </ContextMenuTrigger_Shadcn_>
         <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
           <ContextMenuItem_Shadcn_
