@@ -1,10 +1,8 @@
-import 'package:canvas/project/projects_page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
 class LoginPage extends StatelessWidget {
-  static route() => MaterialPageRoute(builder: (context) => const LoginPage());
-
   const LoginPage({super.key});
 
   @override
@@ -18,10 +16,10 @@ class LoginPage extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 500),
             child: SupaEmailAuth(
               onSignUpComplete: (AuthResponse response) async {
-                Navigator.of(context).pushReplacement(ProjectsPage.route());
+                context.go('/projects');
               },
               onSignInComplete: (AuthResponse response) {
-                Navigator.of(context).pushReplacement(ProjectsPage.route());
+                context.go('/projects');
               },
               metadataFields: [
                 MetaDataField(

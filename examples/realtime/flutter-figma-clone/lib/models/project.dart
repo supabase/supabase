@@ -18,7 +18,7 @@ class Project {
       : id = map['id'] as String,
         name = map['name'] as String,
         profiles = List<Profile>.from(
-          (map['profiles'] as List<int>).map<Profile>(
+          (map['profiles'] as List<dynamic>).map<Profile>(
             (profile) => Profile.fromJson(profile as Map<String, dynamic>),
           ),
         );
