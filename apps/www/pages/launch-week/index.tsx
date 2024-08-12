@@ -127,7 +127,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     .select('*')
     .eq('launch_week', 'lw12')
     .neq('is_published', false)
-    .order('start_at', { ascending: false })
+    .order('start_at')
 
   return {
     props: {
