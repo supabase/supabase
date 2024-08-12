@@ -17,7 +17,11 @@ export const CellDetailPanel = ({ column, value, visible, onClose }: CellDetailP
   const [view, setView] = useState<'view' | 'md'>('view')
 
   const formattedValue =
-    typeof value === 'object' ? JSON.stringify(value, null, '\t') : String(value)
+    value === null
+      ? ''
+      : typeof value === 'object'
+        ? JSON.stringify(value, null, '\t')
+        : String(value)
   const showMarkdownToggle = typeof value === 'string'
 
   useEffect(() => {
@@ -43,12 +47,13 @@ export const CellDetailPanel = ({ column, value, visible, onClose }: CellDetailP
           </SheetTitle>
         </SheetHeader>
         {view === 'view' ? (
-          <div className="h-full">
+          <div className="relative h-full">
             <CodeEditor
               isReadOnly
               id="sql-editor-expand-cell"
               language="json"
               value={formattedValue}
+              placeholder={value === null ? 'NULL' : undefined}
               options={{ wordWrap: 'off', contextmenu: false }}
             />
           </div>

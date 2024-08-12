@@ -9,6 +9,7 @@ import { copyToClipboard } from 'lib/helpers'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
+  cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
@@ -61,8 +62,13 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     return (
       <ContextMenu_Shadcn_ modal={false}>
         <ContextMenuTrigger_Shadcn_ asChild>
-          <div className="flex items-center h-full font-mono text-xs w-full whitespace-pre">
-            {JSON.stringify(row[column])}
+          <div
+            className={cn(
+              'flex items-center h-full font-mono text-xs w-full whitespace-pre',
+              row[column] === null && 'text-foreground-lighter'
+            )}
+          >
+            {row[column] === null ? 'NULL' : JSON.stringify(row[column])}
           </div>
         </ContextMenuTrigger_Shadcn_>
         <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
@@ -155,7 +161,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
 
       <CellDetailPanel
         column={cellPosition?.column.name ?? ''}
-        value={cellPosition?.row[cellPosition.column.name] ?? ''}
+        value={cellPosition?.row[cellPosition.column.name]}
         visible={expandCell}
         onClose={() => setExpandCell(false)}
       />
