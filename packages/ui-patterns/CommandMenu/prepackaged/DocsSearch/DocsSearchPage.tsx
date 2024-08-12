@@ -11,8 +11,8 @@ import {
   type DocsSearchResultSection as PageSection,
 } from 'common'
 import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_, cn } from 'ui'
+import { StatusIcon } from 'ui/src/components/StatusIcon'
 
-import { StatusIcon } from '../../../Icons/StatusIcons'
 import {
   Breadcrumb,
   CommandHeader,

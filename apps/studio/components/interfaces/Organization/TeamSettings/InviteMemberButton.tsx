@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isNil } from 'lodash'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -21,10 +22,14 @@ import {
   useGetPermissions,
 } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import {
   Button,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  Command_Shadcn_,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -33,13 +38,13 @@ import {
   DialogTitle,
   DialogTrigger,
   FormControl_Shadcn_,
-  FormDescription_Shadcn_,
   FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  ScrollArea,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -49,17 +54,20 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  cn,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
   const organization = useSelectedOrganization()
   const { permissions: permissions } = useGetPermissions()
-  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
 
   const [isOpen, setIsOpen] = useState(false)
+  const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
 
   const { data: projects } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
@@ -79,6 +87,8 @@ export const InviteMemberButton = () => {
     { enabled: canReadSubscriptions }
   )
   const currentPlan = subscription?.plan
+  const isOptedIntoProjectLevelPermissions =
+    useIsOptedIntoProjectLevelPermissions(slug as string) && currentPlan?.id === 'enterprise'
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
   const hasOrgRole =
@@ -237,22 +247,22 @@ export const InviteMemberButton = () => {
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              {isOptedIntoProjectLevelPermissions && currentPlan?.id === 'enterprise' && (
+              {isOptedIntoProjectLevelPermissions && (
                 <FormField_Shadcn_
                   name="applyToOrg"
                   control={form.control}
                   render={({ field }) => (
-                    <FormItem_Shadcn_ className="flex items-center gap-x-4">
+                    <FormItemLayout
+                      layout="flex"
+                      label="Apply role to all projects in the organization"
+                    >
                       <FormControl_Shadcn_>
                         <Switch
                           checked={field.value}
                           onCheckedChange={(value) => form.setValue('applyToOrg', value)}
                         />
                       </FormControl_Shadcn_>
-                      <FormLabel_Shadcn_>
-                        Apply role to all projects in the organization
-                      </FormLabel_Shadcn_>
-                    </FormItem_Shadcn_>
+                    </FormItemLayout>
                   )}
                 />
               )}
@@ -260,14 +270,13 @@ export const InviteMemberButton = () => {
                 name="role"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                    <FormLabel_Shadcn_>Member role</FormLabel_Shadcn_>
+                  <FormItemLayout label="Member role">
                     <FormControl_Shadcn_>
                       <Select_Shadcn_
                         value={field.value}
                         onValueChange={(value) => form.setValue('role', value)}
                       >
-                        <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize">
+                        <SelectTrigger_Shadcn_ className="text-sm capitalize">
                           {orgScopedRoles.find((role) => role.id === Number(field.value))?.name ??
                             'Unknown'}
                         </SelectTrigger_Shadcn_>
@@ -294,7 +303,7 @@ export const InviteMemberButton = () => {
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
                     </FormControl_Shadcn_>
-                  </FormItem_Shadcn_>
+                  </FormItemLayout>
                 )}
               />
               {!applyToOrg && (
@@ -302,38 +311,67 @@ export const InviteMemberButton = () => {
                   name="projectRef"
                   control={form.control}
                   render={({ field }) => (
-                    <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                      <FormLabel_Shadcn_>Select a project</FormLabel_Shadcn_>
+                    <FormItemLayout
+                      label="Select a project"
+                      description="You can assign roles to multiple projects once the invite is accepted"
+                    >
                       <FormControl_Shadcn_>
-                        <Select_Shadcn_
-                          value={field.value}
-                          onValueChange={(value) => form.setValue('projectRef', value)}
+                        <Popover_Shadcn_
+                          open={projectDropdownOpen}
+                          onOpenChange={setProjectDropdownOpen}
                         >
-                          <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize text-left truncate max-w-[470px]">
-                            {orgProjects.find((project) => project.ref === field.value)?.name ??
-                              'Unknown'}
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            <SelectGroup_Shadcn_>
-                              {orgProjects.map((project) => {
-                                return (
-                                  <SelectItem_Shadcn_
-                                    key={project.id}
-                                    value={project.ref}
-                                    className="text-sm"
-                                  >
-                                    {project.name}
-                                  </SelectItem_Shadcn_>
-                                )
-                              })}
-                            </SelectGroup_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          <PopoverTrigger_Shadcn_ asChild>
+                            <Button
+                              block
+                              type="default"
+                              role="combobox"
+                              size="small"
+                              className="justify-between"
+                              iconRight={
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              }
+                            >
+                              {orgProjects.find((project) => project.ref === field.value)?.name ??
+                                'Unknown'}
+                            </Button>
+                          </PopoverTrigger_Shadcn_>
+                          <PopoverContent_Shadcn_ sameWidthAsTrigger className="p-0">
+                            <Command_Shadcn_>
+                              <CommandInput_Shadcn_ placeholder="Search project..." />
+                              <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
+                              <CommandGroup_Shadcn_>
+                                <ScrollArea
+                                  className={(orgProjects || []).length > 7 ? 'h-[210px]' : ''}
+                                >
+                                  {orgProjects.map((project) => {
+                                    return (
+                                      <CommandItem_Shadcn_
+                                        key={project.ref}
+                                        value={project.ref}
+                                        onSelect={() => {
+                                          form.setValue('projectRef', project.ref)
+                                          setProjectDropdownOpen(false)
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            'mr-2 h-4 w-4',
+                                            field.value === project.ref
+                                              ? 'opacity-100'
+                                              : 'opacity-0'
+                                          )}
+                                        />
+                                        {project.name}
+                                      </CommandItem_Shadcn_>
+                                    )
+                                  })}
+                                </ScrollArea>
+                              </CommandGroup_Shadcn_>
+                            </Command_Shadcn_>
+                          </PopoverContent_Shadcn_>
+                        </Popover_Shadcn_>
                       </FormControl_Shadcn_>
-                      <FormDescription_Shadcn_>
-                        You can assign roles to multiple projects once the invite is accepted
-                      </FormDescription_Shadcn_>
-                    </FormItem_Shadcn_>
+                    </FormItemLayout>
                   )}
                 />
               )}
@@ -341,8 +379,7 @@ export const InviteMemberButton = () => {
                 name="email"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                    <FormLabel_Shadcn_>Email address</FormLabel_Shadcn_>
+                  <FormItemLayout label="Email address">
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
                         autoFocus
@@ -352,8 +389,7 @@ export const InviteMemberButton = () => {
                         placeholder="Enter email address"
                       />
                     </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
+                  </FormItemLayout>
                 )}
               />
               <InformationBox

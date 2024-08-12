@@ -1,20 +1,34 @@
-import { Clipboard } from 'lucide-react'
+import { Clipboard, Expand } from 'lucide-react'
 import { useState } from 'react'
-import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
-import { createPortal } from 'react-dom'
 
 import { GridFooter } from 'components/ui/GridFooter'
 import { useKeyboardShortcuts } from 'hooks/deprecated'
+import { useFlag } from 'hooks/ui/useFlag'
 import { copyToClipboard } from 'lib/helpers'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import {
+  cn,
+  ContextMenu_Shadcn_,
+  ContextMenuContent_Shadcn_,
+  ContextMenuItem_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
+} from 'ui'
+import { CellDetailPanel } from './CellDetailPanel'
+
+function formatClipboardValue(value: any) {
+  if (value === null) return ''
+  if (typeof value == 'object' || Array.isArray(value)) {
+    return JSON.stringify(value)
+  }
+  return value
+}
 
 const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
-  const SQL_CONTEXT_EDITOR_ID = 'sql-context-menu-' + id
   const enableFolders = useFlag('sqlFolderOrganization')
-  const [cellPosition, setCellPosition] = useState<any>(undefined)
+  const [expandCell, setExpandCell] = useState(false)
+  const [cellPosition, setCellPosition] = useState<{ column: any; row: any; rowIdx: number }>()
 
   const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -44,22 +58,45 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     ['INPUT', 'TEXTAREA'] as any
   )
 
-  const { show: showContextMenu } = useContextMenu()
-
   const formatter = (column: any, row: any) => {
     return (
-      <span
-        className="font-mono text-xs w-full whitespace-pre"
-        onContextMenu={(e) =>
-          showContextMenu(e, {
-            id: SQL_CONTEXT_EDITOR_ID,
-          })
-        }
-      >
-        {JSON.stringify(row[column])}
-      </span>
+      <ContextMenu_Shadcn_ modal={false}>
+        <ContextMenuTrigger_Shadcn_ asChild>
+          <div
+            className={cn(
+              'flex items-center h-full font-mono text-xs w-full whitespace-pre',
+              row[column] === null && 'text-foreground-lighter'
+            )}
+          >
+            {row[column] === null ? 'NULL' : JSON.stringify(row[column])}
+          </div>
+        </ContextMenuTrigger_Shadcn_>
+        <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
+          <ContextMenuItem_Shadcn_
+            className="gap-x-2"
+            onSelect={() => {
+              const cellValue = row[column] ?? ''
+              const value = formatClipboardValue(cellValue)
+              copyToClipboard(value)
+            }}
+            onFocusCapture={(e) => e.stopPropagation()}
+          >
+            <Clipboard size={14} />
+            Copy cell content
+          </ContextMenuItem_Shadcn_>
+          <ContextMenuItem_Shadcn_
+            className="gap-x-2"
+            onSelect={() => setExpandCell(true)}
+            onFocusCapture={(e) => e.stopPropagation()}
+          >
+            <Expand size={14} />
+            View cell content
+          </ContextMenuItem_Shadcn_>
+        </ContextMenuContent_Shadcn_>
+      </ContextMenu_Shadcn_>
     )
   }
+
   const columnRender = (name: string) => {
     return <div className="flex h-full items-center justify-center font-mono text-xs">{name}</div>
   }
@@ -92,14 +129,10 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
       frozen: false,
       sortable: false,
       isLastFrozenColumn: false,
-      renderCell: ({ row }: any) => formatter(key, row),
+      renderCell: ({ row }) => formatter(key, row),
       renderHeaderCell: () => columnRender(key),
     }
   })
-
-  function onSelectedCellChange(position: any) {
-    setCellPosition(position)
-  }
 
   if (rows.length <= 0) {
     return (
@@ -116,19 +149,8 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
         rows={rows}
         className="flex-grow border-t-0"
         rowClass={() => '[&>.rdg-cell]:items-center'}
-        onSelectedCellChange={onSelectedCellChange}
+        onSelectedCellChange={setCellPosition}
       />
-
-      {typeof window !== 'undefined' &&
-        createPortal(
-          <Menu id={SQL_CONTEXT_EDITOR_ID} animation={false}>
-            <Item onClick={onCopyCell}>
-              <Clipboard size={14} />
-              <span className="ml-2 text-xs">Copy cell content</span>
-            </Item>
-          </Menu>,
-          document.body
-        )}
 
       <GridFooter className="flex items-center justify-center">
         <p className="text-xs text-foreground-light">
@@ -136,16 +158,15 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
           {results.autoLimit !== undefined && ` (auto limit ${results.autoLimit} rows)`}
         </p>
       </GridFooter>
+
+      <CellDetailPanel
+        column={cellPosition?.column.name ?? ''}
+        value={cellPosition?.row[cellPosition.column.name]}
+        visible={expandCell}
+        onClose={() => setExpandCell(false)}
+      />
     </>
   )
 }
 
 export default Results
-
-function formatClipboardValue(value: any) {
-  if (value === null) return ''
-  if (typeof value == 'object' || Array.isArray(value)) {
-    return JSON.stringify(value)
-  }
-  return value
-}

@@ -16,7 +16,7 @@ export default function LaunchWeekIndex() {
 
   const TITLE = `${LW12_TITLE} | ${LW12_DATE}`
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
-  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/12/lw12-og.png`
+  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/12/lw12-og.png?lw=12`
 
   const ticketNumber = query.ticketNumber?.toString()
   const [session, setSession] = useState<Session | null>(null)

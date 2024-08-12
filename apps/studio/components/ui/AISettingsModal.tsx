@@ -2,8 +2,9 @@ import Link from 'next/link'
 import toast from 'react-hot-toast'
 
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   AlertDescription_Shadcn_,
@@ -18,7 +19,7 @@ import {
 const AISettingsModal = () => {
   const snap = useAppStateSnapshot()
   const selectedOrganization = useSelectedOrganization()
-  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const isOptedInToAI = useOrgOptedIntoAi()
 
   const [hasEnabledAISchema, setHasEnabledAISchema] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA,
