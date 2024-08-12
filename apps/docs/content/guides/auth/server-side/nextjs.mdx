@@ -687,7 +687,8 @@ export default function createClient(req: NextApiRequest, res: NextApiResponse) 
         setAll(cookiesToSet) {
           res.setHeader(
             'Set-Cookie',
-            cookiesToSet.map(({ name, value, options }) => serializeCookieHeader(name, value, options)
+            cookiesToSet.map(({ name, value, options }) =>
+              serializeCookieHeader(name, value, options)
             )
           )
         },
