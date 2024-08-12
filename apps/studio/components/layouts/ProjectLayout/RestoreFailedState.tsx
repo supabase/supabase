@@ -47,10 +47,20 @@ const RestoreFailedState = () => {
                 <DropdownMenuTrigger>
                   <Button type="default" className="px-1.5" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-48" align="end">
-                  <DropdownMenuItem onClick={() => setVisible(true)} className="gap-x-2">
-                    <Trash size={14} />
-                    Delete project
+                <DropdownMenuContent className="w-72" align="end">
+                  <DropdownMenuItem
+                    onClick={() => setVisible(true)}
+                    className="items-start gap-x-2"
+                  >
+                    <div className="translate-y-0.5">
+                      <Trash size={14} />
+                    </div>
+                    <div className="">
+                      <p>Delete project</p>
+                      <p className="text-foreground-lighter">
+                        Project cannot be restored once it is deleted
+                      </p>
+                    </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

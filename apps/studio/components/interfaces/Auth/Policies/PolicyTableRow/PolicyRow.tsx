@@ -7,6 +7,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import Panel from 'components/ui/Panel'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Edit, MoreVertical, Trash } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -15,9 +16,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconEdit,
-  IconMoreVertical,
-  IconTrash,
 } from 'ui'
 
 interface PolicyRowProps {
@@ -96,17 +94,17 @@ const PolicyRow = ({
               <Button
                 type="default"
                 style={{ paddingLeft: 4, paddingRight: 4 }}
-                icon={<IconMoreVertical />}
+                icon={<MoreVertical />}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-40">
               <DropdownMenuItem className="space-x-2" onClick={() => onSelectEditPolicy(policy)}>
-                <IconEdit size={14} />
+                <Edit size={14} />
                 <p>Edit policy</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="space-x-2" onClick={() => onSelectDeletePolicy(policy)}>
-                <IconTrash size={14} />
+                <Trash size={14} />
                 <p>Delete policy</p>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -118,7 +116,7 @@ const PolicyRow = ({
                 disabled
                 type="default"
                 style={{ paddingLeft: 4, paddingRight: 4 }}
-                icon={<IconMoreVertical />}
+                icon={<MoreVertical />}
               />
             </Tooltip.Trigger>
             {!canUpdatePolicies && (
