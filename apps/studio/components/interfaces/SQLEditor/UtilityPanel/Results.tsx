@@ -161,7 +161,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
 
       <CellDetailPanel
         column={cellPosition?.column.name ?? ''}
-        value={cellPosition?.row[cellPosition.column.name]}
+        value={cellPosition?.row?.[cellPosition.column.name]}
         visible={expandCell}
         onClose={() => setExpandCell(false)}
       />
