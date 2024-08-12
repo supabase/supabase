@@ -406,7 +406,6 @@
         "type": "markdown",
         "excludes": [
           "reference_dart_v1",
-          "reference_dart_v2",
           "reference_python_v2",
           "reference_swift_v1",
           "reference_swift_v2"
