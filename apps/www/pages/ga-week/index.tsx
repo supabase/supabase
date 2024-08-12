@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
@@ -10,7 +9,6 @@ import supabase from '~/lib/supabaseMisc'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { Meetup } from '~/components/LaunchWeek/11/LW11Meetups'
 import LW11StickyNav from '~/components/LaunchWeek/11/Releases/LW11StickyNav'
 import LW11Header from '~/components/LaunchWeek/11/Releases/LW11Header'
 import MainStage from '~/components/LaunchWeek/11/Releases/MainStage'
@@ -21,11 +19,7 @@ const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/11/LaunchWeekPrizeSection')
 )
 
-interface Props {
-  meetups?: Meetup[]
-}
-
-export default function GAWeekIndex({ meetups }: Props) {
+export default function GAWeekIndex() {
   const { query } = useRouter()
 
   const TITLE = 'Supabase GA Week | 15-19 April 2024'
@@ -106,7 +100,7 @@ export default function GAWeekIndex({ meetups }: Props) {
           <MainStage className="relative -mt-20 z-10" />
           <BuildStage />
           <SectionContainer id="meetups" className="scroll-mt-[66px]">
-            <LW11Meetups meetups={meetups} />
+            <LW11Meetups meetups={[]} />
           </SectionContainer>
           <SectionContainer className="lg:pb-40" id="awards">
             <LaunchWeekPrizeSection />
@@ -115,17 +109,4 @@ export default function GAWeekIndex({ meetups }: Props) {
       </ConfDataContext.Provider>
     </>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  const { data: meetups } = await supabase!
-    .from('lw11_meetups')
-    .select('*')
-    .neq('isPublished', false)
-
-  return {
-    props: {
-      meetups: meetups?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1)),
-    },
-  }
 }

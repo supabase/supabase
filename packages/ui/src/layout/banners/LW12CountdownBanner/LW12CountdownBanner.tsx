@@ -27,9 +27,6 @@ export function LW12CountdownBanner() {
           )}
         >
           <p className="flex gap-1.5 items-center">{announcement.text}</p>
-          <div className="hidden sm:block">
-            <Countdown date={new Date(announcement.launchDate)} showCard={false} />
-          </div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
             <Link href="https://supabase.com/launch-week">{announcement.cta}</Link>
           </Button>
