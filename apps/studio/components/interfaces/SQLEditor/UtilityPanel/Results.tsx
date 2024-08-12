@@ -1,4 +1,4 @@
-import { Clipboard } from 'lucide-react'
+import { Clipboard, Expand } from 'lucide-react'
 import { useState } from 'react'
 import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
@@ -6,15 +6,25 @@ import { createPortal } from 'react-dom'
 
 import { GridFooter } from 'components/ui/GridFooter'
 import { useKeyboardShortcuts } from 'hooks/deprecated'
+import { useFlag } from 'hooks/ui/useFlag'
 import { copyToClipboard } from 'lib/helpers'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { CellDetailPanel } from './CellDetailPanel'
+
+function formatClipboardValue(value: any) {
+  if (value === null) return ''
+  if (typeof value == 'object' || Array.isArray(value)) {
+    return JSON.stringify(value)
+  }
+  return value
+}
 
 const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   const SQL_CONTEXT_EDITOR_ID = 'sql-context-menu-' + id
   const enableFolders = useFlag('sqlFolderOrganization')
-  const [cellPosition, setCellPosition] = useState<any>(undefined)
+  const [expandCell, setExpandCell] = useState(false)
+  const [cellPosition, setCellPosition] = useState<{ column: any; row: any; rowIdx: number }>()
 
   const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -28,6 +38,10 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
       const value = formatClipboardValue(cellValue)
       copyToClipboard(value)
     }
+  }
+
+  const onExpandCell = () => {
+    setExpandCell(true)
   }
 
   useKeyboardShortcuts(
@@ -126,6 +140,10 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
               <Clipboard size={14} />
               <span className="ml-2 text-xs">Copy cell content</span>
             </Item>
+            <Item onClick={onExpandCell}>
+              <Expand size={14} />
+              <span className="ml-2 text-xs">View cell content</span>
+            </Item>
           </Menu>,
           document.body
         )}
@@ -136,16 +154,15 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
           {results.autoLimit !== undefined && ` (auto limit ${results.autoLimit} rows)`}
         </p>
       </GridFooter>
+
+      <CellDetailPanel
+        column={cellPosition?.column.name ?? ''}
+        value={cellPosition?.row[cellPosition.column.name] ?? ''}
+        visible={expandCell}
+        onClose={() => setExpandCell(false)}
+      />
     </>
   )
 }
 
 export default Results
-
-function formatClipboardValue(value: any) {
-  if (value === null) return ''
-  if (typeof value == 'object' || Array.isArray(value)) {
-    return JSON.stringify(value)
-  }
-  return value
-}
