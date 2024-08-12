@@ -74,7 +74,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     description: (
       <>
         <strong className="text-foreground">Postgres.new:</strong>
-        <br className="hidden md:block" /> 1 million free databases
+        <br className="hidden sm:block" /> 1 million free databases
       </>
     ),
     links: [
