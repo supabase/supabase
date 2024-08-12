@@ -7,7 +7,7 @@ const LWHeader = ({ className }: { className?: string }) => {
   return (
     <div className={cn('relative w-full overflow-hidden pt-10 sm:pt-8', className)}>
       <div className="absolute z-0 inset-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute z-0 inset-0 w-full aspect-video">
+        <div className="absolute z-0 inset-0 w-full">
           <LW12Background className="absolute z-0 inset-0 w-full flex items-center justify-center opacity-100 transition-opacity h-full" />
         </div>
         <div className="absolute inset-0 w-full h-full bg-[linear-gradient(to_top,#060809)_0%,transparent_100%)]" />

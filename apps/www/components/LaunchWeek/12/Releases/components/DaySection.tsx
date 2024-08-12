@@ -18,7 +18,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
     <section
       id={day.id}
       className={cn(
-        'lw-nav-anchor border-b py-8 first:border-t border-muted dark:border-muted/50 text-foreground scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3',
+        'lw-nav-anchor border-b py-8 first:border-t border-muted dark:border-muted/50 text-foreground scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-3',
         className
       )}
     >
@@ -47,7 +47,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
       </div>
 
       {/* Day card */}
-      <div className="flex col-span-2">
+      <div className="flex md:col-span-3 xl:col-span-2">
         {day.shipped && day.steps.length > 0 ? (
           <Link
             href={day.blog!}

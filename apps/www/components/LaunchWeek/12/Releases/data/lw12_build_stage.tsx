@@ -1,10 +1,11 @@
 // see apps/www/components/LaunchWeek/X/Releases/data/lwx_advent_days.tsx for reference
 
 import { ReactNode } from 'react'
+import { type ClassValue } from 'clsx'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
-  className?: string
+  className?: ClassValue | string
   id: string
   title: string
   description?: string
@@ -58,7 +59,13 @@ export const days: AdventDay[] = [
     description: 'Version update 1.5.7',
     id: 'pg-graphql',
     is_shipped: true,
-    links: [],
+    links: [
+      {
+        url: 'https://news.ycombinator.com/item?id=41209994',
+        label: 'Hacker News',
+        target: '_blank',
+      },
+    ],
     icon: (
       <svg
         width="50"
@@ -123,5 +130,15 @@ export const days: AdventDay[] = [
     is_shipped: false,
     links: [],
     icon: null,
+  },
+  {
+    title: '',
+    description: '',
+    id: '',
+    is_shipped: false,
+    links: [],
+    icon: null,
+    className:
+      'col-span-full lg:col-span-1 xl:col-span-full max-h-[350px] md:max-h-[458px] xl:max-h-[267px]',
   },
 ]
