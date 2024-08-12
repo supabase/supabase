@@ -70,11 +70,12 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     published_at: '2024-08-12T08:00:00.000-07:00',
     videoId: '',
     videoThumbnail: '',
-    title: 'Postgres.new: 1 million free databases',
+    title: 'postgres.new: in-browser Postgres with an AI interface',
     description: (
       <>
-        <strong className="text-foreground">Postgres.new:</strong>
-        <br className="hidden sm:block" /> 1 million free databases
+        <strong className="text-foreground">postgres.new:</strong>
+        <br className="hidden sm:block" /> in-browser Postgres
+        <br className="hidden sm:block" /> with an AI interface
       </>
     ),
     links: [
