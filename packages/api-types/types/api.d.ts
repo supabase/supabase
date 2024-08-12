@@ -2131,6 +2131,7 @@ export interface components {
       | 'pitr_14'
       | 'pitr_28'
       | 'ipv4_default'
+      | 'auth_mfa_phone_default'
     AmiSearchOptions: {
       search_tags?: Record<string, never>
     }
@@ -2291,6 +2292,11 @@ export interface components {
       mailer_templates_reauthentication_content: string | null
       mailer_templates_recovery_content: string | null
       mfa_max_enrolled_factors: number | null
+      mfa_phone_enroll_enabled: boolean | null
+      mfa_phone_max_frequency: number | null
+      mfa_phone_otp_length: number
+      mfa_phone_template: string | null
+      mfa_phone_verify_enabled: boolean | null
       mfa_totp_enroll_enabled: boolean | null
       mfa_totp_verify_enabled: boolean | null
       password_hibp_enabled: boolean | null
@@ -2692,10 +2698,15 @@ export interface components {
       data_api_use_api_schema?: boolean
       db_pass: string
       db_pricing_tier_id?: string
+      /**
+       * @description Provider region description
+       * @example Southeast Asia (Singapore)
+       */
       db_region: string
       db_sql?: string
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
       name: string
+      /** @deprecated */
       org_id?: number
       organization_slug?: string
     }
@@ -3465,6 +3476,11 @@ export interface components {
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: string
       MAILER_TEMPLATES_RECOVERY_CONTENT: string
       MFA_MAX_ENROLLED_FACTORS: number
+      MFA_PHONE_ENROLL_ENABLED: boolean
+      MFA_PHONE_MAX_FREQUENCY: number
+      MFA_PHONE_OTP_LENGTH: number
+      MFA_PHONE_TEMPLATE: string
+      MFA_PHONE_VERIFY_ENABLED: boolean
       MFA_TOTP_ENROLL_ENABLED: boolean
       MFA_TOTP_VERIFY_ENABLED: boolean
       PASSWORD_HIBP_ENABLED: boolean
@@ -3614,11 +3630,11 @@ export interface components {
       id: string
       invoice_pdf: string
       number: string
+      payment_attempted: boolean
       period_end: number
       status: string
       subscription: string | null
       subtotal: number
-      payment_attempted: boolean
     }
     JoinResponse: {
       billing_email: string
@@ -3956,7 +3972,14 @@ export interface components {
         | 'STORAGE_IMAGES_TRANSFORMED'
         | 'REALTIME_MESSAGE_COUNT'
         | 'REALTIME_PEAK_CONNECTIONS'
-        | 'DISK_SIZE_GB_HOURS'
+        | 'DISK_SIZE_GB_HOURS_GP3'
+        | 'DISK_SIZE_GB_HOURS_IO2'
+        | 'AUTH_MFA_PHONE'
+        | 'LOG_DRAIN_EVENTS'
+        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+        | 'DISK_THROUGHPUT_GP3'
+        | 'DISK_IOPS_GP3'
+        | 'DISK_IOPS_IO2'
         | 'COMPUTE_HOURS_BRANCH'
         | 'COMPUTE_HOURS_XS'
         | 'COMPUTE_HOURS_SM'
@@ -3973,12 +3996,13 @@ export interface components {
         | 'PITR_14'
         | 'PITR_28'
         | 'IPV4'
+        | 'LOG_DRAIN'
       pricing_free_units?: number
       pricing_package_price?: number
       pricing_package_size?: number
       pricing_per_unit_price?: number
       /** @enum {string} */
-      pricing_strategy: 'UNIT' | 'PACKAGE' | 'NONE'
+      pricing_strategy: 'UNIT' | 'PACKAGE' | 'TIERED' | 'NONE'
       project_allocations: components['schemas']['ProjectAllocation'][]
       unit_price_desc: string
       unlimited: boolean
@@ -4338,7 +4362,7 @@ export interface components {
       selected_addons: components['schemas']['SelectedAddonResponse'][]
     }
     /** @enum {string} */
-    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4'
+    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4' | 'auth_mfa_phone'
     /** @enum {string} */
     ProjectAddonVariantPricingType: 'fixed' | 'usage'
     ProjectAddonVariantResponse: {
@@ -5424,6 +5448,11 @@ export interface components {
       mailer_templates_reauthentication_content?: string
       mailer_templates_recovery_content?: string
       mfa_max_enrolled_factors?: number
+      mfa_phone_enroll_enabled?: boolean
+      mfa_phone_max_frequency?: number
+      mfa_phone_otp_length?: number
+      mfa_phone_template?: string
+      mfa_phone_verify_enabled?: boolean
       mfa_totp_enroll_enabled?: boolean
       mfa_totp_verify_enabled?: boolean
       password_hibp_enabled?: boolean
@@ -5666,6 +5695,11 @@ export interface components {
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT?: string
       MAILER_TEMPLATES_RECOVERY_CONTENT?: string
       MFA_MAX_ENROLLED_FACTORS?: number
+      MFA_PHONE_ENROLL_ENABLED?: boolean
+      MFA_PHONE_MAX_FREQUENCY?: number
+      MFA_PHONE_OTP_LENGTH?: number
+      MFA_PHONE_TEMPLATE?: string
+      MFA_PHONE_VERIFY_ENABLED?: boolean
       MFA_TOTP_ENROLL_ENABLED?: boolean
       MFA_TOTP_VERIFY_ENABLED?: boolean
       PASSWORD_HIBP_ENABLED?: boolean
@@ -7848,7 +7882,14 @@ export interface operations {
           | 'STORAGE_IMAGES_TRANSFORMED'
           | 'REALTIME_MESSAGE_COUNT'
           | 'REALTIME_PEAK_CONNECTIONS'
-          | 'DISK_SIZE_GB_HOURS'
+          | 'DISK_SIZE_GB_HOURS_GP3'
+          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'AUTH_MFA_PHONE'
+          | 'LOG_DRAIN_EVENTS'
+          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+          | 'DISK_THROUGHPUT_GP3'
+          | 'DISK_IOPS_GP3'
+          | 'DISK_IOPS_IO2'
           | 'COMPUTE_HOURS_BRANCH'
           | 'COMPUTE_HOURS_XS'
           | 'COMPUTE_HOURS_SM'
@@ -7865,6 +7906,7 @@ export interface operations {
           | 'PITR_14'
           | 'PITR_28'
           | 'IPV4'
+          | 'LOG_DRAIN'
         interval: string
         endDate: string
         startDate: string
@@ -11673,8 +11715,8 @@ export interface operations {
   /** Gets the count of a user's content by type */
   ContentController_getContentCount: {
     parameters: {
-      query: {
-        type: string
+      query?: {
+        type?: string
       }
       path: {
         /** @description Project ref */
