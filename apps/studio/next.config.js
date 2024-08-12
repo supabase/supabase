@@ -436,6 +436,14 @@ const nextConfig = {
       'avatars.githubusercontent.com',
       'api-frameworks.vercel.sh',
       'vercel.com',
+      '*.supabase.red',
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.red',
+        pathname: '**',
+      },
     ],
   },
   transpilePackages: [

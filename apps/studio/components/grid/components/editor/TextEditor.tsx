@@ -177,7 +177,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                         htmlType="button"
                         onClick={() => setIsConfirmNextModalOpen(true)}
                       >
-                        Set to NULL
+                        Set to NULL text
                       </Button>
                     )}
                   </div>

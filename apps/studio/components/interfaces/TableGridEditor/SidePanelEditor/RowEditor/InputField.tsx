@@ -170,7 +170,7 @@ const InputField = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
                 <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
-                  Set to NULL
+                  Set to NULLee
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onEditText({ column: field.name, value: field.value })}

@@ -46,6 +46,7 @@ export function getGridColumns(
   }
 ): any[] {
   const columns = table.columns.map((x, idx) => {
+    console.log('x', x)
     const columnType = getColumnType(x)
     const columnDefaultWidth = getColumnDefaultWidth(x)
     const columnWidthBasedOnName =
@@ -124,9 +125,7 @@ function getCellEditor(
       )
     } else if (!['number', 'boolean'].includes(columnType)) {
       // eslint-disable-next-line react/display-name
-      return (p: any) => (
-        <TextEditor {...p} isEditable={isEditable} onExpandEditor={onExpandTextEditor} />
-      )
+      return (p: any) => 'another cat'
     } else {
       return
     }
@@ -169,14 +168,7 @@ function getCellEditor(
     case 'citext':
     case 'text': {
       // eslint-disable-next-line react/display-name
-      return (p: any) => (
-        <TextEditor
-          {...p}
-          isEditable={isEditable}
-          isNullable={columnDefinition.isNullable}
-          onExpandEditor={onExpandTextEditor}
-        />
-      )
+      return (p: any) => 'cat'
     }
     default: {
       return undefined
@@ -189,6 +181,7 @@ function getCellRenderer(
   columnType: ColumnType,
   metadata: { projectRef?: string; tableId?: string }
 ) {
+  console.log('columnType', columnType)
   switch (columnType) {
     case 'boolean': {
       return BooleanFormatter
