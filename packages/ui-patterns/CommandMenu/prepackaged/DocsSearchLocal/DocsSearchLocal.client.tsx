@@ -385,7 +385,6 @@ export function useLocalSearch(supabase: SupabaseClient) {
         dispatch({ type: 'ERRORED' })
       } else if (event.data.type == WORKER_MESSAGE.SEARCH_RESULTS) {
         const searchResults = JSON.parse(event.data.payload.matches)
-        console.log('WORKER MATCHES:', searchResults)
         dispatch({ type: 'COMPLETED', results: searchResults })
       }
     }

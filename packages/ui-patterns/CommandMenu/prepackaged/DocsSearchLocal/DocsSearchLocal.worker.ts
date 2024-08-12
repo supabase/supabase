@@ -75,6 +75,7 @@ async function init(port: MessagePort, supabaseUrl: string, supabaseAnonKey: str
         ),
       },
     })
+    await db.waitReady
     await db.exec(CREATE_VECTOR_EXTENSION)
     await db.exec(CREATE_PAGE_TABLE)
     await db.exec(CREATE_PAGE_SECTION_TABLE)
