@@ -11,7 +11,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { copyToClipboard } from 'lib/helpers'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import { useDispatch, useTrackedState } from '../../store/Store'
 import type { Filter, GridProps, SupaRow } from '../../types'
 import { useKeyboardShortcuts } from '../common/Hooks'
@@ -170,7 +170,7 @@ export const Grid = memo(
 
       return (
         <div
-          className={`${containerClass} flex flex-col`}
+          className={cn(`flex flex-col`, containerClass)}
           style={{ width: width || '100%', height: height || '50vh' }}
         >
           <DataGrid
