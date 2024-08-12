@@ -60,7 +60,6 @@ const TableEditorMenu = () => {
     isSuccess,
     isError,
     error,
-    refetch,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
