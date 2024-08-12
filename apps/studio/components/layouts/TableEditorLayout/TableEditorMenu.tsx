@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
@@ -38,6 +38,7 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
+import { useTableQuery } from 'data/tables/table-query'
 
 const TableEditorMenu = () => {
   const router = useRouter()
@@ -59,7 +60,6 @@ const TableEditorMenu = () => {
     isSuccess,
     isError,
     error,
-    refetch,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
@@ -90,16 +90,27 @@ const TableEditorMenu = () => {
   const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
   const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
-  const refreshTables = async () => {
-    await refetch()
-  }
-
-  refreshTables
   const [protectedSchemas] = partition(
     (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
     (schema) => EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+
+  const { data: selectedTable } = useTableQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      id: Number(id),
+    },
+    // only run if we have a selected table
+    { enabled: Boolean(id) }
+  )
+
+  useEffect(() => {
+    if (selectedTable) {
+      snap.setSelectedSchemaName(selectedTable.schema)
+    }
+  }, [selectedTable])
 
   return (
     <>
