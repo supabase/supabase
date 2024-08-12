@@ -75,9 +75,9 @@ export const InviteMemberButton = () => {
   const orgScopedRoles = (allRoles?.org_scoped_roles ?? []).sort(
     (a, b) => b.base_role_id - a.base_role_id
   )
-  const orgProjects = (projects ?? []).filter(
-    (project) => project.organization_id === organization?.id
-  )
+  const orgProjects = (projects ?? [])
+    .filter((project) => project.organization_id === organization?.id)
+    .sort((a, b) => a.name.localeCompare(b.name))
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
@@ -87,8 +87,8 @@ export const InviteMemberButton = () => {
     { enabled: canReadSubscriptions }
   )
   const currentPlan = subscription?.plan
-  const isOptedIntoProjectLevelPermissions =
-    useIsOptedIntoProjectLevelPermissions(slug as string) && currentPlan?.id === 'enterprise'
+  const isOptedIntoProjectLevelPermissions = true
+  // useIsOptedIntoProjectLevelPermissions(slug as string) && currentPlan?.id === 'enterprise'
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
   const hasOrgRole =
@@ -326,7 +326,7 @@ export const InviteMemberButton = () => {
                               type="default"
                               role="combobox"
                               size="small"
-                              className="justify-between"
+                              className="justify-between max-w-[470px]"
                               iconRight={
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               }
@@ -341,13 +341,16 @@ export const InviteMemberButton = () => {
                               <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
                               <CommandGroup_Shadcn_>
                                 <ScrollArea
-                                  className={(orgProjects || []).length > 7 ? 'h-[210px]' : ''}
+                                  className={cn(
+                                    (orgProjects || []).length > 7 &&
+                                      'max-h-[210px] overflow-y-auto'
+                                  )}
                                 >
                                   {orgProjects.map((project) => {
                                     return (
                                       <CommandItem_Shadcn_
                                         key={project.ref}
-                                        value={project.ref}
+                                        value={project.name}
                                         onSelect={() => {
                                           form.setValue('projectRef', project.ref)
                                           setProjectDropdownOpen(false)
