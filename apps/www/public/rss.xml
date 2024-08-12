@@ -8,6 +8,13 @@
       <lastBuildDate>Sun, 11 Aug 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/postgres-new</guid>
+  <title>postgres.new: In-browser Postgres with an AI interface</title>
+  <link>https://supabase.com/blog/postgres-new</link>
+  <description>Introducing postgres.new, the in-browser Postgres sandbox with AI assistance.</description>
+  <pubDate>Sun, 11 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/github-copilot-extension-for-vs-code</guid>
   <title>Official Supabase extension for VS Code and GitHub Copilot</title>
   <link>https://supabase.com/blog/github-copilot-extension-for-vs-code</link>

@@ -70,11 +70,11 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     published_at: '2024-08-12T08:00:00.000-07:00',
     videoId: 'ooWaPVvljlU',
     videoThumbnail: '',
-    title: 'postgres.new: in-browser Postgres with an AI interface',
+    title: 'postgres.new: In-browser Postgres with an AI interface',
     description: (
       <>
         <strong className="text-foreground">postgres.new:</strong>
-        <br className="hidden sm:block" /> in-browser Postgres
+        <br className="hidden sm:block" /> In-browser Postgres
         <br className="hidden sm:block" /> with an AI interface
       </>
     ),
@@ -90,7 +90,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     ],
     steps: [
       {
-        title: 'postgres.new: in-browser Postgres with an AI interface',
+        title: 'postgres.new: In-browser Postgres with an AI interface',
         blog: '/blog/postgres-new',
         bg_layers: [
           {
