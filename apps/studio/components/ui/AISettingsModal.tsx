@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import toast from 'react-hot-toast'
 
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
@@ -13,9 +12,9 @@ import {
   Alert_Shadcn_,
   Button,
   Modal,
-  Toggle,
   WarningIcon,
 } from 'ui'
+import { SchemaComboBox } from './SchemaComboBox'
 
 const AISettingsModal = () => {
   const snap = useAppStateSnapshot()
@@ -25,17 +24,7 @@ const AISettingsModal = () => {
 
   const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(selectedProject?.ref!)
 
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && selectedSchemas.length > 0
-
-  const handleOptInToggle = () => {
-    // TODO: Fix this before merging.
-    if (selectedSchemas.length === 0) {
-      setSelectedSchemas(['public'])
-    } else {
-      setSelectedSchemas([])
-    }
-    toast.success('Successfully saved settings')
-  }
+  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   return (
     <Modal
@@ -45,19 +34,26 @@ const AISettingsModal = () => {
       onCancel={() => snap.setShowAiSettingsModal(false)}
     >
       <Modal.Content className="flex flex-col items-start justify-between gap-y-4">
-        <div className="flex justify-between gap-x-5 mr-8 my-4">
-          <Toggle
+        <div className="flex flex-col justify-between gap-y-2 my-4 text-sm">
+          <p className="text-foreground-light">Schemas metadata to be shared with OpenAI</p>
+          <SchemaComboBox
+            size="small"
+            // className="min-w-40"
+            label={
+              includeSchemaMetadata && selectedSchemas.length > 0
+                ? `${selectedSchemas.length} schema${
+                    selectedSchemas.length > 1 ? 's' : ''
+                  } selected`
+                : 'No schemas selected'
+            }
             disabled={IS_PLATFORM && !isOptedInToAI}
-            checked={includeSchemaMetadata}
-            onChange={handleOptInToggle}
+            selectedSchemas={selectedSchemas}
+            onSelectSchemas={setSelectedSchemas}
           />
-          <div className="grid gap-2">
-            <p className="text-sm">Include anonymous database metadata in AI queries</p>
-            <p className="text-sm text-foreground-light">
-              Metadata includes table names, column names and their corresponding data types in the
-              request. This will generate queries that are more relevant to your project.
-            </p>
-          </div>
+          <p className="text-foreground-lighter">
+            Metadata includes table names, column names and their corresponding data types in the
+            request. This will generate queries that are more relevant to your project.
+          </p>
         </div>
         {IS_PLATFORM && !isOptedInToAI && selectedOrganization && (
           <Alert_Shadcn_ variant="warning">

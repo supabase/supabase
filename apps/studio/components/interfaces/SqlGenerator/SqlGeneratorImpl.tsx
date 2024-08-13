@@ -3,7 +3,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useEffectOnce } from 'react-use'
 import { format } from 'sql-formatter'
 
+import { IS_PLATFORM } from 'common'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -44,9 +46,12 @@ import { SQLOutputActions } from './SqlOutputActions'
 
 function useSchemaMetadataForAi() {
   const project = useSelectedProject()
-  const [schemas] = useSchemasForAi(project?.ref!)
 
-  const includeMetadata = schemas.length > 0 && !!project
+  const isOptedInToAI = useOrgOptedIntoAi()
+
+  const [schemas] = useSchemasForAi(project?.ref!)
+  const includeMetadata = (isOptedInToAI || !IS_PLATFORM) && schemas.length > 0 && !!project
+
   const metadataSkipReason: AiMetadataSkipReason = !project ? 'no_project' : 'forbidden'
 
   const { data } = useEntityDefinitionsQuery(
