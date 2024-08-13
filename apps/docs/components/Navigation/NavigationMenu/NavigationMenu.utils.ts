@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import type { ICommonItem } from '~/components/reference/Reference.types'
-import type { Json } from '~/types'
+import type { Json } from '~/features/helpers.types'
 import { menuState } from '../../../hooks/useMenuState'
 
 export function getPathWithoutHash(relativePath: string) {
@@ -99,14 +99,6 @@ export function useSpec(specFile?: string) {
   return spec
 }
 
-export const useCloseMenuOnRouteChange = () => {
-  const pathname = usePathname()
-
-  useEffect(() => {
-    menuState.setMenuMobileOpen(false)
-  }, [pathname])
-}
-
 export const getMenuId = (pathname: string | null) => {
   pathname = (pathname ??= '').replace(/^\/guides\//, '')
 
@@ -140,4 +132,12 @@ export const getMenuId = (pathname: string | null) => {
     default:
       return MenuId.GettingStarted
   }
+}
+
+export const useCloseMenuOnRouteChange = () => {
+  const pathname = usePathname()
+
+  useEffect(() => {
+    menuState.setMenuMobileOpen(false)
+  }, [pathname])
 }
