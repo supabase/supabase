@@ -80,47 +80,32 @@ const PolicyRow = ({
         </div>
       </div>
       <div>
-        {true ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button type="default" className="px-1.5" icon={<MoreVertical />} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="end" className="w-40">
-              <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
-                <Edit size={14} />
-                <p>Edit policy</p>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItemTooltip
-                className="gap-x-2"
-                disabled={!canUpdatePolicies}
-                onClick={() => onSelectDeletePolicy(policy)}
-                tooltip={{
-                  content: {
-                    side: 'left',
-                    text: 'You need additional permissions to delete policies',
-                  },
-                }}
-              >
-                <Trash size={14} />
-                <p>Delete policy</p>
-              </DropdownMenuItemTooltip>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <ButtonTooltip
-            disabled
-            type="default"
-            style={{ paddingLeft: 4, paddingRight: 4 }}
-            icon={<MoreVertical />}
-            tooltip={{
-              content: {
-                side: 'left',
-                text: 'You need additional permissions to edit RLS policies',
-              },
-            }}
-          />
-        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="end" className="w-40">
+            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
+              <Edit size={14} />
+              <p>Edit policy</p>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItemTooltip
+              className="gap-x-2"
+              disabled={!canUpdatePolicies}
+              onClick={() => onSelectDeletePolicy(policy)}
+              tooltip={{
+                content: {
+                  side: 'left',
+                  text: 'You need additional permissions to delete policies',
+                },
+              }}
+            >
+              <Trash size={14} />
+              <p>Delete policy</p>
+            </DropdownMenuItemTooltip>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </Panel.Content>
   )

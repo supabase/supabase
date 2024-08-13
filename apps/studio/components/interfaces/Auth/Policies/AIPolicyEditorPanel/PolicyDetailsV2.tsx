@@ -2,9 +2,11 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -32,8 +34,6 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 interface PolicyDetailsV2Props {
   schema: string
@@ -62,7 +62,7 @@ export const PolicyDetailsV2 = ({
 }: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
   const [open, setOpen] = useState(false)
-  const canUpdatePolicies = false // useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
