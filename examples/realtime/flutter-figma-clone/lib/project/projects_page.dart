@@ -78,10 +78,8 @@ class ProjectsPage extends StatelessWidget {
                                                   RandomColor.getRandomFromId(
                                                 profile.username,
                                               ),
-                                              // child: Text(
-                                              //     username.substring(0, 2)),
-                                              foregroundImage: NetworkImage(
-                                                  profile.imageUrl),
+                                              child: Text(profile.username
+                                                  .substring(0, 2)),
                                             ),
                                           ),
                                         )

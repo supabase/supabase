@@ -82,3 +82,6 @@ create or replace function create_new_project() returns uuid as $$
         return new_project_id;
     end
 $$ language plpgsql security definer;
+
+create policy "Project members can receive presence and broadcast messages." on realtime.messages for select using (is_project_member(realtime.topic()::uuid));
+create policy "Project members can send presence and broadcast messages." on realtime.messages for insert with check (is_project_member(realtime.topic()::uuid));

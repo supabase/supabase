@@ -10,9 +10,8 @@ void main() async {
   usePathUrlStrategy();
 
   await Supabase.initialize(
-    url: 'https://akcrpifcnvufkecfmxqz.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrY3JwaWZjbnZ1ZmtlY2ZteHF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY2MTkxMjIsImV4cCI6MjAyMjE5NTEyMn0.nxkhanVHQ7OJ2bwGU1sgrBb7x3JZiGidlAxnFyiv6Jo',
+    url: 'YOUR_SUPABASE_URL',
+    anonKey: 'YOUR_SUPABASE_ANON_KEY',
   );
   runApp(const MyApp());
 }
@@ -20,9 +19,10 @@ void main() async {
 final supabase = Supabase.instance.client;
 
 final _router = GoRouter(
+  initialLocation: '/signin',
   routes: [
     GoRoute(
-      path: '/',
+      path: '/signin',
       builder: (context, state) => const LoginPage(),
     ),
     GoRoute(
@@ -35,6 +35,19 @@ final _router = GoRouter(
           CanvasPage(state.pathParameters['projectId']!),
     ),
   ],
+  redirect: (BuildContext context, GoRouterState state) {
+    final isSignedIn = supabase.auth.currentSession != null;
+    if (state.path != '/signin') {
+      if (!isSignedIn) {
+        return '/signin';
+      }
+    } else {
+      if (isSignedIn) {
+        return '/projects';
+      }
+    }
+    return null;
+  },
 );
 
 class MyApp extends StatelessWidget {
