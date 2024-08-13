@@ -101,6 +101,16 @@ to authenticated
 using ( realtime.topic() = 'locked' );
 ```
 
+And you can choose which features you want to authorize:
+
+```sql
+create policy "authenticated user can listen to all messages from broadcast and presence"
+on "realtime"."messages"
+as permissive for select
+to authenticated
+using ( realtime.messages.extension in ('broadcast', 'presence') );
+```
+
 Reference our [Github Discussion](github.com/orgs/supabase/discussions/22484) for more complex use cases.
 
 ### Enabling Authorization on Channel Subscription
