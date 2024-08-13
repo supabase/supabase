@@ -108,6 +108,7 @@ export const HooksListing = () => {
 
       <ConfirmationModal
         visible={!!selectedHookForDeletion}
+        size="large"
         variant="destructive"
         title="Confirm to delete"
         confirmLabel="Delete"
