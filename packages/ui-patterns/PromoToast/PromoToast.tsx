@@ -45,16 +45,16 @@ const PromoToast = () => {
       )}
     >
       <p className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7">
-        Launch Week 12: Day 1
+        Launch Week 12: Day 2
       </p>
       <div className="relative z-10 text-foreground-lighter flex flex-col text-sm w-full mb-2">
-        <span>postgres.new: in-browser Postgres with an AI interface</span>
+        Realtime Broadcast and Presence Authorization
         {/* <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} /> */}
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week#day-1">
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week#day-2">
             Learn more
           </Link>
         </Button>
