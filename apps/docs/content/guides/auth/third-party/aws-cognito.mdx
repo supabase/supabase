@@ -8,14 +8,14 @@ AWS Cognito User Pools (via AWS Amplify or on its own) can be used as a third-pa
 
 ## Getting started
 
-1. First you need to add an integration to connect your Supabas eproject with your AWS Cognito User Pool. You will need the pool's ID and region.
+1. First you need to add an integration to connect your Supabase project with your AWS Cognito User Pool. You will need the pool's ID and region.
 2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/settings/auth).
 3. Assign the `role: 'authenticated'` custom claim to all JWTs by using a Pre-Token Generation Trigger.
 4. Finally setup the Supabase client in your application.
 
 <Tabs type="underlined" queryGroup="cognito-create-client">
 
-<TabPanel id="create-client-typescript-amplify" label="TypeScript (Amplify)">
+<TabPanel id="ts" label="TypeScript (Amplify)">
 
 ```typescript
 import { fetchAuthSession } from 'aws-amplify/auth'
@@ -32,7 +32,7 @@ const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABAS
 
 </TabPanel>
 
-<TabPanel id="create-client-swift" label="Swift (iOS)">
+<TabPanel id="swift" label="Swift (iOS)">
 
 ```swift
 import Supabase
@@ -62,7 +62,7 @@ let supabase = SupabaseClient(
 
 </TabPanel>
 
-<TabPanel id="create-client-flutter" label="Flutter">
+<TabPanel id="dart" label="Flutter">
 
 ```dart
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';

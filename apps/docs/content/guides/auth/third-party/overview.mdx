@@ -24,6 +24,6 @@ This is made possible if the providers are using JWTs signed with asymmetric key
 
 There are some limitations you should be aware of when using third-party authentication providers with Supabase.
 
-1. The third-party provider must use asymmetricly signed JWTs (exposed as an OIDC Issuer Discovery URL by the third-party authentication provider). Using symmetrically signed JWTs is not possible at this time.
+1. The third-party provider must use asymmetrically signed JWTs (exposed as an OIDC Issuer Discovery URL by the third-party authentication provider). Using symmetrically signed JWTs is not possible at this time.
 2. Your Supabase project caches the JWT verification keys for a long time. This decouples availability of the authentication server from the liveness of your project. However, if you rotate the JWT keys allow up to 30 minutes to have them be picked up by the platform.
 3. It is not possible to disable Supabase Auth at this time.
