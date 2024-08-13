@@ -115,7 +115,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                       such, be very careful when using this API.
                     </p>
                     <div className="mt-4">
-                      <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                      <Button asChild type="default" icon={<ExternalLink />}>
                         <Link
                           href="https://api.supabase.com/api/v0"
                           target="_blank"
