@@ -75,9 +75,9 @@ export const InviteMemberButton = () => {
   const orgScopedRoles = (allRoles?.org_scoped_roles ?? []).sort(
     (a, b) => b.base_role_id - a.base_role_id
   )
-  const orgProjects = (projects ?? []).filter(
-    (project) => project.organization_id === organization?.id
-  )
+  const orgProjects = (projects ?? [])
+    .filter((project) => project.organization_id === organization?.id)
+    .sort((a, b) => a.name.localeCompare(b.name))
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
@@ -326,7 +326,7 @@ export const InviteMemberButton = () => {
                               type="default"
                               role="combobox"
                               size="small"
-                              className="justify-between"
+                              className="justify-between max-w-[470px]"
                               iconRight={
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               }
@@ -336,20 +336,39 @@ export const InviteMemberButton = () => {
                             </Button>
                           </PopoverTrigger_Shadcn_>
                           <PopoverContent_Shadcn_ sameWidthAsTrigger className="p-0">
-                            <Command_Shadcn_>
+                            <Command_Shadcn_
+                              // [Joshen] Let's update this to use keywords in CommandItem once cmdk is updated
+                              filter={(value, search) => {
+                                const project = orgProjects.find((project) => project.ref === value)
+                                const projectName = project?.name.toLowerCase()
+                                if (
+                                  projectName !== undefined &&
+                                  projectName.includes(search.toLowerCase())
+                                ) {
+                                  return 1
+                                } else if (value.includes(search)) {
+                                  return 1
+                                } else {
+                                  return 0
+                                }
+                              }}
+                            >
                               <CommandInput_Shadcn_ placeholder="Search project..." />
                               <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
                               <CommandGroup_Shadcn_>
                                 <ScrollArea
-                                  className={(orgProjects || []).length > 7 ? 'h-[210px]' : ''}
+                                  className={cn(
+                                    (orgProjects || []).length > 7 &&
+                                      'max-h-[210px] overflow-y-auto'
+                                  )}
                                 >
                                   {orgProjects.map((project) => {
                                     return (
                                       <CommandItem_Shadcn_
                                         key={project.ref}
                                         value={project.ref}
-                                        onSelect={() => {
-                                          form.setValue('projectRef', project.ref)
+                                        onSelect={(value) => {
+                                          form.setValue('projectRef', value)
                                           setProjectDropdownOpen(false)
                                         }}
                                       >

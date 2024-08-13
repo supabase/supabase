@@ -62,6 +62,9 @@ import { PolicyDetailsV2 } from './PolicyDetailsV2'
 import { PolicyTemplates } from './PolicyTemplates'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -98,6 +101,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const telemetryProps = useTelemetryProps()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
+  const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
   const [using, setUsing] = useState('')
@@ -400,7 +404,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
       form.reset(defaultValues)
     } else {
-      setAssistantPanel(true)
+      if (canUpdatePolicies) setAssistantPanel(true)
       if (selectedPolicy !== undefined) {
         const { name, action, table, command, roles } = selectedPolicy
         form.reset({
@@ -564,6 +568,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         >
                           <RLSCodeEditor
                             disableTabToUsePlaceholder
+                            readOnly={!canUpdatePolicies}
                             id="rls-exp-one-editor"
                             placeholder={
                               command === 'insert'
@@ -629,6 +634,7 @@ export const AIPolicyEditorPanel = memo(function ({
                             >
                               <RLSCodeEditor
                                 disableTabToUsePlaceholder
+                                readOnly={!canUpdatePolicies}
                                 id="rls-exp-two-editor"
                                 placeholder="-- Provide a SQL expression for the with check statement"
                                 defaultValue={check}
@@ -727,11 +733,17 @@ export const AIPolicyEditorPanel = memo(function ({
                       >
                         Cancel
                       </Button>
-                      <Button
+
+                      <ButtonTooltip
                         form={formId}
                         htmlType="submit"
                         loading={isExecuting || isUpdating}
-                        disabled={isExecuting || isUpdating || incomingChange !== undefined}
+                        disabled={
+                          !canUpdatePolicies ||
+                          isExecuting ||
+                          isUpdating ||
+                          incomingChange !== undefined
+                        }
                         onClick={() => {
                           if (isAiAssistantEnabled) {
                             const sql = editorOneRef.current?.getValue().trim()
@@ -746,9 +758,15 @@ export const AIPolicyEditorPanel = memo(function ({
                             })
                           }
                         }}
+                        tooltip={{
+                          content: {
+                            side: 'top',
+                            text: 'You need additional permissions to update policies',
+                          },
+                        }}
                       >
                         Save policy
-                      </Button>
+                      </ButtonTooltip>
                     </SheetFooter>
                   </div>
                 </div>

@@ -634,7 +634,32 @@ export const auth = {
           name: 'Redirect URLs',
           url: '/guides/auth/redirect-urls',
         },
-        { name: 'Auth Hooks', url: '/guides/auth/auth-hooks' },
+        {
+          name: 'Auth Hooks',
+          url: '/guides/auth/auth-hooks',
+          items: [
+            {
+              name: 'Custom access token hook',
+              url: '/guides/auth/auth-hooks/custom-access-token-hook',
+            },
+            {
+              name: 'Send SMS hook',
+              url: '/guides/auth/auth-hooks/send-sms-hook',
+            },
+            {
+              name: 'Send email hook',
+              url: '/guides/auth/auth-hooks/send-email-hook',
+            },
+            {
+              name: 'MFA verification hook',
+              url: '/guides/auth/auth-hooks/mfa-verification-hook',
+            },
+            {
+              name: 'Password verification hook',
+              url: '/guides/auth/auth-hooks/password-verification-hook',
+            },
+          ],
+        },
         { name: 'Custom SMTP', url: '/guides/auth/auth-smtp' },
         { name: 'User Management', url: '/guides/auth/managing-user-data' },
       ],
@@ -1743,6 +1768,7 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Logging', url: '/guides/platform/logs' },
+        { name: 'Advanced Log Filtering', url: '/guides/platform/advanced-log-filtering' },
         { name: 'Log Drains', url: '/guides/platform/log-drains' },
         { name: 'Metrics', url: '/guides/platform/metrics' },
         { name: 'Monitoring with Sentry', url: '/guides/platform/sentry-monitoring' },
