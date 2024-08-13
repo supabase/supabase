@@ -1,0 +1,80 @@
+---
+title: Introducing Log Drains
+description: Log Drains for exporting product logs is now availabe under Public Alpha
+author: ziinc
+image: lw12/day-4/log-drains-og.png
+thumb: lw12/day-4/log-drains-thumb.png
+launchweek: '12'
+categories:
+  - launch-week
+  - developers
+  - postgres
+tags:
+  - launch-week
+  - o11y
+  - logging
+date: '2024-08-15'
+toc_depth: 3
+---
+
+Today, Supabase is releasing Log Drains for all Team and Enterprise customers as Public Alpha.
+
+This new feature centers around the realtime exporting of product and audit logs across the Supabase stack to third party providers or other observability tools.
+
+Log drains allows the Supabase platform to cater to a wide variety of compliance, audit, or analytical needs for businesses of all types — customers can now retain logs off-platform indefinitely or build complex observability pipelines with their favourite tooling.
+
+### What is the new hosted offering?
+
+Log Drains are available as an project Add-On for all Team and Enterprise customers. Each Log Drain will cost $60 per month per project, with a $0.20 per million log events processing fee and a $0.09 per GB egress fee as part of unified egress.
+
+## How does Log Drains work?
+
+Log Drains is built off the Logflare server, which is the analytics and observability server of the Supabase stack. To meet the requirements of log drains, the team performed an architecture overhaul to allow for log events ingested into the pipeline to be dispatched off to many different destinations concurrently.
+
+This event dispatching is performed at ingestion time, meaning that the log drain destination will receive events at the same speed as it will appear in the platform dashboard — nearly realtime.
+
+## How to set up a Log Drain?
+
+Log drains can be set up in the project settings.
+
+<div>
+  <Img alt="Log drains onboarding page" src="/images/blog/lw12/day-4/log-drains-onboarding.png" />
+</div>
+
+The initial supported destinations are:
+
+- HTTP Endpoint
+- Datadog Logs
+
+For example, we could send a project's logs to an edge function via the HTTP Endpoint drain and perform some processing, such as filtering or key remapping, before dispatching them off to an external provider. In the following example, we perform a simple `console.log` of the received JSON payload.
+
+<div>
+  <Img
+    alt="HTTP Endpoint drain to Supabase Edge Functions"
+    src="/images/blog/lw12/day-4/edge-function-example.png"
+  />
+</div>
+
+Certain SaaS providers will be supported out of the box, such as Datadog Logs:
+
+<div>
+  <Img alt="Datadog Logs drain" src="/images/blog/lw12/day-4/datadog-example.png" />
+</div>
+
+Setup guides are available within the [log drains documentation](https://supabase.com/docs/guides/platform/log-drains), with example walkthroughs for common use cases.
+
+When self-hosting or during local development, log drains are available through the Studio and can be created and configured under Project Settings > Log Drains.
+This feature will require the Supabase Analytics server, Logflare, to be included in the stack. Instructions for setting up and configuring the self-hosted Analytics server can be found in the [self-hosting documentation](https://supabase.com/docs/reference/self-hosting-analytics/introduction).
+
+## What is the current destination roadmap for Log Drains?
+
+We intend to support a wide variety of destinations. Syslog and Loki destinations currently under development and are expected to be released in the coming weeks.
+
+We take community feedback into our product decisions, so if you would like your favourite tools supported as a destination, vote on [this Github discussion](https://github.com/orgs/supabase/discussions/28324)!
+
+## What are the limitations of Log Drains?
+
+- Log drains are project specific. A drain cannot be shared across multiple projects. To send logs from two different projects to the same destination, two log drains will need to be set up.
+- The drain destination type cannot be changed after creation. Delete the drain, and then create a new drain. Only the drain configuration can be updated.
+- Log sampling is not supported yet.
+- Draining specific product logs is not supported yet.
