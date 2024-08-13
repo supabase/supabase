@@ -145,7 +145,7 @@ function SelectCellFormatter({
               type="text"
               size="tiny"
               className="rdg-row__select-column__edit-action"
-              icon={<Maximize2 strokeWidth={1.5} className="text-foreground" />}
+              icon={<Maximize2 />}
               onClick={onEditClick}
               style={{ padding: '3px' }}
             />
