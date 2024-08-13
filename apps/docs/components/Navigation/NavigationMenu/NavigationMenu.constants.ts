@@ -795,6 +795,10 @@ export const database: NavMenuConstant = {
           name: 'Managing Postgres Roles',
           url: '/guides/database/postgres/roles',
         },
+        {
+          name: 'Using Custom Postgres Roles',
+          url: '/guides/storage/schema/custom-roles',
+        },
         { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
         {
           name: 'Superuser Access and Unsupported Operations',
