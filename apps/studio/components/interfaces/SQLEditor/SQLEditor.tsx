@@ -118,7 +118,9 @@ const SQLEditor = () => {
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const [isAiOpen, setIsAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+  const [isDestructiveConfirmModalOpen, setIsDestructiveConfirmModalOpen] = useState(false)
+  const [isUpdateWithoutWhereConfirmModalOpen, setIsUpdateWithoutWhereConfirmModalOpen] =
+    useState(false)
 
   const selectedOrganization = useSelectedOrganization()
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
@@ -306,8 +308,13 @@ const SQLEditor = () => {
         setContainsDestructiveOperations(destructiveOperations)
         setContainsUpdateWithoutWhereClause(updateWithoutWhereClause)
 
-        if (!force && (destructiveOperations || updateWithoutWhereClause)) {
-          setIsConfirmModalOpen(true)
+        if (!force) {
+          if (destructiveOperations) {
+            setIsDestructiveConfirmModalOpen(true)
+          }
+          if (updateWithoutWhereClause) {
+            setIsUpdateWithoutWhereConfirmModalOpen(true)
+          }
           return
         }
 
@@ -630,27 +637,37 @@ const SQLEditor = () => {
   return (
     <>
       <ConfirmModal
-        visible={isConfirmModalOpen}
-        title={
-          containsDestructiveOperations
-            ? 'Destructive operation'
-            : 'Query uses UPDATE without WHERE'
-        }
+        visible={isUpdateWithoutWhereConfirmModalOpen}
+        title="Query uses UPDATE without WHERE"
         danger
-        description={
-          containsDestructiveOperations
-            ? 'We detected a potentially destructive operation in the query. Please confirm that you would like to execute this query.'
-            : 'Without a WHERE clause, this could update all rows in the table. Please confirm that you would like to execute this query.'
-        }
-        buttonLabel={containsDestructiveOperations ? 'Run destructive query' : 'Run update query'}
+        description="Without a WHERE clause, this could update all rows in the table. Please confirm that you would like to execute this query."
+        buttonLabel="Run update query"
         onSelectCancel={() => {
-          setIsConfirmModalOpen(false)
+          setIsUpdateWithoutWhereConfirmModalOpen(false)
           // [Joshen] Somehow calling this immediately doesn't work, hence the timeout
           setTimeout(() => editorRef.current?.focus(), 100)
         }}
         onSelectConfirm={() => {
-          setIsConfirmModalOpen(false)
-          executeQuery(true)
+          setIsUpdateWithoutWhereConfirmModalOpen(false)
+          // only run the query if the destructive modal isn't open
+          if (!isDestructiveConfirmModalOpen) executeQuery(true)
+        }}
+      />
+
+      <ConfirmModal
+        visible={isDestructiveConfirmModalOpen}
+        title="Destructive operation"
+        danger
+        description="We detected a potentially destructive operation in the query. Please confirm that you would like to execute this query."
+        buttonLabel="Run destructive query"
+        onSelectCancel={() => {
+          setIsDestructiveConfirmModalOpen(false)
+          setTimeout(() => editorRef.current?.focus(), 100)
+        }}
+        onSelectConfirm={() => {
+          setIsDestructiveConfirmModalOpen(false)
+          // only run the query if the update without where clause modal isn't open
+          if (!isUpdateWithoutWhereConfirmModalOpen) executeQuery(true)
         }}
       />
 

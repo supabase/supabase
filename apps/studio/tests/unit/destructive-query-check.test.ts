@@ -90,4 +90,27 @@ describe(`destructive query check`, () => {
 
     expect(match).toBe(true)
   })
+
+  it('contains both an update query and a delete query, triggers destructive', () => {
+    const match = checkDestructiveQuery(stripIndent`
+      delete from countries; update countries set name = 'hello';
+    `)
+
+    expect(match).toBe(true)
+  })
+
+  it('contains both an update query and a delete query, triggers no where', () => {
+    const match = isUpdateWithoutWhere(stripIndent`
+      delete from countries; update countries set name = 'hello';
+    `)
+
+    expect(match).toBe(true)
+  })
+  it('contains both an update query and a delete query, triggers no where', () => {
+    const match = isUpdateWithoutWhere(stripIndent`
+      delete from countries; update countries set name = 'hello';
+    `)
+
+    expect(match).toBe(true)
+  })
 })
