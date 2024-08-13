@@ -51,6 +51,8 @@ You then write RLS policies for this table and Realtime will then approve or den
 When you want to connect to a Realtime Channel, you can do the following:
 
 ```tsx
+import { createClient } from "@supabase/supabase-js";
+const client = createClient("url", "anon_key");
 const channel = client.channel("topic");
 // With authenticated user token
 client.realtime.setAuth(token)
