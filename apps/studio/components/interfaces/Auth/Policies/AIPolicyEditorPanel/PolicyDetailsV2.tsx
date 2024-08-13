@@ -32,6 +32,8 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 interface PolicyDetailsV2Props {
   schema: string
@@ -60,6 +62,7 @@ export const PolicyDetailsV2 = ({
 }: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
   const [open, setOpen] = useState(false)
+  const canUpdatePolicies = false // useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -112,6 +115,7 @@ export const PolicyDetailsV2 = ({
                 <FormControl_Shadcn_>
                   <Input_Shadcn_
                     {...field}
+                    disabled={!canUpdatePolicies}
                     className="bg-control border-control"
                     placeholder="Provide a name for your policy"
                   />
@@ -138,6 +142,7 @@ export const PolicyDetailsV2 = ({
                       <PopoverTrigger_Shadcn_ asChild>
                         <Button
                           type="default"
+                          disabled={!canUpdatePolicies}
                           className="w-full [&>span]:w-full h-[38px] text-sm"
                           iconRight={
                             <ChevronsUpDown
@@ -305,6 +310,7 @@ export const PolicyDetailsV2 = ({
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <MultiSelectV2
+                    disabled={!canUpdatePolicies}
                     options={formattedRoles}
                     value={field.value.length === 0 ? [] : field.value?.split(', ')}
                     placeholder="Defaults to all (public) roles if none selected"

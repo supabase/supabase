@@ -20,6 +20,7 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -79,25 +80,31 @@ const PolicyRow = ({
         </div>
       </div>
       <div>
-        {canUpdatePolicies ? (
+        {true ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                style={{ paddingLeft: 4, paddingRight: 4 }}
-                icon={<MoreVertical />}
-              />
+              <Button type="default" className="px-1.5" icon={<MoreVertical />} />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-40">
-              <DropdownMenuItem className="space-x-2" onClick={() => onSelectEditPolicy(policy)}>
+              <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
                 <Edit size={14} />
                 <p>Edit policy</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="space-x-2" onClick={() => onSelectDeletePolicy(policy)}>
+              <DropdownMenuItemTooltip
+                className="gap-x-2"
+                disabled={!canUpdatePolicies}
+                onClick={() => onSelectDeletePolicy(policy)}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: 'You need additional permissions to delete policies',
+                  },
+                }}
+              >
                 <Trash size={14} />
                 <p>Delete policy</p>
-              </DropdownMenuItem>
+              </DropdownMenuItemTooltip>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
