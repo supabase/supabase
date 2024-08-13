@@ -116,7 +116,6 @@ export const CreateHookSheet = ({
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
-  const [statements, setStatements] = useState<string[]>([])
   const httpsAuthHooksEnabled = useFlag('httpsAuthHooksEnabled')
 
   const definition = useMemo(
@@ -124,14 +123,16 @@ export const CreateHookSheet = ({
     [title]
   )
 
-  const hook: Hook = {
-    ...definition,
-    enabled: authConfig?.[definition.enabledKey] || false,
-    method: extractMethod(
-      authConfig?.[definition.uriKey] || '',
-      authConfig?.[definition.secretsKey] || ''
-    ),
-  }
+  const hook: Hook = useMemo(() => {
+    return {
+      ...definition,
+      enabled: authConfig?.[definition.enabledKey] || false,
+      method: extractMethod(
+        authConfig?.[definition.uriKey] || '',
+        authConfig?.[definition.secretsKey] || ''
+      ),
+    }
+  }, [definition, authConfig])
 
   // if the hook has all parameters, then it is not being created.
   const isCreating = !isValidHook(hook)
@@ -193,7 +194,7 @@ export const CreateHookSheet = ({
         })
       }
     }
-  }, [authConfig, title, visible])
+  }, [authConfig, title, visible, definition, form])
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
@@ -263,6 +264,32 @@ export const CreateHookSheet = ({
   }
 
   const values = form.getValues()
+
+  const statements = useMemo(() => {
+    let permissionChanges: string[] = []
+    if (hook.method.type === 'postgres') {
+      if (
+        hook.method.schema !== '' &&
+        hook.method.functionName !== '' &&
+        hook.method.functionName !== values.postgresValues.functionName
+      ) {
+        permissionChanges = getRevokePermissionStatements(
+          hook.method.schema,
+          hook.method.functionName
+        )
+      }
+    }
+
+    if (values.postgresValues.functionName !== '') {
+      permissionChanges = [
+        ...permissionChanges,
+        `-- Grant access to function to supabase_auth_admin\ngrant execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} to supabase_auth_admin;`,
+        `-- Grant access to schema to supabase_auth_admin\ngrant usage on schema ${values.postgresValues.schema} to supabase_auth_admin;`,
+        `-- Revoke function permissions from authenticated, anon and public\nrevoke execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} from authenticated, anon, public;`,
+      ]
+    }
+    return permissionChanges
+  }, [hook, values.postgresValues.schema, values.postgresValues.functionName])
 
   return (
     <Sheet open={visible} onOpenChange={() => onClose()}>
@@ -378,23 +405,7 @@ export const CreateHookSheet = ({
                             size="small"
                             schema={values.postgresValues.schema}
                             value={field.value}
-                            onChange={(value) => {
-                              setStatements([])
-                              if (hook.method.type === 'postgres') {
-                                if (
-                                  hook.method.schema !== '' &&
-                                  hook.method.functionName !== '' &&
-                                  hook.method.functionName !== value
-                                ) {
-                                  const revokeStatements = getRevokePermissionStatements(
-                                    hook.method.schema,
-                                    hook.method.functionName
-                                  )
-                                  setStatements([...revokeStatements])
-                                }
-                              }
-                              field.onChange(value)
-                            }}
+                            onChange={field.onChange}
                             disabled={field.disabled}
                           />
                         </FormControl_Shadcn_>
@@ -402,43 +413,12 @@ export const CreateHookSheet = ({
                     )}
                   />
                 </div>
-
-                <div className="w-full">
-                  <FormField_Shadcn_
-                    key="postgresValues.statements"
-                    control={form.control}
-                    name="postgresValues.statements"
-                    render={({ field }) => {
-                      const schemaName = values.postgresValues.schema
-                      const functionName = values.postgresValues.functionName
-                        ? `${schemaName}.${values.postgresValues.functionName}`
-                        : '<postgres-function>'
-                      const grantStatements = [
-                        `-- Grant supabase_auth_admin permission to execute the function\ngrant execute on function ${functionName} to supabase_auth_admin;`,
-                        `-- Grant usage to supabase_auth_admin\ngrant usage on schema ${schemaName} to supabase_auth_admin;`,
-                        `-- Ensure that the function used as the hook is not accessible from the Data API\nrevoke execute on function ${functionName} from authenticated, anon, public;`,
-                      ]
-                      field.value = statements.join('\n\n')
-                      return (
-                        <FormItemLayout
-                          className="px-4"
-                          label="Additional Permissions Applied"
-                          description="These permission changes will be applied on the postgres function configured as the hook."
-                        >
-                          <div className={cn('h-64')}>
-                            <FormControl_Shadcn_>
-                              <CodeEditor
-                                id="postgres-hook-editor"
-                                isReadOnly={true}
-                                language="pgsql"
-                                value={statements.concat(grantStatements).join('\n\n')}
-                                onInputChange={field.onChange}
-                              />
-                            </FormControl_Shadcn_>
-                          </div>
-                        </FormItemLayout>
-                      )
-                    }}
+                <div className={cn('h-64 w-full')}>
+                  <CodeEditor
+                    id="postgres-hook-editor"
+                    isReadOnly={true}
+                    language="pgsql"
+                    value={statements.join('\n\n')}
                   />
                 </div>
               </>
