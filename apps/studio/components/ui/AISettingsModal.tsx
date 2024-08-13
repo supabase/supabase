@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   AlertDescription_Shadcn_,
@@ -20,16 +21,19 @@ const AISettingsModal = () => {
   const snap = useAppStateSnapshot()
   const selectedOrganization = useSelectedOrganization()
   const isOptedInToAI = useOrgOptedIntoAi()
+  const selectedProject = useSelectedProject()
 
-  const [hasEnabledAISchema, setHasEnabledAISchema] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA,
-    true
-  )
+  const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(selectedProject?.ref!)
 
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
+  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && selectedSchemas.length > 0
 
   const handleOptInToggle = () => {
-    setHasEnabledAISchema((prev) => !prev)
+    // TODO: Fix this before merging.
+    if (selectedSchemas.length === 0) {
+      setSelectedSchemas(['public'])
+    } else {
+      setSelectedSchemas([])
+    }
     toast.success('Successfully saved settings')
   }
 
