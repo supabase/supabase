@@ -21,7 +21,7 @@ export function PartnerIcon({
   return organizationSlug?.includes('vercel_icfg_') ? (
     <Tooltip_Shadcn_>
       <TooltipTrigger_Shadcn_ asChild>
-        <div className="h-5 w-5 bg-surface-100 dark:bg-surface-200 border rounded flex items-center justify-center hover:bg-surface-400 hover:border-stronger flex-shrink-0">
+        <div className="h-5 w-5 bg-surface-100 dark:bg-surface-200 border rounded flex items-center justify-center hover:bg-surface-400 dark:hover:bg-surface-400 hover:border-stronger flex-shrink-0">
           <svg
             className="w-2.5 h-2.5"
             viewBox="0 0 76 65"
