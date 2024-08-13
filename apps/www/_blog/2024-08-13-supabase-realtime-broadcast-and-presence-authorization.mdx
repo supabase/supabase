@@ -1,6 +1,6 @@
 ---
 title: 'Realtime Broadcast and Presence Authorization'
-description: 'Create Authorization policies for Realtime Broadcast and Presence'
+description: 'Secure Realtime Broadcast and Presence with Authorization'
 author: filipe
 image: 2024-08-13-supabase-realtime-broadcast-and-presence-authorization/OG.png
 thumb: 2024-08-13-supabase-realtime-broadcast-and-presence-authorization/thumb.png
@@ -30,7 +30,7 @@ to authenticated
 using ( true );
 ```
 
-To facilitate authorization in Realtime, a new table `realtime.messages` is created automatically by Supabase Realtime when it connects to your Database. This table represents your [Channels](/docs/guides/realtime/concepts#channels) as objects against which you can write RLS policies.
+To facilitate authorization, Realtime creates and manages the following `realtime.messages` table in your Database:
 
 <Img
   src={{
@@ -38,20 +38,20 @@ To facilitate authorization in Realtime, a new table `realtime.messages` is crea
     light:
       '/images/blog/2024-08-13-supabase-realtime-broadcast-and-presence-authorization/schema--light.png',
   }}
-  alt="The table that is used to test the policies."
+  alt="The table that is used to check policies."
 />
 
-You can write Postgres RLS policies for this table and Realtime will use it them control the access to
-Broadcast and Presence for your channels based on the operations set in your policies:
+You then write RLS policies for this table and Realtime will then approve or deny clients' access to your Broadcast and Presence Channels:
 
 - `SELECT` policies - Able to receive messages from the channel
 - `INSERT` policies - Able to send messages to the channel
 
-## How it works without Authorization
+## How Realtime works without Authorization
 
-When you want to connect to a Realtime Channel, you do something close to the following code:
+When you want to connect to a Realtime Channel, you can do the following:
 
 ```tsx
+const channel = client.channel("topic");
 // With authenticated user token
 client.realtime.setAuth(token)
 
@@ -66,16 +66,14 @@ This will enable you to send messages but they will all be public. Any user woul
 
 ## Adding Authorization to Realtime Channels
 
-To convert this into a Realtime Channel that checks RLS policies requires only two steps:
+You can convert this into a Channel that checks RLS policies by following these two steps:
 
 - [Create RLS Policies](#create-rls-policies)
-- [Enabling Authorization on Channel subscription](#enabling-authorization-on-channel-subscription)
+- [Enabling Authorization on Channel Subscription](#enabling-authorization-on-channel-subscription)
 
-### Create RLS policies
+### Create RLS Policies
 
-Any RLS policy will work. Reference our [Github Discussion](github.com/orgs/supabase/discussions/22484) for more complex use cases.
-
-With this example we'll keep it simple and allow authenticated users to connect to a channel, send and receive Broadcast messages and track Presence.
+We'll keep it simple with this example and allow authenticated users to connect to a channel, send and receive Broadcast messages and sync, track, and untrack Presence.
 
 ```sql
 create policy "authenticated user listen to all"
@@ -101,7 +99,9 @@ to authenticated
 using ( realtime.topic() = 'locked' );
 ```
 
-### Enabling Authorization on Channel subscription
+Reference our [Github Discussion](github.com/orgs/supabase/discussions/22484) for more complex use cases.
+
+### Enabling Authorization on Channel Subscription
 
 Now that you have your RLS policies set, you will need to define on your Channel subscription that you intend to use a private channel. To achieve it we've introduced a new configuration parameter `private` to signal to Realtime servers that you want to check authorization on the channel.
 
@@ -138,7 +138,7 @@ supabase.realtime
 
 ### Advanced examples
 
-You can find a more complex example in the [Supabase demo folder](https://github.com/supabase/supabase/tree/master/examples/realtime/nextjs-authorization-demo) where we are using this feature to build chat rooms with restricted access.
+You can find a more complex example in the [NextJs Authorization Demo](https://github.com/supabase/supabase/tree/master/examples/realtime/nextjs-authorization-demo) where we are using this feature to build chat rooms with restricted access or you could check the [Flutter Figma Clone](https://github.com/supabase/supabase/tree/master/examples/realtime/flutter-figma-clone) to see how you can secure realtime communication between users.
 
 ## How does it work?
 
@@ -165,7 +165,7 @@ As a result, in the server, we create a map of policies per connected socket so 
 
 Now that we have set up everything on the database side, let's understand how it works and how we can verify authorization via RLS policies.
 
-Upon channel subscription, based on the configuration message sent when joining the websocket, we determine that you want to use a private channel, then we parse the information from your signed JSON Web Token (JWT), load them into a Postgres transaction using `set_config`, and verify them against the new `realtime.messages`table within the same transaction and we store the output as a group of policies within the context of the user's channel process.
+Realtime uses the private flag client's define when creating channel, takes the headers used to upgrade to the WebSocket connection, claims from your verified JSON Web Token (JWT), loads them into a Postgres transaction using `set_config`, verifies them by querying the `realtime.messages` table, and stores the output as a group of policies within the context of the user's channel on the server.
 
 <Img
   src={{
@@ -175,9 +175,10 @@ Upon channel subscription, based on the configuration message sent when joining 
   }}
   alt="Flow of checks done against the databse to determine the policies for a user connection."
 />
-## How does this scale?
 
-Since we're doing this as soon as the user subscribes to Channel we should see a small latency increase in subscriptions but after that we do not run any queries on the database and we use the stored context to control the actions a user can perform.
+## How is this approach performant?
+
+Realtime checks RLS policies against your database on Channel subscription, so expect a small latency increase initially, but will be cached on the server so all messages will pass from client to server to clients with minimal latency.
 
 Latency between geographically close users is very important for a product like Realtime. To deliver messages as fast as possible between users on our global network, we cache the policies.
 
@@ -185,13 +186,13 @@ We can maintain high throughput and low latency on a Realtime Channel with Broad
 
 - the policy is only generated when a user connects to a Channel
 - the policy cached in memory is close to your users
-- the policy is cached for the duration of the connection or until the JWT expires
+- the policy is cached for the duration of the connection, until the JWT expires, or when the user sends a new refresh token
 
-Another added bonus is the fact that if a user does not have access to a given Channel they won't be able to connect at all and their connections will be rejected.
+If a user does not have access to a given Channel they won't be able to connect at all and their connections will be rejected.
 
 ### Refreshing your Policies
 
-Realtime already has a mechanism to check valid refreshed JWTs used by your connection as a way to ensure the user connected continues to be valid. Now, we've added a step where we re-authorize the user by querying your database's `realtime.messages` table when Realtime receives a new user token. This is to make sure the already connected user continues to be authorized even when you've updated RLS policies.
+Realtime will check RLS policies against your database whenever the user connects or there's a new refresh token to make sure that it continues to be authorized despite any changes to its claims. Be aware of your token expiration time to ensure users policies are checked regularly.
 
 ### Postgres Changes Support
 
