@@ -384,7 +384,20 @@ export function LogDrainDestinationSheetForm({
                         <FormItemLayout
                           layout="horizontal"
                           label={'Region'}
-                          description="The Datadog region to send logs to."
+                          description={
+                            <p>
+                              The Datadog region to send logs to.
+                              <br /> Read more about Datadog regions{' '}
+                              <Link
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline"
+                                href="https://docs.datadoghq.com/getting_started/site/#access-the-datadog-site"
+                              >
+                                here.
+                              </Link>
+                            </p>
+                          }
                         >
                           <FormControl_Shadcn_>
                             <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
