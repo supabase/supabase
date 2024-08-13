@@ -18,9 +18,10 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import { Plus } from 'lucide-react'
 import type { Organization, ResponseError } from 'types'
-import { Button, cn } from 'ui'
+import { Button, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
+import { PartnerIcon } from 'components/ui/partner-icon'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
@@ -222,8 +223,10 @@ const OrganizationProjects = ({
   return (
     <div className="space-y-3" key={organization.slug}>
       <div className="flex space-x-4 items-center">
-        <h4 className="text-lg flex items-center">{organization.name}</h4>
-
+        <div className="flex items-center gap-2">
+          <h4 className="text-lg flex items-center">{organization.name}</h4>{' '}
+          <PartnerIcon organizationSlug={organization.slug} />
+        </div>
         {!!overdueInvoices.length && (
           <div>
             <Button asChild type="danger">

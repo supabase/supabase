@@ -1,4 +1,5 @@
 import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
+import { PartnerIcon } from 'components/ui/partner-icon'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import type { IntegrationName } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -111,6 +112,7 @@ const OrganizationPicker = ({
                         setOpen(false)
                       }}
                     >
+                      <PartnerIcon organizationSlug={org.slug} />
                       <span className="truncate">{org.name}</span>{' '}
                       {configurationId && installed[org.slug] && (
                         <Badge className="!flex-none">Integration Installed</Badge>

@@ -6,6 +6,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
 import type { SidebarLink, SidebarSection } from './AccountLayout.types'
+import { PartnerIcon } from 'components/ui/partner-icon'
 
 interface WithSidebarProps {
   title: string
@@ -202,12 +203,15 @@ const SidebarLinkItem = ({
             <IconArrowUpRight size={'tiny'} />
           </span>
         )}
-        <span
-          title={label}
-          className="w-full truncate text-sm text-foreground-light transition group-hover:text-foreground"
-        >
-          {isSubitem ? <p>{label}</p> : label}
-        </span>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <span
+            title={label}
+            className="w-full truncate text-sm text-foreground-light transition group-hover:text-foreground"
+          >
+            {isSubitem ? <p>{label}</p> : label}
+          </span>
+          <PartnerIcon organizationSlug={id} />
+        </div>
       </span>
     </Link>
   )
