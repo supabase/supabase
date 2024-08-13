@@ -24,14 +24,15 @@ For context, Supabase includes three useful extensions for building real-time ap
 
 This release introduces authorization for Broadcast and Presence using Row Level Security policies:
 
-```sql
-create policy "authenticated user can listen to all messages"
-on "realtime"."messages"
-as permissive
-for select
-to authenticated
-using ( true );
-```
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/IXRrU9MpA8Q"
+    title="I leaked the data through Supabase Realtime - Broadcast and Presence Authorization"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
 
 To facilitate this, Realtime creates and manages a `messages` table in your Database's `realtime` schema:
 
@@ -130,7 +131,7 @@ using (
 );
 ```
 
-Reference our [Github Discussion](github.com/orgs/supabase/discussions/22484) for more complex use cases.
+Reference our [Github Discussion](https://github.com/orgs/supabase/discussions/22484) for more complex use cases.
 
 ### 2. Enabling Authorization on Channels
 
@@ -238,7 +239,7 @@ This method for Realtime Authorization currently only supports Broadcast and Pre
 
 ## Availability
 
-Broadcast and Presence Authorization is available in Public Beta. We are looking for feedback so please do share it in the [GitHub discussion](github.com/orgs/supabase/discussions/22484).
+Broadcast and Presence Authorization is available in Public Beta. We are looking for feedback so please do share it in the [GitHub discussion](https://github.com/orgs/supabase/discussions/22484).
 
 ## Future Work
 
