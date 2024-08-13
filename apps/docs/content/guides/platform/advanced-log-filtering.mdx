@@ -23,7 +23,7 @@ This approach is commonly used with JSON and array columns, so it might look a b
 select
   event_message,
   parsed.error_severity,
-  parsed.user_name 
+  parsed.user_name
 from
   postgres_logs
   -- extract first layer
