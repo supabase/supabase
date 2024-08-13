@@ -112,12 +112,14 @@ If you try to subscribe with an unauthorized user you will get a new error messa
 supabase.realtime
   .channel('locked', { config: { private: true } })
   .subscribe((status: string, err: any) => {
-    if (status === 'CHANNEL_ERROR') {
+    if (status === 'SUBSCRIBED') {
+      console.log("Connected!")
+    } else {
       console.error(err.message)
     }
   })
 
-// Outputs the following error:
+// Outputs the following code:
 // "You do not have permissions to read from this Topic"
 ```
 
@@ -130,10 +132,14 @@ supabase.realtime.setAuth(token)
 supabase.realtime
   .channel('locked', { config: { private: true } })
   .subscribe((status: string, err: any) => {
-    if (status === 'CHANNEL_ERROR') {
+    if (status === 'SUBSCRIBED') {
+      console.log("Connected!")
+    } else {
       console.error(err.message)
     }
   })
+// Outputs the following code:
+// "Connected!"
 ```
 
 ### Advanced examples
