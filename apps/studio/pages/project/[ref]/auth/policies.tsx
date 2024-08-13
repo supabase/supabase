@@ -10,6 +10,7 @@ import Policies from 'components/interfaces/Auth/Policies/Policies'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -20,7 +21,7 @@ import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPe
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import type { NextPageWithLayout } from 'types'
-import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Button, Input } from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -146,26 +147,23 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             </Button>
 
             {isAiAssistantEnabled && (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
-                  <Button
-                    type="primary"
-                    disabled={!canCreatePolicies || schemaHasNoTables}
-                    onClick={() => setShowPolicyAiEditor(true)}
-                  >
-                    Create a new policy
-                  </Button>
-                </TooltipTrigger_Shadcn_>
-                {(!canCreatePolicies || schemaHasNoTables) && (
-                  <TooltipContent_Shadcn_ side="bottom">
-                    {!canCreatePolicies
+              <ButtonTooltip
+                type="primary"
+                disabled={!canCreatePolicies || schemaHasNoTables}
+                onClick={() => setShowPolicyAiEditor(true)}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: !canCreatePolicies
                       ? 'You need additional permissions to create RLS policies'
                       : schemaHasNoTables
                         ? `No table in schema ${schema} to create policies on`
-                        : null}
-                  </TooltipContent_Shadcn_>
-                )}
-              </Tooltip_Shadcn_>
+                        : undefined,
+                  },
+                }}
+              >
+                Create a new policy
+              </ButtonTooltip>
             )}
           </div>
         </div>
