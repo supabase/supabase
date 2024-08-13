@@ -63,13 +63,11 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 1,
     dd: 'Mon',
     shipped: true,
-    isToday: true,
+    isToday: false,
     blog: '/blog/postgres-new',
     hasCountdown: false,
     date: '12 August',
     published_at: '2024-08-12T08:00:00.000-07:00',
-    videoId: 'ooWaPVvljlU',
-    videoThumbnail: '',
     title: 'postgres.new: In-browser Postgres with an AI interface',
     description: (
       <>
@@ -94,10 +92,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         blog: '/blog/postgres-new',
         bg_layers: [
           {
-            img: '/images/launchweek/12/d1/postgresnew-dark.png',
-            mobileImg: '/images/launchweek/12/d1/postgresnew-dark-mobile.png',
-            imgLight: '/images/launchweek/12/d1/postgresnew-light.png',
-            mobileImgLight: '/images/launchweek/12/d1/postgresnew-light-mobile.png',
+            img: '/images/launchweek/12/d1/postgresnew-dark.svg',
+            mobileImg: '/images/launchweek/12/d1/postgresnew-dark-mobile.svg',
+            imgLight: '/images/launchweek/12/d1/postgresnew-light.svg',
+            mobileImgLight: '/images/launchweek/12/d1/postgresnew-light-mobile.svg',
           },
         ],
         steps: [],
@@ -108,21 +106,44 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-2',
     d: 2,
     dd: 'Tue',
-    shipped: false,
-    isToday: false,
-    hasCountdown: true,
-    blog: '',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/supabase-realtime-broadcast-and-presence-authorization',
     date: '13 August',
     published_at: '2024-08-13T08:00:00.000-07:00',
-    title: '',
-    description: '',
+    title: 'Realtime Broadcast and Presence Authorization',
+    description: (
+      <>
+        <span className="text-foreground">Realtime</span> Broadcast and
+        <br className="hidden sm:block" /> Presence Authorization
+      </>
+    ),
     links: [
+      {
+        type: 'video',
+        href: 'IXRrU9MpA8Q',
+      },
       {
         type: 'xSpace',
         href: 'https://supabase.link/lw12-xspace-2',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: 'Realtime Broadcast and Presence Authorization',
+        blog: '/blog/supabase-realtime-broadcast-and-presence-authorization',
+        bg_layers: [
+          {
+            img: '/images/launchweek/12/d2/realtime-dark.svg',
+            mobileImg: '/images/launchweek/12/d2/realtime-dark-mobile.svg',
+            imgLight: '/images/launchweek/12/d2/realtime-light.svg',
+            mobileImgLight: '/images/launchweek/12/d2/realtime-light-mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-3',
@@ -130,7 +151,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Wed',
     shipped: false,
     isToday: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '',
     date: '14 August',
     published_at: '2024-08-14T08:00:00.000-07:00',
