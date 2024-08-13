@@ -9,16 +9,18 @@ AWS Cognito User Pools (via AWS Amplify or on its own) can be used as a third-pa
 ## Getting started
 
 1. First you need to add an integration to connect your Supabase project with your AWS Cognito User Pool. You will need the pool's ID and region.
-2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/settings/auth).
+2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/settings/auth) or configure it in the CLI.
 3. Assign the `role: 'authenticated'` custom claim to all JWTs by using a Pre-Token Generation Trigger.
 4. Finally setup the Supabase client in your application.
+
+## Setup the Supabase client library
 
 <Tabs type="underlined" queryGroup="cognito-create-client">
 
 <TabPanel id="ts" label="TypeScript (Amplify)">
 
 ```typescript
-import { fetchAuthSession } from 'aws-amplify/auth'
+import { fetchAuthSession, Hub } from 'aws-amplify/auth'
 
 const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
   accessToken: async () => {
@@ -27,6 +29,11 @@ const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABAS
     // Alternatively you can use tokens?.idToken instead.
     return tokens?.accessToken
   },
+})
+
+// if you're using Realtime you also need to set up a listener for Cognito auth changes
+Hub.listen('auth', () => {
+  fetchAuthSession().then((tokens) => supabase.realtime.setAuth(tokens?.accessToken))
 })
 ```
 
@@ -87,6 +94,19 @@ Future<void> main() async {
 </TabPanel>
 
 </Tabs>
+
+## Add a new Third-Party Auth integration to your project
+
+In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/settings/auth) and find the Third-Party Auth section to add a new integration.
+
+In the CLI add the following config to your `supabase/config.toml` file:
+
+```toml
+[auth.third_party.aws_cognito]
+enabled = true
+user_pool_id = "<id>"
+user_pool_region = "<region>"
+```
 
 ## Use a Pre-Token Generation Trigger to assign the authenticated role
 

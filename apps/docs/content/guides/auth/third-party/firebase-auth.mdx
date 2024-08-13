@@ -6,7 +6,7 @@ subtitle: 'Use Firebase Auth with your Supabase project'
 
 <Admonition type="note">
 
-Creating a Firebase Auth third-party integration with your Supabase project is currently limited to a private alpha release. We are still trying to improve the developer experience around securing your project. Please reach out to [Supabase Support](https://supabase.help) if you're interested in having this enabled on your project.
+Creating a Firebase Auth third-party integration with your Supabase project is currently limited to a private alpha release. We are still trying to improve the developer experience around securing your project. [Register your interest in Third-Party Auth with Firebase](https://forms.supabase.com/third-party-auth-with-firebase) and the team will reach out to you.
 
 </Admonition>
 
@@ -19,6 +19,8 @@ Firebase Auth can be used as a third-party authentication provider alongside Sup
 3. If you are using Third Party Auth in local development, create and attach restrictive RLS policies to all tables in your public schema, Storage and Realtime to prevent unauthorized access from unrelated Firebase projects.
 4. Assign the `role: 'authenticated'` [custom user claim](https://firebase.google.com/docs/auth/admin/custom-claims) to all your users.
 5. Finally set up the Supabase client in your application.
+
+## Setup the Supabase client library
 
 <Tabs type="underlined" queryGroup="firebase-create-client">
 
@@ -69,15 +71,29 @@ let supabase = SupabaseClient(
 
 </Tabs>
 
-## Securing your project with restrictive RLS policies
+## Add a new Third-Party Auth integration to your project
+
+In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/settings/auth) and find the Third-Party Auth section to add a new integration.
+
+In the CLI add the following config to your `supabase/config.toml` file:
+
+```toml
+[auth.third_party.firebase]
+enabled = true
+project_id = "<id>"
+```
+
+## Adding an extra layer of security to your project's RLS policies
 
 <Admonition type="note">
 
-If you are self-hosting, make sure you closely follow these instructions. If you are using the Firebase provider in the hosted platform, requests from other Firebase projects are rejected with a 401 status code. 
+While Third-Party Auth with Firebase is in a private alpha, it is strongly recommended to follow this guide closely. Once it becomes generally available this method would not be necessary to secure your project against unauthorized access from other Firebase projects.
+
+You should also follow this best practice if self-hosting.
 
 </Admonition>
 
-Firebase Auth uses a single set of JWT signing keys for all projects. This means that JWTs issued from an unrelated Firebase project to yours could access data in your Supabase project. To guard against this, creating and maintaining the following RLS policies for **all of your tables in the `public` schema** is very important. You should also attach this policy to [Storage]() buckets or [Realtime]() channels.
+Firebase Auth uses a single set of JWT signing keys for all projects. This means that JWTs issued from an unrelated Firebase project to yours could access data in your Supabase project. To guard against this, creating and maintaining the following RLS policies for **all of your tables in the `public` schema** is very important. You should also attach this policy to [Storage](/docs/guides/storage/security/access-control) buckets or [Realtime](/docs/guides/realtime/authorization) channels.
 
 To achieve this we recommend using a [restrictive Postgres Row-Level Security policy](https://www.postgresql.org/docs/current/sql-createpolicy.html).
 
@@ -107,7 +123,7 @@ create policy "Restrict access to Supabase Auth and Firebase Auth for project ID
   );
 ```
 
-If you have a lot of tables in your app, or need to manage complex RLS policies for [Storage]() or [Realtime]() it can be useful to define a [stable Postgres function](https://www.postgresql.org/docs/current/xfunc-volatility.html) that performs the check to cut down on duplicate code. For example:
+If you have a lot of tables in your app, or need to manage complex RLS policies for [Storage](/docs/guides/storage) or [Realtime](/docs/guides/realtime) it can be useful to define a [stable Postgres function](https://www.postgresql.org/docs/current/xfunc-volatility.html) that performs the check to cut down on duplicate code. For example:
 
 ```sql
 create function public.is_supabase_or_firebase_project_jwt()
@@ -126,14 +142,14 @@ create function public.is_supabase_or_firebase_project_jwt()
   );
 ```
 
-Please make sure you substitute `<project-ref>` with your Supabase project's ID and the `<firebase-project-id>` to your Firebase Project ID. Then the restrictive policies on all your tables, buckets and channels can be simplified to be:
+Make sure you substitute `<project-ref>` with your Supabase project's ID and the `<firebase-project-id>` to your Firebase Project ID. Then the restrictive policies on all your tables, buckets and channels can be simplified to be:
 
 ```sql
 create policy "Restrict access to correct Supabase and Firebase projects"
   on table_name
   as restrictive
   to authenticated
-  using (public.is_supabase_or_firebase_project_jwt() is true);
+  using ((select public.is_supabase_or_firebase_project_jwt()) is true);
 ```
 
 ## Assign the "role" custom claim
@@ -142,11 +158,12 @@ Your Supabase project inspects the `role` claim present in all JWTs sent to it, 
 
 By default, Firebase JWTs do not contain a `role` claim in them. If you were to send such a JWT to your Supabase project, the `anon` role would be assigned when executing the Postgres query. Most of your app's logic will be accessible by the `authenticated` role.
 
-The easiest way to achieve this is to define a [blocking Firebase Authentication function](https://firebase.google.com/docs/auth/extend-with-blocking-functions). However this is only available if your Firebase project uses [Firebase Authentication with Identity Platform](https://cloud.google.com/identity-platform/docs/product-comparison).
-
-Alternatively you can manually assign the custom claims to all users with the [admin SDK](https://firebase.google.com/docs/auth/admin/custom-claims#set_and_validate_custom_user_claims_via_the_admin_sdk) and define an [`onCreate` Firebase Authentication Cloud Function](https://firebase.google.com/docs/auth/extend-with-functions) to persist the role to all newly created users.
-
 ### Use Firebase Authentication functions to assign the authenticated role
+
+You have two choices to set up a Firebase Authentication function depending on your Firebase project's configuration:
+
+1. Easiest: Use a [blocking Firebase Authentication function](https://firebase.google.com/docs/auth/extend-with-blocking-functions) but this is only available if your project uses [Firebase Authentication with Identity Platform]().
+2. Manually assign the custom claims to all users with the [admin SDK](https://firebase.google.com/docs/auth/admin/custom-claims#set_and_validate_custom_user_claims_via_the_admin_sdk) and define an [`onCreate` Firebase Authentication Cloud Function](https://firebase.google.com/docs/auth/extend-with-functions) to persist the role to all newly created users.
 
 <Tabs type="underlined" queryGroup="firebase-functions">
 
@@ -225,7 +242,7 @@ exports.processSignUp = functions.auth.user().onCreate(async (user) => {
 })
 ```
 
-Note that the `onCreate` Firebase Cloud Function is not _synchronous_ (unlike the Blocking Functions), so the very first ID token received by the Firebase client library in your app _will not contain_ the `role: 'authenticated'` claim. Please do a force-refresh immediately after sign-up to fetch an ID token with the applied role.
+Note that the `onCreate` Firebase Cloud Function is not _synchronous_ (unlike the Blocking Functions), so the very first ID token received by the Firebase client library in your app _will not contain_ the `role: 'authenticated'` claim. Force-refresh the ID token immediately after sign-up to fetch an ID token with the applied role.
 
 </TabPanel>
 
