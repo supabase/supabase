@@ -4,12 +4,22 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
 import { useTelemetryProps } from 'common'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { SchemaComboBox } from 'components/ui/SchemaComboBox'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
-import { AiIconAnimation, Button, cn } from 'ui'
+import { ChevronsUpDown } from 'lucide-react'
+import Link from 'next/link'
+import {
+  AiIconAnimation,
+  Button,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
 import { AssistantChatForm } from 'ui-patterns'
 import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
@@ -30,17 +40,18 @@ export const AIPolicyChat = ({
   onDiff,
 }: AIPolicyChatProps) => {
   const router = useRouter()
+  const project = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
   const { profile } = useProfile()
-  const snap = useAppStateSnapshot()
   const bottomRef = useRef<HTMLDivElement>(null)
   const telemetryProps = useTelemetryProps()
 
+  const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
   const [value, setValue] = useState<string>('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const isOptedInToAI = useOrgOptedIntoAi()
-  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
+  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
   const pendingReply = loading && last(messages)?.role === 'user'
@@ -74,21 +85,53 @@ export const AIPolicyChat = ({
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
         >
-          <Button
-            type="default"
-            className="w-min"
-            icon={
-              <div
-                className={cn(
-                  'w-2 h-2 rounded-full',
-                  includeSchemaMetadata ? 'bg-brand' : 'border border-stronger'
-                )}
-              />
-            }
-            onClick={() => snap.setShowAiSettingsModal(true)}
-          >
-            {includeSchemaMetadata ? 'Include' : 'Exclude'} database metadata in queries
-          </Button>
+          {includeSchemaMetadata ? (
+            <SchemaComboBox
+              className="w-fit"
+              disabled={!includeSchemaMetadata}
+              selectedSchemas={selectedSchemas}
+              onSelectSchemas={setSelectedSchemas}
+              label={
+                includeSchemaMetadata && selectedSchemas.length > 0
+                  ? `${selectedSchemas.length} schema${
+                      selectedSchemas.length > 1 ? 's' : ''
+                    } selected`
+                  : 'No schemas selected'
+              }
+            />
+          ) : (
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                {/* workaround for shadcn tooltip to work with disabled button */}
+                <span tabIndex={0} className="w-fit">
+                  <Button
+                    size="tiny"
+                    type="default"
+                    disabled
+                    iconRight={
+                      <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                    }
+                  >
+                    <div className="w-full flex">
+                      <p className="text-foreground">No schemas selected</p>
+                    </div>
+                  </Button>
+                </span>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ className="w-64">
+                You need to enable schema metadata sharing in your{' '}
+                <Link
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`/org/${selectedOrganization?.slug}/general`}
+                  className="underline"
+                >
+                  organization settings
+                </Link>{' '}
+                to share schemas with AI for more accurate responses.
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
+          )}
         </Message>
 
         {messages.map((m) => (
