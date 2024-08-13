@@ -27,7 +27,7 @@ This release introduces authorization for Broadcast and Presence using Row Level
 ```sql
 create policy "authenticated user can listen to all messages"
 on "realtime"."messages"
-as permissive 
+as permissive
 for select
 to authenticated
 using ( true );
@@ -53,6 +53,7 @@ You can then write RLS Policies for this table and Realtime will then allow or d
 
 When you want to connect to a Realtime Channel, you can do the following:
 
+{/* prettier-ignore */}
 ```tsx
 import { createClient } from '@supabase/supabase-js'
 
@@ -90,15 +91,15 @@ We'll keep it simple with this example. Let's allow authenticated users to:
 ```sql
 create policy "authenticated user listen to all"
 on "realtime"."messages"
-as permissive 
+as permissive
 for select -- receive
 to authenticated
 using ( true );
 
 create policy "authenticated user write to all"
 on "realtime"."messages"
-as permissive 
-for insert -- send 
+as permissive
+for insert -- send
 to authenticated
 with check ( true );
 ```
@@ -108,10 +109,10 @@ We also have a new database function called `realtime.topic()`. You can use this
 ```sql
 create policy "authenticated users can only read from 'locked' topic"
 on "realtime"."messages"
-as permissive 
+as permissive
 for select   -- read only
 to authenticated
-using ( 
+using (
   realtime.topic() = 'locked'  -- access the topic name
 );
 ```
@@ -121,10 +122,10 @@ You can use the `extension` column in the `messages` table to allow/deny specify
 ```sql
 create policy "read access to broadcast and presence"
 on "realtime"."messages"
-as permissive 
+as permissive
 for select
 to authenticated
-using ( 
+using (
   realtime.messages.extension in ('broadcast', 'presence') -- specify the topic name
 );
 ```
