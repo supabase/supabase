@@ -6,11 +6,11 @@ description: 'Add an additional layer of security to your apps with Supabase Aut
 
 ## What is TOTP MFA
 
-TOTP multi-factor authentication involves a timed one-time password generated from an authenticator app in the control of users. The [TOTP MFA API](/docs/reference/javascript/auth-mfa-api) is enabled on all Supabase projects by default. Enrollment involves the display of a QR Code which a user can scan to capture a secret required to generate the one time password for subsequent authentication.
+TOTP multi-factor authentication involves a timed one-time password generated from an authenticator app in the control of users. It involves the display of a QR Code which a user can scan to capture a secret required to generate the one time password for subsequent authentication.
 
-The TOTP QR code was [initially introduced by Google Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format) but is now universally accepted by all authenticator apps. It uses a uri following the `otpauth` scheme such as:
+The use of a QR code was [initially introduced by Google Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format) but is now universally accepted by all authenticator apps. It takes a URI following the `otpauth` scheme such as: `otpauth://totp/supabase:alice@supabase.com?secret=<secret>&issuer=supabase`
 
-Below is a flow chart illustrating how these APIs work together to enable MFA features in your app.
+Below is a flow chart illustrating how the Enrollment, Challenge, and Verify APIs work in the context of MFA (TOTP).
 
 <Image
   alt="Diagram showing the flow of Multi-Factor authentication"
@@ -21,7 +21,7 @@ Below is a flow chart illustrating how these APIs work together to enable MFA fe
   containerClassName="max-w-[700px]"
 />
 
-TOTP MFA is available for free on all plans.
+[TOTP MFA API](/docs/reference/javascript/auth-mfa-api) is free to use and is enabled on all Supabase projects by default.
 
 ### Add enrollment flow
 
