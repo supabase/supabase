@@ -20,7 +20,19 @@ Below is a flow chart illustrating how these APIs work together to enable MFA fe
   containerClassName="max-w-[700px]"
 />
 
+TOTP MFA is available for free on all plans.
+
 ### Add enrollment flow for App Authenticator
+
+An enrollment flow provides a UI for users to set up additional authentication factors. Most applications add the enrollment flow in two places within their app:
+
+1. Right after login or sign up.
+   This lets users quickly set up MFA immediately after they log in or create an
+   account. We recommend encouraging all users to set up MFA if that makes sense
+   for your application. Many applications offer this as an opt-in step in an
+   effort to reduce onboarding friction.
+2. From within a settings page.
+   Allows users to set up, disable or modify their MFA settings.
 
 Enrolling a factor for use with MFA takes three steps:
 
