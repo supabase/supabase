@@ -214,15 +214,6 @@ export const CreateHookSheet = ({
       url = values.httpsValues.url
     }
 
-    // revoke permissions from previous function
-    if (statements.length > 0) {
-      await executeSql({
-        projectRef,
-        connectionString: project.connectionString,
-        sql: statements.join('\n'),
-      })
-    }
-
     const payload = {
       [enabledLabel]: values.enabled,
       [uriLabel]: url,
@@ -234,6 +225,28 @@ export const CreateHookSheet = ({
       {
         onSuccess: () => {
           toast.success(`Successfully created ${values.hookType}.`)
+          if (statements.length > 0) {
+            executeSql({
+              projectRef,
+              connectionString: project.connectionString,
+              sql: statements.join('\n'),
+            })
+          }
+          onClose()
+        },
+        onError: (error) => {
+          if (statements.length > 0 && hook.method.type === 'postgres') {
+            const revokeStatements = getRevokePermissionStatements(
+              hook.method.schema,
+              hook.method.functionName
+            )
+            executeSql({
+              projectRef,
+              connectionString: project.connectionString,
+              sql: revokeStatements.join('\n'),
+            })
+          }
+          toast.error(`Failed to create hook: ${error.message}`)
           onClose()
         },
       }
