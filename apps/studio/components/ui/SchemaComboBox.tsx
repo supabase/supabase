@@ -65,7 +65,8 @@ export const SchemaComboBox = ({
     if (selectedSchemas.includes(schema)) {
       onSelectSchemas(selectedSchemas.filter((s) => s !== schema))
     } else {
-      onSelectSchemas([...selectedSchemas, schema])
+      const newSelectedSchemas = [...selectedSchemas, schema].sort((a, b) => a.localeCompare(b))
+      onSelectSchemas(newSelectedSchemas)
     }
   }
 
