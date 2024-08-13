@@ -4,7 +4,7 @@ import { useEffectOnce } from 'react-use'
 import { format } from 'sql-formatter'
 
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useAllowSendAiSchema } from 'hooks/misc/useAllowSendAiSchema'
+import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -17,10 +17,10 @@ import {
   Input_Shadcn_,
   Modal,
   StatusIcon,
-  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
   cn,
 } from 'ui'
 import {
@@ -43,14 +43,15 @@ import { SAMPLE_QUERIES, generatePrompt } from './SqlGenerator.utils'
 import { SQLOutputActions } from './SqlOutputActions'
 
 function useSchemaMetadataForAi() {
-  const allowed = useAllowSendAiSchema()
   const project = useSelectedProject()
+  const [schemas] = useSchemasForAi(project?.ref!)
 
-  const includeMetadata = allowed && !!project
+  const includeMetadata = schemas.length > 0 && !!project
   const metadataSkipReason: AiMetadataSkipReason = !project ? 'no_project' : 'forbidden'
 
   const { data } = useEntityDefinitionsQuery(
     {
+      schemas: schemas,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },

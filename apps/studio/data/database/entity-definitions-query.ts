@@ -2,7 +2,7 @@ import { UseQueryOptions } from '@tanstack/react-query'
 import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { CREATE_PG_GET_TABLEDEF_SQL } from './database-query-constants'
 
-export const getEntityDefinitionsQuery = (limit = 100) => {
+export const getEntityDefinitionsQuery = (schemas: string[], limit = 100) => {
   const sql = /* SQL */ `
 ${CREATE_PG_GET_TABLEDEF_SQL}
 
@@ -54,7 +54,7 @@ with records as (
       )
       or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
     )
-    and nc.nspname = 'public'
+    and nc.nspname IN (${schemas.map((schema) => `'${schema}'`).join(', ')})
   order by c.relname asc
   limit ${limit}
   offset 0
@@ -78,6 +78,7 @@ export type EntityDefinitionsVariables = {
   limit?: number
   projectRef?: string
   connectionString?: string
+  schemas: string[]
 }
 
 type EntityDefinition = { id: number; sql: string }
@@ -87,14 +88,14 @@ export type EntityDefinitionsError = ExecuteSqlError
 export const useEntityDefinitionsQuery = <
   TData extends EntityDefinitionsData = EntityDefinitionsData,
 >(
-  { limit, projectRef, connectionString }: EntityDefinitionsVariables,
+  { schemas, limit, projectRef, connectionString }: EntityDefinitionsVariables,
   options: UseQueryOptions<ExecuteSqlData, EntityDefinitionsError, TData> = {}
 ) => {
   return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
-      sql: getEntityDefinitionsQuery(limit),
+      sql: getEntityDefinitionsQuery(schemas, limit),
       queryKey: ['entity-definitions'],
     },
     {

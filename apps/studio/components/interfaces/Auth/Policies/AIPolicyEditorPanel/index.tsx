@@ -166,6 +166,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const { data: entities } = useEntityDefinitionsQuery(
     {
+      schemas: ['public'],
       projectRef: selectedProject?.ref,
       connectionString: selectedProject?.connectionString,
     },
