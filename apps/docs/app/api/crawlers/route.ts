@@ -30,9 +30,11 @@ export async function GET(request: Request) {
     slug = maybeVersion
   }
 
-  const flattenedSections = await getFlattenedSections(lib, version)
-  const sectionsWithUrl: Array<AbbrevCommonClientLibSection & { url: URL }> =
-    flattenedSections!.map((section) => {
+  let section: AbbrevCommonClientLibSection
+  let sectionsWithUrl: Array<AbbrevCommonClientLibSection & { url: URL }>
+  try {
+    const flattenedSections = (await getFlattenedSections(lib, version)) ?? []
+    sectionsWithUrl = flattenedSections.map((section) => {
       const url = new URL(request.url)
       url.pathname = [BASE_PATH, 'reference', lib, isVersion ? version : null, section.slug]
         .filter(Boolean)
@@ -43,10 +45,11 @@ export async function GET(request: Request) {
         url,
       }
     })
-  const section = flattenedSections!.find(
-    (section) =>
-      (section.type === 'markdown' || section.type === 'function') && section.slug === slug
-  )
+    section = flattenedSections.find(
+      (section) =>
+        (section.type === 'markdown' || section.type === 'function') && section.slug === slug
+    )
+  } catch {}
 
   if (!section) {
     redirect(notFoundLink(`${lib}/${slug}`))
