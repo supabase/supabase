@@ -569,14 +569,13 @@ export const auth = {
           name: 'Identity Linking',
           url: '/guides/auth/auth-identity-linking',
         },
-        { name: 'Multi-Factor Authentication',
+        {
+          name: 'Multi-Factor Authentication',
           url: '/guides/auth/auth-mfa',
           items: [
-            { name: 'Time-based OTP (TOTP)',
-              url: '/guides/auth/auth-mfa/totp'},
-            { name: 'Phone',
-              url: '/guides/auth/auth-mfa/phone'},
-          ]
+            { name: 'App Authenticator (TOTP)', url: '/guides/auth/auth-mfa/totp' },
+            { name: 'Phone', url: '/guides/auth/auth-mfa/phone' },
+          ],
         },
         {
           name: 'Signout',
