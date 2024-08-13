@@ -57,10 +57,10 @@ export async function copyPages(port: MessagePort, supabase: SupabaseClient, db:
     'id'
   )
   if (pagesError) {
-    return postError(port, pagesError)
+    throw pagesError
   }
   if (!pages) {
-    return postError(port, { message: `Couldn't fetch any pages from remote database.` })
+    throw Error("Couldn't fetch any pages from remote database.")
   }
 
   await Promise.all(
@@ -70,7 +70,7 @@ export async function copyPages(port: MessagePort, supabase: SupabaseClient, db:
       try {
         await db.query(INSERT_PAGES, parameters)
       } catch (error) {
-        postError(port, convertError(error), { parameters })
+        throw Error("Couldn't insert pages into local DB.", { cause: { parameters } })
       }
     })
   )
@@ -84,10 +84,10 @@ export async function copyPageSections(port: MessagePort, supabase: SupabaseClie
     'id'
   )
   if (pageSectionsError) {
-    return postError(port, pageSectionsError)
+    throw pageSectionsError
   }
   if (!pageSections) {
-    return postError(port, { message: `Couldn't fetch any page sections from remote database.` })
+    throw Error("Couldn't fetch any page sections from remote database.")
   }
 
   await Promise.all(
@@ -104,7 +104,7 @@ export async function copyPageSections(port: MessagePort, supabase: SupabaseClie
       try {
         await db.query(INSERT_PAGE_SECTIONS, parameters)
       } catch (error) {
-        postError(port, convertError(error), { parameters })
+        throw Error("Couldn't insert page section into local database.", { cause: { parameters } })
       }
     })
   )
