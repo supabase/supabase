@@ -1,5 +1,5 @@
 ---
-title: 'Realtime Broadcast and Presence Authorization'
+title: 'Supabase Realtime: Broadcast and Presence Authorization'
 description: 'Secure Realtime Broadcast and Presence with Authorization'
 author: filipe
 image: 2024-08-13-supabase-realtime-broadcast-and-presence-authorization/OG.png
@@ -11,10 +11,10 @@ tags:
   - realtime
   - engineering
 date: '2024-08-13'
-toc_depth: 2
+toc_depth: 3
 ---
 
-Today we're releasing Realtime Authorization for Broadcast and Presence in Public Beta.
+Today we're releasing Authorization for Realtime's Broadcast and Presence.
 
 For context, Supabase includes three useful extensions for building real-time applications.
 
@@ -27,12 +27,13 @@ This release introduces authorization for Broadcast and Presence using Row Level
 ```sql
 create policy "authenticated user can listen to all messages"
 on "realtime"."messages"
-as permissive for select
+as permissive 
+for select
 to authenticated
 using ( true );
 ```
 
-To facilitate authorization, Realtime creates and manages the following `realtime.messages` table in your Database:
+To facilitate this, Realtime creates and manages a `messages` table in your Database's `realtime` schema:
 
 <Img
   src={{
@@ -43,10 +44,10 @@ To facilitate authorization, Realtime creates and manages the following `realtim
   alt="The table that is used to check policies."
 />
 
-You then write RLS policies for this table and Realtime will then approve or deny clients' access to your Broadcast and Presence Channels:
+You can then write RLS Policies for this table and Realtime will then allow or deny clients' access to your Broadcast and Presence Channels:
 
-- `SELECT` policies - Able to receive messages from the channel
-- `INSERT` policies - Able to send messages to the channel
+- `SELECT` Policies - Allow/Deny receiving messages
+- `INSERT` Policies - Allow/Deny sending messages
 
 ## How Realtime works without Authorization
 
@@ -54,70 +55,85 @@ When you want to connect to a Realtime Channel, you can do the following:
 
 ```tsx
 import { createClient } from '@supabase/supabase-js'
-const client = createClient('url', 'anon_key')
-const channel = client.channel('topic')
-// With authenticated user token
+
+// Prepare client with authenticated user
+const client = createClient('<url>', '<anon_key>')
 client.realtime.setAuth(token)
 
-client.channel('channel').subscribe((status: string, err: any) => {
+// Prepare the realtime channel
+const channel = client.channel('topic')
+
+channel
+.subscribe((status: string, err: any) => {
   if (status === 'SUBSCRIBED') {
     console.log('Connected')
   }
 })
 ```
 
-Any client with a valid token to your project's Realtime service can subscribe to any Channel and use it to send and receive any messages they want even when you don't want them to do so.
+Without Authorization, any authenticated client can subscribe to any _public_ Channel, to send and receive any messages.
 
 ## Adding Authorization to Realtime Channels
 
-You can convert this into a Channel that checks RLS policies by following these two steps:
+You can convert this into an _authorized_ Channel (one that verifies RLS policies) in two steps:
 
-- [Create RLS Policies](#create-rls-policies)
-- [Enabling Authorization on Channel Subscription](#enabling-authorization-on-channel-subscription)
+1. [Create RLS Policies](#create-rls-policies)
+2. [Enabling Authorization on Channels](#enabling-authorization-on-channels)
 
-### Create RLS Policies
+### 1. Create RLS Policies
 
-We'll keep it simple with this example and allow authenticated users to connect to a channel, send and receive Broadcast messages and sync, track, and untrack Presence.
+We'll keep it simple with this example. Let's allow authenticated users to:
+
+- Broadcast: send and receive messages (full access)
+- Presence: sync, track, and untrack (full access)
 
 ```sql
 create policy "authenticated user listen to all"
 on "realtime"."messages"
-as permissive for select
+as permissive 
+for select -- receive
 to authenticated
 using ( true );
 
 create policy "authenticated user write to all"
 on "realtime"."messages"
-as permissive for insert
+as permissive 
+for insert -- send 
 to authenticated
 with check ( true );
 ```
 
-We also have a new database function called `realtime.topic()` which enables you to write Policies that take into consideration the name of the Channel trying to run the RLS Policy.
+We also have a new database function called `realtime.topic()`. You can use this to access the name of the Channel inside your Policies:
 
 ```sql
 create policy "authenticated users can only read from 'locked' topic"
 on "realtime"."messages"
-as permissive for select
+as permissive 
+for select   -- read only
 to authenticated
-using ( realtime.topic() = 'locked' );
+using ( 
+  realtime.topic() = 'locked'  -- access the topic name
+);
 ```
 
-And you can choose which features you want to authorize:
+You can use the `extension` column in the `messages` table to allow/deny specify the Realtime extension:
 
 ```sql
-create policy "authenticated user can listen to all messages from broadcast and presence"
+create policy "read access to broadcast and presence"
 on "realtime"."messages"
-as permissive for select
+as permissive 
+for select
 to authenticated
-using ( realtime.messages.extension in ('broadcast', 'presence') );
+using ( 
+  realtime.messages.extension in ('broadcast', 'presence') -- specify the topic name
+);
 ```
 
 Reference our [Github Discussion](github.com/orgs/supabase/discussions/22484) for more complex use cases.
 
-### Enabling Authorization on Channel Subscription
+### 2. Enabling Authorization on Channels
 
-Now that you have your RLS policies set, you will need to define on your Channel subscription that you intend to use a private channel. To achieve it we've introduced a new configuration parameter `private` to signal to Realtime servers that you want to check authorization on the channel.
+We've introduced a new configuration parameter `private` to signal to Realtime servers that you want to check authorization on the channel.
 
 If you try to subscribe with an unauthorized user you will get a new error message informing the user that they do not have permission to access the topic.
 
@@ -152,13 +168,14 @@ supabase.realtime
       console.error(err.message)
     }
   })
+
 // Outputs the following code:
 // "Connected!"
 ```
 
 ### Advanced examples
 
-You can find a more complex example in the [NextJs Authorization Demo](https://github.com/supabase/supabase/tree/master/examples/realtime/nextjs-authorization-demo) where we are using this feature to build chat rooms with restricted access or you could check the [Flutter Figma Clone](https://github.com/supabase/supabase/tree/master/examples/realtime/flutter-figma-clone) to see how you can secure realtime communication between users.
+You can find a more complex example in the [Next.js Authorization Demo](https://github.com/supabase/supabase/tree/master/examples/realtime/nextjs-authorization-demo) where we are using this feature to build chat rooms with restricted access or you could check the [Flutter Figma Clone](https://github.com/supabase/supabase/tree/master/examples/realtime/flutter-figma-clone) to see how you can secure realtime communication between users.
 
 ## How does it work?
 
