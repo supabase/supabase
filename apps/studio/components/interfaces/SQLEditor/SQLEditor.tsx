@@ -144,6 +144,7 @@ const SQLEditor = () => {
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
   const isDiffOpen = !!sourceSqlDiff
 
+  const limit = enableFolders ? snapV2.limit : snap.limit
   const snippetIsLoading = enableFolders
     ? !(id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined)
     : !(id && ref && snap.loaded[ref])
@@ -321,8 +322,8 @@ const SQLEditor = () => {
           return toast.error('Unable to run query: Connection string is missing')
         }
 
-        const { appendAutoLimit } = checkIfAppendLimitRequired(sql, snap.limit)
-        const formattedSql = suffixWithLimit(sql, snap.limit)
+        const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+        const formattedSql = suffixWithLimit(sql, limit)
 
         execute({
           projectRef: project.ref,
@@ -331,7 +332,7 @@ const SQLEditor = () => {
             projectRef: project.ref,
             role: impersonatedRole,
           }),
-          autoLimit: appendAutoLimit ? snap.limit : undefined,
+          autoLimit: appendAutoLimit ? limit : undefined,
           isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
           handleError: (error) => {
             throw error
@@ -350,6 +351,7 @@ const SQLEditor = () => {
       setAiTitle,
       databaseSelectorState.selectedDatabaseId,
       databases,
+      limit,
     ]
   )
 
