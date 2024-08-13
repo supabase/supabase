@@ -7,6 +7,7 @@ description: 'Add an additional layer of security to your apps with Supabase Aut
 ## What is TOTP MFA
 
 TOTP multi-factor authentication involves a timed one-time password generated from an authenticator app in the control of users. The [TOTP MFA API](/docs/reference/javascript/auth-mfa-api) is enabled on all Supabase projects by default. Enrollment involves the display of a QR Code which a user can scan to capture a secret required to generate the one time password for subsequent authentication.
+
 The TOTP QR code was [initially introduced by Google Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format) but is now universally accepted by all authenticator apps. It uses a uri following the `otpauth` scheme such as:
 
 Below is a flow chart illustrating how these APIs work together to enable MFA features in your app.
@@ -22,7 +23,7 @@ Below is a flow chart illustrating how these APIs work together to enable MFA fe
 
 TOTP MFA is available for free on all plans.
 
-### Add enrollment flow for App Authenticator
+### Add enrollment flow
 
 An enrollment flow provides a UI for users to set up additional authentication factors. Most applications add the enrollment flow in two places within their app:
 
@@ -150,6 +151,21 @@ export function EnrollMFA({
 ```
 
 ### Add a challenge step to login
+
+Once a user has logged in via their first factor (email+password, magic link, one time password, social login etc.) you need to perform a check if any additional factors need to be verified.
+
+This can be done by using the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` API. When the user signs in and is redirected back to your app, you should call this method to extract the user's current and next authenticator assurance level (AAL).
+
+Therefore if you receive a `currentLevel` which is `aal1` but a `nextLevel` of `aal2`, the user should be given the option to go through MFA.
+
+Below is a table that explains the combined meaning.
+
+| Current Level | Next Level | Meaning                                                  |
+| ------------: | :--------- | :------------------------------------------------------- |
+|        `aal1` | `aal1`     | User does not have MFA enrolled.                         |
+|        `aal1` | `aal2`     | User has an MFA factor enrolled but has not verified it. |
+|        `aal2` | `aal2`     | User has verified their MFA factor.                      |
+|        `aal2` | `aal1`     | User has disabled their MFA factor. (Stale JWT.)         |
 
 #### Example: React
 
