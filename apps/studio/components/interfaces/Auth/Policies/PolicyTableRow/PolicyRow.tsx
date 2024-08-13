@@ -17,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -110,33 +111,18 @@ const PolicyRow = ({
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
-              <Button
-                disabled
-                type="default"
-                style={{ paddingLeft: 4, paddingRight: 4 }}
-                icon={<MoreVertical />}
-              />
-            </Tooltip.Trigger>
-            {!canUpdatePolicies && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="left">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to edit RLS policies
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            )}
-          </Tooltip.Root>
+          <ButtonTooltip
+            disabled
+            type="default"
+            style={{ paddingLeft: 4, paddingRight: 4 }}
+            icon={<MoreVertical />}
+            tooltip={{
+              content: {
+                side: 'left',
+                text: 'You need additional permissions to edit RLS policies',
+              },
+            }}
+          />
         )}
       </div>
     </Panel.Content>
