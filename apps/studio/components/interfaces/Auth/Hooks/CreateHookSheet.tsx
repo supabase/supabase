@@ -412,14 +412,17 @@ export const CreateHookSheet = ({
                       </FormItemLayout>
                     )}
                   />
-                </div>
-                <div className={cn('h-64 w-full')}>
-                  <CodeEditor
-                    id="postgres-hook-editor"
-                    isReadOnly={true}
-                    language="pgsql"
-                    value={statements.join('\n\n')}
-                  />
+                  <div className={cn('h-72 w-full col-span-2')}>
+                    <p className="py-4 text-sm text-foreground-light">
+                      {`The following statements will be executed on the function:`}
+                    </p>
+                    <CodeEditor
+                      id="postgres-hook-editor"
+                      isReadOnly={true}
+                      language="pgsql"
+                      value={statements.join('\n\n')}
+                    />
+                  </div>
                 </div>
               </>
             ) : (
