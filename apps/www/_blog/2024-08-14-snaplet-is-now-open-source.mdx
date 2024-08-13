@@ -31,32 +31,26 @@ There are 3 main tools that they are releasing under the MIT license:
 
 ### Copycat
 
+Copycat generates fake data. It's like faker.js, but deterministic: for any given input it'll always produce the same output. For example, in if you generate an email with the user ID `user_1234`, the next time you generate an email with that email it will be the same, _guaranteed:_
+
 ![Fake data](/images/blog/lw12/day-3/snaplet-fake-data.png)
-
-Copycat generates fake data. It's like faker.js, but deterministic: for any given input it'll always produce the same output.
-
-For example, in if you generate an email with the user ID `user_1234`, the next time you generate an email with that email it will be the same, _guaranteed:_
 
 - Repo: [github.com/snaplet/copycat](https://github.com/snaplet/copycat)
 
 ### Snaplet Seed
 
+Seed generates realistic synthetic data based off a database schema. It automatically determines the values in your database so you don't have to define each value. For example, if you want to generate a 3 `comments` for one of your `posts` you simply point it at your schema and let it handle the rest:
+
 ![Seed data](/images/blog/lw12/day-3/snaplet-seed-data.png)
-
-Seed generates realistic synthetic data based off a database schema. It automatically determines the values in your database so you don't have to define each value.
-
-For example, if you want to generate a 3 `comments` for one of your `posts` you simply point it at your schema and let it handle the rest:
 
 - Repo: [github.com/snaplet/seed](https://github.com/snaplet/seed)
 - Docs: [docs.snaplet.dev/seed](https://docs.snaplet.dev/seed)
 
 ### Snapshot
 
+Snapshot is for capturing, transforming, and restoring snapshots of your database. It's like an advanced version of pg_dump/pg_restore. It has a particularly neat feature called “subsetting”. Point it at a database table and it tell it how much data you need. To maintain referential integrity, subsetting traverses tables, selecting all the rows that are connected to the target table through foreign key relationships:
+
 ![Subset data](/images/blog/lw12/day-3/snaplet-subset.png)
-
-Snapshot is for capturing, transforming, and restoring snapshots of your database. It's like an advanced version of pg_dump/pg_restore.
-
-It has a particularly neat feature called “subsetting”. Point it at a database table and it tell it how much data you need. To maintain referential integrity, subsetting traverses tables, selecting all the rows that are connected to the target table through foreign key relationships:
 
 - Repo: [github.com/snaplet/snapshot](https://github.com/snaplet/snapshot)
 - Docs: [docs.snaplet.dev/snapshot](https://docs.snaplet.dev/snapshot)
