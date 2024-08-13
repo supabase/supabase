@@ -1,16 +1,15 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { ChevronDown, Edit, Lock, Trash, Unlock } from 'lucide-react'
 import type { CalculatedColumn } from 'react-data-grid'
+
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
   Separator,
 } from 'ui'
-
-import { ChevronDown, Edit, Lock, Trash, Unlock } from 'lucide-react'
 import { useDispatch, useTrackedState } from '../../store/Store'
 
 interface ColumnMenuProps {

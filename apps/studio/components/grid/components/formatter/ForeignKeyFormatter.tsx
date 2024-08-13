@@ -1,8 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
-import { Button, IconArrowRight } from 'ui'
+import { Button } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableQuery } from 'data/tables/table-query'
@@ -56,18 +57,17 @@ export const ForeignKeyFormatter = (props: Props) => {
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger asChild>
             <Button
+              asChild
               type="default"
               size="tiny"
               className="translate-y-[2px]"
-              onClick={() => {}}
               style={{ padding: '3px' }}
-              asChild
             >
               <Link
                 href={`/project/${projectRef}/editor/${targetTable?.id}?filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
                 onClick={() => snap.setSelectedSchemaName(relationship.target_table_schema)}
               >
-                <IconArrowRight size="tiny" />
+                <ArrowRight size={14} />
               </Link>
             </Button>
           </Tooltip.Trigger>
