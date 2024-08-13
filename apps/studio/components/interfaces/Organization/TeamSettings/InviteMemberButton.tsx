@@ -367,8 +367,8 @@ export const InviteMemberButton = () => {
                                       <CommandItem_Shadcn_
                                         key={project.ref}
                                         value={project.ref}
-                                        onSelect={(ref) => {
-                                          form.setValue('projectRef', ref)
+                                        onSelect={(value) => {
+                                          form.setValue('projectRef', value)
                                           setProjectDropdownOpen(false)
                                         }}
                                       >
