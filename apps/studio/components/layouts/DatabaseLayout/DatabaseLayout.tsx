@@ -42,21 +42,6 @@ const DatabaseProductMenu = () => {
           columnLevelPrivileges,
         })}
       />
-      <div className="px-3 pb-3">
-        <Alert_Shadcn_>
-          <AlertTitle_Shadcn_ className="text-sm">
-            Replication section has been renamed
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_ className="text-xs">
-            <p className="mb-2">
-              It can be now found under{' '}
-              <Link href={`/project/${project?.ref}/database/publications`} className="underline">
-                Publications
-              </Link>
-            </p>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      </div>
     </>
   )
 }
