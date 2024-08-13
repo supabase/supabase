@@ -1,9 +1,9 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -16,8 +16,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -55,37 +57,25 @@ const PolicyRow = ({
             <Badge color="yellow">Applies to anonymous users</Badge>
           ) : null}
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-x-1">
           <p className="text-foreground-light text-sm">Applied to:</p>
           {policy.roles.slice(0, 3).map((role, i) => (
             <code key={`policy-${role}-${i}`} className="text-foreground-light text-xs">
               {role}
             </code>
           ))}
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              {policy.roles.length > 3 && (
-                <code key={`policy-etc`} className="text-foreground-light text-xs">
+          {policy.roles.length > 3 && (
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <code key="policy-etc" className="text-foreground-light text-xs">
                   + {policy.roles.length - 3} more roles
                 </code>
-              )}
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background max-w-[220px] text-center',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">
-                    {policy.roles.slice(3).join(', ')}
-                  </span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" align="center">
+                {policy.roles.slice(3).join(', ')}
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
+          )}
         </div>
       </div>
       <div>
