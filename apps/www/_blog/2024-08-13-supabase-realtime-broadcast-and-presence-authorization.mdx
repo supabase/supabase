@@ -64,7 +64,7 @@ client.channel('channel').subscribe((status: string, err: any) => {
 })
 ```
 
-This will enable you to send messages but they will all be public. Any user would be subscribe to this Channel and read these messages if they had your anon token.
+Any client with a valid token to your project's Realtime service can subscribe to any Channel and use it to send and receive any messages they want even when you don't want them to do so.
 
 ## Adding Authorization to Realtime Channels
 
