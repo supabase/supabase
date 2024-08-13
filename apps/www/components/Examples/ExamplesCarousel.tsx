@@ -2,7 +2,7 @@ import 'swiper/css'
 
 import { useRef } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import Link from 'next/link'
 import { CTA } from '~/types/common'
 
@@ -85,7 +85,7 @@ const ExamplesCarousel = ({
           })}
         </Swiper>
         <div className="container mx-auto mt-3 hidden flex-row justify-between md:flex">
-          <div ref={prevRef} className="p ml-4 cursor-pointer">
+          <div ref={prevRef} className={cn('p ml-4 cursor-pointer')}>
             <ArrowLeft />
           </div>
           <div ref={nextRef} className="p mr-4 cursor-pointer">

@@ -120,7 +120,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'reference-python',
             href: '/reference/python/introduction',
             level: 'reference_python',
-            community: true,
           },
           {
             label: 'C#',
@@ -635,7 +634,32 @@ export const auth = {
           name: 'Redirect URLs',
           url: '/guides/auth/redirect-urls',
         },
-        { name: 'Auth Hooks', url: '/guides/auth/auth-hooks' },
+        {
+          name: 'Auth Hooks',
+          url: '/guides/auth/auth-hooks',
+          items: [
+            {
+              name: 'Custom access token hook',
+              url: '/guides/auth/auth-hooks/custom-access-token-hook',
+            },
+            {
+              name: 'Send SMS hook',
+              url: '/guides/auth/auth-hooks/send-sms-hook',
+            },
+            {
+              name: 'Send email hook',
+              url: '/guides/auth/auth-hooks/send-email-hook',
+            },
+            {
+              name: 'MFA verification hook',
+              url: '/guides/auth/auth-hooks/mfa-verification-hook',
+            },
+            {
+              name: 'Password verification hook',
+              url: '/guides/auth/auth-hooks/password-verification-hook',
+            },
+          ],
+        },
         { name: 'Custom SMTP', url: '/guides/auth/auth-smtp' },
         { name: 'User Management', url: '/guides/auth/managing-user-data' },
       ],
@@ -798,6 +822,17 @@ export const database: NavMenuConstant = {
           name: 'Database Advisors',
           url: '/guides/database/database-advisors',
         },
+        { name: 'Testing your database', url: '/guides/database/testing' },
+      ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        {
+          name: 'Timeouts',
+          url: '/guides/database/postgres/timeouts',
+        },
         {
           name: 'Debugging and monitoring',
           url: '/guides/database/inspect',
@@ -806,7 +841,6 @@ export const database: NavMenuConstant = {
           name: 'Debugging performance issues',
           url: '/guides/database/debugging-performance',
         },
-        { name: 'Testing your database', url: '/guides/database/testing' },
       ],
     },
     {
@@ -957,8 +991,16 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/mssql',
         },
         {
+          name: 'Connecting to Paddle',
+          url: '/guides/database/extensions/wrappers/paddle',
+        },
+        {
           name: 'Connecting to Redis',
           url: '/guides/database/extensions/wrappers/redis',
+        },
+        {
+          name: 'Connecting to Snowflake',
+          url: '/guides/database/extensions/wrappers/snowflake',
         },
         {
           name: 'Connecting to Stripe',
@@ -1726,6 +1768,7 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Logging', url: '/guides/platform/logs' },
+        { name: 'Advanced Log Filtering', url: '/guides/platform/advanced-log-filtering' },
         { name: 'Log Drains', url: '/guides/platform/log-drains' },
         { name: 'Metrics', url: '/guides/platform/metrics' },
         { name: 'Monitoring with Sentry', url: '/guides/platform/sentry-monitoring' },

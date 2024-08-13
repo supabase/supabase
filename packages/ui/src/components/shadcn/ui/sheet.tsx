@@ -30,9 +30,7 @@ interface SheetPortalProps
     VariantProps<typeof portalVariants> {}
 
 const SheetPortal = ({ side, children, ...props }: SheetPortalProps) => (
-  <SheetPrimitive.Portal {...props}>
-    <div className={portalVariants({ side })}>{children}</div>
-  </SheetPrimitive.Portal>
+  <SheetPrimitive.Portal {...props}>{children}</SheetPrimitive.Portal>
 )
 SheetPortal.displayName = SheetPrimitive.Portal.displayName
 
@@ -51,13 +49,20 @@ const SheetOverlay = React.forwardRef<
 ))
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
 
-const sheetVariants = cva('fixed z-50 scale-100 gap-4 bg-studio opacity-100 shadow-lg', {
+const classes = cn([
+  'fixed z-50 scale-100 gap-4 bg-studio opacity-100 shadow-lg',
+  'data-[state=open]:animate-in data-[state=open]:duration-300 data-[state=closed]:animate-out data-[state=closed]:duration-300',
+])
+
+const sheetVariants = cva(classes, {
   variants: {
     side: {
-      top: 'animate-in slide-in-from-top w-full duration-300 border-b',
-      bottom: 'animate-in slide-in-from-bottom w-full duration-300 border-t',
-      left: 'animate-in slide-in-from-left h-full duration-300 border-r',
-      right: 'animate-in slide-in-from-right h-full duration-300 border-l',
+      top: 'data-[state=open]:slide-in-from-top data-[state=closed]:slide-out-to-top w-full border-b inset-x-0 top-0',
+      bottom:
+        'data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom w-full border-t inset-x-0 bottom-0',
+      left: 'data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left h-full border-r inset-y-0 left-0',
+      right:
+        'data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right h-full border-l inset-y-0 right-0',
     },
     size: {
       content: '',

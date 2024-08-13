@@ -1,3 +1,4 @@
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
@@ -10,7 +11,6 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
-import { Code } from 'lucide-react'
 import type { Organization } from 'types'
 import {
   Button,
@@ -21,8 +21,6 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
-  IconCheck,
-  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -82,7 +80,7 @@ const ProjectLink = ({
     >
       <Link href={href} className="w-full flex items-center justify-between">
         {project.name}
-        {project.ref === ref && <IconCheck />}
+        {project.ref === ref && <Check size={16} />}
       </Link>
     </CommandItem_Shadcn_>
   )
@@ -122,13 +120,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
     <div className="flex items-center px-2">
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            type="text"
-            className="pr-2"
-            iconRight={
-              <Code className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
-            }
-          >
+          <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
             <div className="flex items-center space-x-2">
               <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</p>
             </div>
@@ -165,7 +157,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
                         }}
                         className="w-full flex items-center gap-2"
                       >
-                        <IconPlus size={14} strokeWidth={1.5} />
+                        <Plus size={14} strokeWidth={1.5} />
                         <p>New project</p>
                       </Link>
                     </CommandItem_Shadcn_>

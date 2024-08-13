@@ -51,10 +51,7 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type={(filters || []).length > 0 ? 'link' : 'text'}
-          icon={<FilterIcon strokeWidth={1.5} className="text-foreground-light" />}
-        >
+        <Button type={(filters || []).length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
@@ -113,8 +110,19 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: Filte
     )
   }, [])
 
+  const onSelectApplyFilters = () => {
+    // [Joshen] Trim empty spaces in input for only UUID type columns
+    const formattedFilters = filters.map((f) => {
+      const column = table.columns.find((c) => c.name === f.column)
+      if (column?.format === 'uuid') return { ...f, value: f.value.trim() }
+      else return f
+    })
+    setFilters(formattedFilters)
+    onApplyFilters(formattedFilters)
+  }
+
   function handleEnterKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') onApplyFilters(filters)
+    if (event.key === 'Enter') onSelectApplyFilters()
   }
 
   return (
@@ -146,7 +154,7 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: Filte
         <Button
           disabled={isEqual(filters, initialFilters)}
           type="default"
-          onClick={() => onApplyFilters(filters)}
+          onClick={() => onSelectApplyFilters()}
         >
           Apply filter
         </Button>
