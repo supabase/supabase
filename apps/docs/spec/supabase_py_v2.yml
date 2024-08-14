@@ -1372,7 +1372,7 @@ functions:
         description:  Whether duplicate rows should be ignored.
       - name: on_conflict
         isOptional: true
-        type: bool
+        type: string
         description:  Specified columns to be made to work with UNIQUE constraint.
       - name: default_to_null
         isOptional: true
@@ -1484,7 +1484,7 @@ functions:
         description:  Whether duplicate rows should be ignored.
       - name: on_conflict
         isOptional: true
-        type: bool
+        type: string
         description:  Specified columns to be made to work with UNIQUE constraint.
       - name: default_to_null
         isOptional: true
