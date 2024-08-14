@@ -58,7 +58,7 @@ Adding MFA to your app involves these four steps:
    You need to provide a UI within your app that your users will be able to set-up
    MFA in. You can add this right after sign-up, or as part of a separate flow in
    the settings portion of your app.
-2. **Add unenrollment flow.**
+2. **Add unenroll flow.**
    You need to support a UI through which users can see existing devices and unenroll
    devices which are no longer relevant.
 3. **Add challenge step to login.**
@@ -72,11 +72,11 @@ Adding MFA to your app involves these four steps:
 
 The enrollment flow and the challenge steps differ by factor and are covered on a separate page. Visit the [Phone](/docs/guides/auth/auth-mfa/phone) or [App Authenticator](/docs/guides/auth/auth-mfa/totp) pages to see how to add the flows for the respective factors. You can combine both flows and allow for use of both Phone and App Authenticator Factors.
 
-### Add unenrollment flow
+### Add unenroll flow
 
-The unenrollment process is the same for both Phone and TOTP factors.
+The unenroll process is the same for both Phone and TOTP factors.
 
-An unenrollment flow provides a UI for users to manage and unenroll factors linked to their accounts. Most applications do so via a factor management page where users can view and unlink selected factors.
+An unenroll flow provides a UI for users to manage and unenroll factors linked to their accounts. Most applications do so via a factor management page where users can view and unlink selected factors.
 
 When a user unenrolls a factor, call `supabase.auth.mfa.unenroll()` with the ID of the factor. For example, call `supabase.auth.mfa.unenroll({factorId: "d30fd651-184e-4748-a928-0a4b9be1d429"})` to unenroll a factor with ID `d30fd651-184e-4748-a928-0a4b9be1d429`.
 
