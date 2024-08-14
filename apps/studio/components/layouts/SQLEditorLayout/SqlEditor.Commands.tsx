@@ -16,6 +16,7 @@ import {
   CommandHeader,
   CommandInput,
   CommandWrapper,
+  escapeAttributeSelector,
   generateCommandClassNames,
   PageType,
   useCommandFilterState,
@@ -223,5 +224,7 @@ function SnippetSelector({
 }
 
 function snippetValue(snippet: SqlSnippet) {
-  return `${snippet.id}-${snippet.name}-${snippet.content.sql.slice(0, 30)}`.toLowerCase()
+  return escapeAttributeSelector(
+    `${snippet.id}-${snippet.name}-${snippet.content.sql.slice(0, 30)}`
+  ).toLowerCase()
 }
