@@ -1,6 +1,8 @@
 import { Message as MessageType } from 'ai'
 import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
+import { ChevronsUpDown } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
@@ -14,8 +16,6 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
-import { ChevronsUpDown } from 'lucide-react'
-import Link from 'next/link'
 import {
   AiIconAnimation,
   Button,
@@ -27,6 +27,7 @@ import {
 import { AssistantChatForm } from 'ui-patterns'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
 
@@ -151,41 +152,35 @@ export const AiAssistantPanel = ({
                 }
               />
             ) : (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
-                  {/* workaround for shadcn tooltip to work with disabled button */}
-                  <span tabIndex={0}>
-                    <Button
-                      size="tiny"
-                      type="default"
-                      disabled
-                      iconRight={
-                        <ChevronsUpDown
-                          className="text-foreground-muted"
-                          strokeWidth={2}
-                          size={14}
-                        />
-                      }
-                    >
-                      <div className="w-full flex">
-                        <p className="text-foreground">No schemas selected</p>
-                      </div>
-                    </Button>
-                  </span>
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ className="w-64">
-                  You need to enable schema metadata sharing in your{' '}
-                  <Link
-                    target="_blank"
-                    rel="noreferrer"
-                    href={`/org/${selectedOrganization?.slug}/general`}
-                    className="underline"
-                  >
-                    organization settings
-                  </Link>{' '}
-                  to share schemas with AI for more accurate responses.
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+              <ButtonTooltip
+                disabled
+                size="tiny"
+                type="default"
+                className="w-min"
+                iconRight={<ChevronsUpDown size={14} />}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    className: 'w-72',
+                    text: (
+                      <>
+                        Opt in to sending anonymous data to OpenAI in your{' '}
+                        <Link
+                          target="_blank"
+                          rel="noreferrer"
+                          href={`/org/${selectedOrganization?.slug}/general`}
+                          className="underline"
+                        >
+                          organization settings
+                        </Link>{' '}
+                        to share schemas with the Assistant for more accurate responses.
+                      </>
+                    ),
+                  },
+                }}
+              >
+                No schemas selected
+              </ButtonTooltip>
             )}
             <Button type="warning" onClick={() => setChatId(uuidv4())}>
               Clear history

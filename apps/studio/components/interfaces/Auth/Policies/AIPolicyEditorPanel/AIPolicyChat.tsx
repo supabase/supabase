@@ -23,6 +23,7 @@ import {
 import { AssistantChatForm } from 'ui-patterns'
 import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface AIPolicyChatProps {
   messages: MessageWithDebug[]
@@ -100,37 +101,35 @@ export const AIPolicyChat = ({
               }
             />
           ) : (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                {/* workaround for shadcn tooltip to work with disabled button */}
-                <span tabIndex={0} className="w-fit">
-                  <Button
-                    size="tiny"
-                    type="default"
-                    disabled
-                    iconRight={
-                      <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
-                    }
-                  >
-                    <div className="w-full flex">
-                      <p className="text-foreground">No schemas selected</p>
-                    </div>
-                  </Button>
-                </span>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ className="w-64">
-                You need to enable schema metadata sharing in your{' '}
-                <Link
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`/org/${selectedOrganization?.slug}/general`}
-                  className="underline"
-                >
-                  organization settings
-                </Link>{' '}
-                to share schemas with AI for more accurate responses.
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+            <ButtonTooltip
+              disabled
+              size="tiny"
+              type="default"
+              className="w-min"
+              iconRight={<ChevronsUpDown size={14} />}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  className: 'w-72',
+                  text: (
+                    <>
+                      Opt in to sending anonymous data to OpenAI in your{' '}
+                      <Link
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`/org/${selectedOrganization?.slug}/general`}
+                        className="underline"
+                      >
+                        organization settings
+                      </Link>{' '}
+                      to share schemas with the Assistant for more accurate responses.
+                    </>
+                  ),
+                },
+              }}
+            >
+              No schemas selected
+            </ButtonTooltip>
           )}
         </Message>
 
