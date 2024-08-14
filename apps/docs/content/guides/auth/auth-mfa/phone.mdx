@@ -74,7 +74,6 @@ export function EnrollMFA({
   const [challengeId, setChallengeId] = useState('')
 
   const onEnableClicked = () => {
-    // Enroll and Challenge
     setError('')
     ;(async () => {
       const verify = await auth.mfa.verify({
@@ -96,8 +95,6 @@ export function EnrollMFA({
       const factor = await auth.mfa.enroll({
         phone: phoneNumber,
         factorType: 'phone',
-        // Please replace this with a friendly name of choice
-        friendlyName: '<friendly-name>',
       })
       if (factor.error) {
         setError(factor.error.message)
