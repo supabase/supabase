@@ -22,7 +22,6 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { DollarSign, FileText } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Button, Form_Shadcn_, IconExternalLink, IconGitBranch, Modal } from 'ui'
-import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPlanNotice from './BranchingPlanNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
@@ -202,7 +201,6 @@ const EnableBranchingModal = () => {
                       isValid={canSubmit}
                       githubConnection={githubConnection}
                     />
-                    {!hasPitrEnabled && <BranchingPITRNotice />}
                   </>
                 )}
                 <Modal.Content className="py-6 flex flex-col gap-3">
