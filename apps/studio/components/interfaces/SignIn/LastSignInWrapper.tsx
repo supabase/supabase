@@ -1,6 +1,6 @@
 import { LastSignInType, useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { ReactNode } from 'react'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 
 export function LastSignInWrapper({
   children,
@@ -13,16 +13,13 @@ export function LastSignInWrapper({
 
   return (
     <div>
-      {lastSignIn === type && (
-        <div className="text-foreground-light px-2 font-mono text-xs tracking-tight">Last used</div>
-      )}
-      <div
-        className={cn({
-          'outline outline-1 mt-2 outline-offset-4 outline-foreground-lighter rounded-md':
-            lastSignIn === type,
-        })}
-      >
+      <div className="relative flex items-center">
         {children}
+        {lastSignIn === type && (
+          <Badge variant="brand" className="absolute -right-[84px]">
+            Last used
+          </Badge>
+        )}
       </div>
     </div>
   )
