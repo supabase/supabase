@@ -1,0 +1,17 @@
+Supabase Auth can throw or return various errors when using the API. All errors originating from the `supabase.auth` namespace of the JavaScript client library will be wrapped by the `AuthError` class.
+
+Error objects are split in a few classes:
+
+- `AuthApiError` -- errors which originate from the Supabase Auth API.
+  - Use `isAuthApiError` instead of `instanceof` checks to see if an error you caught is of this type.
+- `CustomAuthError` -- errors which generally originate from state in the client library.
+  - Use the `name` property on the error to identify the class of error received.
+
+Errors originating from the server API classed as `AuthApiError` always have a `code` property that can be used to identify the error returned by the server. The `status` property is also present, encoding the HTTP status code received in the response.
+
+<AuthErrorCodesTable />
+
+### Tips for better error handling
+
+- Do not use string matching on error messages! Always use the `name` and `code` properties of error objects to identify the situation.
+- Although HTTP status codes generally don't change, they can suddenly change due to bugs, so avoid relying on them unless absolutely necessary.

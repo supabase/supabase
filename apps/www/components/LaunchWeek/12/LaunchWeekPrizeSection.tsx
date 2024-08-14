@@ -24,53 +24,57 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               <div className="w-full h-auto lg:min-h-[400px] flex flex-col lg:flex-row items-stretch rounded-lg overflow-hidden">
                 <div className="relative w-full pl-4 xl:px-4 lg:w-2/3 border-b lg:border-none border-muted aspect-[3/1] top-0 md:-bottom-8 overflow-hidden">
                   <Image
-                    src="/images/launchweek/11/airpods-max-alpha.png"
+                    src="/images/launchweek/12/lw12-backpack.png"
                     alt="Supabase AirPod Max prize"
                     draggable={false}
                     width={300}
                     height={300}
-                    className="hidden md:block absolute object-cover scale-50 lg:scale-100 lg:object-top w-[90%] h-full opacity-90 dark:opacity-50 pointer-events-none"
-                  />
-                  <Image
-                    src="/images/launchweek/11/airpods-max-alpha-crop.png"
-                    alt="Supabase AirPod Max prize"
-                    draggable={false}
-                    width={300}
-                    height={300}
-                    className="md:hidden absolute mx-auto object-cover inset-x-0 lg:object-top w-auto h-full opacity-90 dark:opacity-50 pointer-events-none"
+                    quality={100}
+                    className="block absolute mx-auto object-cover inset-x-0 lg:inset-x-auto lg:object-top w-auto lg:w-[90%] h-full opacity-90 dark:opacity-50 pointer-events-none"
                   />
                 </div>
-                <div className="flex flex-col lg:w-1/2 gap-1 p-4 md:p-8 lg:pl-0 lg:h-full">
-                  <div className="flex flex-col gap-2 flex-grow">
-                    <LabelBadge text="5 sets" />
-                    <p className="xl:mt-4 text-foreground">Win AirPods Max</p>
+                <div className="flex flex-col justify-center lg:w-1/2 gap-1 p-4 md:p-8 lg:pl-0 lg:h-full">
+                  <div className="flex flex-col gap-2">
+                    <LabelBadge text="5 pieces" />
+                    <p className="text-foreground">Win Wandrd Backpack</p>
                     <p className="text-foreground-lighter text-sm">
-                      Secure your ticket to enter our random prize pool, and amplify your odds by
-                      sharing. Or if you don't leave anything up for chance - join our Hackathon and
-                      showcase your creations. With luck or skill, you could snag these top-tier
-                      headphones!
+                      Share your ticket to increase your chances of winning a{' '}
+                      <a
+                        className="text-foreground hover:underline"
+                        href="https://eu.wandrd.com/products/prvke?variant=39360658473002"
+                        target="_blank"
+                      >
+                        Wandrd backpack
+                      </a>{' '}
+                      and other limited swag.
                     </p>
                   </div>
                 </div>
               </div>
             }
           />
-          <div className="w-full flex flex-col gap-4 items-stretch">
+          <div className="w-full min-h-[400px] flex flex-col gap-4 items-stretch">
             <LaunchWeekPrizeCard
-              className="flex-grow"
+              className="relative flex-grow"
               content={
-                <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
-                  <LabelBadge text="30 t-shirts" />
-                  <p>Supabase T-shirts</p>
-                </div>
-              }
-            />
-            <LaunchWeekPrizeCard
-              className="flex-grow"
-              content={
-                <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
-                  <LabelBadge text="25 pins" />
-                  <p>Supabase Pins</p>
+                <div className="flex flex-col h-full justify-end">
+                  <div className="relative flex-grow w-full">
+                    <Image
+                      src="/images/launchweek/12/world-tour-tshirt.png"
+                      alt="Supabase Launch Week 12 World Tour T-Shirt"
+                      draggable={false}
+                      width={300}
+                      height={300}
+                      quality={100}
+                      className="absolute object-cover inset-0 object-right lg:object-right w-full h-full opacity-100 pointer-events-none"
+                    />
+                  </div>
+                  <div className="relative flex flex-col justify-center w-full gap-1 p-4 md:p-6 bg-surface-75 border-t border-muted">
+                    <div className="flex flex-col gap-2">
+                      <LabelBadge text="30 t-shirts" />
+                      <p>World Tour T-Shirt</p>
+                    </div>
+                  </div>
                 </div>
               }
             />

@@ -5,9 +5,65 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 25 Jun 2024 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 13 Aug 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/snaplet-is-now-open-source</guid>
+  <title>Snaplet is now open source</title>
+  <link>https://supabase.com/blog/snaplet-is-now-open-source</link>
+  <description>Snaplet is closing their business and opening their source code</description>
+  <pubDate>Tue, 13 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-realtime-broadcast-and-presence-authorization</guid>
+  <title>Supabase Realtime: Broadcast and Presence Authorization</title>
+  <link>https://supabase.com/blog/supabase-realtime-broadcast-and-presence-authorization</link>
+  <description>Secure Realtime Broadcast and Presence with Authorization</description>
+  <pubDate>Mon, 12 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-new</guid>
+  <title>postgres.new: In-browser Postgres with an AI interface</title>
+  <link>https://supabase.com/blog/postgres-new</link>
+  <description>Introducing postgres.new, the in-browser Postgres sandbox with AI assistance.</description>
+  <pubDate>Sun, 11 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/github-copilot-extension-for-vs-code</guid>
+  <title>Official Supabase extension for VS Code and GitHub Copilot</title>
+  <link>https://supabase.com/blog/github-copilot-extension-for-vs-code</link>
+  <description>Today we&apos;re launching a new GitHub Copilot extension for VS Code to make your development with Supabase even more delightful.</description>
+  <pubDate>Sun, 11 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-js-on-jsr</guid>
+  <title>Announcing Supabase on JSR</title>
+  <link>https://supabase.com/blog/supabase-js-on-jsr</link>
+  <description>Supabase is now available on the open source JavaScript Registry (JSR).</description>
+  <pubDate>Mon, 15 Jul 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/range-columns</guid>
+  <title>Simplifying Time-Based Queries with Range Columns</title>
+  <link>https://supabase.com/blog/range-columns</link>
+  <description>Learn how to use range columns in Postgres to simplify time-based queries and add constraints to prevent overlaps.</description>
+  <pubDate>Wed, 10 Jul 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/hardening-supabase</guid>
+  <title>Supabase Security Suite</title>
+  <link>https://supabase.com/blog/hardening-supabase</link>
+  <description>Learn how to use range columns in Postgres to simplify time-based queries and add constraints to prevent overlaps.</description>
+  <pubDate>Wed, 10 Jul 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-realtime-location-sharing-with-maplibre</guid>
+  <title>Postgres Realtime location sharing with MapLibre</title>
+  <link>https://supabase.com/blog/postgres-realtime-location-sharing-with-maplibre</link>
+  <description>Use Supabase Realtime to draw live location data onto the map with MapLibre GL JS.</description>
+  <pubDate>Wed, 03 Jul 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgis-generate-vector-tiles</guid>
   <title>Generate Vector Tiles with PostGIS</title>
   <link>https://supabase.com/blog/postgis-generate-vector-tiles</link>
@@ -478,7 +534,7 @@
 </item>
 <item>
   <guid>https://supabase.com/blog/organization-based-billing</guid>
-  <title>Organization-based Billing, Project Transfers, Team plan</title>
+  <title>Organization-based Billing, Project Transfers, Team Plan</title>
   <link>https://supabase.com/blog/organization-based-billing</link>
   <description>Introducing the new Organization-based Billing</description>
   <pubDate>Wed, 30 Aug 2023 22:00:00 GMT</pubDate>

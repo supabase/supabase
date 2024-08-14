@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { __parseTypeSpec } from './Reference.typeSpec'
+import { parseTypeSpec } from './Reference.typeSpec'
 
 describe('TS type spec parsing', () => {
   it('matches snapshot', async () => {
-    const parsed = await __parseTypeSpec()
+    const parsed = await parseTypeSpec()
     const json = JSON.stringify(
       parsed,
       (key, value) => {

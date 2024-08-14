@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/legacy/image'
 import { usePathname } from 'next/navigation'
 import { IconChevronRight, IconArrowLeft } from '~/../../packages/ui'
-import { REFERENCES } from './NavigationMenu/NavigationMenu.constants'
+import { REFERENCES } from '~/content/navigation.references'
 
 import { NavMenuGroup, NavMenuSection } from './Navigation.types'
 import * as Accordion from '@radix-ui/react-accordion'
