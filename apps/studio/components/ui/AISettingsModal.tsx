@@ -38,7 +38,6 @@ const AISettingsModal = () => {
           <p className="text-foreground-light">Schemas metadata to be shared with OpenAI</p>
           <SchemaComboBox
             size="small"
-            // className="min-w-40"
             label={
               includeSchemaMetadata && selectedSchemas.length > 0
                 ? `${selectedSchemas.length} schema${

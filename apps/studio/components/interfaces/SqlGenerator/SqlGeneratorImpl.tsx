@@ -45,9 +45,8 @@ import { SAMPLE_QUERIES, generatePrompt } from './SqlGenerator.utils'
 import { SQLOutputActions } from './SqlOutputActions'
 
 function useSchemaMetadataForAi() {
-  const project = useSelectedProject()
-
   const isOptedInToAI = useOrgOptedIntoAi()
+  const project = useSelectedProject()
 
   const [schemas] = useSchemasForAi(project?.ref!)
   const includeMetadata = (isOptedInToAI || !IS_PLATFORM) && schemas.length > 0 && !!project
