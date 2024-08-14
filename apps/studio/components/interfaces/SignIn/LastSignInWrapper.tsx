@@ -14,7 +14,7 @@ export function LastSignInWrapper({
   return (
     <div>
       {lastSignIn === type && (
-        <div className="text-foreground px-2 font-mono text-xs tracking-tight">Last used</div>
+        <div className="text-foreground-light px-2 font-mono text-xs tracking-tight">Last used</div>
       )}
       <div
         className={cn({
