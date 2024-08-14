@@ -46,6 +46,7 @@ export interface CodeBlockProps {
   hideCopy?: boolean
   hideLineNumbers?: boolean
   className?: string
+  wrapperClassName?: string
   value?: string
   theme?: any
   children?: string
@@ -59,6 +60,7 @@ export const CodeBlock = ({
   highlightBorder,
   styleConfig,
   className,
+  wrapperClassName,
   value,
   theme,
   children,
@@ -120,7 +122,12 @@ export const CodeBlock = ({
         </div>
       )}
       {className ? (
-        <div className="group relative max-w-[90vw] md:max-w-none overflow-auto">
+        <div
+          className={cn(
+            'group relative max-w-[90vw] md:max-w-none overflow-auto',
+            wrapperClassName
+          )}
+        >
           {/* @ts-ignore */}
           <SyntaxHighlighter
             language={lang}
