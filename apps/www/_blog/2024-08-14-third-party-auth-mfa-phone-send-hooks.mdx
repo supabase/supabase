@@ -24,6 +24,8 @@ Let's dive into each new feature.
 
 ## Support for third-party Auth providers
 
+The headline feature today is [third-party Authentication](https://supabase.com/docs/guides/auth/third-party/overview).
+
 ![Third-party auth](/images/blog/lw12/third-party-auth/third-party-auth.png)
 
 Supabase is a modular platform. We've been designing it so that you can choose which products you use with Postgres. You can use our own products (like Supabase Auth) or external products (like Auth0), and _in theory_ the experience should be just-as-delightful.
@@ -42,30 +44,18 @@ Firebase Auth is currently under a private-alpha release stage, as we're still i
 
 </Admonition>
 
-Migrating auth providers can be very costly and technically challenging, especially for applications with large user bases. You can use Supabase's native Auth offering alongside your third-party authentication provider to achieve a disruption-free migration.
+Migrating auth providers can be costly and technically challenging, especially for applications with large user bases. You can use Supabase's native auth offering alongside your third-party authentication provider to achieve a disruption-free migration.
 
 All of the third-party providers are supported in the Supabase CLI, so you can evaluate, test, and develop your integration for free.
 
-```toml
-# add this to supabase/config.toml to use Auth0
-[auth.third_party.auth0]
-enabled = true
-tenant_id = "<your auth0 tenant ID>"
-tenant_region = "<tenant's region>" # if available
-```
+The Supabase client supports third-party auth like this:
 
-Then in your app, initialize the Supabase client like so:
-
-```tsx
+```ts
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   accessToken: async () => {
     const accessToken = await auth0.getTokenSilently()
-
-    // Alternatively you can use (await auth0.getIdTokenClaims()).__raw to
-    // use an ID token instead.
-
     return accessToken
   },
 })
@@ -73,39 +63,13 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
 ## Phone-based multi-factor authentication
 
-![Phone MFA](/images/blog/lw12/third-party-auth/phone-mfa.png)
-
 We've extended MFA to [support SMS and WhatsApp](https://supabase.com/docs/guides/auth/auth-mfa).
+
+![Phone MFA](/images/blog/lw12/third-party-auth/phone-mfa.png)
 
 We have a strong conviction that all applications should have access to an open and secure authentication provider. Secure-by-default should not be a luxury: developers should have affordable access to security best-practices.
 
-[Almost two years ago](https://supabase.com/blog/mfa-auth-via-rls) we launched [MFA with TOTP (app authenticator)](https://supabase.com/docs/guides/auth/auth-mfa) free of charge. Since then, we've heard a common complaint from developers: app authenticators can be hard to adopt for non-techies. Phone-based MFA is for those use-cases
-
-```tsx
-// to enroll a new phone factor
-const {
-  data: { id: factorId },
-} = await supabase.auth.mfa.enroll({
-  factorType: 'phone',
-  phone: '15552368', // who you gonna call? :D
-})
-
-// to send the code
-const {
-  data: { challengeId },
-} = await supabase.auth.mfa.challenge({
-  factorId,
-})
-
-// to verify the code received by the user
-await supabase.auth.mfa.verify({
-  factorId,
-  challengeId,
-  code: '123456',
-})
-
-// finally the user's `aal` claim in the JWT will be upgraded to aal2
-```
+[Almost two years ago](https://supabase.com/blog/mfa-auth-via-rls) we launched [MFA with TOTP (app authenticator)](https://supabase.com/docs/guides/auth/auth-mfa) free of charge. Since then, we've heard a common complaint from developers: app authenticators can be hard to adopt for non-techies. Phone-based MFA is for those developers who want to provide a more accessible MFA experience for their users.
 
 <Admonition>
 
@@ -113,9 +77,31 @@ No security product is infallible! MFA with SMS can come with some hidden securi
 
 </Admonition>
 
+The code looks like this:
+
+{/* prettier-ignore */}
+```ts
+// Send an SMS or WhatsApp message to the user
+const { data: { challengeId } } = await supabase.auth.mfa.challenge({
+  factorId,
+})
+
+// To verify the code received by the user
+await supabase.auth.mfa.verify({
+  factorId,
+  challengeId,
+  code: '123456',
+})
+
+// The user's `aal` claim in the JWT 
+// will be upgraded to aal2
+```
+
 ## Auth Hooks for SMS and Email
 
-![Send-email-hook(2).png](/images/blog/lw12/third-party-auth/send-email-hook.png)
+We've added a few new [Auth Hooks](https://supabase.com/docs/guides/auth/auth-hooks).
+
+![Email hooks](/images/blog/lw12/third-party-auth/send-email-hook.png)
 
 **Email Hooks**
 
