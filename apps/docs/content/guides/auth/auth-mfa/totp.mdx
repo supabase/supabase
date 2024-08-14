@@ -1,14 +1,14 @@
 ---
 id: 'auth-mfa-totp'
 title: 'Multi-Factor Authentication (TOTP)'
-description: 'Add an additional layer of security to your apps with Supabase Auth multi-factor authentication.'
+description: 'Add an additional layer of security to your apps with TOTP multi-factor authentication.'
 ---
 
-## What is TOTP MFA
+## How does app authenticator multi-factor authentication work?
 
-TOTP multi-factor authentication involves a timed one-time password generated from an authenticator app in the control of users. It involves the display of a QR Code which a user can scan to capture a secret required to generate the one time password for subsequent authentication.
+App Authenticator (TOTP) multi-factor authentication involves a timed one-time password generated from an authenticator app in the control of users. It uses a QR Code which to transmit a shared secret used to generate a One Time Password. A user can scan a QR code with their phone to capture a shared secret required for subsequent authentication.
 
-The use of a QR code was [initially introduced by Google Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format) but is now universally accepted by all authenticator apps. It takes a URI following the `otpauth` scheme such as: `otpauth://totp/supabase:alice@supabase.com?secret=<secret>&issuer=supabase`
+The use of a QR code was [initially introduced by Google Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format) but is now universally accepted by all authenticator apps. The QR code has an alternate representation in URI form following the `otpauth` scheme such as: `otpauth://totp/supabase:alice@supabase.com?secret=<secret>&issuer=supabase` which a user can manually input in cases where there is difficulty rendering a QR Code.
 
 Below is a flow chart illustrating how the Enrollment, Challenge, and Verify APIs work in the context of MFA (TOTP).
 
