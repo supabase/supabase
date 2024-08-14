@@ -5301,6 +5301,33 @@
                       "type": "number",
                       "nullable": true
                     },
+                    "mfa_totp_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_totp_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_otp_length": {
+                      "type": "number"
+                    },
+                    "mfa_phone_template": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mfa_phone_max_frequency": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "password_hibp_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -5621,6 +5648,13 @@
                     "mailer_templates_reauthentication_content",
                     "mailer_templates_recovery_content",
                     "mfa_max_enrolled_factors",
+                    "mfa_totp_enroll_enabled",
+                    "mfa_totp_verify_enabled",
+                    "mfa_phone_enroll_enabled",
+                    "mfa_phone_verify_enabled",
+                    "mfa_phone_otp_length",
+                    "mfa_phone_template",
+                    "mfa_phone_max_frequency",
                     "password_hibp_enabled",
                     "password_min_length",
                     "password_required_characters",
@@ -6241,6 +6275,31 @@
                   },
                   "api_max_request_duration": {
                     "type": "number"
+                  },
+                  "mfa_totp_enroll_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_totp_verify_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_phone_enroll_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_phone_verify_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_phone_max_frequency": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 32767
+                  },
+                  "mfa_phone_otp_length": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 32767
+                  },
+                  "mfa_phone_template": {
+                    "type": "string"
                   }
                 }
               }
@@ -6682,6 +6741,33 @@
                       "type": "number",
                       "nullable": true
                     },
+                    "mfa_totp_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_totp_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_otp_length": {
+                      "type": "number"
+                    },
+                    "mfa_phone_template": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mfa_phone_max_frequency": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "password_hibp_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7002,6 +7088,13 @@
                     "mailer_templates_reauthentication_content",
                     "mailer_templates_recovery_content",
                     "mfa_max_enrolled_factors",
+                    "mfa_totp_enroll_enabled",
+                    "mfa_totp_verify_enabled",
+                    "mfa_phone_enroll_enabled",
+                    "mfa_phone_verify_enabled",
+                    "mfa_phone_otp_length",
+                    "mfa_phone_template",
+                    "mfa_phone_max_frequency",
                     "password_hibp_enabled",
                     "password_min_length",
                     "password_required_characters",
@@ -12227,6 +12320,33 @@
             "type": "number",
             "nullable": true
           },
+          "mfa_totp_enroll_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_totp_verify_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_phone_enroll_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_phone_verify_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_phone_otp_length": {
+            "type": "number"
+          },
+          "mfa_phone_template": {
+            "type": "string",
+            "nullable": true
+          },
+          "mfa_phone_max_frequency": {
+            "type": "number",
+            "nullable": true
+          },
           "password_hibp_enabled": {
             "type": "boolean",
             "nullable": true
@@ -12547,6 +12667,13 @@
           "mailer_templates_reauthentication_content",
           "mailer_templates_recovery_content",
           "mfa_max_enrolled_factors",
+          "mfa_totp_enroll_enabled",
+          "mfa_totp_verify_enabled",
+          "mfa_phone_enroll_enabled",
+          "mfa_phone_verify_enabled",
+          "mfa_phone_otp_length",
+          "mfa_phone_template",
+          "mfa_phone_max_frequency",
           "password_hibp_enabled",
           "password_min_length",
           "password_required_characters",
@@ -13128,6 +13255,31 @@
           },
           "api_max_request_duration": {
             "type": "number"
+          },
+          "mfa_totp_enroll_enabled": {
+            "type": "boolean"
+          },
+          "mfa_totp_verify_enabled": {
+            "type": "boolean"
+          },
+          "mfa_phone_enroll_enabled": {
+            "type": "boolean"
+          },
+          "mfa_phone_verify_enabled": {
+            "type": "boolean"
+          },
+          "mfa_phone_max_frequency": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 32767
+          },
+          "mfa_phone_otp_length": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 32767
+          },
+          "mfa_phone_template": {
+            "type": "string"
           }
         }
       },

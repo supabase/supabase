@@ -27,7 +27,6 @@ import {
   SelectValue_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
-  cn,
 } from 'ui'
 
 import { z } from 'zod'
@@ -35,11 +34,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { ReactNode, useEffect, useState } from 'react'
-import { TrashIcon } from 'lucide-react'
+import { ExternalLink, TrashIcon } from 'lucide-react'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import Link from 'next/link'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
-import { FormDescription } from '@ui/components/shadcn/ui/form'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -152,7 +151,7 @@ export function LogDrainDestinationSheetForm({
       description: defaultValues?.description || '',
       type: defaultType,
       http: defaultValues?.config?.http || 'http2',
-      gzip: defaultValues?.config?.gzip || true,
+      gzip: mode === 'create' ? true : defaultValues?.config?.gzip || false,
       headers: DEFAULT_HEADERS,
       url: defaultValues?.config?.url || '',
       api_key: defaultValues?.config?.api_key || '',
@@ -211,7 +210,7 @@ export function LogDrainDestinationSheetForm({
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
-        <SheetSection className="!px-0">
+        <SheetSection className="!px-0 !pb-0">
           <Form_Shadcn_ {...form}>
             <form
               id={FORM_ID}
@@ -236,14 +235,18 @@ export function LogDrainDestinationSheetForm({
                   label="Name"
                   formControl={form.control}
                 />
-                {/* <LogDrainFormItem
+                <LogDrainFormItem
                   value="description"
                   placeholder="My Destination"
                   label="Description"
                   formControl={form.control}
-                /> */}
+                />
                 {mode === 'create' && (
-                  <FormItemLayout layout="horizontal" label="Type">
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Type"
+                    description={LOG_DRAIN_TYPES.find((t) => t.value === type)?.description || ''}
+                  >
                     <Select
                       defaultValue={defaultType}
                       value={form.getValues('type')}
@@ -264,9 +267,6 @@ export function LogDrainDestinationSheetForm({
                           </SelectItem>
                         ))}
                       </SelectContent>
-                      <FormDescription className="mt-2">
-                        {LOG_DRAIN_TYPES.find((t) => t.value === type)?.description}
-                      </FormDescription>
                     </Select>
                   </FormItemLayout>
                 )}
@@ -307,11 +307,11 @@ export function LogDrainDestinationSheetForm({
                       />
                     </div>
 
-                    {/* <FormField_Shadcn_
+                    <FormField_Shadcn_
                       control={form.control}
                       name="gzip"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="space-y-2">
+                        <FormItem_Shadcn_ className="space-y-2 px-4">
                           <div className="flex gap-2 items-center">
                             <FormControl_Shadcn_>
                               <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -323,16 +323,16 @@ export function LogDrainDestinationSheetForm({
                           </div>
                         </FormItem_Shadcn_>
                       )}
-                    /> */}
+                    />
 
-                    <div className="space-y-2">
-                      <div className="px-content">
+                    <div className="border-t">
+                      <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
                         <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
                         <p className="text-xs text-foreground-lighter">
                           Set custom headers when draining logs to the Endpoint URL
                         </p>
                       </div>
-                      <div className="divide-y border-y">
+                      <div className="divide-y">
                         {hasHeaders &&
                           Object.keys(headers || {})?.map((headerKey) => (
                             <div
@@ -381,7 +381,11 @@ export function LogDrainDestinationSheetForm({
                       name="region"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItemLayout layout="horizontal" label={'Region'}>
+                        <FormItemLayout
+                          layout="horizontal"
+                          label={'Region'}
+                          description="The Datadog region to send logs to."
+                        >
                           <FormControl_Shadcn_>
                             <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                               <SelectTrigger_Shadcn_ className="col-span-3">
@@ -416,7 +420,7 @@ export function LogDrainDestinationSheetForm({
                 e.stopPropagation()
                 addHeader()
               }}
-              className="flex gap-2 mt-4 items-center px-content"
+              className="flex border-t py-4 gap-4 items-center px-content"
             >
               <label className="sr-only" htmlFor="header-name">
                 Header name
@@ -446,7 +450,33 @@ export function LogDrainDestinationSheetForm({
           )}
         </SheetSection>
 
-        <SheetSection></SheetSection>
+        <SheetSection className="border-t mt-4 bg-background-alternative-200">
+          <FormItemLayout
+            isReactForm={false}
+            layout="horizontal"
+            label={
+              <div className="text-foreground-light">
+                Additional drain cost
+                <div className="text-foreground-lighter mt-2">
+                  <Link
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline flex gap-1 items-center"
+                    href="https://supabase.com/docs/guides/platform/log-drains"
+                  >
+                    Documentation <ExternalLink className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            }
+          >
+            <ul className="text-right text-foreground-light">
+              <li className="text-brand-link text-base">$60 / drain / month</li>
+              <li>$0.20 per million events</li>
+              <li>$0.09 per GB</li>
+            </ul>
+          </FormItemLayout>
+        </SheetSection>
 
         <SheetFooter className="p-content">
           <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
