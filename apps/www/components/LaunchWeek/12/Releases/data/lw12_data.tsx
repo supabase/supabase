@@ -107,7 +107,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 2,
     dd: 'Tue',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/supabase-realtime-broadcast-and-presence-authorization',
     date: '13 August',
@@ -149,21 +149,45 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-3',
     d: 3,
     dd: 'Wed',
-    shipped: false,
-    isToday: false,
-    hasCountdown: true,
-    blog: '',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/third-party-auth-mfa-phone-send-hooks',
     date: '14 August',
     published_at: '2024-08-14T08:00:00.000-07:00',
-    title: '',
-    description: '',
+    title: 'Supabase Auth: Bring-your-own Auth0, Cognito, or Firebase',
+    description: (
+      <>
+        <span className="text-foreground">Supabase Auth</span>:<br className="hidden sm:block" />{' '}
+        Bring-your-own Auth0,
+        <br className="hidden sm:block" /> Cognito, or Firebase
+      </>
+    ),
     links: [
+      {
+        type: 'video',
+        href: 'BPD7kxb5N84',
+      },
       {
         type: 'xSpace',
         href: 'https://supabase.link/lw12-xspace-3',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: 'Supabase Auth: Bring-your-own Auth0, Cognito, or Firebase',
+        blog: '/blog/third-party-auth-mfa-phone-send-hooks',
+        bg_layers: [
+          {
+            img: '/images/launchweek/12/d3/auth-dark.svg',
+            mobileImg: '/images/launchweek/12/d3/auth-dark-mobile.svg',
+            imgLight: '/images/launchweek/12/d3/auth-light.svg',
+            mobileImgLight: '/images/launchweek/12/d3/auth-light-mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-4',
@@ -171,7 +195,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Thu',
     shipped: false,
     isToday: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '',
     date: '15 August',
     published_at: '2024-08-15T08:00:00.000-07:00',

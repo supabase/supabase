@@ -38,7 +38,7 @@ const BuildStage: FC = () => {
             <li
               key={`${day.id}-${i}`}
               className={cn(
-                'relative flex flex-col w-full aspect-square rounded-xl border border-dashed border-strong dark:border-background-surface-300 bg-surface-100/10 col-span-1',
+                'relative flex flex-col w-full aspect-video max-h-[250px] sm:aspect-square rounded-xl border border-dashed border-strong dark:border-background-surface-300 bg-surface-100/10 col-span-1',
                 day.className
               )}
               data-delay={i}

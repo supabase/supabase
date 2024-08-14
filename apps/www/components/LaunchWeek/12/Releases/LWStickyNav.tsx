@@ -55,13 +55,13 @@ const LWXStickyNav: FC = () => {
       <nav className="sticky z-30 top-0 bg-default/90 backdrop-blur-sm pointer-events-auto w-full border-b dark:border-muted h-[60px] flex items-center">
         <SectionContainer className="!max-w-none !py-0 lg:!container flex items-center justify-between font-mono gap-4 md:gap-8 text-sm">
           <div className="w-full flex items-center gap-4 md:gap-8">
-            <ul className="w-full lw-sticky-nav flex items-center gap-2 md:gap-4 text-foreground-muted">
+            <ul className="w-full lw-sticky-nav flex items-center gap-2 md:gap-4 text-foreground-lighter">
               {days.map((day: WeekDayProps) => (
                 <li key={day.id}>
                   <Link
                     href={`#${day.id}`}
                     className={cn(
-                      'p-1 transition-colors hover:text-foreground flex items-center',
+                      'p-1 transition-colors text-foreground-muted hover:text-foreground flex items-center',
                       (day.isToday || day.shipped) && 'text-foreground-light'
                     )}
                   >

@@ -27,7 +27,7 @@ const Hero = () => {
                     <AnnouncementBadge
                       url={announcement.link}
                       badge="Launch Week 12"
-                      announcement="Day 2: Realtime Auth"
+                      announcement="Day 3: Third Party Auth"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">

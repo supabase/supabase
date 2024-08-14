@@ -185,7 +185,6 @@ export const days: AdventDay[] = [
     is_shipped: false,
     links: [],
     icon: null,
-    className:
-      'col-span-full lg:col-span-1 xl:col-span-full max-h-[350px] md:max-h-[458px] xl:max-h-[267px]',
+    className: 'col-span-full lg:col-span-1 xl:col-span-full md:max-h-[250px] xl:max-h-[250px]',
   },
 ]
