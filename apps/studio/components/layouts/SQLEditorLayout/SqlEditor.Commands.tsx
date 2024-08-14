@@ -223,6 +223,5 @@ function SnippetSelector({
 }
 
 function snippetValue(snippet: SqlSnippet) {
-  // Lower case is needed because cmdk converts values to lower case
-  return `${snippet.id}-${snippet.name}`.toLowerCase()
+  return `${snippet.id}-${snippet.name}-${snippet.content.sql.slice(0, 30)}`.toLowerCase()
 }
