@@ -134,3 +134,27 @@ A date and time picker will be provided upon pressing the `Start a restore` butt
 ![PITR: Confirmation modal](/docs/img/backups-pitr-confirmation-modal.png)
 
 After locking in the desired point in time to recover to, The Dashboard will then prompt for a review and confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot for downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the latest physical backup available is downloaded to the project and the database is partially restored. WAL files generated after this physical backup up to the specified point-in-time are then downloaded. The underlying records of transactions in these files are replayed against the database to complete the restoration. The Dashboard will display a notification once the restoration completes.
+
+## Troubleshooting
+
+### Logical backups
+
+#### search_path issues
+
+During the `pg_restore` process, the `search_path` is set to an empty string for predictability, and security. Using unqualified references to functions or relations can cause restorations using logical backups to fail, as the database will not be able to locate the function or relation being referenced. This can happen even if the database functions without issues during normal operations, as the `search_path` is usually set to include several schemas during normal operations. Therefore, you should always use schema-qualified names within your SQL code.
+
+You can refer to [an example PR](https://github.com/supabase/supabase/pull/28393/files) on how to update SQL code to use schema-qualified names.
+
+#### Invalid check constraints
+
+Postgres requires that [check constraints](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-CHECK-CONSTRAINTS) be:
+
+1. immutable
+1. not reference table data other than the new or updated row being checked
+
+Violating these requirements can result in numerous failure scenarios, including during logical restorations.
+
+Common examples of check constraints that can result in such failures are:
+
+- validating against the current time, e.g. that the row being inserted references a future event
+- validating the contents of a row against the contents of another table
