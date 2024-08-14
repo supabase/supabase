@@ -184,7 +184,6 @@ export const createTableEditorState = () => {
       }
     },
     onEditForeignKeyColumnValue: (foreignKey: ForeignKeyState) => {
-      console.log('onEditFK', { foreignKey })
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'foreign-row-selector', foreignKey },
