@@ -36,11 +36,11 @@ So we fixed it. Today we're adding first-class support for the following third-p
 2. [AWS Cognito](https://supabase.com/docs/guides/auth/third-party/aws-cognito) (standalone or via AWS Amplify)
 3. [Firebase Auth](https://supabase.com/docs/guides/auth/third-party/firebase-auth)
 
-<aside>
+<Admonition>
 
-💡 Firebase Auth is currently under a private-alpha release stage, as we're still improving the security developer experience when using it. [Register your interest](https://forms.supabase.com/third-party-auth-with-firebase) and someone from the team will reach out.
+Firebase Auth is currently under a private-alpha release stage, as we're still improving the security developer experience when using it. [Register your interest](https://forms.supabase.com/third-party-auth-with-firebase) and someone from the team will reach out.
 
-</aside>
+</Admonition>
 
 Migrating auth providers can be very costly and technically challenging, especially for applications with large user bases. You can use Supabase's native Auth offering alongside your third-party authentication provider to achieve a disruption-free migration.
 
@@ -107,11 +107,11 @@ await supabase.auth.mfa.verify({
 // finally the user's `aal` claim in the JWT will be upgraded to aal2
 ```
 
-<aside>
+<Admonition>
 
-💡 No security product is infallible! MFA with SMS can come with some hidden security drawbacks - please evaluate your application's risk tolerance for SIM-swapping attacks.
+No security product is infallible! MFA with SMS can come with some hidden security drawbacks - please evaluate your application's risk tolerance for SIM-swapping attacks.
 
-</aside>
+</Admonition>
 
 ## Auth Hooks for SMS and Email
 
