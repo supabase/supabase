@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { forwardRef, useRef } from 'react'
 import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
@@ -16,6 +17,7 @@ import { useDispatch, useTrackedState } from '../../store/Store'
 import type { Filter, GridProps, SupaRow } from '../../types'
 import { useKeyboardShortcuts } from '../common/Hooks'
 import RowRenderer from './RowRenderer'
+import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -142,12 +144,13 @@ export const Grid = memo(
         const { targetTableSchema, targetTableName, targetColumnName } =
           table?.columns.find((x) => x.name == columnName)?.foreignKey ?? {}
 
-        return data?.find(
+        const fk = data?.find(
           (key: any) =>
             key.target_schema == targetTableSchema &&
             key.target_table == targetTableName &&
             key.target_columns == targetColumnName
         )
+        return fk !== undefined ? formatForeignKeys([fk])[0] : undefined
       }
 
       function onRowDoubleClick(row: any, column: any) {
