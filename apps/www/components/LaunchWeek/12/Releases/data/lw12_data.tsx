@@ -155,12 +155,12 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '/blog/third-party-auth-mfa-phone-send-hooks',
     date: '14 August',
     published_at: '2024-08-14T08:00:00.000-07:00',
-    title: 'Supabase Auth: Bring Your Own Auth, Phone-based MFA and more',
+    title: 'Supabase Auth: Bring-your-own Auth0, Cognito, or Firebase',
     description: (
       <>
         <span className="text-foreground">Supabase Auth</span>:<br className="hidden sm:block" />{' '}
-        Bring Your Own Auth,
-        <br className="hidden sm:block" /> Phone-based MFA and more
+        Bring-your-own Auth0,
+        <br className="hidden sm:block" /> Cognito, or Firebase
       </>
     ),
     links: [
@@ -175,7 +175,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     ],
     steps: [
       {
-        title: 'Supabase Auth: Bring Your Own Auth, Phone-based MFA and more',
+        title: 'Supabase Auth: Bring-your-own Auth0, Cognito, or Firebase',
         blog: '/blog/third-party-auth-mfa-phone-send-hooks',
         bg_layers: [
           {
