@@ -568,15 +568,11 @@ export const pricing: Pricing = {
           free: false,
           pro: false,
           team: [
-            '$60 per drain per month per project add on',
+            '$60 per drain per month',
             'and $0.20 per Million processed',
             'and $0.09 per GB bandwidth',
           ],
-          enterprise: [
-            '$60 per drain per month per project add on',
-            'and $0.20 per Million processed',
-            'and $0.09 per GB',
-          ],
+          enterprise: 'Custom',
         },
         usage_based: true,
       },
