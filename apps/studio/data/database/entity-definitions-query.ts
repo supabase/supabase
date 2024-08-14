@@ -90,7 +90,10 @@ export const useEntityDefinitionsQuery = <
   TData extends EntityDefinitionsData = EntityDefinitionsData,
 >(
   { schemas, limit, projectRef, connectionString }: EntityDefinitionsVariables,
-  options: UseQueryOptions<ExecuteSqlData, EntityDefinitionsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<ExecuteSqlData, EntityDefinitionsError, TData> = {}
 ) => {
   return useExecuteSqlQuery(
     {
@@ -103,6 +106,7 @@ export const useEntityDefinitionsQuery = <
       select(data) {
         return data.result[0].data.definitions
       },
+      enabled: enabled && schemas.length > 0,
       ...options,
     }
   )

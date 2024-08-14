@@ -109,7 +109,7 @@ export const SchemaComboBox = ({
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>
+          <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="start">
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Find schema..." />
               <CommandList_Shadcn_>

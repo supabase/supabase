@@ -166,10 +166,8 @@ export const AiAssistantPanel = ({
                       <>
                         Opt in to sending anonymous data to OpenAI in your{' '}
                         <Link
-                          target="_blank"
-                          rel="noreferrer"
-                          href={`/org/${selectedOrganization?.slug}/general`}
                           className="underline"
+                          href={`/org/${selectedOrganization?.slug}/general`}
                         >
                           organization settings
                         </Link>{' '}

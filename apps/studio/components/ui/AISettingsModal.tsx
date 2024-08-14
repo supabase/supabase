@@ -34,7 +34,7 @@ const AISettingsModal = () => {
       onCancel={() => snap.setShowAiSettingsModal(false)}
     >
       <Modal.Content className="flex flex-col items-start justify-between gap-y-4">
-        <div className="flex flex-col justify-between gap-y-2 my-4 text-sm">
+        <div className="flex flex-col justify-between gap-y-2 text-sm">
           <p className="text-foreground-light">Schemas metadata to be shared with OpenAI</p>
           <SchemaComboBox
             size="small"

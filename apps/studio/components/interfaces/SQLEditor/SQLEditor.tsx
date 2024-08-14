@@ -635,7 +635,7 @@ const SQLEditor = () => {
                   appSnap.setShowAiSettingsModal(true)
                 }}
               >
-                {isDiffOpen ? (
+                {isDiffOpen && (
                   <motion.div
                     key="ask-ai-input-container"
                     layoutId="ask-ai-input-container"
@@ -660,7 +660,7 @@ const SQLEditor = () => {
                       onCancel={discardAiHandler}
                     />
                   </motion.div>
-                ) : null}
+                )}
               </AISchemaSuggestionPopover>
             )}
             <ResizablePanel collapsible collapsedSize={10} minSize={20}>
