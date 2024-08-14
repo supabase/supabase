@@ -58,7 +58,6 @@ This feature is available today in public alpha for all new projects.
   />
 </div>
 
-
 [Wrappers](https://github.com/supabase/wrappers) is an open source project that simplifies the creation of Postgres Foreign Data Wrappers using [Rust](https://www.rust-lang.org/).
 
 ## Why WebAssembly?
@@ -90,13 +89,13 @@ To better understand how the Wasm FDW works, let's take a look at the architectu
 The above diagram illustrates the key components and how they interact:
 
 1. **Supabase Wrappers Extension (Host):** This is the core component that runs within Postgres. It includes below modules:
-    - **Wasm Runtime:** Provides runtime environment to executes the Wasm FDW package.
-    - **HTTP Interface:** Manages communication with external data sources through HTTP.
-    - **Utilities:** Helper tools and functions to support FDW operations.
-    - Other modules providing specific functionalities, such like JWT, stats and etc.
+   - **Wasm Runtime:** Provides runtime environment to executes the Wasm FDW package.
+   - **HTTP Interface:** Manages communication with external data sources through HTTP.
+   - **Utilities:** Helper tools and functions to support FDW operations.
+   - Other modules providing specific functionalities, such like JWT, stats and etc.
 2. **Wasm FDWs (Guests):** Isolated, dynamically-loaded Wasm packages that perform data fetching and processing. They execute in a sandboxed environment to ensure security and performance. For example:
-    - **Snowflake Wasm FDW:** A foreign data wrapper specifically designed to interact with [Snowflake](https://www.snowflake.com/).
-    - **Paddle Wasm FDW:** Another FDW example, tailored for [Paddle](https://www.paddle.com/) integration.
+   - **Snowflake Wasm FDW:** A foreign data wrapper specifically designed to interact with [Snowflake](https://www.snowflake.com/).
+   - **Paddle Wasm FDW:** Another FDW example, tailored for [Paddle](https://www.paddle.com/) integration.
 3. **Web Storage:** Represents external storage services like [GitHub](https://github.com/) or [S3](https://aws.amazon.com/s3/), where Wasm packages can be publicly stored and downloaded from.
 4. **External Data Source:** Various external systems which data is fetched from or pushed to, such as [Snowflake](https://www.snowflake.com/) and [Paddle](https://www.paddle.com/). Data is accessed using RESTful APIs.
 
@@ -123,7 +122,7 @@ Visit [this guide](https://fdw.dev/guides/create-wasm-wrapper/) to learn more ab
 
 ## Try it now on Supabase
 
-The Wasm FDW feature is available today on the Supabase platform. We have 2 new built-in Wasm FDWs: [Snowflake](https://supabase.com/docs/guides/database/extensions/wrappers/snowflake) and [Paddle](https://supabase.com/docs/guides/database/extensions/wrappers/paddle). 
+The Wasm FDW feature is available today on the Supabase platform. We have 2 new built-in Wasm FDWs: [Snowflake](https://supabase.com/docs/guides/database/extensions/wrappers/snowflake) and [Paddle](https://supabase.com/docs/guides/database/extensions/wrappers/paddle).
 
 To get started, follow below steps:
 
