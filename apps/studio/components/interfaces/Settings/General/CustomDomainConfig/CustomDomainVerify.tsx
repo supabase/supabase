@@ -61,7 +61,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           </h4>
           <p className="text-sm text-foreground-light">
             Set the following TXT record(s) in your DNS provider, then click verify to confirm your
-            control over the domain
+            control over the domain.
           </p>
           <p className="text-sm text-foreground-light">
             Records which have been successfully verified will be removed from this list below.
