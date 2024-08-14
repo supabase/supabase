@@ -308,14 +308,18 @@ const SQLEditor = () => {
         setContainsDestructiveOperations(destructiveOperations)
         setContainsUpdateWithoutWhereClause(updateWithoutWhereClause)
 
+        // check if the query is destructive OR contains an update without a where clause before returning
         if (!force) {
+          let shouldReturn = false
           if (destructiveOperations) {
             setIsDestructiveConfirmModalOpen(true)
+            shouldReturn = true
           }
           if (updateWithoutWhereClause) {
             setIsUpdateWithoutWhereConfirmModalOpen(true)
+            shouldReturn = true
           }
-          return
+          if (shouldReturn) return
         }
 
         if (!hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
