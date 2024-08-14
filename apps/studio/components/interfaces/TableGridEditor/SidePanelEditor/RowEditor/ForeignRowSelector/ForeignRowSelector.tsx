@@ -63,7 +63,7 @@ const ForeignRowSelector = ({
 
   const [params, setParams] = useState<any>({ filter: [], sort: [] })
 
-  const sorts = formatSortURLParams(params.sort ?? [])
+  const sorts = formatSortURLParams(table?.name || '', params.sort ?? [])
   const filters = formatFilterURLParams(params.filter ?? [])
 
   const rowsPerPage = 100
