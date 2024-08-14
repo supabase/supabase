@@ -34,16 +34,10 @@ const cards: { [name: string]: CardProps } = {
     ],
     ctas: [
       {
-        label: 'Get Early Access',
-        href: 'https://forms.supabase.com/enterprise',
-        target: '_blank',
-        type: 'primary',
-      },
-      {
-        label: 'Learn more',
+        label: 'Get Started',
         href: 'https://supabase.com/docs/guides/platform/read-replicas',
         target: '_blank',
-        type: 'default',
+        type: 'primary',
       },
     ],
     image: {
