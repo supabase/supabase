@@ -1,16 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { X } from 'lucide-react'
 import randomBytes from 'randombytes'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { AuthConfigResponse, useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { AuthConfigResponse } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
@@ -34,9 +37,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import FunctionSelector from './FunctionSelector'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 interface CreateHookSheetProps {
   visible: boolean
@@ -150,7 +150,6 @@ export const CreateHookSheet = ({
       postgresValues: {
         schema: 'public',
         functionName: '',
-        statements: '',
       },
     },
   })
@@ -194,7 +193,7 @@ export const CreateHookSheet = ({
         })
       }
     }
-  }, [authConfig, title, visible, definition, form])
+  }, [authConfig, title, visible, definition])
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
@@ -263,7 +262,7 @@ export const CreateHookSheet = ({
     }
   }
 
-  const values = form.getValues()
+  const values = form.watch()
 
   const statements = useMemo(() => {
     let permissionChanges: string[] = []
@@ -344,7 +343,7 @@ export const CreateHookSheet = ({
                   <FormItemLayout label="Hook type" className="px-8">
                     <FormControl_Shadcn_>
                       <RadioGroupStacked
-                        value={values.selectedType}
+                        value={field.value}
                         onValueChange={(value) => field.onChange(value)}
                       >
                         <RadioGroupStackedItem
@@ -412,17 +411,17 @@ export const CreateHookSheet = ({
                       </FormItemLayout>
                     )}
                   />
-                  <div className={cn('h-72 w-full col-span-2')}>
-                    <p className="py-4 text-sm text-foreground-light">
-                      {`The following statements will be executed on the function:`}
-                    </p>
-                    <CodeEditor
-                      id="postgres-hook-editor"
-                      isReadOnly={true}
-                      language="pgsql"
-                      value={statements.join('\n\n')}
-                    />
-                  </div>
+                </div>
+                <div className="h-72 w-full px-8 gap-3 flex flex-col">
+                  <p className="text-sm text-foreground-light">
+                    The following statements will be executed on the function:
+                  </p>
+                  <CodeEditor
+                    id="postgres-hook-editor"
+                    isReadOnly={true}
+                    language="pgsql"
+                    value={statements.join('\n\n')}
+                  />
                 </div>
               </>
             ) : (
