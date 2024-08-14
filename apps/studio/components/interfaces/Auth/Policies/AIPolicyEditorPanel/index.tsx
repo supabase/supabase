@@ -399,7 +399,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
       setUsing('')
       setCheck('')
-      setShowCheckBlock(true)
+      setShowCheckBlock(false)
       setFieldError(undefined)
 
       form.reset(defaultValues)
@@ -628,7 +628,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         {showCheckBlock && (
                           <>
                             <div
-                              className={`mt-1 relative ${incomingChange ? 'hidden' : 'block'}`}
+                              className={`mt-1 min-h-[28px] relative ${incomingChange ? 'hidden' : 'block'}`}
                               style={{
                                 height:
                                   expTwoContentHeight <= 100
