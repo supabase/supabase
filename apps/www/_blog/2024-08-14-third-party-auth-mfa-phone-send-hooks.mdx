@@ -1,0 +1,54 @@
+---
+title: 'Supabase Auth: Bring Your Own Auth, Phone-based MFA and more'
+description: 'Use Firebase Auth, Auth0 or AWS Cognito (Amplify) with your Supabase project, secure your users with SMS based MFA, and use send hooks.'
+author: hf
+image: 2024-08-14-third-party-auth-mfa-phone-send-hooks/OG.png
+thumb: 2024-08-14-third-party-auth-mfa-phone-send-hooks/thumb.png
+launchweek: '12'
+categories:
+  - launch-week
+tags:
+  - auth
+  - engineering
+date: '2024-08-14'
+toc_depth: 3
+---
+
+Boy do we have a ton to announce today in the Auth space!
+
+Supabase Auth is our Auth-as-a-Service product that is fully integrated with the rest of the Supabase products. Until today using other (third-party) auth products with Supabase required translating JWTs issued by these products into a format compatible with Supabase Auth. This is quite tricky, and is not very maintainable.
+
+So we decided to fix it. Today we're announcing first-class support for the following authentication products:
+
+- [Auth0](https://supabase.com/docs/guides/auth/third-party/firebase-auth)
+- [AWS Cognito](https://supabase.com/docs/guides/auth/third-party/aws-cognito), standalone or via AWS Amplify
+
+[Firebase Auth is also supported](https://supabase.com/docs/guides/auth/third-party/firebase-auth), but is currently under a private-alpha release stage, as we're still improving the security developer experience when using it. [Register your interest](https://forms.supabase.com/third-party-auth-with-firebase) and someone from the team will reach out.
+
+You can use all of these with the CLI (Firebase too)!
+
+You get 50 free Monthly Active Users (MAU) and the affordable $0.000325 per MAU after that[^1].
+
+Migrating auth providers can be very costly and technically challenging, especially with big user bases. You're no longer forced to migrate and take advantage of Storage, Realtime, Functions or the Postgres Data APIs (GraphQL and REST). You can also use Supabase Auth alongside your existing authentication provider to achieve a disruption free auth migration.
+
+And now, to give you even more reasons to plan your migration to Supabase Auth sooner we're announcing two highly requested features:
+
+1. [MFA with Phone (SMS or WhatsApp)](https://supabase.com/docs/guides/auth/auth-mfa)
+2. Extending [Auth Hooks](https://supabase.com/docs/guides/auth/auth-hooks) to send SMS and email
+
+We have a strong conviction at Supabase: All applications, new or existing, big or small, should have access to an open and secure authentication provider. Developers should have affordable access to best-practice security features. Secure-by-Default should not be a luxury.
+
+We launched [MFA with TOTP (app authenticator)](https://supabase.com/docs/guides/auth/auth-mfa) free of charge for all developers, [almost two years ago](https://supabase.com/blog/mfa-auth-via-rls). The reception has been heartwarming! A common complaint has been that app authenticators can be hard to adopt with non-techies. This is why we decided to build MFA with Phone.[^2]
+
+It costs $75/month to enable as an add on for the first project in the organization, and $10/month for additional projects that turn it on.
+
+## Send Email and SMS Hooks
+
+Supabase Auth has built-in support for popular SMS sending providers like Twilio, Messagebird, Textlocal and Vonage, but we realize this choice can be limiting in certain circumstances. This is why we're also launching a new ["Send SMS" Auth Hook](https://supabase.com/docs/guides/auth/auth-hooks/send-sms-hook). You no longer need to use the built-in provider, but can implement your own by specifying a HTTP endpoint that receives a POST request when a message needs to be sent.
+
+We've also heard the loud feedback about the built-in email templates (based on the Go templating language). In a can be limiting. There's also excellent new email rendering libraries like [Resend's React Email](https://resend.com/blog/react-email-2). To help you use this, we're also releasing a ["Send Email" Auth Hook)[https://supabase.com/docs/guides/auth/auth-hooks/send-email-hook] with which you can customize how the emails are rendered or sent.
+
+Both of these hooks are available on all plans free of charge.
+
+[^1]: We may increase free/included MAU for third-party authentication providers or reduce the MAU price in the future based on customer feedback.
+[^2]: MFA with SMS can come with some hidden security drawbacks -- please evaluate your application's risk tolerance for SIM-swapping attacks.
