@@ -30,14 +30,14 @@ create server google_sheets
   foreign data wrapper wasm_wrapper
   options (
     -- Install from GitHub
-	  fdw_package_url 'https://github.com/<ORG>/<REPO>/releases/download/v0.2.0/google_sheets_fdw.wasm',
-	  fdw_package_name 'my-company:google-sheets-fdw',
-	  fdw_package_version '0.2.0',
-	  fdw_package_checksum '338674c4c983aa6dbc2b6e63659076fe86d847ca0da6d57a61372b44e0fe4ac9',
+    fdw_package_url 'https://github.com/<ORG>/<REPO>/releases/download/v0.2.0/google_sheets_fdw.wasm',
+    fdw_package_name 'my-company:google-sheets-fdw',
+    fdw_package_version '0.2.0',
+    fdw_package_checksum '338674c4c983aa6dbc2b6e63659076fe86d847ca0da6d57a61372b44e0fe4ac9',
 
-	  -- Provide custom options
-	  base_url 'https://docs.google.com/spreadsheets/d'
-	);
+	-- Provide custom options
+	base_url 'https://docs.google.com/spreadsheets/d'
+  );
 ```
 
 This feature is available today in public alpha for all new projects.
