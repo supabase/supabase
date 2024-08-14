@@ -1,4 +1,4 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import dayjs from 'dayjs'
 import { compact, find, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
 import type { Dictionary } from 'types'
@@ -13,13 +13,14 @@ import {
   TIME_TYPES,
 } from '../SidePanelEditor.constants'
 import type { RowField } from './RowEditor.types'
+import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
-  table: PostgresTable
+  table: PostgresTable,
+  foreignKeys: ForeignKey[]
 ): RowField[] => {
-  const { relationships, primary_keys } = table
-  // @ts-ignore
+  const { primary_keys } = table
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
   return table.columns!.map((column) => {
@@ -36,17 +37,26 @@ export const generateRowFields = (
                 ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
                 : parseValue(row[column.name], column.format)
 
-    const foreignKey = find(relationships, (relationship) => {
-      return (
-        relationship.source_schema === column.schema &&
-        relationship.source_table_name === column.table &&
-        relationship.source_column_name === column.name
-      )
+    const foreignKey = foreignKeys.find((fk) => {
+      return fk.columns.map((x) => x.source).includes(column.name)
     })
 
     return {
       value,
-      foreignKey,
+      foreignKey:
+        foreignKey !== undefined
+          ? ({
+              id: foreignKey.id,
+              constraint_name: foreignKey.name,
+              source_schema: column.schema,
+              source_table_name: column.table,
+              source_column_name: column.name,
+              target_table_schema: foreignKey.schema,
+              target_table_name: foreignKey.table,
+              target_column_name:
+                foreignKey.columns.find((c) => c.source === column.name)?.target ?? '',
+            } as PostgresRelationship)
+          : undefined,
       id: column.id,
       name: column.name,
       comment: parseDescription(column.comment),
