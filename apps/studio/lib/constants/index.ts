@@ -61,6 +61,9 @@ export const LOCAL_STORAGE_KEYS = {
 
   // Used for storing a user id when sending reports to Sentry. The id is hashed for anonymity.
   SENTRY_USER_ID: 'supabase-sentry-user-id',
+
+  // Used for storing the last sign in method used by the user
+  LAST_SIGN_IN_METHOD: 'supabase-last-sign-in-method',
 }
 
 export const OPT_IN_TAGS = {
