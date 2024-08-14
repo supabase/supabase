@@ -19,6 +19,7 @@ import {
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
+import Link from 'next/link'
 
 interface AddIntegrationDropdownProps {
   buttonText?: string
@@ -66,7 +67,7 @@ export const AddIntegrationDropdown = ({
           Add provider
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-56">
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
 
         {subscription?.plan.id === 'free' ? (
@@ -74,17 +75,17 @@ export const AddIntegrationDropdown = ({
             <DropdownMenuSeparator />
             <div className="bg-surface-200 -m-1 p-2">
               <DropdownMenuLabel className="grid gap-1">
-                <p className="text-foreground-light">Pro plan (or higher) required</p>
+                <p className="text-foreground-light">Unavailable on the Free plan</p>
                 <p className="text-foreground-lighter text-xs">
-                  The following providers are not available on{' '}
-                  <a
+                  <Link
                     target="_href"
+                    rel="noreferrer"
+                    className="underline hover:text-foreground-light transition"
                     href={`/org/${organization?.slug}/billing`}
-                    className="underline"
                   >
-                    your plan
-                  </a>
-                  .
+                    Upgrade your plan
+                  </Link>{' '}
+                  to add the following providers to your project.
                 </p>
               </DropdownMenuLabel>
               <ProviderDropdownItem
