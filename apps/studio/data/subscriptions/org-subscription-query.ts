@@ -51,3 +51,18 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
     }
   )
 }
+
+export const useHasAccessToProjectLevelPermissions = (slug: string) => {
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+  const { data: subscription } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: canReadSubscriptions }
+  )
+
+  const isEnterprise = subscription?.plan.id === 'enterprise'
+  if (!isEnterprise) return false
+  return true
+}
