@@ -12,6 +12,7 @@ import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticato
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
+import { LastSignInWrapper } from './LastSignInWrapper'
 
 const signInSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
@@ -133,16 +134,18 @@ const SignInForm = () => {
               />
             </div>
 
-            <Button
-              block
-              form="signIn-form"
-              htmlType="submit"
-              size="large"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-            >
-              Sign In
-            </Button>
+            <LastSignInWrapper type="email">
+              <Button
+                block
+                form="signIn-form"
+                htmlType="submit"
+                size="large"
+                disabled={isSubmitting}
+                loading={isSubmitting}
+              >
+                Sign In
+              </Button>
+            </LastSignInWrapper>
           </div>
         )
       }}

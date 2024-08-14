@@ -48,9 +48,7 @@ const SignInPage: NextPageWithLayout = () => {
           </div>
         </div>
 
-        <LastSignInWrapper type="email">
-          <SignInForm />
-        </LastSignInWrapper>
+        <SignInForm />
       </div>
 
       <div className="self-center my-8 text-sm">
