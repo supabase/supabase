@@ -1,3 +1,5 @@
+'use client'
+
 import type * as RadixPopoverTypes from '@radix-ui/react-popover'
 import * as RadixPopover from '@radix-ui/react-popover'
 import * as React from 'react'
@@ -12,6 +14,7 @@ interface RootProps {
   children?: React.ReactNode
   className?: string
   defaultOpen?: boolean
+  disabled?: boolean
   modal?: boolean
   onOpenChange?: RadixPopoverTypes.PopoverProps['onOpenChange']
   open?: boolean
@@ -23,8 +26,12 @@ interface RootProps {
   header?: React.ReactNode
   footer?: React.ReactNode
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'content'
+  'data-testid'?: string
 }
 
+/**
+ * @deprecated Use ./Popover_shadcn_ instead
+ */
 function Popover({
   align = 'center',
   ariaLabel,
@@ -42,6 +49,8 @@ function Popover({
   header,
   footer,
   size = 'content',
+  disabled,
+  'data-testid': dataTestId,
 }: RootProps) {
   const __styles = styleHandler('popover')
 
@@ -59,8 +68,10 @@ function Popover({
     >
       <RadixPopover.Trigger
         // className={DropdownStyles['sbui-popover__trigger']}
+        disabled={disabled}
         className={__styles.trigger}
         aria-label={ariaLabel}
+        data-testid={dataTestId}
       >
         {children}
       </RadixPopover.Trigger>
@@ -88,6 +99,9 @@ function Popover({
   )
 }
 
+/**
+ * @deprecated Use ./Popover_shadcn_ instead
+ */
 function Close() {
   const __styles = styleHandler('popover')
 
@@ -98,6 +112,9 @@ function Close() {
   )
 }
 
+/**
+ * @deprecated Use ./PopoverSeparator_Shadcn_ instead
+ */
 function Separator() {
   const __styles = styleHandler('popover')
 

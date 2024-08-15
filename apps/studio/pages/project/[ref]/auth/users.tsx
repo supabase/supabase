@@ -1,6 +1,6 @@
-import { Users } from 'components/interfaces/Auth'
-import { AuthLayout } from 'components/layouts'
-import { NextPageWithLayout } from 'types'
+import { Users } from 'components/interfaces/Auth/Users'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import type { NextPageWithLayout } from 'types'
 
 const UsersPage: NextPageWithLayout = () => {
   return <Users />

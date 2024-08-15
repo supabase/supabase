@@ -1,5 +1,5 @@
 import type { Dictionary } from 'types'
-import { Filter, QueryPagination, QueryTable, Sort } from '../types'
+import type { Filter, QueryPagination, QueryTable, Sort } from '../types'
 import {
   countQuery,
   deleteQuery,

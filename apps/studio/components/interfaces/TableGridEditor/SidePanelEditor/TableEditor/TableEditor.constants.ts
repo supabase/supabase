@@ -1,5 +1,5 @@
 import { uuidv4 } from 'lib/helpers'
-import { ColumnField } from '../SidePanelEditor.types'
+import type { ColumnField } from '../SidePanelEditor.types'
 
 export const DEFAULT_COLUMNS: ColumnField[] = [
   {

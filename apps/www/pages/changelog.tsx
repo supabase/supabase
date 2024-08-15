@@ -88,9 +88,9 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     28108378,
   ]
 
-  const releases = await (
-    await fetchGitHubReleases()
-  ).filter((release) => release.id && oldReleases.includes(release.id))
+  const releases = (await fetchGitHubReleases()).filter(
+    (release) => release.id && oldReleases.includes(release.id)
+  )
 
   // uses the graphql api
   async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
@@ -165,21 +165,25 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   // Process discussions
   const formattedDiscussions = await Promise.all(
     discussions.map(async (item: any): Promise<any> => {
-      const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
-      // Find a date rewrite for the current item's title
-      const dateRewrite = deletedDiscussions.find((rewrite) => {
-        return item.title && rewrite.title && item.title.includes(rewrite.title)
-      })
+      try {
+        const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+        // Find a date rewrite for the current item's title
+        const dateRewrite = deletedDiscussions.find((rewrite) => {
+          return item.title && rewrite.title && item.title.includes(rewrite.title)
+        })
 
-      // Use the createdAt date from dateRewrite if found, otherwise use item.createdAt
-      const created_at = dateRewrite ? dateRewrite.createdAt : item.createdAt
+        // Use the createdAt date from dateRewrite if found, otherwise use item.createdAt
+        const created_at = dateRewrite ? dateRewrite.createdAt : item.createdAt
 
-      return {
-        ...item,
-        source: discussionsMdxSource,
-        type: 'discussion',
-        created_at,
-        url: item.url,
+        return {
+          ...item,
+          source: discussionsMdxSource,
+          type: 'discussion',
+          created_at,
+          url: item.url,
+        }
+      } catch (err) {
+        console.error(`Problem processing discussion MDX: ${err}`)
       }
     })
   )
@@ -187,21 +191,25 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   // Process releases
   const formattedReleases = await Promise.all(
     releases.map(async (item: any): Promise<any> => {
-      const releasesMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+      try {
+        const releasesMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
 
-      return {
-        ...item,
-        source: releasesMdxSource,
-        type: 'release',
-        created_at: item.created_at,
-        title: item.name ?? '',
-        url: item.html_url ?? '',
+        return {
+          ...item,
+          source: releasesMdxSource,
+          type: 'release',
+          created_at: item.created_at,
+          title: item.name ?? '',
+          url: item.html_url ?? '',
+        }
+      } catch (err) {
+        console.error(`Problem processing discussion MDX: ${err}`)
       }
     })
   )
 
   // Combine discussions and releases into a single array of entries
-  const combinedEntries = formattedDiscussions.concat(formattedReleases)
+  const combinedEntries = formattedDiscussions.concat(formattedReleases).filter(Boolean)
 
   const sortedCombinedEntries = combinedEntries.sort((a, b) => {
     const dateA = dayjs(a.created_at)

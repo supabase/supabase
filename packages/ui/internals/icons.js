@@ -158,9 +158,8 @@ export default {
   IconMenu: 'src/components/Icon/icons/IconMenu/index.tsx',
   IconMessageCircle: 'src/components/Icon/icons/IconMessageCircle/index.tsx',
   IconMessageSquare: 'src/components/Icon/icons/IconMessageSquare/index.tsx',
-  IconMic: 'src/components/Icon/icons/IconMic/index.tsx',
   IconMicOff: 'src/components/Icon/icons/IconMicOff/index.tsx',
-  IconMicSolid: 'src/components/Icon/icons/IconMicSolid/index.tsx',
+  IconMic: 'src/components/Icon/icons/IconMic/index.tsx',
   IconMinimize2: 'src/components/Icon/icons/IconMinimize2/index.tsx',
   IconMinimize: 'src/components/Icon/icons/IconMinimize/index.tsx',
   IconMinusCircle: 'src/components/Icon/icons/IconMinusCircle/index.tsx',
@@ -198,7 +197,6 @@ export default {
   IconPocket: 'src/components/Icon/icons/IconPocket/index.tsx',
   IconPower: 'src/components/Icon/icons/IconPower/index.tsx',
   IconPrinter: 'src/components/Icon/icons/IconPrinter/index.tsx',
-  IconProductHunt: 'src/components/Icon/icons/IconProductHunt/index.tsx',
   IconRadio: 'src/components/Icon/icons/IconRadio/index.tsx',
   IconRefreshCcw: 'src/components/Icon/icons/IconRefreshCcw/index.tsx',
   IconRefreshCw: 'src/components/Icon/icons/IconRefreshCw/index.tsx',
@@ -287,5 +285,5 @@ export default {
   IconZapOff: 'src/components/Icon/icons/IconZapOff/index.tsx',
   IconZap: 'src/components/Icon/icons/IconZap/index.tsx',
   IconZoomIn: 'src/components/Icon/icons/IconZoomIn/index.tsx',
-  IconZoomOut: 'src/components/Icon/icons/IconZoomOut/index.tsx',
+  IconZoomOut: 'src/components/Icon/icons/IconZoomOut/index.tsx'
 }

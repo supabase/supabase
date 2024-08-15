@@ -1,5 +1,5 @@
 import Table from 'components/to-be-cleaned/Table'
-import { AuthorizedApp } from 'data/oauth/authorized-apps-query'
+import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 import dayjs from 'dayjs'
 import { Button, IconTrash } from 'ui'
 

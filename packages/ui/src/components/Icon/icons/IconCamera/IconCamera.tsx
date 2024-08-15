@@ -9,5 +9,12 @@
     return <IconBase icon={Camera} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { camera } from 'lucide-react'
+  */
   export default IconCamera
   

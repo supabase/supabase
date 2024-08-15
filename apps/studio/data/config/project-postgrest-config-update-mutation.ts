@@ -3,14 +3,15 @@ import toast from 'react-hot-toast'
 
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectPostgrestConfigUpdateVariables = {
   projectRef: string
   dbSchema: string
-  maxRows: string
+  maxRows: number
   dbExtraSearchPath: string
+  dbPool: number | null
 }
 
 export async function updateProjectPostgrestConfig({
@@ -18,11 +19,13 @@ export async function updateProjectPostgrestConfig({
   dbSchema,
   maxRows,
   dbExtraSearchPath,
+  dbPool,
 }: ProjectPostgrestConfigUpdateVariables) {
   const response = await patch(`${API_URL}/projects/${projectRef}/config/postgrest`, {
     db_schema: dbSchema,
     max_rows: maxRows,
     db_extra_search_path: dbExtraSearchPath,
+    db_pool: dbPool,
   })
 
   if (response.error) throw response.error

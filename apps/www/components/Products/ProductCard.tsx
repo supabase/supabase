@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Panel from '~/components/Panel'
 import { cn } from 'ui'
+import { detectBrowser, isBrowser } from 'common'
 
 const ProductCard = ({
   className,
@@ -19,7 +20,7 @@ const ProductCard = ({
   highlights?: string | React.ReactNode
   url: string
   icon?: string
-  image: any
+  image?: any
   className?: string
   onClick?: any
   alignLeft?: boolean
@@ -33,13 +34,13 @@ const ProductCard = ({
     onClick={onClick}
   >
     <Panel
-      hasShimmer
+      hasShimmer={isBrowser && detectBrowser() !== 'Safari'}
       hasActiveOnHover
       hasMotion={title.includes('Edge Functions')}
       outerClassName="relative w-full h-full shadow-lg"
       innerClassName={cn(
         `relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-          bg-surface-100 w-full rounded-xl h-full`
+          bg-surface-75 w-full rounded-xl h-full`
       )}
     >
       <div
@@ -48,7 +49,7 @@ const ProductCard = ({
           alignLeft && 'lg:mx-0 lg:pl-8 lg:items-start lg:text-left lg:max-w-[260px]'
         )}
       >
-        <div className="flex items-center justify-center h-12 w-12 bg-alternative rounded-lg mb-3">
+        <div className="flex items-center justify-center h-10 w-10 bg-surface-200 border rounded-lg mb-3">
           {icon && (
             <svg
               width="25"
@@ -59,7 +60,7 @@ const ProductCard = ({
             >
               <path
                 d={icon}
-                stroke="var(--colors-brand9)"
+                stroke="hsl(var(--foreground-lighter))"
                 strokeMiterlimit="10"
                 strokeLinejoin="round"
                 strokeLinecap="round"
@@ -74,7 +75,7 @@ const ProductCard = ({
           {highlights && <span className="hidden lg:block">{highlights}</span>}
         </div>
       </div>
-      {image}
+      {image && image}
     </Panel>
   </Link>
 )

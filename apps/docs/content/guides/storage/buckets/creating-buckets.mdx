@@ -78,7 +78,7 @@ You can achieve the following by providing: `allowedMimeTypes` and `maxFileSize`
 const { data, error } = await supabase.storage.createBucket('avatars', {
   public: true,
   allowedMimeTypes: ['image/*'],
-  maxFileSize: '1MB',
+  fileSizeLimit: '1MB',
 })
 ```
 

@@ -1,9 +1,9 @@
 import type { PostgresRelationship } from '@supabase/postgres-meta'
 
-export interface JsonEditValue {
+export interface EditValue {
   row?: any
   column: string
-  jsonString: string
+  value: string
 }
 
 export interface RowField {

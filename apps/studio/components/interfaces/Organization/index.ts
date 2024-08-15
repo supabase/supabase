@@ -1,23 +1,10 @@
-import BillingSettings from './BillingSettings/BillingSettings'
-import GeneralSettings from './GeneralSettings/GeneralSettings'
-import IntegrationSettings from './IntegrationSettings/IntegrationSettings'
-import InvoicesSettings from './InvoicesSettings/InvoicesSettings'
-import NewOrgForm from './NewOrg/NewOrgForm'
-import Usage from './Usage/Usage'
-import AuditLogs from './AuditLogs/AuditLogs'
-import OAuthApps from './OAuthApps/OAuthApps'
-import TeamSettings from './TeamSettings/TeamSettings'
-import Documents from './Documents/Documents'
-
-export {
-  BillingSettings,
-  GeneralSettings,
-  IntegrationSettings,
-  InvoicesSettings,
-  NewOrgForm,
-  OAuthApps,
-  AuditLogs,
-  TeamSettings,
-  Usage,
-  Documents,
-}
+export { default as BillingSettings } from './BillingSettings/BillingSettings'
+export { default as GeneralSettings } from './GeneralSettings/GeneralSettings'
+export { default as IntegrationSettings } from './IntegrationSettings/IntegrationSettings'
+export { default as InvoicesSettings } from './InvoicesSettings/InvoicesSettings'
+export { default as NewOrgForm } from './NewOrg/NewOrgForm'
+export { default as Usage } from './Usage/Usage'
+export { default as AuditLogs } from './AuditLogs/AuditLogs'
+export { default as OAuthApps } from './OAuthApps/OAuthApps'
+export { default as TeamSettings } from './TeamSettings/TeamSettings'
+export { default as Documents } from './Documents/Documents'

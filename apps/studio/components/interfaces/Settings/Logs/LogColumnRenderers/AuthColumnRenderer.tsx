@@ -1,5 +1,6 @@
 import { Column } from 'react-data-grid'
-import { LogData } from '..'
+
+import type { LogData } from '../Logs.types'
 import {
   RowLayout,
   SeverityFormatter,

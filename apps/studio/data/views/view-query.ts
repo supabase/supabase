@@ -1,8 +1,8 @@
-import { PostgresView } from '@supabase/postgres-meta'
+import type { PostgresView } from '@supabase/postgres-meta'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { viewKeys } from './keys'
 
 export type ViewVariables = {

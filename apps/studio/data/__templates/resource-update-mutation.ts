@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import toast from 'react-hot-toast'
 
 import { handleError, patch } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { resourceKeys } from './keys'
 
 export type ResourceUpdateVariables = {

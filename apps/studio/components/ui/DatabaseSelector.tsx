@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
+import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -9,17 +10,18 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  IconCheck,
-  IconChevronDown,
-  IconLoader,
-  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 
+import { Markdown } from 'components/interfaces/Markdown'
+import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -66,10 +68,8 @@ const DatabaseSelector = ({
               variant === 'connected-on-left' && 'rounded-l-none border-l-0',
               variant === 'connected-on-both' && 'rounded-none border-x-0'
             )}
-            icon={isLoading && <IconLoader className="animate-spin" />}
-            iconRight={
-              <IconChevronDown className="text-foreground-light" strokeWidth={2} size={12} />
-            }
+            icon={isLoading && <Loader2 className="animate-spin" />}
+            iconRight={<ChevronDown className="text-foreground-light" strokeWidth={2} size={12} />}
           >
             Source:{' '}
             {selectedAdditionalOption ? (
@@ -104,15 +104,17 @@ const DatabaseSelector = ({
                     onSelect={() => {
                       state.setSelectedDatabaseId(option.id)
                       setOpen(false)
+                      onSelectId(option.id)
                     }}
                     onClick={() => {
                       state.setSelectedDatabaseId(option.id)
                       setOpen(false)
+                      onSelectId(option.id)
                     }}
                   >
                     <div className="w-full flex items-center justify-between">
                       <p>{option.name}</p>
-                      {option.id === selectedDatabaseId && <IconCheck />}
+                      {option.id === selectedDatabaseId && <Check size={14} />}
                     </div>
                   </CommandItem_Shadcn_>
                 ))}
@@ -123,6 +125,33 @@ const DatabaseSelector = ({
                 {sortedDatabases?.map((database) => {
                   const region = formatDatabaseRegion(database.region)
                   const id = formatDatabaseID(database.identifier)
+
+                  if (database.status !== 'ACTIVE_HEALTHY') {
+                    const status = [
+                      REPLICA_STATUS.INIT_READ_REPLICA,
+                      REPLICA_STATUS.COMING_UP,
+                    ].includes(database.status)
+                      ? 'coming up'
+                      : 'not healthy'
+
+                    return (
+                      <Tooltip_Shadcn_ key={database.identifier}>
+                        <TooltipTrigger_Shadcn_ asChild>
+                          <div className="px-2 py-1.5 w-full flex items-center justify-between">
+                            <p className="text-xs text-foreground-lighter">
+                              Read replica ({region} - {id})
+                            </p>
+                          </div>
+                        </TooltipTrigger_Shadcn_>
+                        <TooltipContent_Shadcn_ side="right" className="w-80">
+                          <Markdown
+                            className="text-xs text-foreground"
+                            content={`Replica unable to accept requests as its ${status}. [View infrastructure settings](/project/${projectRef}/settings/infrastructure) for more information.`}
+                          />
+                        </TooltipContent_Shadcn_>
+                      </Tooltip_Shadcn_>
+                    )
+                  }
 
                   return (
                     <CommandItem_Shadcn_
@@ -146,7 +175,7 @@ const DatabaseSelector = ({
                             ? 'Primary database'
                             : `Read replica (${region} - ${id})`}
                         </p>
-                        {database.identifier === selectedDatabaseId && <IconCheck />}
+                        {database.identifier === selectedDatabaseId && <Check size={16} />}
                       </div>
                     </CommandItem_Shadcn_>
                   )
@@ -167,7 +196,7 @@ const DatabaseSelector = ({
                   onClick={() => setOpen(false)}
                   className="w-full flex items-center gap-2"
                 >
-                  <IconPlus size={14} strokeWidth={1.5} />
+                  <Plus size={14} strokeWidth={1.5} />
                   <p>Create a new read replica</p>
                 </Link>
               </CommandItem_Shadcn_>

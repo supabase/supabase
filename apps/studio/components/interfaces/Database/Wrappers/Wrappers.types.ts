@@ -8,6 +8,7 @@ export type WrapperMeta = {
   server: Server
   tables: Table[]
   docsUrl: string
+  minimumExtensionVersion?: string
 }
 
 export type ServerOption = {
@@ -15,7 +16,8 @@ export type ServerOption = {
   label: string
   required: boolean
   encrypted: boolean
-  hidden: boolean
+  secureEntry: boolean
+  hidden?: boolean
   isTextArea?: boolean
   urlHelper?: string
   defaultValue?: string

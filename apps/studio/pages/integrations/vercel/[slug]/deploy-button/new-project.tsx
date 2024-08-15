@@ -1,9 +1,11 @@
+import { useParams } from 'common'
 import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
+import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
-import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
 import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
@@ -15,13 +17,13 @@ import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import { useSelectedOrganization, useStore } from 'hooks'
-import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
-import { passwordStrength } from 'lib/helpers'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
+import passwordStrength from 'lib/password-strength'
+import { AWS_REGIONS } from 'shared-data'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import { NextPageWithLayout } from 'types'
-import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
+import type { NextPageWithLayout } from 'types'
 
 const VercelIntegration: NextPageWithLayout = () => {
   return (
@@ -53,15 +55,13 @@ VercelIntegration.getLayout = (page) => (
 
 const CreateProject = () => {
   const router = useRouter()
-  const { ui } = useStore()
   const selectedOrganization = useSelectedOrganization()
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
-  const [instanceSize, setInstanceSize] = useState('micro')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
-  const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region)
+  const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region.displayName)
 
   const snapshot = useIntegrationInstallationSnapshot()
 
@@ -69,25 +69,18 @@ const CreateProject = () => {
     debounce((value: string) => checkPasswordStrength(value), 300)
   ).current
 
-  const {
-    slug,
-    configurationId,
-    next,
-    currentProjectId: foreignProjectId,
-    externalId,
-  } = useParams()
+  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
-  const { mutateAsync: createConnections, isLoading: isLoadingCreateConnections } =
-    useIntegrationVercelConnectionsCreateMutation()
+  const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation()
   const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
 
-  const { data: organizationData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery()
+  const { data: organizationData } = useOrganizationsQuery()
   const organization = organizationData?.find((x) => x.slug === slug)
 
   /**
    * array of integrations installed
    */
-  const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery()
+  const { data: integrationData } = useIntegrationsQuery()
 
   /**
    * the vercel integration installed for organization chosen
@@ -103,11 +96,6 @@ const CreateProject = () => {
     },
     { enabled: organizationIntegration !== undefined }
   )
-
-  const canSubmit =
-    projectName != '' &&
-    passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion != undefined
 
   function onProjectNameChange(e: ChangeEvent<HTMLInputElement>) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -145,7 +133,7 @@ const CreateProject = () => {
       setNewProjectRef(res.ref)
     },
     onError: (error) => {
-      ui.setNotification({ error, category: 'error', message: error.message })
+      toast.error(error.message)
       snapshot.setLoading(false)
     },
   })
@@ -155,25 +143,15 @@ const CreateProject = () => {
     if (!organizationIntegration) return console.error('No organization installation details found')
     if (!organizationIntegration?.id) return console.error('No organization installation ID found')
     if (!foreignProjectId) return console.error('No foreignProjectId ID set')
-    if (!configurationId) return console.error('No configurationId ID set')
     if (!organization) return console.error('No organization ID set')
 
     snapshot.setLoading(true)
 
     let dbSql: string | undefined
     if (shouldRunMigrations) {
-      const id = ui.setNotification({
-        category: 'info',
-        message: `Fetching initial migrations from GitHub repo`,
-      })
-
+      const id = toast(`Fetching initial migrations from GitHub repo`)
       dbSql = (await getInitialMigrationSQLFromGitHubRepo(externalId)) ?? undefined
-
-      ui.setNotification({
-        id,
-        category: 'success',
-        message: `Done fetching initial migrations`,
-      })
+      toast.success(`Done fetching initial migrations`, { id })
     }
 
     createProject({
@@ -182,7 +160,6 @@ const CreateProject = () => {
       dbPass,
       dbRegion,
       dbSql,
-      configurationId,
     })
   }
   const isInstallingRef = useRef(false)
@@ -290,7 +267,7 @@ const CreateProject = () => {
             descriptionText="Select a region close to your users for the best performance."
           >
             {Object.keys(AWS_REGIONS).map((option: string, i) => {
-              const label = Object.values(AWS_REGIONS)[i]
+              const label = Object.values(AWS_REGIONS)[i].displayName
               return (
                 <Listbox.Option
                   key={option}

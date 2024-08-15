@@ -1,13 +1,13 @@
-import { useTelemetryProps } from 'common'
-import { FlaskConical } from 'lucide-react'
+import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, IconExternalLink, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
 
+import { useTelemetryProps } from 'common'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
+import { Button, Modal, ScrollArea, cn } from 'ui'
 import APISidePanelPreview from './APISidePanelPreview'
 import CLSPreview from './CLSPreview'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
@@ -26,7 +26,7 @@ const FeaturePreviewModal = () => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
       name: 'Supabase Assistant for RLS policies',
       content: <RLSAIAssistantPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/19594',
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/21882',
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
@@ -87,7 +87,7 @@ const FeaturePreviewModal = () => {
       onCancel={handleCloseFeaturePreviewModal}
     >
       {FEATURE_PREVIEWS.length > 0 ? (
-        <div className="flex border-t">
+        <div className="flex">
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
               {FEATURE_PREVIEWS.map((feature) => {
@@ -103,9 +103,9 @@ const FeaturePreviewModal = () => {
                     )}
                   >
                     {isEnabled ? (
-                      <IconEye size={14} strokeWidth={2} className="text-brand" />
+                      <Eye size={14} strokeWidth={2} className="text-brand" />
                     ) : (
-                      <IconEyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
+                      <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
                     )}
                     <p className="text-sm truncate" title={feature.name}>
                       {feature.name}
@@ -120,7 +120,7 @@ const FeaturePreviewModal = () => {
               <p>{selectedFeature?.name}</p>
               <div className="flex items-center space-x-2">
                 {selectedFeature?.discussionsUrl !== undefined && (
-                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <Link href={selectedFeature.discussionsUrl} target="_blank" rel="noreferrer">
                       Give feedback
                     </Link>
@@ -143,7 +143,7 @@ const FeaturePreviewModal = () => {
               Have an idea for the dashboard? Let us know via Github Discussions!
             </p>
           </div>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
               target="_blank"

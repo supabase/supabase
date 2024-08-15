@@ -1,12 +1,16 @@
-import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
-import { generateSettingsMenu } from './SettingsMenu.utils'
+import { PropsWithChildren, useEffect } from 'react'
 
 import { useParams } from 'common'
-import ProductMenu from 'components/ui/ProductMenu'
-import ProjectLayout from '..'
+import { ProductMenu } from 'components/ui/ProductMenu'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
+import { IS_PLATFORM } from 'lib/constants'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { generateSettingsMenu } from './SettingsMenu.utils'
+import { useFlag } from 'hooks/ui/useFlag'
 
 interface SettingsLayoutProps {
   title?: string
@@ -17,6 +21,12 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
   const { ref } = useParams()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
+
+  useEffect(() => {
+    if (!IS_PLATFORM) {
+      router.push('/project/default')
+    }
+  }, [router])
 
   // billing pages live under /billing/invoices and /billing/subscription, etc
   // so we need to pass the [5]th part of the url to the menu
@@ -36,11 +46,16 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     'billing:invoices',
   ])
 
+  const warehouseEnabled = useFlag('warehouse')
+  const logDrainsEnabled = useFlag('logdrains')
+
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     invoices: invoicesEnabled,
+    warehouse: warehouseEnabled,
+    logDrains: logDrainsEnabled,
   })
 
   return (
@@ -57,4 +72,4 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
   )
 }
 
-export default withAuth(observer(SettingsLayout))
+export default withAuth(SettingsLayout)

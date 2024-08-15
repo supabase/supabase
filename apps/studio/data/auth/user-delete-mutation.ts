@@ -3,8 +3,8 @@ import toast from 'react-hot-toast'
 
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
-import { User } from './users-query'
+import type { ResponseError } from 'types'
+import type { User } from './users-query'
 import { authKeys } from './keys'
 
 export type UserDeleteVariables = {

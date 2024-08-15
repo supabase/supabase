@@ -1,5 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 type GetForeignKeyConstraintsVariables = {
   schema?: string
@@ -94,7 +94,7 @@ export type ForeignKeyConstraintsVariables = GetForeignKeyConstraintsVariables &
 }
 
 export type ForeignKeyConstraintsData = ForeignKeyConstraint[]
-export type ForeignKeyConstraintsError = unknown
+export type ForeignKeyConstraintsError = ExecuteSqlError
 
 export const useForeignKeyConstraintsQuery = <
   TData extends ForeignKeyConstraintsData = ForeignKeyConstraintsData,
