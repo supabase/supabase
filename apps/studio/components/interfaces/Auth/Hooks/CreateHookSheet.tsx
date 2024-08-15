@@ -67,7 +67,6 @@ const FormSchema = z
     postgresValues: z.object({
       schema: z.string(),
       functionName: z.string(),
-      statements: z.string(),
     }),
   })
   .superRefine((data, ctx) => {
@@ -173,7 +172,6 @@ export const CreateHookSheet = ({
           postgresValues: {
             schema: (values.type === 'postgres' && values.schema) || 'public',
             functionName: (values.type === 'postgres' && values.functionName) || '',
-            statements: '',
           },
         })
       } else {
@@ -188,7 +186,6 @@ export const CreateHookSheet = ({
           postgresValues: {
             schema: 'public',
             functionName: '',
-            statements: '',
           },
         })
       }
@@ -235,31 +232,11 @@ export const CreateHookSheet = ({
           onClose()
         },
         onError: (error) => {
-          if (statements.length > 0 && hook.method.type === 'postgres') {
-            const revokeStatements = getRevokePermissionStatements(
-              hook.method.schema,
-              hook.method.functionName
-            )
-            executeSql({
-              projectRef,
-              connectionString: project.connectionString,
-              sql: revokeStatements.join('\n'),
-            })
-          }
           toast.error(`Failed to create hook: ${error.message}`)
           onClose()
         },
       }
     )
-
-    // grant permissions to new function
-    if (values.postgresValues.statements.length > 0) {
-      await executeSql({
-        projectRef,
-        connectionString: project.connectionString,
-        sql: values.postgresValues.statements,
-      })
-    }
   }
 
   const values = form.watch()
