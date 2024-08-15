@@ -665,6 +665,18 @@ export interface paths {
     /** Gets project's usage api requests count */
     get: operations['UsageApiController_getApiRequestsCount']
   }
+  '/platform/projects/{ref}/analytics/log-drains': {
+    /** Lists all log drains */
+    get: operations['LogDrainController_listLogDrains']
+    /** Create a log drain */
+    post: operations['LogDrainController_createLogDrain']
+  }
+  '/platform/projects/{ref}/analytics/log-drains/{token}': {
+    /** Update a log drain */
+    put: operations['LogDrainController_updateLogDrain']
+    /** Delete a log drain */
+    delete: operations['LogDrainController_deleteLogDrain']
+  }
   '/platform/projects/{ref}/analytics/warehouse/access-tokens': {
     /** Lists project's warehouse access tokens from logflare */
     get: operations['v1-list-all-warehouse-tokens']
@@ -782,6 +794,10 @@ export interface paths {
      * @deprecated
      */
     patch: operations['ContentController_updateContent']
+  }
+  '/platform/projects/{ref}/content/count': {
+    /** Gets the count of a user's content by type */
+    get: operations['ContentController_getContentCount']
   }
   '/platform/projects/{ref}/content/folders': {
     /** Gets project's content root folder */
@@ -983,10 +999,6 @@ export interface paths {
     /** Sets up a payment method */
     post: operations['SetupIntentController_setUpPaymentMethod']
   }
-  '/platform/telemetry/activity': {
-    /** Sends server activity */
-    post: operations['TelemetryActivityController_sendServerActivity']
-  }
   '/platform/telemetry/event': {
     /** Sends analytics server event */
     post: operations['TelemetryEventController_sendServerEvent']
@@ -998,10 +1010,6 @@ export interface paths {
   '/platform/telemetry/page': {
     /** Send server page event */
     post: operations['TelemetryPageController_sendServerPage']
-  }
-  '/platform/telemetry/pageview': {
-    /** Send pageview event */
-    post: operations['TelemetryPageviewController_sendServerPageViewed']
   }
   '/platform/tos/fly': {
     /** Redirects to Fly sso flow */
@@ -1492,6 +1500,18 @@ export interface paths {
     /** Gets project's usage api requests count */
     get: operations['UsageApiController_getApiRequestsCount']
   }
+  '/v0/projects/{ref}/analytics/log-drains': {
+    /** Lists all log drains */
+    get: operations['LogDrainController_listLogDrains']
+    /** Create a log drain */
+    post: operations['LogDrainController_createLogDrain']
+  }
+  '/v0/projects/{ref}/analytics/log-drains/{token}': {
+    /** Update a log drain */
+    put: operations['LogDrainController_updateLogDrain']
+    /** Delete a log drain */
+    delete: operations['LogDrainController_deleteLogDrain']
+  }
   '/v0/projects/{ref}/analytics/warehouse/access-tokens': {
     /** Lists project's warehouse access tokens from logflare */
     get: operations['v1-list-all-warehouse-tokens']
@@ -1609,6 +1629,10 @@ export interface paths {
      * @deprecated
      */
     patch: operations['ContentController_updateContent']
+  }
+  '/v0/projects/{ref}/content/count': {
+    /** Gets the count of a user's content by type */
+    get: operations['ContentController_getContentCount']
   }
   '/v0/projects/{ref}/content/item/{id}': {
     /** Gets project's content by the given id */
@@ -1852,7 +1876,7 @@ export interface paths {
   '/v1/projects/{ref}/config/auth/third-party-auth': {
     /** [Alpha] Lists all third-party auth integrations */
     get: operations['ThirdPartyAuthController_listTPAForProject']
-    /** [Alpha] Creates a new third-party auth integration */
+    /** Creates a new third-party auth integration */
     post: operations['ThirdPartyAuthController_createTPAForProject']
   }
   '/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}': {
@@ -2107,6 +2131,7 @@ export interface components {
       | 'pitr_14'
       | 'pitr_28'
       | 'ipv4_default'
+      | 'auth_mfa_phone_default'
     AmiSearchOptions: {
       search_tags?: Record<string, never>
     }
@@ -2267,6 +2292,13 @@ export interface components {
       mailer_templates_reauthentication_content: string | null
       mailer_templates_recovery_content: string | null
       mfa_max_enrolled_factors: number | null
+      mfa_phone_enroll_enabled: boolean | null
+      mfa_phone_max_frequency: number | null
+      mfa_phone_otp_length: number
+      mfa_phone_template: string | null
+      mfa_phone_verify_enabled: boolean | null
+      mfa_totp_enroll_enabled: boolean | null
+      mfa_totp_verify_enabled: boolean | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       password_required_characters: string | null
@@ -2509,6 +2541,13 @@ export interface components {
       partner_billing: components['schemas']['AwsPartnerBillingBody']
       primary_email: string
     }
+    CreateBackendParams: {
+      config: Record<string, never>
+      description?: string
+      name: string
+      /** @enum {string} */
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic'
+    }
     CreateBranchBody: {
       branch_name: string
       git_branch?: string
@@ -2659,10 +2698,15 @@ export interface components {
       data_api_use_api_schema?: boolean
       db_pass: string
       db_pricing_tier_id?: string
+      /**
+       * @description Provider region description
+       * @example Southeast Asia (Singapore)
+       */
       db_region: string
       db_sql?: string
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
       name: string
+      /** @deprecated */
       org_id?: number
       organization_slug?: string
     }
@@ -2852,16 +2896,8 @@ export interface components {
       custom_origin_server: string
       hostname: string
       id: string
-      ownership_verification: {
-        name?: string
-        type?: string
-        value?: string
-      }
-      ssl: {
-        status?: string
-        validation_errors?: components['schemas']['ValidationError'][]
-        validation_records?: components['schemas']['ValidationRecord'][]
-      }
+      ownership_verification: components['schemas']['OwnershipVerification']
+      ssl: components['schemas']['SslValidation']
       status: string
       verification_errors?: string[]
     }
@@ -3119,6 +3155,9 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }
+    GetContentCountResponse: {
+      count: number
+    }
     GetMetricsBody: {
       /** @enum {string} */
       interval: '1d' | '3d' | '7d'
@@ -3137,7 +3176,6 @@ export interface components {
       expires_at: string
       icon?: string
       name: string
-      organization_slug?: string
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
@@ -3438,6 +3476,13 @@ export interface components {
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: string
       MAILER_TEMPLATES_RECOVERY_CONTENT: string
       MFA_MAX_ENROLLED_FACTORS: number
+      MFA_PHONE_ENROLL_ENABLED: boolean
+      MFA_PHONE_MAX_FREQUENCY: number
+      MFA_PHONE_OTP_LENGTH: number
+      MFA_PHONE_TEMPLATE: string
+      MFA_PHONE_VERIFY_ENABLED: boolean
+      MFA_TOTP_ENROLL_ENABLED: boolean
+      MFA_TOTP_VERIFY_ENABLED: boolean
       PASSWORD_HIBP_ENABLED: boolean
       PASSWORD_MIN_LENGTH: number
       PASSWORD_REQUIRED_CHARACTERS: string
@@ -3585,6 +3630,7 @@ export interface components {
       id: string
       invoice_pdf: string
       number: string
+      payment_attempted: boolean
       period_end: number
       status: string
       subscription: string | null
@@ -3614,6 +3660,20 @@ export interface components {
       inserted_at: string
       scopes: string
       token: string
+    }
+    LFBackend: {
+      config: Record<string, never>
+      description?: string
+      id: number
+      metadata: {
+        project_ref?: string
+        type?: string
+      }
+      name: string
+      token: string
+      /** @enum {string} */
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic'
+      user_id: number
     }
     LFEndpoint: {
       cache_duration_seconds: number
@@ -3912,6 +3972,14 @@ export interface components {
         | 'STORAGE_IMAGES_TRANSFORMED'
         | 'REALTIME_MESSAGE_COUNT'
         | 'REALTIME_PEAK_CONNECTIONS'
+        | 'DISK_SIZE_GB_HOURS_GP3'
+        | 'DISK_SIZE_GB_HOURS_IO2'
+        | 'AUTH_MFA_PHONE'
+        | 'LOG_DRAIN_EVENTS'
+        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+        | 'DISK_THROUGHPUT_GP3'
+        | 'DISK_IOPS_GP3'
+        | 'DISK_IOPS_IO2'
         | 'COMPUTE_HOURS_BRANCH'
         | 'COMPUTE_HOURS_XS'
         | 'COMPUTE_HOURS_SM'
@@ -3928,12 +3996,13 @@ export interface components {
         | 'PITR_14'
         | 'PITR_28'
         | 'IPV4'
+        | 'LOG_DRAIN'
       pricing_free_units?: number
       pricing_package_price?: number
       pricing_package_size?: number
       pricing_per_unit_price?: number
       /** @enum {string} */
-      pricing_strategy: 'UNIT' | 'PACKAGE' | 'NONE'
+      pricing_strategy: 'UNIT' | 'PACKAGE' | 'TIERED' | 'NONE'
       project_allocations: components['schemas']['ProjectAllocation'][]
       unit_price_desc: string
       unlimited: boolean
@@ -3941,7 +4010,6 @@ export interface components {
       usage_original: number
     }
     OrgUsageResponse: {
-      slugs: string[]
       usage_billing_enabled: boolean
       usages: components['schemas']['OrgMetricUsage'][]
     }
@@ -3949,11 +4017,10 @@ export interface components {
       organization_id: number
       overdue_invoice_count: number
     }
-    PageBody: {
-      location: string
-      path: string
-      referrer?: string
-      title?: string
+    OwnershipVerification: {
+      name: string
+      type: string
+      value: string
     }
     PasswordCheckBody: {
       password: string
@@ -4295,7 +4362,7 @@ export interface components {
       selected_addons: components['schemas']['SelectedAddonResponse'][]
     }
     /** @enum {string} */
-    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4'
+    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4' | 'auth_mfa_phone'
     /** @enum {string} */
     ProjectAddonVariantPricingType: 'fixed' | 'usage'
     ProjectAddonVariantResponse: {
@@ -4308,6 +4375,7 @@ export interface components {
       price_type: components['schemas']['ProjectAddonVariantPricingType']
     }
     ProjectAllocation: {
+      hours?: number
       name: string
       ref: string
       usage: number
@@ -4423,6 +4491,7 @@ export interface components {
         | 'rls_references_user_metadata'
         | 'materialized_view_in_api'
         | 'foreign_table_in_api'
+        | 'unsupported_reg_types'
         | 'auth_otp_long_expiry'
         | 'auth_otp_short_length'
       remediation: Record<string, never>
@@ -4755,9 +4824,11 @@ export interface components {
     }
     RestrictionData: {
       grace_period_end?: string
+      report_date?: string
       /** @enum {string} */
       restrictions?: 'drop_requests_402'
       usage_stats?: components['schemas']['UsageStats']
+      violation_data?: Record<string, never>
       violations?: (
         | 'exceed_db_size_quota'
         | 'exceed_egress_quota'
@@ -5035,6 +5106,11 @@ export interface components {
     SslEnforcements: {
       database: boolean
     }
+    SslValidation: {
+      status: string
+      validation_errors?: components['schemas']['ValidationError'][]
+      validation_records: components['schemas']['ValidationRecord'][]
+    }
     StorageBucket: {
       created_at: string
       id: string
@@ -5210,14 +5286,6 @@ export interface components {
     TaxIdV2Response: {
       tax_id: components['schemas']['TaxIdV2'] | null
     }
-    TelemetryActivityBody: {
-      activity: string
-      data?: Record<string, never>
-      orgSlug?: string
-      page: components['schemas']['PageBody']
-      projectRef?: string
-      source: string
-    }
     TelemetryEventBody: {
       action: string
       category: string
@@ -5236,14 +5304,6 @@ export interface components {
       ga?: components['schemas']['GoogleAnalyticBody']
       referrer: string
       route?: string
-      title: string
-    }
-    TelemetryPageviewBody: {
-      location: string
-      orgSlug?: string
-      path: string
-      projectRef?: string
-      referrer: string
       title: string
     }
     ThirdPartyAuth: {
@@ -5388,6 +5448,13 @@ export interface components {
       mailer_templates_reauthentication_content?: string
       mailer_templates_recovery_content?: string
       mfa_max_enrolled_factors?: number
+      mfa_phone_enroll_enabled?: boolean
+      mfa_phone_max_frequency?: number
+      mfa_phone_otp_length?: number
+      mfa_phone_template?: string
+      mfa_phone_verify_enabled?: boolean
+      mfa_totp_enroll_enabled?: boolean
+      mfa_totp_verify_enabled?: boolean
       password_hibp_enabled?: boolean
       password_min_length?: number
       /** @enum {string} */
@@ -5446,6 +5513,11 @@ export interface components {
       smtp_sender_name?: string
       smtp_user?: string
       uri_allow_list?: string
+    }
+    UpdateBackendParams: {
+      config?: Record<string, never>
+      description?: string
+      name?: string
     }
     UpdateBranchBody: {
       branch_name?: string
@@ -5623,6 +5695,13 @@ export interface components {
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT?: string
       MAILER_TEMPLATES_RECOVERY_CONTENT?: string
       MFA_MAX_ENROLLED_FACTORS?: number
+      MFA_PHONE_ENROLL_ENABLED?: boolean
+      MFA_PHONE_MAX_FREQUENCY?: number
+      MFA_PHONE_OTP_LENGTH?: number
+      MFA_PHONE_TEMPLATE?: string
+      MFA_PHONE_VERIFY_ENABLED?: boolean
+      MFA_TOTP_ENROLL_ENABLED?: boolean
+      MFA_TOTP_VERIFY_ENABLED?: boolean
       PASSWORD_HIBP_ENABLED?: boolean
       PASSWORD_MIN_LENGTH?: number
       /** @enum {string} */
@@ -5892,6 +5971,7 @@ export interface components {
     }
     UpdateVercelConnectionsBody: {
       env_sync_targets?: ('production' | 'preview' | 'development')[]
+      public_env_var_prefix?: string
     }
     UpgradeDatabaseBody: {
       target_version: number
@@ -6029,7 +6109,7 @@ export interface components {
       inserted_at: string
       is_physical_backup: boolean
       /** @enum {string} */
-      status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED'
+      status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED' | 'CANCELLED'
     }
     V1BackupsResponse: {
       backups: components['schemas']['V1Backup'][]
@@ -7802,6 +7882,14 @@ export interface operations {
           | 'STORAGE_IMAGES_TRANSFORMED'
           | 'REALTIME_MESSAGE_COUNT'
           | 'REALTIME_PEAK_CONNECTIONS'
+          | 'DISK_SIZE_GB_HOURS_GP3'
+          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'AUTH_MFA_PHONE'
+          | 'LOG_DRAIN_EVENTS'
+          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+          | 'DISK_THROUGHPUT_GP3'
+          | 'DISK_IOPS_GP3'
+          | 'DISK_IOPS_IO2'
           | 'COMPUTE_HOURS_BRANCH'
           | 'COMPUTE_HOURS_XS'
           | 'COMPUTE_HOURS_SM'
@@ -7818,6 +7906,7 @@ export interface operations {
           | 'PITR_14'
           | 'PITR_28'
           | 'IPV4'
+          | 'LOG_DRAIN'
         interval: string
         endDate: string
         startDate: string
@@ -10723,6 +10812,110 @@ export interface operations {
       }
     }
   }
+  /** Lists all log drains */
+  LogDrainController_listLogDrains: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFBackend'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch log drains */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a log drain */
+  LogDrainController_createLogDrain: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateBackendParams']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['LFBackend']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create a log drain */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Update a log drain */
+  LogDrainController_updateLogDrain: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Log drains token */
+        token: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateBackendParams']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFBackend']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update log drain */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a log drain */
+  LogDrainController_deleteLogDrain: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Log drains token */
+        token: string
+      }
+    }
+    responses: {
+      204: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete a log drain */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Lists project's warehouse access tokens from logflare */
   'v1-list-all-warehouse-tokens': {
     parameters: {
@@ -11514,6 +11707,29 @@ export interface operations {
         }
       }
       /** @description Failed to update project's content */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets the count of a user's content by type */
+  ContentController_getContentCount: {
+    parameters: {
+      query?: {
+        type?: string
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetContentCountResponse']
+        }
+      }
+      /** @description Failed to retrieve user's content count */
       500: {
         content: never
       }
@@ -12678,23 +12894,6 @@ export interface operations {
       }
     }
   }
-  /** Sends server activity */
-  TelemetryActivityController_sendServerActivity: {
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TelemetryActivityBody']
-      }
-    }
-    responses: {
-      201: {
-        content: never
-      }
-      /** @description Failed to send server activity */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Sends analytics server event */
   TelemetryEventController_sendServerEvent: {
     requestBody: {
@@ -12741,23 +12940,6 @@ export interface operations {
         content: never
       }
       /** @description Failed to send server page event */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Send pageview event */
-  TelemetryPageviewController_sendServerPageViewed: {
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TelemetryPageviewBody']
-      }
-    }
-    responses: {
-      201: {
-        content: never
-      }
-      /** @description Failed to send pageview event */
       500: {
         content: never
       }
@@ -14153,7 +14335,7 @@ export interface operations {
       }
     }
   }
-  /** [Alpha] Creates a new third-party auth integration */
+  /** Creates a new third-party auth integration */
   ThirdPartyAuthController_createTPAForProject: {
     parameters: {
       path: {
@@ -14740,6 +14922,9 @@ export interface operations {
       201: {
         content: never
       }
+      403: {
+        content: never
+      }
       /** @description Failed to remove read replica */
       500: {
         content: never
@@ -14761,6 +14946,9 @@ export interface operations {
     }
     responses: {
       201: {
+        content: never
+      }
+      403: {
         content: never
       }
       /** @description Failed to set up read replica */

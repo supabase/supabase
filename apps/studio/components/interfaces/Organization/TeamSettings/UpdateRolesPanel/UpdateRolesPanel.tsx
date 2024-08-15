@@ -7,8 +7,8 @@ import { useOrganizationRolesV2Query } from 'data/organization-members/organizat
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -57,7 +57,7 @@ interface UpdateRolesPanelProps {
 export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelProps) => {
   const { slug } = useParams()
   const organization = useSelectedOrganization()
-  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const { data: projects } = useProjectsQuery()
   const { data: permissions } = usePermissionsQuery()
@@ -68,7 +68,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
 
   const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
-    organization?.id,
+    organization?.slug,
     orgScopedRoles.concat(projectScopedRoles),
     permissions ?? []
   )

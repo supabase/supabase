@@ -1,5 +1,5 @@
 import { EmbeddedTarget, flattenTargets } from '@supabase/sql-to-rest'
-import { ResultBundle } from './util'
+import type { ResultBundle } from './util'
 
 export type Assumption = {
   id: string

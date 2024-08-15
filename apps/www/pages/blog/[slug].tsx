@@ -20,6 +20,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 import LW11Summary from '~/components/LaunchWeek/11/LW11Summary'
+import LW12Summary from '~/components/LaunchWeek/12/LWSummary'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
@@ -125,6 +126,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const isLaunchWeek7 = props.blog.launchweek === '7'
   const isLaunchWeekX = props.blog.launchweek?.toString().toLocaleLowerCase() === 'x'
   const isGAWeek = props.blog.launchweek?.toString().toLocaleLowerCase() === '11'
+  const isLaunchWeek12 = props.blog.launchweek?.toString().toLocaleLowerCase() === '12'
 
   const author = authorArray
     .map((authorId) => {
@@ -336,6 +338,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   {isLaunchWeek7 && <BlogLinks />}
                   {isLaunchWeekX && <LWXSummary />}
                   {isGAWeek && <LW11Summary />}
+                  {isLaunchWeek12 && <LW12Summary />}
                   <div className="block lg:hidden py-8">
                     <div className="text-foreground-lighter text-sm">Share this article</div>
                     <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />

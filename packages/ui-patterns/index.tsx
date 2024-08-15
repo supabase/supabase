@@ -2,6 +2,7 @@
  * The components are listed here so that VsCode can find out about them and list them as import suggestions. Don't
  * import directly from here.
  */
+export * from './CommandMenu'
 export * from './ConsentToast'
 export * from './CountdownWidget'
 export * from './ExpandableVideo'
@@ -18,4 +19,5 @@ export * from './Dialogs/ConfirmationModal'
 export * from './AssistantChat/AssistantChatForm'
 export * from './AssistantChat/AssistantCommandsPopover'
 export * from './SqlToRest'
+export * from './PromoToast'
 export * from './admonition'
