@@ -1169,6 +1169,10 @@ export const functions: NavMenuConstant = {
           name: 'Deploying with CI / CD pipelines',
           url: '/guides/functions/cicd-workflow',
         },
+        {
+          name: 'Integrating with Log Drains',
+          url: '/guides/functions/log-drains',
+        },
       ],
     },
     {
