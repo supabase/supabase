@@ -10,19 +10,17 @@ const SvgComponent = () => (
       strokeLinejoin="bevel"
       strokeMiterlimit={10}
       d="M20.307 12a7.807 7.807 0 0 1-7.807 7.808M4.693 12A7.807 7.807 0 0 1 12.5 4.193"
-      opacity={0.33}
+      opacity={0.45}
     />
     <circle
       cx={17.512}
       cy={6.971}
       r={3.723}
-      fill="currentColor"
       stroke="currentColor"
       strokeLinejoin="bevel"
       strokeMiterlimit={10}
     />
     <path
-      fill="currentColor"
       stroke="currentColor"
       strokeLinejoin="bevel"
       strokeMiterlimit={10}

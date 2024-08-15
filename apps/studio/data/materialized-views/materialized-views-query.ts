@@ -1,52 +1,60 @@
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+
 import { PostgresMaterializedView } from '@supabase/postgres-meta'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { materializedViewKeys } from './keys'
-import { MaterializedView } from './materialized-view-query'
 
 export type MaterializedViewsVariables = {
   projectRef?: string
   connectionString?: string
+  schema?: string
 }
 
-export type MaterializedViewsResponse = MaterializedView[] | { error?: any }
-
 export async function getMaterializedViews(
-  { projectRef, connectionString }: MaterializedViewsVariables,
+  { projectRef, connectionString, schema }: MaterializedViewsVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const response = (await get(`${API_URL}/pg-meta/${projectRef}/materialized-views`, {
-    headers: Object.fromEntries(headers),
+  const { data, error } = await get('/platform/pg-meta/{ref}/materialized-views', {
+    params: {
+      header: { 'x-connection-encrypted': connectionString! },
+      path: { ref: projectRef },
+      query: {
+        included_schemas: schema || '',
+        include_columns: true,
+      } as any,
+    },
+    headers,
     signal,
-  })) as MaterializedViewsResponse
+  })
 
-  if (!Array.isArray(response) && response.error) {
-    throw response.error
-  }
-
-  return response as PostgresMaterializedView[]
+  if (error) handleError(error)
+  return data as PostgresMaterializedView[]
 }
 
 export type MaterializedViewsData = Awaited<ReturnType<typeof getMaterializedViews>>
-export type MaterializedViewsError = unknown
+export type MaterializedViewsError = ResponseError
 
 export const useMaterializedViewsQuery = <TData = MaterializedViewsData>(
-  { projectRef, connectionString }: MaterializedViewsVariables,
+  { projectRef, connectionString, schema }: MaterializedViewsVariables,
   {
     enabled = true,
     ...options
   }: UseQueryOptions<MaterializedViewsData, MaterializedViewsError, TData> = {}
 ) =>
   useQuery<MaterializedViewsData, MaterializedViewsError, TData>(
-    materializedViewKeys.list(projectRef),
-    ({ signal }) => getMaterializedViews({ projectRef, connectionString }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    schema
+      ? materializedViewKeys.listBySchema(projectRef, schema)
+      : materializedViewKeys.list(projectRef),
+    ({ signal }) => getMaterializedViews({ projectRef, connectionString, schema }, signal),
+    {
+      enabled: enabled && typeof projectRef !== 'undefined',
+      staleTime: 0,
+      ...options,
+    }
   )

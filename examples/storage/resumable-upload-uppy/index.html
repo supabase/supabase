@@ -44,9 +44,10 @@
         Tus,
       } from 'https://releases.transloadit.com/uppy/v3.6.1/uppy.min.mjs'
 
-      const SUPABASE_ANON_KEY = 'repace-with-your-anon-key'
-      const SUPABASE_PROJECT_ID = 'repace-with-your-project-id'
-      const STORAGE_BUCKET = 'repace-with-your-bucket-id'
+      const SUPABASE_ANON_KEY = 'replace-with-your-anon-key'
+      const SUPABASE_PROJECT_ID = 'replace-with-your-project-id'
+      const STORAGE_BUCKET = 'replace-with-your-bucket-id'
+      const BEARER_TOKEN='replace-with-your-bearer-token'
 
       const folder = ''
       const supabaseStorageURL = `https://${SUPABASE_PROJECT_ID}.supabase.co/storage/v1/upload/resumable`
@@ -61,7 +62,7 @@
         .use(Tus, {
           endpoint: supabaseStorageURL,
           headers: {
-            authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            authorization: `Bearer ${BEARER_TOKEN}`,
             apikey: SUPABASE_ANON_KEY,
           },
           uploadDataDuringCreation: true,

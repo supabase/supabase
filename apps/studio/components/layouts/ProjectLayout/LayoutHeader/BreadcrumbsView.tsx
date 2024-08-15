@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { Fragment } from 'react'
 
 interface BreadcrumbsViewProps {
@@ -9,23 +8,25 @@ const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewProps) =>
   return (
     <>
       {breadcrumbs?.length
-        ? breadcrumbs.map((breadcrumb: any) => (
+        ? breadcrumbs.map((breadcrumb: any, i: number) => (
             <Fragment key={breadcrumb.key}>
-              <span className="text-border-stronger">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  stroke="currentColor"
-                  strokeWidth="1"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                  shapeRendering="geometricPrecision"
-                >
-                  <path d="M16 3.549L7.12 20.600"></path>
-                </svg>
-              </span>
+              {i > 0 && (
+                <span className="text-border-stronger dark:text-border-strong">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                    shapeRendering="geometricPrecision"
+                  >
+                    <path d="M16 3.549L7.12 20.600"></path>
+                  </svg>
+                </span>
+              )}
 
               <a
                 onClick={breadcrumb.onClick || (() => {})}
@@ -42,4 +43,4 @@ const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewProps) =>
   )
 }
 
-export default observer(BreadcrumbsView)
+export default BreadcrumbsView

@@ -1,15 +1,22 @@
-import { useParams } from 'common'
+import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Button, IconRefreshCw, IconSearch, IconX, Input, Listbox } from 'ui'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import NoPermission from 'components/ui/NoPermission'
+import { authKeys } from 'data/auth/keys'
 import { useUsersQuery } from 'data/auth/users-query'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { Search, X } from 'lucide-react'
+import { Button, IconRefreshCw, Input, Listbox } from 'ui'
 import AddUserDropdown from './AddUserDropdown'
 import UsersList from './UsersList'
 
 const Users = () => {
+  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
@@ -17,23 +24,50 @@ const Users = () => {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [filterKeywords, setFilterKeywords] = useState('')
-  const [filterVerified, setFilterVerified] = useState<'verified' | 'unverified'>()
+  type Filter = 'verified' | 'unverified' | 'anonymous'
+  const [filter, setFilter] = useState<Filter>()
 
-  const { data, isLoading, isSuccess, refetch, isRefetching } = useUsersQuery({
-    projectRef,
-    page,
-    keywords: filterKeywords,
-    verified: filterVerified,
-  })
+  const canReadUsers = useCheckPermissions(PermissionAction.TENANT_SQL_SELECT, 'auth.users')
+  const isPermissionsLoaded = usePermissionsLoaded()
 
-  function onVerifiedFilterChange(e: any) {
-    setFilterVerified(e)
+  const {
+    data,
+    isLoading,
+    isSuccess,
+    refetch,
+    isRefetching,
+    error,
+    isPreviousData: isFetchingNextPage,
+  } = useUsersQuery(
+    {
+      projectRef,
+      page,
+      keywords: filterKeywords,
+      filter,
+      connectionString: project?.connectionString!,
+    },
+    {
+      keepPreviousData: true,
+      onSuccess(data) {
+        if (data.users.length <= 0 && data.total > 0) {
+          queryClient.removeQueries(
+            authKeys.users(projectRef, { page, keywords: filterKeywords, filter })
+          )
+
+          setPage((prev) => prev - 1)
+        }
+      },
+    }
+  )
+
+  function onVerifiedFilterChange(val: Filter) {
+    setFilter(val)
   }
 
   function clearSearch() {
     setSearch('')
     setFilterKeywords('')
-    setFilterVerified(undefined)
+    setFilter(undefined)
   }
 
   return (
@@ -51,21 +85,16 @@ const Users = () => {
             name="email"
             id="email"
             placeholder="Search by email or phone number"
-            icon={<IconSearch size="tiny" />}
+            icon={<Search size={14} />}
             actions={[
               search && (
-                <Button
-                  size="tiny"
-                  type="text"
-                  icon={<IconX size="tiny" />}
-                  onClick={() => clearSearch()}
-                />
+                <Button size="tiny" type="text" icon={<X />} onClick={() => clearSearch()} />
               ),
             ]}
           />
           <Listbox
             size="small"
-            value={filterVerified}
+            value={filter}
             onChange={onVerifiedFilterChange}
             name="verified"
             id="verified"
@@ -80,6 +109,9 @@ const Users = () => {
             <Listbox.Option label="Un-Verified Users" value="unverified">
               Un-Verified Users
             </Listbox.Option>
+            <Listbox.Option label="Anonymous Users" value="anonymous">
+              Anonymous Users
+            </Listbox.Option>
           </Listbox>
         </div>
         <div className="mt-4 flex items-center gap-2 md:mt-0">
@@ -88,7 +120,7 @@ const Users = () => {
             size="tiny"
             icon={<IconRefreshCw />}
             type="default"
-            loading={isLoading || isRefetching}
+            loading={isRefetching && !isFetchingNextPage}
             onClick={() => refetch()}
           >
             Reload
@@ -99,16 +131,23 @@ const Users = () => {
       <section className="thin-scrollbars mt-4 overflow-visible px-6">
         <div className="section-block--body relative overflow-x-auto rounded">
           <div className="inline-block min-w-full align-middle">
-            <UsersList
-              page={page}
-              setPage={setPage}
-              keywords={filterKeywords}
-              verified={filterVerified}
-              total={data?.total ?? 0}
-              users={data?.users ?? []}
-              isLoading={isLoading}
-              isSuccess={isSuccess}
-            />
+            {isPermissionsLoaded && !canReadUsers ? (
+              <div className="mt-8">
+                <NoPermission isFullPage resourceText="access your project's users" />
+              </div>
+            ) : (
+              <UsersList
+                page={page}
+                setPage={setPage}
+                keywords={filterKeywords}
+                total={data?.total ?? 0}
+                users={data?.users ?? []}
+                isLoading={isLoading}
+                isSuccess={isSuccess}
+                isFetchingNextPage={isFetchingNextPage}
+                error={error}
+              />
+            )}
           </div>
         </div>
       </section>

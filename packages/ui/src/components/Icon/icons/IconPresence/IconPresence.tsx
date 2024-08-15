@@ -14,7 +14,7 @@ const SvgComponent = () => (
       strokeLinejoin="round"
       strokeMiterlimit={10}
       d="M24.544 32.746h-5.623a3 3 0 0 1-3-3V18.5a3 3 0 0 1 3-3h11.247a3 3 0 0 1 3 3v5.623"
-      opacity={0.33}
+      opacity={0.45}
     />
   </>
 )

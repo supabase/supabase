@@ -1,35 +1,77 @@
 import dagre from '@dagrejs/dagre'
+import { groupBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
 
+import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
+import type { Database } from 'data/read-replicas/replicas-query'
 import {
   AVAILABLE_REPLICA_REGIONS,
-  DatabaseConfiguration,
   NODE_ROW_HEIGHT,
   NODE_SEP,
   NODE_WIDTH,
 } from './InstanceConfiguration.constants'
-import { groupBy } from 'lodash'
 
-export const generateNodes = (
-  databases: DatabaseConfiguration[],
-  {
-    onSelectRestartReplica,
-    onSelectResizeReplica,
-    onSelectDropReplica,
-  }: {
-    onSelectRestartReplica: (database: DatabaseConfiguration) => void
-    onSelectResizeReplica: (database: DatabaseConfiguration) => void
-    onSelectDropReplica: (database: DatabaseConfiguration) => void
-  }
-): Node[] => {
+// [Joshen] Just FYI the nodes generation assumes each project only has one load balancer
+// Will need to change if this eventually becomes otherwise
+
+export const generateNodes = ({
+  primary,
+  replicas,
+  loadBalancers,
+  onSelectRestartReplica,
+  onSelectDropReplica,
+}: {
+  primary: Database
+  replicas: Database[]
+  loadBalancers: LoadBalancer[]
+  onSelectRestartReplica: (database: Database) => void
+  onSelectDropReplica: (database: Database) => void
+}): Node[] => {
   const position = { x: 0, y: 0 }
-  const replicas = databases.filter((d) => d.type === 'READ_REPLICA')
   const regions = groupBy(replicas, (d) => {
     const region = AVAILABLE_REPLICA_REGIONS.find((region) => d.region.includes(region.region))
     return region?.key
   })
 
-  const databaseNodes: Node[] = databases
+  const loadBalancer = loadBalancers.find((x) =>
+    x.databases.some((db) => db.identifier === primary.identifier)
+  )
+  const loadBalancerNode: Node | undefined =
+    loadBalancer !== undefined
+      ? {
+          position,
+          id: 'load-balancer',
+          type: 'LOAD_BALANCER',
+          data: {
+            numDatabases: loadBalancer.databases.length,
+          },
+        }
+      : undefined
+
+  const primaryRegion = AVAILABLE_REPLICA_REGIONS.find((region) =>
+    primary.region.includes(region.region)
+  )
+  const primaryNode: Node = {
+    position,
+    id: primary.identifier,
+    type: 'PRIMARY',
+    data: {
+      id: primary.identifier,
+      region:
+        primary.cloud_provider === 'FLY'
+          ? { name: 'Singapore (sin)', key: 'SOUTHEAST_ASIA' }
+          : primaryRegion ?? { name: primary.region },
+      provider: primary.cloud_provider,
+      inserted_at: primary.inserted_at,
+      computeSize: primary.size,
+      status: primary.status,
+      numReplicas: replicas.length,
+      numRegions: Object.keys(regions).length,
+      hasLoadBalancer: loadBalancer !== undefined,
+    },
+  }
+
+  const replicaNodes: Node[] = replicas
     .sort((a, b) => (a.region > b.region ? 1 : -1))
     .map((database) => {
       const region = AVAILABLE_REPLICA_REGIONS.find((region) =>
@@ -38,43 +80,39 @@ export const generateNodes = (
 
       return {
         position,
-        id: `database-${database.id}`,
-        type: database.type,
+        id: database.identifier,
+        type: 'READ_REPLICA',
         data: {
-          id: database.id,
+          id: database.identifier,
           region,
-          label: database.type === 'PRIMARY' ? 'Primary Database' : 'Read Replica',
           provider: database.cloud_provider,
           inserted_at: database.inserted_at,
           computeSize: database.size,
-          ...(database.type === 'READ_REPLICA'
-            ? {
-                onSelectRestartReplica: () => onSelectRestartReplica(database),
-                onSelectResizeReplica: () => onSelectResizeReplica(database),
-                onSelectDropReplica: () => onSelectDropReplica(database),
-              }
-            : {}),
-          ...(database.type === 'PRIMARY'
-            ? {
-                numReplicas: replicas.length,
-                numRegions: Object.keys(regions).length,
-              }
-            : {}),
+          status: database.status,
+          onSelectRestartReplica: () => onSelectRestartReplica(database),
+          onSelectDropReplica: () => onSelectDropReplica(database),
         },
       }
     })
 
-  return [...databaseNodes]
+  return [
+    ...(loadBalancerNode !== undefined ? [loadBalancerNode] : []),
+    primaryNode,
+    ...replicaNodes,
+  ]
 }
 
 export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 200, nodesep: NODE_SEP })
+  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 160, nodesep: NODE_SEP })
 
-  nodes.forEach((node) =>
-    dagreGraph.setNode(node.id, { width: NODE_WIDTH / 2, height: NODE_ROW_HEIGHT / 2 })
-  )
+  nodes.forEach((node) => {
+    dagreGraph.setNode(node.id, {
+      width: NODE_WIDTH / 2,
+      height: node.id === 'load-balancer' ? -70 : NODE_ROW_HEIGHT / 2,
+    })
+  })
 
   edges.forEach((edge) => dagreGraph.setEdge(edge.source, edge.target))
 
@@ -123,7 +161,7 @@ export const addRegionNodes = (nodes: Node[], edges: Edge[]) => {
     const regionNode: Node = {
       id: key,
       position: { x: minX - 10, y: minY - 10 },
-      width: maxX - minX,
+      width: maxX - minX + NODE_WIDTH / 2,
       type: 'REGION',
       data: { region, numReplicas: value.length },
     }
@@ -131,4 +169,12 @@ export const addRegionNodes = (nodes: Node[], edges: Edge[]) => {
   })
 
   return { nodes: [...regionNodes, ...nodes], edges }
+}
+
+export const formatSeconds = (value: number) => {
+  const hours = ~~(value / 3600)
+  const minutes = Math.floor((value % 3600) / 60)
+  const seconds = Math.floor(value % 60)
+
+  return `${hours > 0 ? `${hours}h` : ''} ${minutes > 0 ? `${minutes}m` : ''} ${seconds > 0 ? `${seconds}s` : ''}`.trim()
 }

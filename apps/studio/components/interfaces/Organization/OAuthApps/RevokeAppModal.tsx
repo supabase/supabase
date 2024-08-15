@@ -1,8 +1,9 @@
 import { useParams } from 'common'
+import toast from 'react-hot-toast'
+import { Alert, IconLock, Modal } from 'ui'
+
 import { useAuthorizedAppRevokeMutation } from 'data/oauth/authorized-app-revoke-mutation'
-import { AuthorizedApp } from 'data/oauth/authorized-apps-query'
-import { useStore } from 'hooks'
-import { Alert, IconAlertOctagon, IconLock, Modal } from 'ui'
+import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 
 export interface RevokeAppModalProps {
   selectedApp?: AuthorizedApp
@@ -10,14 +11,10 @@ export interface RevokeAppModalProps {
 }
 
 const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const { mutate: revokeAuthorizedApp, isLoading: isDeleting } = useAuthorizedAppRevokeMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully revoked the app "${selectedApp?.name}"`,
-      })
+      toast.success(`Successfully revoked the app "${selectedApp?.name}"`)
       onClose()
     },
   })
@@ -39,26 +36,26 @@ const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
       onConfirm={onConfirmDelete}
     >
       <Modal.Content>
-        <div className="py-4">
-          <Alert withIcon variant="warning" title="This action cannot be undone">
-            {selectedApp?.name} application will no longer have access to your organization's
-            settings and projects.
-          </Alert>
-          <ul className="mt-4 space-y-5">
-            <li className="flex gap-3 text-sm">
-              <IconLock w={14} className="flex-shrink-0" />
-              <div>
-                <strong>Before you remove this app, consider:</strong>
-                <ul className="space-y-2 mt-2">
-                  <li className="list-disc ml-4">
-                    No users are currently using this application. The application will no longer
-                    have access to your organization after being revoked.
-                  </li>
-                </ul>
-              </div>
-            </li>
-          </ul>
-        </div>
+        <Alert withIcon variant="warning" title="This action cannot be undone">
+          {selectedApp?.name} application will no longer have access to your organization's settings
+          and projects.
+        </Alert>
+      </Modal.Content>
+      <Modal.Content>
+        <ul className="space-y-5">
+          <li className="flex gap-3 text-sm">
+            <IconLock w={14} className="flex-shrink-0" />
+            <div>
+              <strong>Before you remove this app, consider:</strong>
+              <ul className="space-y-2 mt-2">
+                <li className="list-disc ml-4">
+                  No users are currently using this application. The application will no longer have
+                  access to your organization after being revoked.
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
       </Modal.Content>
     </Modal>
   )

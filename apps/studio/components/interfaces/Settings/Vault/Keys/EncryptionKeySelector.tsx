@@ -1,7 +1,8 @@
 import { noop } from 'lodash'
 import { IconPlus, Input, Listbox, Modal } from 'ui'
 
-import { useStore } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 
 interface EncryptionKeySelectorProps {
   id?: string
@@ -24,8 +25,14 @@ const EncryptionKeySelector = ({
   onSelectKey = noop,
   onUpdateDescription = noop,
 }: EncryptionKeySelectorProps) => {
-  const { vault } = useStore()
-  const keys = vault.listKeys()
+  const { project } = useProjectContext()
+
+  const { data } = usePgSodiumKeysQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const keys = data || []
 
   return (
     <>

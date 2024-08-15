@@ -1,8 +1,7 @@
-import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
-import { useCallback } from 'react'
+import type { OAuthScope } from '@supabase/shared-types/out/constants'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
+import { get, handleError } from 'data/fetchers'
 import { resourceKeys } from './keys'
 
 export type ApiAuthorizationVariables = {
@@ -26,9 +25,13 @@ export async function getApiAuthorizationDetails(
 ) {
   if (!id) throw new Error('Authorization ID is required')
 
-  const response = await get(`${API_ADMIN_URL}/oauth/authorizations/${id}`, { signal })
-  if (response.error) throw response.error
-  return response as ApiAuthorizationResponse
+  const { data, error } = await get('/platform/oauth/authorizations/{id}', {
+    params: { path: { id } },
+    signal,
+  })
+
+  if (error) handleError(error)
+  return data as ApiAuthorizationResponse
 }
 
 export type ResourceData = Awaited<ReturnType<typeof getApiAuthorizationDetails>>
@@ -46,15 +49,3 @@ export const useApiAuthorizationQuery = <TData = ResourceData>(
       ...options,
     }
   )
-
-export const useApiAuthorizationPrefetch = ({ id }: ApiAuthorizationVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (id) {
-      client.prefetchQuery(resourceKeys.resource(id), ({ signal }) =>
-        getApiAuthorizationDetails({ id }, signal)
-      )
-    }
-  }, [id])
-}

@@ -1,4 +1,20 @@
 export const analyticsKeys = {
+  // warehouse
+  warehouseQuery: (projectRef: string, query: string) =>
+    ['projects', projectRef, 'warehouse', 'query', query] as const,
+  warehouseTenant: (projectRef: string) => ['projects', projectRef, 'warehouse', 'tenant'] as const,
+  warehouseCollections: (projectRef: string) =>
+    ['projects', projectRef, 'warehouse', 'collections'] as const,
+  warehouseCollectionsCreate: (projectRef: string) =>
+    ['projects', projectRef, 'warehouse', 'collections', 'create'] as const,
+  warehouseEndpoints: (projectRef: string) =>
+    ['projects', projectRef, 'warehouse', 'endpoints'] as const,
+  warehouseBackends: (projectRef: string) =>
+    ['projects', projectRef, 'warehouse', 'backends'] as const,
+  warehouseAccessTokens: (projectRef: string) =>
+    ['projects', projectRef, 'warehouse', 'access-tokens'] as const,
+
+  // logs/reports endpoints
   functionsInvStats: (
     projectRef: string | undefined,
     {
@@ -57,6 +73,29 @@ export const analyticsKeys = {
       },
     ] as const,
 
+  orgDailyComputeStats: (
+    orgSlug: string | undefined,
+    {
+      startDate,
+      endDate,
+      projectRef,
+    }: {
+      startDate?: string
+      endDate?: string
+      projectRef?: string
+    }
+  ) =>
+    [
+      'organizations',
+      orgSlug,
+      'daily-stats-compute',
+      {
+        startDate: isoDateStringToDate(startDate),
+        endDate: isoDateStringToDate(endDate),
+        projectRef,
+      },
+    ] as const,
+
   orgDailyStats: (
     orgSlug: string | undefined,
     {
@@ -92,18 +131,20 @@ export const analyticsKeys = {
       startDate,
       endDate,
       interval,
+      databaseIdentifier,
     }: {
       attribute?: string
       startDate?: string
       endDate?: string
       interval?: string
+      databaseIdentifier?: string
     }
   ) =>
     [
       'projects',
       projectRef,
       'infra-monitoring',
-      { attribute, startDate, endDate, interval },
+      { attribute, startDate, endDate, interval, databaseIdentifier },
     ] as const,
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,

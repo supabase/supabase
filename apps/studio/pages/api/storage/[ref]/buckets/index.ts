@@ -31,9 +31,18 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id, public: isPublicBucket } = req.body
+  const {
+    id,
+    public: isPublicBucket,
+    allowed_mime_types: allowedMimeTypes,
+    file_size_limit: fileSizeLimit,
+  } = req.body
 
-  const { data, error } = await supabase.storage.createBucket(id, { public: isPublicBucket })
+  const { data, error } = await supabase.storage.createBucket(id, {
+    public: isPublicBucket,
+    allowedMimeTypes,
+    fileSizeLimit,
+  })
   if (error) {
     return res.status(400).json({ error: { message: error.message } })
   }

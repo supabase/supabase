@@ -1,5 +1,5 @@
 'use client'
-import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
+import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 export default function ThemeSwitcher() {
   return <ThemeToggle />

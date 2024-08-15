@@ -22,16 +22,16 @@ const PasswordStrengthBar = ({
           aria-valuenow={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
           aria-valuetext={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
           role="progressbar"
-          className="mb-2 overflow-hidden transition-all border rounded bg-background"
+          className="mb-2 overflow-hidden transition-all border rounded bg-200 w-full"
         >
           <div
             style={{
               width: (PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore],
             }}
-            className={`relative h-2 w-full ${
+            className={`relative h-1 w-full ${
               (PASSWORD_STRENGTH_COLOR as any)[passwordStrengthScore]
             } transition-all duration-500 ease-out shadow-inner`}
-          ></div>
+          />
         </div>
       )}
       <p>
@@ -39,7 +39,7 @@ const PasswordStrengthBar = ({
           ? passwordStrengthMessage
           : 'This is the password to your postgres database, so it must be strong and hard to guess.'}{' '}
         <span
-          className="text-brand opacity-50 underline hover:opacity-100 transition cursor-pointer"
+          className="text-foreground opacity-50 underline hover:opacity-100 transition cursor-pointer"
           onClick={generateStrongPassword}
         >
           Generate a password

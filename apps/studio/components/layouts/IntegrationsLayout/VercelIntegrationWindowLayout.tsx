@@ -1,4 +1,5 @@
 import { PropsWithChildren } from 'react'
+import InlineSVG from 'react-inlinesvg'
 
 import { useParams } from 'common'
 import { BASE_PATH } from 'lib/constants'
@@ -6,8 +7,8 @@ import IntegrationWindowLayout from './IntegrationWindowLayout'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 
 const VERCEL_ICON = (
-  <div className="bg-black shadow rounded p-1 w-8 h-8 flex justify-center items-center">
-    <img src={`${BASE_PATH}/img/icons/vercel-icon.svg`} alt="Vercel Icon" className="w-4" />
+  <div className="bg-black shadow rounded p-1 w-8 h-8 flex justify-center items-center text-white">
+    <InlineSVG src={`${BASE_PATH}/img/icons/vercel-icon.svg`} title="Vercel Icon" className="w-4" />
   </div>
 )
 

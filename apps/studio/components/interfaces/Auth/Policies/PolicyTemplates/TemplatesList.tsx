@@ -16,14 +16,14 @@ const TemplatesList = ({
   selectedTemplate,
   setSelectedTemplate = noop,
 }: TemplatesListProps) => (
-  <div className="flex flex-col justify-between border-r border-default" style={{ width: '30%' }}>
+  <div className="flex flex-col justify-between border-r border-default">
     <div
       className="hide-scrollbar  divide-border-primary space-y-0 divide-y divide-solid overflow-y-auto"
       style={{ maxHeight: '24rem' }}
     >
       <Menu type="border">
         {templates.map((template, i) => {
-          const active = selectedTemplate === template
+          const active = selectedTemplate?.id === template?.id
           return (
             <div
               key={i}

@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import { parseArgs } from 'node:util'
 import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
+import type { Json, Section } from '../helpers.mdx'
 import { fetchSources } from './sources'
 
 dotenv.config()
@@ -21,7 +22,9 @@ async function generateEmbeddings() {
   const requiredEnvVars = [
     'NEXT_PUBLIC_SUPABASE_URL',
     'SUPABASE_SERVICE_ROLE_KEY',
-    'OPENAI_KEY',
+    'OPENAI_API_KEY',
+    'NEXT_PUBLIC_MISC_USE_URL',
+    'NEXT_PUBLIC_MISC_USE_ANON_KEY',
     'SEARCH_GITHUB_APP_ID',
     'SEARCH_GITHUB_APP_INSTALLATION_ID',
     'SEARCH_GITHUB_APP_PRIVATE_KEY',
@@ -37,6 +40,7 @@ async function generateEmbeddings() {
 
   const supabaseClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
     process.env.SUPABASE_SERVICE_ROLE_KEY,
     {
       auth: {
@@ -63,15 +67,25 @@ async function generateEmbeddings() {
   }
 
   for (const embeddingSource of embeddingSources) {
-    const { type, source, path, parentPath } = embeddingSource
+    const { type, source, path } = embeddingSource
 
     try {
-      const { checksum, meta, sections } = await embeddingSource.load()
+      const {
+        checksum,
+        sections,
+        meta = {},
+        ragIgnore = false,
+      }: {
+        checksum: string
+        sections: Section[]
+        ragIgnore?: boolean
+        meta?: Json
+      } = embeddingSource.process()
 
       // Check for existing page in DB and compare checksums
       const { error: fetchPageError, data: existingPage } = await supabaseClient
         .from('page')
-        .select('id, path, checksum, parentPage:parent_page_id(id, path)')
+        .select('id, path, checksum')
         .filter('path', 'eq', path)
         .limit(1)
         .maybeSingle()
@@ -82,34 +96,6 @@ async function generateEmbeddings() {
 
       // We use checksum to determine if this page & its sections need to be regenerated
       if (!shouldRefresh && existingPage?.checksum === checksum) {
-        const existingParentPage = Array.isArray(existingPage?.parentPage)
-          ? existingPage?.parentPage[0]
-          : existingPage?.parentPage
-
-        // If parent page changed, update it
-        if (existingParentPage?.path !== parentPath) {
-          console.log(`[${path}] Parent page has changed. Updating to '${parentPath}'...`)
-          const { error: fetchParentPageError, data: parentPage } = await supabaseClient
-            .from('page')
-            .select()
-            .filter('path', 'eq', parentPath)
-            .limit(1)
-            .maybeSingle()
-
-          if (fetchParentPageError) {
-            throw fetchParentPageError
-          }
-
-          const { error: updatePageError } = await supabaseClient
-            .from('page')
-            .update({ parent_page_id: parentPage?.id })
-            .filter('id', 'eq', existingPage.id)
-
-          if (updatePageError) {
-            throw updatePageError
-          }
-        }
-
         // No content/embedding update required on this page
         // Update other meta info
         const { error: updatePageError } = await supabaseClient
@@ -149,17 +135,6 @@ async function generateEmbeddings() {
         }
       }
 
-      const { error: fetchParentPageError, data: parentPage } = await supabaseClient
-        .from('page')
-        .select()
-        .filter('path', 'eq', parentPath)
-        .limit(1)
-        .maybeSingle()
-
-      if (fetchParentPageError) {
-        throw fetchParentPageError
-      }
-
       // Create/update page record. Intentionally clear checksum until we
       // have successfully generated all page sections.
       const { error: upsertPageError, data: page } = await supabaseClient
@@ -171,7 +146,7 @@ async function generateEmbeddings() {
             type,
             source,
             meta,
-            parent_page_id: parentPage?.id,
+            content: embeddingSource.extractIndexedContent(),
             version: refreshVersion,
             last_refresh: refreshDate,
           },
@@ -188,10 +163,11 @@ async function generateEmbeddings() {
       console.log(`[${path}] Adding ${sections.length} page sections (with embeddings)`)
       for (const { slug, heading, content } of sections) {
         // OpenAI recommends replacing newlines with spaces for best results (specific to embeddings)
+        // force a redeploy
         const input = content.replace(/\n/g, ' ')
 
         try {
-          const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY })
+          const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
           const embeddingResponse = await openai.embeddings.create({
             model: 'text-embedding-ada-002',
@@ -200,7 +176,7 @@ async function generateEmbeddings() {
 
           const [responseData] = embeddingResponse.data
 
-          const { error: insertPageSectionError, data: pageSection } = await supabaseClient
+          const { error: insertPageSectionError } = await supabaseClient
             .from('page_section')
             .insert({
               page_id: page.id,
@@ -209,6 +185,7 @@ async function generateEmbeddings() {
               content,
               token_count: embeddingResponse.usage.total_tokens,
               embedding: responseData.embedding,
+              rag_ignore: ragIgnore,
             })
             .select()
             .limit(1)

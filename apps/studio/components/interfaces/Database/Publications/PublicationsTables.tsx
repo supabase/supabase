@@ -7,9 +7,9 @@ import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import InformationBox from 'components/ui/InformationBox'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { Button, IconAlertCircle, IconChevronLeft, IconSearch, Input } from 'ui'
 import PublicationsTableItem from './PublicationsTableItem'
@@ -50,33 +50,6 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
     }
   )
 
-  // const publication = selectedPublication
-  // const enabledForAllTables = publication.tables == null
-
-  // const toggleReplicationForAllTables = async (publication: any, disable: boolean) => {
-  //   const toggle = disable ? 'disable' : 'enable'
-  //   ConfirmAlert({
-  //     title: 'Confirm',
-  //     type: 'warn',
-  //     message: `Are you sure you want to ${toggle} replication for all tables in ${publication.name}?`,
-  //     onAsyncConfirm: async () => {
-  //       try {
-  //         const res: any = await meta.publications.recreate(publication.id)
-  //         if (res.error) {
-  //           throw res.error
-  //         } else {
-  //           onPublicationUpdated(res)
-  //         }
-  //       } catch (error: any) {
-  //         ui.setNotification({
-  //           category: 'error',
-  //           message: `Failed to toggle replication for all tables: ${error.message}`,
-  //         })
-  //       }
-  //     },
-  //   })
-  // }
-
   return (
     <>
       <div className="mb-4">
@@ -110,7 +83,7 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
       </div>
       {isLoading && (
         <div className="mt-8">
-          <Connecting />
+          <Loading />
         </div>
       )}
 

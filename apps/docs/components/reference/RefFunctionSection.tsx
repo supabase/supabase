@@ -1,29 +1,26 @@
+import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
-
 import { CodeBlock, IconDatabase, Tabs } from 'ui'
-
+import components from '~/components'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
+import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
-
-import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
-import { Fragment } from 'react'
-import { IRefFunctionSection } from './Reference.types'
-import components from '~/components'
+import type { IRefFunctionSection } from './Reference.types'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
-
-  // gracefully return nothing if function does not exist
   if (!item) return <></>
 
   const hasTsRef = item['$ref'] || null
 
   const tsDefinition =
     hasTsRef && props.typeSpec ? extractTsDocNode(hasTsRef, props.typeSpec) : null
-  const parameters = hasTsRef && tsDefinition ? generateParameters(tsDefinition) : ''
-  const shortText = hasTsRef && tsDefinition ? tsDefinition.signatures[0].comment.shortText : ''
+  const parameters =
+    item.overwriteParams ??
+    (hasTsRef && tsDefinition ? generateParameters(tsDefinition) : item.params)
+  const shortText = hasTsRef && tsDefinition ? tsDefinition.signatures[0].comment?.shortText : ''
 
   return (
     <>
@@ -51,24 +48,15 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                 </ReactMarkdown>
               </div>
             )}
-            {/* // parameters */}
+            {/* parameters */}
             {parameters && (
               <div className="not-prose mt-12">
                 <h5 className="mb-3 text-base text-foreground">Parameters</h5>
-                <ul className="">
+                <ul>
                   {parameters.map((param) => {
-                    // grab override params from yaml file
-                    const overrideParams = item.overrideParams
-
-                    // params from the yaml file can override the params from parameters if it matches the name
-                    const overide = overrideParams?.filter((x) => {
-                      return param.name === x.name
-                    })
-
-                    const paramItem = overide?.length > 0 ? overide[0] : param
                     return (
-                      <Param {...paramItem} key={param.name}>
-                        {paramItem.subContent && (
+                      <Param {...param} key={param.name}>
+                        {param.subContent && (
                           <div className="mt-3">
                             <Options>
                               {param.subContent.map((param) => {
@@ -111,7 +99,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                   size="tiny"
                   type="rounded-pills"
                   scrollable
-                  queryGroup="example"
                 >
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {
@@ -126,20 +113,14 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       const codeBlockLang = example?.code?.startsWith('```js')
                         ? 'js'
                         : example?.code?.startsWith('```ts')
-                        ? 'ts'
-                        : example?.code?.startsWith('```dart')
-                        ? 'dart'
-                        : example?.code?.startsWith('```c#')
-                        ? 'csharp'
-                        : example?.code?.startsWith('```kotlin')
-                        ? 'kotlin'
-                        : 'js'
-                      //                     `
-                      // import { createClient } from '@supabase/supabase-js'
-
-                      // // Create a single supabase client for interacting with your database
-                      // const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-                      // `
+                          ? 'ts'
+                          : example?.code?.startsWith('```dart')
+                            ? 'dart'
+                            : example?.code?.startsWith('```c#')
+                              ? 'csharp'
+                              : example?.code?.startsWith('```kotlin')
+                                ? 'kotlin'
+                                : 'js'
                       const staticExample = item.examples[exampleIndex]
 
                       const response = staticExample.response
@@ -149,7 +130,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       return (
                         <Tabs.Panel
                           id={example.id}
-                          key={example.id}
+                          key={exampleIndex}
                           label={example.name}
                           className="flex flex-col gap-3"
                         >

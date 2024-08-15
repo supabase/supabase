@@ -1,49 +1,54 @@
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import { PropsWithChildren } from 'react'
 
-import ProductMenu from 'components/ui/ProductMenu'
-import { useSelectedProject, useStore, withAuth } from 'hooks'
-import ProjectLayout from '../'
+import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ProductMenu } from 'components/ui/ProductMenu'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
+import Link from 'next/link'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
 export interface DatabaseLayoutProps {
   title?: string
 }
 
-const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
-  const { ui, meta, vault } = useStore()
+const DatabaseProductMenu = () => {
   const project = useSelectedProject()
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
 
-  const vaultExtension = meta.extensions.byId('supabase_vault')
-  const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
-  const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
+  const { data } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
 
-  useEffect(() => {
-    if (ui.selectedProjectRef) {
-      meta.roles.load()
-      meta.triggers.load()
-      meta.extensions.load()
-      meta.publications.load()
-    }
-  }, [ui.selectedProjectRef])
-
-  useEffect(() => {
-    if (isVaultEnabled) {
-      vault.load()
-    }
-  }, [ui.selectedProjectRef, isVaultEnabled])
+  const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
+  const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
+  const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
   return (
-    <ProjectLayout
-      product="Database"
-      productMenu={
-        <ProductMenu page={page} menu={generateDatabaseMenu(project, { pgNetExtensionExists })} />
-      }
-    >
+    <>
+      <ProductMenu
+        page={page}
+        menu={generateDatabaseMenu(project, {
+          pgNetExtensionExists,
+          pitrEnabled,
+          columnLevelPrivileges,
+        })}
+      />
+    </>
+  )
+}
+
+const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
+  return (
+    <ProjectLayout product="Database" productMenu={<DatabaseProductMenu />} isBlocking={false}>
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
       </main>
@@ -51,4 +56,4 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
   )
 }
 
-export default withAuth(observer(DatabaseLayout))
+export default withAuth(DatabaseLayout)

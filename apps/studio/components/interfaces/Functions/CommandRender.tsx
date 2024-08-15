@@ -1,20 +1,26 @@
-import { useState } from 'react'
-import { IconCheck, IconClipboard } from 'ui'
+import { Check, Clipboard } from 'lucide-react'
+import { forwardRef, useState } from 'react'
+import { cn } from 'ui'
 
-const CommandRender = ({ commands }: any) => {
-  return (
-    <div className="space-y-4">
-      {commands.map((item: any, idx: number) => {
-        return <Command key={`command-${idx}`} item={item} />
-      })}
-    </div>
-  )
-}
+const CommandRender = forwardRef<HTMLDivElement, { commands: any[]; className?: string }>(
+  ({ commands, className }, ref) => {
+    return (
+      <div ref={ref} className={cn('space-y-4', className)}>
+        {commands.map((item: any, idx: number) => (
+          <Command key={`command-${idx}`} item={item} />
+        ))}
+      </div>
+    )
+  }
+)
+
+CommandRender.displayName = 'CommandRender'
 
 export default CommandRender
 
 const Command = ({ item }: any) => {
   const [isCopied, setIsCopied] = useState(false)
+
   return (
     <div className="space-y-1">
       <span className="font-mono text-sm text-foreground-lighter">{`> ${item.comment}`}</span>
@@ -22,7 +28,7 @@ const Command = ({ item }: any) => {
         <div className="flex gap-2 font-mono text-sm font-normal text-foreground">
           <span className="text-foreground-lighter">$</span>
           <span>
-            <span className="">{item.jsx ? item.jsx() : null} </span>
+            <span>{item.jsx ? item.jsx() : null} </span>
             <button
               type="button"
               className="text-foreground-lighter hover:text-foreground"
@@ -38,15 +44,9 @@ const Command = ({ item }: any) => {
               }}
             >
               {isCopied ? (
-                <div className="text-brand">
-                  <IconCheck size={14} strokeWidth={3} />
-                </div>
+                <Check size={14} strokeWidth={3} className="text-brand" />
               ) : (
-                <div className="relative">
-                  <div className="block">
-                    <IconClipboard size={14} />
-                  </div>
-                </div>
+                <Clipboard size={14} />
               )}
             </button>
           </span>

@@ -195,8 +195,8 @@ const DateRangePicker = ({
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button asChild type="default" iconRight={<IconChevronDown />}>
+        <DropdownMenuTrigger asChild>
+          <Button type="default" iconRight={<IconChevronDown />}>
             <span>{timePeriod && options.find((x) => x.key === timePeriod)?.label}</span>
           </Button>
         </DropdownMenuTrigger>

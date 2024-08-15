@@ -1,19 +1,23 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { delete_ } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
-import { customDomainKeys } from './keys'
 import { toast } from 'react-hot-toast'
-import { ResponseError } from 'types'
+
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
+import { customDomainKeys } from './keys'
 
 export type CustomDomainDeleteVariables = {
   projectRef: string
 }
 
 export async function deleteCustomDomain({ projectRef }: CustomDomainDeleteVariables) {
-  const response = await delete_(`${API_ADMIN_URL}/projects/${projectRef}/custom-hostname`, {})
+  const { data, error } = await del(`/v1/projects/{ref}/custom-hostname`, {
+    params: {
+      path: { ref: projectRef },
+    },
+  })
 
-  if (response.error) throw response.error
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type CustomDomainDeleteData = Awaited<ReturnType<typeof deleteCustomDomain>>

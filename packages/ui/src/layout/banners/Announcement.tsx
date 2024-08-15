@@ -1,9 +1,12 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 
-import _announcement from './data/Announcement.json'
-import { IconX } from 'ui'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
+import IconX from '../../components/Icon/icons/IconX/IconX'
+import { cn } from '../../lib/utils/cn'
+import _announcement from './data/Announcement.json'
 
 export interface AnnouncementProps {
   show: boolean
@@ -17,22 +20,23 @@ const announcement = _announcement as AnnouncementProps
 
 interface AnnouncementComponentProps {
   show?: boolean
+  dismissable?: boolean
   className?: string
 }
 
 const Announcement = ({
   show = true,
+  dismissable = true,
   className,
   children,
 }: PropsWithChildren<AnnouncementComponentProps>) => {
-  const [hidden, setHidden] = useState(true)
+  const [hidden, setHidden] = useState(false)
 
-  const router = useRouter()
-  const isHomePage = router.pathname === '/'
-  const isLaunchWeekSection = router.pathname.includes('launch-week')
+  const pathname = usePathname()
+  const isLaunchWeekSection = pathname?.includes('launch-week') ?? false
 
   // override to hide announcement
-  if (!show || !announcement.show || isHomePage || isLaunchWeekSection) return null
+  if (!show || !announcement.show) return null
 
   // construct the key for the announcement, based on the title text
   const announcementKey = 'announcement_' + announcement.text.replace(/ /g, '')
@@ -57,11 +61,8 @@ const Announcement = ({
     return null
   } else {
     return (
-      <div
-        onClick={() => window.location.assign(announcement.link)}
-        className={['relative z-40 h-[55px] w-full cursor-pointer', className].join(' ')}
-      >
-        {!isLaunchWeekSection && (
+      <div className={cn('relative z-40 w-full', className)}>
+        {dismissable && !isLaunchWeekSection && (
           <div
             className="absolute z-50 right-4 flex h-full items-center opacity-100 text-white transition-opacity hover:opacity-100"
             onClick={handleClose}

@@ -1,10 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
-import { Button, Form, IconMail, Input, Modal } from 'ui'
+import { Mail } from 'lucide-react'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button, Form, Input, Modal } from 'ui'
 
 export type InviteUserModalProps = {
   visible: boolean
@@ -12,11 +13,15 @@ export type InviteUserModalProps = {
 }
 
 const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
 
   const handleToggle = () => setVisible(!visible)
-  const { mutateAsync: inviteUser, isLoading: isInviting } = useUserInviteMutation()
+  const { mutate: inviteUser, isLoading: isInviting } = useUserInviteMutation({
+    onSuccess: (_, variables) => {
+      toast.success(`Sent invite email to ${variables.email}`)
+      setVisible(false)
+    },
+  })
   const canInviteUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
 
   const validate = (values: any) => {
@@ -35,10 +40,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
 
   const onInviteUser = async (values: any) => {
     if (!projectRef) return console.error('Project ref is required')
-
-    await inviteUser({ projectRef, email: values.email })
-    ui.setNotification({ category: 'success', message: `Sent invite email to ${values.email}` })
-    setVisible(false)
+    inviteUser({ projectRef, email: values.email })
   }
 
   return (
@@ -59,13 +61,13 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
           onSubmit={onInviteUser}
         >
           {() => (
-            <div className="space-y-6 py-4">
+            <>
               <Modal.Content>
                 <Input
                   id="email"
                   className="w-full"
                   label="User email"
-                  icon={<IconMail />}
+                  icon={<Mail />}
                   type="email"
                   name="email"
                   placeholder="User email"
@@ -83,7 +85,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
                   Invite user
                 </Button>
               </Modal.Content>
-            </div>
+            </>
           )}
         </Form>
       </Modal>
@@ -91,4 +93,4 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   )
 }
 
-export default observer(InviteUserModal)
+export default InviteUserModal

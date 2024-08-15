@@ -1,0 +1,161 @@
+---
+id: 'auth-slack'
+title: 'Login with Slack'
+description: 'Add Slack OAuth to your Supabase project'
+---
+
+To enable Slack Auth for your project, you need to set up a Slack OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
+<Admonition type="caution">
+
+We will be replacing the existing Slack provider with a new Slack (OIDC) provider. Developers with Slack OAuth Applications created prior to 24th June 2024 should create a new application and migrate their credentials from the Slack provider to the Slack (OIDC) provider. Existing OAuth Applications built with the old Slack provider will continue to work up till 10th October. You can refer to the [**list of supported scopes**](https://api.slack.com/scopes?filter=user) for the new Slack (OIDC) User.
+
+</Admonition>
+
+Setting up Slack logins for your application consists of 3 parts:
+
+- Create and configure a Slack Project and App on the [Slack Developer Dashboard](https://api.slack.com/apps).
+- Add your Slack `API Key` and `API Secret Key` to your [Supabase Project](https://supabase.com/dashboard).
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+
+## Access your Slack Developer account
+
+- Go to [api.slack.com](https://api.slack.com/apps).
+- Click on `Your Apps` at the top right to log in.
+
+![Slack Developer Portal.](/docs/img/guides/auth-slack/slack-portal.png)
+
+## Find your callback URL
+
+<SocialProviderSetup provider="Slack" />
+
+## Create a Slack OAuth app
+
+- Go to [api.slack.com](https://api.slack.com/apps).
+- Click on `Create New App`
+
+Under `Create an app...`:
+
+- Click `From scratch`
+- Type the name of your app
+- Select your `Slack Workspace`
+- Click `Create App`
+
+Under `App Credentials`:
+
+- Copy and save your newly-generated `Client ID`
+- Copy and save your newly-generated `Client Secret`
+
+Under the sidebar, select `OAuth & Permissions` and look for `Redirect URLs`:
+
+- Click `Add New Redirect URL`
+- Paste your `Callback URL` then click `Add`
+- Click `Save URLs`
+
+Under `Scopes`:
+
+- Add the following scopes under the `User Token Scopes`: `profile`, `email`, `openid`. These scopes are the default scopes that Supabase Auth uses to request for user information. Do not add other scopes as [Sign In With Slack only supports `profile`, `email`, `openid`](https://api.slack.com/authentication/sign-in-with-slack#request).
+
+## Enter your Slack credentials into your Supabase project
+
+<SocialProviderSettingsSupabase provider="Slack" />
+
+## Add login code to your client app
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+<CreateClientSnippet />
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `slack_oidc` as the `provider`:
+
+```js
+async function signInWithSlack() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'slack_oidc',
+  })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `slack` as the `provider`:
+
+```dart
+Future<void> signInWithSlack() async {
+  await supabase.auth.signInWithOAuth(OAuthProvider.slack);
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `SlackOIDC` as the `Provider`:
+
+```kotlin
+suspend fun signInWithSlack() {
+	supabase.auth.signInWith(SlackOIDC)
+}
+```
+
+</TabPanel>
+</Tabs>
+
+<OAuthPkceFlow />
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```js
+async function signOut() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```kotlin
+suspend fun signOut() {
+	supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Resources
+
+- [Supabase - Get started for free](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Slack Developer Dashboard](https://api.slack.com/apps)

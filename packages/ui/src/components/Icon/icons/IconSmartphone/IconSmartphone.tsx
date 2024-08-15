@@ -9,5 +9,12 @@
     return <IconBase icon={Smartphone} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { smartphone } from 'lucide-react'
+  */
   export default IconSmartphone
   

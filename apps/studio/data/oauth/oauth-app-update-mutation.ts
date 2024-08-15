@@ -1,10 +1,10 @@
-import { OAuthScope } from '@supabase/shared-types/out/constants'
+import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 import { put } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import { API_URL } from 'lib/constants'
+import type { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
 
 export type OAuthAppUpdateVariables = {
@@ -32,7 +32,7 @@ export async function updateOAuthApp({
   if (!website) throw new Error('OAuth app URL is required')
   if (!redirect_uris || redirect_uris.length === 0) throw new Error('Redirect URIs are required')
 
-  const response = await put(`${API_ADMIN_URL}/organizations/${slug}/oauth/apps/${id}`, {
+  const response = await put(`${API_URL}/organizations/${slug}/oauth/apps/${id}`, {
     name,
     website,
     icon,

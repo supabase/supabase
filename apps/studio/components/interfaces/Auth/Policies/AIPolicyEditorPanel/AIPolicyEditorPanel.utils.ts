@@ -1,36 +1,25 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PostgresPolicy } from '@supabase/postgres-meta'
+import type { Message } from 'ai/react'
 import { uuidv4 } from 'lib/helpers'
-import { ThreadMessage } from 'openai/resources/beta/threads/messages/messages'
+import { isEqual } from 'lodash'
+
+export type MessageWithDebug = Message & { isDebug: boolean }
 
 export const generateThreadMessage = ({
   id,
-  threadId,
-  runId,
   content,
-  metadata = {},
+  isDebug,
 }: {
   id?: string
-  threadId?: string
-  runId?: string
   content: string
-  metadata?: any
+  isDebug: boolean
 }) => {
-  const message: ThreadMessage = {
+  const message: MessageWithDebug = {
     id: id ?? uuidv4(),
-    object: 'thread.message',
     role: 'assistant',
-    file_ids: [],
-    metadata,
-    content: [
-      {
-        type: 'text',
-        text: { value: content, annotations: [] },
-      },
-    ],
-    created_at: Math.floor(Number(new Date()) / 1000),
-    assistant_id: null,
-    thread_id: threadId ?? '',
-    run_id: runId ?? '',
+    content,
+    createdAt: new Date(),
+    isDebug: isDebug,
   }
   return message
 }
@@ -38,6 +27,8 @@ export const generateThreadMessage = ({
 export const generatePlaceholder = (policy?: PostgresPolicy) => {
   if (policy === undefined) {
     return `
+-- Press tab to use this code\n
+&nbsp;\n
 CREATE POLICY *name* ON *table_name*\n
 AS PERMISSIVE -- PERMISSIVE | RESTRICTIVE\n
 FOR ALL -- ALL | SELECT | INSERT | UPDATE | DELETE\n
@@ -57,6 +48,8 @@ WITH CHECK ( *check_expression* );
     }
 
     return `
+-- Press tab to use this code\n
+&nbsp;\n
 BEGIN;\n
 &nbsp;\n
 -- To update your policy definition\n
@@ -73,4 +66,98 @@ RENAME TO "*New Policy Name*";\n
 COMMIT;
 `.trim()
   }
+}
+
+export const generatePolicyDefinition = (policy: PostgresPolicy) => {
+  return `
+CREATE POLICY "${policy.name}" on "${policy.schema}"."${policy.table}"
+AS ${policy.action} FOR ${policy.command}
+TO ${policy.roles.join(', ')}
+${policy.definition ? `USING (${policy.definition})` : ''}
+${policy.check ? `WITH CHECK (${policy.check})` : ''}
+;
+`.trim()
+}
+
+export const generateCreatePolicyQuery = ({
+  name,
+  schema,
+  table,
+  behavior,
+  command,
+  roles,
+  using,
+  check,
+}: {
+  name: string
+  schema: string
+  table: string
+  behavior: string
+  command: string
+  roles: string
+  using?: string
+  check?: string
+}) => {
+  const querySkeleton = `create policy "${name}" on "${schema}"."${table}" as ${behavior} for ${command} to ${roles}`
+  const query =
+    command === 'insert'
+      ? `${querySkeleton} with check (${check});`
+      : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
+  return query
+}
+
+export const generateAlterPolicyQuery = ({
+  name,
+  newName,
+  schema,
+  table,
+  command,
+  roles,
+  using,
+  check,
+}: {
+  name: string
+  newName: string
+  schema: string
+  table: string
+  command: string
+  roles: string
+  using: string
+  check: string
+}) => {
+  const querySkeleton = `alter policy "${name}" on "${schema}"."${table}" to ${roles}`
+  const query =
+    command === 'insert'
+      ? `${querySkeleton} with check (${check});`
+      : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
+  if (newName === name) return query
+  else return `${query}\n${querySkeleton} rename to "${newName}"`
+}
+
+export const checkIfPolicyHasChanged = (
+  selectedPolicy: PostgresPolicy,
+  policyForm: {
+    name: string
+    roles: string[]
+    check: string | null
+    definition: string | null
+  }
+) => {
+  if (selectedPolicy.command === 'INSERT' && selectedPolicy.check !== policyForm.check) {
+    return true
+  }
+  if (
+    selectedPolicy.command !== 'INSERT' &&
+    (selectedPolicy.definition !== policyForm.definition ||
+      selectedPolicy.check !== policyForm.check)
+  ) {
+    return true
+  }
+  if (selectedPolicy.name !== policyForm.name) {
+    return true
+  }
+  if (!isEqual(selectedPolicy.roles, policyForm.roles)) {
+    return true
+  }
+  return false
 }

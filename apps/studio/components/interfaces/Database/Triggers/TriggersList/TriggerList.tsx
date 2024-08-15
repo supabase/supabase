@@ -1,7 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { includes, sortBy } from 'lodash'
 import {
   Badge,
   Button,
@@ -16,8 +15,10 @@ import {
   IconX,
 } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 interface TriggerListProps {
   schema: string
@@ -34,19 +35,26 @@ const TriggerList = ({
   editTrigger,
   deleteTrigger,
 }: TriggerListProps) => {
-  const { meta } = useStore()
-  const triggers = meta.triggers.list()
-  const filteredTriggers = triggers.filter((x: any) =>
+  const { project } = useProjectContext()
+
+  const { data: triggers } = useDatabaseTriggersQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const filteredTriggers = (triggers ?? []).filter((x) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
 
-  const _triggers = filteredTriggers.filter((x: any) => x.schema == schema)
+  const _triggers = sortBy(
+    filteredTriggers.filter((x) => x.schema == schema),
+    (trigger) => trigger.name.toLocaleLowerCase()
+  )
   const canUpdateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   if (_triggers.length === 0 && filterString.length === 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={6}>
+        <Table.td colSpan={7}>
           <p className="text-sm text-foreground">No triggers created yet</p>
           <p className="text-sm text-foreground-light">
             There are no triggers found in the schema "{schema}"
@@ -59,7 +67,7 @@ const TriggerList = ({
   if (_triggers.length === 0 && filterString.length > 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={5}>
+        <Table.td colSpan={7}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
@@ -92,11 +100,17 @@ const TriggerList = ({
           </Table.td>
 
           <Table.td className="hidden xl:table-cell">
-            <div className="flex space-x-2">
+            <div className="flex gap-2 flex-wrap">
               {x.events.map((event: string) => (
                 <Badge key={event}>{`${x.activation} ${event}`}</Badge>
               ))}
             </div>
+          </Table.td>
+
+          <Table.td className="hidden space-x-2 xl:table-cell">
+            <p title={x.orientation} className="truncate">
+              {x.orientation}
+            </p>
           </Table.td>
 
           <Table.td className="hidden xl:table-cell">
@@ -114,9 +128,9 @@ const TriggerList = ({
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
                   <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
-                        <span />
+                    <DropdownMenuTrigger asChild>
+                      <Button type="default" className="px-1">
+                        <IconMoreVertical />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-36">
@@ -161,4 +175,4 @@ const TriggerList = ({
   )
 }
 
-export default observer(TriggerList)
+export default TriggerList

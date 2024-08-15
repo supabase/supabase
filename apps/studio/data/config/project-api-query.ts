@@ -1,80 +1,30 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
+import { components } from 'api-types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { configKeys } from './keys'
-import { ResponseError } from 'types'
 
 export type ProjectApiVariables = {
   projectRef?: string
 }
 
-export type Project = {
-  id: number
-  name: string
-  ref: string
-  status: string
-  db_host: string
-  db_name: string
-  db_user: string
-  db_schema: string
-  db_port: number
-  db_ssl: boolean
-  services: Service[]
-}
-
-export type App = {
-  id: number
-  name: string
-}
-
-export type AppConfig = {
-  endpoint: string
-  db_schema: string
-  realtime_multitenant_enabled: boolean
-}
-
-export type Service = {
-  id: number
-  name: string
-  app_config: AppConfig
-  app: App
-  service_api_keys: ServiceApiKey[]
-}
-
-export type ServiceApiKey = {
-  api_key_encrypted: string
-  tags: string
-  name: string
-}
-
-export type AutoApiService = Service & {
-  protocol: 'https' | 'http'
-  endpoint: string
-  restUrl: string
-  project: Project
-  defaultApiKey: string
-  serviceApiKey: string
-}
+export type AutoApiService = components['schemas']['AutoApiService']
 
 export type ProjectApiResponse = {
-  project: Project
   autoApiService: AutoApiService
 }
 
 export async function getProjectApi({ projectRef }: ProjectApiVariables, signal?: AbortSignal) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await get(`${API_URL}/props/project/${projectRef}/api`, {
+  const { data, error } = await get('/platform/props/project/{ref}/api', {
+    params: { path: { ref: projectRef } },
     signal,
   })
-  if (response.error) {
-    throw response.error
-  }
 
-  return response as ProjectApiResponse
+  if (error) handleError(error)
+  return data
 }
 
 export type ProjectApiData = Awaited<ReturnType<typeof getProjectApi>>
@@ -104,15 +54,3 @@ export const useProjectApiQuery = <TData = ProjectApiData>(
       ...options,
     }
   )
-
-export const useProjectApiPrefetch = ({ projectRef }: ProjectApiVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(configKeys.api(projectRef), ({ signal }) =>
-        getProjectApi({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

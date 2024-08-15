@@ -25,7 +25,7 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const response = await post(`${PG_META_URL}/query`, { query: enrichQuery(query) }, { headers })
 
   if (response.error) {
-    return res.status(400).json({ error: response.error })
+    return res.status(400).json(response.error)
   } else {
     return res.status(200).json(response)
   }

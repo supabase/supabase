@@ -8,7 +8,7 @@ import CopyButton from 'components/ui/CopyButton'
 import dayjs from 'dayjs'
 import React from 'react'
 import { IconAlertCircle, IconInfo } from 'ui'
-import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
+import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
 
 export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
@@ -30,22 +30,23 @@ export const SelectionDetailedRow = ({
   valueRender?: React.ReactNode
 }) => {
   return (
-    <div className="grid grid-cols-12 group">
-      <span className="text-foreground-lighter text-sm col-span-4 whitespace-pre-wrap">
+    <div className="group flex items-center gap-2 flex-wrap relative">
+      <span className="text-foreground-lighter text-sm col-span-3 whitespace-pre-wrap">
         {label}
       </span>
-      <span className="text-foreground text-sm col-span-6 whitespace-pre-wrap break-all">
+      <span
+        title={value}
+        className="truncate font-mono text-foreground text-sm col-span-8 whitespace-pre-wrap break-all"
+      >
         {valueRender ?? value}
       </span>
       <CopyButton
-        bounceIconOnCopy
+        iconOnly
         text={value}
-        className="group-hover:opacity-100 opacity-0 my-auto transition col-span-2  h-4 w-4 px-0 py-0"
+        className="group-hover:opacity-100 opacity-0 p-0 h-6 w-6 col-span-1 absolute top-1 right-1"
         type="text"
         title="Copy to clipboard"
-      >
-        {''}
-      </CopyButton>
+      />
     </div>
   )
 }
@@ -242,20 +243,6 @@ export const TimestampLocalFormatter = ({
 export const timestampLocalFormatter = (value: string | number) => {
   const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
   return dayjs(timestamp).format('DD MMM  HH:mm:ss')
-}
-
-/*
- * Header Formatter
- *
- * for http response codes
- */
-
-export const HeaderFormmater = ({ value }: any) => {
-  return (
-    <div className="flex h-full items-center text-xs font-normal text-foreground-lighter">
-      {value}
-    </div>
-  )
 }
 
 /*

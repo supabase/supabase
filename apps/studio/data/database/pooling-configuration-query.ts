@@ -1,39 +1,28 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
-import { ResponseError } from 'types'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
 export type PoolingConfigurationVariables = {
-  projectRef: string
+  projectRef?: string
 }
 
-export type PoolingConfiguration = {
-  db_dns_name: string
-  db_host: string
-  db_name: string
-  db_port: number
-  db_ssl: boolean
-  db_user: string
-  default_pool_size: number | null
-  ignore_startup_parameters: string
-  inserted_at: string
-  max_client_conn: number | null
-  pgbouncer_enabled: boolean
-  supavisor_enabled: boolean
-  pgbouncer_status: string
-  pool_mode: string
-  connectionString: string
-}
+export type PoolingConfiguration = components['schemas']['SupavisorConfigResponse']
 
 export async function getPoolingConfiguration(
   { projectRef }: PoolingConfigurationVariables,
   signal?: AbortSignal
 ) {
-  const response = await get(`${API_URL}/projects/${projectRef}/config/pgbouncer`, { signal })
-  if (response.error) throw response.error
-  return response as PoolingConfiguration
+  if (!projectRef) throw new Error('Project ref is required')
+
+  const { data, error } = await get(`/platform/projects/{ref}/config/supavisor`, {
+    params: { path: { ref: projectRef } },
+    signal,
+  })
+  if (error) handleError(error)
+  return data
 }
 
 export type PoolingConfigurationData = Awaited<ReturnType<typeof getPoolingConfiguration>>
@@ -54,15 +43,3 @@ export const usePoolingConfigurationQuery = <TData = PoolingConfigurationData>(
       ...options,
     }
   )
-
-export const usePoolingConfigurationPrefetch = ({ projectRef }: PoolingConfigurationVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(databaseKeys.poolingConfiguration(projectRef), ({ signal }) =>
-        getPoolingConfiguration({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

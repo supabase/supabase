@@ -1,29 +1,24 @@
-import { useParams } from 'common'
+import { Rewind } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { Button, IconRewind } from 'ui'
 
-import {
-  Filters,
-  LogEventChart,
-  LogSearchCallback,
-  LogTable,
-  LogTemplate,
-  LogsTableName,
-  QueryType,
-  TEMPLATES,
-  ensureNoTimestampConflict,
-  maybeShowUpgradePrompt,
-} from 'components/interfaces/Settings/Logs'
+import { useParams } from 'common'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import useLogsPreview from 'hooks/analytics/useLogsPreview'
-import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
-import { LOGS_TABLES } from './Logs.constants'
-import UpgradePrompt from './UpgradePrompt'
-import { useSelectedOrganization } from 'hooks'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import useLogsPreview from 'hooks/analytics/useLogsPreview'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { Button } from 'ui'
+import LogEventChart from './LogEventChart'
+import LogTable from './LogTable'
+import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
+import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
+import { ensureNoTimestampConflict, maybeShowUpgradePrompt } from './Logs.utils'
+import UpgradePrompt from './UpgradePrompt'
 
 /**
  * Acts as a container component for the entire log display
@@ -51,9 +46,12 @@ export const LogsPreviewer = ({
   children,
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
-  const { s, ite, its } = useParams()
+  const { s, ite, its, db } = useParams()
   const [showChart, setShowChart] = useState(true)
   const organization = useSelectedOrganization()
+  const state = useDatabaseSelectorStateSnapshot()
+
+  const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
@@ -78,7 +76,11 @@ export const LogsPreviewer = ({
   )
 
   useEffect(() => {
-    setFilters((prev) => ({ ...prev, search_query: s as string }))
+    setFilters((prev) => ({
+      ...prev,
+      search_query: s as string,
+      database: db as string,
+    }))
     if (ite || its) {
       setParams((prev) => ({
         ...prev,
@@ -86,7 +88,7 @@ export const LogsPreviewer = ({
         iso_timestamp_end: (ite || '') as string,
       }))
     }
-  }, [s, ite, its])
+  }, [db, s, ite, its])
 
   // Show the prompt on page load based on query params
   useEffect(() => {
@@ -97,6 +99,22 @@ export const LogsPreviewer = ({
       }
     }
   }, [its, subscription])
+
+  useEffect(() => {
+    if (db !== undefined) {
+      const database = databases?.find((d) => d.identifier === db)
+      if (database !== undefined) state.setSelectedDatabaseId(db)
+    } else if (state.selectedDatabaseId !== undefined && state.selectedDatabaseId !== projectRef) {
+      if (LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)) {
+        router.push({
+          pathname: router.pathname,
+          query: { ...router.query, db: state.selectedDatabaseId },
+        })
+      } else {
+        state.setSelectedDatabaseId(projectRef)
+      }
+    }
+  }, [db, isSuccess])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setFilters((prev: any) => ({ ...prev, search_query: template.searchString }))
@@ -173,15 +191,11 @@ export const LogsPreviewer = ({
         defaultSearchValue={filters.search_query as string}
         defaultToValue={params.iso_timestamp_end}
         defaultFromValue={params.iso_timestamp_start}
-        onExploreClick={() => {
-          router.push(
-            `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
-              params.sql || ''
-            )}&its=${encodeURIComponent(params.iso_timestamp_start || '')}&ite=${encodeURIComponent(
-              params.iso_timestamp_end || ''
-            )}`
-          )
-        }}
+        queryUrl={`/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
+          params.sql || ''
+        )}&its=${encodeURIComponent(params.iso_timestamp_start || '')}&ite=${encodeURIComponent(
+          params.iso_timestamp_end || ''
+        )}`}
         onSelectTemplate={onSelectTemplate}
         filters={filters}
         onFiltersChange={setFilters}
@@ -189,6 +203,17 @@ export const LogsPreviewer = ({
         condensedLayout={condensedLayout}
         isShowingEventChart={showChart}
         onToggleEventChart={() => setShowChart(!showChart)}
+        onSelectedDatabaseChange={(id: string) => {
+          setFilters((prev) => ({
+            ...prev,
+            database: id !== projectRef ? undefined : id,
+          }))
+          const { db, ...params } = router.query
+          router.push({
+            pathname: router.pathname,
+            query: id !== projectRef ? { ...router.query, db: id } : params,
+          })
+        }}
       />
       {children}
       <div
@@ -229,10 +254,10 @@ export const LogsPreviewer = ({
           />
         </LoadingOpacity>
         {!error && (
-          <div className="flex flex-row justify-between p-2">
+          <div className="border-t flex flex-row justify-between p-2">
             <Button
               onClick={loadOlder}
-              icon={<IconRewind />}
+              icon={<Rewind />}
               type="default"
               loading={isLoadingOlder}
               disabled={isLoadingOlder}

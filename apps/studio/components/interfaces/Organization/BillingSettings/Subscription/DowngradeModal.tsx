@@ -1,4 +1,5 @@
-import { OrgSubscription, ProjectAddon } from 'data/subscriptions/org-subscription-query'
+import type { ProjectInfo } from 'data/projects/projects-query'
+import type { OrgSubscription, ProjectAddon } from 'data/subscriptions/types'
 import { PricingInformation } from 'shared-data'
 import { Alert, IconAlertOctagon, IconMinusCircle, IconPauseCircle, Modal } from 'ui'
 
@@ -8,6 +9,7 @@ export interface DowngradeModalProps {
   subscription?: OrgSubscription
   onClose: () => void
   onConfirm: () => void
+  projects: ProjectInfo[]
 }
 
 const ProjectDowngradeListItem = ({ projectAddon }: { projectAddon: ProjectAddon }) => {
@@ -39,7 +41,26 @@ const DowngradeModal = ({
   subscription,
   onClose,
   onConfirm,
+  projects,
 }: DowngradeModalProps) => {
+  // Filter out the micro addon as we're dealing with that separately
+  const previousProjectAddons =
+    subscription?.project_addons.flatMap((projectAddons) => {
+      const addons = projectAddons.addons.filter((it) => it.variant.identifier !== 'ci_micro')
+      if (!addons.length) {
+        return []
+      } else {
+        return {
+          ...projectAddons,
+          // Overwrite addons, filtered out the micro addon
+          addons,
+        }
+      }
+    }) || []
+
+  const hasInstancesOnMicro = projects.some((project) => project.infra_compute_size === 'micro')
+  const downgradingToNano = subscription?.nano_enabled === true
+
   return (
     <Modal
       size="large"
@@ -50,76 +71,80 @@ const DowngradeModal = ({
       header={`Confirm to downgrade to ${selectedPlan?.name} plan`}
     >
       <Modal.Content>
-        <div className="py-6">
-          <div className="space-y-2">
-            <Alert
-              withIcon
-              variant="warning"
-              title="Downgrading to the free plan will lead to reductions in your organization's quota"
-            >
-              <p>
-                If you're already past the limits of the free plan, your projects could become
-                unresponsive or enter read only mode.
-              </p>
-            </Alert>
-
-            {(subscription?.project_addons.length ?? 0) > 0 && (
-              <Alert
-                title={`A total of ${subscription?.project_addons.length} project(s) will be affected from the downgrade`}
-                variant="warning"
-                withIcon
-              >
-                <ul className="space-y-1 max-h-[100px] overflow-y-auto">
-                  {subscription?.project_addons.map((project) => (
-                    <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
-                  ))}
-                </ul>
-              </Alert>
-            )}
-          </div>
-
-          <ul className="mt-4 space-y-5 text-sm">
-            <li className="flex gap-3">
-              <div>
-                <IconPauseCircle />
-              </div>
-              <span>Projects will be paused after a week of inactivity</span>
-            </li>
-
-            <li>
-              <div className="flex gap-3 mb-2">
-                <div>
-                  <IconMinusCircle />
-                </div>
-                <span>Add ons from all projects under this organization will be removed.</span>
-              </div>
-            </li>
-
-            <li className="flex gap-3">
-              <IconAlertOctagon w={14} className="flex-shrink-0" />
-              <div>
-                <strong>Before you downgrade to the {selectedPlan?.name} plan, consider:</strong>
-                <ul className="space-y-2 mt-2">
-                  <li className="list-disc ml-4">
-                    Your projects no longer require their respective add ons.
-                  </li>
-                  <li className="list-disc ml-4">
-                    Your resource consumption are well within the {selectedPlan?.name} plan's quota.
-                  </li>
-                  <li className="list-disc ml-4">
-                    Alternatively, you may also transfer projects across organizations.
-                  </li>
-                </ul>
-              </div>
-            </li>
-          </ul>
-
-          {subscription?.billing_via_partner === true && (
-            <p className="mt-4 text-sm">
-              Your organization will be downgraded at the end of your current billing cycle.
+        <div className="space-y-2">
+          <Alert
+            withIcon
+            variant="warning"
+            title="Downgrading to the Free Plan will lead to reductions in your organization's quota"
+          >
+            <p>
+              If you're already past the limits of the Free Plan, your projects could become
+              unresponsive or enter read only mode.
             </p>
+          </Alert>
+
+          {((previousProjectAddons.length ?? 0) > 0 ||
+            (hasInstancesOnMicro && downgradingToNano)) && (
+            <Alert title={`Projects affected by the downgrade`} variant="warning" withIcon>
+              <ul className="space-y-1 max-h-[100px] overflow-y-auto">
+                {previousProjectAddons.map((project) => (
+                  <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
+                ))}
+
+                {projects
+                  .filter((it) => it.infra_compute_size === 'micro')
+                  .map((project) => (
+                    <li className="list-disc ml-6" key={project.ref}>
+                      {project.name}: Compute will be downgraded. Project will also{' '}
+                      <span className="font-bold">need to be restarted</span>.
+                    </li>
+                  ))}
+              </ul>
+            </Alert>
           )}
         </div>
+
+        <ul className="mt-4 space-y-5 text-sm">
+          <li className="flex gap-3">
+            <div>
+              <IconPauseCircle />
+            </div>
+            <span>Projects will be paused after a week of inactivity</span>
+          </li>
+
+          <li>
+            <div className="flex gap-3 mb-2">
+              <div>
+                <IconMinusCircle />
+              </div>
+              <span>Add ons from all projects under this organization will be removed.</span>
+            </div>
+          </li>
+
+          <li className="flex gap-3">
+            <IconAlertOctagon w={14} className="flex-shrink-0" />
+            <div>
+              <strong>Before you downgrade to the {selectedPlan?.name} plan, consider:</strong>
+              <ul className="space-y-2 mt-2">
+                <li className="list-disc ml-4">
+                  Your projects no longer require their respective add ons.
+                </li>
+                <li className="list-disc ml-4">
+                  Your resource consumption are well within the {selectedPlan?.name} plan's quota.
+                </li>
+                <li className="list-disc ml-4">
+                  Alternatively, you may also transfer projects across organizations.
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+
+        {subscription?.billing_via_partner === true && subscription.billing_partner === 'fly' && (
+          <p className="mt-4 text-sm">
+            Your organization will be downgraded at the end of your current billing cycle.
+          </p>
+        )}
       </Modal.Content>
     </Modal>
   )

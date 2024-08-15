@@ -247,12 +247,7 @@ export default function launchweek() {
           <div className="border border-[#2E2E2E] rounded-2xl text-sm px-5 py-4 flex flex-col sm:flex-row justify-between items-center">
             <div className="relative flex items-center mb-4 sm:mb-0">
               <div className="flex min-w-[150px]">
-                <img
-                  // src={`/images/launchweek/${isDarkMode ? 'outro.svg' : 'outro-light.svg'}`}
-                  src={`/images/launchweek/outro.svg`}
-                  width={110}
-                  height={80}
-                ></img>
+                <img src={`/images/launchweek/outro.svg`} width={110} height={80}></img>
               </div>
               <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
                 <span className="text-white mr-2">Wrap Up</span>
@@ -406,8 +401,8 @@ export default function launchweek() {
                       <div className="absolute top-0 right-0 w-full h-full -z-20 ">
                         <Image
                           src={'/images/launchweek/mfa-dark.png'}
-                          layout="fill"
-                          objectFit="cover"
+                          fill
+                          className="object-cover"
                           quality={100}
                           priority
                         />
@@ -415,8 +410,8 @@ export default function launchweek() {
                       <div className="absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover:opacity-100 duration-500 transition-all">
                         <Image
                           src={'/images/launchweek/mfa-dark-hover.png'}
-                          layout="fill"
-                          objectFit="cover"
+                          fill
+                          className="object-cover"
                           quality={100}
                         />
                       </div>
@@ -457,11 +452,10 @@ export default function launchweek() {
                       >
                         <Image
                           src={'/images/launchweek/wrappers-visual.svg'}
-                          layout="fill"
-                          objectFit="cover"
+                          fill
                           quality={100}
                           priority
-                          className="left-16"
+                          className="left-16 object-cover"
                         />
                       </div>
                       <div
@@ -469,10 +463,9 @@ export default function launchweek() {
                       >
                         <Image
                           src={'/images/launchweek/wrappers-visual-hover.svg'}
-                          layout="fill"
-                          objectFit="cover"
+                          fill
                           quality={100}
-                          className="test"
+                          className="test object-cover"
                         />
                       </div>
                       <div className="flex items-center flex-col-reverse lg:flex-row text-white">
@@ -516,11 +509,10 @@ export default function launchweek() {
                         >
                           <Image
                             src={'/images/launchweek/vault-visual.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
@@ -528,10 +520,9 @@ export default function launchweek() {
                         >
                           <Image
                             src={'/images/launchweek/vault-visual-hover.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex items-center flex-col-reverse lg:flex-row">
@@ -548,11 +539,10 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={'/images/launchweek/TCE-visual.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
@@ -560,10 +550,9 @@ export default function launchweek() {
                         >
                           <Image
                             src={'/images/launchweek/TCE-visual-hover.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -585,11 +574,10 @@ export default function launchweek() {
                         >
                           <Image
                             src={'/images/launchweek/community-visual.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
@@ -597,10 +585,9 @@ export default function launchweek() {
                         >
                           <Image
                             src={'/images/launchweek/community-visual-hover.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex items-center flex-col-reverse lg:flex-row">
@@ -682,11 +669,10 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={'/images/launchweek/PgGraphql-visual.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
@@ -694,10 +680,9 @@ export default function launchweek() {
                         >
                           <Image
                             src={'/images/launchweek/PgGraphql-visual-hover.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -717,11 +702,10 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={'/images/launchweek/custom-domains-visual.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
@@ -729,10 +713,9 @@ export default function launchweek() {
                         >
                           <Image
                             src={'/images/launchweek/custom-domains-visual-hover.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -752,11 +735,10 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={'/images/launchweek/PITR-visual.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
@@ -764,10 +746,9 @@ export default function launchweek() {
                         >
                           <Image
                             src={'/images/launchweek/PITR-visual-hover.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -787,11 +768,10 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={'/images/launchweek/pg_crdt-visual.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
@@ -799,10 +779,9 @@ export default function launchweek() {
                         >
                           <Image
                             src={'/images/launchweek/pg_crdt-visual-hover.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -822,11 +801,10 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={'/images/launchweek/postgres-visual.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
@@ -834,10 +812,9 @@ export default function launchweek() {
                         >
                           <Image
                             src={'/images/launchweek/postgres-visual-hover.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -857,11 +834,10 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={'/images/launchweek/PostgREST11-visual.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
@@ -869,10 +845,9 @@ export default function launchweek() {
                         >
                           <Image
                             src={'/images/launchweek/PostgREST11-visual-hover.svg'}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -1002,7 +977,7 @@ export default function launchweek() {
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
-                  ></img>
+                  />
                   <h3 className="text-white">Super UI</h3>
                   <p className="text-slate-1000 text-xs">Previous Best Overall Project Runner Up</p>
                 </div>
@@ -1081,7 +1056,7 @@ export default function launchweek() {
                     <div className="absolute -inset-0.5 bg-brand-600 rounded-full opacity-75 group-hover:opacity-100 group-hover:blur-sm transition duration-500"></div>
                     <a href={creator.link} target="_blank" rel="noopener">
                       <img
-                        className="relative rounded-full w-12 h-12 border border-[#2E2E2E] border-brand hover:shadow-md"
+                        className="relative rounded-full w-12 h-12 border border-brand hover:shadow-md"
                         src={creator.profile_picture}
                       />
                     </a>
@@ -1091,24 +1066,21 @@ export default function launchweek() {
             })}
           </div>
           <div className="flex-1">
-            <Badge
-              className={`!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#DFFFF1] !border-[#DFFFF1] h-fit relative mb-4 ${
-                true
-                  ? 'after:absolute after:rounded-full after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br  text-transparent !border-[#163837] after:from-[#14292c] after:to-[#141516] after:border-[#1f3536] after:-z-10'
-                  : ''
-              }`}
-            >
+            <Badge className="!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#DFFFF1] h-fit relative mb-4 after:absolute after:rounded-full after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br !border-[#163837] after:from-[#14292c] after:to-[#141516] after:border-[#1f3536] after:-z-10">
               Shipped
             </Badge>
             <h2 className="text-3xl text-white mb-2">The Supabase Content Storm</h2>
             <p className="text-slate-900 md:max-w-[80%] mb-16">
               We worked with more than 30 content creators from around the world to drop a mountain
               of content simultaneously!
-              <a rel="noopener" target="_blank" href="/blog/the-supabase-content-storm">
-                <div className="text-brand flex items-center mt-2">
-                  See all the content
-                  <IconExternalLink size="small" className="inline-block ml-1" />
-                </div>
+              <a
+                rel="noopener"
+                target="_blank"
+                href="/blog/the-supabase-content-storm"
+                className="text-brand flex items-center mt-2"
+              >
+                See all the content
+                <IconExternalLink size="small" className="inline-block ml-1" />
               </a>
             </p>
             {activeCreator !== null && (

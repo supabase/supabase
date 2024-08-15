@@ -21,7 +21,6 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     data: [],
     yAxisLimit: 0,
     format: '%',
-    totalAverage: 0,
     total: 0,
   }
   return res.status(200).json(response)

@@ -1,18 +1,28 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
 import { Dispatch, SetStateAction, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import { useFlag } from 'hooks/ui/useFlag'
+import Telemetry from 'lib/telemetry'
+import { ExternalLink } from 'lucide-react'
 import {
   Button,
-  IconBroadcast,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  Form_Shadcn_,
   IconChevronDown,
-  IconDatabaseChanges,
-  IconPresence,
-  Input,
+  Input_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  Toggle,
+  Switch,
 } from 'ui'
-
-import Link from 'next/link'
 import { RealtimeConfig } from '../useRealtimeMessages'
 
 interface ChooseChannelPopoverProps {
@@ -20,16 +30,45 @@ interface ChooseChannelPopoverProps {
   onChangeConfig: Dispatch<SetStateAction<RealtimeConfig>>
 }
 
+const FormSchema = z.object({ channel: z.string(), isPrivate: z.boolean() })
+
 export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPopoverProps) => {
   const [open, setOpen] = useState(false)
-  const [channelName, setChannelName] = useState(config.channelName)
+  const telemetryProps = useTelemetryProps()
+  const router = useRouter()
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(FormSchema),
+    defaultValues: { channel: '', isPrivate: false },
+  })
 
   const onOpen = (v: boolean) => {
     // when opening, copy the outside config into the intermediate one
     if (v === true) {
-      setChannelName(config.channelName)
+      form.setValue('channel', config.channelName)
     }
     setOpen(v)
+  }
+
+  const onSubmit = () => {
+    setOpen(false)
+    Telemetry.sendEvent(
+      {
+        category: 'realtime_inspector',
+        action: 'started_listening_to_channel_in_input_channel_popover',
+        label: 'realtime_inspector_config',
+      },
+      telemetryProps,
+      router
+    )
+    onChangeConfig({
+      ...config,
+      channelName: form.getValues('channel'),
+      isChannelPrivate: form.getValues('isPrivate'),
+      enabled: true,
+    })
   }
 
   return (
@@ -45,130 +84,126 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
             className="max-w-[120px] truncate"
             title={config.channelName.length > 0 ? config.channelName : ''}
           >
-            {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Choose channel'}
+            {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Join a channel'}
           </p>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0" align="start">
-        <div className="border-b border-overlay p-4 flex flex-col text-sm">
+      <PopoverContent_Shadcn_ className="p-0 w-[320px]" align="start">
+        <div className="p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (
             <>
-              <label className="text-foreground text-xs mb-2">Name of channel</label>
-              <div className="flex flex-row">
-                <Input
-                  size="tiny"
-                  className="w-full"
-                  inputClassName="rounded-r-none"
-                  placeholder="Enter a channel name"
-                  value={channelName}
-                  onChange={(e) => {
-                    setChannelName(e.target.value)
-                  }}
-                />
-                <Button
-                  type="default"
-                  className="rounded-l-none"
-                  disabled={channelName.length === 0}
-                  onClick={() => {
-                    setOpen(false)
-                    onChangeConfig({ ...config, channelName })
-                  }}
+              <Form_Shadcn_ {...form}>
+                <form
+                  id="realtime-channel"
+                  onSubmit={form.handleSubmit(() => onSubmit())}
+                  className="flex flex-col gap-y-4"
                 >
-                  Set channel
-                </Button>
-              </div>
-              <p className="text-xs text-foreground-lighter mt-2">
-                The channel you initialize with the Supabase Realtime client. Learn more in{' '}
-                <Link
-                  href="https://supabase.com/docs/guides/realtime/concepts#channels"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline hover:text-foreground transition"
-                >
-                  our docs
-                </Link>
-              </p>
+                  <FormField_Shadcn_
+                    name="channel"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                        <div className="flex flex-col gap-y-1">
+                          <label className="text-foreground text-xs">Name of channel</label>
+                          <div className="flex flex-row">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                {...field}
+                                autoComplete="off"
+                                className="rounded-r-none text-xs px-2.5 py-1 h-auto"
+                                placeholder="Enter a channel name"
+                              />
+                            </FormControl_Shadcn_>
+
+                            <Button
+                              type="primary"
+                              className="rounded-l-none"
+                              disabled={form.getValues().channel.length === 0}
+                              onClick={() => onSubmit()}
+                            >
+                              Listen to channel
+                            </Button>
+                          </div>
+                        </div>
+                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
+                          The channel you initialize with the Supabase Realtime client. Learn more
+                          in{' '}
+                          <a
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline hover:text-foreground transition"
+                            href="https://supabase.com/docs/guides/realtime/concepts#channels"
+                          >
+                            our docs
+                          </a>
+                        </FormDescription_Shadcn_>
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+
+                  <FormField_Shadcn_
+                    key="isPrivate"
+                    control={form.control}
+                    name="isPrivate"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_ className="">
+                        <div className="flex flex-row items-center gap-x-2">
+                          <FormControl_Shadcn_>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={field.disabled}
+                            />
+                          </FormControl_Shadcn_>
+                          <FormLabel_Shadcn_ className="text-xs">
+                            Is channel private?
+                          </FormLabel_Shadcn_>
+                        </div>
+                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter mt-2">
+                          If the channel is marked as private, it will use RLS policies to filter
+                          messages.
+                        </FormDescription_Shadcn_>
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+
+                  <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://supabase.com/docs/guides/realtime/authorization"
+                    >
+                      Documentation
+                    </a>
+                  </Button>
+                </form>
+              </Form_Shadcn_>
             </>
           ) : (
             <div className="space-y-2">
               <div className="flex items-center gap-x-2">
-                <p className="text-foreground text-xs">Currently using channel</p>
+                <p className="text-foreground text-xs">
+                  Currently joined{' '}
+                  <span className={config.isChannelPrivate ? 'text-brand' : 'text-warning'}>
+                    {config.isChannelPrivate ? 'private' : 'public'}
+                  </span>{' '}
+                  channel:
+                </p>
                 <p className="text-xs border border-scale-600  py-0.5 px-1 rounded-md bg-surface-200">
                   {config.channelName}
                 </p>
               </div>
               <p className="text-xs text-foreground-lighter mt-2">
-                If you unset this channel, all of the messages populated on this page will disappear
+                If you leave this channel, all of the messages populated on this page will disappear
               </p>
               <Button
                 type="default"
                 onClick={() => onChangeConfig({ ...config, channelName: '', enabled: false })}
               >
-                Unset channel
+                Leave channel
               </Button>
             </div>
           )}
-        </div>
-        <div className="border-b border-overlay p-4">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex gap-2.5 items-center">
-              <IconPresence size="xlarge" className="bg-brand-400 rounded text-brand-600" />
-              <label htmlFor="toggle-presence" className="text-sm">
-                Presence
-              </label>
-            </div>
-            <Toggle
-              id="toggle-presence"
-              size="tiny"
-              checked={config.enablePresence}
-              onChange={() => onChangeConfig({ ...config, enablePresence: !config.enablePresence })}
-            />
-          </div>
-          <p className="text-xs text-foreground-light pt-1">
-            Store and synchronize user state consistently across clients
-          </p>
-        </div>
-        <div className="border-b border-overlay p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex gap-2.5 items-center">
-              <IconBroadcast size="xlarge" className="bg-brand-400 rounded text-brand-600" />
-              <label htmlFor="toggle-broadcast" className="text-sm">
-                Broadcast
-              </label>
-            </div>
-            <Toggle
-              id="toggle-broadcast"
-              size="tiny"
-              checked={config.enableBroadcast}
-              onChange={() =>
-                onChangeConfig({ ...config, enableBroadcast: !config.enableBroadcast })
-              }
-            />
-          </div>
-          <p className="text-xs  text-foreground-light pt-1">
-            Send any data to any client subscribed to the same channel
-          </p>
-        </div>
-        <div className="border-b border-overlay p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex gap-2.5 items-center">
-              <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded text-brand-600" />
-              <label htmlFor="toggle-db-changes" className="text-sm">
-                Database changes
-              </label>
-            </div>
-            <Toggle
-              id="toggle-db-changes"
-              size="tiny"
-              checked={config.enableDbChanges}
-              onChange={() =>
-                onChangeConfig({ ...config, enableDbChanges: !config.enableDbChanges })
-              }
-            />
-          </div>
-          <p className="text-xs text-foreground-light pt-1">
-            Listen for Database inserts, updates, deletes and more
-          </p>
         </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

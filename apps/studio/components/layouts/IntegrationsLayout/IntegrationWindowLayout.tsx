@@ -1,10 +1,10 @@
-import { useParams } from 'common'
-import { useFlag, withAuth } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { PropsWithChildren, ReactNode, forwardRef } from 'react'
-import { IconX, cn, LoadingLine, IconBook, IconLifeBuoy } from 'ui'
-import { ScaffoldContainer } from '../Scaffold'
 import Link from 'next/link'
+import { PropsWithChildren, ReactNode, forwardRef } from 'react'
+import { IconBook, IconLifeBuoy, IconX, LoadingLine, cn } from 'ui'
+
+import { withAuth } from 'hooks/misc/withAuth'
+import { BASE_PATH } from 'lib/constants'
+import { ScaffoldContainer } from '../Scaffold'
 
 export type IntegrationWindowLayoutProps = {
   title: string
@@ -20,15 +20,12 @@ const IntegrationWindowLayout = ({
   loading = false,
   docsHref,
 }: PropsWithChildren<IntegrationWindowLayoutProps>) => {
-  const ongoingIncident = useFlag('ongoingIncident')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
-
   return (
-    <div className="flex w-full flex-col" style={{ height: maxHeight, maxHeight }}>
+    <div className="flex w-full flex-col">
       <Header title={title} integrationIcon={integrationIcon} />
       <LoadingLine loading={loading} />
       <main className="overflow-auto flex flex-col h-full bg">{children}</main>
-      <ScaffoldContainer className="bg-background flex flex-row gap-6 py-6 border-t">
+      <ScaffoldContainer className="bg-studio flex flex-row gap-6 py-6 border-t">
         {docsHref && (
           <Link
             href={docsHref}

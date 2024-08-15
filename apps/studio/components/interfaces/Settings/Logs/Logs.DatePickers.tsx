@@ -1,6 +1,7 @@
 import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
+
 import {
   Alert,
   Button,
@@ -11,7 +12,8 @@ import {
   DropdownMenuTrigger,
   IconClock,
 } from 'ui'
-import { DatetimeHelper, getDefaultHelper, LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from '.'
+import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD, getDefaultHelper } from './Logs.constants'
+import type { DatetimeHelper } from './Logs.types'
 
 interface Props {
   to: string
@@ -50,9 +52,8 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   return (
     <div className="flex items-center">
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           <Button
-            asChild
             type={helperValue ? 'secondary' : 'default'}
             icon={<IconClock size={12} />}
             className="rounded-r-none"

@@ -1,6 +1,6 @@
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { DataPoint } from 'data/analytics/constants'
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import SectionHeader from '../SectionHeader'
 import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
@@ -35,7 +35,9 @@ const UsageSection = ({
     isSuccess: isSuccessUsage,
   } = useOrgUsageQuery({ orgSlug })
 
-  const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === categoryKey)
+  const categoryMeta = USAGE_CATEGORIES(subscription).find(
+    (category) => category.key === categoryKey
+  )
   if (!categoryMeta) return null
 
   return (

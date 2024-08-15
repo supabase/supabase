@@ -2,12 +2,11 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Badge, IconCircle, IconLoader } from 'ui'
 
-import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { Project, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useEffect, useState } from 'react'
-import { Project } from 'types'
 
 export interface PausingStateProps {
   project: Project
@@ -44,7 +43,7 @@ const PausingState = ({ project }: PausingStateProps) => {
         <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-y-0 lg:space-x-6">
           <h1 className="text-3xl">{project.name}</h1>
           <div>
-            <Badge color="gray">
+            <Badge>
               <div className="flex items-center gap-2">
                 <IconLoader className="animate-spin" size={12} />
                 <span>Pausing project</span>

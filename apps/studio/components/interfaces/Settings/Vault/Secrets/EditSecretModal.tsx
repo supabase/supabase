@@ -1,22 +1,28 @@
 import { isEmpty } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
+import toast from 'react-hot-toast'
 
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useStore } from 'hooks'
-import { VaultSecret } from 'types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
+import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
+import type { VaultSecret } from 'types'
+import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
 
 interface EditSecretModalProps {
-  selectedSecret: VaultSecret
+  selectedSecret: VaultSecret | undefined
   onClose: () => void
 }
 
 const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
-  const { ui, vault } = useStore()
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
   const [showSecretValue, setShowSecretValue] = useState(false)
-  const [isLoadingSecretValue, setIsLoadingSecretValue] = useState(false)
+  const { project } = useProjectContext()
+
+  const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
+  const { mutateAsync: updateSecret } = useVaultSecretUpdateMutation()
 
   let INITIAL_VALUES = {
     name: selectedSecret?.name ?? '',
@@ -39,49 +45,55 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
   }
 
   const onUpdateSecret = async (values: any, { setSubmitting }: any) => {
-    const payload: Partial<VaultSecret> = {}
-    if (values.name !== selectedSecret.name) payload.name = values.name
-    if (values.description !== selectedSecret.description) payload.description = values.description
-    if (selectedKeyId !== selectedSecret.key_id) {
-      let encryptionKeyId = selectedKeyId
-      if (values.keyId === 'create-new') {
-        const addKeyRes = await vault.addKey(values.keyName || undefined)
-        if (addKeyRes.error) {
-          return ui.setNotification({
-            error: addKeyRes.error,
-            category: 'error',
-            message: `Failed to create new key: ${addKeyRes.error.message}`,
+    if (!project) return console.error('Project is required')
+
+    try {
+      const payload: Partial<VaultSecret> = {}
+      if (values.name !== selectedSecret?.name) payload.name = values.name
+      if (values.description !== selectedSecret?.description)
+        payload.description = values.description
+      if (selectedKeyId !== selectedSecret?.key_id) {
+        let encryptionKeyId = selectedKeyId
+        if (values.keyId === 'create-new') {
+          const addKeyRes = await addKeyMutation({
+            projectRef: project?.ref!,
+            connectionString: project?.connectionString,
+            name: values.keyName || undefined,
           })
+          if (addKeyRes.error) {
+            return toast.error(`Failed to create new key: ${addKeyRes.error.message}`)
+          } else {
+            encryptionKeyId = addKeyRes[0].id
+          }
+        }
+
+        payload.key_id = encryptionKeyId
+      }
+      payload.secret = values.secret
+
+      if (!isEmpty(payload) && selectedSecret) {
+        setSubmitting(true)
+        const res = await updateSecret({
+          projectRef: project.ref,
+          connectionString: project?.connectionString,
+          id: selectedSecret.id,
+          ...payload,
+        })
+        if (!res.error) {
+          toast.success('Successfully updated secret')
+          setSubmitting(false)
+          onClose()
         } else {
-          encryptionKeyId = addKeyRes[0].id
+          toast.error(`Failed to update secret: ${res.error.message}`)
+          setSubmitting(false)
         }
       }
-
-      payload.key_id = encryptionKeyId
-    }
-    payload.secret = values.secret
-
-    if (!isEmpty(payload)) {
-      setSubmitting(true)
-      const res = await vault.updateSecret(selectedSecret.id, payload)
-      if (!res.error) {
-        ui.setNotification({ category: 'success', message: 'Successfully updated secret' })
-        setSubmitting(false)
-        onClose()
-      } else {
-        ui.setNotification({
-          error: res.error,
-          category: 'error',
-          message: `Failed to update secret: ${res.error.message}`,
-        })
-        setSubmitting(false)
-      }
+    } finally {
     }
   }
 
   return (
     <Modal
-      closable
       hideFooter
       size="medium"
       visible={selectedSecret !== undefined}
@@ -96,83 +108,71 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
         onSubmit={onUpdateSecret}
       >
         {({ isSubmitting, resetForm }: any) => {
-          // [Alaister] although this "technically" is breaking the rules of React hooks
-          // it won't error because the hooks are always rendered in the same order
+          // [Joshen] JFYI this is breaking rules of hooks, will be fixed once we move to
+          // using react hook form instead
           // eslint-disable-next-line react-hooks/rules-of-hooks
-          useEffect(() => {
-            if (selectedSecret !== undefined && selectedSecret.decryptedSecret === undefined) {
-              fetchSecretValue()
+          const { isLoading: isLoadingSecretValue } = useVaultSecretDecryptedValueQuery(
+            {
+              projectRef: project?.ref!,
+              id: selectedSecret?.id!,
+              connectionString: project?.connectionString,
+            },
+            {
+              enabled: !!(project?.ref && selectedSecret?.id),
+              onSuccess: (res) => {
+                resetForm({
+                  values: { ...INITIAL_VALUES, secret: res },
+                  initialValues: { ...INITIAL_VALUES, secret: res },
+                })
+              },
             }
-          }, [selectedSecret])
-
-          const fetchSecretValue = async () => {
-            if (selectedSecret === undefined) return
-            setIsLoadingSecretValue(true)
-            const res = await vault.fetchSecretValue(selectedSecret.id)
-            resetForm({
-              values: { ...INITIAL_VALUES, secret: res },
-              initialValues: { ...INITIAL_VALUES, secret: res },
-            })
-            setIsLoadingSecretValue(false)
-          }
+          )
 
           return isLoadingSecretValue ? (
-            <div className="space-y-2 py-4 px-2">
-              <ShimmeringLoader />
-              <div className="w-3/4">
-                <ShimmeringLoader />
-              </div>
-              <div className="w-1/2">
-                <ShimmeringLoader />
-              </div>
-            </div>
+            <Modal.Content>
+              <GenericSkeletonLoader />
+            </Modal.Content>
           ) : (
-            <div className="py-4">
-              <Modal.Content>
-                <div className="space-y-4 pb-4">
-                  <Input id="name" label="Name" />
-                  <Input id="description" label="Description" labelOptional="Optional" />
-                  <Input
-                    id="secret"
-                    type={showSecretValue ? 'text' : 'password'}
-                    label="Secret value"
-                    actions={
-                      <div className="mr-1">
-                        <Button
-                          type="default"
-                          icon={showSecretValue ? <IconEyeOff /> : <IconEye />}
-                          onClick={() => setShowSecretValue(!showSecretValue)}
-                        />
-                      </div>
-                    }
-                  />
-                </div>
+            <>
+              <Modal.Content className="space-y-4">
+                <Input id="name" label="Name" />
+                <Input id="description" label="Description" labelOptional="Optional" />
+                <Input
+                  id="secret"
+                  type={showSecretValue ? 'text' : 'password'}
+                  label="Secret value"
+                  actions={
+                    <div className="mr-1">
+                      <Button
+                        type="default"
+                        icon={showSecretValue ? <IconEyeOff /> : <IconEye />}
+                        onClick={() => setShowSecretValue(!showSecretValue)}
+                      />
+                    </div>
+                  }
+                />
               </Modal.Content>
               <Modal.Separator />
-              <Modal.Content>
-                <div className="py-4 space-y-4">
-                  <EncryptionKeySelector
-                    id="keyId"
-                    nameId="keyName"
-                    label="Select a key to encrypt your secret with"
-                    labelOptional="Optional"
-                    selectedKeyId={selectedKeyId}
-                    onSelectKey={setSelectedKeyId}
-                  />
-                </div>
+              <Modal.Content className="space-y-4">
+                <EncryptionKeySelector
+                  id="keyId"
+                  nameId="keyName"
+                  label="Select a key to encrypt your secret with"
+                  labelOptional="Optional"
+                  selectedKeyId={selectedKeyId}
+                  onSelectKey={setSelectedKeyId}
+                />
               </Modal.Content>
               <Modal.Separator />
-              <Modal.Content>
-                <div className="flex items-center justify-end space-x-2">
-                  <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
-                    Cancel
-                  </Button>
-                  <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
-                    Update secret
-                  </Button>
-                </div>
+              <Modal.Content className="flex items-center justify-end space-x-2">
+                <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+                  Cancel
+                </Button>
+                <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
+                  Update secret
+                </Button>
               </Modal.Content>
-            </div>
+            </>
           )
         }}
       </Form>

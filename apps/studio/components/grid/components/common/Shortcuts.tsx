@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { useTrackedState } from '../../store'
+import type { DataGridHandle } from 'react-data-grid'
+import { useTrackedState } from '../../store/Store'
+import { copyToClipboard, formatClipboardValue } from '../../utils/common'
 import { useKeyboardShortcuts } from './Hooks'
-import { DataGridHandle } from 'react-data-grid'
-import { formatClipboardValue, copyToClipboard } from '../../utils'
 
 type ShortcutsProps = {
   gridRef: React.RefObject<DataGridHandle>
@@ -18,8 +18,8 @@ export function Shortcuts({ gridRef }: ShortcutsProps) {
       return navigator?.appVersion.indexOf('Win') !== -1
         ? 'windows'
         : navigator?.appVersion.indexOf('Mac') !== -1
-        ? 'macos'
-        : 'unknown'
+          ? 'macos'
+          : 'unknown'
     }
     const metakey = getClientOS() === 'windows' ? 'Control' : 'Command'
     setMetaKey(metakey)

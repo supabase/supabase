@@ -5,7 +5,7 @@ import { Badge, IconExternalLink } from 'ui'
 import { CategoryAttribute } from './Usage.constants'
 
 export interface SectionContent {
-  section: CategoryAttribute
+  section: Pick<CategoryAttribute, 'name' | 'description' | 'links'>
   includedInPlan?: boolean
 }
 
@@ -26,7 +26,7 @@ const SectionContent = ({
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
                     <p className="text-base capitalize">{name}</p>
-                    {includedInPlan === false && <Badge color="gray">Not included</Badge>}
+                    {includedInPlan === false && <Badge>Not included</Badge>}
                   </div>
                   <div className="grid gap-4">
                     {description.split('\n').map((value, idx) => (
@@ -36,7 +36,7 @@ const SectionContent = ({
                     ))}
                   </div>
                 </div>
-                {links && links.length && (
+                {links && links.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-sm text-foreground mb-2">More information</p>
                     {links.map((link) => (

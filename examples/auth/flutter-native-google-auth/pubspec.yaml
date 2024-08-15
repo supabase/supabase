@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  supabase_flutter: ^1.10.19
+  supabase_flutter: ^2.0.0
   google_sign_in: ^6.1.5
 
 dev_dependencies:

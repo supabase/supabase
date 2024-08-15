@@ -1,24 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { IconInfo, Tabs } from 'ui'
+import { Info } from 'lucide-react'
 
 import { BackupsList } from 'components/interfaces/Database'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useCheckPermissions } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import type { NextPageWithLayout } from 'types'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
-  const router = useRouter()
   const { project } = useProjectContext()
-  const ref = project?.ref
+  const ref = project?.ref || 'default'
 
   const {
     data: backups,
@@ -29,6 +28,8 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
   } = useBackupsQuery({ projectRef: ref })
 
   const isPitrEnabled = backups?.pitr_enabled
+  const isPermissionsLoaded = usePermissionsLoaded()
+
   const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
 
   return (
@@ -36,21 +37,10 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-6">
-            <h3 className="text-xl text-foreground">Database Backups</h3>
+            <FormHeader className="!mb-0" title="Database Backups" />
 
-            <Tabs
-              type="underlined"
-              size="small"
-              activeId="scheduled"
-              onChange={(id: any) => {
-                if (id === 'pitr') router.push(`/project/${ref}/database/backups/pitr`)
-              }}
-            >
-              <Tabs.Panel id="scheduled" label="Scheduled backups" />
-              <Tabs.Panel id="pitr" label="Point in Time" />
-            </Tabs>
-
-            <div className="space-y-4">
+            <DatabaseBackupsNav active="scheduled" projRef={ref} />
+            <div className="flex flex-col gap-y-4">
               {isLoading && <GenericSkeletonLoader />}
 
               {isError && (
@@ -70,7 +60,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                     <InformationBox
                       hideCollapse
                       defaultVisibility
-                      icon={<IconInfo strokeWidth={2} />}
+                      icon={<Info strokeWidth={2} />}
                       title="Point-In-Time-Recovery (PITR) enabled"
                       description={
                         <div>
@@ -88,10 +78,10 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {canReadScheduledBackups ? (
-                    <BackupsList />
-                  ) : (
+                  {isPermissionsLoaded && !canReadScheduledBackups ? (
                     <NoPermission resourceText="view scheduled backups" />
+                  ) : (
+                    <BackupsList />
                   )}
                 </>
               )}
@@ -107,4 +97,4 @@ DatabaseScheduledBackups.getLayout = (page) => (
   <DatabaseLayout title="Database">{page}</DatabaseLayout>
 )
 
-export default observer(DatabaseScheduledBackups)
+export default DatabaseScheduledBackups

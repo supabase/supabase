@@ -1,6 +1,5 @@
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import React, { ReactNode } from 'react'
-import { Dictionary } from './base'
 import { SupaRow, SupaTable } from './table'
 
 export interface GridProps {
@@ -18,10 +17,9 @@ export interface SupabaseGridProps {
    */
   table: SupaTable
   /**
-   *
-   * run sql query
+   * database table id
    */
-  onSqlQuery: (query: string) => Promise<{ data?: any; error?: any }>
+  tableId?: string
 
   /**
    * Optional react node to display in grid header
@@ -37,9 +35,9 @@ export interface SupabaseGridProps {
    */
   schema?: string
   /**
-   * storageRef is used to save state on localstorage
+   * projectRef is used to save state on localstorage
    */
-  storageRef?: string
+  projectRef?: string
   /**
    * Optional grid theme
    */
@@ -66,6 +64,7 @@ export interface SupabaseGridProps {
   onEditRow?: (row: SupaRow) => void
   onError?: (error: any) => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
+  onExpandTextEditor: (column: string, row: SupaRow) => void
   updateTableRow: (previousRow: any, updatedData: any) => void
   onEditForeignKeyColumnValue: (args: {
     foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
@@ -92,20 +91,4 @@ export interface SupabaseGridProps {
    * show import csv data button if available
    */
   onImportData?: () => void
-}
-
-export interface SupabaseGridRef {
-  /**
-   * callback when a new row is added
-   *
-   * @param row   newly added row data
-   */
-  rowAdded(row: Dictionary<any>): void
-  /**
-   * callback when a row is edited
-   *
-   * @param row   edited row data
-   * @param idx   edited row index
-   */
-  rowEdited(row: Dictionary<any>, idx: number): void
 }

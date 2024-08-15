@@ -1,0 +1,13 @@
+.loading path {
+  stroke-dasharray: 30 220;
+  animation: dash 1.15s cubic-bezier(0.39, 0.29, 0.5, 0.59) infinite both;
+}
+
+@keyframes dash {
+  from {
+    stroke-dashoffset: 52;
+  }
+  to {
+    stroke-dashoffset: 280;
+  }
+}

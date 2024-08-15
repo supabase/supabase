@@ -1,36 +1,11 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { organizationKeys } from './keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import { components } from 'api-types'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
-export type OrganizationPaymentMethod = {
-  id: string
-  customer: string
-  type: string
-  object: string
-  metadata: any
-  livemode: boolean
-  created: number
-  card: {
-    brand: string
-    country: string
-    exp_month: number
-    exp_year: number
-    fingerprint: string
-    last4: string
-    funding: string
-    // [Joshen] There's more but just putting what's relevant
-  }
-  billing_details: {
-    address: any
-    email: string | null
-    name: string | null
-    phone: string | null
-  }
-}
+export type OrganizationPaymentMethod = components['schemas']['Payment']
 
 export async function getOrganizationPaymentMethods(
   { slug }: OrganizationPaymentMethodsVariables,
@@ -38,10 +13,20 @@ export async function getOrganizationPaymentMethods(
 ) {
   if (!slug) throw new Error('slug is required')
 
-  const response = await get(`${API_URL}/organizations/${slug}/payments`, { signal })
-  if (response.error) throw response.error
+  const { data, error } = await get(`/platform/organizations/{slug}/payments`, {
+    params: {
+      path: {
+        slug,
+      },
+    },
+    headers: {
+      Version: '2',
+    },
+    signal,
+  })
 
-  return response.data as OrganizationPaymentMethod[]
+  if (error) handleError(error)
+  return data
 }
 
 export type OrganizationPaymentMethodsData = Awaited<

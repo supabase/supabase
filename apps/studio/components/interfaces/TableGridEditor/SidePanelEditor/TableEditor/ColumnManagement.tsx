@@ -1,7 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import type { PostgresColumn, PostgresTable, PostgresType } from '@supabase/postgres-meta'
 import { isEmpty, noop, partition } from 'lodash'
-import Link from 'next/link'
+import { HelpCircle, Key } from 'lucide-react'
 import { useState } from 'react'
 import {
   DragDropContext,
@@ -10,38 +9,55 @@ import {
   Droppable,
   DroppableProvided,
 } from 'react-beautiful-dnd'
-import { Alert, Button, IconEdit, IconExternalLink, IconHelpCircle, IconKey, IconTrash } from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconEdit,
+  IconExternalLink,
+  IconTrash,
+} from 'ui'
+import { WarningIcon } from 'ui'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
-import ForeignKeySelector from '../ForeignKeySelector/ForeignKeySelector'
+import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
+import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
-import { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
+import type { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
 import Column from './Column'
-import { ImportContent } from './TableEditor.types'
+import type { ImportContent, TableField } from './TableEditor.types'
 
 interface ColumnManagementProps {
-  table?: Partial<PostgresTable>
+  table: TableField
   columns?: ColumnField[]
-  enumTypes: PostgresType[]
+  relations: ForeignKey[]
+  enumTypes: EnumeratedType[]
   importContent?: ImportContent
   isNewRecord: boolean
   onColumnsUpdated: (columns: ColumnField[]) => void
   onSelectImportData: () => void
   onClearImportContent: () => void
+  onUpdateFkRelations: (relations: ForeignKey[]) => void
 }
 
 const ColumnManagement = ({
   table,
   columns = [],
+  relations,
   enumTypes = [],
   importContent,
   isNewRecord,
   onColumnsUpdated = noop,
   onSelectImportData = noop,
   onClearImportContent = noop,
+  onUpdateFkRelations,
 }: ColumnManagementProps) => {
-  const [selectedColumnToEditRelation, setSelectedColumnToEditRelation] = useState<ColumnField>()
+  const [open, setOpen] = useState(false)
+  const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
+  const [selectedFk, setSelectedFk] = useState<ForeignKey>()
 
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
@@ -49,36 +65,11 @@ const ColumnManagement = ({
     (column: ColumnField) => column.isPrimaryKey
   )
 
-  const saveColumnForeignKey = (foreignKeyConfiguration?: {
-    table: PostgresTable
-    column: PostgresColumn
-    deletionAction: string
-    updateAction: string
-  }) => {
-    if (selectedColumnToEditRelation !== undefined) {
-      onUpdateColumn(selectedColumnToEditRelation, {
-        foreignKey:
-          foreignKeyConfiguration !== undefined
-            ? {
-                id: 0,
-                constraint_name: '',
-                source_schema: table?.schema ?? '',
-                source_table_name: table?.name ?? '',
-                source_column_name: selectedColumnToEditRelation?.name,
-                target_table_schema: foreignKeyConfiguration.table.schema,
-                target_table_name: foreignKeyConfiguration.table.name,
-                target_column_name: foreignKeyConfiguration.column.name,
-                deletion_action: foreignKeyConfiguration.deletionAction,
-                update_action: foreignKeyConfiguration.updateAction,
-              }
-            : undefined,
-        ...(foreignKeyConfiguration !== undefined && {
-          format: foreignKeyConfiguration.column.format,
-          defaultValue: null,
-        }),
-      })
-    }
-    setSelectedColumnToEditRelation(undefined)
+  const checkIfHaveForeignKeys = (column: ColumnField) => {
+    return (
+      relations.find((relation) => relation.columns.find((x) => x.source === column.name)) !==
+      undefined
+    )
   }
 
   const onUpdateColumn = (columnToUpdate: ColumnField, changes: Partial<ColumnField>) => {
@@ -143,24 +134,36 @@ const ColumnManagement = ({
       <div className="w-full space-y-4 table-editor-columns">
         <div className="flex items-center justify-between w-full">
           <h5>Columns</h5>
-          {isNewRecord && (
-            <>
-              {hasImportContent ? (
-                <div className="flex items-center space-x-3">
-                  <Button type="default" icon={<IconEdit />} onClick={onSelectImportData}>
-                    Edit content
+          <div className="flex items-center gap-x-2">
+            <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+              <a
+                href="https://supabase.com/docs/guides/database/tables#data-types"
+                target="_blank"
+                rel="noreferrer"
+              >
+                About data types
+              </a>
+            </Button>
+            {isNewRecord && (
+              <>
+                <div className="py-3 border-r" />
+                {hasImportContent ? (
+                  <div className="flex items-center gap-x-2">
+                    <Button type="default" icon={<IconEdit />} onClick={onSelectImportData}>
+                      Edit content
+                    </Button>
+                    <Button type="danger" icon={<IconTrash />} onClick={onClearImportContent}>
+                      Remove content
+                    </Button>
+                  </div>
+                ) : (
+                  <Button type="default" onClick={onSelectImportData}>
+                    Import data via spreadsheet
                   </Button>
-                  <Button type="danger" icon={<IconTrash />} onClick={onClearImportContent}>
-                    Remove content
-                  </Button>
-                </div>
-              ) : (
-                <Button type="default" onClick={onSelectImportData}>
-                  Import data via spreadsheet
-                </Button>
-              )}
-            </>
-          )}
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         {hasImportContent && (
@@ -171,20 +174,22 @@ const ColumnManagement = ({
         )}
 
         {primaryKeyColumns.length === 0 && (
-          <Alert title="Warning: No primary keys selected" variant="warning" withIcon>
-            Tables require at least one column as a primary key in order to uniquely identify each
-            row. Without a primary key, you will not be able to update or delete rows from the
-            table.
-          </Alert>
+          <Alert_Shadcn_ variant="warning">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>Warning: No primary keys selected</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Tables should have at least one column as the primary key to identify each row.
+              Without a primary key, you will not be able to update or delete rows from the table.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         )}
 
         {primaryKeyColumns.length > 1 && (
           <InformationBox
             block
-            icon={<IconKey className="text-white" size="large" />}
+            icon={<Key size={16} />}
             title="Composite primary key selected"
-            description="The columns that you've selected will be grouped as a primary key, and will serve
-          as the unique identifier for the rows in your table"
+            description="The columns that you've selected will be grouped as a primary key, and will serve as the unique identifier for the rows in your table"
           />
         )}
 
@@ -198,7 +203,7 @@ const ColumnManagement = ({
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
                   <h5 className="text-xs text-foreground-lighter">
-                    <IconHelpCircle size={15} strokeWidth={1.5} />
+                    <HelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
@@ -207,7 +212,7 @@ const ColumnManagement = ({
                     <div
                       className={[
                         'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                        'border border-background', //border
+                        'border border-background w-[300px]', //border
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -228,7 +233,7 @@ const ColumnManagement = ({
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
                   <h5 className="text-xs text-foreground-lighter">
-                    <IconHelpCircle size={15} strokeWidth={1.5} />
+                    <HelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
@@ -237,7 +242,7 @@ const ColumnManagement = ({
                     <div
                       className={[
                         'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                        'border border-background', //border
+                        'border border-background w-[300px]', //border
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -279,15 +284,21 @@ const ColumnManagement = ({
                           >
                             <Column
                               column={column}
+                              relations={relations.filter((relation) => {
+                                return relation.columns.some((x) => x.source === column.name)
+                              })}
                               enumTypes={enumTypes}
+                              hasForeignKeys={checkIfHaveForeignKeys(column)}
                               isNewRecord={isNewRecord}
                               hasImportContent={hasImportContent}
                               dragHandleProps={draggableProvided.dragHandleProps}
-                              onEditRelation={() => {
-                                setSelectedColumnToEditRelation(column)
-                              }}
                               onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
                               onRemoveColumn={() => onRemoveColumn(column)}
+                              onEditForeignKey={(fk) => {
+                                setOpen(true)
+                                setSelectedColumn(column)
+                                if (fk) setSelectedFk(fk)
+                              }}
                             />
                           </div>
                         )}
@@ -313,15 +324,21 @@ const ColumnManagement = ({
                         <div ref={draggableProvided.innerRef} {...draggableProvided.draggableProps}>
                           <Column
                             column={column}
+                            relations={relations.filter((relation) => {
+                              return relation.columns.some((x) => x.source === column.name)
+                            })}
                             enumTypes={enumTypes}
                             isNewRecord={isNewRecord}
+                            hasForeignKeys={checkIfHaveForeignKeys(column)}
                             hasImportContent={hasImportContent}
                             dragHandleProps={draggableProvided.dragHandleProps}
-                            onEditRelation={() => {
-                              setSelectedColumnToEditRelation(column)
-                            }}
                             onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
                             onRemoveColumn={() => onRemoveColumn(column)}
+                            onEditForeignKey={(fk) => {
+                              setOpen(true)
+                              setSelectedColumn(column)
+                              if (fk) setSelectedFk(fk)
+                            }}
                           />
                         </div>
                       )}
@@ -334,33 +351,38 @@ const ColumnManagement = ({
           </DragDropContext>
         </div>
 
-        <div className="flex items-center justify-between">
-          {!hasImportContent && (
+        {!hasImportContent && (
+          <div className="flex items-center justify-center rounded border border-strong border-dashed py-3">
             <Button type="default" onClick={() => onAddColumn()}>
               Add column
             </Button>
-          )}
-          <Button
-            asChild
-            type="text"
-            className="text-foreground-light hover:text-foreground"
-            icon={<IconExternalLink size={12} strokeWidth={2} />}
-          >
-            <Link
-              href="https://supabase.com/docs/guides/database/tables#data-types"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Learn more about data types
-            </Link>
-          </Button>
-        </div>
+          </div>
+        )}
       </div>
+
       <ForeignKeySelector
-        column={selectedColumnToEditRelation as ColumnField}
-        visible={selectedColumnToEditRelation !== undefined}
-        closePanel={() => setSelectedColumnToEditRelation(undefined)}
-        saveChanges={saveColumnForeignKey}
+        visible={open}
+        column={selectedColumn}
+        table={{ id: table.id, name: table.name, columns: table.columns }}
+        foreignKey={selectedFk}
+        onClose={() => {
+          setOpen(false)
+          setSelectedFk(undefined)
+          setSelectedColumn(undefined)
+        }}
+        onSaveRelation={(fk) => {
+          const existingRelationIds = relations.map((x) => x.id)
+          if (fk.id !== undefined && existingRelationIds.includes(fk.id)) {
+            onUpdateFkRelations(
+              relations.map((x) => {
+                if (x.id === fk.id) return fk
+                return x
+              })
+            )
+          } else {
+            onUpdateFkRelations(relations.concat([fk]))
+          }
+        }}
       />
     </>
   )

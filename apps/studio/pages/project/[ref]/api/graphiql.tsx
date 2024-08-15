@@ -1,31 +1,35 @@
 import '@graphiql/react/dist/style.css'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useTheme } from 'next-themes'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
-import { DocsLayout } from 'components/layouts'
-import Connecting from 'components/ui/Loading/Loading'
+import DocsLayout from 'components/layouts/DocsLayout/DocsLayout'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { Loading } from 'components/ui/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useStore } from 'hooks'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { getImpersonatedRole } from 'state/role-impersonation-state'
-import { NextPageWithLayout } from 'types'
+import { useGetImpersonatedRole } from 'state/role-impersonation-state'
+import type { NextPageWithLayout } from 'types'
 
 const GraphiQLPage: NextPageWithLayout = () => {
-  const { ui, meta } = useStore()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
+  const { project } = useProjectContext()
   const currentTheme = resolvedTheme?.includes('dark') ? 'dark' : 'light'
 
-  const isExtensionsLoading = meta.extensions.isLoading
-  const pgGraphqlExtension = meta.extensions.byId('pg_graphql')
+  const { data, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const pgGraphqlExtension = (data ?? []).find((ext) => ext.name === 'pg_graphql')
 
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
   const { data: settings, isFetched } = useProjectApiQuery({ projectRef })
@@ -38,19 +42,14 @@ const GraphiQLPage: NextPageWithLayout = () => {
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const jwtSecret = config?.jwt_secret
 
-  useEffect(() => {
-    if (ui.selectedProjectRef) {
-      // Schemas may be needed when enabling the GraphQL extension
-      meta.extensions.load()
-    }
-  }, [ui.selectedProjectRef])
+  const getImpersonatedRole = useGetImpersonatedRole()
 
   const fetcher = useMemo(() => {
     const fetcherFn = createGraphiQLFetcher({
       url: `${API_URL}/projects/${projectRef}/api/graphql`,
       fetch,
     })
-    const customFetcher: Fetcher = (graphqlParams, opts) => {
+    const customFetcher: Fetcher = async (graphqlParams, opts) => {
       let userAuthorization: string | undefined
 
       const role = getImpersonatedRole()
@@ -60,7 +59,12 @@ const GraphiQLPage: NextPageWithLayout = () => {
         role !== undefined &&
         role.type === 'postgrest'
       ) {
-        userAuthorization = `Bearer ${getRoleImpersonationJWT(projectRef, jwtSecret, role)}`
+        try {
+          const token = await getRoleImpersonationJWT(projectRef, jwtSecret, role)
+          userAuthorization = 'Bearer ' + token
+        } catch (err: any) {
+          toast.error(`Failed to get JWT for role: ${err.message}`)
+        }
       }
 
       return fetcherFn(graphqlParams, {
@@ -78,10 +82,10 @@ const GraphiQLPage: NextPageWithLayout = () => {
     }
 
     return customFetcher
-  }, [projectRef, jwtSecret, accessToken, serviceRoleKey])
+  }, [projectRef, getImpersonatedRole, jwtSecret, accessToken, serviceRoleKey])
 
   if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
-    return <Connecting />
+    return <Loading />
   }
 
   if (pgGraphqlExtension?.installed_version === null) {
@@ -106,4 +110,5 @@ const GraphiQLPage: NextPageWithLayout = () => {
 }
 
 GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
-export default observer(GraphiQLPage)
+
+export default GraphiQLPage

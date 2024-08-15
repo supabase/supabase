@@ -1,20 +1,18 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { useCallback } from 'react'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'lib/common/fetch'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { Permission, ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
+import type { Permission, ResponseError } from 'types'
 import { permissionKeys } from './keys'
 
 export type PermissionsResponse = Permission[]
 
 export async function getPermissions(signal?: AbortSignal) {
-  const response = await get(`${API_URL}/profile/permissions`, {
-    signal,
-  })
-  if (response.error) throw response.error
+  const { data, error } = await get('/platform/profile/permissions', { signal })
+  if (error) handleError(error)
 
-  return response as PermissionsResponse
+  // [Joshen] TODO: Type this properly from the API
+  return data as unknown as PermissionsResponse
 }
 
 export type PermissionsData = Awaited<ReturnType<typeof getPermissions>>
@@ -32,11 +30,3 @@ export const usePermissionsQuery = <TData = PermissionsData>(
       staleTime: 30 * 60 * 1000,
     }
   )
-
-export const usePermissionsPrefetch = () => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    client.prefetchQuery(permissionKeys.list(), ({ signal }) => getPermissions(signal))
-  }, [])
-}

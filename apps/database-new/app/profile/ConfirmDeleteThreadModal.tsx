@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, createRef } from 'react'
+import { deleteThread } from '@/app/actions'
+import { createRef, useEffect } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
 import { Button, Input_Shadcn_, Modal } from 'ui'
-import { deleteThread } from '@/app/actions'
 import { ThreadType } from './Threads'
 
 const ConfirmDeleteThreadModal = ({
@@ -53,8 +53,6 @@ const ConfirmDeleteThreadModal = ({
     )
   }
 
-  console.log('thread', thread)
-
   return (
     <Modal
       size="small"
@@ -64,12 +62,12 @@ const ConfirmDeleteThreadModal = ({
       header="Confirm to delete thread?"
       className="pb-2"
     >
-      <form action={formAction} key={`${thread.id}-delete-thread-form`}>
+      <form action={formAction} key={`${thread.thread_id}-delete-thread-form`}>
         <Modal.Content className="py-4">
           <p className="text-sm">Once the thread is deleted, it cannot be recovered.</p>
         </Modal.Content>
         <Modal.Separator />
-        <Input_Shadcn_ name="thread_id" required type="hidden" value={thread.thread_id} />
+        <Input_Shadcn_ name="thread_id" value={state.data.thread_id} type="hidden" />
         <Modal.Content className="flex flex-row gap-3 justify-end">
           <Button type="default">Cancel</Button>
           <SubmitButton />

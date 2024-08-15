@@ -1,6 +1,6 @@
 import { DataPoint } from 'data/analytics/constants'
 import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
 import UsageSection from './UsageSection/UsageSection'
 
 export interface BandwidthProps {
@@ -12,7 +12,6 @@ export interface BandwidthProps {
   currentBillingCycleSelected: boolean
 }
 
-// [Joshen TODO] Needs to take in org slug and eventually use daily stats org query
 const Bandwidth = ({
   orgSlug,
   projectRef,

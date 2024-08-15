@@ -1,11 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { useState } from 'react'
-import { Button, IconLoader } from 'ui'
+import toast from 'react-hot-toast'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
-import { useCheckPermissions, useStore } from 'hooks'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { timeout } from 'lib/helpers'
+import { Button, IconLoader } from 'ui'
 
 // Removes some auto-generated Postgrest text
 // Ideally PostgREST wouldn't add this if there is already a comment
@@ -28,11 +31,10 @@ interface DescrptionProps {
 }
 
 const Description = ({ content, metadata, onChange = noop }: DescrptionProps) => {
-  const { meta, ui } = useStore()
-
   const contentText = temp_removePostgrestText(content || '').trim()
   const [value, setValue] = useState(contentText)
   const [isUpdating, setIsUpdating] = useState(false)
+  const { project } = useProjectContext()
 
   const { table, column, rpc } = metadata
 
@@ -53,22 +55,17 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
     if (rpc) query = `comment on function "${rpc}" is '${description}';`
 
     if (query) {
-      const res = await meta.query(query)
-
-      // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
-      await timeout(500)
-
-      if (res.error) {
-        ui.setNotification({
-          error: res.error,
-          category: 'error',
-          message: `Failed to update description: ${res.error.message}`,
+      try {
+        await executeSql({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          sql: query,
         })
-      } else {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully updated description`,
-        })
+        // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
+        await timeout(500)
+        toast.success(`Successfully updated description`)
+      } catch (error: any) {
+        toast.error(`Failed to update description: ${error.message}`)
       }
     }
 

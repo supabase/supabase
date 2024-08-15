@@ -1,26 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, useStore } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import { DatabaseFunction } from 'data/database-functions/database-functions-query'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import type { NextPageWithLayout } from 'types'
 
 const FunctionsPage: NextPageWithLayout = () => {
-  const { ui, meta } = useStore()
-  const [selectedFunction, setSelectedFunction] = useState<any>()
-  const [showCreateFunctionForm, setShowCreateFunctionForm] = useState<boolean>(false)
-  const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState<boolean>(false)
+  const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
+  const [showCreateFunctionForm, setShowCreateFunctionForm] = useState(false)
+  const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
 
   const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) meta.functions.load()
-  }, [ui.selectedProjectRef])
+  const isPermissionsLoaded = usePermissionsLoaded()
 
   const createFunction = () => {
     setSelectedFunction(undefined)
@@ -37,7 +34,7 @@ const FunctionsPage: NextPageWithLayout = () => {
     setShowDeleteFunctionForm(true)
   }
 
-  if (!canReadFunctions) {
+  if (isPermissionsLoaded && !canReadFunctions) {
     return <NoPermission isFullPage resourceText="view database functions" />
   }
 
@@ -46,7 +43,7 @@ const FunctionsPage: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <h3 className=" mb-4 text-xl text-foreground">Database Functions</h3>
+            <FormHeader title="Database Functions" />
             <FunctionsList
               createFunction={createFunction}
               editFunction={editFunction}
@@ -71,4 +68,4 @@ const FunctionsPage: NextPageWithLayout = () => {
 
 FunctionsPage.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
 
-export default observer(FunctionsPage)
+export default FunctionsPage

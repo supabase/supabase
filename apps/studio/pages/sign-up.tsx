@@ -1,8 +1,8 @@
 import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
 import SignUpForm from 'components/interfaces/SignIn/SignUpForm'
-import { SignInLayout } from 'components/layouts'
+import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import Link from 'next/link'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const SignUpPage: NextPageWithLayout = () => {
   return (
@@ -15,7 +15,7 @@ const SignUpPage: NextPageWithLayout = () => {
             <div className="w-full border-t border-strong" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-background px-2 text-sm text-foreground">or</span>
+            <span className="bg-studio px-2 text-sm text-foreground">or</span>
           </div>
         </div>
 

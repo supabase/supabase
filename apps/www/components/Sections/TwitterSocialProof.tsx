@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconMessageCircle, TweetCard } from 'ui'
+import { Button, IconMessageCircle } from 'ui'
 import Tweets from '../../data/tweets/Tweets.json'
 import Link from 'next/link'
+import { TweetCard } from 'ui-patterns/TweetCard'
 
 function TwitterSocialProof() {
   // base path for images
@@ -54,7 +55,7 @@ function TwitterSocialProof() {
         >
           {showButton && (
             <div
-              className={`absolute bottom-0 left-0 z-10 w-full h-[25%] bg-gradient-to-t from-background via-background`}
+              className={`absolute bottom-0 left-0 z-10 w-full h-[400px] bg-gradient-to-t from-background via-background`}
             />
           )}
           {tweets.map((tweet: any, i: number) => (

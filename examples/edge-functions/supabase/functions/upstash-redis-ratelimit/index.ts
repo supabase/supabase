@@ -1,6 +1,6 @@
 import { Redis } from 'https://deno.land/x/upstash_redis@v1.19.3/mod.ts'
 import { Ratelimit } from 'https://cdn.skypack.dev/@upstash/ratelimit@0.4.4'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 console.log(`Function "upstash-redis-counter" up and running!`)
 
@@ -20,10 +20,14 @@ Deno.serve(async (req) => {
         },
       }
     )
+
+    // First get the token from the Authorization header
+    const token = req.headers.get('Authorization').replace('Bearer ', '')
+
     // Now we can get the session or user object
     const {
       data: { user },
-    } = await supabaseClient.auth.getUser()
+    } = await supabaseClient.auth.getUser(token)
     if (!user) throw new Error('no user')
     console.log(user.id)
 

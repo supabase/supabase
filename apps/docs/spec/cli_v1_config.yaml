@@ -1,0 +1,831 @@
+# The spec is divided into 2 main sections:
+#   info: general information about the tool
+#   functions: public functions which the user can access
+
+configspec: '001'
+
+# This section outlines the general information for the tool.
+info:
+  id: 'cli' # {string} A unique ID for this tool.
+  version: '1.93.0' # {string} The current version number of the tool.
+  title: 'CLI' # {string} A readable name.
+  source: 'https://github.com/supabase/cli' # {string} Where developers can find the source code.
+  bugs: 'https://github.com/supabase/cli/issues' # {string} Where developers can file bugs.
+  spec: 'https://github.com/supabase/supabase/spec/cli_v1_config.yaml' # {string} Where developers can find this spec (to link directly in the docs).
+  description: |
+    A `supabase/config.toml` file is generated after running `supabase init`.
+
+    You can edit this file to change the settings for your locally running project. After you make changes, you will need to restart using `supabase stop` and then `supabase start` for the changes to take effect.
+  tags:
+    - id: general
+      title: General
+      description: General settings.
+    - id: auth
+      title: Auth
+      description: Auth settings.
+    - id: api
+      title: API
+      description: Auth settings.
+    - id: database
+      title: Database
+      description: Database settings.
+    - id: dashboard
+      title: Dashboard
+      description: Dashboard settings.
+    - id: realtime
+      title: Realtime
+      description: Dashboard settings.
+    - id: storage
+      title: Storage
+      description: Storage settings.
+    - id: edge-functions
+      title: Edge-Functions
+      description: Edge-Functions settings.
+    - id: analytics
+      title: Analytics
+      description: Analytics settings.
+    - id: local
+      title: Local Development
+      description: Local Development settings.
+
+# This section is an array of public functions which a user might need to execute.
+parameters:
+  - id: 'project_id' # {string} A unique identifier for this param.
+    title: 'project_id' # {string} Any name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    required: true
+    description: |
+      A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.
+
+  - id: 'api.enabled'
+    title: 'api.enabled'
+    tags: ['api']
+    required: false
+    default: 'true'
+    description: |
+      Enable the local PostgREST service.
+    links:
+      - name: 'PostgREST configuration'
+        link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'api.port'
+    title: 'api.port'
+    tags: ['api']
+    required: false
+    default: '54321'
+    description: |
+      Port to use for the API URL.
+    links:
+      - name: 'PostgREST configuration'
+        link: 'https://postgrest.org/en/stable/configuration.html'
+    usage: |
+      [api]
+      port = 54321
+
+  - id: 'api.schemas'
+    title: 'api.schemas'
+    tags: ['api']
+    required: false
+    default: '["public", "storage", "graphql_public"]'
+    description: |
+      Schemas to expose in your API. Tables, views and functions in this schema will get API endpoints. `public` and `storage` are always included.
+    links:
+      - name: 'PostgREST configuration'
+        link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'api.extra_search_path'
+    title: 'api.extra_search_path'
+    tags: ['api']
+    required: false
+    default: '["public", "extensions"]'
+    description: |
+      Extra schemas to add to the search_path of every request. public is always included.
+    links:
+      - name: 'PostgREST configuration'
+        link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'api.max_rows'
+    title: 'api.max_rows'
+    tags: ['api']
+    required: false
+    default: '1000'
+    description: |
+      The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests.
+    links:
+      - name: 'PostgREST configuration'
+        link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'db.port'
+    title: 'db.port'
+    tags: ['database']
+    required: false
+    default: '54322'
+    description: |
+      Port to use for the local database URL.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'db.shadow_port'
+    title: 'db.shadow_port'
+    tags: ['database']
+    required: false
+    default: '54320'
+    description: |
+      Port to use for the local shadow database.
+    links: []
+
+  - id: 'db.major_version'
+    title: 'db.major_version'
+    tags: ['database']
+    required: false
+    default: '15'
+    description: |
+      The database major version to use. This has to be the same as your remote database's. Run `SHOW server_version;` on the remote database to check.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'db.pooler.enabled'
+    title: 'db.pooler.enabled'
+    tags: ['database']
+    required: false
+    default: 'false'
+    description: |
+      Enable the local PgBouncer service.
+    links:
+      - name: 'PgBouncer Configuration'
+        link: https://www.pgbouncer.org/config.html
+
+  - id: 'db.pooler.port'
+    title: 'db.pooler.port'
+    tags: ['database']
+    required: false
+    default: '54329'
+    description: |
+      Port to use for the local connection pooler.
+    links:
+      - name: 'PgBouncer Configuration'
+        link: https://www.pgbouncer.org/config.html#listen_port
+
+  - id: 'db.pooler.pool_mode'
+    title: 'db.pooler.pool_mode'
+    tags: ['database']
+    required: false
+    default: '"transaction"'
+    description: |
+      Specifies when a server connection can be reused by other clients. Configure one of the supported pooler modes: `transaction`, `session`.
+    links:
+      - name: 'PgBouncer Configuration'
+        link: https://www.pgbouncer.org/config.html#pool_mode
+
+  - id: 'db.pooler.default_pool_size'
+    title: 'db.pooler.default_pool_size'
+    tags: ['database']
+    required: false
+    default: '20'
+    description: |
+      How many server connections to allow per user/database pair.
+    links:
+      - name: 'PgBouncer Configuration'
+        link: https://www.pgbouncer.org/config.html#default_pool_size
+
+  - id: 'db.pooler.max_client_conn'
+    title: 'db.pooler.max_client_conn'
+    tags: ['database']
+    required: false
+    default: '100'
+    description: |
+      Maximum number of client connections allowed.
+    links:
+      - name: 'PgBouncer Configuration'
+        link: https://www.pgbouncer.org/config.html#max_client_conn
+
+  - id: 'realtime.enabled'
+    title: 'realtime.enabled'
+    tags: ['realtime']
+    required: false
+    default: 'true'
+    description: |
+      Enable the local Realtime service.
+    links: []
+
+  - id: 'realtime.ip_version'
+    title: 'realtime.ip_version'
+    tags: ['realtime']
+    required: false
+    default: '"IPv6"'
+    description: |
+      Bind realtime via either IPv4 or IPv6. (default: IPv6)
+    links: []
+
+  - id: 'studio.enabled'
+    title: 'studio.enabled'
+    tags: ['dashboard']
+    required: false
+    default: 'true'
+    description: |
+      Enable the local Supabase Studio dashboard.
+    links: []
+
+  - id: 'studio.port'
+    title: 'studio.port'
+    tags: ['dashboard']
+    required: false
+    default: '54323'
+    description: |
+      Port to use for Supabase Studio.
+    links: []
+
+  - id: 'studio.api_url'
+    title: 'studio.api_url'
+    tags: ['dashboard']
+    required: false
+    default: '"http://localhost"'
+    description: |
+      External URL of the API server that frontend connects to.
+    links: []
+
+  - id: 'inbucket.enabled'
+    title: 'inbucket.enabled'
+    tags: ['local']
+    required: false
+    default: 'true'
+    description: |
+      Enable the local InBucket service.
+    links:
+      - name: 'Inbucket documentation'
+        link: 'https://www.inbucket.org'
+
+  - id: 'inbucket.port'
+    title: 'inbucket.port'
+    tags: ['local']
+    required: false
+    default: 'true'
+    description: |
+      Port to use for the email testing server web interface.
+
+      Emails sent with the local dev setup are not actually sent - rather, they are monitored, and you can view the emails that would have been sent from the web interface.
+    links:
+      - name: 'Inbucket documentation'
+        link: 'https://www.inbucket.org'
+
+  - id: 'inbucket.smtp_port'
+    title: 'inbucket.smtp_port'
+    tags: ['local']
+    required: false
+    default: '54325'
+    description: |
+      Port to use for the email testing server SMTP port.
+
+      Emails sent with the local dev setup are not actually sent - rather, they are monitored, and you can view the emails that would have been sent from the web interface.
+
+      If set, you can access the SMTP server from this port.
+    links:
+      - name: 'Inbucket documentation'
+        link: 'https://www.inbucket.org'
+
+  - id: 'inbucket.pop3_port'
+    title: 'inbucket.pop3_port'
+    tags: ['local']
+    required: false
+    default: '54326'
+    description: |
+      Port to use for the email testing server POP3 port.
+
+      Emails sent with the local dev setup are not actually sent - rather, they are monitored, and you can view the emails that would have been sent from the web interface.
+
+      If set, you can access the POP3 server from this port.
+    links:
+      - name: 'Inbucket documentation'
+        link: 'https://www.inbucket.org'
+
+  - id: 'storage.enabled'
+    title: 'storage.enabled'
+    tags: ['storage']
+    required: false
+    default: 'true'
+    description: |
+      Enable the local Storage service.
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.file_size_limit'
+    title: 'storage.file_size_limit'
+    tags: ['storage']
+    required: false
+    default: '"50MiB"'
+    description: |
+      The maximum file size allowed (e.g. "5MB", "500KB").
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'auth.enabled'
+    title: 'auth.enabled'
+    tags: ['auth']
+    required: false
+    default: 'true'
+    description: |
+      Enable the local GoTrue service.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.site_url'
+    title: 'auth.site_url'
+    tags: ['auth']
+    required: false
+    default: '"http://localhost:3000"'
+    description: |
+      The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.additional_redirect_urls'
+    title: 'auth.additional_redirect_urls'
+    tags: ['auth']
+    required: false
+    default: '["https://localhost:3000"]'
+    description: |
+      A list of _exact_ URLs that auth providers are permitted to redirect to post authentication.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.jwt_expiry'
+    title: 'auth.jwt_expiry'
+    tags: ['auth']
+    required: false
+    default: '3600'
+    description: |
+      How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week).
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.enable_refresh_token_rotation'
+    title: 'auth.enable_refresh_token_rotation'
+    tags: ['auth']
+    required: false
+    default: 'true'
+    description: |
+      If disabled, the refresh token will never expire.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.refresh_token_reuse_interval'
+    title: 'auth.refresh_token_reuse_interval'
+    tags: ['auth']
+    required: false
+    default: '10'
+    description: |
+      Allows refresh tokens to be reused after expiry, up to the specified interval in seconds. Requires enable_refresh_token_rotation = true.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.enable_signup'
+    title: 'auth.enable_signup'
+    tags: ['auth']
+    required: false
+    default: 'true'
+    description: |
+      Allow/disallow new user signups to your project.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.enable_anonymous_sign_ins'
+    title: 'auth.enable_anonymous_sign_ins'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Allow/disallow anonymous sign-ins to your project.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.email.enable_signup'
+    title: 'auth.email.enable_signup'
+    tags: ['auth']
+    required: false
+    default: 'true'
+    description: |
+      Allow/disallow new user signups via email to your project.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.email.double_confirm_changes'
+    title: 'auth.email.double_confirm_changes'
+    tags: ['auth']
+    required: false
+    default: 'true'
+    description: |
+      If enabled, a user will be required to confirm any email change on both the old, and new email addresses. If disabled, only the new email is required to confirm.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.email.enable_confirmations'
+    title: 'auth.email.enable_confirmations'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      If enabled, users need to confirm their email address before signing in.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.email.smtp.host'
+    title: 'auth.email.smtp.host'
+    tags: ['auth']
+    required: false
+    default: 'inbucket'
+    description: |
+      Hostname or IP address of the SMTP server.
+
+  - id: 'auth.email.smtp.port'
+    title: 'auth.email.smtp.port'
+    tags: ['auth']
+    required: false
+    default: 2500
+    description: |
+      Port number of the SMTP server.
+
+  - id: 'auth.email.smtp.user'
+    title: 'auth.email.smtp.user'
+    tags: ['auth']
+    required: false
+    description: |
+      Username for authenticating with the SMTP server.
+
+  - id: 'auth.email.smtp.pass'
+    title: 'auth.email.smtp.pass'
+    tags: ['auth']
+    required: false
+    description: |
+      Password for authenticating with the SMTP server.
+
+  - id: 'auth.email.smtp.admin_email'
+    title: 'auth.email.smtp.admin_email'
+    tags: ['auth']
+    required: false
+    default: 'admin@email.com'
+    description: |
+      Email used as the sender for emails sent from the application.
+
+  - id: 'auth.email.smtp.sender_name'
+    title: 'auth.email.smtp.sender_name'
+    tags: ['auth']
+    required: false
+    description: |
+      Display name used as the sender for emails sent from the application.
+
+  - id: 'auth.email.template.type.subject'
+    title: 'auth.email.template.<type>.subject'
+    tags: ['auth']
+    required: false
+    description: |
+      The full list of email template types are:
+
+      - `invite`
+      - `confirmation`
+      - `recovery`
+      - `magic_link`
+      - `email_change`
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.email.template.type.content_path'
+    title: 'auth.email.template.<type>.content_path'
+    tags: ['auth']
+    required: false
+    description: |
+      The full list of email template types are:
+
+      - `invite`
+      - `confirmation`
+      - `recovery`
+      - `magic_link`
+      - `email_change`
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.enable_signup'
+    title: 'auth.sms.enable_signup'
+    tags: ['auth']
+    required: false
+    default: 'true'
+    description: |
+      Allow/disallow new user signups via SMS to your project.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.enable_confirmations'
+    title: 'auth.sms.enable_confirmations'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      If enabled, users need to confirm their phone number before signing in.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.test_otp'
+    title: 'auth.sms.test_otp'
+    tags: ['auth']
+    required: false
+    description: |
+      Use pre-defined map of phone number to OTP for testing.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+    usage: |
+      [auth.sms.test_otp]
+      4152127777 = "123456"
+
+  - id: 'auth.sms.provider.enabled'
+    title: 'auth.sms.<provider>.enabled'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Use an external SMS provider. The full list of providers are:
+
+      - `twilio`
+      - `twilio_verify`
+      - `messagebird`
+      - `textlocal`
+      - `vonage`
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.twilio.account_sid'
+    title: 'auth.sms.<twilio|twilio_verify>.account_sid'
+    tags: ['auth']
+    required: true
+    description: |
+      Twilio Account SID
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.twilio.message_service_sid'
+    title: 'auth.sms.<twilio|twilio_verify>.message_service_sid'
+    tags: ['auth']
+    required: true
+    description: |
+      Twilio Message Service SID
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.twilio.auth_token'
+    title: 'auth.sms.<twilio|twilio_verify>.auth_token'
+    tags: ['auth']
+    required: true
+    default: 'env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)'
+    description: |
+      Twilio Auth Token
+
+      DO NOT commit your Twilio auth token to git. Use environment variable substitution instead.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.messagebird.originator'
+    title: 'auth.sms.messagebird.originator'
+    tags: ['auth']
+    required: true
+    description: |
+      MessageBird Originator
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.messagebird.access_key'
+    title: 'auth.sms.messagebird.access_key'
+    tags: ['auth']
+    required: true
+    default: 'env(SUPABASE_AUTH_SMS_MESSAGEBIRD_ACCESS_KEY)'
+    description: |
+      MessageBird Access Key
+
+      DO NOT commit your MessageBird access key to git. Use environment variable substitution instead.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.textlocal.sender'
+    title: 'auth.sms.textlocal.sender'
+    tags: ['auth']
+    required: true
+    description: |
+      TextLocal Sender
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.textlocal.api_key'
+    title: 'auth.sms.textlocal.api_key'
+    tags: ['auth']
+    required: true
+    default: 'env(SUPABASE_AUTH_SMS_TEXTLOCAL_API_KEY)'
+    description: |
+      TextLocal API Key
+
+      DO NOT commit your TextLocal API key to git. Use environment variable substitution instead.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.vonage.from'
+    title: 'auth.sms.vonage.from'
+    tags: ['auth']
+    required: true
+    description: |
+      Vonage From
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.vonage.api_key'
+    title: 'auth.sms.vonage.api_key'
+    tags: ['auth']
+    required: true
+    description: |
+      Vonage API Key
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.sms.vonage.api_secret'
+    title: 'auth.sms.vonage.api_secret'
+    tags: ['auth']
+    required: true
+    default: 'env(SUPABASE_AUTH_SMS_VONAGE_API_SECRET)'
+    description: |
+      Vonage API Secret
+
+      DO NOT commit your Vonage API secret to git. Use environment variable substitution instead.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.external.provider.enabled'
+    title: 'auth.external.<provider>.enabled'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Use an external OAuth provider. The full list of providers are:
+
+      - `apple`
+      - `azure`
+      - `bitbucket`
+      - `discord`
+      - `facebook`
+      - `github`
+      - `gitlab`
+      - `google`
+      - `kakao`
+      - `keycloak`
+      - `linkedin`
+      - `notion`
+      - `twitch`
+      - `twitter`
+      - `slack`
+      - `spotify`
+      - `workos`
+      - `zoom`
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.external.provider.client_id'
+    title: 'auth.external.<provider>.client_id'
+    tags: ['auth']
+    required: true
+    description: |
+      Client ID for the external OAuth provider.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.external.provider.secret'
+    title: 'auth.external.<provider>.secret'
+    tags: ['auth']
+    required: true
+    default: 'env(SUPABASE_AUTH_EXTERNAL_<PROVIDER>_SECRET)'
+    description: |
+      Client secret for the external OAuth provider.
+
+      DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.external.provider.url'
+    title: 'auth.external.<provider>.url'
+    tags: ['auth']
+    required: false
+    description: |
+      The base URL used for constructing the URLs to request authorization and
+      access tokens. Used by gitlab and keycloak. For gitlab it defaults to
+      https://gitlab.com. For keycloak you need to set this to your instance,
+      for example: https://keycloak.example.com/realms/myrealm .
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.external.provider.redirect_uri'
+    title: 'auth.external.<provider>.redirect_uri'
+    tags: ['auth']
+    required: false
+    description: |
+      The URI a OAuth2 provider will redirect to with the code and state values.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'functions.function_name.verify_jwt'
+    title: 'functions.<function_name>.verify_jwt'
+    tags: ['edge-functions']
+    required: false
+    default: 'true'
+    description: |
+      By default, when you deploy your Edge Functions or serve them locally, it
+      will reject requests without a valid JWT in the Authorization header.
+      Setting this configuration changes the default behavior.
+
+      Note that the `--no-verify-jwt` flag overrides this configuration.
+    links:
+      - name: '`supabase functions` CLI subcommands'
+        link: 'https://supabase.com/docs/reference/cli/supabase-functions'
+
+  - id: 'functions.function_name.import_map'
+    title: 'functions.<function_name>.import_map'
+    tags: ['edge-functions']
+    required: false
+    description: |
+      Specify the Deno import map file to use for the Function.
+
+      Note that the `--import-map` flag overrides this configuration.
+    links:
+      - name: '`supabase functions` CLI subcommands'
+        link: 'https://supabase.com/docs/reference/cli/supabase-functions'
+
+  - id: 'analytics.enabled'
+    title: 'analytics.enabled'
+    tags: ['analytics']
+    required: false
+    default: 'false'
+    description: |
+      Enable the local Logflare service.
+    links:
+      - name: Self-hosted Logflare Configuration
+        link: https://supabase.com/docs/reference/self-hosting-analytics/list-endpoints#getting-started
+
+  - id: 'analytics.port'
+    title: 'analytics.port'
+    tags: ['analytics']
+    required: false
+    default: '54327'
+    description: |
+      Port to the local Logflare service.
+    links: []
+
+  - id: 'analytics.vector_port'
+    title: 'analytics.vector_port'
+    tags: ['analytics']
+    required: false
+    default: '54328'
+    description: |
+      Port to the local syslog ingest service.
+    links: []
+
+  - id: 'analytics.backend'
+    title: 'analytics.backend'
+    tags: ['analytics']
+    required: false
+    default: '"postgres"'
+    description: |
+      Configure one of the supported backends:
+      
+      - `postgres`
+      - `bigquery`
+    links:
+      - name: Self-hosted Logflare Configuration
+        link: https://supabase.com/docs/reference/self-hosting-analytics/list-endpoints#getting-started

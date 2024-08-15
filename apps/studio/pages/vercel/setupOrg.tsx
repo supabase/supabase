@@ -87,7 +87,7 @@ const CreateOrganization = observer(({}) => {
   })
 
   return (
-    <div className="">
+    <div>
       {(organizations?.length ?? 0) > 0 ? (
         <p className="mb-2">Create a new organization</p>
       ) : (
@@ -151,7 +151,7 @@ const OrgSelection = observer(({}) => {
   }
 
   return (
-    <div className="">
+    <div>
       <div className="relative mt-1 mb-8">
         <Select
           label="Choose an organization"

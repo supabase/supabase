@@ -9,5 +9,12 @@
     return <IconBase icon={Search} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { search } from 'lucide-react'
+  */
   export default IconSearch
   

@@ -1,15 +1,21 @@
-import * as TabsPrimitive from '@radix-ui/react-tabs'
-import { useRouter } from 'next/router'
-import { Children, PropsWithChildren, useEffect, useState } from 'react'
-import styleHandler from '../../lib/theme/styleHandler'
-import { useTabGroup } from './TabsProvider'
+'use client'
 
-interface TabsProps {
+import * as TabsPrimitive from '@radix-ui/react-tabs'
+import {
+  Children,
+  useMemo,
+  useState,
+  type KeyboardEvent,
+  type PropsWithChildren,
+  type RefObject,
+} from 'react'
+import styleHandler from '../../lib/theme/styleHandler'
+
+export interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
   defaultActiveId?: string
   activeId?: string
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
-  queryGroup?: string
   block?: boolean
   tabBarGutter?: number
   tabBarStyle?: React.CSSProperties
@@ -20,18 +26,25 @@ interface TabsProps {
   addOnBefore?: React.ReactNode
   addOnAfter?: React.ReactNode
   listClassNames?: string
+  baseClassNames?: string
+  refs?: {
+    base: RefObject<HTMLDivElement> | ((elem: HTMLDivElement | null) => void)
+    list: RefObject<HTMLDivElement> | ((elem: HTMLDivElement | null) => void)
+  }
 }
 
 interface TabsSubComponents {
   Panel: React.FC<PropsWithChildren<PanelProps>>
 }
 
+/**
+ * @deprecated Use ./Tabs_shadcn_ instead
+ */
 const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   defaultActiveId,
   activeId,
   type = 'pills',
   size = 'tiny',
-  queryGroup,
   block,
   onChange,
   onClick,
@@ -40,52 +53,30 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   addOnBefore,
   addOnAfter,
   listClassNames,
+  baseClassNames,
+  refs,
   children: _children,
 }) => {
-  // toArray is used here to filter out invalid children
-  // another method would be to use React.Children.map
   const children = Children.toArray(_children) as PanelPropsProps[]
-  const tabIds = children.map((tab) => tab.props.id)
-
-  const router = useRouter()
-  const queryTabs = queryGroup ? router.query[queryGroup] : undefined
-  const [queryTabRaw] = Array.isArray(queryTabs) ? queryTabs : [queryTabs]
-  const queryTab = queryTabRaw && tabIds.includes(queryTabRaw) ? queryTabRaw : undefined
 
   const [activeTab, setActiveTab] = useState(
-    queryTab ??
+    activeId ??
       defaultActiveId ??
       // if no defaultActiveId is set use the first panel
       children?.[0]?.props?.id
   )
 
-  // If query param present for the query group, switch to that tab.
-  useEffect(() => {
-    if (queryTab) {
-      setActiveTab(queryTab)
-      setGroupActiveId?.(queryTab)
-    }
-  }, [queryTab])
+  useMemo(() => {
+    if (activeId && activeId !== activeTab) setActiveTab(activeId)
+  }, [activeId])
 
   let __styles = styleHandler('tabs')
 
-  const { groupActiveId, setGroupActiveId } = useTabGroup(tabIds)
-
-  const active = activeId ?? groupActiveId ?? activeTab
-
   function onTabClick(id: string) {
-    setActiveTab(id)
-    setGroupActiveId?.(id)
-
-    if (queryGroup) {
-      const url = new URL(document.location.href)
-      url.searchParams.set(queryGroup, id)
-      window.history.replaceState(undefined, '', url)
-    }
-
     onClick?.(id)
-    if (id !== active) {
+    if (id !== activeTab) {
       onChange?.(id)
+      setActiveTab(id)
     }
   }
 
@@ -95,12 +86,15 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   if (listClassNames) listClasses.push(listClassNames)
 
   return (
-    <TabsPrimitive.Root value={active} className={__styles.base}>
-      <TabsPrimitive.List className={listClasses.join(' ')}>
+    <TabsPrimitive.Root
+      value={activeTab}
+      className={[__styles.base, baseClassNames].join(' ')}
+      ref={refs?.base}
+    >
+      <TabsPrimitive.List className={listClasses.join(' ')} ref={refs?.list}>
         {addOnBefore}
         {children.map((tab) => {
-          const isActive = active === tab.props.id
-
+          const isActive = activeTab === tab.props.id
           const triggerClasses = [__styles[type].base, __styles.size[size]]
           if (isActive) {
             triggerClasses.push(__styles[type].active)
@@ -113,8 +107,8 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
 
           return (
             <TabsPrimitive.Trigger
-              onKeyDown={(e: any) => {
-                if (e.keyCode === 13) {
+              onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => {
+                if (e.key === 'Enter') {
                   e.preventDefault()
                   onTabClick(tab.props.id)
                 }
@@ -126,6 +120,7 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
             >
               {tab.props.icon}
               <span>{tab.props.label}</span>
+              {tab.props.iconRight}
             </TabsPrimitive.Trigger>
           )
         })}
@@ -145,9 +140,13 @@ interface PanelProps {
   id: string
   label?: string
   icon?: React.ReactNode
+  iconRight?: React.ReactNode
   className?: string
 }
 
+/**
+ * @deprecated Use ./TabsContent_Shadcn_ instead
+ */
 export const Panel: React.FC<PropsWithChildren<PanelProps>> = ({ children, id, className }) => {
   let __styles = styleHandler('tabs')
 

@@ -3,12 +3,17 @@ import Image from 'next/legacy/image'
 import React from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import type {
+  Integration,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
+import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-import { Badge, Button, cn, IconArrowRight, IconExternalLink, IconGitHub } from 'ui'
+import { Badge, Button, IconArrowRight, IconExternalLink, IconGitHub, cn } from 'ui'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -68,7 +73,7 @@ const Avatar = ({ src }: { src: string | undefined }) => {
 }
 
 const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInstallationProps>(
-  ({ title, integration, disabled, ...props }, ref) => {
+  ({ integration, disabled, ...props }, ref) => {
     const IntegrationIconBlock = () => {
       return (
         <div className="bg-black text-white w-8 h-8 rounded flex items-center justify-center">
@@ -100,9 +105,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
                     integration.metadata?.gitHubConnectionOwner)}
               </span>
 
-              <Badge color="scale" className="capitalize">
-                {integration.metadata?.account.type}
-              </Badge>
+              <Badge className="capitalize">{integration.metadata?.account.type}</Badge>
             </div>
             <div className="flex flex-col gap-0">
               <span className="text-foreground-lighter text-xs">
@@ -154,7 +157,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         ref={ref}
         key={connection.id}
         {...props}
-        className={cn(showNode && 'pl-8 ml-6 border-l border-muted', 'pb-2', 'relative')}
+        className={cn(showNode && 'pl-8 ml-6 border-l border-muted', 'relative')}
       >
         {showNode && (
           <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-10 -left-px"></div>
@@ -162,30 +165,56 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         <div
           className={cn(
             orientation === 'horizontal'
-              ? 'flex items-center justify-between'
+              ? 'flex items-center justify-between gap-2'
               : 'flex flex-col gap-3',
-            'bg-surface-100 border shadow-sm px-8 py-4 rounded-lg',
+            'bg-surface-100 border shadow-sm px-6 py-4 rounded-lg',
             className
           )}
         >
-          <div className={'flex flex-col gap-1'}>
-            <div className="flex gap-2 items-center">
-              <HandleIcon type={'Supabase'} />
-              <span className="text-sm">{project?.name}</span>
-              <IconArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
-              {!connection?.metadata?.framework ? (
-                <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
-                  <HandleIcon type={type} className={'!w-2.5'} />
-                </div>
-              ) : (
-                <img
-                  src={`${BASE_PATH}/img/icons/frameworks/${connection.metadata.framework}.svg`}
-                  width={21}
-                  height={21}
-                  alt={`icon`}
-                />
-              )}
-              <span className="text-sm truncate">{connection.metadata?.name}</span>
+          <div className="flex flex-col gap-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <div className="flex-shrink-0 flex gap-x-2 items-center max-w-40 ">
+                <HandleIcon type={'Supabase'} />
+                <span title={project?.name} className="text-sm truncate">
+                  {project?.name}
+                </span>
+              </div>
+
+              <IconArrowRight
+                size={14}
+                className="flex-shrink-0 text-foreground-lighter"
+                strokeWidth={1.5}
+              />
+
+              <div className="flex-1 min-w-0 flex gap-2 items-center">
+                {!connection?.metadata?.framework ? (
+                  <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
+                    <HandleIcon type={type} className={'!w-2.5'} />
+                  </div>
+                ) : (
+                  <img
+                    src={`${BASE_PATH}/img/icons/frameworks/${connection.metadata.framework}.svg`}
+                    width={21}
+                    height={21}
+                    alt={`icon`}
+                  />
+                )}
+                {type === 'GitHub' ? (
+                  <a
+                    title={connection.metadata.name}
+                    href={`https://github.com/${connection.metadata?.name}`}
+                    className="text-sm truncate"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {connection.metadata?.name}
+                  </a>
+                ) : (
+                  <span title={connection.metadata.name} className="text-sm truncate">
+                    {connection.metadata?.name}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col gap-0">
@@ -198,7 +227,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
             </div>
           </div>
 
-          <div>{actions}</div>
+          <div className="flex-shrink-0">{actions}</div>
         </div>
       </li>
     )
@@ -206,7 +235,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
 )
 
 const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationConnectionProps>(
-  ({ className, connection, type, ...props }, ref) => {
+  ({ connection, type, ...props }, ref) => {
     const { data: projects } = useProjectsQuery()
     const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
 
@@ -223,7 +252,7 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
           <div className="flex gap-2 items-center">
             <HandleIcon type={'Supabase'} />
             <span className="text-sm">{project?.name}</span>
-            <IconArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
+            <ArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
             <HandleIcon type={type} />
             <span className="text-sm">{connection.metadata.name}</span>
           </div>
@@ -245,34 +274,40 @@ const EmptyIntegrationConnection = React.forwardRef<
     showNode?: boolean
     orgSlug?: string
     onClick: () => void
+    disabled?: boolean
   }
->(({ className, showNode = true, orgSlug = '_', onClick, ...props }, ref) => {
+>(({ className, showNode = true, onClick, disabled, ...props }, ref) => {
   return (
     <div
       ref={ref}
       {...props}
       className={cn(
-        showNode && 'ml-6 pl-8  border-l',
-        'pb-2 ',
+        showNode && 'ml-6 pl-8 mt-4 border-l',
+        'relative pb-2',
         'last:border-l-transparent',
-        'relative',
         className
       )}
     >
       {showNode && (
-        <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-10 -left-px"></div>
+        <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-14 -top-4 -left-px"></div>
       )}
       <div
         className={cn(
           'w-full',
           'border border-dashed bg-surface-100 border-overlay',
-          '',
           'flex h-20 px-10 rounded-lg justify-center items-center'
         )}
       >
-        <Button type="default" onClick={() => onClick()}>
+        <ButtonTooltip
+          type="default"
+          disabled={disabled}
+          onClick={() => onClick()}
+          tooltip={{
+            content: { side: 'bottom', text: 'Additional permissions required to add connection' },
+          }}
+        >
           Add new project connection
-        </Button>
+        </ButtonTooltip>
       </div>
     </div>
   )
@@ -285,20 +320,19 @@ interface IntegrationConnectionHeader extends React.HTMLAttributes<HTMLDivElemen
 }
 
 const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, IntegrationConnectionHeader>(
-  ({ className, name, markdown = '', showNode = true, ...props }, ref) => {
+  ({ className, markdown = '', showNode = true, ...props }, ref) => {
     return (
       <div
         {...props}
         ref={ref}
         className={cn(
           showNode && 'border-l border-muted ml-6 pl-8',
-          'pt-6 pb-3',
-          'prose text-sm',
+          'py-4 prose text-sm',
           className
         )}
       >
         {props.title && <h5 className="text-foreground">{props.title}</h5>}
-        <Markdown content={markdown} className="" />
+        <Markdown content={markdown} />
       </div>
     )
   }

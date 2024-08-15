@@ -1,0 +1,162 @@
+---
+id: 'auth-facebook'
+title: 'Login with Facebook'
+description: 'Add Facebook OAuth to your Supabase project'
+---
+
+To enable Facebook Auth for your project, you need to set up a Facebook OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up Facebook logins for your application consists of 3 parts:
+
+- Create and configure a Facebook Application on the [Facebook Developers Site](https://developers.facebook.com)
+- Add your Facebook keys to your [Supabase Project](https://supabase.com/dashboard)
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Access your Facebook Developer account
+
+- Go to [developers.facebook.com](https://developers.facebook.com).
+- Click on `Log In` at the top right to log in.
+
+![Facebook Developer Portal.](/docs/img/guides/auth-facebook/facebook-portal.png)
+
+## Create a Facebook app
+
+- Click on `My Apps` at the top right.
+- Click `Create App` near the top right.
+- Select your app type and click `Continue`.
+- Fill in your app information, then click `Create App`.
+- This should bring you to the screen: `Add Products to Your App`. (Alternatively you can click on `Add Product` in the left sidebar to get to this screen.)
+
+<SocialProviderSetup provider="Facebook" />
+
+## Set up Facebook login for your Facebook app
+
+From the `Add Products to your App` screen:
+
+- Click `Setup` under `Facebook Login`
+- Skip the Quickstart screen, instead, in the left sidebar, click `Settings` under `Facebook Login`
+- Enter your callback URI under `Valid OAuth Redirect URIs` on the `Facebook Login Settings` page
+- Enter this in the `Valid OAuth Redirect URIs` box
+- Click `Save Changes` at the bottom right
+
+Be aware that you have to set the right use case permissions to enable Third party applications to read the email address. To do so:
+
+Under `Build Your App`, click on `Use Cases` screen. From there, do the following steps:
+
+- Click the Edit button in `Authentication and Account Creation` on the right side. This action will lead to the other page.
+- `public_profile` is set by default, so make sure it and `email` have status of **Ready for testing** in the redirected page.
+- If not, click the **Add** button in email on right side.
+
+## Copy your Facebook app ID and secret
+
+- Click `Settings / Basic` in the left sidebar
+- Copy your App ID from the top of the `Basic Settings` page
+- Under `App Secret` click `Show` then copy your secret
+- Make sure all required fields are completed on this screen.
+
+## Enter your Facebook app ID and secret into your Supabase project
+
+<SocialProviderSettingsSupabase provider="Facebook" />
+
+## Add login code to your client app
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+<CreateClientSnippet />
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `facebook` as the `provider`:
+
+```js
+async function signInWithFacebook() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'facebook',
+  })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `facebook` as the `provider`:
+
+```dart
+Future<void> signInWithFacebook() async {
+  await supabase.auth.signInWithOAuth(OAuthProvider.facebook);
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Facebook` as the `Provider`:
+
+```kotlin
+suspend fun signInWithFacebook() {
+	supabase.auth.signInWith(Facebook)
+}
+```
+
+</TabPanel>
+</Tabs>
+
+<OAuthPkceFlow />
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```js
+async function signOut() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```kotlin
+suspend fun signOut() {
+	supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+</Tabs>
+
+Now, you should be able to login with Facebook and alert you to `Submit for Login Review` when users try to sign into your app. Follow the instructions there to make your app go live for full features and products.
+You can read more about App Review [here](https://developers.facebook.com/docs/app-review/).
+
+## Resources
+
+- [Supabase - Get started for free](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Facebook Developers Dashboard](https://developers.facebook.com/)

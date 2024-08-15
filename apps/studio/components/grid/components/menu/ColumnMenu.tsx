@@ -1,20 +1,16 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { CalculatedColumn } from 'react-data-grid'
+import { ChevronDown, Edit, Lock, Trash, Unlock } from 'lucide-react'
+import type { CalculatedColumn } from 'react-data-grid'
+
 import {
   Button,
-  Divider,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconEdit,
-  IconLock,
-  IconTrash,
-  IconUnlock,
+  Separator,
 } from 'ui'
-
-import { useDispatch, useTrackedState } from '../../store'
+import { useDispatch, useTrackedState } from '../../store/Store'
 
 interface ColumnMenuProps {
   column: CalculatedColumn<any, unknown>
@@ -51,7 +47,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
               <DropdownMenuItem className="space-x-2" onClick={onEditColumn} disabled={isEncrypted}>
-                <IconEdit size="tiny" />
+                <Edit size={14} />
                 <p>Edit column</p>
               </DropdownMenuItem>
             </Tooltip.Trigger>
@@ -80,21 +76,21 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
         >
           {column.frozen ? (
             <>
-              <IconUnlock size="tiny" />
+              <Unlock size={14} />
               <p>Unfreeze column</p>
             </>
           ) : (
             <>
-              <IconLock size="tiny" />
+              <Lock size={14} />
               <p>Freeze column</p>
             </>
           )}
         </DropdownMenuItem>
         {state.editable && onDeleteColumn !== undefined && (
           <>
-            <Divider light />
+            <Separator />
             <DropdownMenuItem className="space-x-2" onClick={onDeleteColumn}>
-              <IconTrash size="tiny" stroke="red" />
+              <Trash size={14} stroke="red" />
               <p>Delete column</p>
             </DropdownMenuItem>
           </>
@@ -106,16 +102,13 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           <Button
-            asChild
             className="opacity-50 flex"
             type="text"
-            icon={<IconChevronDown />}
             style={{ padding: '3px' }}
-          >
-            <span></span>
-          </Button>
+            icon={<ChevronDown />}
+          />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" side="bottom">
           {renderMenu()}

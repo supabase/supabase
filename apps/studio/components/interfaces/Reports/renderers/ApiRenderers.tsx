@@ -1,17 +1,27 @@
+import sumBy from 'lodash/sumBy'
+import { ChevronRight } from 'lucide-react'
+import { Fragment, useState } from 'react'
+
+import { useParams } from 'common'
 import {
   jsonSyntaxHighlight,
   TextFormatter,
 } from 'components/interfaces/Settings/Logs/LogsFormatters'
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
 import BarChart from 'components/ui/Charts/BarChart'
-import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
-import sumBy from 'lodash/sumBy'
-import { Fragment, useState } from 'react'
-import { Button, Collapsible, IconChevronRight } from 'ui'
+import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import { ResponseError } from 'types'
+import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Button,
+  Collapsible,
+  WarningIcon,
+} from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
-import Link from 'next/link'
-import { useParams } from 'common/hooks'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -20,7 +30,7 @@ export const NetworkTrafficRenderer = (
     egress: number
   }>
 ) => {
-  const data = useFillTimeseriesSorted(
+  const { data, error, isError } = useFillTimeseriesSorted(
     props.data,
     'timestamp',
     ['ingress_mb', 'egress_mb'],
@@ -28,12 +38,29 @@ export const NetworkTrafficRenderer = (
     props.params?.iso_timestamp_start,
     props.params?.iso_timestamp_end
   )
+
   const totalIngress = sumBy(props.data, 'ingress_mb')
   const totalEgress = sumBy(props.data, 'egress_mb')
 
   function determinePrecision(valueInMb: number) {
     return valueInMb < 0.001 ? 7 : totalIngress > 1 ? 2 : 4
   }
+
+  if (!!props.error) {
+    const error = (
+      typeof props.error === 'string' ? { message: props.error } : props.error
+    ) as ResponseError
+    return <AlertError subject="Failed to retrieve network traffic" error={error} />
+  } else if (isError) {
+    return (
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
+        <AlertTitle_Shadcn_>Failed to retrieve network traffic</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <BarChart
@@ -64,6 +91,7 @@ export const NetworkTrafficRenderer = (
     </div>
   )
 }
+
 export const TotalRequestsChartRenderer = (
   props: ReportWidgetProps<{
     timestamp: string
@@ -73,7 +101,7 @@ export const TotalRequestsChartRenderer = (
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
-  const data = useFillTimeseriesSorted(
+  const { data, error, isError } = useFillTimeseriesSorted(
     props.data,
     'timestamp',
     'count',
@@ -81,6 +109,22 @@ export const TotalRequestsChartRenderer = (
     props.params?.iso_timestamp_start,
     props.params?.iso_timestamp_end
   )
+
+  if (!!props.error) {
+    const error = (
+      typeof props.error === 'string' ? { message: props.error } : props.error
+    ) as ResponseError
+    return <AlertError subject="Failed to retrieve total requests" error={error} />
+  } else if (isError) {
+    return (
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
+        <AlertTitle_Shadcn_>Failed to retrieve total requests</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
+  }
+
   return (
     <BarChart
       size="small"
@@ -108,15 +152,17 @@ export const TopApiRoutesRenderer = (
   }>
 ) => {
   const { ref: projectRef } = useParams()
-
   const [showMore, setShowMore] = useState(false)
+
+  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200 !border-x-0 !rounded-none'
+  const cellClasses = '!text-xs !py-2 !border-x-0 !rounded-none align-middle'
+
   if (props.data.length === 0) return null
-  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200'
-  const cellClasses = '!text-xs !py-2'
 
   return (
     <Collapsible>
       <Table
+        className="rounded-t-none"
         head={
           <>
             <Table.th className={headerClasses}>Request</Table.th>
@@ -129,10 +175,10 @@ export const TopApiRoutesRenderer = (
         body={
           <>
             {props.data.map((datum, index) => (
-              <Fragment key={datum.path + (datum.search || '')}>
+              <Fragment key={datum.method + datum.path + (datum.search || '')}>
                 <Table.tr
                   className={[
-                    'p-0 transition transform duration-700',
+                    'p-0 transition transform cursor-pointer hover:bg-surface-200',
                     showMore && index >= 3 ? 'w-full h-full opacity-100' : '',
                     !showMore && index >= 3 ? ' w-0 h-0 translate-y-10 opacity-0' : '',
                   ].join(' ')}
@@ -203,7 +249,7 @@ export const ErrorCountsChartRenderer = (
     return acc + datum.count
   }, 0)
 
-  const data = useFillTimeseriesSorted(
+  const { data, error, isError } = useFillTimeseriesSorted(
     props.data,
     'timestamp',
     'count',
@@ -211,6 +257,21 @@ export const ErrorCountsChartRenderer = (
     props.params?.iso_timestamp_start,
     props.params?.iso_timestamp_end
   )
+
+  if (!!props.error) {
+    const error = (
+      typeof props.error === 'string' ? { message: props.error } : props.error
+    ) as ResponseError
+    return <AlertError subject="Failed to retrieve request errors" error={error} />
+  } else if (isError) {
+    return (
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
+        <AlertTitle_Shadcn_>Failed to retrieve request errors</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
+  }
 
   return (
     <BarChart
@@ -237,7 +298,7 @@ export const ResponseSpeedChartRenderer = (
     avg: datum.avg,
   }))
 
-  const data = useFillTimeseriesSorted(
+  const { data, error, isError } = useFillTimeseriesSorted(
     transformedData,
     'timestamp',
     'avg',
@@ -247,6 +308,22 @@ export const ResponseSpeedChartRenderer = (
   )
 
   const lastAvg = props.data[props.data.length - 1]?.avg
+
+  if (!!props.error) {
+    const error = (
+      typeof props.error === 'string' ? { message: props.error } : props.error
+    ) as ResponseError
+    return <AlertError subject="Failed to retrieve response speeds" error={error} />
+  } else if (isError) {
+    return (
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
+        <AlertTitle_Shadcn_>Failed to retrieve response speeds</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
+  }
+
   return (
     <BarChart
       size="small"
@@ -271,10 +348,10 @@ interface RouteTdContentProps {
 const RouteTdContent = (datum: RouteTdContentProps) => (
   <Collapsible>
     <Collapsible.Trigger asChild>
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
         <Button asChild type="text" className=" !py-0 !p-1" title="Show more route details">
           <span>
-            <IconChevronRight
+            <ChevronRight
               size={14}
               className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
             />
@@ -290,8 +367,8 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
               datum.status_code >= 400
                 ? 'bg-orange-500'
                 : datum.status_code >= 300
-                ? 'bg-yellow-500'
-                : 'bg-green-500'
+                  ? 'bg-yellow-500'
+                  : 'bg-green-500'
             }`}
             value={String(datum.status_code)}
           />

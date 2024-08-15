@@ -1,11 +1,13 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { Query, SupaTable } from 'components/grid'
+import { Query } from 'components/grid/query/Query'
+import type { SupaTable } from 'components/grid/types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { ResponseError } from 'types'
+import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
+import type { ResponseError } from 'types'
 
 export type TableRowUpdateVariables = {
   projectRef: string
@@ -14,6 +16,7 @@ export type TableRowUpdateVariables = {
   configuration: { identifiers: any }
   payload: any
   enumArrayColumns: string[]
+  returning?: boolean
   impersonatedRole?: ImpersonationRole
 }
 
@@ -21,11 +24,15 @@ export function getTableRowUpdateSql({
   table,
   configuration,
   payload,
+  returning = false,
   enumArrayColumns,
-}: Pick<TableRowUpdateVariables, 'table' | 'payload' | 'configuration' | 'enumArrayColumns'>) {
+}: Pick<
+  TableRowUpdateVariables,
+  'table' | 'payload' | 'configuration' | 'enumArrayColumns' | 'returning'
+>) {
   return new Query()
     .from(table.name, table.schema ?? undefined)
-    .update(payload, { returning: true, enumArrayColumns })
+    .update(payload, { returning, enumArrayColumns })
     .match(configuration.identifiers)
     .toSql()
 }
@@ -37,17 +44,23 @@ export async function updateTableRow({
   payload,
   configuration,
   enumArrayColumns,
+  returning,
   impersonatedRole,
 }: TableRowUpdateVariables) {
   const sql = wrapWithRoleImpersonation(
-    getTableRowUpdateSql({ table, configuration, payload, enumArrayColumns }),
+    getTableRowUpdateSql({ table, configuration, payload, enumArrayColumns, returning }),
     {
       projectRef,
       role: impersonatedRole,
     }
   )
 
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+  })
 
   return result
 }

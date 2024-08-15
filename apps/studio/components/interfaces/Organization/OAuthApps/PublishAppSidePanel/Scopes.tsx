@@ -178,6 +178,14 @@ export const ScopesPanel = ({
         scopes={scopes}
         setScopes={setScopes}
       />
+      <Scope
+        title="Storage"
+        description="Storage buckets and files."
+        readScopeName={OAuthScope.STORAGE_READ}
+        writeScopeName={OAuthScope.STORAGE_WRITE}
+        scopes={scopes}
+        setScopes={setScopes}
+      />
     </div>
   )
 }

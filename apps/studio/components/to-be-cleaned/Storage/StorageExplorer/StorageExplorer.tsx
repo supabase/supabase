@@ -3,12 +3,9 @@ import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { Bucket } from 'data/storage/buckets-query'
-import { useStore } from 'hooks'
-import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
-import { copyToClipboard } from 'lib/helpers'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import type { Bucket } from 'data/storage/buckets-query'
+import { IS_PLATFORM } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import ConfirmDeleteModal from './ConfirmDeleteModal'
@@ -55,15 +52,11 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
 
   const storageExplorerRef = useRef(null)
 
-  const { ui } = useStore()
   const { ref } = useParams()
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
-  const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
-  const apiService = (projectSettings?.services ?? []).find(
-    (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
-  )
-  const apiConfig = apiService?.app_config
-  const apiUrl = `${apiConfig?.protocol ?? 'https'}://${apiConfig?.endpoint ?? '-'}`
+
+  // [Joshen] This is to ensure that StorageExplorerStore can get the storage file size limit
+  // Will be better once we deprecate the mobx store entirely, which we will get there
+  useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
 
   // This state exists outside of the header because FileExplorerColumn needs to listen to these as well
   // I'm keeping them outside of the mobx store as I feel that the store should contain persistent data
@@ -101,7 +94,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
           }
         }
       } else if (view === STORAGE_VIEWS.COLUMNS) {
-        const paths = openedFolders.map((folder: any) => folder.name)
+        const paths = openedFolders.map((folder) => folder.name)
         fetchFoldersByPath(paths, itemSearchString, true)
       }
     }
@@ -123,19 +116,19 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
 
   const onSelectAllItemsInColumn = (columnIndex: number) => {
     const columnFiles = columns[columnIndex].items
-      .filter((item: any) => item.type === STORAGE_ROW_TYPES.FILE)
-      .map((item: any) => {
+      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
+      .map((item) => {
         return { ...item, columnIndex }
       })
-    const columnFilesId = compact(columnFiles.map((item: any) => item.id))
-    const selectedItemsFromColumn = selectedItems.filter((item: any) =>
-      columnFilesId.includes(item.id)
+    const columnFilesId = compact(columnFiles.map((item) => item.id))
+    const selectedItemsFromColumn = selectedItems.filter(
+      (item) => item.id && columnFilesId.includes(item.id)
     )
 
     if (selectedItemsFromColumn.length === columnFiles.length) {
       // Deselect all items from column
       const updatedSelectedItems = selectedItems.filter(
-        (item: any) => !columnFilesId.includes(item.id)
+        (item) => item.id && !columnFilesId.includes(item.id)
       )
       setSelectedItems(updatedSelectedItems)
     } else {
@@ -185,25 +178,11 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     clearSelectedItems()
   }
 
-  const onCopyUrl = (name: string, url: string) => {
-    const formattedUrl =
-      customDomainData?.customDomain?.status === 'active'
-        ? url.replace(apiUrl, `https://${customDomainData.customDomain.hostname}`)
-        : url
-    copyToClipboard(formattedUrl, () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Copied URL for ${name} to clipboard.`,
-        duration: 4000,
-      })
-    })
-  }
-
   return (
     <div
       ref={storageExplorerRef}
       className="
-        bg-background
+        bg-studio
         border-overlay flex
         h-full w-full flex-col rounded-md border"
     >
@@ -230,9 +209,8 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
           onColumnLoadMore={(index, column) =>
             fetchMoreFolderContents(index, column, itemSearchString)
           }
-          onCopyUrl={onCopyUrl}
         />
-        <PreviewPane onCopyUrl={onCopyUrl} />
+        <PreviewPane />
       </div>
       <ConfirmDeleteModal
         visible={selectedItemsToDelete.length > 0}
@@ -247,7 +225,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
         onSelectCancel={clearSelectedItemsToMove}
         onSelectMove={onMoveSelectedFiles}
       />
-      <CustomExpiryModal onCopyUrl={onCopyUrl} />
+      <CustomExpiryModal />
     </div>
   )
 }

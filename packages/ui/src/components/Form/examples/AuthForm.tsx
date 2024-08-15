@@ -112,7 +112,7 @@ const CardForm = () => {
             setSubmitting(false)
           }, 400)
         }}
-        validate={(values: Values) => {
+        validate={(values) => {
           const errors: any = {}
           if (!values.jwt_expiry) {
             errors.jwt_expiry = 'This is required'
@@ -185,7 +185,7 @@ AuthFormSchema.map((provider) => {
 
 console.log('form initialState', initialState)
 
-function providersReducer(state, action) {
+function providersReducer(state: any, action: any) {
   switch (action.type) {
     case 'update':
       return Object.assign(state, action.values)
@@ -483,7 +483,7 @@ console.log('form domainInitialState', domainInitialState)
 //   }
 // }
 
-function domainsReducer(state, action) {
+function domainsReducer(state: any, action: any) {
   let _state = []
   switch (action.type) {
     case 'update':
@@ -782,7 +782,7 @@ const SmtpForm = () => {
             setSubmitting(false)
           }, 400)
         }}
-        validate={(values: Values) => {
+        validate={(values) => {
           const errors: any = {}
           if (!values.jwt_expiry) {
             errors.jwt_expiry = 'This is required'
@@ -923,7 +923,7 @@ const TemplatesForm = () => {
             setSubmitting(false)
           }, 400)
         }}
-        validate={(values: Values) => {
+        validate={(values) => {
           const errors: any = {}
           if (!values.jwt_expiry) {
             errors.jwt_expiry = 'This is required'

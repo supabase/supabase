@@ -1,60 +1,127 @@
+import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Form, Input, Modal } from 'ui'
+import toast from 'react-hot-toast'
 
-import { useParams } from 'common/hooks'
 import {
-  DatePickerToFrom,
-  LogsQueryPanel,
-  LogsTableName,
-  LogsWarning,
-  LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
-  LogTable,
-  LogTemplate,
-  maybeShowUpgradePrompt,
-  TEMPLATES,
-  useEditorHints,
-} from 'components/interfaces/Settings/Logs'
+  Button,
+  Form,
+  Input,
+  Modal,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from 'ui'
+import { IS_PLATFORM } from 'common'
+
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { LogsLayout } from 'components/layouts'
-import CodeEditor from 'components/ui/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
-import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useContentInsertMutation } from 'data/content/content-insert-mutation'
-import { useLocalStorage, useSelectedOrganization, useStore } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
-import { LogSqlSnippets, NextPageWithLayout } from 'types'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import type { LogSqlSnippets, NextPageWithLayout } from 'types'
+import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
+import LogsQueryPanel, { SourceType } from 'components/interfaces/Settings/Logs/LogsQueryPanel'
+import { createWarehouseQueryTemplates } from 'components/interfaces/Settings/Logs/Warehouse.utils'
+import {
+  maybeShowUpgradePrompt,
+  useEditorHints,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import {
+  DatePickerToFrom,
+  LogTemplate,
+  LogsWarning,
+} from 'components/interfaces/Settings/Logs/Logs.types'
+import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
+import { useLocalStorage } from '@uidotdev/usehooks'
+import {
+  LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
+  LOGS_TABLES,
+  TEMPLATES,
+} from 'components/interfaces/Settings/Logs/Logs.constants'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import LogTable from 'components/interfaces/Settings/Logs/LogTable'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 
-const PLACEHOLDER_QUERY =
+const PLACEHOLDER_WAREHOUSE_QUERY =
+  '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
+const LOCAL_PLACEHOLDER_QUERY =
+  'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
+
+const PLATFORM_PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
+
+const PLACEHOLDER_QUERY = IS_PLATFORM ? PLATFORM_PLACEHOLDER_QUERY : LOCAL_PLACEHOLDER_QUERY
+
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
-  const { ui } = useStore()
   const router = useRouter()
-  const { ref: projectRef, q, ite, its } = useParams()
+  const { ref, q, ite, its } = useParams()
+  const projectRef = ref as string
   const organization = useSelectedOrganization()
   const [editorId, setEditorId] = useState<string>(uuidv4())
+  const [warehouseEditorId, setWarehouseEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
+  const [warehouseEditorValue, setWarehouseEditorValue] = useState<string>(
+    PLACEHOLDER_WAREHOUSE_QUERY
+  )
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
+
+  const routerSource = router.query.source as SourceType
+  const [sourceType, setSourceType] = useState<SourceType>(routerSource || 'logs')
+
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const { params, logData, error, isLoading, changeQuery, runQuery, setParams } = useLogsQuery(
-    projectRef as string,
+  const {
+    params,
+    logData,
+    error,
+    isLoading: logsLoading,
+    changeQuery,
+    runQuery,
+    setParams,
+  } = useLogsQuery(
+    projectRef,
     {
       iso_timestamp_start: its ? (its as string) : undefined,
       iso_timestamp_end: ite ? (ite as string) : undefined,
+    },
+    sourceType === 'logs'
+  )
+
+  const {
+    refetch: runWarehouseQuery,
+    data: warehouseResults,
+    isFetching: warehouseFetching,
+    error: warehouseError,
+  } = useWarehouseQueryQuery(
+    { ref: projectRef, sql: warehouseEditorValue },
+    {
+      enabled: false,
     }
   )
+
+  useEffect(() => {
+    if (warehouseError) {
+      toast.error(warehouseError.message)
+    }
+  }, [warehouseError])
+
+  const isLoading = logsLoading || warehouseFetching
+
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${projectRef}-recent-log-sql`,
     []
   )
+
+  const { data: warehouseCollections } = useWarehouseCollectionsQuery({ projectRef })
+
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
       schema_version: '1',
@@ -117,9 +184,49 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
     const query = typeof value === 'string' ? value || editorValue : editorValue
+
     if (value && typeof value === 'string') {
       setEditorValue(value)
     }
+
+    if (sourceType === 'warehouse') {
+      const whQuery = warehouseEditorValue
+
+      if (!warehouseCollections?.length) {
+        toast.error('You do not have any collections in your warehouse yet.')
+        return
+      }
+
+      // Check that a collection name is included in the query
+      const collectionNames = warehouseCollections?.map((collection) => collection.name)
+      const collectionExists = collectionNames?.find((collectionName) =>
+        whQuery.includes(collectionName)
+      )
+
+      if (!collectionExists) {
+        toast.error('Please specify a collection name in the query')
+        return
+      }
+
+      // Check that the user is not trying to query logs tables and warehouse collections at the same time
+      const logsSources = Object.values(LOGS_TABLES)
+      const logsSourceExists = logsSources.find((source) => whQuery.includes(source))
+
+      if (logsSourceExists) {
+        toast.error(
+          'Cannot query logs tables from a warehouse query. Please remove the logs table from the query.'
+        )
+        return
+      }
+
+      runWarehouseQuery()
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, q: query },
+      })
+      return
+    }
+
     changeQuery(query)
     runQuery()
     router.push({
@@ -132,11 +239,24 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const handleClear = () => {
     setEditorValue('')
     setEditorId(uuidv4())
+    setWarehouseEditorId(uuidv4())
     changeQuery('')
   }
 
-  const handleInsertSource = (source: LogsTableName) => {
-    setEditorValue((prev) => prev + source)
+  const handleInsertSource = (source: string) => {
+    if (sourceType === 'warehouse') {
+      //TODO: Only one collection can be queried at a time, we need to replace the current collection from the query for the new one
+
+      setWarehouseEditorId(uuidv4())
+
+      return
+    }
+
+    setEditorValue((prev) => {
+      const index = prev.indexOf('from')
+      if (index === -1) return `${prev}${source}`
+      return `${prev.substring(0, index + 4)} ${source} ${prev.substring(index + 5)}`
+    })
     setEditorId(uuidv4())
   }
 
@@ -167,43 +287,60 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       const error = e as { message: string }
       console.error(error)
       setSaveModalOpen(false)
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to save query: ${error.message}`,
-      })
+      toast.error(`Failed to save query: ${error.message}`)
     },
     onSuccess: (values) => {
       setSaveModalOpen(false)
-      ui.setNotification({
-        category: 'success',
-        message: `Saved "${values[0].name}" log query`,
-      })
+      toast.success(`Saved "${values[0].name}" log query`)
     },
   })
 
   return (
-    <div className="w-full h-full px-5 py-6 mx-auto">
-      <LogsExplorerHeader />
-
-      <div className="flex flex-col flex-grow h-full gap-4">
-        <div className="border rounded">
+    <div className="w-full h-full mx-auto">
+      <ResizablePanelGroup
+        className="w-full h-full"
+        direction="vertical"
+        autoSaveId={LOCAL_STORAGE_KEYS.LOG_EXPLORER_SPLIT_SIZE}
+      >
+        <ResizablePanel collapsible minSize={5}>
           <LogsQueryPanel
             defaultFrom={params.iso_timestamp_start || ''}
             defaultTo={params.iso_timestamp_end || ''}
             onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
             onClear={handleClear}
-            onRun={handleRun}
             hasEditorValue={Boolean(editorValue)}
             templates={TEMPLATES.filter((template) => template.mode === 'custom')}
+            warehouseCollections={warehouseCollections || []}
             onSelectTemplate={onSelectTemplate}
+            warehouseTemplates={createWarehouseQueryTemplates(warehouseCollections || [])}
+            onSelectWarehouseTemplate={(template) => {
+              setWarehouseEditorValue(template.query)
+              setWarehouseEditorId(uuidv4())
+            }}
             onSave={handleOnSave}
             isLoading={isLoading}
             warnings={warnings}
+            dataSource={sourceType}
+            onDataSourceChange={(srcType) => {
+              setSourceType(srcType)
+              router.push({
+                pathname: router.pathname,
+                query: { ...router.query, source: srcType },
+              })
+            }}
           />
-          <div className="h-48 min-h-[7rem]">
-            <ShimmerLine active={isLoading} />
+
+          <ShimmerLine active={isLoading} />
+          {sourceType === 'warehouse' ? (
+            <CodeEditor
+              id={warehouseEditorId}
+              language="pgsql" // its bq sql but monaco doesn't have a language for it
+              defaultValue={warehouseEditorValue}
+              onInputChange={(v) => setWarehouseEditorValue(v || '')}
+              onInputRun={handleRun}
+            />
+          ) : (
             <CodeEditor
               id={editorId}
               language="pgsql"
@@ -211,24 +348,28 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               onInputChange={(v) => setEditorValue(v || '')}
               onInputRun={handleRun}
             />
-          </div>
-        </div>
-        <div className="relative flex flex-col flex-grow">
+          )}
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel collapsible minSize={5} className="flex flex-col flex-grow">
           <LoadingOpacity active={isLoading}>
-            <div className="flex flex-grow h-full">
-              <LogTable
-                params={params}
-                data={logData}
-                error={error}
-                projectRef={projectRef as string}
-              />
-            </div>
+            <LogTable
+              showHistogramToggle={false}
+              onRun={handleRun}
+              onSave={handleOnSave}
+              hasEditorValue={Boolean(editorValue)}
+              params={params}
+              data={sourceType === 'warehouse' ? warehouseResults?.result : logData}
+              error={error}
+              projectRef={projectRef}
+            />
           </LoadingOpacity>
           <div className="flex flex-row justify-end mt-2">
             <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
           </div>
-        </div>
-      </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+
       <Modal
         size="medium"
         onCancel={() => setSaveModalOpen(!saveModalOpen)}
@@ -263,38 +404,32 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         >
           {() => (
             <>
-              <div className="py-4">
-                <Modal.Content>
-                  <div className="space-y-6">
-                    <Input layout="horizontal" label="Name" id="name" />
-                    <div className="text-area-text-sm">
-                      <Input.TextArea
-                        layout="horizontal"
-                        labelOptional="Optional"
-                        label="Description"
-                        id="description"
-                        rows={2}
-                      />
-                    </div>
-                  </div>
-                </Modal.Content>
-              </div>
-              <div className="py-3 border-t bg-surface-100">
-                <Modal.Content>
-                  <div className="flex items-center justify-end gap-2">
-                    <Button
-                      size="tiny"
-                      type="default"
-                      onClick={() => setSaveModalOpen(!saveModalOpen)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button size="tiny" loading={isSubmitting} htmlType="submit">
-                      Save
-                    </Button>
-                  </div>
-                </Modal.Content>
-              </div>
+              <Modal.Content className="space-y-6">
+                <Input layout="horizontal" label="Name" id="name" />
+                <div className="text-area-text-sm">
+                  <Input.TextArea
+                    layout="horizontal"
+                    labelOptional="Optional"
+                    label="Description"
+                    id="description"
+                    rows={2}
+                  />
+                </div>
+              </Modal.Content>
+              <Modal.Separator />
+              <Modal.Content className="flex items-center justify-end gap-2">
+                <Button size="tiny" type="default" onClick={() => setSaveModalOpen(!saveModalOpen)}>
+                  Cancel
+                </Button>
+                <Button
+                  size="tiny"
+                  loading={isSubmitting}
+                  disabled={isSubmitting}
+                  htmlType="submit"
+                >
+                  Save
+                </Button>
+              </Modal.Content>
             </>
           )}
         </Form>
@@ -305,4 +440,4 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
 LogsExplorerPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
 
-export default observer(LogsExplorerPage)
+export default LogsExplorerPage

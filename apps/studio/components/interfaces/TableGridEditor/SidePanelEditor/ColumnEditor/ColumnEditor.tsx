@@ -1,35 +1,42 @@
-import type { PostgresColumn, PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
+import { ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import {
+  CONSTRAINT_TYPE,
+  Constraint,
+  useTableConstraintsQuery,
+} from 'data/database/constraints-query'
+import {
+  ForeignKeyConstraint,
+  useForeignKeyConstraintsQuery,
+} from 'data/database/foreign-key-constraints-query'
+import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
+import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import type { Dictionary } from 'types'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   Checkbox,
-  IconAlertCircle,
-  IconExternalLink,
-  IconPlus,
   Input,
   SidePanel,
   Toggle,
+  WarningIcon,
 } from 'ui'
-
-import { Dictionary } from 'components/grid'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useStore } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { ForeignKeySelector } from '..'
 import ActionBar from '../ActionBar'
+import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
+import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
-import {
+import type {
   ColumnField,
   CreateColumnPayload,
-  ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
 import ColumnDefaultValue from './ColumnDefaultValue'
@@ -38,7 +45,6 @@ import {
   generateColumnFieldFromPostgresColumn,
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
-  getColumnForeignKey,
   validateFields,
 } from './ColumnEditor.utils'
 import ColumnForeignKey from './ColumnForeignKey'
@@ -52,10 +58,12 @@ export interface ColumnEditorProps {
   closePanel: () => void
   saveChanges: (
     payload: CreateColumnPayload | UpdateColumnPayload,
-    foreignKey: ExtendedPostgresRelationship | undefined,
     isNewRecord: boolean,
     configuration: {
-      columnId: string | undefined
+      columnId?: string
+      primaryKey?: Constraint
+      foreignKeyRelations: ForeignKey[]
+      existingForeignKeyRelations: ForeignKeyConstraint[]
     },
     resolve: any
   ) => void
@@ -71,35 +79,55 @@ const ColumnEditor = ({
   updateEditorDirty = noop,
 }: ColumnEditorProps) => {
   const { ref } = useParams()
-  const { meta, vault } = useStore()
   const { project } = useProjectContext()
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
-  const [isEditingRelation, setIsEditingRelation] = useState<boolean>(false)
+  const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+
+  const { data: types } = useEnumeratedTypesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const enumTypes = (types ?? []).filter(
+    (type) => !EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+  )
+
+  const { data: constraints } = useTableConstraintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: selectedTable?.schema,
+    table: selectedTable?.name,
+  })
+  const primaryKey = (constraints ?? []).find(
+    (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
+  )
 
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: selectedTable?.schema,
   })
-  const foreignKeyMeta = data || []
-
-  const keys = vault.listKeys()
-  const enumTypes = meta.types.list((type: PostgresType) => !EXCLUDED_SCHEMAS.includes(type.schema))
 
   const isNewRecord = column === undefined
-  const originalForeignKey = column
-    ? getColumnForeignKey(column, selectedTable, foreignKeyMeta)
-    : undefined
+  const foreignKeyMeta = data || []
+  const foreignKeys = foreignKeyMeta.filter((relation) => {
+    return relation.source_id === column?.table_id && relation.source_columns.includes(column.name)
+  })
+  const lockColumnType =
+    fkRelations.find(
+      (fk) =>
+        fk.columns.find((col) => col.source === columnFields?.name) !== undefined && !fk.toRemove
+    ) !== undefined
 
   useEffect(() => {
     if (visible) {
       setErrors({})
       const columnFields = isNewRecord
-        ? { ...generateColumnField(), keyId: keys.length > 0 ? keys[0].id : 'create-new' }
-        : generateColumnFieldFromPostgresColumn(column!, selectedTable, foreignKeyMeta)
+        ? generateColumnField({ schema: selectedTable.schema, table: selectedTable.name })
+        : generateColumnFieldFromPostgresColumn(column, selectedTable, foreignKeyMeta)
       setColumnFields(columnFields)
+      setFkRelations(formatForeignKeys(foreignKeys))
     }
   }, [visible])
 
@@ -109,6 +137,22 @@ const ColumnEditor = ({
     const isTextBasedColumn = TEXT_TYPES.includes(columnFields.format)
     if (!isTextBasedColumn && changes.defaultValue === '') {
       changes.defaultValue = null
+    }
+
+    const changedName = 'name' in changes && changes.name !== columnFields.name
+
+    if (
+      changedName &&
+      fkRelations.find((fk) => fk.columns.find(({ source }) => source === columnFields?.name))
+    ) {
+      setFkRelations(
+        fkRelations.map((relation) => ({
+          ...relation,
+          columns: relation.columns.map((col) =>
+            col.source === columnFields?.name ? { ...col, source: changes.name! } : col
+          ),
+        }))
+      )
     }
 
     const updatedColumnFields = { ...columnFields, ...changes } as ColumnField
@@ -122,36 +166,6 @@ const ColumnEditor = ({
     setErrors(updatedErrors)
   }
 
-  const saveColumnForeignKey = (foreignKeyConfiguration?: {
-    table: PostgresTable
-    column: PostgresColumn
-    deletionAction: string
-    updateAction: string
-  }) => {
-    onUpdateField({
-      foreignKey:
-        foreignKeyConfiguration !== undefined
-          ? {
-              id: 0,
-              constraint_name: '',
-              source_schema: selectedTable.schema,
-              source_table_name: selectedTable.name,
-              source_column_name: columnFields?.name || column?.name || '',
-              target_table_schema: foreignKeyConfiguration.table.schema,
-              target_table_name: foreignKeyConfiguration.table.name,
-              target_column_name: foreignKeyConfiguration.column.name,
-              deletion_action: foreignKeyConfiguration.deletionAction,
-              update_action: foreignKeyConfiguration.updateAction,
-            }
-          : undefined,
-      ...(foreignKeyConfiguration !== undefined && {
-        format: foreignKeyConfiguration.column.format,
-        defaultValue: null,
-      }),
-    })
-    setIsEditingRelation(false)
-  }
-
   const onSaveChanges = (resolve: () => void) => {
     if (columnFields) {
       const errors = validateFields(columnFields)
@@ -161,11 +175,13 @@ const ColumnEditor = ({
         const payload = isNewRecord
           ? generateCreateColumnPayload(selectedTable.id, columnFields)
           : generateUpdateColumnPayload(column!, selectedTable, columnFields)
-        const foreignKey = columnFields.foreignKey
-          ? { ...columnFields.foreignKey, source_column_name: columnFields.name }
-          : undefined
-        const configuration = { columnId: column?.id }
-        saveChanges(payload, foreignKey, isNewRecord, configuration, resolve)
+        const configuration = {
+          columnId: column?.id,
+          primaryKey,
+          foreignKeyRelations: fkRelations,
+          existingForeignKeyRelations: foreignKeys,
+        }
+        saveChanges(payload, isNewRecord, configuration, resolve)
       } else {
         resolve()
       }
@@ -214,24 +230,6 @@ const ColumnEditor = ({
       <SidePanel.Separator />
       <FormSection
         header={
-          <FormSectionLabel className="lg:!col-span-4">Foreign Key Relation</FormSectionLabel>
-        }
-      >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <div>
-            <ColumnForeignKey
-              column={columnFields}
-              originalForeignKey={originalForeignKey}
-              onSelectEditRelation={() => setIsEditingRelation(true)}
-              onSelectRemoveRelation={() => onUpdateField({ foreignKey: undefined })}
-              onSelectCancelRemoveRelation={() => onUpdateField({ foreignKey: originalForeignKey })}
-            />
-          </div>
-        </FormSectionContent>
-      </FormSection>
-      <SidePanel.Separator />
-      <FormSection
-        header={
           <FormSectionLabel
             className="lg:!col-span-4"
             description={
@@ -240,7 +238,7 @@ const ColumnEditor = ({
                   asChild
                   type="default"
                   size="tiny"
-                  icon={<IconPlus size={14} strokeWidth={2} />}
+                  icon={<Plus size={14} strokeWidth={2} />}
                 >
                   <Link href={`/project/${ref}/database/types`} target="_blank" rel="noreferrer">
                     Create enum types
@@ -250,7 +248,7 @@ const ColumnEditor = ({
                   asChild
                   type="default"
                   size="tiny"
-                  icon={<IconExternalLink size={14} strokeWidth={2} />}
+                  icon={<ExternalLink size={14} strokeWidth={2} />}
                 >
                   <Link
                     href="https://supabase.com/docs/guides/database/tables#data-types"
@@ -274,7 +272,10 @@ const ColumnEditor = ({
             layout="vertical"
             enumTypes={enumTypes}
             error={errors.format}
-            disabled={columnFields?.foreignKey !== undefined}
+            description={
+              lockColumnType ? 'Column type cannot be changed as it has a foreign key relation' : ''
+            }
+            disabled={lockColumnType}
             onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
           {columnFields.foreignKey === undefined && (
@@ -309,10 +310,27 @@ const ColumnEditor = ({
               )}
             </div>
           )}
+
           <ColumnDefaultValue
             columnFields={columnFields}
             enumTypes={enumTypes}
             onUpdateField={onUpdateField}
+          />
+        </FormSectionContent>
+      </FormSection>
+
+      <SidePanel.Separator />
+
+      <FormSection
+        header={<FormSectionLabel className="lg:!col-span-4">Foreign Keys</FormSectionLabel>}
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
+          <ColumnForeignKey
+            column={columnFields}
+            relations={fkRelations}
+            closePanel={closePanel}
+            onUpdateColumnType={(format: string) => onUpdateField({ format })}
+            onUpdateFkRelations={setFkRelations}
           />
         </FormSectionContent>
       </FormSection>
@@ -359,7 +377,7 @@ const ColumnEditor = ({
           >
             <FormSectionContent loading={false} className="lg:!col-span-8">
               <Alert_Shadcn_>
-                <IconAlertCircle />
+                <WarningIcon />
                 <AlertTitle_Shadcn_>
                   Column encryption has been removed from the GUI
                 </AlertTitle_Shadcn_>
@@ -374,7 +392,7 @@ const ColumnEditor = ({
                     </Link>{' '}
                     Transparent Column Encryption (TCE).
                   </p>
-                  <Button asChild type="default" icon={<IconExternalLink />} className="mt-2">
+                  <Button asChild type="default" icon={<ExternalLink />} className="mt-2">
                     <Link
                       target="_blank"
                       rel="noreferrer"
@@ -387,15 +405,9 @@ const ColumnEditor = ({
               </Alert_Shadcn_>
             </FormSectionContent>
           </FormSection>
+          <SidePanel.Separator />
         </>
       )}
-
-      <ForeignKeySelector
-        column={columnFields}
-        visible={isEditingRelation}
-        closePanel={() => setIsEditingRelation(false)}
-        saveChanges={saveColumnForeignKey}
-      />
     </SidePanel>
   )
 }

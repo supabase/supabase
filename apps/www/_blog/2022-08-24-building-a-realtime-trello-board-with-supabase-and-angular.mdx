@@ -2,8 +2,8 @@
 title: 'Building a Realtime Trello Board with Supabase and Angular'
 description: Go beyond the hello world example with this real world project.
 author: simon_grimm
-image: simon-grimm-angular-realtime/angular-supabase.png
-thumb: simon-grimm-angular-realtime/angular-supabase.png
+image: simon-grimm-angular-realtime/angular-supabase.jpg
+thumb: simon-grimm-angular-realtime/angular-supabase.jpg
 categories:
   - engineering
 tags:
@@ -135,11 +135,11 @@ create or replace function get_boards_for_authenticated_user()
 returns setof bigint
 language sql
 security definer
-set search_path = public
+set search_path = ''
 stable
 as $$
     select board_id
-    from user_boards
+    from public.user_boards
     where user_id = auth.uid()
 $$;
 ```
@@ -177,7 +177,7 @@ create policy "Users can update their boards" on boards for
     );
 
 create policy "Users can delete their created boards" on boards for
-    delete using (auth.uid() = creator);
+    delete using ((select auth.uid()) = creator);
 
 -- user_boards row level security
 alter table user_boards enable row level security;
@@ -186,10 +186,10 @@ create policy "Users can add their boards" on user_boards for
     insert to authenticated with check (true);
 
 create policy "Users can view boards" on user_boards for
-    select using (auth.uid() = user_id);
+    select using ((select auth.uid()) = user_id);
 
 create policy "Users can delete their boards" on user_boards for
-    delete using (auth.uid() = user_id);
+    delete using ((select auth.uid()) = user_id);
 
 -- lists row level security
 alter table lists enable row level security;
@@ -614,7 +614,10 @@ import { filter, map, take } from 'rxjs/operators'
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router
+  ) {}
 
   canActivate(): Observable<boolean | UrlTree> {
     return this.auth.currentUser.pipe(

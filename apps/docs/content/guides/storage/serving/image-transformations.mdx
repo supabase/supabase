@@ -1,0 +1,544 @@
+---
+id: 'storage-image-transformations'
+title: 'Storage Image Transformations'
+description: 'Transform images with Storage'
+subtitle: 'Transform images with Storage'
+sidebar_label: 'Image Transformations'
+tocVideo: 'dLqSmxX3r7I'
+---
+
+Supabase Storage offers the functionality to optimize and resize images on the fly. Any image stored in your buckets can be transformed and optimized for fast delivery.
+
+<Admonition type="note">
+
+Image Resizing is currently enabled for [Pro Plan and above](https://supabase.com/pricing).
+
+</Admonition>
+
+## Get a public URL for a transformed image
+
+Our client libraries methods like `getPublicUrl` and `createSignedUrl` support the `transform` option. This returns the URL that serves the transformed image.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+supabase.storage.from('bucket').getPublicUrl('image.jpg', {
+  transform: {
+    width: 500,
+    height: 600,
+  },
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final url = supabase.storage.from('bucket').getPublicUrl(
+      'image.jpg',
+      transform: const TransformOptions(
+        width: 500,
+        height: 600,
+      ),
+    );
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let url = try await supabase.storage.from("bucket")
+  .getPublicURL(
+    path: "image.jpg"
+    options: TransformOptions(with: 500, height: 600)
+  )
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val url = supabase.storage.from("bucket").publicRenderUrl("image.jpg") {
+    size(width = 500, height = 600)
+}
+```
+
+</TabPanel>
+</Tabs>
+
+An example URL could look like this:
+
+`https://project_id.supabase.co/storage/v1/render/image/public/bucket/image.jpg?width=500&height=600`
+
+## Signing URLs with transformation options
+
+To share a transformed image in a private bucket for a fixed amount of time, provide the transform option when you create the signed URL:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
+  transform: {
+    width: 200,
+    height: 200,
+  },
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final url = await supabase.storage.from('bucket').createSignedUrl(
+      'image.jpg',
+      60000,
+      transform: const TransformOptions(
+        width: 200,
+        height: 200,
+      ),
+    );
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let url = try await supabase.storage.from("bucket")
+  .createSignedURL(
+    path: "image.jpg",
+    expiresIn: 60,
+    transform: TransformOptions(
+      width: 200,
+      height: 200
+    )
+  )
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val url = supabase.storage.from("bucket").createSignedUrl("image.jpg", 60.seconds) {
+	size(200, 200)
+}
+```
+
+</TabPanel>
+</Tabs>
+
+The transformation options are embedded into the token attached to the URL — they cannot be changed once signed.
+
+## Downloading images
+
+To download a transformed image, pass the `transform` option to the `download` function.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+supabase.storage.from('bucket').download('image.jpg', {
+  transform: {
+    width: 800,
+    height: 300,
+  },
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.storage.from('bucket').download(
+      'image.jpg',
+      transform: const TransformOptions(
+        width: 800,
+        height: 300,
+      ),
+    );
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let data = try await supabase.storage.from("bucket")
+  .download(
+    path: "image.jpg",
+    options: TransformOptions(
+      width: 800,
+      height: 300
+    )
+  )
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.storage.from("bucket").downloadAuthenticated("image.jpg") {
+    size(800, 300)
+}
+
+//Or on JVM stream directly to a file
+val file = File("image.jpg")
+supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
+    size(800, 300)
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Automatic image optimization (WebP)
+
+When using the image transformation API, Storage will automatically find the best format supported by the client and return that to the client, without any code change. For instance, if you use Chrome when viewing a jpeg image and using transformation options, you'll see that images are automatically optimized as `webp` images.
+
+As a result, this will lower the bandwidth that you send to your users and your application will load much faster.
+
+<Admonition type="note">
+
+We currently only support WebP. AVIF support will come in the near future.
+
+</Admonition>
+
+**Disabling automatic optimization:**
+
+In case you'd like to return the original format of the image and **opt-out** from the automatic image optimization detection, you can pass the `format=origin` parameter when requesting a transformed image, this is also supported in the JavaScript SDK starting from v2.2.0
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+await supabase.storage.from('bucket').download('image.jpeg', {
+  transform: {
+    width: 200,
+    height: 200,
+    format: 'origin',
+  },
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.storage.from('bucket').download(
+      'image.jpeg',
+      transform: const TransformOptions(
+        width: 200,
+        height: 200,
+        format: RequestImageFormat.origin,
+      ),
+    );
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let data = try await supabase.storage.from("bucket")
+  .download(
+    path: "image.jpg",
+    options: TransformOptions(
+      width: 200,
+      height: 200,
+      format: "origin"
+    )
+  )
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.storage.from("bucket").downloadAuthenticated("image.jpg") {
+    size(200, 200)
+	format = "origin"
+}
+
+//Or on JVM stream directly to a file
+val file = File("image.jpg")
+supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
+    size(200, 200)
+	format = "origin"
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Next.js loader
+
+You can use Supabase Image Transformation to optimize your Next.js images using a custom [Loader](https://nextjs.org/docs/api-reference/next/image#loader-configuration).
+
+To get started, create a `supabase-image-loader.js` file in your Next.js project which exports a default function:
+
+```ts
+const projectId = '' // your supabase project id
+
+export default function supabaseLoader({ src, width, quality }) {
+  return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&quality=${quality || 75}`
+}
+```
+
+In your `nextjs.config.js` file add the following configuration to instruct Next.js to use our custom loader
+
+```js
+module.exports = {
+  images: {
+    loader: 'custom',
+    loaderFile: './supabase-image-loader.js',
+  },
+}
+```
+
+At this point you are ready to use the `Image` component provided by Next.js
+
+```tsx
+import Image from 'next/image'
+
+const MyImage = (props) => {
+  return <Image src="bucket/image.png" alt="Picture of the author" width={500} height={500} />
+}
+```
+
+## Transformation options
+
+We currently support a few transformation options focusing on optimizing, resizing, and cropping images.
+
+### Optimizing
+
+You can set the quality of the returned image by passing a value from 20 to 100 (with 100 being the highest quality) to the `quality` parameter. This parameter defaults to 80.
+
+Example:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+supabase.storage.from('bucket').download('image.jpg', {
+  transform: {
+    quality: 50,
+  },
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.storage.from('bucket').download(
+      'image.jpg',
+      transform: const TransformOptions(
+        quality: 50,
+      ),
+    );
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let data = try await supabase.storage.from("bucket")
+  .download(
+    path: "image.jpg",
+    options: TransformOptions(
+      quality: 50
+    )
+  )
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.storage["bucket"].downloadAuthenticated("image.jpg") {
+    quality = 50
+}
+
+//Or on JVM stream directly to a file
+val file = File("image.jpg")
+supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
+    quality = 50
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Resizing
+
+You can use `width` and `height` parameters to resize an image to a specific dimension. If only one parameter is specified, the image will be resized and cropped, maintaining the aspect ratio.
+
+### Modes
+
+You can use different resizing modes to fit your needs, each of them uses a different approach to resize the image:
+
+Use the `resize` parameter with one of the following values:
+
+- `cover` : resizes the image while keeping the aspect ratio to fill a given size and crops projecting parts. (default)
+
+- `contain` : resizes the image while keeping the aspect ratio to fit a given size.
+
+- `fill` : resizes the image without keeping the aspect ratio.
+
+Example:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+supabase.storage.from('bucket').download('image.jpg', {
+  transform: {
+    width: 800,
+    height: 300,
+    resize: 'contain', // 'cover' | 'fill'
+  },
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = supabase.storage.from('bucket').download(
+      'image.jpg',
+      transform: const TransformOptions(
+        width: 800,
+        height: 300,
+        resize: ResizeMode.contain, // 'cover' | 'fill'
+      ),
+    );
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let data = try await supabase.storage.from("bucket")
+  .download(
+    path: "image.jpg",
+    options: TransformOptions(
+      width: 800,
+      height: 300,
+      resize: "contain" // "cover" | "fill"
+    )
+  )
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.storage.from("bucket").downloadAuthenticated("image.jpg") {
+    size(800, 300)
+    resize = ImageTransformation.Resize.CONTAIN
+}
+
+//Or on JVM stream directly to a file
+val file = File("image.jpg")
+supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
+    size(800, 300)
+    resize = ImageTransformation.Resize.CONTAIN
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Limits
+
+- Width and height must be an integer value between 1-2500.
+- The image size cannot exceed 25MB.
+- The image resolution cannot exceed 50MP.
+
+### Supported image formats
+
+| Format | Extension | Source | Result |
+| ------ | --------- | ------ | ------ |
+| PNG    | `png`     | ☑️     | ☑️     |
+| JPEG   | `jpg`     | ☑️     | ☑️     |
+| WebP   | `webp`    | ☑️     | ☑️     |
+| AVIF   | `avif`    | ☑️     | ☑️     |
+| GIF    | `gif`     | ☑️     | ☑️     |
+| ICO    | `ico`     | ☑️     | ☑️     |
+| SVG    | `svg`     | ☑️     | ☑️     |
+| HEIC   | `heic`    | ☑️     | ❌     |
+| BMP    | `bmp`     | ☑️     | ☑️     |
+| TIFF   | `tiff`    | ☑️     | ☑️     |
+
+## Self hosting
+
+Our solution to image resizing and optimization can be self-hosted as with any other Supabase product. Under the hood we use [Imgproxy](https://imgproxy.net/)
+
+#### Imgproxy configuration:
+
+Simply deploy an imgproxy container with the following configuration:
+
+```yaml
+imgproxy:
+  image: darthsim/imgproxy
+  environment:
+    - IMGPROXY_ENABLE_WEBP_DETECTION=true
+    - IMGPROXY_JPEG_PROGRESSIVE=true
+```
+
+Note: make sure that this service can only be reachable within an internal network and not exposed to the public internet
+
+#### Storage API configuration:
+
+Once [Imgproxy](https://imgproxy.net/) is deployed we need to configure a couple of environment variables in your self-hosted [storage-api](https://github.com/supabase/storage-api) service as follows:
+
+```shell
+ENABLE_IMAGE_TRANSFORMATION=true
+IMGPROXY_URL=yourinternalimgproxyurl.internal.com
+```
+
+{/* Finish with a video. This also appears in the Sidebar via the "tocVideo" metadata */}
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/dLqSmxX3r7I"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>

@@ -239,7 +239,7 @@ const TableOfContents = (props: any) => {
                     onClick={() => scrollTo(chapter.key)}
                   >
                     <p className="font-mono text-xs text-foreground">{`0${chapter.no}`}</p>
-                    <p className="ml-4 text-base text-black transition border-b border-default hover:text-foreground">
+                    <p className="ml-4 text-base text-foreground-light transition border-b border-default hover:text-foreground">
                       {chapter.name}
                     </p>
                   </div>
@@ -535,7 +535,7 @@ const NewFeaturesAndIntegrations = () => {
               If you're new to Supabase, here's a few of the things you get when you choose us as
               your backend.
             </p>
-            <ul className="">
+            <ul>
               <li className="mb-10">
                 <p className="w-20 pb-2 mb-2 border-b-2 border-default">Auth</p>
                 <p className="mb-5">
@@ -550,7 +550,7 @@ const NewFeaturesAndIntegrations = () => {
                   </a>{' '}
                   (and{' '}
                   <a
-                    href="/docs/gotrue/server/about#endpoints"
+                    href="/docs/guides/auth/architecture#client-layer"
                     target="_blank"
                     className="text-brand hover:text-brand"
                   >
@@ -692,7 +692,7 @@ const BetaPricing = () => (
             </li>
           </ul>
           <p>
-            The Supabase Base plan is now called the Supabase Pro plan as per the{' '}
+            The Supabase Base plan is now called the Supabase Pro Plan as per the{' '}
             <a href="https://supabase.com/pricing" className="text-brand hover:text-brand">
               pricing page
             </a>
