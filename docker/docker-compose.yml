@@ -10,7 +10,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20240729-ce42139
+    image: supabase/studio:20240812-111a9d5
     restart: unless-stopped
     healthcheck:
       test:
