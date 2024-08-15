@@ -12,7 +12,6 @@ import { cn } from '../../lib/utils/cn'
 import { useFormContext } from '../Form/FormContext'
 import { IconCheck } from '../Icon/icons/IconCheck'
 import { SelectContext } from './SelectContext'
-import { Select_Shadcn_ } from 'ui'
 
 export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>, 'size'> {
   className?: string

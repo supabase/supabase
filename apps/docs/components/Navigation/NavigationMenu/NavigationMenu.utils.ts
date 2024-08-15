@@ -1,8 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ICommonItem } from '~/components/reference/Reference.types'
-import { Json } from '~/types'
+import { usePathname } from 'next/navigation'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import type { ICommonItem } from '~/components/reference/Reference.types'
+import type { Json } from '~/features/helpers.types'
+import { menuState } from '../../../hooks/useMenuState'
 
 export function getPathWithoutHash(relativePath: string) {
   return new URL(relativePath, 'http://placeholder').pathname
@@ -94,4 +97,47 @@ export function useSpec(specFile?: string) {
   }, [specFile])
 
   return spec
+}
+
+export const getMenuId = (pathname: string | null) => {
+  pathname = (pathname ??= '').replace(/^\/guides\//, '')
+
+  switch (true) {
+    case pathname.startsWith('ai'):
+      return MenuId.Ai
+    case pathname.startsWith('api'):
+      return MenuId.Api
+    case pathname.startsWith('auth'):
+      return MenuId.Auth
+    case pathname.startsWith('cli'):
+      return MenuId.Cli
+    case pathname.startsWith('database'):
+      return MenuId.Database
+    case pathname.startsWith('functions'):
+      return MenuId.Functions
+    case pathname.startsWith('getting-started'):
+      return MenuId.GettingStarted
+    case pathname.startsWith('graphql'):
+      return MenuId.Graphql
+    case pathname.startsWith('platform'):
+      return MenuId.Platform
+    case pathname.startsWith('realtime'):
+      return MenuId.Realtime
+    case pathname.startsWith('resources'):
+      return MenuId.Resources
+    case pathname.startsWith('self-hosting'):
+      return MenuId.SelfHosting
+    case pathname.startsWith('storage'):
+      return MenuId.Storage
+    default:
+      return MenuId.GettingStarted
+  }
+}
+
+export const useCloseMenuOnRouteChange = () => {
+  const pathname = usePathname()
+
+  useEffect(() => {
+    menuState.setMenuMobileOpen(false)
+  }, [pathname])
 }

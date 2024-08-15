@@ -2,6 +2,12 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { compact, debounce, isEqual, noop } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import APIDocsButton from 'components/ui/APIDocsButton'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
   DropdownMenu,
@@ -26,12 +32,6 @@ import {
   IconX,
   Input,
 } from 'ui'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import APIDocsButton from 'components/ui/APIDocsButton'
-import { useCheckPermissions } from 'hooks'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 
 const VIEW_OPTIONS = [

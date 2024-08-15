@@ -98,6 +98,15 @@ const config = {
         },
       },
     },
+    hook_timeouts: {
+      postgres_hooks: {
+        value: 2,
+      },
+      http_hooks: {
+        value: 5,
+
+      },
+    }
   },
   branching: {
     inactivity_period_in_minutes: {

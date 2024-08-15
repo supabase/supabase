@@ -14,7 +14,7 @@ import {
 import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   ProjectRoleConfiguration,

@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
@@ -11,8 +11,10 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -36,7 +38,7 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useTableQuery } from 'data/tables/table-query'
 
 const TableEditorMenu = () => {
   const router = useRouter()
@@ -58,7 +60,6 @@ const TableEditorMenu = () => {
     isSuccess,
     isError,
     error,
-    refetch,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
@@ -67,7 +68,7 @@ const TableEditorMenu = () => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       schema: snap.selectedSchemaName,
-      search: searchText || undefined,
+      search: searchText.trim() || undefined,
       sort,
       filterTypes: visibleTypes,
     },
@@ -89,16 +90,27 @@ const TableEditorMenu = () => {
   const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
   const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
-  const refreshTables = async () => {
-    await refetch()
-  }
-
-  refreshTables
   const [protectedSchemas] = partition(
     (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
     (schema) => EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+
+  const { data: selectedTable } = useTableQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      id: Number(id),
+    },
+    // only run if we have a selected table
+    { enabled: Boolean(id) }
+  )
+
+  useEffect(() => {
+    if (selectedTable) {
+      snap.setSelectedSchemaName(selectedTable.schema)
+    }
+  }, [selectedTable])
 
   return (
     <>
@@ -162,7 +174,7 @@ const TableEditorMenu = () => {
               name="search-tables"
               aria-labelledby="Search tables"
               onChange={(e) => {
-                setSearchText(e.target.value.trim())
+                setSearchText(e.target.value)
               }}
               value={searchText}
               placeholder="Search tables..."

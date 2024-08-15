@@ -1,5 +1,8 @@
+import { ExternalLink } from 'lucide-react'
+
 import { useParams } from 'common'
-import { FormHeader, FormPanel } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import {
@@ -7,9 +10,8 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconAlertCircle,
-  IconExternalLink,
   Tabs,
+  WarningIcon,
 } from 'ui'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
@@ -38,7 +40,7 @@ const EmailTemplates = () => {
           description="Customize the emails that will be sent out to your users."
         />
         <div className="mb-6">
-          <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+          <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <a
               target="_blank"
               rel="noreferrer"
@@ -51,7 +53,7 @@ const EmailTemplates = () => {
       </div>
       {isError && (
         <Alert_Shadcn_ variant="destructive">
-          <IconAlertCircle strokeWidth={2} />
+          <WarningIcon />
           <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
         </Alert_Shadcn_>

@@ -53,6 +53,7 @@ const nextConfig = {
       'img.youtube.com',
       'archbee-image-uploads.s3.amazonaws.com',
       'obuldanrptloktxcffvn.supabase.co',
+      'xguihxuzqibwxjnimxev.supabase.co',
     ],
   },
   // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
@@ -62,17 +63,12 @@ const nextConfig = {
       transform: 'lodash/{{member}}',
     },
   },
-  transpilePackages: [
-    'ui',
-    'ui-patterns',
-    'common',
-    'mermaid',
-    'mdx-mermaid',
-    'dayjs',
-    'shared-data',
-    'api-types',
-    'icons',
-  ],
+  transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
+  experimental: {
+    outputFileTracingIncludes: {
+      '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
+    },
+  },
   /**
    * The SQL to REST API translator relies on libpg-query, which packages a
    * native Node.js module that wraps the Postgres query parser.
@@ -154,6 +150,15 @@ const nextConfig = {
         permanent: false,
       },
     ]
+  },
+  typescript: {
+    // WARNING: production builds can successfully complete even there are type errors
+    // Typechecking is checked separately via .github/workflows/typecheck.yml
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    ignoreDuringBuilds: true,
   },
 }
 

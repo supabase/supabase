@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 
 import SignInForm from 'components/interfaces/SignIn/SignInForm'
 import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
-import { SignInLayout } from 'components/layouts'
+import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'

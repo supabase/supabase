@@ -80,7 +80,7 @@ const CliCommandSection = (props) => {
                   <ReactMarkdown>{command.description}</ReactMarkdown>
                 </div>
               ) : (
-                <p className="capitalize mb-4 scroll-mt-16 mt-0 text-foreground-light text-base">
+                <p className="capitalize mb-4 scroll-mt-24 mt-0 text-foreground-light text-base">
                   {command.summary}
                 </p>
               )}

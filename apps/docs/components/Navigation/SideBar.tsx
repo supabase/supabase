@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/legacy/image'
 import { usePathname } from 'next/navigation'
 import { IconChevronRight, IconArrowLeft } from '~/../../packages/ui'
-import { REFERENCES } from './NavigationMenu/NavigationMenu.constants'
+import { REFERENCES } from '~/content/navigation.references'
 
 import { NavMenuGroup, NavMenuSection } from './Navigation.types'
 import * as Accordion from '@radix-ui/react-accordion'
@@ -43,7 +43,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
 
   return (
     <div
-      className="bg-background border-muted sidebar-width sticky top-16
+      className="bg-background border-muted sidebar-width sticky top-44
       h-screen overflow-y-scroll border-r py-8 px-6 sidebar-menu-container hidden lg:block"
     >
       {isInReferencePages && (

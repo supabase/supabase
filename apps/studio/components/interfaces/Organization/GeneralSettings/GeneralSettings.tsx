@@ -7,16 +7,15 @@ import toast from 'react-hot-toast'
 import { useParams } from 'common'
 import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from 'lib/constants'
 import { Collapsible, Form, IconChevronRight, Input, Toggle, cn } from 'ui'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
@@ -26,10 +25,10 @@ const GeneralSettings = () => {
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
   const selectedOrganization = useSelectedOrganization()
-  const { name, opt_in_tags } = selectedOrganization ?? {}
+  const { name } = selectedOrganization ?? {}
 
   const formId = 'org-general-settings'
-  const isOptedIntoAi = opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL)
+  const isOptedIntoAi = useOrgOptedIntoAi()
   const initialValues = { name: name ?? '', isOptedIntoAi }
 
   const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')

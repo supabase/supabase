@@ -1,3 +1,5 @@
+// Ignore barrel file rule here since it's just exporting more constants
+// eslint-disable-next-line barrel-files/avoid-re-export-all
 export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
@@ -39,7 +41,10 @@ export const LOCAL_STORAGE_KEYS = {
 
   SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
   SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
-  SQL_EDITOR_AI_SCHEMA: 'supabase_sql-editor-ai-schema-enabled',
+  SQL_EDITOR_AI_PANEL_SPLIT_SIZE: 'supabase_sql-editor-ai-panel-split-size',
+
+  // Key to track which schemas are ok to be sent to AI. The project ref is intentionally put at the end for easier search in the browser console.
+  SQL_EDITOR_AI_SCHEMA: (ref: string) => `supabase_sql-editor-ai-schema-enabled-${ref}`,
   SQL_EDITOR_AI_OPEN: 'supabase_sql-editor-ai-open',
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',

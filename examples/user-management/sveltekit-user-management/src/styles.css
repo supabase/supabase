@@ -370,3 +370,18 @@ button.primary,
 	animation: spin 1s linear infinite;
 	filter: invert(1);
 }
+
+.form-widget .error {
+	color: #ff3131;
+	font-size: 0.8rem;
+	font-weight: 300;
+}
+.form-widget .fail {
+	background-color: #ff2d2d30;
+	border: 1px solid #9c0000;
+}
+.form-widget .success {
+	background-color: #2dff8430;
+	border: 1px solid var(--custom-color-brand);
+	padding: 20px;
+}

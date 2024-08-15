@@ -4,8 +4,10 @@ import { readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
+
 import { genGuideMeta, genGuidesStaticParams } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
@@ -16,7 +18,7 @@ import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 const org = 'supabase'
 const repo = 'wrappers'
 const branch = 'main'
-const docsDir = 'docs'
+const docsDir = 'docs/catalog'
 const externalSite = 'https://supabase.github.io/wrappers'
 
 // Each external docs page is mapped to a local page
@@ -78,6 +80,13 @@ const pageMap = [
     remoteFile: 'mssql.md',
   },
   {
+    slug: 'paddle',
+    meta: {
+      title: 'Paddle',
+    },
+    remoteFile: 'paddle.md',
+  },
+  {
     slug: 'redis',
     meta: {
       title: 'Redis',
@@ -90,6 +99,13 @@ const pageMap = [
       title: 'AWS S3',
     },
     remoteFile: 's3.md',
+  },
+  {
+    slug: 'snowflake',
+    meta: {
+      title: 'Snowflake',
+    },
+    remoteFile: 'snowflake.md',
   },
   {
     slug: 'stripe',
@@ -159,7 +175,7 @@ const getContent = async (params: Params) => {
     ;({ remoteFile, meta } = federatedPage)
     const repoPath = `${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
     editLink = `${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`
-    const response = await fetch(`https://raw.githubusercontent.com/${repoPath}`)
+    const response = await fetchRevalidatePerDay(`https://raw.githubusercontent.com/${repoPath}`)
     content = await response.text()
   }
 

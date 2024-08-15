@@ -16,7 +16,7 @@ import Papa from 'papaparse'
 import toast from 'react-hot-toast'
 
 import { IS_PLATFORM } from 'common'
-import { parseSupaTable } from 'components/grid'
+import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
@@ -218,9 +218,25 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
         <Tooltip.Trigger className="min-w-4" asChild>
           {entity.type === ENTITY_TYPE.TABLE ? (
-            <Table2 size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+            <Table2
+              size={15}
+              strokeWidth={1.5}
+              className={cn(
+                'text-foreground-muted group-hover:text-foreground-lighter',
+                isActive && 'text-foreground-lighter',
+                'transition-colors'
+              )}
+            />
           ) : entity.type === ENTITY_TYPE.VIEW ? (
-            <Eye size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+            <Eye
+              size={15}
+              strokeWidth={1.5}
+              className={cn(
+                'text-foreground-muted group-hover:text-foreground-lighter',
+                isActive && 'text-foreground-lighter',
+                'transition-colors'
+              )}
+            />
           ) : (
             <div
               className={cn(

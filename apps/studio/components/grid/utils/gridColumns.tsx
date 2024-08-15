@@ -1,25 +1,21 @@
 import { CalculatedColumn } from 'react-data-grid'
 
-import {
-  BooleanEditor,
-  DateEditor,
-  DateTimeEditor,
-  DateTimeWithTimezoneEditor,
-  JsonEditor,
-  NumberEditor,
-  SelectEditor,
-  TextEditor,
-  TimeEditor,
-  TimeWithTimezoneEditor,
-} from 'components/grid/components/editor'
-import {
-  BooleanFormatter,
-  DefaultFormatter,
-  ForeignKeyFormatter,
-  JsonFormatter,
-} from 'components/grid/components/formatter'
-import { AddColumn, ColumnHeader, SelectColumn } from 'components/grid/components/grid'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
+import { BooleanEditor } from '../components/editor/BooleanEditor'
+import { DateEditor } from '../components/editor/DateEditor'
+import { DateTimeEditor, DateTimeWithTimezoneEditor } from '../components/editor/DateTimeEditor'
+import { JsonEditor } from '../components/editor/JsonEditor'
+import { NumberEditor } from '../components/editor/NumberEditor'
+import { SelectEditor } from '../components/editor/SelectEditor'
+import { TextEditor } from '../components/editor/TextEditor'
+import { TimeEditor, TimeWithTimezoneEditor } from '../components/editor/TimeEditor'
+import { BooleanFormatter } from '../components/formatter/BooleanFormatter'
+import { DefaultFormatter } from '../components/formatter/DefaultFormatter'
+import { ForeignKeyFormatter } from '../components/formatter/ForeignKeyFormatter'
+import { JsonFormatter } from '../components/formatter/JsonFormatter'
+import { AddColumn } from '../components/grid/AddColumn'
+import { ColumnHeader } from '../components/grid/ColumnHeader'
+import { SelectColumn } from '../components/grid/SelectColumn'
 import type { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
   isArrayColumn,
@@ -198,7 +194,7 @@ function getCellRenderer(
       return BooleanFormatter
     }
     case 'foreign_key': {
-      if (columnDef.isPrimaryKey || !columnDef.isUpdatable) {
+      if (!columnDef.isUpdatable) {
         return DefaultFormatter
       } else {
         // eslint-disable-next-line react/display-name

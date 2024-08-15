@@ -136,7 +136,7 @@ class MainActivity : ComponentActivity() {
 
 ### Provide Supabase instances with Hilt
 
-To make the app easier to test, create a `SupabaseMdule.kt` file as follows:
+To make the app easier to test, create a `SupabaseModule.kt` file as follows:
 
 ```kotlin
 @InstallIn(SingletonComponent::class)
@@ -303,14 +303,18 @@ class ProductRepositoryImpl @Inject constructor(
                     set("price", price)
                     set("image", buildImageUrl(imageFileName = imageUrl))
                 }) {
-                    eq("id", id)
+                    filter {
+                        eq("id", id)
+                    }
                 }
             } else {
                 postgrest.from("products").update({
                     set("name", name)
                     set("price", price)
                 }) {
-                    eq("id", id)
+                    filter {
+                        eq("id", id)
+                    }
                 }
             }
         }

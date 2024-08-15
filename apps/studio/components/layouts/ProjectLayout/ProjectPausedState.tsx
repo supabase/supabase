@@ -15,7 +15,9 @@ import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-q
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useFlag, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -29,7 +31,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import { useProjectContext } from './ProjectContext'
 import { RestorePaidPlanProjectNotice } from './RestorePaidPlanProjectNotice'
 

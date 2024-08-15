@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ResponseError } from 'types'
 import { subscriptionKeys } from './keys'
 
@@ -50,4 +50,17 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
       ...options,
     }
   )
+}
+
+export const useHasAccessToProjectLevelPermissions = (slug: string) => {
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+  const { data: subscription } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: canReadSubscriptions }
+  )
+
+  return subscription?.plan.id === 'enterprise'
 }

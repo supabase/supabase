@@ -1,10 +1,11 @@
+import { User } from 'lucide-react'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useSignOut } from 'lib/auth'
 import { useProfile } from 'lib/profile'
-import { useTheme } from 'next-themes'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,16 +17,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-  IconUser,
+  singleThemes,
+  Theme,
 } from 'ui'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 const UserSettingsDropdown = () => {
   const signOut = useSignOut()
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const { profile } = useProfile()
-  const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
+  const setCommandMenuOpen = useSetCommandMenuOpen()
   const { theme, setTheme } = useTheme()
 
   const onClickLogout = async () => {
@@ -40,7 +42,7 @@ const UserSettingsDropdown = () => {
           id="user-settings-dropdown"
           className="flex items-center justify-center border font-bold rounded-full h-7 w-7 text-foreground-light bg-surface-100"
         >
-          {profile?.first_name ? profile?.first_name?.[0] : <IconUser size={14} strokeWidth={2} />}
+          {profile?.first_name ? profile?.first_name?.[0] : <User size={14} strokeWidth={2} />}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
@@ -83,9 +85,11 @@ const UserSettingsDropdown = () => {
               setTheme(x)
             }}
           >
-            <DropdownMenuRadioItem value={'system'}>System</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value={'dark'}>Dark</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value={'light'}>Light</DropdownMenuRadioItem>
+            {singleThemes.map((theme: Theme) => (
+              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                {theme.name}
+              </DropdownMenuRadioItem>
+            ))}
           </DropdownMenuRadioGroup>
 
           <DropdownMenuSeparator />

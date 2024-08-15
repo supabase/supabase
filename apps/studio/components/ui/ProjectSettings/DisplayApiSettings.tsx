@@ -6,7 +6,7 @@ import { useParams } from 'common/hooks'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import { AlertCircle, BookOpen, Loader2 } from 'lucide-react'
 

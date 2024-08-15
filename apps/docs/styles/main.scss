@@ -3,8 +3,7 @@
 @tailwind utilities;
 
 @import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/dark.css';
-@import './../../../packages/ui/build/css/themes/deep-dark.css';
+@import './../../../packages/ui/build/css/themes/dark-combined.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
 @font-face {
@@ -29,6 +28,7 @@
 
 :root {
   --sidebar-width: 300px;
+  --header-height: 50px;
 }
 
 body {
@@ -267,6 +267,10 @@ article p code {
   height: unset !important;
 }
 
+#docs-content-container #introduction {
+  @apply scroll-mt-60;
+}
+
 /* dat.GUI */
 
 .dg.ac {
@@ -277,6 +281,14 @@ article p code {
 
 th code {
   @apply text-nowrap;
+}
+
+/* 
+ * Prevents very long code lines (checksums, URLs, etc., from breaking table
+ * widths
+ */
+.prose :where(td) code {
+  @apply break-all;
 }
 
 /* Zoomable image */
@@ -296,4 +308,37 @@ th code {
 }
 [data-rmiz-modal-img] {
   image-rendering: high-quality;
+}
+
+/* Loaders */
+
+.shimmering-loader {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    hsl(var(--border-default)) 4%,
+    hsl(var(--background-surface-200)) 25%,
+    hsl(var(--border-default)) 36%
+  );
+  background-size: 1000px 100%;
+}
+
+.dark .shimmering-loader {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    hsl(var(--border-default)) 4%,
+    hsl(var(--border-control)) 25%,
+    hsl(var(--border-default)) 36%
+  );
+  background-size: 1000px 100%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
 }

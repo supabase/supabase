@@ -10,10 +10,12 @@ import { ScaffoldContainer, ScaffoldContainerLegacy } from 'components/layouts/S
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import AlertError from 'components/ui/AlertError'
 import InformationBox from 'components/ui/InformationBox'
+import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { Button, IconInfo, Listbox } from 'ui'
 import { Restriction } from '../BillingSettings/Restriction'
@@ -22,7 +24,6 @@ import Bandwidth from './Bandwidth'
 import Compute from './Compute'
 import SizeAndCounts from './SizeAndCounts'
 import TotalUsage from './TotalUsage'
-import NoPermission from 'components/ui/NoPermission'
 
 const Usage = () => {
   const { slug, projectRef } = useParams()

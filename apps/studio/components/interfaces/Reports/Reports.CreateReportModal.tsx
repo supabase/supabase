@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 
 import { useContentInsertMutation } from 'data/content/content-insert-mutation'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { Button, Form, Input, Modal } from 'ui'
 

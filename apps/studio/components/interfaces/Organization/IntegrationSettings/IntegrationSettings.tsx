@@ -17,7 +17,9 @@ import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorizat
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useCheckPermissions, useFlag, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import {
   GITHUB_INTEGRATION_INSTALLATION_URL,

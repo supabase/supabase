@@ -11,7 +11,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Alert, Button, IconX, Input } from 'ui'
 import AuthorizedAppRow from './AuthorizedAppRow'
 import DeleteAppModal from './DeleteAppModal'
@@ -61,7 +61,7 @@ const OAuthApps = () => {
   if (!canReadOAuthApps) {
     return (
       <ScaffoldContainerLegacy>
-        <NoPermission resourceText="view invoices" />
+        <NoPermission resourceText="view OAuth apps" />
       </ScaffoldContainerLegacy>
     )
   }

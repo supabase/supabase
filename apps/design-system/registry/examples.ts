@@ -332,6 +332,54 @@ export const examples: Registry = [
     files: ['example/command-dialog.tsx'],
   },
   {
+    name: 'commandmenu-demo',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-demo.tsx'],
+  },
+  {
+    name: 'commandmenu-badge',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-badge.tsx'],
+  },
+  {
+    name: 'commandmenu-icon',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-icon.tsx'],
+  },
+  {
+    name: 'commandmenu-hidden',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-hidden.tsx'],
+  },
+  {
+    name: 'commandmenu-force',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-force.tsx'],
+  },
+  {
+    name: 'commandmenu-conditional',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-conditional.tsx'],
+  },
+  {
+    name: 'commandmenu-subpage',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-subpage.tsx'],
+  },
+  {
+    name: 'commandmenu-subpage-custom',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-subpage-custom.tsx'],
+  },
+  {
     name: 'context-menu-demo',
     type: 'components:example',
     registryDependencies: ['context-menu'],
@@ -665,12 +713,24 @@ export const examples: Registry = [
     registryDependencies: ['slider'],
     files: ['example/slider-demo.tsx'],
   },
-  // {
-  //   name: 'sonner-demo',
-  //   type: 'components:example',
-  //   registryDependencies: ['sonner'],
-  //   files: ['example/sonner-demo.tsx'],
-  // },
+  {
+    name: 'sonner-demo',
+    type: 'components:example',
+    registryDependencies: ['sonner'],
+    files: ['example/sonner-demo.tsx'],
+  },
+  {
+    name: 'sonner-types',
+    type: 'components:example',
+    registryDependencies: ['sonner'],
+    files: ['example/sonner-types.tsx'],
+  },
+  {
+    name: 'sonner-upload',
+    type: 'components:example',
+    registryDependencies: ['sonner'],
+    files: ['example/sonner-upload.tsx'],
+  },
   {
     name: 'switch-demo',
     type: 'components:example',
@@ -1051,6 +1111,16 @@ export const examples: Registry = [
     files: ['example/modal-hide-footer.tsx'],
   },
   {
+    name: 'assistant-chat-demo',
+    type: 'components:example',
+    files: ['example/assistant-chat-demo.tsx'],
+  },
+  {
+    name: 'assistant-chat-commands',
+    type: 'components:example',
+    files: ['example/assistant-chat-commands.tsx'],
+  },
+  {
     name: 'color-usage-surface-www-and-docs',
     type: 'docs:example',
     files: ['example/color-usage-surface-www-and-docs.tsx'],
@@ -1064,5 +1134,10 @@ export const examples: Registry = [
     name: 'color-usage-surface-studio-frame',
     type: 'docs:example',
     files: ['example/color-usage-surface-studio-frame.tsx'],
+  },
+  {
+    name: 'expanding-textarea-demo',
+    type: 'docs:example',
+    files: ['example/expanding-textarea-demo.tsx'],
   },
 ]

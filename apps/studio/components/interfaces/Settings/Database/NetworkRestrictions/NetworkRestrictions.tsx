@@ -5,11 +5,12 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FormHeader, FormPanel } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Badge,
   Button,

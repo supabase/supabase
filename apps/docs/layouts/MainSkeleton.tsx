@@ -1,16 +1,18 @@
 'use client'
 
-import { useTheme } from 'next-themes'
-import Image from 'next/legacy/image'
-import Link from 'next/link'
-import { type PropsWithChildren, memo, useEffect } from 'react'
+import dynamic from 'next/dynamic'
+import { memo, useEffect, type PropsWithChildren, type ReactNode } from 'react'
+
 import { cn } from 'ui'
-import Footer from '~/components/Navigation/Footer'
-import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
-import NavigationMenu, { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+
+import DefaultNavigationMenu, {
+  MenuId,
+} from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
+
+const Footer = dynamic(() => import('~/components/Navigation/Footer'))
 
 const levelsData = {
   home: {
@@ -158,60 +160,52 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
   return (
     <div
       className={cn(
-        'transition-all ease-out z-10',
+        'lg:hidden px-3.5 border-b z-10',
+        'transition-all ease-out',
         'top-0',
         mobileMenuOpen && 'absolute',
-        'flex items-center h-[var(--header-height,40px)]',
-        mobileMenuOpen ? 'gap-0' : 'gap-3'
+        'flex items-center',
+        mobileMenuOpen ? 'gap-0' : 'gap-1'
       )}
     >
       <button
-        className={[
-          'h-8 w-8 flex group items-center justify-center mr-2',
-          mobileMenuOpen && 'mt-0.5',
-        ].join(' ')}
+        className={cn(
+          'h-8 w-8 flex group items-center justify-center mr-1',
+          mobileMenuOpen && 'mt-0.5'
+        )}
         onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
       >
         <div
-          className={[
+          className={cn(
             'space-y-1  cursor-pointer relative',
-            mobileMenuOpen ? 'w-4 h-4' : 'w-4 h-[8px]',
-          ].join(' ')}
+            mobileMenuOpen ? 'w-4 h-4' : 'w-4 h-[8px]'
+          )}
         >
           <span
-            className={[
+            className={cn(
               'transition-all ease-out block w-4 h-px bg-foreground-muted group-hover:bg-foreground',
-              !mobileMenuOpen ? 'w-4' : 'absolute rotate-45 top-[6px]',
-            ].join(' ')}
-          ></span>
+              !mobileMenuOpen ? 'w-4' : 'absolute rotate-45 top-[6px]'
+            )}
+          />
           <span
-            className={[
+            className={cn(
               'transition-all ease-out block h-px bg-foreground-muted group-hover:bg-foreground',
-              !mobileMenuOpen ? 'w-3 group-hover:w-4' : 'absolute w-4 -rotate-45 top-[2px]',
-            ].join(' ')}
-          ></span>
+              !mobileMenuOpen ? 'w-3 group-hover:w-4' : 'absolute w-4 -rotate-45 top-[2px]'
+            )}
+          />
         </div>
       </button>
-      <div className={[].join(' ')}>
-        <HomeMenuIconPicker
-          icon={menuLevel ? levelsData[menuLevel].icon : 'home'}
-          className={[
-            'transition-all duration-200',
-            mobileMenuOpen ? 'invisible w-0 h-0' : 'w-4 h-4',
-          ].join(' ')}
-        />
-      </div>
       <span
-        className={[
+        className={cn(
           'transition-all duration-200',
           'text-foreground',
-          mobileMenuOpen ? 'text-xs' : 'text-sm',
-        ].join(' ')}
+          mobileMenuOpen ? 'text-xs' : 'text-sm'
+        )}
       >
         {mobileMenuOpen
           ? 'Close'
           : menuLevel
-            ? levelsData[menuLevel].name
+            ? levelsData[menuLevel]?.name
             : levelsData['home'].name}
       </span>
     </div>
@@ -235,7 +229,7 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
 
   return (
     <div
-      className={[
+      className={cn(
         'h-full',
         'left-0',
         'right-0',
@@ -243,28 +237,10 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
         'backdrop-blur-sm backdrop-filter bg-alternative/90',
         mobileMenuOpen ? 'absolute h-full w-full top-0 left-0' : 'hidden h-0',
         // always hide on desktop
-        'lg:hidden',
-      ].join(' ')}
+        'lg:hidden'
+      )}
       onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
     ></div>
-  )
-})
-
-const HeaderLogo = memo(function HeaderLogo() {
-  const { resolvedTheme } = useTheme()
-  return (
-    <Link href="/" className="px-10 flex items-center gap-2">
-      <Image
-        className="cursor-pointer"
-        src={
-          resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
-        }
-        width={96}
-        height={24}
-        alt="Supabase Logo"
-      />
-      <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
-    </Link>
   )
 })
 
@@ -272,121 +248,130 @@ const Container = memo(function Container({
   children,
   className,
 }: PropsWithChildren<{ className?: string }>) {
-  const mobileMenuOpen = useMenuMobileOpen()
-
   return (
-    <div
+    <main
       // used by layout to scroll to top
       id={DOCS_CONTENT_CONTAINER_ID}
       className={cn(
-        /**
-         * This controls scroll restoration on page navigation, so the overflow
-         * must be on the element with DOCS_CONTENT_CONTAINER_ID
-         */
-        'overflow-auto',
-        'w-full transition-all ease-out',
-        mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
+        'w-full transition-all ease-out relative',
         // desktop override any margin styles
         'lg:ml-0',
         className
       )}
     >
-      {children}
-    </div>
+      <div className="flex flex-col sticky top-0">{children}</div>
+    </main>
   )
 })
 
-const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) {
+const NavContainer = memo(function NavContainer({ children }: PropsWithChildren) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
     <nav
       aria-labelledby="main-nav-title"
-      className={[
-        // 'hidden',
-        'absolute lg:relative',
-        mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0 z-20' : 'w-0 -left-[280px]',
+      className={cn(
+        'fixed lg:relative z-40 lg:z-auto',
+        mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-full',
         'lg:w-[420px] !lg:left-0',
+        'lg:top-[var(--header-height)] lg:sticky',
+        'h-screen lg:h-[calc(100vh-var(--header-height))]',
         // desktop override any left styles
         'lg:left-0',
         'transition-all',
-        'top-0',
+        'top-0 bottom-0',
         'flex flex-col ml-0',
-      ].join(' ')}
+        'border-r',
+        'lg:overflow-y-auto'
+      )}
     >
       <div
-        className={[
-          'top-0',
-          'relative',
-          'w-auto',
-          'border-r overflow-auto h-screen',
+        className={cn(
+          'top-0 lg:top-[var(--header-height)]',
+          'h-full',
+          'relative lg:sticky',
+          'w-full lg:w-auto',
+          'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
           'backdrop-blur backdrop-filter bg-background',
-          'flex flex-col',
-        ].join(' ')}
+          'flex flex-col flex-grow'
+        )}
       >
-        <h1 id="main-nav-title" className="sr-only">
+        <span id="main-nav-title" className="sr-only">
           Main menu
-        </h1>
-        <div className="top-0 sticky z-10">
-          <div>
-            <div>
-              <div
-                className={[
-                  'hidden lg:flex lg:height-auto',
-                  'pt-8 bg-background flex-col gap-8',
-                ].join(' ')}
-              >
-                <HeaderLogo />
-              </div>
-              <div className="h-4 bg-background w-full"></div>
-              <div className="bg-gradient-to-b from-background to-transparent h-4 w-full"></div>
-            </div>
-          </div>
+        </span>
+        <div className="top-0 sticky h-0 z-10">
+          <div className="bg-gradient-to-b from-background to-transparent h-4 w-full"></div>
         </div>
         <div
-          className={[
+          className={cn(
             'transition-all ease-out duration-200',
-            'absolute left-0 right-0 h-screen',
-            'px-5 pl-5 py-16',
-            'top-[0px]',
+            'absolute left-0 right-0',
+            'px-5 pl-5 pt-6 pb-16 lg:pb-32',
             'bg-background',
             // desktop styles
-            'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
-            'lg:opacity-100 lg:visible',
-          ].join(' ')}
+            'lg:relative lg:left-0 lg:pb-10 lg:px-10 lg:flex',
+            'lg:opacity-100 lg:visible'
+          )}
         >
-          <NavigationMenu menuId={menuId} />
+          {children}
         </div>
       </div>
     </nav>
   )
 })
 
-function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }>) {
+interface SkeletonProps extends PropsWithChildren {
+  menuId?: MenuId
+  NavigationMenu?: ReactNode
+}
+
+function TopNavSkeleton({ children }) {
   return (
-    <div className="flex flex-row h-full">
-      <NavContainer menuId={menuId} />
-      <Container className="[--header-height:40px] lg:[--header-height:60px]">
-        <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
+    <div className="flex flex-col h-full w-full">
+      <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
+        <TopNavBar />
+      </div>
+      {children}
+    </div>
+  )
+}
+
+function SidebarSkeleton({ children, menuId, NavigationMenu }: SkeletonProps) {
+  const mobileMenuOpen = useMenuMobileOpen()
+  const hideSideNav = !menuId
+
+  return (
+    <div className="flex flex-row h-full relative">
+      {!hideSideNav && (
+        <NavContainer>{NavigationMenu ?? <DefaultNavigationMenu menuId={menuId} />}</NavContainer>
+      )}
+      <Container>
+        <div
+          className={cn(
+            'flex lg:hidden w-full top-0 left-0 right-0 z-50',
+            hideSideNav && 'sticky',
+            mobileMenuOpen && 'z-10'
+          )}
+        >
           <TopNavBar />
         </div>
         <div
-          className={[
-            'sticky transition-all top-0',
-            'z-10',
-            'backdrop-blur backdrop-filter bg-background',
-          ].join(' ')}
+          className={cn(
+            'sticky',
+            'transition-all top-0 z-10',
+            'backdrop-blur backdrop-filter bg-background'
+          )}
         >
-          <div className={['lg:hidden', 'px-3.5', 'border-b z-10'].join(' ')}>
-            <MobileHeader menuId={menuId} />
-          </div>
+          {!hideSideNav && <MobileHeader menuId={menuId} />}
         </div>
-        {children}
-        <Footer />
+        <div className="grow">
+          {children}
+          <Footer />
+        </div>
         <MobileMenuBackdrop />
       </Container>
     </div>
   )
 }
 
-export { MainSkeleton }
+export { TopNavSkeleton, SidebarSkeleton }

@@ -1,13 +1,13 @@
 'use client'
 
 import { Loader2 } from 'lucide-react'
-import React, { ChangeEvent, createRef, useEffect } from 'react'
-import { TextArea } from 'ui/src/components/shadcn/ui/text-area'
+import React, { ChangeEvent, useRef } from 'react'
+import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
-  /* The ref for the textarea */
-  textAreaRef: React.RefObject<HTMLTextAreaElement>
+  /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
+  textAreaRef?: React.RefObject<HTMLTextAreaElement>
   /* The loading state of the form */
   loading: boolean
   /* The disabled state of the form */
@@ -45,29 +45,8 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
     },
     ref
   ) => {
-    const formRef = createRef<HTMLFormElement>()
-    const submitRef = createRef<HTMLButtonElement>()
-
-    /**
-     * This effect is used to resize the textarea based on the content
-     */
-    useEffect(() => {
-      if (textAreaRef) {
-        if (!value && textAreaRef && textAreaRef.current) {
-          textAreaRef.current.style.height = '40px'
-        } else if (textAreaRef && textAreaRef.current) {
-          const newHeight = textAreaRef.current.scrollHeight + 'px'
-          textAreaRef.current.style.height = newHeight
-        }
-      }
-    }, [value, textAreaRef])
-
-    /**
-     * This effect is used to focus the textarea when the component mounts
-     */
-    useEffect(() => {
-      textAreaRef?.current?.focus()
-    }, [value, textAreaRef])
+    const formRef = useRef<HTMLFormElement>(null)
+    const submitRef = useRef<HTMLButtonElement>(null)
 
     /**
      * This function is used to handle the "Enter" key press
@@ -95,21 +74,15 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
             {icon}
           </div>
         )}
-        <TextArea
+        <ExpandingTextArea
           ref={textAreaRef}
           autoFocus
-          rows={1}
           disabled={disabled}
-          contentEditable
-          aria-expanded={false}
-          className={cn(
-            icon ? 'pl-12' : '',
-            'transition-all text-sm pr-10 rounded-[18px] resize-none box-border leading-6'
-          )}
+          className={cn(icon ? 'pl-12' : '', 'text-sm pr-10 rounded-[18px]')}
           placeholder={placeholder}
           spellCheck={false}
           value={value}
-          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onValueChange(event)}
+          onChange={(event) => onValueChange(event)}
           onKeyDown={handleKeyDown}
         />
         <div className="absolute right-1.5 top-1.5 flex gap-3 items-center">

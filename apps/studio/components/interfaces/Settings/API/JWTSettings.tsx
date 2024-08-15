@@ -23,7 +23,7 @@ import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { uuidv4 } from 'lib/helpers'
 import {
   Alert,
@@ -38,9 +38,9 @@ import {
   DropdownMenuTrigger,
   Input,
   Modal,
+  WarningIcon,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
