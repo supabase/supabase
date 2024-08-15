@@ -33,6 +33,7 @@ import { useMaterializedViewsQuery } from 'data/materialized-views/materialized-
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useViewsQuery } from 'data/views/views-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -71,6 +72,7 @@ const TableList = ({
   const { ref } = useParams()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [filterString, setFilterString] = useState<string>('')
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
@@ -86,7 +88,7 @@ const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
+      schema: selectedSchema,
       sortByProperty: 'name',
       includeColumns: true,
     },
@@ -109,7 +111,7 @@ const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
+      schema: selectedSchema,
     },
     {
       select(views) {
@@ -130,7 +132,7 @@ const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
+      schema: selectedSchema,
     },
     {
       select(materializedViews) {
@@ -153,7 +155,7 @@ const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
+      schema: selectedSchema,
     },
     {
       select(foreignTables) {
@@ -177,7 +179,7 @@ const TableList = ({
   const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
     (x) => visibleTypes.includes(x.type)
   )
-  const isLocked = EXCLUDED_SCHEMAS.includes(snap.selectedSchemaName || '')
+  const isLocked = EXCLUDED_SCHEMAS.includes(selectedSchema)
 
   const error = tablesError || viewsError || materializedViewsError || foreignTablesError
   const isError = isErrorTables || isErrorViews || isErrorMaterializedViews || isErrorForeignTables
@@ -203,8 +205,8 @@ const TableList = ({
               className="w-[260px]"
               size="small"
               showError={false}
-              selectedSchemaName={snap.selectedSchemaName}
-              onSelectSchema={snap.setSelectedSchemaName}
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={setSelectedSchema}
             />
             <Popover_Shadcn_>
               <PopoverTrigger_Shadcn_ asChild>
@@ -276,7 +278,7 @@ const TableList = ({
         )}
       </div>
 
-      {isLocked && <ProtectedSchemaWarning schema={snap.selectedSchemaName} entity="tables" />}
+      {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="tables" />}
 
       {isLoading && <GenericSkeletonLoader />}
 
@@ -305,7 +307,7 @@ const TableList = ({
             body={
               <>
                 {entities.length === 0 && filterString.length === 0 && (
-                  <Table.tr key={snap.selectedSchemaName}>
+                  <Table.tr key={selectedSchema}>
                     <Table.td colSpan={7}>
                       {visibleTypes.length === 0 ? (
                         <>
@@ -331,7 +333,7 @@ const TableList = ({
                                     .join(
                                       ', '
                                     )}, and ${formatTooltipText(visibleTypes[visibleTypes.length - 1])}s`}{' '}
-                            found in the schema "{snap.selectedSchemaName}"
+                            found in the schema "{selectedSchema}"
                           </p>
                         </>
                       )}
@@ -339,7 +341,7 @@ const TableList = ({
                   </Table.tr>
                 )}
                 {entities.length === 0 && filterString.length > 0 && (
-                  <Table.tr key={snap.selectedSchemaName}>
+                  <Table.tr key={selectedSchema}>
                     <Table.td colSpan={7}>
                       <p className="text-sm text-foreground">No results found</p>
                       <p className="text-sm text-foreground-light">
@@ -517,7 +519,7 @@ const TableList = ({
                                             if (canUpdateTables && !isLocked) {
                                               onDeleteTable({
                                                 ...x,
-                                                schema: snap.selectedSchemaName,
+                                                schema: selectedSchema,
                                               })
                                             }
                                           }}

@@ -24,6 +24,7 @@ import type { Entity } from 'data/entity-types/entity-type-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { getTable } from 'data/tables/table-query'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   DropdownMenu,
@@ -49,6 +50,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 }) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+  const { selectedSchema } = useQuerySchemaState()
 
   const isActive = Number(id) === entity.id
 
@@ -61,7 +63,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     'rls_disabled_in_public',
     ['ERROR'],
     lints,
-    snap.selectedSchemaName
+    selectedSchema
   ).hasLint
 
   const viewHasLints: boolean = getEntityLintDetails(
@@ -69,7 +71,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     'security_definer_view',
     ['ERROR', 'WARN'],
     lints,
-    snap.selectedSchemaName
+    selectedSchema
   ).hasLint
 
   const materializedViewHasLints: boolean = getEntityLintDetails(
@@ -77,7 +79,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     'materialized_view_in_api',
     ['ERROR', 'WARN'],
     lints,
-    snap.selectedSchemaName
+    selectedSchema
   ).hasLint
 
   const formatTooltipText = (entityType: string) => {
@@ -318,7 +320,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
             <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
               <Link
                 key="view-policies"
-                href={`/project/${projectRef}/auth/policies?schema=${snap.selectedSchemaName}&search=${entity.id}`}
+                href={`/project/${projectRef}/auth/policies?schema=${selectedSchema}&search=${entity.id}`}
               >
                 <Lock size={12} />
                 <span>View Policies</span>
