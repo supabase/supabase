@@ -3745,36 +3745,54 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.enroll'
     notes: |
       Enrolls a new factor.
-      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - Use `FactorType.TOTP` or `FactorType.Phone` as the factorType and use the returned id to create a challenge.
       - To create a challenge, see [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify).
       - To create and verify a challenge in a single step, see [`mfa.createChallengeAndVerify()`](/docs/reference/kotlin/auth-mfa-challengeandverify).
     params:
       - name: factorType
         isOptional: false
-        type: FactorType<R>
-        description: The type of MFA factor to enroll. Currently only supports `FactorType.TOTP`.
+        type: FactorType<C, R>
+        description: The type of MFA factor to enroll. Currently supports `FactorType.TOTP` and `FactorType.Phone`.
       - name: issuer
         isOptional: true
         type: String?
         description: Domain which the user is enrolling with.
-      - name: friendlyName
+      - name: config
         isOptional: true
-        type: String?
-        description: Human readable name assigned to a device.
+        type: Config.() -> Unit
+        description: Factor type specific configuration.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
         isSpotlight: true
         code: |
           ```kotlin
-          val factor = supabase.auth.mfa.enroll(factorType = FactorType.TOTP)
+          val factor = supabase.auth.mfa.enroll(factorType = FactorType.TOTP, friendlyName = "Your friendly Name") {
+                // Optional
+                issuer = "example.com"
+          }
 
           // Use the id to create a challenge.
           // The challenge can be verified by entering the code generated from the authenticator app.
           // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
           val (id, type, qrCode) = factor.data //qrCode is a svg as a string
           val (factorId, factorType, _) = factor
+          val challenge = supabase.auth.mfa.createChallenge(factor.id)
+          ```
+      - id: enroll-phone-factor
+        name: Enroll a Phone Factor
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val factor = supabase.auth.mfa.enroll(factorType = FactorType.Phone, friendlyName = "Your friendly Name") {
+                phone = "+123456789" 
+          }
+
+          // Use the id to create a challenge and send an SMS with a code to the user.
+          val (phone) = factor.data
+          val (factorId, factorType, _) = factor
+          val challenge = supabase.auth.mfa.createChallenge(factor.id)
           ```
       - id: get-local-verified-factors
         name: Check the local user for verified factors
@@ -3797,11 +3815,16 @@ functions:
       Creates a challenge for a factor.
       - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify).
+      - A phone factor sends a code to the user upon challenge. The channel defaults to `Phone.Channel.SMS` unless otherwise specified.
     params:
       - name: factorId
         isOptional: false
         type: String
         description: The id of the MFA factor you want to create a challenge for.
+      - name: channel
+        isOptional: true
+        type: Phone.Channel?
+        description: The channel to send the challenge to. Defaults to `Phone.Channel.SMS`.
     examples:
       - id: create-mfa-challenge
         name: Create a challenge for a factor

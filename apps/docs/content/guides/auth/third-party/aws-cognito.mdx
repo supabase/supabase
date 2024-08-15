@@ -93,6 +93,38 @@ Future<void> main() async {
 
 </TabPanel>
 
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+import com.amplifyframework.auth.AuthSession
+import com.amplifyframework.auth.cognito.AWSCognitoAuthSession
+import com.amplifyframework.core.Amplify
+
+val supabase = createSupabaseClient(
+    "https://<supabase-project>.supabase.co",
+    "SUPABASE_ANON_KEY"
+) {
+    accessToken = {
+        getAccessToken()
+    }
+}
+
+suspend fun getAccessToken(): String? {
+    return suspendCoroutine {
+        Amplify.Auth.fetchAuthSession(
+            { result: AuthSession ->
+                val cognitoAuthSession = result as AWSCognitoAuthSession
+                it.resume(cognitoAuthSession.userPoolTokensResult.value?.accessToken)
+            },
+            { _ ->
+                // Handle error
+            })
+    }
+}
+```
+
+</TabPanel>
+
 </Tabs>
 
 ## Add a new Third-Party Auth integration to your project
