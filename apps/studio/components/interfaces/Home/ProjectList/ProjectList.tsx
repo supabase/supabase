@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
-import { PartnerIcon } from 'components/ui/partner-icon'
+import PartnerIcon from 'components/ui/PartnerIcon'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import {

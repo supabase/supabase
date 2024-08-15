@@ -6,7 +6,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
 import type { SidebarLink, SidebarSection } from './AccountLayout.types'
-import { PartnerIcon } from 'components/ui/partner-icon'
+import PartnerIcon from 'components/ui/PartnerIcon'
 
 interface WithSidebarProps {
   title: string

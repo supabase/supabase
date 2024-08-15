@@ -23,7 +23,7 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { PartnerIcon } from 'components/ui/partner-icon'
+import PartnerIcon from 'components/ui/PartnerIcon'
 
 interface OrganizationDropdownProps {
   isNewNav?: boolean

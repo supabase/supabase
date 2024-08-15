@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { PartnerIcon } from 'components/ui/partner-icon'
+import PartnerIcon from 'components/ui/PartnerIcon'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
