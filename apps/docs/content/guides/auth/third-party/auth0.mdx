@@ -84,6 +84,24 @@ Future<void> main() async {
 
 </TabPanel>
 
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+import com.auth0.android.result.Credentials
+
+val supabase = createSupabaseClient(
+    "https://<supabase-project>.supabase.co",
+    "SUPABASE_ANON_KEY"
+) {
+    accessToken = {
+        val credentials: Credentials = ...; // Get credentials from Auth0
+        credentials.accessToken
+    }
+}
+```
+
+</TabPanel>
+
 </Tabs>
 
 ## Add a new Third-Party Auth integration to your project
