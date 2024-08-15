@@ -1,22 +1,22 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
 import { useState } from 'react'
+
+import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs/Logs.constants'
+import Table from 'components/to-be-cleaned/Table'
+import { copyToClipboard } from 'lib/helpers'
+import { Clipboard } from 'lucide-react'
 import { logConstants } from 'shared-data'
 import {
   Button,
   IconBookOpen,
   IconCheck,
-  IconClipboard,
   IconExternalLink,
   IconList,
   IconX,
   SidePanel,
   Tabs,
 } from 'ui'
-
-import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs'
-import Table from 'components/to-be-cleaned/Table'
-import { copyToClipboard } from 'lib/helpers'
 
 export interface LogsExplorerHeaderProps {
   subtitle?: string
@@ -178,7 +178,7 @@ const Field = ({
         ) : (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
-              <IconClipboard size="tiny" strokeWidth={1.5} />
+              <Clipboard size={14} strokeWidth={1.5} />
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">

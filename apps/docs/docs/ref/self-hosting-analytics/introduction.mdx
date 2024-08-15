@@ -43,7 +43,7 @@ Two compose services are required: Logflare, and Vector. Logflare is the HTTP An
 
 Regardless of the backend chosen, the following environment variables **must** be set for the `supabase/logflare` docker image:
 
-- `LOGFLARE_SINGLE_TENANT_MODE=true`: The feature flag for enabling single tenant mode for Logflare. Must be set to `true`
+- `LOGFLARE_SINGLE_TENANT=true`: The feature flag for enabling single tenant mode for Logflare. Must be set to `true`
 - `LOGFLARE_SUPABASE_MODE=true`: The feature flag for seeding Supabase-related data. Must be set to `true`
 
 For all other configuration environment variables, please refer to the [Logflare self-hosting documentation](https://docs.logflare.app/self-hosting/#configuration).

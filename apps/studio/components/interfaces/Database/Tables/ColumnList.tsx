@@ -1,31 +1,27 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
+import { ChevronLeft, Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  IconEdit,
-  IconMoreVertical,
-  IconPlus,
-  IconSearch,
-  IconTrash,
-  Input,
-} from 'ui'
 
 import { useParams } from 'common'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useTable from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { ChevronLeft } from 'lucide-react'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Input,
+} from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {
@@ -42,6 +38,7 @@ const ColumnList = ({
   const { id, ref } = useParams()
   const [filterString, setFilterString] = useState<string>('')
   const { data: selectedTable, error, isError, isLoading, isSuccess } = useTable(Number(id))
+  const isTableEntity = 'live_rows_estimate' in ((selectedTable as PostgresTable) || {})
 
   const columns =
     (filterString.length === 0
@@ -68,18 +65,14 @@ const ColumnList = ({
             placeholder="Filter columns"
             value={filterString}
             onChange={(e: any) => setFilterString(e.target.value)}
-            icon={<IconSearch size="tiny" />}
+            icon={<Search size={12} />}
           />
         </div>
-        {!isLocked && (
+        {!isLocked && isTableEntity && (
           <div>
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
-                <Button
-                  disabled={!canUpdateColumns}
-                  icon={<IconPlus />}
-                  onClick={() => onAddColumn()}
-                >
+                <Button disabled={!canUpdateColumns} icon={<Plus />} onClick={() => onAddColumn()}>
                   New column
                 </Button>
               </Tooltip.Trigger>
@@ -155,12 +148,10 @@ const ColumnList = ({
                       <code className="text-xs">{x.format}</code>
                     </Table.td>
                     <Table.td className="text-right">
-                      {!isLocked && (
+                      {!isLocked && isTableEntity && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button type="default" className="px-1">
-                              <IconMoreVertical />
-                            </Button>
+                            <Button type="default" className="px-1" icon={<MoreVertical />} />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="bottom" align="end" className="w-32">
                             <DropdownMenuItem
@@ -169,7 +160,7 @@ const ColumnList = ({
                             >
                               <Tooltip.Root delayDuration={0}>
                                 <Tooltip.Trigger className="flex items-center space-x-2">
-                                  <IconEdit size="tiny" />
+                                  <Edit size={12} />
                                   <p>Edit column</p>
                                 </Tooltip.Trigger>
                                 {!canUpdateColumns && (
@@ -198,7 +189,7 @@ const ColumnList = ({
                             >
                               <Tooltip.Root delayDuration={0}>
                                 <Tooltip.Trigger className="flex items-center space-x-2">
-                                  <IconTrash stroke="red" size="tiny" />
+                                  <Trash stroke="red" size={12} />
                                   <p>Delete column</p>
                                 </Tooltip.Trigger>
                                 {!canUpdateColumns && (

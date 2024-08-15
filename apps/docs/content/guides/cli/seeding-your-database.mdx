@@ -50,12 +50,43 @@ COPY countries (name, code) FROM 'seed/countries.csv' WITH (FORMAT csv);
 
 ## Generating seed data
 
-You can generate seed data for local development using [Snaplet](https://www.snaplet.dev/).
+You can generate seed data for local development using [Snaplet](https://github.com/snaplet/seed).
 
-If this is your first time using Snaplet to seed your project, you'll need to setup Snaplet
-for your project with `npx @snaplet/seed init`, and follow the interactive prompts. The command
-will look at your database and its structure, and use it to generate the configuration files
-and assets needed by `@snaplet/seed`.
+<Admonition type="tip">
+
+To use Snaplet, you need to have Node.js and npm installed. You can add Node.js to your project by running `npm init -y` in your project directory.
+
+</Admonition>
+
+If this is your first time using Snaplet to seed your project, you'll need to set up Snaplet with the following command:
+
+```bash
+npx @snaplet/seed init
+```
+
+This command will analyze your database and its structure, and then generate a JavaScript client which can be used to define exactly how your data should be generated using code. The `init` command generates a configuration file, `seed.config.ts` and an example script, `seed.ts`, as a starting point.
+
+<Admonition type="tip">
+
+During `init` if you are not using an Object Relational Mapper (ORM) or your ORM is not in the supported list, choose `node-postgres`.
+
+</Admonition>
+
+In most cases you only want to generate data for specific schemas or tables. This is defined with `select`. Here is an example `seed.config.ts` configuration file:
+
+```ts
+export default defineConfig({
+  adapter: async () => {
+    const client = new Client({
+      connectionString: 'postgresql://postgres:postgres@localhost:54322/postgres',
+    })
+    await client.connect()
+    return new SeedPg(client)
+  },
+  // We only want to generate data for the public schema
+  select: ['!*', 'public.*'],
+})
+```
 
 Suppose you have a database with the following schema:
 
@@ -116,7 +147,24 @@ INSERT INTO "User" (name, email) VALUES ("Steven Plank", "s@plank.org")
 INSERT INTO "Comment" (text, userId, postId) VALUES ("Actually, that's not correct...", 4, 1)
 ```
 
-Whenever your database structure changes, `@snaplet/seed` will need to be regenerated so that it is
-in sync with your new database structure. You can do this by running `npx @snaplet/seed sync`.
+Whenever your database structure changes, you will need to regenerate `@snaplet/seed` to keep it in sync with the new structure. You can do this by running:
 
-For more information, check out Snaplet's [seed documentation](https://docs.snaplet.dev/seed/integrations/supabase)
+```bash
+npx @snaplet/seed sync
+```
+
+You can further enhance your seed script by using Large Language Models to generate more realistic data. To enable this feature, set one of the following environment variables in your `.env` file:
+
+```plaintext
+OPENAI_API_KEY=<your_openai_api_key>
+GROQ_API_KEY=<your_groq_api_key>
+```
+
+After setting the environment variables, run the following commands to sync and generate the seed data:
+
+```bash
+npx @snaplet/seed sync
+npx tsx seed.ts > supabase/seed.sql
+```
+
+For more information, check out Snaplet's [seed documentation](https://snaplet-seed.netlify.app/seed/integrations/supabase)

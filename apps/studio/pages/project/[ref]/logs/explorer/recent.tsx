@@ -1,13 +1,13 @@
-import { useParams } from 'common'
 import Link from 'next/link'
-import { Button, IconClock } from 'ui'
 
+import { useParams } from 'common'
 import RecentQueriesItem from 'components/interfaces/Settings/Logs/RecentQueriesItem'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
-import { useLocalStorage } from 'hooks'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
+import { Button, IconClock } from 'ui'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()

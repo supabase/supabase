@@ -1,28 +1,32 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
+import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { IconLoader, SidePanel } from 'ui'
 
-import { parseSupaTable } from 'components/grid'
-import { formatFilterURLParams, formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
+import {
+  formatFilterURLParams,
+  formatSortURLParams,
+  parseSupaTable,
+} from 'components/grid/SupabaseGrid.utils'
 import RefreshButton from 'components/grid/components/header/RefreshButton'
-import { FilterPopover } from 'components/grid/components/header/filter'
+import FilterPopover from 'components/grid/components/header/filter/FilterPopover'
 import { SortPopover } from 'components/grid/components/header/sort'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useTableQuery } from 'data/tables/table-query'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import { SidePanel } from 'ui'
 import ActionBar from '../../ActionBar'
+import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { useEncryptedColumns } from '../../SidePanelEditor.utils'
 import Pagination from './Pagination'
 import SelectorGrid from './SelectorGrid'
 
 export interface ForeignRowSelectorProps {
   visible: boolean
-  foreignKey?: ForeignKeyConstraint
-  onSelect: (value: any) => void
+  foreignKey?: ForeignKey
+  onSelect: (value?: { [key: string]: any }) => void
   closePanel: () => void
 }
 
@@ -34,12 +38,7 @@ const ForeignRowSelector = ({
 }: ForeignRowSelectorProps) => {
   const { project } = useProjectContext()
 
-  const {
-    target_id: _tableId,
-    target_schema: schemaName,
-    target_table: tableName,
-    target_columns: columnName,
-  } = foreignKey ?? {}
+  const { tableId: _tableId, schema: schemaName, table: tableName, columns } = foreignKey ?? {}
   const tableId = _tableId ? Number(_tableId) : undefined
 
   const { data: table } = useTableQuery({
@@ -64,7 +63,7 @@ const ForeignRowSelector = ({
 
   const [params, setParams] = useState<any>({ filter: [], sort: [] })
 
-  const sorts = formatSortURLParams(params.sort ?? [])
+  const sorts = formatSortURLParams(table?.name || '', params.sort ?? [])
   const filters = formatFilterURLParams(params.filter ?? [])
 
   const rowsPerPage = 100
@@ -108,7 +107,7 @@ const ForeignRowSelector = ({
         <div className="h-full">
           {isLoading && (
             <div className="flex h-full py-6 flex-col items-center justify-center space-y-2">
-              <IconLoader className="animate-spin" />
+              <Loader2 size={14} className="animate-spin" />
               <p className="text-sm text-foreground-light">Loading rows</p>
             </div>
           )}
@@ -164,7 +163,12 @@ const ForeignRowSelector = ({
                 <SelectorGrid
                   table={supaTable}
                   rows={data.rows}
-                  onRowSelect={(row) => onSelect(row[columnName?.[0] ?? ''])}
+                  onRowSelect={(row) => {
+                    const value = columns?.reduce((a, b) => {
+                      return { ...a, [b.source]: row[b.target] }
+                    }, {})
+                    onSelect(value)
+                  }}
                 />
               ) : (
                 <div className="flex h-full items-center justify-center border-b border-t border-default">

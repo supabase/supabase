@@ -9,7 +9,7 @@
 
 ```tsx
 import { NextPage } from 'next'
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 
 // Import the corresponding layout based on the page
 import { Layout } from 'components/layouts'

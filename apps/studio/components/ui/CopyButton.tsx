@@ -1,6 +1,8 @@
-import { Button, ButtonProps, IconCheck, IconClipboard } from 'ui'
-import { copyToClipboard } from 'lib/helpers'
+import { Check, Clipboard } from 'lucide-react'
 import { useEffect, useState } from 'react'
+
+import { copyToClipboard } from 'lib/helpers'
+import { Button, ButtonProps } from 'ui'
 
 export interface CopyButtonProps extends ButtonProps {
   text: string
@@ -27,16 +29,16 @@ const CopyButton = ({
 
   return (
     <Button
-      onClick={(e) => {
+      onClick={async (e) => {
         setShowCopied(true)
-        copyToClipboard(text)
+        await copyToClipboard(text)
         onClick?.(e)
       }}
       icon={
         showCopied ? (
-          <IconCheck size="tiny" strokeWidth={2} className="text-brand" />
+          <Check size={14} strokeWidth={2} className="text-brand" />
         ) : (
-          <IconClipboard size="tiny" />
+          <Clipboard size={14} />
         )
       }
       {...props}

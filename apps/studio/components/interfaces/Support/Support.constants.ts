@@ -22,7 +22,7 @@ export const CATEGORY_OPTIONS = [
   {
     value: SupportCategories.PERFORMANCE_ISSUES,
     label: 'Performance issues',
-    description: 'Reporting of performance issues is only available on the Pro plan',
+    description: 'Reporting of performance issues is only available on the Pro Plan',
     query: 'Performance',
   },
   {

@@ -2,14 +2,13 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useSelectedProject } from 'hooks'
-import { AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { AlertTitle_Shadcn_, Alert_Shadcn_, Button, CriticalIcon, WarningIcon } from 'ui'
 
 /**
  * Shown on projects in organization which are above their qouta
  */
-export const RestrictrionBanner = () => {
+export const RestrictionBanner = () => {
   const project = useSelectedProject()
   const { data } = useOrganizationsQuery()
   const currentOrg = data?.find((org) => org.id === project?.organization_id)

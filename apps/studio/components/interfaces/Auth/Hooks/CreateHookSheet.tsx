@@ -1,17 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { X } from 'lucide-react'
 import randomBytes from 'randombytes'
+import { useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import ReactMarkdown from 'react-markdown'
 import * as z from 'zod'
 
 import { useParams } from 'common'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { AuthConfigResponse } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useFlag } from 'hooks'
-import { X } from 'lucide-react'
-import { useEffect, useMemo } from 'react'
-import ReactMarkdown from 'react-markdown'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   FormControl_Shadcn_,
@@ -225,7 +225,7 @@ export const CreateHookSheet = ({
 
   return (
     <Sheet open={visible} onOpenChange={() => onClose()}>
-      <SheetContent showClose={false} className="flex flex-col gap-0">
+      <SheetContent size="lg" showClose={false} className="flex flex-col gap-0">
         <SheetHeader className="py-3 flex flex-row justify-between items-center border-b-0">
           <div className="flex flex-row gap-3 items-center">
             <SheetClose
@@ -383,7 +383,7 @@ export const CreateHookSheet = ({
                           <Button
                             type="default"
                             size="small"
-                            className="rounded-l-none h-[38px]"
+                            className="rounded-l-none"
                             onClick={() => {
                               const authHookSecret = generateAuthHookSecret()
                               form.setValue('httpsValues.secret', authHookSecret)

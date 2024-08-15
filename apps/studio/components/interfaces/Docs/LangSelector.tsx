@@ -1,5 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCheckPermissions } from 'hooks'
+
+import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,
@@ -8,8 +10,6 @@ import {
   DropdownMenuTrigger,
   IconKey,
 } from 'ui'
-
-import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 

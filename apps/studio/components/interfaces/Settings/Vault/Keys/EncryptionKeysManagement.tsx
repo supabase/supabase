@@ -11,7 +11,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-delete-mutation'
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Alert,
   Button,

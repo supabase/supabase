@@ -1,9 +1,9 @@
-import { SupabaseClient } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { codeBlock, oneLine } from 'common-tags'
-import OpenAI from 'openai'
+import type OpenAI from 'openai'
 import { ApplicationError, UserError } from './errors'
 import { getChatRequestTokenCount, getMaxTokenCount, tokenizer } from './tokenizer'
-import { Message } from './types'
+import type { Message } from './types'
 
 export async function clippy(
   openai: OpenAI,
