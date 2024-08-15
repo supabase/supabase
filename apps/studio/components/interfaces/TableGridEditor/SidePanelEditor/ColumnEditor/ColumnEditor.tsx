@@ -310,6 +310,7 @@ const ColumnEditor = ({
               )}
             </div>
           )}
+
           <ColumnDefaultValue
             columnFields={columnFields}
             enumTypes={enumTypes}
@@ -317,7 +318,9 @@ const ColumnEditor = ({
           />
         </FormSectionContent>
       </FormSection>
+
       <SidePanel.Separator />
+
       <FormSection
         header={<FormSectionLabel className="lg:!col-span-4">Foreign Keys</FormSectionLabel>}
       >
@@ -326,7 +329,7 @@ const ColumnEditor = ({
             column={columnFields}
             relations={fkRelations}
             closePanel={closePanel}
-            onUpdateColumnType={(format: string) => onUpdateField({ format, defaultValue: null })}
+            onUpdateColumnType={(format: string) => onUpdateField({ format })}
             onUpdateFkRelations={setFkRelations}
           />
         </FormSectionContent>
@@ -403,34 +406,6 @@ const ColumnEditor = ({
             </FormSectionContent>
           </FormSection>
           <SidePanel.Separator />
-
-          {/* TODO: need to pull column privileges in here if any columns are using column-level privileges, show this warning */}
-          {/* [Joshen] This shouldn't show up for all tables */}
-          {/* <FormSection
-            header={
-              <FormSectionLabel className="lg:!col-span-4">Column privileges</FormSectionLabel>
-            }
-          >
-            <FormSectionContent loading={false} className="lg:!col-span-8">
-              <Alert_Shadcn_ variant="warning">
-                <WarningIcon />
-                <AlertTitle_Shadcn_>This table uses column-privileges</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <p>
-                    Several columns in this table have column-level privileges. This new column will
-                    have privileges set to on by default.
-                  </p>
-                  <p className="mt-3">
-                    <Link href={`/project/${ref}/database/privileges`} passHref>
-                      <Button asChild type="default" size="tiny">
-                        <a>Column-level privileges</a>
-                      </Button>
-                    </Link>
-                  </p>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            </FormSectionContent>
-          </FormSection> */}
         </>
       )}
     </SidePanel>
