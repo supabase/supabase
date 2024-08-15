@@ -14,13 +14,13 @@ export function LastSignInWrapper({
   return (
     <div className="flex items-center relative">
       {lastSignIn === type && (
-        <Badge variant="brand" className="absolute -right-[84px]">
+        <Badge variant="default" className="absolute -right-[84px]">
           Last used
         </Badge>
       )}
       <div
         className={cn('w-full', {
-          'outline outline-1 outline-offset-4 outline-foreground-lighter rounded-md ':
+          'outline outline-1 outline-offset-4 outline-foreground-lighter/50 rounded-md ':
             lastSignIn === type,
         })}
       >
