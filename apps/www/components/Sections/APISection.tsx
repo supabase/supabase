@@ -1,5 +1,7 @@
+// Import Swiper styles if swiper used on page
+import 'swiper/css'
+
 import { useState } from 'react'
-// Import Swiper React components
 import { Button, IconArrowUpRight, Tabs } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import CodeBlock from '../CodeBlock/CodeBlock'
@@ -38,13 +40,11 @@ function APISection(props: Props) {
         <h2 className="h3">{props.title}</h2>
         <div className="p">{props.text}</div>
         {props.documentation_link && (
-          <Link href={props.documentation_link} as={props.documentation_link}>
-            <a>
-              <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                Explore documentation
-              </Button>
-            </a>
-          </Link>
+          <Button asChild size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
+            <Link href={props.documentation_link} as={props.documentation_link}>
+              Explore documentation
+            </Link>
+          </Button>
         )}
         {props.footer && <div className="py-8">{props.footer}</div>}
       </div>

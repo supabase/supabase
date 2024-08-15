@@ -10,7 +10,7 @@ export const AlphaNumbers = [
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="stroke-white dark:stroke-black"
+        className="stroke-background"
       >
         <ellipse cx="12" cy="5" rx="9" ry="3" />
         <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
@@ -32,7 +32,7 @@ export const AlphaNumbers = [
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="stroke-white dark:stroke-black"
+        className="stroke-background"
       >
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
       </svg>
@@ -52,7 +52,7 @@ export const AlphaNumbers = [
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="stroke-white dark:stroke-black"
+        className="stroke-background"
       >
         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
         <polyline points="22 4 12 14.01 9 11.01" />
@@ -73,7 +73,7 @@ export const AlphaNumbers = [
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="stroke-white dark:stroke-black"
+        className="stroke-background"
       >
         <line x1="6" y1="3" x2="6" y2="15" />
         <circle cx="18" cy="6" r="3" />
@@ -96,7 +96,7 @@ export const AlphaNumbers = [
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="stroke-white dark:stroke-black"
+        className="stroke-background"
       >
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" />
@@ -119,7 +119,7 @@ export const AlphaNumbers = [
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="stroke-white dark:stroke-black"
+        className="stroke-background"
       >
         <polyline points="4 17 10 11 4 5" />
         <line x1="12" y1="19" x2="20" y2="19" />

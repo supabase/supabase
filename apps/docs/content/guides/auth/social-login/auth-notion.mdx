@@ -1,0 +1,144 @@
+---
+id: 'auth-notion'
+title: 'Login with Notion'
+description: 'Add Notion OAuth to your Supabase project'
+---
+
+To enable Notion Auth for your project, you need to set up a Notion Application and add the Application OAuth credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up Notion logins for your application consists of 3 parts:
+
+- Create and configure a Notion Application [Notion Developer Portal](https://www.notion.so/my-integrations)
+- Retrieve your OAuth client ID and OAuth client secret and add them to your [Supabase Project](https://supabase.com/dashboard)
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Create your notion integration
+
+- Go to [developers.notion.com](https://developers.notion.com/).
+- Click "View my integrations" and login.
+
+![notion.so](/docs/img/guides/auth-notion/notion.png)
+
+- Once logged in, go to [notion.so/my-integrations](https://notion.so/my-integrations) and create a new integration.
+- When creating your integration, ensure that you select "Public integration" under "Integration type" and "Read user information including email addresses" under "Capabilities".
+- You will need to add a redirect uri, see [Add the redirect uri](#add-the-redirect-uri)
+- Once you've filled in the necessary fields, click "Submit" to finish creating the integration.
+
+![notion.so](/docs/img/guides/auth-notion/notion-developer.png)
+
+## Add the redirect URI
+
+- After selecting "Public integration", you should see an option to add "Redirect URIs".
+
+![notion.so](/docs/img/guides/auth-notion/notion-redirect-uri.png)
+
+<SocialProviderSetup provider="Notion" />
+
+## Add your Notion credentials into your Supabase project
+
+- Once you've created your notion integration, you should be able to retrieve the "OAuth client ID" and "OAuth client secret" from the "OAuth Domain and URIs" tab.
+
+![notion.so](/docs/img/guides/auth-notion/notion-creds.png)
+
+<SocialProviderSettingsSupabase provider="Notion" />
+
+## Add login code to your client app
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+<CreateClientSnippet />
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `notion` as the `provider`:
+
+```js
+async function signInWithNotion() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'notion',
+  })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `notion` as the `provider`:
+
+```dart
+Future<void> signInWithNotion() async {
+  await supabase.auth.signInWithOAuth(OAuthProvider.notion);
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Notion` as the `Provider`:
+
+```kotlin
+suspend fun signInWithNotion() {
+	supabase.auth.signInWith(Notion)
+}
+```
+
+</TabPanel>
+</Tabs>
+
+<OAuthPkceFlow />
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```js
+async function signOut() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```kotlin
+suspend fun signOut() {
+	supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Resources
+
+- [Supabase - Get started for free](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Notion Account](https://notion.so)
+- [Notion Developer Portal](https://www.notion.so/my-integrations)

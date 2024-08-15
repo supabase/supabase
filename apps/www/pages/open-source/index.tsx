@@ -1,3 +1,5 @@
+import 'swiper/css'
+
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 
@@ -10,9 +12,6 @@ import Repos from '~/components/OpenSource/Repos'
 import Sponsorships from '~/components/OpenSource/Sponsorships'
 
 import pageData from '~/data/open-source'
-
-// Import Swiper styles if swiper used on page
-import 'swiper/swiper.min.css'
 
 const OpenSource = () => {
   const router = useRouter()
@@ -47,7 +46,7 @@ const OpenSource = () => {
           <Repos tabs={pageData.repo_tabs} />
         </SectionContainer>
         <SectionContainer className="!py-0">
-          <div className="w-full bg-scale-400 border-b" />
+          <div className="w-full border-b" />
         </SectionContainer>
         <SectionContainer>
           <Sponsorships sponsorships={pageData.sponsorships} />

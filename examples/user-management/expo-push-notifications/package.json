@@ -1,0 +1,32 @@
+{
+  "name": "expo-user-management",
+  "version": "1.0.0",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "@rneui/themed": "^4.0.0-rc.8",
+    "@shopify/flash-list": "1.6.4",
+    "@supabase/supabase-js": "^2.38.2",
+    "expo": "~51.0.8",
+    "expo-constants": "~16.0.1",
+    "expo-dev-client": "~4.0.14",
+    "expo-device": "~6.0.2",
+    "expo-notifications": "~0.28.3",
+    "expo-status-bar": "~1.12.1",
+    "react": "18.2.0",
+    "react-native": "0.74.1",
+    "react-native-url-polyfill": "^2.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@types/react": "~18.2.79",
+    "typescript": "~5.3.3"
+  },
+  "private": true
+}

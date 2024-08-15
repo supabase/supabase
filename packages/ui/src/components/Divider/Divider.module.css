@@ -6,31 +6,30 @@
 }
 
 .sbui-divider-vertical {
-  @apply bg-gray-200 dark:bg-dark-500;
+  @apply bg-border;
   width: 1px;
   height: inherit;
 }
 
 .sbui-divider-vertical.sbui-divider--light {
-  @apply bg-gray-100 dark:bg-dark-600;
+  @apply bg-border-control;
 }
 
 .sbui-divider--no-text {
-  @apply border-gray-200 dark:border-dark-500;
+  @apply border-default;
   border-bottom-style: solid;
   border-bottom-width: 1px;
 }
 
 .sbui-divider > span {
   @apply text-sm;
-  @apply text-gray-300;
-  @apply dark:text-dark-400;
+  @apply text-background-surface-200;
   display: inline-block;
   padding: 0 1em;
 }
 
 .sbui-divider--left:before {
-  @apply border-gray-200 dark:border-dark-500;
+  @apply border-default;
   border-bottom-style: solid;
   border-bottom-width: 1px;
   top: 50%;
@@ -41,7 +40,7 @@
 }
 
 .sbui-divider--left:after {
-  @apply border-gray-200 dark:border-dark-500;
+  @apply border-default;
   border-bottom-style: solid;
   border-bottom-width: 1px;
   top: 50%;
@@ -52,7 +51,7 @@
 }
 
 .sbui-divider--right:before {
-  @apply border-gray-200 dark:border-dark-500;
+  @apply border-default;
   border-bottom-style: solid;
   border-bottom-width: 1px;
   top: 50%;
@@ -63,7 +62,7 @@
 }
 
 .sbui-divider--right:after {
-  @apply border-gray-200 dark:border-dark-500;
+  @apply border-default;
   border-bottom-style: solid;
   border-bottom-width: 1px;
   top: 50%;
@@ -75,7 +74,7 @@
 
 .sbui-divider--center:before,
 .sbui-divider--center:after {
-  @apply border-gray-200 dark:border-dark-500;
+  @apply border-default;
   border-bottom-style: solid;
   border-bottom-width: 1px;
   top: 50%;
@@ -92,10 +91,9 @@
 .sbui-divider--light.sbui-divider--center:before,
 .sbui-divider--light.sbui-divider--center:after,
 .sbui-divider--light.sbui-divider--no-text {
-  @apply border-gray-100 dark:border-dark-600;
+  @apply border-control;
 }
 
 .sbui-divider--light.sbui-divider > span {
-  @apply text-gray-200;
-  @apply dark:text-dark-800;
+  @apply text-foreground-muted;
 }

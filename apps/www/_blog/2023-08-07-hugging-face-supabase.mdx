@@ -1,7 +1,7 @@
 ---
 title: 'Hugging Face is now supported in Supabase'
 description: "We've added support Hugging Face support in our Python Vector Client and Edge Functions."
-launchweek: 8
+launchweek: '8'
 categories:
   - product
 tags:
@@ -28,7 +28,7 @@ We’ve added support in our [Python Vector Client](https://supabase.com/docs/gu
     src="https://www.youtube-nocookie.com/embed/RJccSbJ9Go4"
     title="YouTube video player"
     frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
     allowfullscreen
   ></iframe>
 </div>
@@ -96,7 +96,7 @@ Let’s step through a small demo where we accept some text, convert it into an 
 ```ts
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { env, pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.5.0'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 // Preparation for Deno runtime
 env.useBrowserCache = false

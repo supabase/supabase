@@ -1,0 +1,500 @@
+[
+  {
+    "title": "Introduction",
+    "id": "introduction",
+    "slug": "introduction",
+    "type": "markdown"
+  },
+  {
+    "type": "category",
+    "title": "Auth",
+    "items": [
+      {
+        "id": "v1-create-a-sso-provider",
+        "title": "Create a sso provider",
+        "slug": "v1-create-a-sso-provider",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-a-sso-provider",
+        "title": "Delete a sso provider",
+        "slug": "v1-delete-a-sso-provider",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-a-sso-provider",
+        "title": "Get a sso provider",
+        "slug": "v1-get-a-sso-provider",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-auth-service-config",
+        "title": "Get auth service config",
+        "slug": "v1-get-auth-service-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-sso-provider",
+        "title": "List all sso provider",
+        "slug": "v1-list-all-sso-provider",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-a-sso-provider",
+        "title": "Update a sso provider",
+        "slug": "v1-update-a-sso-provider",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-auth-service-config",
+        "title": "Update auth service config",
+        "slug": "v1-update-auth-service-config",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Database",
+    "items": [
+      {
+        "id": "v1-disable-readonly-mode-temporarily",
+        "title": "Disable readonly mode temporarily",
+        "slug": "v1-disable-readonly-mode-temporarily",
+        "type": "operation"
+      },
+      {
+        "id": "v1-enable-database-webhook",
+        "title": "Enable database webhook",
+        "slug": "v1-enable-database-webhook",
+        "type": "operation"
+      },
+      {
+        "id": "v1-generate-typescript-types",
+        "title": "Generate typescript types",
+        "slug": "v1-generate-typescript-types",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-a-snippet",
+        "title": "Get a snippet",
+        "slug": "v1-get-a-snippet",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-postgres-config",
+        "title": "Get postgres config",
+        "slug": "v1-get-postgres-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-pgbouncer-config",
+        "title": "Get project pgbouncer config",
+        "slug": "v1-get-project-pgbouncer-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-readonly-mode-status",
+        "title": "Get readonly mode status",
+        "slug": "v1-get-readonly-mode-status",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-ssl-enforcement-config",
+        "title": "Get ssl enforcement config",
+        "slug": "v1-get-ssl-enforcement-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-supavisor-config",
+        "title": "Get supavisor config",
+        "slug": "v1-get-supavisor-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-backups",
+        "title": "List all backups",
+        "slug": "v1-list-all-backups",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-snippets",
+        "title": "List all snippets",
+        "slug": "v1-list-all-snippets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-remove-a-read-replica",
+        "title": "Remove a read replica",
+        "slug": "v1-remove-a-read-replica",
+        "type": "operation"
+      },
+      {
+        "id": "v1-restore-pitr-backup",
+        "title": "Restore pitr backup",
+        "slug": "v1-restore-pitr-backup",
+        "type": "operation"
+      },
+      {
+        "id": "v1-run-a-query",
+        "title": "Run a query",
+        "slug": "v1-run-a-query",
+        "type": "operation"
+      },
+      {
+        "id": "v1-setup-a-read-replica",
+        "title": "Setup a read replica",
+        "slug": "v1-setup-a-read-replica",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-postgres-config",
+        "title": "Update postgres config",
+        "slug": "v1-update-postgres-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-ssl-enforcement-config",
+        "title": "Update ssl enforcement config",
+        "slug": "v1-update-ssl-enforcement-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-supavisor-config",
+        "title": "Update supavisor config",
+        "slug": "v1-update-supavisor-config",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Domains",
+    "items": [
+      {
+        "id": "v1-activate-custom-hostname",
+        "title": "Activate custom hostname",
+        "slug": "v1-activate-custom-hostname",
+        "type": "operation"
+      },
+      {
+        "id": "v1-activate-vanity-subdomain-config",
+        "title": "Activate vanity subdomain config",
+        "slug": "v1-activate-vanity-subdomain-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-check-vanity-subdomain-availability",
+        "title": "Check vanity subdomain availability",
+        "slug": "v1-check-vanity-subdomain-availability",
+        "type": "operation"
+      },
+      {
+        "id": "v1-deactivate-vanity-subdomain-config",
+        "title": "Deactivate vanity subdomain config",
+        "slug": "v1-deactivate-vanity-subdomain-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-hostname-config",
+        "title": "Get hostname config",
+        "slug": "v1-get-hostname-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-vanity-subdomain-config",
+        "title": "Get vanity subdomain config",
+        "slug": "v1-get-vanity-subdomain-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-hostname-config",
+        "title": "Update hostname config",
+        "slug": "v1-update-hostname-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-verify-dns-config",
+        "title": "Verify dns config",
+        "slug": "v1-verify-dns-config",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Edge Functions",
+    "items": [
+      {
+        "id": "v1-delete-a-function",
+        "title": "Delete a function",
+        "slug": "v1-delete-a-function",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-a-function",
+        "title": "Get a function",
+        "slug": "v1-get-a-function",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-a-function-body",
+        "title": "Get a function body",
+        "slug": "v1-get-a-function-body",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-functions",
+        "title": "List all functions",
+        "slug": "v1-list-all-functions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-a-function",
+        "title": "Update a function",
+        "slug": "v1-update-a-function",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Environments",
+    "items": [
+      {
+        "id": "v1-create-a-branch",
+        "title": "Create a branch",
+        "slug": "v1-create-a-branch",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-a-branch",
+        "title": "Delete a branch",
+        "slug": "v1-delete-a-branch",
+        "type": "operation"
+      },
+      {
+        "id": "v1-disable-preview-branching",
+        "title": "Disable preview branching",
+        "slug": "v1-disable-preview-branching",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-a-branch-config",
+        "title": "Get a branch config",
+        "slug": "v1-get-a-branch-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-branches",
+        "title": "List all branches",
+        "slug": "v1-list-all-branches",
+        "type": "operation"
+      },
+      {
+        "id": "v1-reset-a-branch",
+        "title": "Reset a branch",
+        "slug": "v1-reset-a-branch",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-a-branch-config",
+        "title": "Update a branch config",
+        "slug": "v1-update-a-branch-config",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "OAuth",
+    "items": [
+      {
+        "id": "v1-authorize-user",
+        "title": "Authorize user",
+        "slug": "v1-authorize-user",
+        "type": "operation"
+      },
+      {
+        "id": "v1-exchange-oauth-token",
+        "title": "Exchange oauth token",
+        "slug": "v1-exchange-oauth-token",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Organizations",
+    "items": [
+      {
+        "id": "v1-create-an-organization",
+        "title": "Create an organization",
+        "slug": "v1-create-an-organization",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-an-organization",
+        "title": "Get an organization",
+        "slug": "v1-get-an-organization",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-organizations",
+        "title": "List all organizations",
+        "slug": "v1-list-all-organizations",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-organization-members",
+        "title": "List organization members",
+        "slug": "v1-list-organization-members",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Projects",
+    "items": [
+      {
+        "id": "v1-create-a-project",
+        "title": "Create a project",
+        "slug": "v1-create-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-a-project",
+        "title": "Delete a project",
+        "slug": "v1-delete-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-network-bans",
+        "title": "Delete network bans",
+        "slug": "v1-delete-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-network-restrictions",
+        "title": "Get network restrictions",
+        "slug": "v1-get-network-restrictions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-postgrest-upgrade-eligibility",
+        "title": "Get postgrest upgrade eligibility",
+        "slug": "v1-get-postgrest-upgrade-eligibility",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-postgrest-upgrade-status",
+        "title": "Get postgrest upgrade status",
+        "slug": "v1-get-postgrest-upgrade-status",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-services-health",
+        "title": "Get services health",
+        "slug": "v1-get-services-health",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-network-bans",
+        "title": "List all network bans",
+        "slug": "v1-list-all-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-projects",
+        "title": "List all projects",
+        "slug": "v1-list-all-projects",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-network-restrictions",
+        "title": "Update network restrictions",
+        "slug": "v1-update-network-restrictions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-upgrade-postgres-version",
+        "title": "Upgrade postgres version",
+        "slug": "v1-upgrade-postgres-version",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Rest",
+    "items": [
+      {
+        "id": "v1-get-postgrest-service-config",
+        "title": "Get postgrest service config",
+        "slug": "v1-get-postgrest-service-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-postgrest-service-config",
+        "title": "Update postgrest service config",
+        "slug": "v1-update-postgrest-service-config",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Secrets",
+    "items": [
+      {
+        "id": "v1-bulk-create-secrets",
+        "title": "Bulk create secrets",
+        "slug": "v1-bulk-create-secrets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-bulk-delete-secrets",
+        "title": "Bulk delete secrets",
+        "slug": "v1-bulk-delete-secrets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-pgsodium-config",
+        "title": "Get pgsodium config",
+        "slug": "v1-get-pgsodium-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-api-keys",
+        "title": "Get project api keys",
+        "slug": "v1-get-project-api-keys",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-secrets",
+        "title": "List all secrets",
+        "slug": "v1-list-all-secrets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-pgsodium-config",
+        "title": "Update pgsodium config",
+        "slug": "v1-update-pgsodium-config",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Storage",
+    "items": [
+      {
+        "id": "v1-list-all-buckets",
+        "title": "List all buckets",
+        "slug": "v1-list-all-buckets",
+        "type": "operation"
+      }
+    ]
+  }
+]

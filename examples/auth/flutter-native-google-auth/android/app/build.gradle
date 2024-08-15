@@ -52,10 +52,6 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        // You need an empty manifestPlaceholders for appauth to not throw an error
-        manifestPlaceholders += [
-                'appAuthRedirectScheme': ''
-        ]
         multiDexEnabled true
     }
 

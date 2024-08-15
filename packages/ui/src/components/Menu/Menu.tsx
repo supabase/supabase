@@ -1,8 +1,10 @@
+'use client'
+
 import React from 'react'
+import styleHandler from '../../lib/theme/styleHandler'
+import { cn } from '../../lib/utils/cn'
 import Typography from '../Typography'
 import { MenuContextProvider, useMenuContext } from './MenuContext'
-
-import styleHandler from '../../lib/theme/styleHandler'
 
 interface MenuProps {
   children: React.ReactNode
@@ -79,16 +81,15 @@ export function Item({
   }
 
   return (
-    <li role="menuitem" className="outline-none">
-      <a
-        style={style}
-        className={classes.join(' ')}
-        onClick={onClick}
-        aria-current={active ? 'page' : undefined}
-      >
-        {icon && <div className={`${iconClasses.join(' ')} min-w-fit`}>{icon}</div>}
-        <span className={contentClasses.join(' ')}>{children}</span>
-      </a>
+    <li
+      role="menuitem"
+      className={cn('outline-none', classes)}
+      style={style}
+      onClick={onClick}
+      aria-current={active ? 'page' : undefined}
+    >
+      {icon && <div className={`${iconClasses.join(' ')} min-w-fit`}>{icon}</div>}
+      <span className={contentClasses.join(' ')}>{children}</span>
     </li>
   )
 }
@@ -96,7 +97,7 @@ export function Item({
 interface GroupProps {
   children?: React.ReactNode
   icon?: React.ReactNode
-  title: string
+  title: React.ReactNode
 }
 
 export function Group({ children, icon, title }: GroupProps) {

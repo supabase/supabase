@@ -1,45 +1,76 @@
-import { Children } from 'react'
-import * as CopyToClipboard from 'react-copy-to-clipboard'
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { monokaiCustomTheme } from './CodeBlock.utils'
-import { Button, IconCheck, IconCopy } from 'ui'
+'use client'
 
-import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
-import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
-import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
-import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
-import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
+import { Check, Copy } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { Children, ReactNode, useState } from 'react'
+import * as CopyToClipboard from 'react-copy-to-clipboard'
+import { Light as SyntaxHighlighter, SyntaxHighlighterProps } from 'react-syntax-highlighter'
+import { cn } from '../../lib/utils/cn'
+import { Button } from '../Button/Button'
+import { monokaiCustomTheme } from './CodeBlock.utils'
+
+import curl from 'highlightjs-curl'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
+import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
 import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
+import http from 'react-syntax-highlighter/dist/cjs/languages/hljs/http'
+import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
-
-import { useState } from 'react'
-import { useTheme } from 'next-themes'
+import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
+import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
+import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 
 export interface CodeBlockProps {
-  title?: string
-  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
+  title?: ReactNode
+  language?:
+    | 'js'
+    | 'jsx'
+    | 'sql'
+    | 'py'
+    | 'bash'
+    | 'ts'
+    | 'dart'
+    | 'json'
+    | 'csharp'
+    | 'kotlin'
+    | 'curl'
+    | 'http'
   linesToHighlight?: number[]
+  highlightBorder?: boolean
+  styleConfig?: {
+    lineNumber?: string
+    highlightBackgroundColor?: string
+    highlightBorderColor?: string
+  }
   hideCopy?: boolean
   hideLineNumbers?: boolean
   className?: string
+  wrapperClassName?: string
   value?: string
+  theme?: any
   children?: string
+  renderer?: SyntaxHighlighterProps['renderer']
 }
 
 export const CodeBlock = ({
   title,
   language,
   linesToHighlight = [],
+  highlightBorder,
+  styleConfig,
   className,
+  wrapperClassName,
   value,
+  theme,
   children,
   hideCopy = false,
   hideLineNumbers = false,
+  renderer,
 }: CodeBlockProps) => {
-  const { theme } = useTheme()
-  const monokaiTheme = monokaiCustomTheme(theme === 'dark')
+  const { resolvedTheme } = useTheme()
+  const isDarkTheme = resolvedTheme?.includes('dark')!
+  const monokaiTheme = theme ?? monokaiCustomTheme(isDarkTheme)
 
   const [copied, setCopied] = useState(false)
 
@@ -75,33 +106,40 @@ export const CodeBlock = ({
   SyntaxHighlighter.registerLanguage('csharp', csharp)
   SyntaxHighlighter.registerLanguage('json', json)
   SyntaxHighlighter.registerLanguage('kotlin', kotlin)
+  SyntaxHighlighter.registerLanguage('curl', curl)
+  SyntaxHighlighter.registerLanguage('http', http)
 
   const large = false
   // don't show line numbers if bash == lang
-  if (lang !== 'bash') hideLineNumbers = true
+  if (lang === 'bash' || lang === 'sh') hideLineNumbers = true
   const showLineNumbers = !hideLineNumbers
 
   return (
     <>
       {title && (
-        <div className="rounded-t-md bg-scale-300 py-2 px-4 border-b border-scale-500 text-blue-1100 font-sans">
-          {title.replace(/%20/g, ' ')}
+        <div className="text-sm rounded-t-md bg-surface-100 py-2 px-4 border border-b-0 border-default font-sans">
+          {title}
         </div>
       )}
       {className ? (
-        <div className="relative max-w-[90vw] md:max-w-none overflow-auto">
+        <div
+          className={cn(
+            'group relative max-w-[90vw] md:max-w-none overflow-auto',
+            wrapperClassName
+          )}
+        >
           {/* @ts-ignore */}
           <SyntaxHighlighter
             language={lang}
             wrapLines={true}
             // @ts-ignore
             style={monokaiTheme}
-            className={[
-              'code-block border p-4 w-full !my-0 !bg-scale-300',
+            className={cn(
+              'code-block border border-surface p-4 w-full !my-0 !bg-surface-100',
               `${!title ? '!rounded-md' : '!rounded-t-none !rounded-b-md'}`,
               `${!showLineNumbers ? 'pl-6' : ''}`,
-              className,
-            ].join(' ')}
+              className
+            )}
             customStyle={{
               fontSize: large ? 18 : 13,
               lineHeight: large ? 1.5 : 1.4,
@@ -110,7 +148,16 @@ export const CodeBlock = ({
             lineProps={(lineNumber) => {
               if (linesToHighlight.includes(lineNumber)) {
                 return {
-                  style: { display: 'block', backgroundColor: 'var(--colors-scale6)' },
+                  style: {
+                    display: 'block',
+                    backgroundColor: styleConfig?.highlightBackgroundColor
+                      ? styleConfig?.highlightBackgroundColor
+                      : 'hsl(var(--background-selection))',
+                    borderLeft: highlightBorder
+                      ? `1px solid ${styleConfig?.highlightBorderColor ? styleConfig?.highlightBorderColor : 'hsl(var(--foreground-default)'})`
+                      : null,
+                  },
+                  class: 'hljs-line-highlight',
                 }
               }
               return {}
@@ -123,21 +170,22 @@ export const CodeBlock = ({
               paddingLeft: '4px',
               paddingRight: '4px',
               marginRight: '12px',
-              color: '#828282',
+              color: styleConfig?.lineNumber ?? '#828282',
               textAlign: 'center',
               fontSize: large ? 14 : 12,
               paddingTop: '4px',
               paddingBottom: '4px',
             }}
+            renderer={renderer}
           >
             {codeValue}
           </SyntaxHighlighter>
           {!hideCopy && (value || children) && className ? (
             <div
               className={[
-                'absolute right-2',
-                `${theme === 'dark' ? 'dark' : ''}`,
-                `${!title ? 'top-2' : 'top-[3.25rem]'}`,
+                'absolute right-2 top-2',
+                'opacity-0 group-hover:opacity-100 transition',
+                `${isDarkTheme ? 'dark' : ''}`,
               ].join(' ')}
             >
               {/* //
@@ -145,7 +193,8 @@ export const CodeBlock = ({
               <CopyToClipboard text={value || children}>
                 <Button
                   type="default"
-                  icon={copied ? <IconCheck /> : <IconCopy />}
+                  className="px-1.5"
+                  icon={copied ? <Check /> : <Copy />}
                   onClick={() => handleCopy()}
                 >
                   {copied ? 'Copied' : ''}

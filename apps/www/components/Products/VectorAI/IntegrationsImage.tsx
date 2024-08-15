@@ -14,10 +14,9 @@ const IntegrationsImage = () => {
   const initial = INITIAL_BOTTOM
   const animate = getAnimation({})
 
-  const image =
-    resolvedTheme === 'dark'
-      ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.png`
-      : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.png`
+  const image = resolvedTheme?.includes('dark')
+    ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.png`
+    : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.png`
 
   const ResolvedImage = () => (
     <Image

@@ -9,5 +9,12 @@
     return <IconBase icon={Move} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { move } from 'lucide-react'
+  */
   export default IconMove
   

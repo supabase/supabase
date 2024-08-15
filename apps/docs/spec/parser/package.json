@@ -1,0 +1,35 @@
+{
+  "name": "@supabase/generator",
+  "version": "0.0.0",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "license": "MIT",
+  "scripts": {
+    "tsdoc:dereference:functions:v1": "tsx ./tsdoc.ts --input ../enrichments/tsdoc_v1/functions.json --output ../enrichments/tsdoc_v1/functions_dereferenced.json",
+    "tsdoc:dereference:gotrue:v1": "tsx ./tsdoc.ts --input ../enrichments/tsdoc_v1/gotrue.json --output ../enrichments/tsdoc_v1/gotrue_dereferenced.json",
+    "tsdoc:dereference:postgrest:v1": "tsx ./tsdoc.ts --input ../enrichments/tsdoc_v1/postgrest.json --output ../enrichments/tsdoc_v1/postgrest_dereferenced.json",
+    "tsdoc:dereference:realtime:v1": "tsx ./tsdoc.ts --input ../enrichments/tsdoc_v1/realtime.json --output ../enrichments/tsdoc_v1/realtime_dereferenced.json",
+    "tsdoc:dereference:storage:v1": "tsx ./tsdoc.ts --input ../enrichments/tsdoc_v1/storage.json --output ../enrichments/tsdoc_v1/storage_dereferenced.json",
+    "tsdoc:dereference:supabase:v1": "tsx ./tsdoc.ts --input ../enrichments/tsdoc_v1/supabase.json --output ../enrichments/tsdoc_v1/supabase_dereferenced.json",
+    "tsdoc:dereference:functions:v2": "tsx ./tsdoc.ts --input ../enrichments/tsdoc_v2/functions.json --output ../enrichments/tsdoc_v2/functions_dereferenced.json",
+    "tsdoc:dereference:gotrue:v2": "tsx ./tsdoc.ts --input ../enrichments/tsdoc_v2/gotrue.json --output ../enrichments/tsdoc_v2/gotrue_dereferenced.json",
+    "tsdoc:dereference:postgrest:v2": "tsx ./tsdoc.ts --input ../enrichments/tsdoc_v2/postgrest.json --output ../enrichments/tsdoc_v2/postgrest_dereferenced.json",
+    "tsdoc:dereference:realtime:v2": "tsx ./tsdoc.ts --input ../enrichments/tsdoc_v2/realtime.json --output ../enrichments/tsdoc_v2/realtime_dereferenced.json",
+    "tsdoc:dereference:storage:v2": "tsx ./tsdoc.ts --input ../enrichments/tsdoc_v2/storage.json --output ../enrichments/tsdoc_v2/storage_dereferenced.json",
+    "tsdoc:dereference:supabase:v2": "tsx ./tsdoc.ts --input ../enrichments/tsdoc_v2/supabase.json --output ../enrichments/tsdoc_v2/supabase_dereferenced.json"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@redocly/cli": "^1.6.0",
+    "@types/json-stringify-safe": "^5.0.0",
+    "@types/lodash": "^4.14.202",
+    "json-stringify-safe": "^5.0.1",
+    "lodash": "^4.17.21",
+    "prettier": "^4.0.0-alpha.8",
+    "tsx": "^4.7.0"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  }
+}

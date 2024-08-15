@@ -1,7 +1,7 @@
-import { Content, Paragraph, Parent } from 'mdast'
-import { MdxJsxFlowElement } from 'mdast-util-mdx'
-import { AdmonitionProps } from 'ui'
-import { Node } from 'unist'
+import type { Content, Paragraph, Parent } from 'mdast'
+import type { MdxJsxFlowElement } from 'mdast-util-mdx'
+import type { AdmonitionProps } from 'ui'
+import type { Node } from 'unist'
 import { visit } from 'unist-util-visit'
 
 /**
@@ -109,7 +109,7 @@ function mapAdmonitionType(type: string): AdmonitionProps['type'] {
     case 'question':
     case 'info':
     default:
-      return 'info'
+      return 'note'
   }
 }
 

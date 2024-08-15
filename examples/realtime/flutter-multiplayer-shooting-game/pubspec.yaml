@@ -12,9 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-  supabase_flutter: ^1.4.0
-  flame: ^1.6.0
-  uuid: ^3.0.7
+  supabase_flutter: ^2.0.0
+  flame: ^1.12.0
+  uuid: ^4.2.1
 
 dev_dependencies:
   flutter_test:

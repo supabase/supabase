@@ -13,8 +13,8 @@ const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
   const ref = React.useRef<any>()
   const states = ['1', '2', '3']
   const colors = {
-    green: resolvedTheme === 'dark' ? '#1CF7C3' : '#00B99F',
-    gray: resolvedTheme === 'dark' ? '#151918' : '#D3D3D3',
+    green: resolvedTheme?.includes('dark') ? '#1CF7C3' : '#00B99F',
+    gray: resolvedTheme?.includes('dark') ? '#151918' : '#D3D3D3',
   }
   const transitionDuration = 250
 

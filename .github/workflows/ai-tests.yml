@@ -1,0 +1,46 @@
+name: AI Unit Tests & Type Check
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'packages/ai-commands/**'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'packages/ai-commands/**'
+  schedule:
+    - cron: '15 0 * * 1' # Every Monday @ 12:15am UTC (off the hour to avoid heavy load times)
+
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+    defaults:
+      run:
+        working-directory: ./packages/ai-commands
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            packages
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - name: Install deps
+        run: npm ci
+      - name: Type check
+        run: npm run typecheck
+      - name: Run tests
+        run: npm run test

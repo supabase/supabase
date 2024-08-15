@@ -11,7 +11,7 @@ import {
   ExampleProps,
 } from 'data/CodeExamples'
 import monokaiCustomTheme from 'data/CodeEditorTheme'
-import { Button, IconCopy, Space, Tabs } from 'ui'
+import { Button, Space, Tabs } from 'ui'
 
 SyntaxHighlighter.registerLanguage('javascript', js)
 
@@ -74,13 +74,6 @@ const CodeExamples = () => {
   const Buttons = () => (
     <Space direction="vertical" size={1}>
       {Object.values(exampleList).map((x, i) => {
-        const length: number = Object.values(exampleList).length - 1
-        // const radiusStyles = {
-        //   borderBottomRightRadius: i !== length ? '0' : undefined,
-        //   borderBottomLeftRadius: i !== length ? '0' : undefined,
-        //   borderTopLeftRadius: i !== length + 1 && i !== 0 ? '0' : undefined,
-        //   borderTopRightRadius: i !== length + 1 && i !== 0 ? '0' : undefined,
-        // }
         return (
           <Button
             block
@@ -93,13 +86,8 @@ const CodeExamples = () => {
                 ? {
                     background: 'white',
                     color: '#3d3d3d',
-                    // borderBottom: i !== 0 ? 'none' : 'red',
-                    // ...radiusStyles,
                   }
-                : {
-                    // borderBottom: i !== length ? 'none' : undefined,
-                    // ...radiusStyles,
-                  }
+                : undefined
             }
           >
             {x.name}
@@ -132,7 +120,7 @@ const CodeExamples = () => {
       <div className="grid grid-cols-12 gap-2 xl:gap-8">
         <div className="col-span-12 text-center lg:col-span-3 lg:hidden">{<TabNav />}</div>
         <div className="col-span-12 lg:col-span-9">
-          <div className="bg-dark-600 dark:bg-scale-300 rounded-md rounded-b-lg">
+          <div className="bg-surface-100 rounded-md rounded-b-lg">
             <div className="flex items-center justify-between p-2 pl-5">
               <p className="text-dark-100 mr-2 truncate text-sm sm:text-base">
                 {exampleList[example].description}
@@ -151,7 +139,7 @@ const CodeExamples = () => {
             <SyntaxHighlighter
               language="javascript"
               // @ts-ignore
-              style={monokaiCustomTheme}
+              style={isDarkTheme ? monokaiCustomTheme.dark : monokaiCustomTheme.light}
               className="rounded-b-lg"
               customStyle={{
                 padding: 0,

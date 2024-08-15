@@ -1,0 +1,26 @@
+.table-editor-columns .sbui-formlayout--responsive {
+  gap: 0rem !important;
+}
+
+.table-editor-column-type .sbui-listbox-option-container {
+  width: 400px;
+}
+
+.table-editor-column-type .sbui-listbox {
+  @apply px-2;
+}
+
+.column-type-disabled {
+  @apply pointer-events-none;
+}
+
+.column-type-disabled .sbui-listbox-label {
+  @apply opacity-50;
+}
+
+// This fix should ideally be in the UI library
+.table-editor-search {
+  input {
+    @apply pr-10;
+  }
+}

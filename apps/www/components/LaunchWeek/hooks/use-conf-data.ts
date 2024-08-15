@@ -1,32 +1,44 @@
 import { Session, SupabaseClient } from '@supabase/supabase-js'
 import { createContext, useContext } from 'react'
 
-export type PageState = 'registration' | 'ticket'
+export type TicketState = 'registration' | 'ticket' | 'loading' | 'game'
 
 export type UserData = {
   id?: string
   email?: string
-  ticketNumber?: number
   username?: string
   name?: string
+  ticket_number?: number
+  platinum?: boolean
   golden?: boolean
   referrals?: number
   bg_image_id?: number
+  role?: string
+  company?: string
+  location?: string
   metadata?: {
     role?: string
     company?: string
     location?: string
+    hasSecretTicket?: boolean
+    hasSharedSecret?: boolean
+    hideAvatar?: boolean
+    hideMetadata?: boolean
   }
-  sharedOnTwitter?: string
-  sharedOnLinkedIn?: string
+  shared_on_twitter?: string
+  shared_on_linkedin?: string
+  secret?: boolean
 }
 
 type ConfDataContextType = {
-  supabase: SupabaseClient | any
+  supabase: SupabaseClient | null
   session: Session | null
   userData: UserData
   setUserData: React.Dispatch<React.SetStateAction<UserData>>
-  setPageState: React.Dispatch<React.SetStateAction<PageState>>
+  ticketState: TicketState
+  setTicketState: React.Dispatch<React.SetStateAction<TicketState>>
+  showCustomizationForm?: boolean
+  setShowCustomizationForm?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const ConfDataContext = createContext<ConfDataContextType | null>(null)

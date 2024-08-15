@@ -1,4 +1,4 @@
-import { PrivacySettings } from 'ui'
+import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 const footerData = [
   {
@@ -33,8 +33,8 @@ const footerData = [
         url: '/pricing',
       },
       {
-        text: 'Launch Week 8',
-        url: '/launch-week',
+        text: 'GA Week',
+        url: '/ga-week',
       },
     ],
   },
@@ -75,11 +75,11 @@ const footerData = [
       },
       {
         text: 'SOC2',
-        url: 'https://forms.supabase.com/soc2',
+        url: '/security',
       },
       {
         text: 'HIPAA',
-        url: 'https://forms.supabase.com/hipaa',
+        url: 'https://forms.supabase.com/hipaa2',
       },
     ],
   },
@@ -96,7 +96,7 @@ const footerData = [
       },
       {
         text: 'Contributing',
-        url: '/docs/handbook/contributing',
+        url: 'https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md',
       },
       {
         text: 'Open Source',
@@ -134,6 +134,10 @@ const footerData = [
       {
         text: 'Company',
         url: '/company',
+      },
+      {
+        text: 'General Availability',
+        url: '/ga',
       },
       {
         text: 'Terms of Service',
