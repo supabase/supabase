@@ -18,6 +18,7 @@ async function generate() {
     '_blog/*.mdx',
     '_case-studies/*.mdx',
     '_customers/*.mdx',
+    '_events/*.mdx',
     '_alternatives/*.mdx',
     '!pages/index.tsx',
     '!data/*.mdx',
@@ -32,6 +33,7 @@ async function generate() {
   const blogUrl = 'blog'
   const caseStudiesUrl = 'case-studies'
   const customerStoriesUrl = 'customers'
+  const eventsUrl = 'events'
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
@@ -47,6 +49,7 @@ async function generate() {
               .replace('_blog', `/${blogUrl}`)
               .replace('_case-studies', `/${caseStudiesUrl}`)
               .replace('_customers', `/${customerStoriesUrl}`)
+              .replace('_events', `/${eventsUrl}`)
               .replace('_alternatives', '/alternatives')
               .replace('.tsx', '')
               .replace('.mdx', '')
@@ -64,6 +67,7 @@ async function generate() {
             if (route === '/partners/[slug]') return null
             if (route === '/case-studies/[slug]') return null
             if (route === '/customers/[slug]') return null
+            if (route === '/events/[slug]') return null
             if (route === '/launch-week/ticket-image') return null
 
             /**

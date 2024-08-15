@@ -20,7 +20,7 @@ export interface ExitSurveyModalProps {
   onClose: (success?: boolean) => void
 }
 
-// [Joshen] For context - Exit survey is only when going to free plan from a paid plan
+// [Joshen] For context - Exit survey is only when going to Free Plan from a paid plan
 const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurveyModalProps) => {
   const { slug } = useParams()
   const captchaRef = useRef<HCaptcha>(null)
@@ -107,8 +107,8 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
             toast.success(
               willPlanDowngradeHappenImmediately
                 ? hasProjectsWithComputeDowngrade
-                  ? 'Successfully downgraded organization to the Free plan. Your projects are currently restarting to update their compute instances.'
-                  : 'Successfully downgraded organization to the Free plan'
+                  ? 'Successfully downgraded organization to the Free Plan. Your projects are currently restarting to update their compute instances.'
+                  : 'Successfully downgraded organization to the Free Plan'
                 : 'Your organization is scheduled for the downgrade at the end of your current billing cycle',
               { duration: hasProjectsWithComputeDowngrade ? 8000 : 4000 }
             )

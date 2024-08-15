@@ -1,11 +1,12 @@
-import { IS_PLATFORM } from 'common'
+import { Filter, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
+import { IS_PLATFORM } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { PROJECT_STATUS } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
-import { Filter, Search } from 'lucide-react'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -94,8 +95,8 @@ const HomePageActions = ({
               <p className="text-xs">Filter projects by status</p>
               <div className="flex flex-col">
                 {[
-                  { key: 'ACTIVE_HEALTHY', label: 'Active' },
-                  { key: 'INACTIVE', label: 'Paused' },
+                  { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
+                  { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
                 ].map(({ key, label }) => (
                   <div key={key} className="group flex items-center justify-between py-0.5">
                     <div className="flex items-center gap-x-2">

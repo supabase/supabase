@@ -68,6 +68,7 @@ const BarChart = ({
   const _YAxisProps = YAxisProps || {
     tickFormatter: (value) => numberFormatter(value, valuePrecision),
     tick: false,
+    width: 0,
   }
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
@@ -105,7 +106,7 @@ const BarChart = ({
   }
 
   return (
-    <div className={['flex flex-col gap-3', className].join(' ')}>
+    <div className={['flex flex-col gap-y-3', className].join(' ')}>
       <ChartHeader
         title={title}
         format={format}
@@ -121,12 +122,6 @@ const BarChart = ({
       <Container>
         <RechartBarChart
           data={data}
-          margin={{
-            top: 0,
-            right: 0,
-            left: 0,
-            bottom: 0,
-          }}
           className="overflow-visible"
           //   mouse hover focusing logic
           onMouseMove={(e: any) => {

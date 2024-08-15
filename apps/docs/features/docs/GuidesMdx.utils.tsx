@@ -1,13 +1,15 @@
 import matter from 'gray-matter'
 import { type Metadata, type ResolvingMetadata } from 'next'
 import { redirect } from 'next/navigation'
-import { watch } from 'node:fs'
 import { readFile, readdir } from 'node:fs/promises'
-import { extname, join, resolve, sep } from 'node:path'
-import { existsFile } from '~/features/helpers.fs'
+import { extname, join, sep } from 'node:path'
+
+import { pluckPromise } from '~/features/helpers.fn'
+import { cache_fullProcess_withDevCacheBust, existsFile } from '~/features/helpers.fs'
 import type { OrPromise } from '~/features/helpers.types'
 import { notFoundLink } from '~/features/recommendations/NotFound.utils'
-import { BASE_PATH, IS_DEV, MISC_URL } from '~/lib/constants'
+import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
+import { BASE_PATH } from '~/lib/constants'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
 import { newEditLink } from './GuidesMdx.template'
 
@@ -75,30 +77,12 @@ const getGuidesMarkdownInternal = async ({ slug }: { slug: string[] }) => {
  * Caching this for the entire process is fine because the Markdown content is
  * baked into each deployment and cannot change. There's also nothing sensitive
  * here: this is just reading the public MDX files from the codebase.
- *
- * Unlike Next.js' unstable cache, this doesn't persist between deployments,
- * which we don't want because the content _will_ change.
  */
-const cache = <Args extends unknown[], Output>(fn: (...args: Args) => Promise<Output>) => {
-  const _cache = new Map<string, Output>()
-
-  if (IS_DEV) {
-    watch(resolve(GUIDES_DIRECTORY), { recursive: true }, (_, filename) => {
-      if (!filename) return
-      const cacheKey = [{ slug: filename.replace(/\.mdx$/, '').split(sep) }]
-      _cache.delete(JSON.stringify(cacheKey))
-    })
-  }
-
-  return async (...args: Args) => {
-    const cacheKey = JSON.stringify(args)
-    if (!_cache.has(cacheKey)) {
-      _cache.set(cacheKey, await fn(...args))
-    }
-    return _cache.get(cacheKey)!
-  }
-}
-const getGuidesMarkdown = cache(getGuidesMarkdownInternal)
+const getGuidesMarkdown = cache_fullProcess_withDevCacheBust(
+  getGuidesMarkdownInternal,
+  GUIDES_DIRECTORY,
+  (filename: string) => JSON.stringify([{ slug: filename.replace(/\.mdx$/, '').split(sep) }])
+)
 
 const genGuidesStaticParams = (directory?: string) => async () => {
   const promises = directory
@@ -126,9 +110,6 @@ const genGuidesStaticParams = (directory?: string) => async () => {
   return result
 }
 
-const pluckPromise = <T, K extends keyof T>(promise: Promise<T>, key: K) =>
-  promise.then((data) => data[key])
-
 const genGuideMeta =
   <Params,>(
     generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: `/${string}` }>
@@ -154,12 +135,11 @@ const genGuideMeta =
       openGraph: {
         ...parentOg,
         url: `${BASE_PATH}${pathname}`,
-        images: {
-          url: `${MISC_URL}/functions/v1/og-images?site=docs&type=${encodeURIComponent(ogType)}&title=${encodeURIComponent(meta.title)}&description=${encodeURIComponent(meta.description ?? 'undefined')}`,
-          width: 800,
-          height: 600,
-          alt: meta.title,
-        },
+        images: generateOpenGraphImageMeta({
+          type: ogType,
+          title: meta.title,
+          description: meta.description,
+        }),
       },
     }
   }

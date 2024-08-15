@@ -7,10 +7,10 @@ function calculateWinChances(userData: UserData): number {
   // When the chance === 3, you have a golden ticket
   let numChances = 1
 
-  if (userData.sharedOnLinkedIn) {
+  if (userData.shared_on_linkedin) {
     numChances++
   }
-  if (userData.sharedOnTwitter) {
+  if (userData.shared_on_twitter) {
     numChances++
   }
 

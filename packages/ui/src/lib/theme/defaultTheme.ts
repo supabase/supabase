@@ -233,7 +233,7 @@ export default {
       yellow: `bg-yellow-200 text-yellow-1100 border border-yellow-700`,
       amber: `bg-amber-200 text-amber-1100 border border-amber-700`,
       gold: `bg-gold-200 text-gold-1100 border border-gold-700`,
-      gray: `bg-gray-200 text-gray-1100 border border-gray-700`,
+      gray: `bg-200 text-gray-1100 border border-gray-700`,
       slate: `bg-slate-200 text-slate-1100 border border-slate-700`,
     },
   },
@@ -252,7 +252,7 @@ export default {
     description: `text-xs`,
     variant: {
       danger: {
-        base: `bg-red-200 btext-red-1200 border-red-700`,
+        base: `bg-red-200 text-red-1200 border-red-700`,
         icon: `text-red-900`,
         header: `text-red-1200`,
         description: `text-red-1100`,
@@ -264,7 +264,7 @@ export default {
         description: `text-amber-1100`,
       },
       info: {
-        base: `bg-alternative border-alternative`,
+        base: `bg-alternative border`,
         icon: `text-foreground-lighter`,
         header: `text-foreground`,
         description: `text-foreground-light`,
@@ -850,17 +850,17 @@ export default {
   sidepanel: {
     base: `
       z-50
-      bg-overlay
+      bg-dash-sidebar
       flex flex-col
       fixed
       inset-y-0
       h-full lg:h-screen
-      border-l border-overlay
+      border-l
       shadow-xl
     `,
     header: `
-      space-y-1 py-4 px-4 bg-overlay sm:px-6
-      border-b border-overlay
+      space-y-1 py-4 px-4 bg-dash-sidebar sm:px-6
+      border-b
     `,
     contents: `
       relative
@@ -873,7 +873,7 @@ export default {
     footer: `
       flex justify-end gap-2
       p-4 bg-overlay
-      border-t border-overlay
+      border-t
     `,
     size: {
       medium: `w-screen max-w-md h-full`,
@@ -1222,7 +1222,7 @@ export default {
   modal: {
     base: `
       relative
-      bg-overlay
+      bg-dash-sidebar
       my-4
       border border-overlay
       rounded-md
@@ -1351,7 +1351,7 @@ export default {
     option: `
       w-listbox
       transition cursor-pointer select-none relative py-2 pl-3 pr-9
-      text-foreground-muted
+      text-foreground-light
       text-sm
       hover:bg-border-overlay
       focus:bg-border-overlay
@@ -1360,7 +1360,7 @@ export default {
       focus:outline-none
     `,
     option_active: `text-foreground bg-selection`,
-    option_disabled: `cursor-not-allowed opacity-50`,
+    option_disabled: `cursor-not-allowed opacity-60`,
     option_inner: `flex items-center space-x-3`,
     option_check: `absolute inset-y-0 right-0 flex items-center pr-3 text-brand`,
     option_check_active: `text-brand`,

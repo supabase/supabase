@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Check, Loader2 } from 'lucide-react'
+import { Check, ExternalLink, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -26,7 +26,6 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   IconAlertCircle,
-  IconExternalLink,
   Input_Shadcn_,
   Modal,
 } from 'ui'
@@ -165,7 +164,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <IconExternalLink size={14} strokeWidth={1.5} />
+                    <ExternalLink size={14} strokeWidth={1.5} />
                   </Link>
                 </div>
               </div>

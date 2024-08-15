@@ -4,6 +4,7 @@ import {
   AdvancedAuthSettingsForm,
   BasicAuthSettingsForm,
   SmtpForm,
+  ThirdPartyAuthForm,
 } from 'components/interfaces/Auth'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
@@ -19,6 +20,7 @@ import type { NextPageWithLayout } from 'types'
 
 const AuthSettings: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
+  // TODO: check if these permissions cover third party auth as well
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
   return (
@@ -39,6 +41,7 @@ const AuthSettings: NextPageWithLayout = () => {
             <BasicAuthSettingsForm />
             <SmtpForm />
             <AdvancedAuthSettingsForm />
+            <ThirdPartyAuthForm />
           </>
         )}
       </ScaffoldContainer>

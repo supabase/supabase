@@ -2,12 +2,13 @@ import { Check, Minus, User, X } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useState } from 'react'
 
+import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import { Badge, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
@@ -19,17 +20,18 @@ interface MemberRowProps {
 }
 
 export const MemberRow = ({ member }: MemberRowProps) => {
+  const { slug } = useParams()
   const { profile } = useProfile()
   const { data: projects } = useProjectsQuery()
   const selectedOrganization = useSelectedOrganization()
   const [hasInvalidImg, setHasInvalidImg] = useState(false)
-  const projectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
   })
 
-  const memberIsUser = member.primary_email == profile?.primary_email
+  const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const isInvitedUser = Boolean(member.invited_id)
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
@@ -126,12 +128,10 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                     })
                     .filter((x) => x.length > 0)
 
-            if (projectsApplied.length === 0) return null
-
             return (
               <div key={`role-${id}`} className="flex items-center gap-x-2">
                 <p>{roleName}</p>
-                {projectLevelPermissionsEnabled && (
+                {isOptedIntoProjectLevelPermissions && (
                   <>
                     <span>•</span>
                     {projectsApplied.length === 1 ? (
@@ -147,17 +147,19 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                               : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
                           </span>
                         </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
-                          {projectsApplied
-                            ?.slice(0, 2)
-                            .map((name) => <span key={name}>{name}</span>)}
-                          {projectsApplied.length > 2 && (
-                            <span>
-                              And {projectsApplied.length - 2} other project
-                              {projectsApplied.length > 4 ? 's' : ''}
-                            </span>
-                          )}
-                        </TooltipContent_Shadcn_>
+                        {role?.project_ids !== null && projectsApplied.length > 1 && (
+                          <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
+                            {projectsApplied
+                              ?.slice(0, 2)
+                              .map((name) => <span key={name}>{name}</span>)}
+                            {projectsApplied.length > 2 && (
+                              <span>
+                                And {projectsApplied.length - 2} other project
+                                {projectsApplied.length > 4 ? 's' : ''}
+                              </span>
+                            )}
+                          </TooltipContent_Shadcn_>
+                        )}
                       </Tooltip_Shadcn_>
                     )}
                   </>

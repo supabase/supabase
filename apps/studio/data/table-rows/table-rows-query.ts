@@ -22,6 +22,7 @@ import {
 } from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
 import { formatFilterValue } from './utils'
+import { THRESHOLD_COUNT } from './table-rows-count-query'
 
 type GetTableRowsArgs = {
   table?: SupaTable
@@ -73,8 +74,8 @@ export const fetchAllTableRows = async ({
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
 
-  // If sorts is empty, use the primary key as the default sort
-  if (sorts.length === 0) {
+  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
+  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
     const primaryKey = getDefaultOrderByColumn(table)
     if (primaryKey) {
       queryChains = queryChains.order(table.name, primaryKey, true, true)
@@ -143,10 +144,9 @@ export const getTableRowsSqlQuery = ({
       queryChains = queryChains.filter(x.column, x.operator, value)
     })
 
-  // If sorts is empty, use the primary key as the default sort
-  if (sorts.length === 0) {
+  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
+  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
     const defaultOrderByColumn = getDefaultOrderByColumn(table)
-
     if (defaultOrderByColumn) {
       queryChains = queryChains.order(table.name, defaultOrderByColumn, true, true)
     }
@@ -176,9 +176,7 @@ export const getTableRowsSqlQuery = ({
   return outputSql
 }
 
-export type TableRows = {
-  rows: SupaRow[]
-}
+export type TableRows = { rows: SupaRow[] }
 
 export type TableRowsVariables = GetTableRowsArgs & {
   projectRef?: string
