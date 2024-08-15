@@ -36,7 +36,7 @@ Since the earliest days of pg_graphql, [keyset pagination](https://supabase.gith
     after: "Y3Vyc29yMQ=="
   ) {
   ...
-} 
+}
 ```
 
 to retrieve the first 2 records after the record with unique id `Y3Vyc29yMQ==` .
@@ -95,9 +95,7 @@ the `tags` column with type `text[]` can be filtered on.
 
 ```graphql
 {
-  blogCollection(
-    filter: {tags: {contains: ["tech", "innovation"]}},
-  ) {
+  blogCollection(filter: { tags: { contains: ["tech", "innovation"] } }) {
     edges {
       cursor
       node {
