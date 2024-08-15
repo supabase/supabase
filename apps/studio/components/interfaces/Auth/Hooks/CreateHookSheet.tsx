@@ -192,6 +192,34 @@ export const CreateHookSheet = ({
     }
   }, [authConfig, title, visible, definition])
 
+  const values = form.watch()
+
+  const statements = useMemo(() => {
+    let permissionChanges: string[] = []
+    if (hook.method.type === 'postgres') {
+      if (
+        hook.method.schema !== '' &&
+        hook.method.functionName !== '' &&
+        hook.method.functionName !== values.postgresValues.functionName
+      ) {
+        permissionChanges = getRevokePermissionStatements(
+          hook.method.schema,
+          hook.method.functionName
+        )
+      }
+    }
+
+    if (values.postgresValues.functionName !== '') {
+      permissionChanges = [
+        ...permissionChanges,
+        `-- Grant access to function to supabase_auth_admin\ngrant execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} to supabase_auth_admin;`,
+        `-- Grant access to schema to supabase_auth_admin\ngrant usage on schema ${values.postgresValues.schema} to supabase_auth_admin;`,
+        `-- Revoke function permissions from authenticated, anon and public\nrevoke execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} from authenticated, anon, public;`,
+      ]
+    }
+    return permissionChanges
+  }, [hook, values.postgresValues.schema, values.postgresValues.functionName])
+
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
     const definition = HOOKS_DEFINITIONS.find((d) => values.hookType === d.title)
@@ -238,34 +266,6 @@ export const CreateHookSheet = ({
       }
     )
   }
-
-  const values = form.watch()
-
-  const statements = useMemo(() => {
-    let permissionChanges: string[] = []
-    if (hook.method.type === 'postgres') {
-      if (
-        hook.method.schema !== '' &&
-        hook.method.functionName !== '' &&
-        hook.method.functionName !== values.postgresValues.functionName
-      ) {
-        permissionChanges = getRevokePermissionStatements(
-          hook.method.schema,
-          hook.method.functionName
-        )
-      }
-    }
-
-    if (values.postgresValues.functionName !== '') {
-      permissionChanges = [
-        ...permissionChanges,
-        `-- Grant access to function to supabase_auth_admin\ngrant execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} to supabase_auth_admin;`,
-        `-- Grant access to schema to supabase_auth_admin\ngrant usage on schema ${values.postgresValues.schema} to supabase_auth_admin;`,
-        `-- Revoke function permissions from authenticated, anon and public\nrevoke execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} from authenticated, anon, public;`,
-      ]
-    }
-    return permissionChanges
-  }, [hook, values.postgresValues.schema, values.postgresValues.functionName])
 
   return (
     <Sheet open={visible} onOpenChange={() => onClose()}>
