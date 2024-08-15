@@ -1,4 +1,4 @@
-import { Table, Plus } from 'lucide-react'
+import { Table2 } from 'lucide-react'
 
 import { useParams } from 'common'
 import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
@@ -18,7 +18,7 @@ export function useProjectLevelTableEditorCommands(options?: CommandOptions) {
         id: 'create-table',
         name: 'Create new table',
         route: `/project/${ref}/editor?create=table`,
-        icon: () => <Plus />,
+        icon: () => <Table2 />,
       },
     ],
     {
@@ -42,7 +42,7 @@ export function useTableEditorGotoCommands(options?: CommandOptions) {
         id: 'view-tables',
         name: 'View your tables',
         route: `/project/${ref}/editor`,
-        icon: () => <Table />,
+        icon: () => <Table2 />,
       },
     ],
     {
