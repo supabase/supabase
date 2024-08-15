@@ -1,0 +1,102 @@
+---
+id: 'functions-log-drains'
+title: 'Integrating with Log Drains'
+description: 'Integrating an Edge Function with a HTTP Endpoint Drain.'
+subtitle: 'Integrating an Edge Function with a HTTP Endpoint Drain.'
+---
+
+This guide will provide a walkthrough to integrate Edge Functions with a HTTP Endpoint Log Drain.
+
+<Admonition type="note">
+
+Log Drains on Supabase Platform is currently only available Team and Enterprise customers.
+
+</Admonition>
+
+## Setup Steps
+
+### Create and deploy the edge function
+
+Generate a new edge function template and update it to log out the received JSON payload. For simplicity, we will accept any request with an Anon Key.
+
+```bash
+supabase functions new hello-world
+```
+
+You can use this example snippet as an illustration of how the received request will be like.
+
+```ts
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+
+Deno.serve(async (req) => {
+  const data = await req.json()
+
+  console.log(`Received ${data.length} logs, first log:\n ${JSON.stringify(data[0])}`)
+  return new Response(JSON.stringify({ message: 'ok' }), {
+    headers: { 'Content-Type': 'application/json' },
+  })
+})
+```
+
+And then deploy it with:
+
+```bash
+supabase functions deploy hello-world --project-ref [PROJECT REF]
+```
+
+<Admonition type="warning">
+
+This will create an infinite loop, as we are generating an additional log event that will eventually trigger a new request to this edge function. However, due to the batching nature of how Log Drain events are dispatched, the rate of edge function triggers will not increase greatly and will have an upper bound.
+
+</Admonition>
+
+### Configure the HTTP Drain
+
+Create a HTTP drain under the [Project Settings > Log Drains](https://supabase.com/dashboard/project/_/settings/log-drains).
+
+- Disable the Gzip, as we want to receive the payload without compression.
+- Under URL, set it to your edge function URL `https://[PROJECT REF].supabase.co/functions/v1/hello-world`
+- Under Headers, set the `Authorization: Bearer [ANON KEY]`
+
+<ProjectConfigVariables variable="anonKey" />
+
+## Enabling Gzip
+
+To send compressed requests and reduce egress costs, adjusting the edge function to support Gzip can be achieved using native in-built APIs:
+
+```ts
+import { gunzipSync } from 'node:zlib'
+
+Deno.serve(async (req) => {
+  try {
+    // Check if the request body is gzip compressed
+    const contentEncoding = req.headers.get('content-encoding')
+    if (contentEncoding !== 'gzip') {
+      return new Response('Request body is not gzip compressed', {
+        status: 400,
+      })
+    }
+
+    // Read the compressed body
+    const compressedBody = await req.arrayBuffer()
+
+    // Decompress the body
+    const decompressedBody = gunzipSync(new Uint8Array(compressedBody))
+
+    // Convert the decompressed body to a string
+    const decompressedString = new TextDecoder().decode(decompressedBody)
+    const data = JSON.parse(decompressedString)
+    // Process the decompressed body as needed
+    console.log(`Received: ${data.length} logs.`)
+
+    return new Response('ok', {
+      headers: { 'Content-Type': 'text/plain' },
+    })
+  } catch (error) {
+    console.error('Error:', error)
+    return new Response('Error processing request', { status: 500 })
+  }
+})
+```
+
+After deployment, re-configure the HTTP Endpoint by turning on the Gzip option to send gzipped payloads to the edge function.
