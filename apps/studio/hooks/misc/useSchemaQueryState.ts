@@ -2,8 +2,6 @@ import { parseAsString, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useCallback } from 'react'
-import { useLocalStorage } from './useLocalStorage'
 
 /**
  * This hook wraps useQueryState because useQueryState imports app router for some reason which breaks the SSR in
@@ -20,20 +18,19 @@ const useIsomorphicUseQueryState = (defaultSchema: string) => {
 
 export const useQuerySchemaState = () => {
   const { ref } = useParams()
-  const [defaultSchema, setDefaultSchema] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref ?? ''),
-    'public'
-  )
 
-  const [schema, setSchema] = useIsomorphicUseQueryState(defaultSchema)
+  let defaultSchema = 'public'
+  if (typeof window !== 'undefined') {
+    defaultSchema =
+      window.localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref ?? '')) || 'public'
+  }
 
-  const setSelectedSchema = useCallback(
-    (schema: string) => {
-      setDefaultSchema(schema)
-      setSchema(schema)
-    },
-    [setDefaultSchema, setSchema]
-  )
+  const [schema, setSelectedSchema] = useIsomorphicUseQueryState(defaultSchema)
+
+  // Update the schema to local storage on every change
+  if (defaultSchema !== schema && typeof window !== 'undefined') {
+    window.localStorage.setItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref ?? ''), schema)
+  }
 
   return { selectedSchema: schema, setSelectedSchema }
 }
