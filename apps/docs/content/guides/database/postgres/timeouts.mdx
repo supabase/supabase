@@ -18,7 +18,7 @@ You can change the Postgres timeout at the:
 
 ### Session level
 
-Session level settings persist for the duration of the connection. You must be connecting to the database in session mode for this to take effect.
+Session level settings persist only for the duration of the connection.
 
 Set the session timeout by running:
 
@@ -26,7 +26,7 @@ Set the session timeout by running:
 set statement_timeout = '10min';
 ```
 
-Because this applies to sessions only, it can only be used with connections through Supavisor in session mode (port 5432) or a direct connection. It cannot be used in the Dashboard, with the Supabase Client API, nor with Supavisor in Transaction mode (port 6543).
+Because it applies to sessions only, it can only be used with connections through Supavisor in session mode (port 5432) or a direct connection. It cannot be used in the Dashboard, with the Supabase Client API, nor with Supavisor in Transaction mode (port 6543).
 
 This is most often used for single, long running, administrative tasks, such as creating an HSNW index. Once the setting is implemented, you can view it by executing:
 
@@ -51,25 +51,9 @@ set statement_timeout TO '4s'; -- set custom timeout
 
 This is mostly for recurring functions that need a special exemption for runtimes.
 
-### Global level
-
-This changes the statement timeout for all queries.
-
-It is only available on Supabase Postgres version 15.1.1.78 and higher. If you are unsure what version you have, check your [Infrastructure Settings](/dashboard/project/_/settings/infrastructure)
-
-```sql
-alter database postgres set statement_timeout TO '4s';
-```
-
-Check if your changes took effect:
-
-```sql
-show statement_timeout;
-```
-
 ### Role level
 
-This sets the timeout for a specific role. It has a higher precedence than the global timeout setting.
+This sets the timeout for a specific role.
 
 The default role timeouts are:
 
@@ -101,6 +85,20 @@ where
   );
 ```
 
+### Global level
+
+This changes the statement timeout for all roles and sessions without an explicit timeout already set.
+
+```sql
+alter database postgres set statement_timeout TO '4s';
+```
+
+Check if your changes took effect:
+
+```sql
+show statement_timeout;
+```
+
 Although not necessary, if you are uncertain if a timeout has been applied, you can run a quick test:
 
 ```sql
@@ -117,7 +115,7 @@ The Supabase Dashboard contains tools to help you identify timed-out and long-ru
 
 ### Using the Log Explorer
 
-Go to the [Log Explorer](/dashboard/project/_/logs/explorer), and run the following query to identify timed-out events (`statement timeout`) and queries that successfully run in greater than 10 seconds (`duration`).
+Go to the [Log Explorer](/dashboard/project/_/logs/explorer), and run the following query to identify timed-out events (`statement timeout`) and queries that successfully run for longer than 10 seconds (`duration`).
 
 ```sql
 select
@@ -170,9 +168,3 @@ where
   -- find events from the relevant role
   parsed.user_name = '<ROLE>'
 ```
-
-## Resources
-
-- [How to interpret and explore the Postgres logs](https://github.com/orgs/supabase/discussions/26224)
-- [How to interpret and explore the Database API logs](https://github.com/orgs/supabase/discussions/22849)
-- [How to filter the Log Explorer](https://github.com/orgs/supabase/discussions/22640)

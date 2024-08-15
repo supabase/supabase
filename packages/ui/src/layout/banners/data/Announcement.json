@@ -1,7 +1,7 @@
 {
   "show": true,
-  "text": "Launch Week 12",
+  "text": "Launch Week 12: Day 3",
   "launchDate": "2024-08-12T07:00:00.000-08:00",
-  "link": "https://supabase.com/launch-week",
-  "cta": "Claim ticket"
+  "link": "/launch-week#day-3",
+  "cta": "Learn more"
 }

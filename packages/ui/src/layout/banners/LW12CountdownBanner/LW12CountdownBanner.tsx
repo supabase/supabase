@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { Button } from '../../../components/Button/Button'
 import { cn } from '../../../lib/utils/cn'
 import announcement from '../data/Announcement.json'
-import Countdown from './Countdown'
+// import Countdown from './Countdown'
 
 export function LW12CountdownBanner() {
   const pathname = usePathname()
@@ -27,11 +27,8 @@ export function LW12CountdownBanner() {
           )}
         >
           <p className="flex gap-1.5 items-center">{announcement.text}</p>
-          <div className="hidden sm:block">
-            <Countdown date={new Date(announcement.launchDate)} showCard={false} />
-          </div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
-            <Link href="https://supabase.com/launch-week">{announcement.cta}</Link>
+            <Link href={`https://supabase.com${announcement.link}`}>{announcement.cta}</Link>
           </Button>
         </div>
       </div>

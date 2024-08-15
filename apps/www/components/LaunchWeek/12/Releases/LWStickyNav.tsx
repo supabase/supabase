@@ -5,17 +5,9 @@ import { cn } from 'ui'
 import { isBrowser } from 'common'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import useConfData from '../../hooks/use-conf-data'
-import Image from 'next/image'
 
 const LWXStickyNav: FC = () => {
   const days = mainDays()
-  const { ticketState, userData } = useConfData()
-  const hasPlatinumTicket = userData.platinum
-  const hasSecretTicket = userData.secret
-  const hasTicket = ticketState === 'ticket'
-  const USER = userData?.name || userData?.username
-  const DISPLAY_NAME = USER && USER.split(' ')[0]
 
   const OFFSET = 66
   const anchors = useRef<NodeListOf<HTMLHeadingElement> | null>(null)
@@ -49,8 +41,8 @@ const LWXStickyNav: FC = () => {
 
   useEffect(() => {
     if (!isBrowser) return
-    anchors.current = document.querySelectorAll('.lwx-nav-anchor')
-    links.current = document.querySelectorAll('.lwx-sticky-nav li a')
+    anchors.current = document.querySelectorAll('.lw-nav-anchor')
+    links.current = document.querySelectorAll('.lw-sticky-nav li a')
 
     window.addEventListener('scroll', handleScroll)
     return () => {
@@ -58,28 +50,19 @@ const LWXStickyNav: FC = () => {
     }
   }, [])
 
-  function getTicketIcon() {
-    const getImgPath = (type: string) =>
-      `/images/launchweek/11/tickets/icon/ticket-icon-${type}.png`
-
-    if (hasSecretTicket) return getImgPath('secret')
-    if (hasPlatinumTicket) return getImgPath('platinum')
-    return getImgPath('regular')
-  }
-
   return (
     <div className="absolute inset-0 pointer-events-none w-full h-full">
-      <nav className="sticky z-30 top-0 bg-alternative/90 backdrop-blur-sm pointer-events-auto w-full border-t border-b dark:border-[#111718] h-[60px] flex items-center">
+      <nav className="sticky z-30 top-0 bg-default/90 backdrop-blur-sm pointer-events-auto w-full border-b dark:border-muted h-[60px] flex items-center">
         <SectionContainer className="!max-w-none !py-0 lg:!container flex items-center justify-between font-mono gap-4 md:gap-8 text-sm">
-          <div className="flex items-center gap-4 md:gap-8">
-            <ul className="lwx-sticky-nav hidden md:flex items-center gap-2 md:gap-4 text-foreground-muted">
+          <div className="w-full flex items-center gap-4 md:gap-8">
+            <ul className="w-full lw-sticky-nav flex items-center gap-2 md:gap-4 text-foreground-lighter">
               {days.map((day: WeekDayProps) => (
                 <li key={day.id}>
                   <Link
                     href={`#${day.id}`}
                     className={cn(
-                      'p-1 transition-colors hover:text-foreground flex items-center',
-                      day.isToday && 'text-foreground-light'
+                      'p-1 transition-colors text-foreground-muted hover:text-foreground flex items-center',
+                      (day.isToday || day.shipped) && 'text-foreground-light'
                     )}
                   >
                     {day.dd}{' '}
@@ -94,29 +77,22 @@ const LWXStickyNav: FC = () => {
               ))}
               <li>
                 <Link href="#build-stage" className="p-1 transition-colors hover:text-foreground">
-                  Build Stage
+                  Build <span className="hidden sm:inline">Stage</span>
                 </Link>
               </li>
+              <div className="flex items-center justify-end gap-2 md:gap-4 flex-1">
+                <li>
+                  <Link href="#meetups" className="p-1 transition-colors hover:text-foreground">
+                    Meetups
+                  </Link>
+                </li>
+                <li className="hidden sm:block">
+                  <Link href="#ticket" className="p-1 transition-colors hover:text-foreground">
+                    Ticket
+                  </Link>
+                </li>
+              </div>
             </ul>
-          </div>
-          <div>
-            {hasTicket && (
-              <Link
-                href="#ticket"
-                className="flex items-center gap-2 text-xs text-foreground-light hover:text-foreground transition-colors"
-              >
-                {DISPLAY_NAME}'s ticket
-                <Image
-                  src={getTicketIcon()}
-                  alt=""
-                  width={24}
-                  height={24}
-                  aria-hidden
-                  className="w-auto h-4 shadow"
-                  priority
-                />
-              </Link>
-            )}
           </div>
         </SectionContainer>
       </nav>

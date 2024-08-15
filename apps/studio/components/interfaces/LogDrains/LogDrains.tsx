@@ -117,7 +117,7 @@ export function LogDrains({
             <TableRow>
               <TableHead className="max-w-[200px]">Name</TableHead>
               <TableHead>Description</TableHead>
-              <TableHead className="text-right">Source</TableHead>
+              <TableHead className="text-right">Destination</TableHead>
               <TableHead className="text-right">
                 <div className="sr-only">Actions</div>
               </TableHead>
@@ -164,6 +164,8 @@ export function LogDrains({
           </TableBody>
 
           <ConfirmationModal
+            confirmLabel="Delete"
+            variant="destructive"
             title="Delete Log Drain"
             visible={isDeleteModalOpen}
             onConfirm={() => {

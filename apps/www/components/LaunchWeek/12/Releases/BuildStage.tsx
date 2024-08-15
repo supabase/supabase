@@ -1,8 +1,8 @@
 import React, { FC } from 'react'
-import { buildDays as days } from '~/components/LaunchWeek/11/Releases/data'
+import { buildDays as days } from '~/components/LaunchWeek/12/Releases/data'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import AdventCard from './components/AdventCard'
+import BuildCard from './components/BuildCard'
 import { motion, useInView } from 'framer-motion'
 import { cn } from 'ui'
 
@@ -24,7 +24,7 @@ const BuildStage: FC = () => {
 
   return (
     <>
-      <SectionContainer className="!max-w-none lg:!container lwx-nav-anchor" id="build-stage">
+      <SectionContainer className="!max-w-none lg:!container lw-nav-anchor" id="build-stage">
         <h3 className="text-foreground uppercase font-mono pb-4 md:pb-8 text-sm tracking-[0.1rem]">
           Build Stage
         </h3>
@@ -38,12 +38,12 @@ const BuildStage: FC = () => {
             <li
               key={`${day.id}-${i}`}
               className={cn(
-                'relative flex flex-col w-full aspect-square rounded-xl border border-dashed border-muted bg-surface-100/10 col-span-1',
+                'relative flex flex-col w-full aspect-video max-h-[250px] sm:aspect-square rounded-xl border border-dashed border-strong dark:border-background-surface-300 bg-surface-100/10 col-span-1',
                 day.className
               )}
               data-delay={i}
             >
-              <AdventCard day={day} index={i} />
+              <BuildCard day={day} index={i} />
               {!day.is_shipped && (
                 <div className="absolute m-4 md:m-6 lg:m-8">
                   <svg

@@ -37,7 +37,7 @@
     "config": "*",
     "contentlayer2": "0.4.6",
     "dat.gui": "^0.7.9",
-    "dayjs": "^1.11.10",
+    "dayjs": "^1.11.12",
     "eslint-config-supabase": "*",
     "framer-motion": "^11.0.3",
     "globby": "^13.2.2",

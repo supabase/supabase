@@ -2569,4 +2569,9 @@ module.exports = [
     destination:
       '/docs/guides/auth/phone-login?showSmsProvider=Textlocal%2520%28Community%2520Supported%29',
   },
+  {
+    permanent: true,
+    source: '/launchweek',
+    destination: '/launch-week',
+  },
 ]
