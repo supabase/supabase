@@ -86,7 +86,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                         <Link href={href} className="w-full flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span>{org.name}</span>
-                            <PartnerIcon organizationSlug={org.slug} />
+                            <PartnerIcon organization={org} />
                           </div>
                           {org.slug === slug && <Check size={16} />}
                         </Link>

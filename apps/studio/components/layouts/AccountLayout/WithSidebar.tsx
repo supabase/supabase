@@ -133,6 +133,7 @@ const SidebarItem = ({ links, subitems, subitemsParentKey }: SidebarItemProps) =
             href={link.href}
             onClick={link.onClick}
             isExternal={link.isExternal || false}
+            icon={link.icon}
           />
         )
 
@@ -145,6 +146,7 @@ const SidebarItem = ({ links, subitems, subitemsParentKey }: SidebarItemProps) =
               label={y.label}
               onClick={y.onClick}
               isExternal={link.isExternal || false}
+              icon={link.icon}
             />
           ))
           render = [render, ...subItemsRender]
@@ -168,6 +170,7 @@ const SidebarLinkItem = ({
   isSubitem,
   isExternal,
   onClick,
+  icon,
 }: SidebarLinkProps) => {
   if (isUndefined(href)) {
     let icon
@@ -210,7 +213,7 @@ const SidebarLinkItem = ({
           >
             {isSubitem ? <p>{label}</p> : label}
           </span>
-          <PartnerIcon organizationSlug={id} />
+          {icon}
         </div>
       </span>
     </Link>

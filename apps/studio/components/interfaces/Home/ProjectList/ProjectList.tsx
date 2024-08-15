@@ -1,8 +1,10 @@
 import { groupBy } from 'lodash'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
+import { PartnerIcon } from 'components/ui/partner-icon'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import {
@@ -16,12 +18,10 @@ import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-w
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
-import { Plus } from 'lucide-react'
 import type { Organization, ResponseError } from 'types'
-import { Button, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Button, cn } from 'ui'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
-import { PartnerIcon } from 'components/ui/partner-icon'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
@@ -225,7 +225,7 @@ const OrganizationProjects = ({
       <div className="flex space-x-4 items-center">
         <div className="flex items-center gap-2">
           <h4 className="text-lg flex items-center">{organization.name}</h4>{' '}
-          <PartnerIcon organizationSlug={organization.slug} />
+          <PartnerIcon organization={organization} />
         </div>
         {!!overdueInvoices.length && (
           <div>
