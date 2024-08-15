@@ -4409,6 +4409,241 @@ functions:
           )
           ```
 
+  - id: subscribe
+    title: on().subscribe()
+    notes: |
+      - By default, Broadcast and Presence are enabled for all projects.
+      - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
+      - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
+      - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
+    examples:
+      - id: listen-to-broadcast
+        name: Listen to broadcast messages
+        isSpotlight: true
+        code: |
+          ```python
+          channel = supabase.channel("room1")
+
+          def on_subscribe(status, err):
+            if status == RealtimeSubscribeStates.SUBSCRIBED:
+              channel.send_broadcast('cursor-pos', { "x": random.random(), "y": random.random() })
+
+          def handle_broadcast(payload):
+            print("Cursor position received!", payload)
+
+          channel.on_broadcast(event="cursor-pos", callback=handle_broadcast).subscribe(on_subscribe)
+          ```
+      - id: listen-to-presence-sync
+        name: Listen to presence sync
+        isSpotlight: true
+        code: |
+          ```python
+          channel = supabase.channel('room1')
+
+          def on_subscribe(status, err):
+            if status == RealtimeSubscribeStates.SUBSCRIBED:
+              channel.track({ "online_at": datetime.datetime.now().isoformat() })
+
+          def handle_presence_sync():
+            print('Synced presence state: ', channel.presence.state)
+
+          channel.on_presence_sync(callback=handle_presence_sync).subscribe(on_subscribe)
+          ```
+      - id: listen-to-presence-join
+        name: Listen to presence join
+        isSpotlight: true
+        code: |
+          ```python
+          channel = supabase.channel('room1')
+
+          def handle_presence_join(key, current_presence, new_presence):
+            print('Newly joined presences: ', new_presence)
+
+          def on_subscribe(status, err):
+            if status == RealtimeSubscribeStates.SUBSCRIBED:
+              channel.track({ "online_at": datetime.datetime.now().isoformat() })
+
+          channel.on_presence_join(callback=handle_presence_join).subscribe(on_subscribe)
+          ```
+      - id: listen-to-presence-leave
+        name: Listen to presence leave
+        isSpotlight: true
+        code: |
+          ```python
+          channel = supabase.channel('room1')
+
+          def handle_presence_leave(key, current_presence, left_presence):
+            print('Newly left presences: ', left_presence)
+
+          def on_subscribe(status, err):
+            if status == RealtimeSubscribeStates.SUBSCRIBED:
+              channel.track({ "online_at": datetime.datetime.now().isoformat() })
+              channel.untrack()
+
+          channel.on_presence_leave(callback=handle_presence_leave).subscribe(on_subscribe)
+          ```
+      - id: listen-to-all-database-changes
+        name: Listen to all database changes
+        isSpotlight: true
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("*", schema="*", callback=handle_record_updated)
+            .subscribe()
+          ```
+      - id: listen-to-a-specific-table
+        name: Listen to a specific table
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("*", schema="public", table="countries", callback=handle_record_updated)
+            .subscribe()
+          ```
+      - id: listen-to-inserts
+        name: Listen to inserts
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
+            .subscribe()
+          ```
+      - id: listen-to-updates
+        name: Listen to updates
+        description: |
+          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          enable full replication for the table you are listening to:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("UPDATE", schema="public", table="countries", callback=handle_record_updated)
+            .subscribe()
+          ```
+      - id: listen-to-deletes
+        name: Listen to deletes
+        description: |
+          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          enable full replication for the table you are listening too:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
+            .subscribe()
+          ```
+      - id: listen-to-multiple-events
+        name: Listen to multiple events
+        description: You can chain listeners if you want to listen to multiple events for each table.
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
+            .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
+            .subscribe()
+          ```
+      - id: listening-to-row-level-changes
+        name: Listen to row level changes
+        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        notes: |
+          - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("UPDATE", schema="public", table="countries", filter="id=eq.200", callback=handle_record_updated)
+            .subscribe()
+          ```
+  - id: broadcast-message
+    title: broadcastMessage()
+    description: |
+      Broadcast a message to all connected clients to a channel.
+    notes: |
+      - When using REST you don't need to subscribe to the channel
+      - REST calls are only available from 2.37.0 onwards
+    $ref: '@supabase/realtime-js.RealtimeChannel.send'
+    examples:
+      - id: send-a-message
+        name: Send a message via websocket
+        isSpotlight: true
+        code: |
+          ```python
+          channel = supabase.channel('room1')
+
+          def on_subscribe(status, err):
+            if status == RealtimeSubscribeStates.SUBSCRIBED:
+              channel.send_broadcast('cursor-pos', { "x": random.random(), "y": random.random() })
+
+          channel.subscribe(on_subscribe)
+          ```
+        response: |
+          ```
+          ok | timed out | error
+          ```
+      # - id: send-a-message-via-rest
+      #   name: Send a message via REST
+      #   isSpotlight: true
+      #   code: |
+      #     ```python
+      #     supabase
+      #       .channel('room1')
+      #       .send_broadcast(
+      #         'cursor-pos',
+      #         { "x": random.random(), "y": random.random() },
+      #       )
+      #     ```
+  - id: get-channels
+    title: getChannels()
+    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
+    examples:
+      - id: get-all-channels
+        name: Get all channels
+        isSpotlight: true
+        code: |
+          ```python
+          channels = supabase.get_channels()
+          ```
+
+  - id: remove-channel
+    title: removeChannel()
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
+    notes: |
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - id: removes-a-channel
+        name: Removes a channel
+        isSpotlight: true
+        code: |
+          ```python
+          supabase.remove_channel(myChannel)
+          ```
+
+  - id: remove-all-channels
+    title: removeAllChannels()
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
+    notes: |
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - id: remove-all-channels
+        name: Remove all channels
+        isSpotlight: true
+        code: |
+          ```python
+          supabase.remove_all_channels()
+          ```
+
+
   - id: list-buckets
     title: 'list_buckets()'
     notes: |
