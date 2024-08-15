@@ -61,7 +61,7 @@ const OAuthApps = () => {
   if (!canReadOAuthApps) {
     return (
       <ScaffoldContainerLegacy>
-        <NoPermission resourceText="view invoices" />
+        <NoPermission resourceText="view OAuth apps" />
       </ScaffoldContainerLegacy>
     )
   }

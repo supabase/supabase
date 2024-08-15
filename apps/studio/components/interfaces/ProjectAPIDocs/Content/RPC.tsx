@@ -10,7 +10,7 @@ import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
 
-const RPC = ({ language }: ContentProps) => {
+export const RPC = ({ language }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
@@ -22,10 +22,28 @@ const RPC = ({ language }: ContentProps) => {
 
   const rpcName = snap.activeDocsSection[1]
   const rpc = functions.find((fn) => fn.name === rpcName)
-  const rpcJsonSchema = jsonSchema?.paths[rpc?.path]
 
+  const {
+    post: { parameters: postParameters },
+  } = rpc ?? {}
+  const rpcJsonSchema = jsonSchema?.paths[rpc?.path]
   const summary = rpcJsonSchema?.post?.summary
-  const parameters = rpc?.get.parameters ?? []
+
+  const rpcParamsObject =
+    postParameters &&
+    postParameters[0] &&
+    postParameters[0].schema &&
+    postParameters[0].schema.properties
+      ? postParameters[0].schema.properties
+      : {}
+  const parameters: { name: string; format: string; type: string; required: boolean }[] =
+    Object.entries(rpcParamsObject)
+      .map(([k, v]: any) => ({
+        name: k,
+        ...v,
+        required: postParameters[0].schema.required.includes(k),
+      }))
+      .filter((x) => !!x.name)
 
   useEffect(() => {
     if (rpcName !== undefined) {
@@ -51,7 +69,7 @@ const RPC = ({ language }: ContentProps) => {
             <Table.th key="type">Type</Table.th>,
             <Table.th key="required"></Table.th>,
           ]}
-          body={parameters.map((parameter: any) => (
+          body={parameters.map((parameter) => (
             <Table.tr key={parameter.name}>
               <Table.td title={parameter.name}>
                 <p className="font-mono text-xs text-foreground truncate">{parameter.name}</p>
@@ -62,7 +80,7 @@ const RPC = ({ language }: ContentProps) => {
                 {parameter.required ? (
                   <Badge variant="warning">Required</Badge>
                 ) : (
-                  <p className="text-foreground-light">Optional</p>
+                  <Badge variant="default">Optional</Badge>
                 )}
               </Table.td>
             </Table.tr>
@@ -83,5 +101,3 @@ const RPC = ({ language }: ContentProps) => {
     </div>
   )
 }
-
-export default RPC

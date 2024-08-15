@@ -17,7 +17,7 @@ The number of dimensions in your embeddings is the most important factor in choo
 
 ## HNSW
 
-### 384 dimensions
+### 384 dimensions [#hnsw-384-dimensions]
 
 This benchmark uses the dbpedia-entities-openai-1M dataset containing 1,000,000 embeddings of text, regenerated for 384 dimension embeddings. Each embedding is generated using [gte-small](https://huggingface.co/Supabase/gte-small).
 
@@ -48,7 +48,7 @@ Accuracy was 0.99 for benchmarks.
 </TabPanel>
 </Tabs>
 
-### 960 dimensions
+### 960 dimensions [#hnsw-960-dimensions]
 
 This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, which contains 1,000,000 embeddings of images. Each embedding is 960 dimensions.
 
@@ -56,10 +56,10 @@ This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, whic
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="openai1536"
+  defaultActiveId="gist960"
   queryGroup="benchmark"
 >
-<TabPanel id="openai1536" label="OpenAI-1536">
+<TabPanel id="gist960" label="gist-960">
 
 | Compute Size | Vectors   | m   | ef_construction | ef_search | QPS  | Latency Mean | Latency p95 | RAM Usage     | RAM    |
 | ------------ | --------- | --- | --------------- | --------- | ---- | ------------ | ----------- | ------------- | ------ |
@@ -81,7 +81,7 @@ QPS can also be improved by increasing [`m` and `ef_construction`](/docs/guides/
 </TabPanel>
 </Tabs>
 
-### 1536 dimensions
+### 1536 dimensions [#hnsw-1536-dimensions]
 
 This benchmark uses the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset, which contains 1,000,000 embeddings of text. And 224,482 embeddings from [Wikipedia articles](https://huggingface.co/datasets/Supabase/wikipedia-en-embeddings) for compute add-ons `large` and below. Each embedding is 1536 dimensions created with the [OpenAI Embeddings API](https://platform.openai.com/docs/guides/embeddings).
 
@@ -131,7 +131,7 @@ It is possible to upload more vectors to a single table if Memory allows it (for
 
 ## IVFFlat
 
-### 384 dimensions
+### 384 dimensions [#ivfflat-384-dimensions]
 
 This benchmark uses the dbpedia-entities-openai-1M dataset containing 1,000,000 embeddings of text, regenerated for 384 dimension embeddings. Each embedding is generated using [gte-small](https://huggingface.co/Supabase/gte-small).
 
@@ -176,7 +176,7 @@ This benchmark uses the dbpedia-entities-openai-1M dataset containing 1,000,000 
 </TabPanel>
 </Tabs>
 
-### 960 dimensions
+### 960 dimensions [#ivfflat-960-dimensions]
 
 This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, which contains 1,000,000 embeddings of images. Each embedding is 960 dimensions.
 
@@ -205,7 +205,7 @@ This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, whic
 </TabPanel>
 </Tabs>
 
-### 1536 dimensions
+### 1536 dimensions [#ivfflat-1536-dimensions]
 
 This benchmark uses the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset, which contains 1,000,000 embeddings of text. Each embedding is 1536 dimensions created with the [OpenAI Embeddings API](https://platform.openai.com/docs/guides/embeddings).
 

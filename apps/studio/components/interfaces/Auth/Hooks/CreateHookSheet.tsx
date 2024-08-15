@@ -225,7 +225,7 @@ export const CreateHookSheet = ({
 
   return (
     <Sheet open={visible} onOpenChange={() => onClose()}>
-      <SheetContent showClose={false} className="flex flex-col gap-0">
+      <SheetContent size="lg" showClose={false} className="flex flex-col gap-0">
         <SheetHeader className="py-3 flex flex-row justify-between items-center border-b-0">
           <div className="flex flex-row gap-3 items-center">
             <SheetClose
@@ -383,7 +383,7 @@ export const CreateHookSheet = ({
                           <Button
                             type="default"
                             size="small"
-                            className="rounded-l-none h-[38px]"
+                            className="rounded-l-none"
                             onClick={() => {
                               const authHookSecret = generateAuthHookSecret()
                               form.setValue('httpsValues.secret', authHookSecret)

@@ -22,6 +22,7 @@ import {
 } from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
 import { formatFilterValue } from './utils'
+import { THRESHOLD_COUNT } from './table-rows-count-query'
 
 type GetTableRowsArgs = {
   table?: SupaTable
@@ -73,26 +74,17 @@ export const fetchAllTableRows = async ({
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
 
-  /**
-   * [Joshen] JFYI 190724 We've commented the default sort logic out below and in getTableRowsSqlQuery
-   * as the default sort causes resource issues in particular for very large tables (e.g 200M rows)
-   * The long term fix here should be to only apply default sort if table has < 50k rows
-   * - this is the same threshold that we do for retrieving the exact count on the table (ref table-rows-count-query)
-   * - we can check the estimate row count when we get the table details via pg-meta under the live_rows_estimate property
-   * - i.e the larger the table, the less hand holding the table editor does (which i think is fair from a scalability pov)
-   */
-
-  // If sorts is empty, use the primary key as the default sort
-  // if (sorts.length === 0) {
-  //   const primaryKey = getDefaultOrderByColumn(table)
-  //   if (primaryKey) {
-  //     queryChains = queryChains.order(table.name, primaryKey, true, true)
-  //   }
-  // } else {
-  sorts.forEach((sort) => {
-    queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
-  })
-  // }
+  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
+  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
+    const primaryKey = getDefaultOrderByColumn(table)
+    if (primaryKey) {
+      queryChains = queryChains.order(table.name, primaryKey, true, true)
+    }
+  } else {
+    sorts.forEach((sort) => {
+      queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
+    })
+  }
 
   // Starting from page 0, fetch 500 records per call
   let page = -1
@@ -152,18 +144,17 @@ export const getTableRowsSqlQuery = ({
       queryChains = queryChains.filter(x.column, x.operator, value)
     })
 
-  // If sorts is empty, use the primary key as the default sort
-  // if (sorts.length === 0) {
-  //   const defaultOrderByColumn = getDefaultOrderByColumn(table)
-
-  //   if (defaultOrderByColumn) {
-  //     queryChains = queryChains.order(table.name, defaultOrderByColumn, true, true)
-  //   }
-  // } else {
-  sorts.forEach((x) => {
-    queryChains = queryChains.order(x.table, x.column, x.ascending, x.nullsFirst)
-  })
-  // }
+  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
+  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
+    const defaultOrderByColumn = getDefaultOrderByColumn(table)
+    if (defaultOrderByColumn) {
+      queryChains = queryChains.order(table.name, defaultOrderByColumn, true, true)
+    }
+  } else {
+    sorts.forEach((x) => {
+      queryChains = queryChains.order(x.table, x.column, x.ascending, x.nullsFirst)
+    })
+  }
 
   // getPagination is expecting to start from 0
   const { from, to } = getPagination((page ?? 1) - 1, limit)
@@ -185,9 +176,7 @@ export const getTableRowsSqlQuery = ({
   return outputSql
 }
 
-export type TableRows = {
-  rows: SupaRow[]
-}
+export type TableRows = { rows: SupaRow[] }
 
 export type TableRowsVariables = GetTableRowsArgs & {
   projectRef?: string

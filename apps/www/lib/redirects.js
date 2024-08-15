@@ -2425,18 +2425,8 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/launch-week',
-    destination: '/ga-week',
-  },
-  {
-    permanent: false,
     source: '/special-announcement',
     destination: '/ga-week',
-  },
-  {
-    permanent: false,
-    source: '/launch-week/tickets/:path*',
-    destination: '/ga-week/tickets/:path*',
   },
   {
     permanent: false,
@@ -2578,5 +2568,10 @@ module.exports = [
     source: '/docs/guides/auth/phone-login/textlocal',
     destination:
       '/docs/guides/auth/phone-login?showSmsProvider=Textlocal%2520%28Community%2520Supported%29',
+  },
+  {
+    permanent: true,
+    source: '/launchweek',
+    destination: '/launch-week',
   },
 ]
