@@ -140,6 +140,67 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     }
   }
 
+  const exportTableAsSQL = async () => {
+    if (IS_PLATFORM && !project?.connectionString) {
+      return console.error('Connection string is required')
+    }
+    const toastId = toast.loading(`Exporting ${entity.name} as SQL...`)
+
+    try {
+      const table = await getTable({
+        id: entity.id,
+        projectRef,
+        connectionString: project?.connectionString,
+      })
+      const supaTable =
+        table &&
+        parseSupaTable(
+          {
+            table: table,
+            columns: table.columns ?? [],
+            primaryKeys: table.primary_keys,
+            relationships: table.relationships,
+          },
+          []
+        )
+
+      const rows = await fetchAllTableRows({
+        projectRef,
+        connectionString: project?.connectionString,
+        table: supaTable,
+      })
+      const formattedRows = rows.map((row) => {
+        const formattedRow = row
+        Object.keys(row).map((column) => {
+          if (typeof row[column] === 'object' && row[column] !== null)
+            formattedRow[column] = JSON.stringify(formattedRow[column])
+        })
+        return formattedRow
+      })
+
+      if (formattedRows.length > 0) {
+        const sqlStatements = formattedRows
+          .map((row) => {
+            const columns = Object.keys(row)
+              .map((col) => `"${col}"`)
+              .join(', ')
+            const values = Object.values(row)
+              .map((val) => `'${val}'`)
+              .join(', ')
+            return `INSERT INTO ${entity.name} (${columns}) VALUES (${values});`
+          })
+          .join('\n')
+
+        const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
+        saveAs(sqlData, `${entity!.name}_rows.sql`)
+      }
+
+      toast.success(`Successfully exported ${entity.name} as SQL`, { id: toastId })
+    } catch (error: any) {
+      toast.error(`Failed to export table: ${error.message}`, { id: toastId })
+    }
+  }
+
   const EntityTooltipTrigger = ({ entity }: { entity: Entity }) => {
     let tooltipContent = null
 
@@ -334,6 +395,17 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
             >
               <Download size={12} />
               <span>Export as CSV</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              key="download-table-csv"
+              className="space-x-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                exportTableAsSQL()
+              }}
+            >
+              <Download size={12} />
+              <span>Export as SQL</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

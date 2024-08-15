@@ -327,6 +327,52 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     setIsExporting(false)
   }
 
+  async function onRowsExportSQL() {
+    setIsExporting(true)
+
+    if (allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
+      toast.error(
+        `Sorry! We're unable to support exporting of SQL for row counts larger than ${MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment.`
+      )
+      return setIsExporting(false)
+    }
+
+    if (!project) {
+      toast.error('Project is required')
+      return setIsExporting(false)
+    }
+
+    const rows = allRowsSelected
+      ? await fetchAllTableRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table,
+          filters,
+          sorts,
+          impersonatedRole: roleImpersonationState.role,
+        })
+      : allRows.filter((x) => selectedRows.has(x.idx))
+
+    const sqlStatements = rows
+      .map((row) => {
+        const filteredRow = { ...row }
+        delete filteredRow.idx
+
+        const columns = Object.keys(filteredRow)
+          .map((col) => `"${col}"`)
+          .join(', ')
+        const values = Object.values(filteredRow)
+          .map((val) => (typeof val === 'object' && val !== null ? JSON.stringify(val) : val))
+          .map((val) => `'${val}'`)
+          .join(', ')
+        return `INSERT INTO ${table.name} (${columns}) VALUES (${values});`
+      })
+      .join('\n')
+
+    const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
+    saveAs(sqlData, `${state.table!.name}_rows.sql`)
+    setIsExporting(false)
+  }
   function deselectRows() {
     dispatch({
       type: 'SELECTED_ROWS_CHANGE',
@@ -363,16 +409,26 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       </div>
       <div className="h-[20px] border-r border-strong" />
       <div className="flex items-center gap-2">
-        <Button
-          type="primary"
-          size="tiny"
-          icon={<Download />}
-          loading={isExporting}
-          disabled={isExporting}
-          onClick={onRowsExportCSV}
-        >
-          Export to CSV
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button
+              type="primary"
+              size="tiny"
+              icon={<Download />}
+              loading={isExporting}
+              disabled={isExporting}
+            >
+              Export
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-40">
+            <DropdownMenuItem onClick={onRowsExportCSV}>
+              <span className="text-foreground-light">Export to CSV</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onRowsExportSQL}>Export to SQL</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {editable && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>
