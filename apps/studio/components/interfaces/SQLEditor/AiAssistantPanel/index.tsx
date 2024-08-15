@@ -1,59 +1,105 @@
 import { Message as MessageType } from 'ai'
 import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
+import { ChevronsUpDown } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { useChat } from 'ai/react'
 import { useTelemetryProps } from 'common'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { SchemaComboBox } from 'components/ui/SchemaComboBox'
+import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
-import { AiIconAnimation, Button, cn } from 'ui'
+import uuidv4 from 'lib/uuid'
+import {
+  AiIconAnimation,
+  Button,
+  cn,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
 import { AssistantChatForm } from 'ui-patterns'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
 
 interface AiAssistantPanelProps {
-  messages: MessageWithDebug[]
   selectedMessage?: string
-  loading: boolean
-  onSubmit: (s: string) => void
-  onClearHistory: () => void
+  existingSql: string
+  includeSchemaMetadata: boolean
   onDiff: ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => void
   onClose: () => void
 }
 
 export const AiAssistantPanel = ({
-  messages,
   selectedMessage,
-  loading,
-  onSubmit,
+  existingSql,
   onDiff,
-  onClearHistory,
   onClose,
+  includeSchemaMetadata,
 }: AiAssistantPanelProps) => {
+  const project = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
+
+  const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
+
+  const { data } = useEntityDefinitionsQuery(
+    {
+      schemas: selectedSchemas,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: includeSchemaMetadata }
+  )
+
+  const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
+
+  // Use chat id because useChat doesn't have a reset function to clear all messages
+  const [chatId, setChatId] = useState(uuidv4())
+  const {
+    messages: chatMessages,
+    append,
+    isLoading,
+  } = useChat({
+    id: chatId,
+    api: `${BASE_PATH}/api/ai/sql/generate-v2`,
+    body: {
+      existingSql: existingSql,
+      entityDefinitions: entityDefinitions,
+    },
+  })
+
+  const messages = useMemo(() => {
+    const merged = [...chatMessages.map((m) => ({ ...m, isDebug: false }))]
+
+    return merged.sort(
+      (a, b) =>
+        (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0) ||
+        a.role.localeCompare(b.role)
+    )
+  }, [chatMessages])
+
   const router = useRouter()
   const { profile } = useProfile()
-  const snap = useAppStateSnapshot()
   const bottomRef = useRef<HTMLDivElement>(null)
   const telemetryProps = useTelemetryProps()
 
   const [value, setValue] = useState<string>('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  const isOptedInToAI = useOrgOptedIntoAi()
-  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
-
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
-  const pendingReply = loading && last(messages)?.role === 'user'
+  const pendingReply = isLoading && last(messages)?.role === 'user'
 
   useEffect(() => {
-    if (!loading) {
+    if (!isLoading) {
       setValue('')
       if (inputRef.current) inputRef.current.focus()
     }
@@ -65,9 +111,9 @@ export const AiAssistantPanel = ({
           bottomRef.current.scrollIntoView({ behavior: 'smooth' })
         }
       },
-      loading ? 100 : 500
+      isLoading ? 100 : 500
     )
-  }, [loading])
+  }, [isLoading])
 
   return (
     <div className="flex flex-col h-full border-l border-control">
@@ -92,22 +138,49 @@ export const AiAssistantPanel = ({
           }
         >
           <div className="flex flex-row justify-between space-x-2">
-            <Button
-              type="default"
-              className="w-min"
-              icon={
-                <div
-                  className={cn(
-                    'w-2 h-2 rounded-full',
-                    includeSchemaMetadata ? 'bg-brand' : 'border border-stronger'
-                  )}
-                />
-              }
-              onClick={() => snap.setShowAiSettingsModal(true)}
-            >
-              {includeSchemaMetadata ? 'Include' : 'Exclude'} database metadata in queries
-            </Button>
-            <Button type="warning" onClick={() => onClearHistory()}>
+            {includeSchemaMetadata ? (
+              <SchemaComboBox
+                disabled={!includeSchemaMetadata}
+                selectedSchemas={selectedSchemas}
+                onSelectSchemas={setSelectedSchemas}
+                label={
+                  includeSchemaMetadata && selectedSchemas.length > 0
+                    ? `${selectedSchemas.length} schema${
+                        selectedSchemas.length > 1 ? 's' : ''
+                      } selected`
+                    : 'No schemas selected'
+                }
+              />
+            ) : (
+              <ButtonTooltip
+                disabled
+                size="tiny"
+                type="default"
+                className="w-min"
+                iconRight={<ChevronsUpDown size={14} />}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    className: 'w-72',
+                    text: (
+                      <>
+                        Opt in to sending anonymous data to OpenAI in your{' '}
+                        <Link
+                          className="underline"
+                          href={`/org/${selectedOrganization?.slug}/general`}
+                        >
+                          organization settings
+                        </Link>{' '}
+                        to share schemas with the Assistant for more accurate responses.
+                      </>
+                    ),
+                  },
+                }}
+              >
+                No schemas selected
+              </ButtonTooltip>
+            )}
+            <Button type="warning" onClick={() => setChatId(uuidv4())}>
               Clear history
             </Button>
           </div>
@@ -134,8 +207,8 @@ export const AiAssistantPanel = ({
       <div className="sticky p-5 flex-0 border-t">
         <AssistantChatForm
           textAreaRef={inputRef}
-          loading={loading}
-          disabled={loading}
+          loading={isLoading}
+          disabled={isLoading}
           icon={
             <AiIconAnimation
               allowHoverEffect
@@ -147,7 +220,11 @@ export const AiAssistantPanel = ({
           onValueChange={(e) => setValue(e.target.value)}
           onSubmit={(event) => {
             event.preventDefault()
-            onSubmit(value)
+            append({
+              content: value,
+              role: 'user',
+              createdAt: new Date(),
+            })
             Telemetry.sendEvent(
               {
                 category: 'sql_editor_ai_assistant',

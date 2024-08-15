@@ -4,15 +4,26 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
 import { useTelemetryProps } from 'common'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { SchemaComboBox } from 'components/ui/SchemaComboBox'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
-import { AiIconAnimation, Button, cn } from 'ui'
+import { ChevronsUpDown } from 'lucide-react'
+import Link from 'next/link'
+import {
+  AiIconAnimation,
+  Button,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
 import { AssistantChatForm } from 'ui-patterns'
 import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface AIPolicyChatProps {
   messages: MessageWithDebug[]
@@ -30,17 +41,18 @@ export const AIPolicyChat = ({
   onDiff,
 }: AIPolicyChatProps) => {
   const router = useRouter()
+  const project = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
   const { profile } = useProfile()
-  const snap = useAppStateSnapshot()
   const bottomRef = useRef<HTMLDivElement>(null)
   const telemetryProps = useTelemetryProps()
 
+  const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
   const [value, setValue] = useState<string>('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const isOptedInToAI = useOrgOptedIntoAi()
-  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
+  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
   const pendingReply = loading && last(messages)?.role === 'user'
@@ -74,21 +86,49 @@ export const AIPolicyChat = ({
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
         >
-          <Button
-            type="default"
-            className="w-min"
-            icon={
-              <div
-                className={cn(
-                  'w-2 h-2 rounded-full',
-                  includeSchemaMetadata ? 'bg-brand' : 'border border-stronger'
-                )}
-              />
-            }
-            onClick={() => snap.setShowAiSettingsModal(true)}
-          >
-            {includeSchemaMetadata ? 'Include' : 'Exclude'} database metadata in queries
-          </Button>
+          {includeSchemaMetadata ? (
+            <SchemaComboBox
+              className="w-fit"
+              disabled={!includeSchemaMetadata}
+              selectedSchemas={selectedSchemas}
+              onSelectSchemas={setSelectedSchemas}
+              label={
+                includeSchemaMetadata && selectedSchemas.length > 0
+                  ? `${selectedSchemas.length} schema${
+                      selectedSchemas.length > 1 ? 's' : ''
+                    } selected`
+                  : 'No schemas selected'
+              }
+            />
+          ) : (
+            <ButtonTooltip
+              disabled
+              size="tiny"
+              type="default"
+              className="w-min"
+              iconRight={<ChevronsUpDown size={14} />}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  className: 'w-72',
+                  text: (
+                    <>
+                      Opt in to sending anonymous data to OpenAI in your{' '}
+                      <Link
+                        className="underline"
+                        href={`/org/${selectedOrganization?.slug}/general`}
+                      >
+                        organization settings
+                      </Link>{' '}
+                      to share schemas with the Assistant for more accurate responses.
+                    </>
+                  ),
+                },
+              }}
+            >
+              No schemas selected
+            </ButtonTooltip>
+          )}
         </Message>
 
         {messages.map((m) => (
