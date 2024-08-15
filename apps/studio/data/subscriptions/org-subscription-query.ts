@@ -62,7 +62,5 @@ export const useHasAccessToProjectLevelPermissions = (slug: string) => {
     { enabled: canReadSubscriptions }
   )
 
-  const isEnterprise = subscription?.plan.id === 'enterprise'
-  if (!isEnterprise) return false
-  return true
+  return subscription?.plan.id === 'enterprise'
 }
