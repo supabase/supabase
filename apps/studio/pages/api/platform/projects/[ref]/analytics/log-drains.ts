@@ -1,13 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
 import { PROJECT_ANALYTICS_URL } from 'pages/api/constants'
-import { get } from 'lib/common/fetch'
-import { post } from 'common/fetchWrappers'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
+  const { ref } = req.query
 
   const missingEnvVars = envVarsSet()
 
@@ -17,6 +16,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       .json({ error: { message: `${missingEnvVars.join(', ')} env variables are not set` } })
   }
 
+  console.log(`request received: `, process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN)
+
   switch (method) {
     case 'GET':
       // list log drains
@@ -25,64 +26,71 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       url.search = new URLSearchParams({
         'metadata[type]': 'log-drain',
       }).toString()
-      const result = await get(url.toString(), {
+      const resp = await fetch(url, {
+        method: 'GET',
         headers: {
-          'x-api-key': process.env.LOGFLARE_API_KEY,
+          Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
+      }).then(res =>{
+        return res.json()
       })
 
-      return res.status(200).json(result)
+      return res.status(200).json(resp)
     case 'POST':
       // create the log drain
       const postUrl = new URL(PROJECT_ANALYTICS_URL)
       postUrl.pathname = '/api/backends'
-      const postResult = await post(postUrl.toString(), req.body, {
+      const postResult = await fetch(postUrl, {
+        body: JSON.stringify({
+          ...req.body,
+          metadata: {
+            type: "log-drain"
+          }
+        }),
+        method: "POST",
         headers: {
-          'x-api-key': process.env.LOGFLARE_API_KEY,
+          Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      }).then(async (res) => {
-        // TODO: create rules
-        if (!res || typeof res.body !== 'string') {
-          return
-        }
+      }).then(async r =>  await r.json())
 
-        const backend = JSON.parse(res.body)
-
-        return backend
-      })
+      console.log('postResult', postResult)
       const sourcesGetUrl = new URL(PROJECT_ANALYTICS_URL)
       sourcesGetUrl.pathname = '/api/sources'
-      const sources = await get(sourcesGetUrl.toString(), {
+      const sources = await fetch(sourcesGetUrl, {
+        method: "GET",
         headers: {
-          'x-api-key': process.env.LOGFLARE_API_KEY,
+          Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      }).then((res) => JSON.parse(res.body))
+      }).then(r=>r.json())
+      console.log('sources', sources)
 
       const params = sources.map((source: { name: string; id: number }) => {
         const name = (source.name as string).toLowerCase()
         if (name.includes('realtime')) {
           return {
             backend_id: postResult.id,
-            lql_string: 'metadata.project:default',
+            lql_string: `metadata.project:${ref}`,
             source_id: source.id,
           }
         } else {
-          return { backend_id: postResult.id, lql_string: 'project:default', source_id: source.id }
+          return { backend_id: postResult.id, lql_string: `project:${ref}`, source_id: source.id }
         }
       })
       const rulesPostUrl = new URL(PROJECT_ANALYTICS_URL)
-      rulesPostUrl.pathname = '/api/sources'
+      rulesPostUrl.pathname = '/api/rules'
       await Promise.all(
         params.map((param: any) =>
-          post(rulesPostUrl.toString(), param, {
+          fetch(rulesPostUrl, {
+            method: "POST",
+            body: JSON.stringify(param),
             headers: {
-              'x-api-key': process.env.LOGFLARE_API_KEY,
+              Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
               'Content-Type': 'application/json',
               Accept: 'application/json',
             },
@@ -99,7 +107,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const envVarsSet = () => {
   const missingEnvVars = [
-    process.env.LOGFLARE_API_KEY ? null : 'LOGFLARE_API_KEY',
+    process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN ? null : 'LOGFLARE_PRIVATE_ACCESS_TOKEN',
     process.env.LOGFLARE_URL ? null : 'LOGFLARE_URL',
   ].filter((v) => v)
   if (missingEnvVars.length == 0) {

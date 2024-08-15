@@ -24,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       url.pathname = `/api/backends/${uuid}`
       const result = await get(url.toString(), {
         headers: {
-          'x-api-key': process.env.LOGFLARE_API_KEY,
+          'x-api-key': process.env.LOGFLARE_PUBLIC_ACCESS_TOKEN,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
@@ -39,7 +39,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         body: JSON.stringify(req.body),
         method: 'PUT',
         headers: {
-          'x-api-key': process.env.LOGFLARE_API_KEY as string,
+          'x-api-key': process.env.LOGFLARE_PUBLIC_ACCESS_TOKEN as string,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
@@ -57,7 +57,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       deleteUrl.pathname = `/api/backends/${uuid}`
       await fetch(deleteUrl, {
         headers: {
-          'x-api-key': process.env.LOGFLARE_API_KEY as string,
+          'x-api-key': process.env.LOGFLARE_PUBLIC_ACCESS_TOKEN as string,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
@@ -72,7 +72,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const envVarsSet = () => {
   const missingEnvVars = [
-    process.env.LOGFLARE_API_KEY ? null : 'LOGFLARE_API_KEY',
+    process.env.LOGFLARE_PUBLIC_ACCESS_TOKEN ? null : 'LOGFLARE_PUBLIC_ACCESS_TOKEN',
     process.env.LOGFLARE_URL ? null : 'LOGFLARE_URL',
   ].filter((v) => v)
   if (missingEnvVars.length == 0) {
