@@ -2,8 +2,8 @@
 title: 'Postgres Foreign Data Wrappers with Wasm'
 description: 'Build Wasm foreign data wrapper with Wrappers and use it on Supabase'
 author: bo_lu
-image: lw12/day-5/wasm-fdw-og.png
-thumb: lw12/day-5/wasm-fdw-thumb.png
+image: lw12/day-5/OG_FDW-with-WASM.png
+thumb: lw12/day-5/thumb_FDW-with-WASM.png
 launchweek: '12'
 categories:
   - launch-week
@@ -50,8 +50,8 @@ This feature is available today in public alpha for all new projects.
   <Img
     alt="Foreign Data Wrappers"
     src={{
-      light: '/images/blog/lw12/day-5/fdw-diagram.png',
-      dark: '/images/blog/lw12/day-5/fdw-diagram.png',
+      light: '/images/blog/lw12/day-5/FDW--light.png',
+      dark: '/images/blog/lw12/day-5/FDW.png',
     }}
   />
 </div>
@@ -78,8 +78,8 @@ To better understand how the Wasm FDW works, let's take a look at the architectu
   <Img
     alt="Wasm FDW architecture"
     src={{
-      light: '/images/blog/lw12/day-5/wasm-fdw-architecture.png',
-      dark: '/images/blog/lw12/day-5/wasm-fdw-architecture.png',
+      light: '/images/blog/lw12/day-5/FDW-architecture--light.png',
+      dark: '/images/blog/lw12/day-5/FDW-architecture.png',
     }}
   />
 </div>
@@ -171,10 +171,10 @@ create server paddle_server
   options (
     -- check all available versions at
     -- https://fdw.dev/catalog/paddle/#available-versions
-    fdw_package_url 'https://github.com/supabase/wrappers/releases/download/wasm_paddle_fdw_v0.1.0/paddle_fdw.wasm',
+    fdw_package_url 'https://github.com/supabase/wrappers/releases/download/wasm_paddle_fdw_v0.1.1/paddle_fdw.wasm',
     fdw_package_name 'supabase:paddle-fdw',
-    fdw_package_version '0.1.0',
-    fdw_package_checksum '7d0b902440ac2ef1af85d09807145247f14d1d8fd4d700227e5a4d84c8145409',
+    fdw_package_version '0.1.1',
+    fdw_package_checksum 'c5ac70bb2eef33693787b7d4efce9a83cde8d4fa40889d2037403a51263ba657',
 
     -- save your Paddle credentials
     api_url 'https://sandbox-api.paddle.com',
@@ -188,7 +188,7 @@ Create a table for Paddle data:
 
 ```sql
 -- create dedicated schema for Paddle foreign tables
-create schema paddle;
+create schema if not exists paddle;
 
 -- create foreign table
 create foreign table paddle.customers (
