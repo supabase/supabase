@@ -123,7 +123,7 @@ const Nav = (props: Props) => {
                 {!isUserLoading && (
                   <>
                     {isLoggedIn ? (
-                      <Button className="hidden text-white lg:block" asChild>
+                      <Button className="hidden lg:block" asChild>
                         <Link href="/dashboard/projects">Dashboard</Link>
                       </Button>
                     ) : (

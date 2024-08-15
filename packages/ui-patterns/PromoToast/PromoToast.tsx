@@ -7,8 +7,8 @@ import { cn } from 'ui/src/lib/utils/cn'
 import { Button } from 'ui/src/components/Button/Button'
 import { LOCAL_STORAGE_KEYS } from 'common'
 // import CountdownComponent from 'ui/src/layout/banners/LW12CountdownBanner/Countdown'
-// import announcement from 'ui/src/layout/banners/data/Announcement.json'
 import { useTheme } from 'next-themes'
+import announcement from 'ui/src/layout/banners/data/Announcement.json'
 
 const LW12BGDark =
   'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw12/assets/bg-dark.svg?t=2024-07-26T09%3A59%3A25.373Z'
@@ -45,16 +45,16 @@ const PromoToast = () => {
       )}
     >
       <p className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7">
-        Launch Week 12: Day 1
+        Launch Week 12: Day 3
       </p>
       <div className="relative z-10 text-foreground-lighter flex flex-col text-sm w-full mb-2">
-        <span>postgres.new: in-browser Postgres with an AI interface</span>
+        Supabase Auth: Bring-your-own Auth0, Cognito, or Firebase
         {/* <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} /> */}
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week#day-1">
+          <Link target="_blank" rel="noreferrer" href={`https://supabase.com${announcement.link}`}>
             Learn more
           </Link>
         </Button>

@@ -5,9 +5,30 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 11 Aug 2024 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 13 Aug 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/third-party-auth-mfa-phone-send-hooks</guid>
+  <title>Supabase Auth: Bring-your-own Auth0, Cognito, or Firebase</title>
+  <link>https://supabase.com/blog/third-party-auth-mfa-phone-send-hooks</link>
+  <description>Use Firebase Auth, Auth0 or AWS Cognito (Amplify) with your Supabase project, secure your users with SMS based MFA, and use send hooks.</description>
+  <pubDate>Tue, 13 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/snaplet-is-now-open-source</guid>
+  <title>Snaplet is now open source</title>
+  <link>https://supabase.com/blog/snaplet-is-now-open-source</link>
+  <description>Snaplet is closing their business and opening their source code</description>
+  <pubDate>Tue, 13 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-realtime-broadcast-and-presence-authorization</guid>
+  <title>Supabase Realtime: Broadcast and Presence Authorization</title>
+  <link>https://supabase.com/blog/supabase-realtime-broadcast-and-presence-authorization</link>
+  <description>Secure Realtime Broadcast and Presence with Authorization</description>
+  <pubDate>Mon, 12 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgres-new</guid>
   <title>postgres.new: In-browser Postgres with an AI interface</title>
   <link>https://supabase.com/blog/postgres-new</link>

@@ -1,5 +1,8 @@
+import { ChevronDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+
+import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import {
   Alert,
   Button,
@@ -12,9 +15,6 @@ import {
   Input,
   Modal,
 } from 'ui'
-
-import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
-import { ChevronDown, ExternalLink } from 'lucide-react'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void

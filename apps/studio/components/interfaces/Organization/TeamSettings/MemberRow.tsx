@@ -7,8 +7,8 @@ import Table from 'components/to-be-cleaned/Table'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import { Badge, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
@@ -25,7 +25,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   const { data: projects } = useProjectsQuery()
   const selectedOrganization = useSelectedOrganization()
   const [hasInvalidImg, setHasInvalidImg] = useState(false)
-  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,

@@ -1237,7 +1237,7 @@ export const WRAPPERS: WrapperMeta[] = [
           encrypted: false,
           secureEntry: false,
           defaultValue:
-            'https://github.com/supabase/wrappers/releases/download/wasm_paddle_fdw_v0.1.0/paddle_fdw.wasm',
+            'https://github.com/supabase/wrappers/releases/download/wasm_paddle_fdw_v0.1.1/paddle_fdw.wasm',
           hidden: true,
         },
         {
@@ -1255,7 +1255,7 @@ export const WRAPPERS: WrapperMeta[] = [
           required: true,
           encrypted: false,
           secureEntry: false,
-          defaultValue: '0.1.0',
+          defaultValue: '0.1.1',
           hidden: true,
         },
         {
@@ -1264,7 +1264,7 @@ export const WRAPPERS: WrapperMeta[] = [
           required: true,
           encrypted: false,
           secureEntry: false,
-          defaultValue: '7d0b902440ac2ef1af85d09807145247f14d1d8fd4d700227e5a4d84c8145409',
+          defaultValue: 'c5ac70bb2eef33693787b7d4efce9a83cde8d4fa40889d2037403a51263ba657',
           hidden: true,
         },
         {
@@ -1337,7 +1337,7 @@ export const WRAPPERS: WrapperMeta[] = [
           encrypted: false,
           secureEntry: false,
           defaultValue:
-            'https://github.com/supabase/wrappers/releases/download/wasm_snowflake_fdw_v0.1.0/snowflake_fdw.wasm',
+            'https://github.com/supabase/wrappers/releases/download/wasm_snowflake_fdw_v0.1.1/snowflake_fdw.wasm',
           hidden: true,
         },
         {
@@ -1355,7 +1355,7 @@ export const WRAPPERS: WrapperMeta[] = [
           required: true,
           encrypted: false,
           secureEntry: false,
-          defaultValue: '0.1.0',
+          defaultValue: '0.1.1',
           hidden: true,
         },
         {
@@ -1364,7 +1364,7 @@ export const WRAPPERS: WrapperMeta[] = [
           required: true,
           encrypted: false,
           secureEntry: false,
-          defaultValue: '2fb46fd8afa63f3975dadf772338106b609b131861849356e0c09dde032d1af8',
+          defaultValue: '7aaafc7edc1726bc93ddc04452d41bda9e1a264a1df2ea9bf1b00b267543b860',
           hidden: true,
         },
         {
