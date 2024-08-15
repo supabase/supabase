@@ -1,5 +1,5 @@
-import jsonLogic from 'json-logic-js'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import jsonLogic from 'json-logic-js'
 
 export interface Organization {
   id: number
@@ -7,9 +7,10 @@ export interface Organization {
   name: string
   billing_email: string
   is_owner?: boolean
-  stripe_customer_id?: string
   opt_in_tags: string[]
   subscription_id?: string | null
+  restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
+  restriction_data: Record<string, never>
 }
 
 /**
@@ -77,8 +78,10 @@ export interface Role {
 export interface Permission {
   actions: PermissionAction[]
   condition: jsonLogic.RulesLogic
-  organization_id: number
+  organization_slug: string
   resources: string[]
+  restrictive?: boolean
+  project_refs: string[]
 }
 
 export interface ResponseFailure {
@@ -88,7 +91,7 @@ export interface ResponseFailure {
 export type SupaResponse<T> = T | ResponseFailure
 
 export interface ResponseError {
-  code?: number
+  code?: number | string
   message: string
   requestId?: string
 }

@@ -1,10 +1,9 @@
-import { AuthError } from '@supabase/gotrue-js'
-import { Factor } from '@supabase/supabase-js'
+import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Form, IconLock, Input } from 'ui'
 import { object, string } from 'yup'
 
 import { useTelemetryProps } from 'common'
@@ -12,20 +11,21 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { useStore } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { getReturnToPath } from 'lib/gotrue'
 import Telemetry from 'lib/telemetry'
+import { Button, Form, Input } from 'ui'
 
 const signInSchema = object({
   code: string().required('MFA Code is required'),
 })
 
 const SignInMfaForm = () => {
-  const { ui } = useStore()
-  const queryClient = useQueryClient()
   const router = useRouter()
+  const signOut = useSignOut()
+  const queryClient = useQueryClient()
   const telemetryProps = useTelemetryProps()
+  const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
 
   const {
     data: factors,
@@ -35,16 +35,30 @@ const SignInMfaForm = () => {
     isLoading: isLoadingFactors,
   } = useMfaListFactorsQuery()
   const {
-    mutateAsync: mfaChallengeAndVerify,
-    isLoading,
+    mutate: mfaChallengeAndVerify,
+    isLoading: isVerifying,
     isSuccess,
-  } = useMfaChallengeAndVerifyMutation()
-  const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
-  const signOut = useSignOut()
+  } = useMfaChallengeAndVerifyMutation({
+    onSuccess: async () => {
+      Telemetry.sendEvent(
+        { category: 'account', action: 'sign_in', label: '' },
+        telemetryProps,
+        router
+      )
+      await queryClient.resetQueries()
+      router.push(getReturnToPath())
+    },
+  })
 
   const onClickLogout = async () => {
     await signOut()
     await router.replace('/sign-in')
+  }
+
+  const onSignIn = async ({ code }: { code: string }) => {
+    if (selectedFactor) {
+      mfaChallengeAndVerify({ factorId: selectedFactor.id, code, refreshFactors: false })
+    }
   }
 
   useEffect(() => {
@@ -58,43 +72,6 @@ const SignInMfaForm = () => {
       }
     }
   }, [factors?.totp, isSuccessFactors, router, queryClient])
-
-  const onSignIn = async ({ code }: { code: string }) => {
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Signing in...`,
-    })
-    if (selectedFactor) {
-      await mfaChallengeAndVerify(
-        { factorId: selectedFactor.id, code, refreshFactors: false },
-        {
-          onSuccess: async () => {
-            ui.setNotification({
-              id: toastId,
-              category: 'success',
-              message: `Signed in successfully!`,
-            })
-
-            Telemetry.sendEvent(
-              { category: 'account', action: 'sign_in', label: '' },
-              telemetryProps,
-              router
-            )
-            await queryClient.resetQueries()
-
-            router.push(getReturnToPath())
-          },
-          onError: (error) => {
-            ui.setNotification({
-              id: toastId,
-              category: 'error',
-              message: (error as AuthError).message,
-            })
-          },
-        }
-      )
-    }
-  }
 
   return (
     <>
@@ -118,9 +95,9 @@ const SignInMfaForm = () => {
                   name="code"
                   type="text"
                   autoFocus
-                  icon={<IconLock />}
+                  icon={<Lock />}
                   placeholder="XXXXXX"
-                  disabled={isLoading}
+                  disabled={isVerifying}
                   autoComplete="off"
                   spellCheck="false"
                   autoCapitalize="none"
@@ -137,7 +114,7 @@ const SignInMfaForm = () => {
                     block
                     type="outline"
                     size="large"
-                    disabled={isLoading || isSuccess}
+                    disabled={isVerifying || isSuccess}
                     onClick={onClickLogout}
                     className="opacity-80 hover:opacity-100 transition"
                   >
@@ -148,10 +125,10 @@ const SignInMfaForm = () => {
                     form="sign-in-mfa-form"
                     htmlType="submit"
                     size="large"
-                    disabled={isLoading || isSuccess}
-                    loading={isLoading || isSuccess}
+                    disabled={isVerifying || isSuccess}
+                    loading={isVerifying || isSuccess}
                   >
-                    {isLoading ? 'Verifying' : isSuccess ? 'Signing in' : 'Verify'}
+                    {isVerifying ? 'Verifying' : isSuccess ? 'Signing in' : 'Verify'}
                   </Button>
                 </div>
               </div>
@@ -179,9 +156,9 @@ const SignInMfaForm = () => {
           )}
           <li>
             <Link
-              href="/support/new?subject=Unable+to+sign+in+via+MFA&category=Login_issues"
               target="_blank"
               rel="noreferrer"
+              href="/support/new?subject=Unable+to+sign+in+via+MFA&category=Login_issues"
               className="text-sm transition text-foreground-light hover:text-foreground"
             >
               Reach out to us via support

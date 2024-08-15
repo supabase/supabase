@@ -44,7 +44,7 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
         value={formatted}
         language="sql"
         className={cn(
-          '!bg-transparent !py-3 !px-3.5 prose dark:prose-dark',
+          '!py-3 !px-3.5 prose dark:prose-dark transition',
           // change the look of the code block. The flex hack is so that the code is wrapping since
           // every word is a separate span
           '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
@@ -52,12 +52,25 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
         hideCopy
         hideLineNumbers
       />
-      <div className="absolute top-5 right-2 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
+      <div
+        className={cn(
+          'absolute',
+          'top-0 right-2',
+          'bg-surface-300',
+          'border border-strong',
+          'rounded',
+          'h-[28px]',
+          'opacity-0 group-hover:opacity-100',
+          'group-hover:top-2',
+          'transition-all'
+        )}
+      >
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger asChild>
             <Button
               type="text"
               size="tiny"
+              className={cn('text-foreground-lighter hover:text-foreground', 'transition')}
               onClick={() => {
                 onDiff(formatted)
                 Telemetry.sendEvent(
@@ -71,7 +84,7 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
                 )
               }}
             >
-              <FileDiff className="h-4 w-4" />
+              <FileDiff className={cn('h-4 w-4')} />
             </Button>
           </Tooltip.Trigger>
           <Tooltip.Portal>
@@ -93,6 +106,7 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
             <Button
               type="text"
               size="tiny"
+              className={cn('text-foreground-lighter hover:text-foreground', 'transition')}
               onClick={() => {
                 handleCopy(formatted)
                 Telemetry.sendEvent(
@@ -106,7 +120,11 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
                 )
               }}
             >
-              {copied ? <Check size={16} className="text-brand-600" /> : <Copy size={16} />}
+              {copied ? (
+                <Check size={16} className="text-brand-600" />
+              ) : (
+                <Copy size={16} className={cn('h-4 w-4')} />
+              )}
             </Button>
           </Tooltip.Trigger>
           <Tooltip.Portal>

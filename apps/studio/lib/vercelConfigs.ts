@@ -1,4 +1,4 @@
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 
 const QuickStart = SQL_TEMPLATES.filter((template) => template.type === 'quickstart')
 
@@ -186,15 +186,17 @@ create policy "Public profiles are viewable by everyone."
 
 create policy "Users can insert their own profile."
   on profiles for insert
-  with check ( auth.uid() = id );
+  with check ( (select auth.uid()) = id );
 
 create policy "Users can update own profile."
   on profiles for update
-  using ( auth.uid() = id );
+  using ( (select auth.uid()) = id );
 
 -- Create a trigger to sync profiles and auth.users
 create function public.handle_new_user()
-returns trigger as $$
+returns trigger
+set search_path = ''
+as $$
 begin
   insert into public.profiles (id, full_name, avatar_url)
   values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
@@ -249,7 +251,7 @@ create policy "Posts are viewable by everyone."
 
 create policy "Users can post as themselves."
     on posts for insert
-    with check ( auth.uid() = "authorId" );
+    with check ( (select auth.uid()) = "authorId" );
 
 -- Create a table for sites
 create table sites (
@@ -269,7 +271,7 @@ create policy "Sites are viewable by everyone."
 
 create policy "Users can create their own sites."
     on sites for insert
-    with check ( auth.uid() = "ownerId" );
+    with check ( (select auth.uid()) = "ownerId" );
 
 -- Create a table for votes
 create table votes (
@@ -289,11 +291,11 @@ create policy "Votes are viewable by everyone"
 
 create policy "Users can vote as themselves"
     on votes for insert
-    with check (auth.uid() = "userId");
+    with check ((select auth.uid()) = "userId");
 
 create policy "Users can update their own votes"
     on votes for update
-    using ( auth.uid() = "userId" );
+    using ( (select auth.uid()) = "userId" );
 
 
 -- Set up Realtime!

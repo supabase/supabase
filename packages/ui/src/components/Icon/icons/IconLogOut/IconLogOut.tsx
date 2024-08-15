@@ -9,5 +9,12 @@
     return <IconBase icon={LogOut} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { logOut } from 'lucide-react'
+  */
   export default IconLogOut
   

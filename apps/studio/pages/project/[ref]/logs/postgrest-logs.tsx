@@ -1,10 +1,9 @@
-import React from 'react'
 import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { LogsLayout } from 'components/layouts'
+
+import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { NextPageWithLayout } from 'types'
-import { LogsTableName } from 'components/interfaces/Settings/Logs'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
+import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -12,14 +11,14 @@ export const LogPage: NextPageWithLayout = () => {
 
   return (
     <LogsPreviewer
-      projectRef={ref as string}
-      condensedLayout={true}
-      tableName={LogsTableName.POSTGREST}
+      condensedLayout
       queryType="postgrest"
+      projectRef={ref as string}
+      tableName={LogsTableName.POSTGREST}
     />
   )
 }
 
-LogPage.getLayout = (page) => <LogsLayout title="Database">{page}</LogsLayout>
+LogPage.getLayout = (page) => <LogsLayout title="Postgrest Logs">{page}</LogsLayout>
 
-export default observer(LogPage)
+export default LogPage

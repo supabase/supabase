@@ -63,6 +63,8 @@ Ensure that the appropriate scopes have been added under OAuth 2.0 Scopes at the
 >
 <TabPanel id="js" label="JavaScript">
 
+<CreateClientSnippet />
+
 When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `linkedin_oidc` as the `provider`:
 
 ```js
@@ -70,6 +72,17 @@ async function signInWithLinkedIn() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'linkedin_oidc',
   })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `linkedin_oidc` as the `provider`:
+
+```dart
+Future<void> signInWithLinkedIn() async {
+  await supabase.auth.signInWithOAuth(OAuthProvider.linkedinOidc);
 }
 ```
 
@@ -86,6 +99,8 @@ suspend fun signInWithKaLinkedIn() {
 
 </TabPanel>
 </Tabs>
+
+<OAuthPkceFlow />
 
 <Tabs
   scrollable
@@ -105,9 +120,20 @@ async function signOut() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```kotlin
 suspend fun signOut() {
@@ -135,6 +161,6 @@ Do reach out to support if you have any concerns around this change.
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
+- [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [LinkedIn Developer Dashboard](https://api.LinkedIn.com/apps)

@@ -1,11 +1,12 @@
-import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
+import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Button, IconEye, IconEyeOff, Input, InputNumber, Listbox, Toggle } from 'ui'
 
+import { DatePicker } from 'components/ui/DatePicker'
 import { BASE_PATH } from 'lib/constants'
-import { Enum } from './AuthProvidersForm.types'
+import { Button, Input, InputNumber, Listbox, Toggle } from 'ui'
+import type { Enum } from './AuthProvidersForm.types'
 
 interface FormFieldProps {
   name: string
@@ -116,7 +117,7 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
           actions={
             !!properties.isSecret ? (
               <Button
-                icon={hidden ? <IconEye /> : <IconEyeOff />}
+                icon={hidden ? <Eye /> : <EyeOff />}
                 type="default"
                 onClick={() => setHidden(!hidden)}
               />
@@ -159,7 +160,7 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
           actions={
             !!properties.isSecret ? (
               <Button
-                icon={hidden ? <IconEye /> : <IconEyeOff />}
+                icon={hidden ? <Eye /> : <EyeOff />}
                 type="default"
                 onClick={() => setHidden(!hidden)}
               />

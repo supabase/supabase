@@ -1,4 +1,4 @@
-import { User } from 'data/auth/users-query'
+import type { User } from 'data/auth/users-query'
 import { uuidv4 } from './helpers'
 
 type PostgrestImpersonationRole =
@@ -14,6 +14,7 @@ type PostgrestImpersonationRole =
       type: 'postgrest'
       role: 'authenticated'
       user: User
+      aal?: 'aal1' | 'aal2'
     }
 
 export type PostgrestRole = PostgrestImpersonationRole['role']
@@ -36,7 +37,7 @@ function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole
     const user = role.user
 
     return {
-      aal: 'aal1',
+      aal: role.aal ?? 'aal1',
       amr: [{ method: 'password', timestamp: nowTimestamp }],
       app_metadata: user.raw_app_meta_data,
       aud: 'authenticated',
@@ -49,6 +50,7 @@ function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole
       session_id: uuidv4(),
       sub: user.id,
       user_metadata: user.raw_user_meta_data,
+      is_anonymous: user.is_anonymous,
     }
   }
 

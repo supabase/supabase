@@ -1,11 +1,12 @@
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useQuery } from '@tanstack/react-query'
+import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useParams } from 'common'
 
+import { useParams } from 'common'
 import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
 import { useProfile } from 'lib/profile'
-import { Button, IconExternalLink } from 'ui'
+import { Button } from 'ui'
 
 // [Joshen] For this notice specifically, just FYI
 // 1 month after 26th Jan we'll need to add some contextual information about this deprecation
@@ -96,7 +97,7 @@ export const NoticeBanner = () => {
           'We are migrating our infrastructure from IPv4 to IPv6. Please migrate now. You can ignore this warning if you have already migrated.'}
       </p>
       <div className="flex items-center gap-x-1">
-        <Button asChild type="link" iconRight={<IconExternalLink />}>
+        <Button asChild type="link" iconRight={<ExternalLink size={14} />}>
           <a
             href={
               currentlyViewing === 'vercel'

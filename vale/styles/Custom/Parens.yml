@@ -4,4 +4,5 @@ link: 'https://developers.google.com/style/parentheses'
 nonword: true
 level: suggestion
 tokens:
-  - '\(.+\)'
+  # Ignore acronym definitions
+  - '\([^A-Z]+\)'

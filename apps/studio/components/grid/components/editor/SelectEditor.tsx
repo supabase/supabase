@@ -1,7 +1,7 @@
+import type { RenderEditCellProps } from 'react-data-grid'
 import { Select } from 'ui'
-import { RenderEditCellProps } from 'react-data-grid'
 
-import { useTrackedState } from 'components/grid/store'
+import { useTrackedState } from 'components/grid/store/Store'
 
 interface SelectEditorProps<TRow, TSummaryRow = unknown>
   extends RenderEditCellProps<TRow, TSummaryRow> {

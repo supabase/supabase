@@ -1,24 +1,22 @@
-import { Route } from 'components/ui/ui.types'
-import { Project } from 'data/projects/project-detail-query'
+import type { Route } from 'components/ui/ui.types'
+import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import {
-  ApiDocs,
   Auth,
   Database,
   EdgeFunctions,
-  Logs,
   Realtime,
   Reports,
-  Settings,
   SqlEditor,
   Storage,
   TableEditor,
 } from 'icons'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
+import { Settings, FileText, List, Lightbulb } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}/building`
+  const buildingUrl = `/project/${ref}`
 
   return [
     {
@@ -43,7 +41,7 @@ export const generateProductRoutes = (
   features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; realtime?: boolean }
 ): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}/building`
+  const buildingUrl = `/project/${ref}`
 
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
@@ -87,7 +85,7 @@ export const generateProductRoutes = (
           },
         ]
       : []),
-    ...(IS_PLATFORM && realtimeEnabled
+    ...(realtimeEnabled
       ? [
           {
             key: 'realtime',
@@ -102,9 +100,15 @@ export const generateProductRoutes = (
 
 export const generateOtherRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}/building`
+  const buildingUrl = `/project/${ref}`
 
   return [
+    {
+      key: 'advisors',
+      label: 'Advisors',
+      icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
+    },
     ...(IS_PLATFORM
       ? [
           {
@@ -118,15 +122,20 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
     {
       key: 'logs',
       label: 'Logs',
-      icon: <Logs size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs/explorer`),
     },
     {
       key: 'api',
       label: 'API Docs',
-      icon: <ApiDocs size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
     },
+  ]
+}
+
+export const generateSettingsRoutes = (ref?: string, project?: Project): Route[] => {
+  return [
     ...(IS_PLATFORM
       ? [
           {

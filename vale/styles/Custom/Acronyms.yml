@@ -1,5 +1,5 @@
 extends: conditional
-message: "Spell out '%s', if it's unfamiliar to the audience."
+message: "The first instance of '%s' should be spelled out, followed by the acronym in brackets. For example: 'Data Definition Language (DDL)'"
 link: 'https://developers.google.com/style/abbreviations'
 level: suggestion
 ignorecase: false
@@ -9,6 +9,7 @@ second: '(?:\b[A-Z][a-z]+ )+\(([A-Z]{3,5})\)'
 # ... with the exception of these:
 exceptions:
   - API
+  - ARM
   - ASP
   - CLI
   - CPU
@@ -20,6 +21,7 @@ exceptions:
   - FAQ
   - GCC
   - GDB
+  - GDPR
   - GET
   - GPT
   - GPU
@@ -61,6 +63,7 @@ exceptions:
   - URI
   - URL
   - USB
+  - USD
   - UTF
   - XML
   - XSS

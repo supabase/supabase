@@ -7,17 +7,14 @@ description: 'Prebuilt, customizable Flutter widgets for authenticating users.'
 Flutter Auth UI is a Flutter package containing pre-built widgets for authenticating users.
 It is unstyled and can match your brand and aesthetic.
 
-<image src="https://raw.githubusercontent.com/supabase-community/flutter-auth-ui/main/assets/supabase_auth_ui.png" />
+![Flutter Auth UI](https://raw.githubusercontent.com/supabase-community/flutter-auth-ui/main/screenshots/supabase_auth_ui.png)
 
 ## Add Flutter Auth UI
 
 Add the latest version of the package [supabase-auth-ui](https://pub.dev/packages/supabase_auth_ui) to pubspec.yaml:
 
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  supabase_auth_ui: ^0.1.0+2
+```bash
+flutter pub add supabase_auth_ui
 ```
 
 ### Initialize the Flutter Auth package
@@ -93,9 +90,9 @@ Use SupaPhoneAuth to create a phone authentication form.
 
 ```dart
 SupaPhoneAuth(
-    authAction: SupaAuthAction.signUp,
-    onSuccess: (AuthResponse response) {},
-  ),
+  authAction: SupaAuthAction.signUp,
+  onSuccess: (AuthResponse response) {},
+),
 ```
 
 ### Social Auth
@@ -107,13 +104,13 @@ Use SupaSocialsAuth to create list of social login buttons.
 ```dart
 SupaSocialsAuth(
   socialProviders: [
-  SocialProviders.apple,
-  SocialProviders.google,
+    OAuthProvider.apple,
+    OAuthProvider.google,
   ],
   colored: true,
   redirectUrl: kIsWeb
-  ? null
-  : 'io.mydomain.myapp://callback',
+    ? null
+    : 'io.mydomain.myapp://callback',
   onSuccess: (Session response) {},
   onError: (error) {},
 )

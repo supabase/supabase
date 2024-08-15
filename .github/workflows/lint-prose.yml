@@ -20,4 +20,6 @@ jobs:
       - uses: errata-ai/vale-action@reviewdog
         with:
           files: apps/docs/content
-          fail_on_error: true
+          # [Charis] Temporary because we still have to go through giant backlog of existing errors
+          # Don't want people to worry about this (just want them looking at the specific PR comments)
+          # fail_on_error: true

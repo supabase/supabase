@@ -27,7 +27,7 @@ const UsersListItemSkeleton = () => {
         <ShimmeringLoader className="h-[20px] py-0 w-20" />
       </Table.td>
       <Table.td className="table-cell">
-        <Button type="text" disabled={true} className="hover:border-gray-500 flex">
+        <Button type="text" disabled={true} className="hover:border-muted flex">
           <IconMoreHorizontal />
         </Button>
       </Table.td>

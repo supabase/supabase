@@ -1,3 +1,5 @@
+'use client'
+
 import {
   LOCAL_STORAGE_KEYS,
   handlePageTelemetry,

@@ -40,6 +40,13 @@ Object.values(icons).map((icon) => {
     return <IconBase icon={${icon.name}} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { ${icon.name.charAt(0).toLowerCase() + icon.name.slice(1)} } from 'lucide-react'
+  */
   export default Icon${icon.name}
   `,
     function (err) {

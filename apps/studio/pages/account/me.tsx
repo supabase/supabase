@@ -1,19 +1,19 @@
-import { observer } from 'mobx-react-lite'
-
 import {
   AccountInformation,
   AnalyticsSettings,
-  ThemeSettingsOld,
   ThemeSettings,
+  ThemeSettingsOld,
 } from 'components/interfaces/Account/Preferences'
+import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
-import { AccountLayout } from 'components/layouts'
+import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -39,7 +39,7 @@ User.getLayout = (page) => (
 
 export default User
 
-const ProfileCard = observer(() => {
+const ProfileCard = () => {
   const profileUpdateEnabled = useIsFeatureEnabled('profile:update')
 
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
@@ -76,6 +76,10 @@ const ProfileCard = observer(() => {
       <section>
         <AnalyticsSettings />
       </section>
+
+      <section>
+        <AccountDeletion />
+      </section>
     </article>
   )
-})
+}

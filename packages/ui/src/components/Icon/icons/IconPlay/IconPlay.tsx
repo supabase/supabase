@@ -9,5 +9,12 @@
     return <IconBase icon={Play} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { play } from 'lucide-react'
+  */
   export default IconPlay
   

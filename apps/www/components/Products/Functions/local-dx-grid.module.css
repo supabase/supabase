@@ -1,0 +1,13 @@
+.local-dx-grid {
+  grid-template-areas:
+    'localDX     parity'
+    'ecosystem   ci    ';
+}
+
+@media (min-width: 1280px) {
+  .local-dx-grid {
+    grid-template-areas:
+      'localDX     parity     ecosystem'
+      'ci          ci         ecosystem';
+  }
+}

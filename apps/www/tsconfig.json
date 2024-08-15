@@ -2,11 +2,13 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "contentlayer/generated": ["./.contentlayer/generated"],
       "~/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
+      "@ui/*": ["./../../packages/ui/src/*"],
+      "@ui-patterns/*": ["./../../packages/ui-patterns/*"]
     },
     "downlevelIteration": true,
-    "target": "es5",
+    "target": "ES2021",
     "module": "esnext",
     "jsx": "preserve",
     "strict": true,
@@ -27,5 +29,12 @@
     ]
   },
   "exclude": ["node_modules", "supabase"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".contentlayer/generated",
+    "./../../packages/ui/src/**/*.d.ts"
+  ]
 }

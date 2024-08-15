@@ -1,5 +1,3 @@
-import { ConnectionPooling } from './ConnectionPooling/ConnectionPooling'
-import NetworkRestrictions from './NetworkRestrictions/NetworkRestrictions'
-import DatabaseSettings from './DatabaseSettings/DatabaseSettings'
-
-export { ConnectionPooling, DatabaseSettings, NetworkRestrictions }
+export { ConnectionPooling } from './ConnectionPooling/ConnectionPooling'
+export { default as NetworkRestrictions } from './NetworkRestrictions/NetworkRestrictions'
+export { default as DatabaseSettings } from './DatabaseSettings/DatabaseSettings'

@@ -1,20 +1,20 @@
-import { observer } from 'mobx-react-lite'
-import { Menu, Item, Separator, Submenu } from 'react-contexify'
-import 'react-contexify/dist/ReactContexify.css'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IconClipboard, IconEdit, IconMove, IconDownload, IconTrash2, IconChevronRight } from 'ui'
+import { observer } from 'mobx-react-lite'
+import { Item, Menu, Separator, Submenu } from 'react-contexify'
+import 'react-contexify/dist/ReactContexify.css'
 
-import { useCheckPermissions } from 'hooks'
-import { URL_EXPIRY_DURATION } from '../Storage.constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { noop } from 'lodash'
+import { IconChevronRight, IconClipboard, IconDownload, IconEdit, IconMove, IconTrash2 } from 'ui'
+import { URL_EXPIRY_DURATION } from '../Storage.constants'
+import { StorageItemWithColumn } from '../Storage.types'
+import { useCopyUrl } from './useCopyUrl'
 
 interface ItemContextMenuProps {
   id: string
-  onCopyUrl: (name: string, url: string) => void
 }
 
-const ItemContextMenu = ({ id = '', onCopyUrl = noop }: ItemContextMenuProps) => {
+const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
   const storageExplorerStore = useStorageStore()
   const {
     getFileUrl,
@@ -25,15 +25,16 @@ const ItemContextMenu = ({ id = '', onCopyUrl = noop }: ItemContextMenuProps) =>
     setSelectedItemsToMove,
     setSelectedFileCustomExpiry,
   } = storageExplorerStore
+  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
   const isPublic = selectedBucket.public
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
-  const onHandleClick = async (event: any, item: any, expiresIn?: number) => {
+  const onHandleClick = async (event: any, item: StorageItemWithColumn, expiresIn?: number) => {
     if (item.isCorrupted) return
     switch (event) {
       case 'copy':
         if (expiresIn !== undefined && expiresIn < 0) return setSelectedFileCustomExpiry(item)
-        else return onCopyUrl(item.name, await getFileUrl(item, expiresIn))
+        else return onCopyUrl(item.name, getFileUrl(item, expiresIn))
       case 'rename':
         return setSelectedItemToRename(item)
       case 'move':

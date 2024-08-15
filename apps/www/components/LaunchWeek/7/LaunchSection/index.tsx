@@ -41,7 +41,7 @@ export const LaunchSection = (props: WeekDayProps) => {
             </div>
           </Badge>
         ) : (
-          <Badge color="purple">Not shipped yet</Badge>
+          <Badge variant="secondary">Not shipped yet</Badge>
         )}
       </div>
       <h4 className="text-foreground text-2xl md:text-3xl lg:text-4xl">

@@ -1,4 +1,5 @@
-import * as React from 'react'
+'use client'
+
 import { CodeBlock } from '../../components/CodeBlock/CodeBlock'
 import Image from 'next/image'
 import { cn } from '../utils'
