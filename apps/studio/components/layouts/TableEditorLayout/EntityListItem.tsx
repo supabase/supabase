@@ -394,7 +394,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
               }}
             >
               <Download size={12} />
-              <span>Export as CSV</span>
+              <span>Export table as CSV</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               key="download-table-csv"
@@ -405,7 +405,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
               }}
             >
               <Download size={12} />
-              <span>Export as SQL</span>
+              <span>Export table as SQL</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
