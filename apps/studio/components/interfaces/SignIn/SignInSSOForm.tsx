@@ -1,28 +1,26 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
-import { useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { auth, buildPathWithParams } from 'lib/gotrue'
 import { useRef, useState } from 'react'
-import { Button, Form, Input } from 'ui'
+import toast from 'react-hot-toast'
 import { object, string } from 'yup'
 
-const signInSchema = object({
-  email: string().email('Must be a valid email').required('Email is required'),
-})
+import { BASE_PATH } from 'lib/constants'
+import { auth, buildPathWithParams } from 'lib/gotrue'
+import { Button, Form, Input } from 'ui'
+
+const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
 
 const SignInSSOForm = () => {
-  const { ui } = useStore()
   const queryClient = useQueryClient()
-
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
+  const signInSchema = object({
+    email: string().email('Must be a valid email').required('Email is required'),
+  })
   const onSignIn = async ({ email }: { email: string }) => {
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Signing in...`,
-    })
+    const toastId = toast.loading('Signing in...')
 
     let token = captchaToken
     if (!token) {
@@ -57,12 +55,11 @@ const SignInSSOForm = () => {
     } else {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
+      toast.error(`Failed to sign in: ${error.message}`, { id: toastId })
 
-      ui.setNotification({
-        id: toastId,
-        category: 'error',
-        message: error.message,
-      })
+      if (!WHITELIST_ERRORS.includes(error.message)) {
+        Sentry.captureMessage('[CRITICAL] Failed to sign in via SSO: ' + error.message)
+      }
     }
   }
 

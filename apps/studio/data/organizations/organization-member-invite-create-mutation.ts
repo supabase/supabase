@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast'
 
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationMemberInviteCreateVariables = {
@@ -12,6 +12,8 @@ export type OrganizationMemberInviteCreateVariables = {
   ownerId: number
   roleId: number
 }
+
+// [Joshen TODO] Should be deprecated now - double check before deleting
 
 export async function createOrganizationMemberInvite({
   slug,

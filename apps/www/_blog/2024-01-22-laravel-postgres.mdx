@@ -78,9 +78,9 @@ DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/pos
 
 By default Laravel uses the `public` schema. We recommend changing this as supabase exposes the `public` schema as a [data API](/docs/guides/api).
 
-You can change the schema of your Laravel application by modifying the `search_path` variable `app/config/database.php`:
+You can change the schema of your Laravel application by modifying the `search_path` variable `config/database.php`:
 
-```php app/config/database.php
+```php config/database.php
 'pgsql' => [
     'driver' => 'pgsql',
     'url' => env('DATABASE_URL'),

@@ -1,11 +1,13 @@
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { EmptyState, SidePanelEditor } from 'components/interfaces/TableGridEditor'
-import { TableEditorLayout } from 'components/layouts'
+
+import EmptyState from 'components/interfaces/TableGridEditor/EmptyState'
+import SidePanelEditor from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
-import { Table } from 'data/tables/table-query'
-import { NextPageWithLayout } from 'types'
+import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
+import type { Table } from 'data/tables/table-query'
+import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()

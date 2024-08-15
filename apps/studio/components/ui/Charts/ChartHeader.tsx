@@ -7,7 +7,8 @@ export interface ChartHeaderProps {
   highlightedLabel?: number | string | null
   highlightedValue?: number | string | null
 }
-const ChartHeader: React.FC<ChartHeaderProps> = ({
+
+const ChartHeader = ({
   format,
   highlightedValue,
   highlightedLabel,
@@ -25,6 +26,7 @@ const ChartHeader: React.FC<ChartHeaderProps> = ({
       className={`text-foreground text-xl font-normal ${minimalHeader ? 'text-base' : 'text-2xl'}`}
     >
       {highlightedValue !== undefined && String(highlightedValue)}
+      {format === 'seconds' ? ' ' : ''}
       <span className="text-lg">
         {typeof format === 'function' ? format(highlightedValue) : format}
       </span>

@@ -1,49 +1,50 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
-import { useTheme } from 'next-themes'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { setProjectStatus } from 'data/projects/projects-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import type { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { INSTANCE_MICRO_SPECS, PROJECT_STATUS } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Badge,
   Button,
-  IconAlertTriangle,
+  CriticalIcon,
   IconExternalLink,
   IconInfo,
   Modal,
   Radio,
   SidePanel,
+  WarningIcon,
 } from 'ui'
-
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()
-  const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { project: selectedProject } = useProjectContext()
   const organization = useSelectedOrganization()
 
+  const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
   const canUpdateCompute = useCheckPermissions(
@@ -61,51 +62,41 @@ const ComputeInstanceSidePanel = () => {
     snap.setPanelKey(undefined)
   }
 
+  const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
-      ui.setNotification({
-        duration: 8000,
-        category: 'success',
-        message: `Successfully updated compute instance to ${selectedCompute?.name}. Your project is currently being restarted to update its instance`,
-      })
+      toast.success(
+        `Successfully updated compute instance to ${selectedCompute?.name}. Your project is currently being restarted to update its instance`,
+        { duration: 8000 }
+      )
       setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
       onClose()
       router.push(`/project/${projectRef}`)
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update compute instance: ${error.message}`,
-      })
+      toast.error(`Unable to update compute instance: ${error.message}`)
     },
   })
   const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
-      ui.setNotification({
-        duration: 8000,
-        category: 'success',
-        message: `Successfully updated compute instance. Your project is currently being restarted to update its instance`,
-      })
+      toast.success(
+        `Successfully updated compute instance. Your project is currently being restarted to update its instance`,
+        { duration: 8000 }
+      )
       setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
       onClose()
       router.push(`/project/${projectRef}`)
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update compute instance: ${error.message}`,
-      })
+      toast.error(`Unable to update compute instance: ${error.message}`)
     },
   })
 
   const [selectedOption, setSelectedOption] = useState<string>('')
 
   const isSubmitting = isUpdating || isRemoving
-
   const projectId = selectedProject?.id
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
   const selectedAddons = addons?.selected_addons ?? []
@@ -125,7 +116,20 @@ const ComputeInstanceSidePanel = () => {
 
   const availableOptions = useMemo(() => {
     const computeOptions =
-      availableAddons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
+      availableAddons
+        .find((addon) => addon.type === 'compute_instance')
+        ?.variants.filter((option) => {
+          if (!selectedProject?.cloud_provider) {
+            return true
+          }
+
+          const meta = option.meta as ProjectAddonVariantMeta
+
+          return (
+            !meta.supported_cloud_providers ||
+            meta.supported_cloud_providers.includes(selectedProject.cloud_provider)
+          )
+        }) ?? []
 
     // Backwards comp until API is deployed
     if (!hasMicroOptionFromApi) {
@@ -162,9 +166,12 @@ const ComputeInstanceSidePanel = () => {
   const selectedCompute = availableOptions.find((option) => option.identifier === selectedOption)
   const hasChanges =
     selectedOption !== (subscriptionCompute?.variant.identifier ?? defaultInstanceSize)
+  const hasReadReplicas = (databases ?? []).length > 1
 
   const blockDowngradeDueToPitr =
     pitrAddon !== undefined && ['ci_micro', 'ci_nano'].includes(selectedOption) && hasChanges
+  const blockDowngradeDueToReadReplicas =
+    hasChanges && hasReadReplicas && ['ci_micro', 'ci_nano'].includes(selectedOption)
 
   useEffect(() => {
     if (visible) {
@@ -173,24 +180,16 @@ const ComputeInstanceSidePanel = () => {
       } else {
         setSelectedOption(defaultInstanceSize)
       }
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Change project compute size',
-            section: 'Add ons',
-          },
-          projectRef,
-        },
-        router
-      )
     }
   }, [visible, isLoading])
 
   const onConfirmUpdateComputeInstance = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!projectId) return console.error('Project ID is required')
+    if (computeSizeChangesDisabled)
+      toast.error(
+        'Compute size changes are currently disabled - our engineers are working on a fix.'
+      )
 
     // Temporary backwards compatibility fix
     if (
@@ -217,11 +216,16 @@ const ComputeInstanceSidePanel = () => {
         onConfirm={() => setShowConfirmationModal(true)}
         loading={isLoading}
         disabled={
-          isFreePlan || isLoading || !hasChanges || blockDowngradeDueToPitr || !canUpdateCompute
+          isFreePlan ||
+          isLoading ||
+          !hasChanges ||
+          blockDowngradeDueToPitr ||
+          blockDowngradeDueToReadReplicas ||
+          !canUpdateCompute
         }
         tooltip={
           isFreePlan
-            ? 'Unable to update compute instance on a free plan'
+            ? 'Unable to update compute instance on a Free Plan'
             : !canUpdateCompute
               ? 'You do not have permission to update compute instance'
               : undefined
@@ -265,7 +269,7 @@ const ComputeInstanceSidePanel = () => {
                   withIcon
                   className="mb-4"
                   variant="info"
-                  title="Changing your compute size is only available on the Pro plan"
+                  title="Changing your compute size is only available on the Pro Plan"
                   actions={
                     <Button asChild type="default">
                       <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
@@ -382,44 +386,72 @@ const ComputeInstanceSidePanel = () => {
               </p>
             )}
 
-            {hasChanges && !blockDowngradeDueToPitr && (
-              <Alert
-                withIcon
-                variant="info"
-                title="Your project will need to be restarted when changing it's compute size"
-              >
-                Your project will be unavailable for up to 2 minutes while the changes take place.
-              </Alert>
+            {hasChanges && !blockDowngradeDueToPitr && !blockDowngradeDueToReadReplicas && (
+              <Alert_Shadcn_>
+                <WarningIcon />
+                <AlertTitle_Shadcn_>
+                  Your project will need to be restarted when changing its compute size
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  Your project will be unavailable for up to 2 minutes while the changes take place.
+                </AlertDescription_Shadcn_>
+                {hasReadReplicas && (
+                  <AlertDescription_Shadcn_>
+                    The compute sizes for <span className="text-foreground">all read replicas</span>{' '}
+                    on your project will also be changed to the {selectedCompute?.name} size as
+                    well.
+                  </AlertDescription_Shadcn_>
+                )}
+              </Alert_Shadcn_>
             )}
 
-            {blockDowngradeDueToPitr && (
-              <Alert
-                withIcon
-                variant="info"
-                className="mb-4"
-                title="Disable PITR before downgrading"
-                actions={
+            {blockDowngradeDueToReadReplicas ? (
+              <Alert_Shadcn_>
+                <WarningIcon />
+                <AlertTitle_Shadcn_>
+                  Unable to downgrade as project has active read replicas
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  The minimum compute size for using read replicas is the Small Compute. You need to
+                  remove all read replicas before downgrading Compute as it requires at least a
+                  Small compute instance.
+                </AlertDescription_Shadcn_>
+                <AlertDescription_Shadcn_ className="mt-2">
+                  <Button asChild type="default">
+                    <Link
+                      href={`/project/${projectRef}/settings/infrastructure`}
+                      onClick={() => snap.setPanelKey(undefined)}
+                    >
+                      Manage read replicas
+                    </Link>
+                  </Button>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            ) : blockDowngradeDueToPitr ? (
+              <Alert_Shadcn_>
+                <WarningIcon />
+                <AlertTitle_Shadcn_>Disable PITR before downgrading</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  You currently have PITR enabled. The minimum compute size for using PITR is the
+                  Small Compute.
+                </AlertDescription_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  You need to disable PITR before downgrading Compute as it requires at least a
+                  Small compute instance.
+                </AlertDescription_Shadcn_>
+                <AlertDescription_Shadcn_ className="mt-2">
                   <Button type="default" onClick={() => snap.setPanelKey('pitr')}>
                     Change PITR
                   </Button>
-                }
-              >
-                <p>
-                  You currently have PITR enabled. The minimum compute instance size for using PITR
-                  is the Small Compute.
-                </p>
-                <p>
-                  You need to disable PITR before downgrading Compute as it requires at least a
-                  Small compute instance.
-                </p>
-              </Alert>
-            )}
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            ) : null}
 
             {hasChanges &&
               subscription?.billing_via_partner &&
               subscription.scheduled_plan_change?.target_plan !== undefined && (
                 <Alert_Shadcn_ variant={'warning'} className="mb-2">
-                  <IconAlertTriangle className="h-4 w-4" />
+                  <CriticalIcon />
                   <AlertDescription_Shadcn_>
                     You have a scheduled subscription change that will be canceled if you change
                     your compute size.
@@ -440,15 +472,13 @@ const ComputeInstanceSidePanel = () => {
         header="Confirm to upgrade compute instance now"
       >
         <Modal.Content>
-          <div className="py-6">
-            <Alert
-              withIcon
-              variant="warning"
-              title="Your project will need to be restarted when changing it's compute size"
-            >
-              Your project will be unavailable for up to 2 minutes while the changes take place.
-            </Alert>
-          </div>
+          <Alert
+            withIcon
+            variant="warning"
+            title="Your project will need to be restarted when changing its compute size"
+          >
+            Your project will be unavailable for up to 2 minutes while the changes take place.
+          </Alert>
         </Modal.Content>
       </Modal>
     </>

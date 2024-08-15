@@ -1,13 +1,15 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect } from 'react'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useFlag, useSelectedOrganization, withAuth } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { withAuth } from 'hooks/misc/withAuth'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import SettingsLayout from '../SettingsLayout/SettingsLayout'
-import { SidebarSection } from './AccountLayout.types'
+import type { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
 
 export interface AccountLayoutProps {
@@ -30,6 +32,12 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
     await signOut()
     await router.push('/sign-in')
   }
+
+  useEffect(() => {
+    if (!IS_PLATFORM) {
+      router.push('/project/default')
+    }
+  }, [router])
 
   const organizationsLinks = (organizations ?? [])
     .map((organization) => ({
@@ -130,7 +138,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
               {
                 key: `logout`,
                 icon: '/icons/feather/power.svg',
-                label: 'Logout',
+                label: 'Log out',
                 href: undefined,
                 onClick: onClickLogout,
               },
@@ -150,7 +158,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className="h-full min-h-[0px] basis-0 flex-1">
+      <div className="h-screen min-h-[0px] basis-0 flex-1">
         <WithSidebar
           hideSidebar={navLayoutV2}
           title={title}

@@ -2,20 +2,28 @@
 // https://github.com/supabase/infrastructure/blob/develop/worker/src/lib/constants.ts#L544-L596
 
 export const POOLING_OPTIMIZATIONS = {
-  ci_small: {
+  ci_nano: {
     maxClientConn: 200,
+    poolSize: 15,
+  },
+  ci_micro: {
+    maxClientConn: 200,
+    poolSize: 15,
+  },
+  ci_small: {
+    maxClientConn: 400,
     poolSize: 15,
   },
   ci_medium: {
-    maxClientConn: 200,
+    maxClientConn: 600,
     poolSize: 15,
   },
   ci_large: {
-    maxClientConn: 300,
-    poolSize: 15,
+    maxClientConn: 800,
+    poolSize: 20,
   },
   ci_xlarge: {
-    maxClientConn: 700,
+    maxClientConn: 1000,
     poolSize: 20,
   },
   ci_2xlarge: {

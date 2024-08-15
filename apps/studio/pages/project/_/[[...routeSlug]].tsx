@@ -1,10 +1,9 @@
-import { observer } from 'mobx-react-lite'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import ProjectList from 'components/interfaces/Home/ProjectList'
-import { withAuth } from 'hooks'
+import { ProjectList } from 'components/interfaces/Home/ProjectList'
+import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 
 const Header = () => {
@@ -58,11 +57,11 @@ const GenericProjectPage: NextPage = () => {
           className="flex-grow py-6 space-y-8 overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
         >
-          <ProjectList rewriteHref={urlRewriterFactory(routeSlug)} />
+          <ProjectList rewriteHref={urlRewriterFactory(routeSlug)} search="" />
         </div>
       </div>
     </>
   )
 }
 
-export default withAuth(observer(GenericProjectPage))
+export default withAuth(GenericProjectPage)

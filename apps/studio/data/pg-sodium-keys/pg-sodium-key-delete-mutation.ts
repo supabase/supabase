@@ -3,9 +3,8 @@ import toast from 'react-hot-toast'
 
 import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { pgSodiumKeys } from './keys'
-import { sqlKeys } from 'data/sql/keys'
 
 export type VaultSecretDeleteVariables = {
   projectRef: string

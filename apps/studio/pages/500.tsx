@@ -1,12 +1,11 @@
 import { NextPage } from 'next'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
-import { Button } from 'ui'
-import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import { useSignOut } from 'lib/auth'
-import { useTheme } from 'next-themes'
+import { Button } from 'ui'
 
 const Error500: NextPage = () => {
   const router = useRouter()
@@ -64,4 +63,4 @@ const Error500: NextPage = () => {
   )
 }
 
-export default observer(Error500)
+export default Error500

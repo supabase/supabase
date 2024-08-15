@@ -1,0 +1,37 @@
+extends: capitalization
+message: "'%s' should use sentence-style capitalization."
+link: "https://developers.google.com/style/capitalization#capitalization-in-titles-and-headings"
+level: warning
+scope: heading
+match: $sentence
+indicators:
+  - ":"
+exceptions:
+  - API
+  - Azure
+  - ChatGPT
+  - ChatGPT Retrieval Plugin
+  - CLI
+  - Cosmos
+  - Docker
+  - Edge Functions?
+  - Emmet
+  - gRPC
+  - HNSW
+  - I
+  - JWT
+  - Kubernetes
+  - Linux
+  - macOS
+  - Marketplace
+  - MongoDB
+  - OpenAI
+  - REPL
+  - REST
+  - Studio
+  - Transformers.js
+  - TypeScript
+  - URLs
+  - Visual
+  - VS
+  - Windows

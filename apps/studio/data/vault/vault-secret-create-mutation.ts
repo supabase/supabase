@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 
 import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError, VaultSecret } from 'types'
+import type { ResponseError, VaultSecret } from 'types'
 import { vaultSecretsKeys } from './keys'
 import { sqlKeys } from 'data/sql/keys'
 
@@ -51,7 +51,7 @@ export const useVaultSecretCreateMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to delete secret: ${data.message}`)
+          toast.error(`Failed to create secret: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

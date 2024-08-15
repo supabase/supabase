@@ -1,52 +1,58 @@
-import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
-import { UpdateCustomReportModal } from 'components/interfaces/Reports/Reports.UpdateModal'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { useContentInsertMutation } from 'data/content/content-insert-mutation'
-import { Content, useContentQuery } from 'data/content/content-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useIsFeatureEnabled, useSelectedProject } from 'hooks'
-import { uuidv4 } from 'lib/helpers'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React from 'react'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  IconChevronDown,
-  IconEdit2,
-  IconPlus,
-  IconTrash,
-  Menu,
-  Modal,
-  cn,
-} from 'ui'
+
+import { useParams } from 'common'
+import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
+import { UpdateCustomReportModal } from 'components/interfaces/Reports/Reports.UpdateModal'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
+import { Content, useContentQuery } from 'data/content/content-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useProfile } from 'lib/profile'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Menu, cn } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ReportMenuItem } from './ReportMenuItem'
 
 const ReportsMenu = () => {
   const router = useRouter()
-  const insertReport = useContentInsertMutation()
-  const deleteReport = useContentDeleteMutation()
-  const updateReport = useContentUpsertMutation()
-
-  const project = useSelectedProject()
-  const { id } = router.query
+  const { profile } = useProfile()
+  const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4]) as string
-  const ref = project?.ref ?? 'default'
-
-  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false)
-  const [showNewReportModal, setShowNewReportModal] = React.useState(false)
-  const [showUpdateReportModal, setShowUpdateReportModal] = React.useState(false)
-  const [selectedReport, setSelectedReport] = React.useState<Content>()
-
   const storageEnabled = useIsFeatureEnabled('project_storage:all')
 
+  const canCreateCustomReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'report', owner_id: profile?.id },
+    subject: { id: profile?.id },
+  })
+
   const { data: content, isLoading } = useContentQuery(ref)
+  const { mutate: deleteReport, isLoading: isDeleting } = useContentDeleteMutation({
+    onSuccess: () => {
+      setDeleteModalOpen(false)
+      toast.success('Successfully deleted report')
+      router.push(`/project/${ref}/reports`)
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete report: ${error.message}`)
+    },
+  })
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [showNewReportModal, setShowNewReportModal] = useState(false)
+  const [selectedReportToDelete, setSelectedReportToDelete] = useState<Content>()
+  const [selectedReportToUpdate, setSelectedReportToUpdate] = useState<Content>()
+
+  const onConfirmDeleteReport = () => {
+    if (ref === undefined) return console.error('Project ref is required')
+    if (selectedReportToDelete?.id === undefined) return console.error('Report ID is required')
+    deleteReport({ projectRef: ref, ids: [selectedReportToDelete.id] })
+  }
 
   function getReportMenuItems() {
     if (!content) return []
@@ -103,52 +109,9 @@ const ReportsMenu = () => {
           key: 'database',
           url: `/project/${ref}/reports/database`,
         },
-        {
-          name: 'Query Performance',
-          key: 'query-performance',
-          url: `/project/${ref}/reports/query-performance`,
-        },
       ],
     },
   ]
-
-  async function createCustomReport({ name, description }: { name: string; description?: string }) {
-    try {
-      if (!ref) return
-
-      const res = await insertReport.mutateAsync({
-        projectRef: ref,
-        payload: {
-          id: uuidv4(),
-          type: 'report',
-          name,
-          description: description || '',
-          visibility: 'project',
-          content: {
-            schema_version: 1,
-            period_start: {
-              time_period: '7d',
-              date: '',
-            },
-            period_end: {
-              time_period: 'today',
-              date: '',
-            },
-            interval: '1d',
-            layout: [],
-          },
-        },
-      })
-      toast.success('New report created')
-
-      const newReportId = res[0].id
-      setShowNewReportModal(false)
-      router.push(`/project/${ref}/reports/${newReportId}`)
-    } catch (error) {
-      toast.error(`Failed to create report. Check console for more details.`)
-      console.error(error)
-    }
-  }
 
   return (
     <Menu type="pills" className="mt-6">
@@ -159,75 +122,55 @@ const ReportsMenu = () => {
           <ShimmeringLoader className="w-1/2" />
         </div>
       ) : (
-        <div className="flex flex-col px-2">
-          <div className="flex px-2">
-            <Button
+        <div className="flex flex-col px-2 gap-y-6">
+          <div className="px-2">
+            <ButtonTooltip
+              block
               type="default"
+              icon={<Plus />}
+              disabled={!canCreateCustomReport}
               className="justify-start flex-grow"
               onClick={() => {
                 setShowNewReportModal(true)
               }}
-              icon={<IconPlus size="tiny" />}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to create custom reports',
+                },
+              }}
             >
               New custom report
-            </Button>
+            </ButtonTooltip>
           </div>
-          {reportMenuItems.length > 0 ? (
-            <div className="mt-6">
-              <Menu.Group title={'Your custom reports'} />
-              {reportMenuItems.map((item, idx) => (
-                <Link
-                  className={cn(
-                    'pr-2 h-7 pl-3 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
-                    'flex items-center justify-between rounded-md group relative',
-                    item.key === pageKey ? 'bg-surface-300 text-foreground' : 'hover:bg-surface-200'
-                  )}
-                  key={item.key + '-menukey'}
-                  href={item.url}
-                >
-                  <div>{item.name}</div>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Button
-                        type="text"
-                        className="px-1 opacity-50 hover:opacity-100"
-                        icon={<IconChevronDown size="tiny" strokeWidth={2} />}
-                      />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-52 *:space-x-2">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          if (!item.id) return
-                          setSelectedReport(item.report)
-                          setShowUpdateReportModal(true)
-                        }}
-                      >
-                        <IconEdit2 size="tiny" />
-                        <div>Rename</div>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={async () => {
-                          if (!item.id) return
-                          setSelectedReport(item.report)
-                          setDeleteModalOpen(true)
-                        }}
-                      >
-                        <IconTrash size="tiny" />
-                        <div>Delete</div>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </Link>
+          {reportMenuItems.length > 0 ? (
+            <div>
+              <Menu.Group
+                title={<span className="uppercase font-mono">Your custom reports</span>}
+              />
+              {reportMenuItems.map((item) => (
+                <ReportMenuItem
+                  key={item.id}
+                  item={item}
+                  pageKey={pageKey}
+                  onSelectEdit={() => {
+                    setSelectedReportToUpdate(item.report)
+                  }}
+                  onSelectDelete={() => {
+                    setSelectedReportToDelete(item.report)
+                    setDeleteModalOpen(true)
+                  }}
+                />
               ))}
             </div>
           ) : null}
-          {menuItems.map((item, idx) => (
-            <div className="mt-6" key={item.key + '-menu-group'}>
+
+          {menuItems.map((item) => (
+            <div key={item.key + '-menu-group'}>
               {item.items ? (
                 <>
-                  <Menu.Group title={item.title} />
+                  <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
                   <div key={item.key} className="flex flex-col">
                     {item.items.map((subItem) => (
                       <li
@@ -250,77 +193,52 @@ const ReportsMenu = () => {
               ) : null}
             </div>
           ))}
-          <UpdateCustomReportModal
-            onSubmit={async (newVals) => {
-              console.log('debug', newVals)
-              try {
-                if (!selectedReport) return
-                if (!selectedReport.id) return
-                if (!selectedReport.project_id) return
 
-                await updateReport.mutateAsync({
-                  projectRef: ref,
-                  payload: {
-                    ...selectedReport,
-                    project_id: selectedReport.project_id,
-                    id: selectedReport.id,
-                    name: newVals.name,
-                    description: newVals.description || '',
-                  },
-                })
-                toast.success('Report updated')
-                setShowUpdateReportModal(false)
-              } catch (error) {
-                toast.error(`Failed to update report. Check console for more details.`)
-                console.error(error)
-              }
-            }}
-            onCancel={() => setShowUpdateReportModal(false)}
-            visible={showUpdateReportModal}
+          {/* [Joshen] Temp notice while we shift some pages on 040424 - can probably remove in 3 months perhaps */}
+          <Alert_Shadcn_>
+            <AlertTitle_Shadcn_ className="text-sm">
+              Query Performance and Project Linter reports have been shifted
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="text-xs">
+              <p className="mb-2">They can now be found in the menu under the database section.</p>
+              <Button asChild type="default" size="tiny">
+                <Link href={`/project/${ref}/database/query-performance`}>
+                  Head over to Database
+                </Link>
+              </Button>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+
+          <UpdateCustomReportModal
+            onCancel={() => setSelectedReportToUpdate(undefined)}
+            selectedReport={selectedReportToUpdate}
             initialValues={{
-              name: selectedReport?.name || '',
-              description: selectedReport?.description || '',
+              name: selectedReportToUpdate?.name || '',
+              description: selectedReportToUpdate?.description || '',
             }}
           />
+
           <ConfirmationModal
-            header="Delete custom report"
-            buttonLabel="Delete report"
-            buttonLoadingLabel="Deleting report"
+            title="Delete custom report"
+            confirmLabel="Delete report"
+            confirmLabelLoading="Deleting report"
             size="medium"
-            loading={deleteReport.isLoading}
+            loading={isDeleting}
             visible={deleteModalOpen}
-            onSelectConfirm={async () => {
-              if (selectedReport) {
-                if (!selectedReport.id) return
-                await deleteReport.mutateAsync({
-                  projectRef: ref,
-                  ids: [selectedReport.id],
-                })
-                toast.success('Report deleted')
-                router.push(`/project/${ref}/reports`)
-              }
-              setDeleteModalOpen(false)
-            }}
-            onSelectCancel={() => setDeleteModalOpen(false)}
+            onCancel={() => setDeleteModalOpen(false)}
+            onConfirm={onConfirmDeleteReport}
           >
-            <Modal.Content>
-              <div className="my-6">
-                <div className="text-sm text-foreground-light grid gap-4">
-                  <div className="grid gap-1">
-                    <p>Are you sure you want to delete '{selectedReport?.name}'?</p>
-                  </div>
-                </div>
+            <div className="text-sm text-foreground-light grid gap-4">
+              <div className="grid gap-1">
+                <p>Are you sure you want to delete '{selectedReportToDelete?.name}'?</p>
               </div>
-            </Modal.Content>
+            </div>
           </ConfirmationModal>
+
           <CreateReportModal
             visible={showNewReportModal}
-            onCancel={() => {
-              setShowNewReportModal(false)
-            }}
-            afterSubmit={() => {
-              setShowNewReportModal(false)
-            }}
+            onCancel={() => setShowNewReportModal(false)}
+            afterSubmit={() => setShowNewReportModal(false)}
           />
         </div>
       )}

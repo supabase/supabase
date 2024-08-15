@@ -46,9 +46,9 @@ const ComputePricingTable = () => {
                     <td key={column.key} className="p-3">
                       {column.key === 'dedicated' ? (
                         column.value ? (
-                          <IconPricingIncludedCheck plan="Pro plan" />
+                          <IconPricingIncludedCheck plan="Pro Plan" />
                         ) : (
-                          <IconPricingMinus plan="Free plan" />
+                          <IconPricingMinus plan="Free Plan" />
                         )
                       ) : (
                         column.value
@@ -82,9 +82,9 @@ const ComputePricingTable = () => {
                   >
                     {column.key === 'dedicated' ? (
                       column.value ? (
-                        <IconPricingIncludedCheck plan="Pro plan" />
+                        <IconPricingIncludedCheck plan="Pro Plan" />
                       ) : (
-                        <IconPricingMinus plan="Free plan" />
+                        <IconPricingMinus plan="Free Plan" />
                       )
                     ) : (
                       column.value

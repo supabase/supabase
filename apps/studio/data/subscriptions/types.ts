@@ -1,4 +1,4 @@
-import { components } from 'data/api'
+import type { components } from 'data/api'
 
 export type SubscriptionTier =
   | 'tier_free'
@@ -28,6 +28,7 @@ export interface ProjectAddonVariantMeta {
   connections_direct?: number
   connections_pooler?: number
   backup_duration_days?: number
+  supported_cloud_providers?: string[]
 }
 
 export type ProjectSelectedAddon = components['schemas']['SelectedAddonResponse']

@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { Entity, useEntityTypeQuery } from 'data/entity-types/entity-type-query'
+import { type Entity, useEntityTypeQuery } from 'data/entity-types/entity-type-query'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { useMemo } from 'react'
 

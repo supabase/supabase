@@ -3,7 +3,7 @@ import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { integrationKeys } from './keys'
 import { toast } from 'react-hot-toast'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type VercelIntegrationCreateVariables = {
   code: string

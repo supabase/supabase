@@ -1,4 +1,4 @@
-import { PostgresMaterializedView } from '@supabase/postgres-meta'
+import type { PostgresMaterializedView } from '@supabase/postgres-meta'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'

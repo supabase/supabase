@@ -1,13 +1,12 @@
-import { Item, ItemParams, Menu, PredicateParams, Separator } from 'react-contexify'
-import { IconClipboard, IconEdit, IconTrash } from 'ui'
-
-import { SupaRow } from 'components/grid/types'
+import { Clipboard, Edit, Trash } from 'lucide-react'
 import { useCallback } from 'react'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTrackedState } from '../../store'
-import { copyToClipboard, formatClipboardValue } from '../../utils'
+import { Item, ItemParams, Menu, PredicateParams, Separator } from 'react-contexify'
 
-export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
+import type { SupaRow } from 'components/grid/types'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { ROW_CONTEXT_MENU_ID } from '.'
+import { useTrackedState } from '../../store/Store'
+import { copyToClipboard, formatClipboardValue } from '../../utils/common'
 
 export type RowContextMenuProps = {
   rows: SupaRow[]
@@ -62,16 +61,16 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
     <>
       <Menu id={ROW_CONTEXT_MENU_ID} animation={false}>
         <Item onClick={onCopyCellContent}>
-          <IconClipboard size="tiny" />
+          <Clipboard size={14} />
           <span className="ml-2 text-xs">Copy cell content</span>
         </Item>
         <Item onClick={onEditRowClick} hidden={isItemHidden} data="edit">
-          <IconEdit size="tiny" />
+          <Edit size={14} />
           <span className="ml-2 text-xs">Edit row</span>
         </Item>
         {state.editable && <Separator />}
         <Item onClick={onDeleteRow} hidden={isItemHidden} data="delete">
-          <IconTrash size="tiny" stroke="red" />
+          <Trash size={14} stroke="red" />
           <span className="ml-2 text-xs">Delete row</span>
         </Item>
       </Menu>

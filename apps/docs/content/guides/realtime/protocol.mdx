@@ -115,7 +115,7 @@ To update the access token, you need to send to the server a message specifying 
 
 ## Postgres CDC message
 
-Realtime sends a message with the following structure
+Realtime sends a message with the following structure. By default, the payload only includes new record changes, and the `old` entry includes the changed row's primary id. If you want to receive old records, you can set the replicate identity of your table to full. Check out [this section of the guide](/docs/guides/realtime/postgres-changes#receiving-old-records).
 
 ```ts
 {
@@ -123,14 +123,13 @@ Realtime sends a message with the following structure
    "topic": string,
    "payload": {
       "data": {
-         "columns": Array<{name: string, type: string}>,
-         "commit_timestamp": string,
-         "errors": null | string,
-         "old_record": {"id": number | string},
-         "record": {[key: string]: boolean | number | string | null},
-         "type": "*" | "INSERT" | "UPDATE" | "DELETE",
-         "schema": string,
-         "table": string
+         schema: string,
+         table: string,
+         commit_timestamp: string,
+         eventType: "*" | "INSERT" | "UPDATE" | "DELETE",
+         new: {[key: string]: boolean | number | string | null},
+         old: {[key: string]: number | string},
+         errors: string | null
       },
       "ids": Array<number>
    },

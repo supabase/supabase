@@ -9,5 +9,12 @@
     return <IconBase icon={Pause} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { pause } from 'lucide-react'
+  */
   export default IconPause
   

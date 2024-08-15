@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
@@ -33,6 +35,9 @@ interface GroupProps {
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
 }
 
+/**
+ * @deprecated Use ./Checkbox_shadcn_ instead
+ */
 function Group({
   id,
   layout = 'vertical',
@@ -74,6 +79,7 @@ function Group({
                 return (
                   <Checkbox
                     id={option.id}
+                    key={option.id}
                     value={option.value}
                     label={option.label}
                     beforeLabel={option.beforeLabel}
@@ -92,6 +98,9 @@ function Group({
   )
 }
 
+/**
+ * @deprecated Use ./Checkbox_shadcn_ instead
+ */
 export function Checkbox({
   className,
   id = '',
@@ -119,13 +128,13 @@ export function Checkbox({
         const markupId = id
           ? id
           : name
-          ? name
-          : label
-          ? label
-              .toLowerCase()
-              .replace(/^[^A-Z0-9]+/gi, '')
-              .replace(/ /g, '-')
-          : undefined
+            ? name
+            : label
+              ? label
+                  .toLowerCase()
+                  .replace(/^[^A-Z0-9]+/gi, '')
+                  .replace(/ /g, '-')
+              : undefined
 
         // @ts-ignore
         size = parentSize ? parentSize : size

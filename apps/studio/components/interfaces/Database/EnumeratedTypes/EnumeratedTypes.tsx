@@ -1,3 +1,4 @@
+import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -5,10 +6,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconEdit,
-  IconMoreVertical,
-  IconSearch,
-  IconTrash,
   Input,
 } from 'ui'
 
@@ -45,12 +42,13 @@ const EnumeratedTypes = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const enumeratedTypes =
+  const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
+  const filteredEnumeratedTypes =
     search.length > 0
-      ? (data ?? []).filter(
+      ? enumeratedTypes.filter(
           (x) => x.schema === selectedSchema && x.name.toLowerCase().includes(search.toLowerCase())
         )
-      : (data ?? []).filter((x) => x.schema === selectedSchema)
+      : enumeratedTypes.filter((x) => x.schema === selectedSchema)
 
   const protectedSchemas = (schemas ?? []).filter((schema) =>
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
@@ -75,7 +73,7 @@ const EnumeratedTypes = () => {
             className="w-64"
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search for a type"
-            icon={<IconSearch size={14} />}
+            icon={<Search size={14} />}
           />
         </div>
         {!isLocked && (
@@ -103,7 +101,7 @@ const EnumeratedTypes = () => {
           ]}
           body={
             <>
-              {enumeratedTypes.length === 0 && search.length === 0 && (
+              {filteredEnumeratedTypes.length === 0 && search.length === 0 && (
                 <Table.tr>
                   <Table.td colSpan={4}>
                     <p className="text-sm text-foreground">No enumerated types created yet</p>
@@ -113,7 +111,7 @@ const EnumeratedTypes = () => {
                   </Table.td>
                 </Table.tr>
               )}
-              {enumeratedTypes.length === 0 && search.length > 0 && (
+              {filteredEnumeratedTypes.length === 0 && search.length > 0 && (
                 <Table.tr>
                   <Table.td colSpan={4}>
                     <p className="text-sm text-foreground">No results found</p>
@@ -123,8 +121,8 @@ const EnumeratedTypes = () => {
                   </Table.td>
                 </Table.tr>
               )}
-              {enumeratedTypes.length > 0 &&
-                enumeratedTypes.map((type) => (
+              {filteredEnumeratedTypes.length > 0 &&
+                filteredEnumeratedTypes.map((type) => (
                   <Table.tr key={type.id}>
                     <Table.td className="w-20">
                       <p className="w-20 truncate">{type.schema}</p>
@@ -136,23 +134,21 @@ const EnumeratedTypes = () => {
                         <div className="flex justify-end items-center space-x-2">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1">
-                                <IconMoreVertical />
-                              </Button>
+                              <Button type="default" className="px-1" icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-32">
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => setSelectedTypeToEdit(type)}
                               >
-                                <IconEdit size="tiny" />
+                                <Edit size={14} />
                                 <p>Update type</p>
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => setSelectedTypeToDelete(type)}
                               >
-                                <IconTrash stroke="red" size="tiny" />
+                                <Trash size={14} />
                                 <p>Delete type</p>
                               </DropdownMenuItem>
                             </DropdownMenuContent>

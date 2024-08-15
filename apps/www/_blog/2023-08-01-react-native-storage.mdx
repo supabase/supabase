@@ -68,8 +68,8 @@ You can either do this through the UI and pick from examples, or simply run my S
 CREATE POLICY "Enable storage access for users based on user_id" ON "storage"."objects"
 AS PERMISSIVE FOR ALL
 TO public
-USING (bucket_id = 'files' AND auth.uid()::text = (storage.foldername(name))[1])
-WITH CHECK (bucket_id = 'files' AND auth.uid()::text = (storage.foldername(name))[1])
+USING (bucket_id = 'files' AND (SELECT auth.uid()::text )= (storage.foldername(name))[1])
+WITH CHECK (bucket_id = 'files' AND (SELECT auth.uid()::text) = (storage.foldername(name))[1])
 ```
 
 This will allow users to only access their own folder, and not any other files in the bucket.

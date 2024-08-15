@@ -1,15 +1,16 @@
 import clsx from 'clsx'
 import { PricingInformation } from 'shared-data'
 import { Button, IconCheck } from 'ui'
+import { pickFeatures } from 'shared-data/plans'
 
 export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
-  billingViaPartner: boolean
+  billingPartner: 'fly' | 'aws' | undefined
 }
 
-const EnterpriseCard = ({ plan, isCurrentPlan, billingViaPartner }: EnterpriseCardProps) => {
-  const features = billingViaPartner ? plan.featuresPartner : plan.features
+const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardProps) => {
+  const features = pickFeatures(plan, billingPartner)
 
   return (
     <div

@@ -1,12 +1,12 @@
 import React, { FC } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, IconCheck, cn } from 'ui'
+import { Button, cn, IconCheck } from 'ui'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 
 import gaEvents from '~/lib/gaEvents'
-import { plans } from 'shared-data/plans'
+import { pickFeatures, pickFooter, plans } from 'shared-data/plans'
 
 const PricingPlans: FC = () => {
   const router = useRouter()
@@ -23,13 +23,15 @@ const PricingPlans: FC = () => {
           {plans.map((plan) => {
             const isPromoPlan = plan.name === 'Pro'
             const isTeamPlan = plan.name === 'Team'
+            const features = pickFeatures(plan)
+            const footer = pickFooter(plan)
 
             return (
               <div
                 key={`row-${plan.name}`}
                 className={cn(
-                  'flex flex-col border xl:border-r-0 last:border-r bg-surface-100 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
-                  isPromoPlan && 'border-brand !border-2 !rounded-xl xl:-my-8',
+                  'flex flex-col border xl:border-r-0 last:border-r bg-surface-75 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
+                  isPromoPlan && 'border-foreground-muted !border-2 !rounded-xl xl:-my-8',
                   isTeamPlan && 'xl:border-l-0'
                 )}
               >
@@ -41,11 +43,11 @@ const PricingPlans: FC = () => {
                 >
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2 pb-2">
-                      <h3 className="text-2xl font-normal uppercase flex items-center gap-4 font-mono">
+                      <h3 className="text-foreground text-2xl font-normal uppercase flex items-center gap-4 font-mono">
                         {plan.name}
                       </h3>
                       {plan.nameBadge && (
-                        <span className="bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center">
+                        <span className="bg-foreground-light text-background rounded-md py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center">
                           {plan.nameBadge}
                         </span>
                       )}
@@ -61,7 +63,7 @@ const PricingPlans: FC = () => {
                   </p>
                   <Button
                     block
-                    size="small"
+                    size="large"
                     type={plan.name === 'Enterprise' ? 'default' : 'primary'}
                     asChild
                   >
@@ -140,7 +142,7 @@ const PricingPlans: FC = () => {
                     <p className="text-foreground-lighter text-[13px] mt-2 mb-4">{plan.preface}</p>
                   )}
                   <ul className="text-[13px] flex-1 text-foreground-lighter">
-                    {plan.features.map((feature) => (
+                    {features.map((feature) => (
                       <li
                         key={typeof feature === 'string' ? feature : feature[0]}
                         className="flex flex-col py-2 first:mt-0"
@@ -169,9 +171,9 @@ const PricingPlans: FC = () => {
 
                   <div className="flex flex-col gap-6 mt-auto prose">
                     <div className="space-y-2 mt-12">
-                      {plan.footer && (
+                      {footer && (
                         <p className="text-[13px] leading-5 text-foreground-lighter whitespace-pre-wrap mb-0">
-                          {plan.footer}
+                          {footer}
                         </p>
                       )}
                     </div>

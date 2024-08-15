@@ -13,16 +13,6 @@ export interface NavMenuSection {
   items: Partial<NavMenuSection>[]
 }
 
-export interface References {
-  [key: string]: {
-    name: string
-    library?: string
-    versions: string[]
-    icon: string
-    currentVersion?: string
-  }
-}
-
 type MenuItem = {
   label: string
   icon?: string
@@ -32,7 +22,11 @@ type MenuItem = {
   community?: boolean
 }
 
-export type HomepageMenuItems = MenuItem[][]
+export type DropdownMenuItem = MenuItem & {
+  menuItems?: MenuItem[][]
+}
+
+export type GlobalMenuItems = DropdownMenuItem[][]
 
 export type NavMenuConstant = Readonly<{
   title: string

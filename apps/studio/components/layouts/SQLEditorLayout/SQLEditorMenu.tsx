@@ -1,61 +1,59 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
+import { FilePlus, FolderPlus, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconPlus,
-  IconSearch,
-  IconX,
-  Input,
-  Menu,
-  Modal,
-  Separator,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
 
+import { useParams } from 'common'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { WarningIcon } from 'components/ui/Icons'
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import {
+  createSqlSnippetSkeleton,
+  createSqlSnippetSkeletonV2,
+} from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import QueryItem from './QueryItem'
-import { partition, uniq, uniqBy } from 'lodash'
-import { selectItemsInRange } from './SQLEditorLayout.utils'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  InnerSideBarFilterSearchInput,
+  InnerSideBarFilterSortDropdown,
+  InnerSideBarFilterSortDropdownItem,
+  InnerSideBarFilters,
+  InnerSideMenuItem,
+} from 'ui-patterns/InnerSideMenu'
+import { SQLEditorNavV1 } from './SQLEditorNavV1'
+import { SQLEditorNav as SQLEditorNavV2 } from './SQLEditorNavV2/SQLEditorNav'
 
-const SideBarContent = observer(() => {
-  const { ui } = useStore()
-  const { ref, id: activeId } = useParams()
+interface SQLEditorMenuProps {
+  onViewOngoingQueries: () => void
+}
+
+export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
+  const { ref, id: activeId } = useParams()
 
   const [searchText, setSearchText] = useState('')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedQueries, setSelectedQueries] = useState<string[]>([])
 
   const snap = useSqlEditorStateSnapshot()
-  const { isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
-    refetchOnWindowFocus: false,
-    staleTime: 300, // 5 minutes
-    onSuccess(data) {
-      if (ref) snap.setRemoteSnippets(data.snippets, ref)
-    },
-  })
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess: (data) => postDeleteCleanup(data),
@@ -80,124 +78,52 @@ const SideBarContent = observer(() => {
     }
   }
 
-  const snippets = useSnippets(ref)
-
-  const projectSnippets = useMemo(() => {
-    return snippets.filter((snippet) => snippet.visibility === 'project')
-  }, [snippets])
-
-  const filteredProjectSnippets = useMemo(() => {
-    if (searchText.length > 0) {
-      return projectSnippets.filter((tab) =>
-        tab.name.toLowerCase().includes(searchText.toLowerCase())
-      )
-    }
-    return projectSnippets
-  }, [projectSnippets, searchText])
-
-  const personalSnippets = useMemo(() => {
-    const ss = snippets.filter(
-      (snippet) => snippet.visibility === 'user' && !snippet.content.favorite
-    )
-
-    if (searchText.length > 0) {
-      return ss.filter((tab) => tab.name.toLowerCase().includes(searchText.toLowerCase()))
-    }
-    return ss
-  }, [searchText, snippets])
-
-  const favoriteSnippets = useMemo(() => {
-    return snippets.filter((snippet) => snippet.content.favorite)
-  }, [snippets])
-
-  const filteredFavoriteSnippets = useMemo(() => {
-    if (searchText.length > 0) {
-      return favoriteSnippets.filter((tab) =>
-        tab.name.toLowerCase().includes(searchText.toLowerCase())
-      )
-    }
-    return favoriteSnippets
-  }, [favoriteSnippets, searchText])
-
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
 
-  const onSelectQuery = (id?: string, isShiftHeld: boolean = false) => {
-    if (id === undefined) return
-
-    if (isShiftHeld) {
-      const [selectedFavSnippets, selectedOtherSnippets] = partition(
-        selectedQueries,
-        (id) => snippets.find((x) => x.id === id)?.content.favorite
-      )
-      const selectedSnippet = snippets.find((x) => x.id === id)
-      const isFavourite = selectedSnippet?.content.favorite
-
-      if (isFavourite) {
-        if (selectedFavSnippets.length > 0) {
-          const updatedSelectedFavSnippets = selectItemsInRange(
-            id,
-            filteredFavoriteSnippets,
-            selectedFavSnippets
-          )
-          setSelectedQueries(updatedSelectedFavSnippets.concat(selectedOtherSnippets))
-        } else {
-          selectQuery(id)
-        }
-      } else {
-        if (selectedOtherSnippets.length > 0) {
-          const updatedSelectedOtherSnippets = selectItemsInRange(
-            id,
-            personalSnippets,
-            selectedOtherSnippets
-          )
-          setSelectedQueries(updatedSelectedOtherSnippets.concat(selectedFavSnippets))
-        } else {
-          selectQuery(id)
-        }
-      }
-    } else {
-      selectQuery(id)
-    }
-  }
-
-  const selectQuery = (id: string) => {
-    if (selectedQueries.includes(id)) {
-      setSelectedQueries(selectedQueries.filter((x) => x !== id))
-    } else {
-      setSelectedQueries(selectedQueries.concat([id]))
-    }
+  const createNewFolder = () => {
+    // [Joshen] LEFT OFF: We need to figure out a good UX for creating folders
+    // - Modal? Directly chuck into the tree view like storage explorer?
+    if (!ref) return console.error('Project ref is required')
+    snapV2.addNewFolder({ projectRef: ref })
+    // createFolder({ projectRef: ref, name: 'test' })
   }
 
   const handleNewQuery = async () => {
-    if (!ref) return console.error('Project is required')
+    if (!ref) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
     if (!profile) return console.error('Profile is required')
     if (!canCreateSQLSnippet) {
-      return ui.setNotification({
-        category: 'info',
-        message: 'Your queries will not be saved as you do not have sufficient permissions',
-      })
+      return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
 
     try {
-      const snippet = createSqlSnippetSkeleton({
-        id: uuidv4(),
-        name: untitledSnippetTitle,
-        owner_id: profile?.id,
-        project_id: project?.id,
-      })
-
-      snap.addSnippet(snippet as SqlSnippet, ref)
-
-      router.push(`/project/${ref}/sql/${snippet.id}`)
-      setSearchText('')
+      if (enableFolders) {
+        const snippet = createSqlSnippetSkeletonV2({
+          id: uuidv4(),
+          name: untitledSnippetTitle,
+          owner_id: profile.id,
+          project_id: project.id,
+          sql: '',
+        })
+        snapV2.addSnippet({ projectRef: ref, snippet })
+        router.push(`/project/${ref}/sql/${snippet.id}`)
+        setSearchText('')
+      } else {
+        const snippet = createSqlSnippetSkeleton({
+          id: uuidv4(),
+          name: untitledSnippetTitle,
+          owner_id: profile?.id,
+          project_id: project?.id,
+        })
+        snap.addSnippet(snippet as SqlSnippet, ref)
+        router.push(`/project/${ref}/sql/${snippet.id}`)
+        setSearchText('')
+      }
     } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create new query: ${error.message}`,
-      })
+      toast.error(`Failed to create new query: ${error.message}`)
     }
   }
 
@@ -208,200 +134,124 @@ const SideBarContent = observer(() => {
 
   return (
     <>
-      <div className="mt-6">
-        <Menu type="pills">
-          {isLoading ? (
-            <div className="px-5 my-4 space-y-2">
-              <ShimmeringLoader />
-              <ShimmeringLoader className="w-3/4" />
-              <ShimmeringLoader className="w-1/2" />
-            </div>
-          ) : isSuccess ? (
-            <div className="space-y-6">
-              <div className="px-4 flex flex-col gap-2">
-                <Button
-                  type="default"
-                  className="justify-start"
-                  onClick={() => handleNewQuery()}
-                  icon={<IconPlus size="tiny" />}
-                >
-                  New query
-                </Button>
-                <Input
-                  className="table-editor-search border-none"
-                  icon={
-                    <IconSearch className="text-foreground-lighter" size={12} strokeWidth={1.5} />
-                  }
-                  placeholder="Search queries"
-                  onChange={(e) => setSearchText(e.target.value.trim())}
-                  value={searchText}
-                  size="tiny"
-                  actions={
-                    searchText && (
-                      <Button type="text" className="px-1" onClick={() => setSearchText('')}>
-                        <IconX size={12} strokeWidth={2} />
-                      </Button>
-                    )
-                  }
-                />
-              </div>
-              <div className="flex flex-col gap-y-6 px-2">
-                {searchText.length === 0 && (
-                  <div>
-                    <ProductMenuItem
-                      name="Templates"
-                      isActive={router.asPath === `/project/${ref}/sql/templates`}
-                      url={`/project/${ref}/sql/templates`}
+      <div className="h-full flex flex-col justify-between">
+        <div className="mt-4 mb-2 flex flex-col gap-y-4">
+          <div className="mx-4 flex items-center justify-between gap-x-2">
+            {enableFolders ? (
+              <>
+                {/* [Joshen] Just double check with Jonny if this is okay */}
+                <InnerSideBarFilters className="w-full p-0 gap-0">
+                  <InnerSideBarFilterSearchInput
+                    name="search-queries"
+                    placeholder="Search queries..."
+                    aria-labelledby="Search queries"
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                  >
+                    <InnerSideBarFilterSortDropdown
+                      value={snapV2.order}
+                      onValueChange={(value: any) => snapV2.setOrder(value)}
+                    >
+                      <InnerSideBarFilterSortDropdownItem key="name" value="name">
+                        Alphabetical
+                      </InnerSideBarFilterSortDropdownItem>
+                      <InnerSideBarFilterSortDropdownItem key="inserted_at" value="inserted_at">
+                        Created At
+                      </InnerSideBarFilterSortDropdownItem>
+                    </InnerSideBarFilterSortDropdown>
+                  </InnerSideBarFilterSearchInput>
+                </InnerSideBarFilters>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="default"
+                      icon={<Plus className="text-foreground" />}
+                      className="w-[26px]"
                     />
-                    <ProductMenuItem
-                      name="Quickstarts"
-                      isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
-                      url={`/project/${ref}/sql/quickstarts`}
-                    />
-                  </div>
-                )}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" side="bottom" className="w-48">
+                    <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery()}>
+                      <FilePlus size={14} />
+                      Create a new snippet
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
+                      <FolderPlus size={14} />
+                      Create a new folder
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <Button
+                block
+                type="default"
+                className="justify-start"
+                onClick={() => handleNewQuery()}
+                icon={<Plus className="text-foreground-muted" strokeWidth={1} size={14} />}
+              >
+                New query
+              </Button>
+            )}
+          </div>
 
-                {searchText.length > 0 &&
-                  filteredFavoriteSnippets.length === 0 &&
-                  filteredProjectSnippets.length === 0 &&
-                  personalSnippets.length === 0 && (
-                    <div className="h-32 border border-dashed flex flex-col gap-y-3 items-center justify-center rounded px-3">
-                      <div className="flex flex-col gap-y-1 items-center justify-center">
-                        <p className="text-xs text-foreground">No queries found</p>
-                        <p className="text-xs text-foreground-light text-center">
-                          Your search for "{searchText}" did not return any results
-                        </p>
-                      </div>
-                      <Button type="default" onClick={() => handleNewQuery()}>
-                        New query
-                      </Button>
-                    </div>
-                  )}
+          <div className="px-2">
+            <InnerSideMenuItem
+              title="Templates"
+              isActive={router.asPath === `/project/${ref}/sql/templates`}
+              href={`/project/${ref}/sql/templates`}
+            >
+              Templates
+            </InnerSideMenuItem>
+            <InnerSideMenuItem
+              title="Quickstarts"
+              isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
+              href={`/project/${ref}/sql/quickstarts`}
+            >
+              Quickstarts
+            </InnerSideMenuItem>
+          </div>
 
-                {filteredProjectSnippets.length > 0 ? (
-                  <div className="editor-product-menu">
-                    <Menu.Group title="Project queries" />
-
-                    <div className="space-y-1">
-                      {filteredProjectSnippets.map((tabInfo) => {
-                        const { id } = tabInfo || {}
-                        return (
-                          <QueryItem
-                            key={id}
-                            tabInfo={tabInfo}
-                            hasQueriesSelected={selectedQueries.length > 0}
-                          />
-                        )
-                      })}
-                    </div>
-                  </div>
-                ) : null}
-
-                {selectedQueries.length > 0 && (
-                  <>
-                    <Separator />
-                    <div className="px-2 flex items-center gap-x-2">
-                      <Button block type="default" onClick={() => setShowDeleteModal(true)}>
-                        Delete {selectedQueries.length.toLocaleString()} quer
-                        {selectedQueries.length > 1 ? 'ies' : 'y'}
-                      </Button>
-                      <Tooltip_Shadcn_ delayDuration={100}>
-                        <TooltipTrigger_Shadcn_ asChild>
-                          <Button
-                            type="default"
-                            className="px-1"
-                            icon={<IconX />}
-                            onClick={() => setSelectedQueries([])}
-                          />
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom">
-                          Clear selection
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
-                    </div>
-                  </>
-                )}
-
-                {filteredFavoriteSnippets.length > 0 ? (
-                  <div className="editor-product-menu">
-                    <Menu.Group title="Favorites" />
-                    <div className="space-y-1">
-                      {filteredFavoriteSnippets.map((tabInfo) => {
-                        const { id } = tabInfo || {}
-                        return (
-                          <QueryItem
-                            key={id}
-                            tabInfo={tabInfo}
-                            isSelected={selectedQueries.includes(id as string)}
-                            hasQueriesSelected={selectedQueries.length > 0}
-                            onSelectQuery={(isShiftHeld) => onSelectQuery(id, isShiftHeld)}
-                            onDeleteQuery={postDeleteCleanup}
-                          />
-                        )
-                      })}
-                    </div>
-                  </div>
-                ) : null}
-
-                {personalSnippets.length > 0 ? (
-                  <div className="editor-product-menu">
-                    <Menu.Group title="Your queries" />
-                    <div className="space-y-1 pb-8">
-                      {personalSnippets.map((tabInfo) => {
-                        const { id } = tabInfo || {}
-                        return (
-                          <QueryItem
-                            key={id}
-                            tabInfo={tabInfo}
-                            isSelected={selectedQueries.includes(id as string)}
-                            hasQueriesSelected={selectedQueries.length > 0}
-                            onSelectQuery={(isShiftHeld) => onSelectQuery(id, isShiftHeld)}
-                            onDeleteQuery={postDeleteCleanup}
-                          />
-                        )
-                      })}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            </div>
+          {enableFolders ? (
+            <SQLEditorNavV2 searchText={searchText} />
           ) : (
-            <div></div>
+            <SQLEditorNavV1
+              searchText={searchText}
+              setSearchText={setSearchText}
+              selectedQueries={selectedQueries}
+              handleNewQuery={handleNewQuery}
+              setSelectedQueries={setSelectedQueries}
+              setShowDeleteModal={setShowDeleteModal}
+            />
           )}
-        </Menu>
+        </div>
+
+        <div className="p-4 border-t sticky bottom-0 bg-studio">
+          <Button block type="default" onClick={onViewOngoingQueries}>
+            View running queries
+          </Button>
+        </div>
       </div>
+
       <ConfirmationModal
-        header="Confirm to delete query"
-        buttonLabel="Delete query"
-        buttonLoadingLabel="Deleting query"
+        title="Confirm to delete query"
+        confirmLabel={`Delete ${selectedQueries.length.toLocaleString()} quer${selectedQueries.length > 1 ? 'ies' : 'y'}`}
+        confirmLabelLoading="Deleting query"
         size="medium"
         loading={isDeleting}
         visible={showDeleteModal}
-        onSelectConfirm={onConfirmDelete}
-        onSelectCancel={() => setShowDeleteModal(false)}
+        onConfirm={onConfirmDelete}
+        onCancel={() => setShowDeleteModal(false)}
+        variant={'destructive'}
+        alert={{
+          title: 'This action cannot be undone',
+          description: 'The selected SQL snippets cannot be recovered once deleted',
+        }}
       >
-        <Modal.Content>
-          <div className="my-6">
-            <div className="text-sm text-foreground-light grid gap-4">
-              <div className="grid gap-y-4">
-                <Alert_Shadcn_ variant="destructive">
-                  <WarningIcon />
-                  <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    The selected SQL snippets cannot be recovered once deleted
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-                <p>
-                  Are you sure you want to delete the selected {selectedQueries.length} quer
-                  {selectedQueries.length > 1 ? 'ies' : 'y'}?
-                </p>
-              </div>
-            </div>
-          </div>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to delete the selected {selectedQueries.length} quer
+          {selectedQueries.length > 1 ? 'ies' : 'y'}?
+        </p>
       </ConfirmationModal>
     </>
   )
-})
-
-export default SideBarContent
+}

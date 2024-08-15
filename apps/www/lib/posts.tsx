@@ -3,11 +3,11 @@ import path from 'path'
 import matter from 'gray-matter'
 import { generateReadingTime } from './helpers'
 
-type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives'
+type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'
 
 // substring amount for file names
 // based on YYYY-MM-DD format
-const FILENAME_SUBSTRING = 11
+export const FILENAME_SUBSTRING = 11
 
 type GetSortedPostsParams = {
   directory: Directories

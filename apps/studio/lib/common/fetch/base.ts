@@ -1,6 +1,6 @@
 import { getAccessToken } from 'lib/gotrue'
 import { isUndefined } from 'lodash'
-import { SupaResponse } from 'types/base'
+import type { SupaResponse } from 'types/base'
 
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
   const message = e?.message ? `An error has occurred: ${e.message}` : 'An error has occurred'

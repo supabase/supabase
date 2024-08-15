@@ -1,17 +1,17 @@
 ---
 title: 'Native Mobile Deep Linking'
-description: 'Learn how to handle deep linking for OAuth and email based login.'
+subtitle: 'Set up Deep Linking for mobile applications.'
 tocVideo: '8TZ6O1C8ujE'
 ---
 
-In certain auth scenarios you will need to handle linking back into your application to finish the user's sign in.
+Many Auth methods involve a redirect to your app. For example:
 
-### When do you need to setup deep links
+- Signup confirmation emails, Magic Link signins, and password reset emails contain a link that redirects to your app.
+- In OAuth signins, an automatic redirect occurs to your app.
 
-- Magic link login.
-- Have `confirm email` enabled and are using email login.
-- Resetting password for email login.
-- Calling `.signInWithOAuth()` method.
+With Deep Linking, you can configure this redirect to open a specific page. This is necessary if, for example, you need to display a form for password reset, or to manually exchange a token hash.
+
+## Setting up Deep Linking
 
 <Tabs
   scrollable
@@ -113,7 +113,7 @@ In certain auth scenarios you will need to handle linking back into your applica
 
   </TabPanel>
   <TabPanel id="flutter" label="Flutter">
-    \*Currently supabase_flutter supports deep links on Android, iOS, Web, MacOS and Windows.
+    // Currently supabase_flutter supports deep links on Android, iOS, Web, MacOS and Windows.
 
     ### Deep link config
 
@@ -341,6 +341,60 @@ In certain auth scenarios you will need to handle linking back into your applica
       </dict>
       </plist>
     ```
+
+  </TabPanel>
+  <TabPanel id="kotlin" label="Android Kotlin">
+  ### Deep link config
+
+    1. Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
+    2. Enter your app redirect URL in the `Additional Redirect URLs` field. This is the URL that the user gets redirected to after clicking a magic link.
+
+    The redirect callback url should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
+
+    Now, edit the Android manifest to make sure the app opens when the user clicks on the magic link.
+
+    ```xml
+    <manifest ...>
+      <!-- ... other tags -->
+      <application ...>
+        <activity ...>
+          <!-- ... other tags -->
+
+          <!-- Deep Links -->
+          <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
+            <data
+              android:scheme="YOUR_SCHEME"
+              android:host="YOUR_HOSTNAME" />
+          </intent-filter>
+        </activity>
+      </application>
+    </manifest>
+    ```
+
+    Check the [Android documentation](https://developer.android.com/training/app-links/deep-linking) for more information.
+
+    Next, specify the scheme and host in the Supabase Client:
+    ```kotlin
+    install(Auth) {
+       host = "login-callback"
+       scheme = "io.supabase.user-management"
+    }
+    ```
+
+    Finally, call `Auth#handleDeeplinks` when the app opens:
+
+    ```kotlin
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        supabase.handleDeeplinks(intent)
+    }
+    ```
+
+    The user will now be authenticated when your app receives a valid deeplink!
 
   </TabPanel>
 </Tabs>

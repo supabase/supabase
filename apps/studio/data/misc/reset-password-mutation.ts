@@ -1,8 +1,11 @@
+import * as Sentry from '@sentry/nextjs'
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
+
+const WHITELIST_ERRORS = ['email must be an email']
 
 export type ResetPasswordVariables = {
   email: string
@@ -16,7 +19,7 @@ export async function resetPassword({ email, hcaptchaToken, redirectTo }: ResetP
     body: { email, hcaptchaToken, redirectTo },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -41,6 +44,9 @@ export const useResetPasswordMutation = ({
           toast.error(`Failed to reset password: ${data.message}`)
         } else {
           onError(data, variables, context)
+        }
+        if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
+          Sentry.captureMessage('[CRITICAL] Failed to send reset password email: ' + data.message)
         }
       },
       ...options,

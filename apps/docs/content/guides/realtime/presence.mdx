@@ -49,6 +49,17 @@ final supabase = Supabase.instance.client;
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let supabaseURL = "https://<project>.supabase.co"
+let supabaseKey = "<your-anon-key>"
+let supabase = SupabaseClient(supabaseURL: URL(string: supabaseURL)!, supabaseKey: supabaseKey)
+
+let realtime = supabase.realtime
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -108,6 +119,23 @@ roomOne.onPresenceSync((_) {
 }).onPresenceLeave((payload) {
   print('leave: $payload');
 }).subscribe();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Listen to the presence change stream, emitting a new `PresenceAction` whenever someone joins or leaves:
+
+```swift
+let roomOne = await supabase.channel("room_01")
+let presenceStream = await roomOne.presenceChange()
+
+await roomOne.subscribe()
+
+for await presence in presenceStream {
+  print(presence.join) // You can also use presence.decodeJoins(as: MyType.self)
+  print(presence.leaves) // You can also use presence.decodeLeaves(as: MyType.self)
+}
 ```
 
 </TabPanel>
@@ -181,6 +209,31 @@ roomOne.subscribe((status, error) async {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let roomOne = await supabase.channel("room_01")
+
+// Using a custom type
+let userStatus = UserStatus(
+    user: "user-1",
+    onlineAt: Date().timeIntervalSince1970
+)
+
+await roomOne.subscribe()
+
+try await roomOne.track(userStatus)
+
+// Or using a raw JSONObject.
+await roomOne.track(
+  [
+    "user": .string("user-1"),
+    "onlineAt": .double(Date().timeIntervalSince1970)
+  ]
+)
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -238,6 +291,13 @@ untrackPresence();
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+await roomOne.untrack()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -288,6 +348,15 @@ final channelC = supabase.channel(
   'test',
   opts: const RealtimeChannelConfig(key: 'userId-123'),
 );
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let channelC = await supabase.channel("test") {
+  $0.presence.key = "userId-123"
+}
 ```
 
 </TabPanel>

@@ -23,9 +23,9 @@ Let's start building the SwiftUI app from scratch.
 
 Open Xcode and create a new SwiftUI project.
 
-Add the [supabase-swift](https://github.com/supabase-community/supabase-swift) dependency.
+Add the [supabase-swift](https://github.com/supabase/supabase-swift) dependency.
 
-Add the `https://github.com/supabase-community/supabase-swift` package to your app. For instructions, see the [Apple tutorial on adding package dependencies](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
+Add the `https://github.com/supabase/supabase-swift` package to your app. For instructions, see the [Apple tutorial on adding package dependencies](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
 
 Create a helper file to initialize the Supabase client.
 You need the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
@@ -128,6 +128,8 @@ After a user is signed in, you can allow them to edit their profile details and 
 Create a new view for that called `ProfileView.swift`.
 
 ```swift ProfileView.swift
+import SwiftUI
+
 struct ProfileView: View {
   @State var username = ""
   @State var fullName = ""
@@ -180,7 +182,7 @@ struct ProfileView: View {
     do {
       let currentUser = try await supabase.auth.session.user
 
-      let profile: Profile = try await supabase.database
+      let profile: Profile = try await supabase
         .from("profiles")
         .select()
         .eq("id", value: currentUser.id)
@@ -204,7 +206,7 @@ struct ProfileView: View {
       do {
         let currentUser = try await supabase.auth.session.user
 
-        try await supabase.database
+        try await supabase
           .from("profiles")
           .update(
             UpdateProfileParams(
@@ -260,6 +262,8 @@ Now that you've created all the views, add an entry point for the application. T
 Add a new `AppView.swift` file.
 
 ```swift AppView.swift
+import SwiftUI
+
 struct AppView: View {
   @State var isAuthenticated = false
 
@@ -272,7 +276,7 @@ struct AppView: View {
       }
     }
     .task {
-      for await state in await supabase.auth.authStateChanges {
+      for await state in supabase.auth.authStateChanges {
         if [.initialSession, .signedIn, .signedOut].contains(state.event) {
           isAuthenticated = state.session != nil
         }
@@ -513,9 +517,5 @@ struct Profile: Codable {
 ```
 
 You no longer need the `UpdateProfileParams` struct, as you can now reuse the `Profile` struct for both request and response calls.
-
-### Storage management
-
-<StorageManagement />
 
 At this stage you have a fully functional application!

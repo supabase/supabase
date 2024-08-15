@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { Badge } from 'ui'
 
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
@@ -10,10 +9,12 @@ import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
+import { Badge } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
-import FeedbackDropdown from './FeedbackDropdown'
+import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
 
@@ -21,9 +22,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-
-  const isBranchingEnabled =
-    selectedProject?.is_branch_enabled === true || selectedProject?.parent_project_ref !== undefined
+  const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const { data: orgUsage } = useOrgUsageQuery({ orgSlug: selectedOrganization?.slug })
 
@@ -35,7 +34,9 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     }
   }, [orgUsage])
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+  const { data: subscription } = useOrgSubscriptionQuery({
+    orgSlug: selectedOrganization?.slug,
+  })
 
   const projectHasNoLimits = subscription?.usage_billing_enabled === true
 
@@ -46,7 +47,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
   return (
     <div
-      className={`flex h-12 max-h-12 items-center justify-between py-2 px-5 ${
+      className={`flex h-12 max-h-12 min-h-12 items-center justify-between py-2 px-5 bg-dash-sidebar ${
         headerBorder ? 'border-b border-default' : ''
       }`}
     >
@@ -79,7 +80,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 {showOverUsageBadge && (
                   <div className="ml-2">
                     <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                      <Badge color="red">Exceeding usage limits</Badge>
+                      <Badge variant="destructive">Exceeding usage limits</Badge>
                     </Link>
                   </div>
                 )}

@@ -9,5 +9,12 @@
     return <IconBase icon={CornerRightUp} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { cornerRightUp } from 'lucide-react'
+  */
   export default IconCornerRightUp
   
