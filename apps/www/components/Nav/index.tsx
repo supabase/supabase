@@ -38,9 +38,9 @@ const Nav = (props: Props) => {
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('/launch-week')
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
-  const isLaunchWeek11Page = router.pathname === '/ga-week'
-  const hasStickySubnav = isLaunchWeekXPage || isLaunchWeek11Page || isLaunchWeekPage
-  const showLaunchWeekNavMode = (isLaunchWeekPage || isLaunchWeek11Page) && !open
+  const isGAWeekSection = router.pathname.startsWith('/ga-week')
+  const hasStickySubnav = isLaunchWeekXPage || isGAWeekSection || isLaunchWeekPage
+  const showLaunchWeekNavMode = (isLaunchWeekPage || isGAWeekSection) && !open
 
   React.useEffect(() => {
     if (open) {
@@ -71,6 +71,14 @@ const Nav = (props: Props) => {
         className={cn('sticky top-0 z-40 transform', hasStickySubnav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
       >
+        <div
+          className={cn(
+            'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95',
+            !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
+            showLaunchWeekNavMode && '!bg-transparent transition-all',
+            isGAWeekSection && 'dark:!bg-alternative'
+          )}
+        />
         <nav
           className={cn(
             `relative z-40 border-default border-b backdrop-blur-sm transition-opacity`,
