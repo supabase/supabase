@@ -1,5 +1,5 @@
 import { VariantProps, cva } from 'class-variance-authority'
-import * as React from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../../lib/constants'
 import { cn } from '../../../lib/utils/cn'
 
@@ -18,12 +18,32 @@ const InputVariants = cva('aria-[]', {
   },
 })
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
+const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, size = 'small', ...props }, ref) => {
+    const inputRef = useRef<HTMLInputElement>(null)
+
+    useImperativeHandle(ref, () => inputRef.current!)
+
+    // Prevent the number input from incrementing/decrementing
+    // as you scroll past while scrolling the page
+    useEffect(() => {
+      const input = inputRef.current
+      if (type === 'number' && input) {
+        const handleWheel = (event: WheelEvent) => {
+          if (document.activeElement === input) {
+            event.preventDefault()
+          }
+        }
+
+        input.addEventListener('wheel', handleWheel)
+        return () => input.removeEventListener('wheel', handleWheel)
+      }
+    }, [type])
+
     return (
       <input
         type={type}
-        ref={ref}
+        ref={inputRef}
         {...props}
         className={cn(
           'flex h-10 w-full rounded-md border border-control bg-foreground/[.026] px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-foreground-muted',
