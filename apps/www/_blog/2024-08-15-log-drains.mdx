@@ -29,9 +29,9 @@ While we continue to improve logging and alerting within the Supabase platform, 
 
 ## The Supabase Analytics server
 
-Log Drains is built into Logflare, the analytics and observability server of the Supabase stack. The architecture of analytics server has been rewritten to allow for efficient and scalable log dispatching to multiple destinations. This allowed us to drain logs to destinations without any noticable lag.
+Log Drains is built into [Logflare](https://github.com/Logflare/logflare), the analytics and observability server of the Supabase stack. The architecture of analytics server had to be rewritten to allow for efficient and scalable log dispatching to multiple destinations. This enabled the server to drain logs to destinations without any noticeable lag.
 
-This feature will require the Supabase Analytics server to be included in the stack. Instructions for setting up and configuring the Analytics server can be found in the [self-hosting docs](https://supabase.com/docs/reference/self-hosting-analytics/introduction).
+Since Logflare is open source, Log Drains are available during local development or when you are self-hosting Supabase. Instructions for setting up and configuring the Analytics server can be found in the [self-hosting docs](https://supabase.com/docs/reference/self-hosting-analytics/introduction). If you are interested in how we open-sourced Logflare, check out the blog post [here](https://supabase.com/blog/2024/07/14/logflare-open-source).
 
 ## Configuring Log Drains
 
