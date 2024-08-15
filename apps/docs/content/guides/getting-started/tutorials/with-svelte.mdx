@@ -91,7 +91,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
   <div class="col-6 form-widget" aria-live="polite">
     <h1 class="header">Supabase + Svelte</h1>
     <p class="description">Sign in via magic link with your email below</p>
-    <form class="form-widget" on:submit|preventDefault={handleLogin}>
+    <form class="form-widget" on:submit|preventDefault="{handleLogin}">
       <div>
         <label for="email">Email</label>
         <input
@@ -99,11 +99,11 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
           class="inputField"
           type="email"
           placeholder="Your email"
-          bind:value={email}
+          bind:value="{email}"
         />
       </div>
       <div>
-        <button type="submit" class="button block" aria-live="polite" disabled={loading}>
+        <button type="submit" class="button block" aria-live="polite" disabled="{loading}">
           <span>{loading ? 'Loading' : 'Send magic link'}</span>
         </button>
       </div>
@@ -359,9 +359,9 @@ And then we can add the widget to the Account page:
   import Avatar from './Avatar.svelte'
 </script>
 
-<form on:submit|preventDefault={updateProfile} class="form-widget">
+<form on:submit|preventDefault="{updateProfile}" class="form-widget">
   <!-- Add to body -->
-  <Avatar bind:url={avatarUrl} size={150} on:upload={updateProfile} />
+  <Avatar bind:url="{avatarUrl}" size="{150}" on:upload="{updateProfile}" />
 
   <!-- Other form elements -->
 </form>
