@@ -77,7 +77,10 @@ export async function fetchDiscussions(owner: string, repo: string, categoryId: 
 export class GitHubDiscussionLoader extends BaseLoader {
   type = 'github-discussions' as const
 
-  constructor(source: string, public discussion: Discussion) {
+  constructor(
+    source: string,
+    public discussion: Discussion
+  ) {
     super(source, discussion.url)
   }
 
@@ -89,7 +92,11 @@ export class GitHubDiscussionLoader extends BaseLoader {
 export class GitHubDiscussionSource extends BaseSource {
   type = 'github-discussions' as const
 
-  constructor(source: string, path: string, public discussion: Discussion) {
+  constructor(
+    source: string,
+    path: string,
+    public discussion: Discussion
+  ) {
     super(source, path)
   }
 

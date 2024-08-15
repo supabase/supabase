@@ -1,20 +1,21 @@
-import { Button, Checkbox, Form, Popover } from 'ui'
-import React, { useState } from 'react'
-import { Filters, FilterSet } from '.'
+import { Fragment, useState } from 'react'
 
-interface Props {
+import { Button, Checkbox, Form, Popover } from 'ui'
+import type { FilterSet, Filters } from './Logs.types'
+
+interface LogsFilterPopoverProps {
   options: FilterSet
   filters: Filters
   onFiltersChange: (filters: Filters) => void
   buttonClassName: string
 }
 
-const LogsFilterPopover: React.FC<Props> = ({
+const LogsFilterPopover = ({
   options,
   filters,
   onFiltersChange,
   buttonClassName,
-}) => {
+}: LogsFilterPopoverProps) => {
   const [open, setOpen] = useState(false)
 
   const handleReset = () => {
@@ -51,7 +52,7 @@ const LogsFilterPopover: React.FC<Props> = ({
             <>
               <div className="space-y-4 py-6">
                 {options.options.map((x, i: number) => (
-                  <React.Fragment key={x.key}>
+                  <Fragment key={x.key}>
                     <Checkbox
                       value="true"
                       id={`${options.key}.${x.key}`}
@@ -62,15 +63,15 @@ const LogsFilterPopover: React.FC<Props> = ({
                       defaultChecked={(filters?.[options.key] as Filters)?.[x.key] as boolean}
                     />
                     {i !== options.options.length - 1 && <Popover.Separator />}
-                  </React.Fragment>
+                  </Fragment>
                 ))}
               </div>
-              <div className="flex items-center justify-end gap-2 border-t border-default bg-background py-2 px-3">
+              <div className="flex items-center justify-end gap-2 border-t border-default bg-studio py-2 px-3">
                 <Button size="tiny" type="default" onClick={handleReset} htmlType="button">
                   Clear
                 </Button>
                 <Button loading={isSubmitting} type="primary" htmlType="submit">
-                  Save
+                  Apply
                 </Button>
               </div>
             </>

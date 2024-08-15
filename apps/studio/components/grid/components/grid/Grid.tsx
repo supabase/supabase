@@ -1,23 +1,23 @@
 /* eslint-disable react/display-name */
-
-import 'react-data-grid/lib/styles.css'
-import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { forwardRef, useRef } from 'react'
+import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
 import { memo } from 'react-tracked'
 
+import { formatClipboardValue } from 'components/grid/utils/common'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useKeyboardShortcuts, useUrlState } from 'hooks'
-import { Button } from 'ui'
-import { useDispatch, useTrackedState } from '../../store'
-import { Filter, GridProps, SupaRow } from '../../types'
-import RowRenderer from './RowRenderer'
-import { formatClipboardValue } from 'components/grid/utils'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { copyToClipboard } from 'lib/helpers'
+import { Button, cn } from 'ui'
+import { useDispatch, useTrackedState } from '../../store/Store'
+import type { Filter, GridProps, SupaRow } from '../../types'
+import { useKeyboardShortcuts } from '../common/Hooks'
+import RowRenderer from './RowRenderer'
+import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -102,22 +102,26 @@ export const Grid = memo(
       const selectedCellRef = useRef<{ rowIdx: number; row: any; column: any } | null>(null)
 
       function copyCellValue() {
-        const selectedCellValue = selectedCellRef.current?.row[selectedCellRef.current?.column?.key]
+        const selectedCellValue =
+          selectedCellRef.current?.row?.[selectedCellRef.current?.column?.key]
         const text = formatClipboardValue(selectedCellValue)
         if (!text) return
         copyToClipboard(text)
       }
 
-      useKeyboardShortcuts({
-        'Command+c': (event: KeyboardEvent) => {
-          event.stopPropagation()
-          copyCellValue()
+      useKeyboardShortcuts(
+        {
+          'Command+c': (event: KeyboardEvent) => {
+            event.stopPropagation()
+            copyCellValue()
+          },
+          'Control+c': (event: KeyboardEvent) => {
+            event.stopPropagation()
+            copyCellValue()
+          },
         },
-        'Control+c': (event: KeyboardEvent) => {
-          event.stopPropagation()
-          copyCellValue()
-        },
-      })
+        ['INPUT', 'TEXTAREA']
+      )
 
       function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
         selectedCellRef.current = args
@@ -140,12 +144,13 @@ export const Grid = memo(
         const { targetTableSchema, targetTableName, targetColumnName } =
           table?.columns.find((x) => x.name == columnName)?.foreignKey ?? {}
 
-        return data?.find(
+        const fk = data?.find(
           (key: any) =>
             key.target_schema == targetTableSchema &&
             key.target_table == targetTableName &&
             key.target_columns == targetColumnName
         )
+        return fk !== undefined ? formatForeignKeys([fk])[0] : undefined
       }
 
       function onRowDoubleClick(row: any, column: any) {
@@ -168,7 +173,7 @@ export const Grid = memo(
 
       return (
         <div
-          className={`${containerClass} flex flex-col`}
+          className={cn(`flex flex-col`, containerClass)}
           style={{ width: width || '100%', height: height || '50vh' }}
         >
           <DataGrid
@@ -208,8 +213,6 @@ export const Grid = memo(
                                 Add rows to your table to get started.
                               </p>
                               <div className="flex items-center space-x-2 mt-4">
-                                {/* [Joshen] Leaving this as a placeholder */}
-                                {/* <Button type="outline">Generate random data</Button> */}
                                 {onAddRow !== undefined && onImportData !== undefined && (
                                   <Button type="default" onClick={onImportData}>
                                     Import data via CSV

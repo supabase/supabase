@@ -1,16 +1,17 @@
 import {
   GitHubDiscussionLoader,
-  GitHubDiscussionSource,
+  type GitHubDiscussionSource,
   fetchDiscussions,
 } from './github-discussion'
-import { MarkdownLoader, MarkdownSource } from './markdown'
+import { MarkdownLoader, type MarkdownSource } from './markdown'
+import { IntegrationLoader, type IntegrationSource, fetchPartners } from './partner-integrations'
 import {
   CliReferenceLoader,
-  CliReferenceSource,
+  type CliReferenceSource,
   ClientLibReferenceLoader,
-  ClientLibReferenceSource,
+  type ClientLibReferenceSource,
   OpenApiReferenceLoader,
-  OpenApiReferenceSource,
+  type OpenApiReferenceSource,
 } from './reference-doc'
 import { walk } from './util'
 
@@ -22,6 +23,7 @@ export type SearchSource =
   | ClientLibReferenceSource
   | CliReferenceSource
   | GitHubDiscussionSource
+  | IntegrationSource
 
 /**
  * Fetches all the sources we want to index for search
@@ -31,7 +33,7 @@ export async function fetchSources() {
     'api',
     '/reference/api',
     { title: 'Management API Reference' },
-    'spec/transforms/api_v0_openapi_deparsed.json',
+    'spec/transforms/api_v1_openapi_deparsed.json',
     'spec/common-api-sections.json'
   ).load()
 
@@ -91,10 +93,21 @@ export async function fetchSources() {
     'spec/common-cli-sections.json'
   ).load()
 
-  const guideSources = (await walk('pages'))
+  const pagesSources = (await walk('pages'))
     .filter(({ path }) => /\.mdx?$/.test(path))
     .filter(({ path }) => !ignoredFiles.includes(path))
     .map((entry) => new MarkdownLoader('guide', entry.path).load())
+
+  const contentSources = (await walk('content'))
+    .filter(({ path }) => /\.mdx?$/.test(path))
+    .filter(({ path }) => !ignoredFiles.includes(path))
+    .map((entry) => new MarkdownLoader('guide', entry.path, { yaml: true }).load())
+
+  const guideSources = [...pagesSources, ...contentSources]
+
+  const partnerIntegrationSources = (await fetchPartners()).map((partner) =>
+    new IntegrationLoader(partner.slug, partner).load()
+  )
 
   const githubDiscussionSources = (
     await fetchDiscussions(
@@ -115,6 +128,7 @@ export async function fetchSources() {
       ktLibReferenceSource,
       cliReferenceSource,
       ...githubDiscussionSources,
+      ...partnerIntegrationSources,
       ...guideSources,
     ])
   ).flat()

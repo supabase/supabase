@@ -7,16 +7,12 @@ import DefaultLayout from '~/components/Layouts/Default'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { createAppAuth } from '@octokit/auth-app'
-import { Octokit } from '@octokit/core'
 import { Octokit as OctokitRest } from '@octokit/rest'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
 import { deletedDiscussions } from '~/lib/changelog.utils'
-
-export const ExtendedOctokit = Octokit.plugin(paginateGraphql)
-export type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
 
 export type Discussion = {
   id: string
@@ -82,10 +78,26 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     }
   }
 
-  const releases = await fetchGitHubReleases()
+  // Process as of Feb. 2024:
+  // create a Release each month and create a corresponding changelog discussion
+  // — we don't want to pull in both the changelog entry and the release entry
+  // — we want to ignore new releases and only show the old ones that don't have a corresponding changelog discussion
+  // — so we have this list of old releases that we want to show
+  const oldReleases = [
+    40981345, 39091930, 37212777, 35927141, 34612423, 33383788, 32302703, 30830915, 29357247,
+    28108378,
+  ]
+
+  const releases = (await fetchGitHubReleases()).filter(
+    (release) => release.id && oldReleases.includes(release.id)
+  )
 
   // uses the graphql api
   async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
+    const { Octokit } = await import('@octokit/core')
+    const ExtendedOctokit = Octokit.plugin(paginateGraphql)
+    type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
+
     const octokit = new ExtendedOctokit({
       authStrategy: createAppAuth,
       auth: {
@@ -153,21 +165,25 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   // Process discussions
   const formattedDiscussions = await Promise.all(
     discussions.map(async (item: any): Promise<any> => {
-      const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
-      // Find a date rewrite for the current item's title
-      const dateRewrite = deletedDiscussions.find((rewrite) => {
-        return item.title && rewrite.title && item.title.includes(rewrite.title)
-      })
+      try {
+        const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+        // Find a date rewrite for the current item's title
+        const dateRewrite = deletedDiscussions.find((rewrite) => {
+          return item.title && rewrite.title && item.title.includes(rewrite.title)
+        })
 
-      // Use the createdAt date from dateRewrite if found, otherwise use item.createdAt
-      const created_at = dateRewrite ? dateRewrite.createdAt : item.createdAt
+        // Use the createdAt date from dateRewrite if found, otherwise use item.createdAt
+        const created_at = dateRewrite ? dateRewrite.createdAt : item.createdAt
 
-      return {
-        ...item,
-        source: discussionsMdxSource,
-        type: 'discussion',
-        created_at,
-        url: item.url,
+        return {
+          ...item,
+          source: discussionsMdxSource,
+          type: 'discussion',
+          created_at,
+          url: item.url,
+        }
+      } catch (err) {
+        console.error(`Problem processing discussion MDX: ${err}`)
       }
     })
   )
@@ -175,21 +191,25 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   // Process releases
   const formattedReleases = await Promise.all(
     releases.map(async (item: any): Promise<any> => {
-      const releasesMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+      try {
+        const releasesMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
 
-      return {
-        ...item,
-        source: releasesMdxSource,
-        type: 'release',
-        created_at: item.created_at,
-        title: item.name ?? '',
-        url: item.html_url ?? '',
+        return {
+          ...item,
+          source: releasesMdxSource,
+          type: 'release',
+          created_at: item.created_at,
+          title: item.name ?? '',
+          url: item.html_url ?? '',
+        }
+      } catch (err) {
+        console.error(`Problem processing discussion MDX: ${err}`)
       }
     })
   )
 
   // Combine discussions and releases into a single array of entries
-  const combinedEntries = formattedDiscussions.concat(formattedReleases)
+  const combinedEntries = formattedDiscussions.concat(formattedReleases).filter(Boolean)
 
   const sortedCombinedEntries = combinedEntries.sort((a, b) => {
     const dateA = dayjs(a.created_at)

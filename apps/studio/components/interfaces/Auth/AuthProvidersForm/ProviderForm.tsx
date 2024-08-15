@@ -1,38 +1,38 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { Check, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import type { components } from 'data/api'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
 import {
   Alert,
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Collapsible,
   Form,
-  IconAlertTriangle,
-  IconCheck,
-  IconChevronUp,
   Input,
+  WarningIcon,
 } from 'ui'
-
-import { useParams } from 'common'
-import { components } from 'data/api'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useCheckPermissions, useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
-import { Provider } from './AuthProvidersForm.types'
+import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 
 export interface ProviderFormProps {
-  config: components['schemas']['GetGoTrueConfigResponse']
+  config: components['schemas']['GoTrueConfigResponse']
   provider: Provider
 }
 
 const ProviderForm = ({ config, provider }: ProviderFormProps) => {
-  const { ui } = useStore()
   const [open, setOpen] = useState(false)
   const { ref: projectRef } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
@@ -40,7 +40,11 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
+  const { data: settings } = useProjectApiQuery({ projectRef })
+  const apiUrl = `${settings?.autoApiService.protocol}://${settings?.autoApiService.endpoint}`
+
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+
   const generateInitialValues = () => {
     const initialValues: { [x: string]: string | boolean } = {}
 
@@ -50,7 +54,9 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
       const isDoubleNegative = doubleNegativeKeys.includes(key)
 
       if (provider.title === 'SAML 2.0') {
-        initialValues[key] = (config as any)[key] ?? false
+        const configValue = (config as any)[key]
+        initialValues[key] =
+          configValue || (provider.properties[key].type === 'boolean' ? false : '')
       } else {
         if (isDoubleNegative) {
           initialValues[key] = !(config as any)[key]
@@ -59,8 +65,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           initialValues[key] = configValue
             ? configValue
             : provider.properties[key].type === 'boolean'
-            ? false
-            : ''
+              ? false
+              : ''
         }
       }
     })
@@ -75,11 +81,14 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
     provider.title === 'LinkedIn (OIDC)' &&
     config &&
     (config as any)['EXTERNAL_LINKEDIN_OIDC_ENABLED']
+  const isSlackOIDCEnabled =
+    provider.title === 'Slack (OIDC)' && config['EXTERNAL_SLACK_OIDC_ENABLED']
   const isExternalProviderAndEnabled: boolean =
     config && (config as any)[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
 
   // [Joshen] Doing this check as SAML doesn't follow the same naming structure as the other provider options
-  const isActive: boolean = isSAMLEnabled || isExternalProviderAndEnabled || isLinkedInOIDCEnabled
+  const isActive: boolean =
+    isSAMLEnabled || isExternalProviderAndEnabled || isLinkedInOIDCEnabled || isSlackOIDCEnabled
   const INITIAL_VALUES = generateInitialValues()
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -99,7 +108,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         onSuccess: () => {
           resetForm({ values: { ...values }, initialValues: { ...values } })
           setOpen(false)
-          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+          toast.success('Successfully updated settings')
         },
       }
     )
@@ -117,7 +126,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
         >
           <div className="flex items-center gap-3">
-            <IconChevronUp
+            <ChevronUp
               className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
               strokeWidth={2}
               width={14}
@@ -133,7 +142,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
             {isActive ? (
               <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
                 <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
-                  <IconCheck strokeWidth={2} size={12} />
+                  <Check strokeWidth={2} size={12} />
                 </span>
                 <span className="px-1">Enabled</span>
               </div>
@@ -155,42 +164,36 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
-              <div
-                className="
-            group border-t
-            border-strong bg-surface-100 py-6 px-6 text-foreground
-            "
-              >
+              <div className="group border-t border-strong bg-surface-100 py-6 px-6 text-foreground">
+                {provider.title === 'Slack (Deprecated)' && (
+                  <Alert_Shadcn_ variant="warning">
+                    <WarningIcon />
+                    <AlertTitle_Shadcn_>Slack (Deprecated) Provider</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      Recently, Slack has updated their OAuth API. Please use the new Slack (OIDC)
+                      provider below. Developers using this provider should move over to the new
+                      provider. Please refer to our{' '}
+                      <a
+                        href="https://supabase.com/docs/guides/auth/social-login/auth-slack"
+                        className="underline"
+                        target="_blank"
+                      >
+                        documentation
+                      </a>{' '}
+                      for more details.
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
                 <div className="mx-auto my-6 max-w-lg space-y-6">
-                  {provider.title === 'LinkedIn (Deprecated)' && (
-                    <Alert_Shadcn_ variant="warning">
-                      <IconAlertTriangle strokeWidth={2} />
-                      <AlertTitle_Shadcn_>LinkedIn (Deprecated) Provider</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        As of 1st August, LinkedIn has updated their OAuth API scopes. Please use
-                        the new LinkedIn provider below. Developers using this provider should move
-                        over to the new provider. Please refer to our{' '}
-                        <a
-                          href="https://supabase.com/docs/guides/auth/social-login/auth-linkedin"
-                          className="underline"
-                          target="_blank"
-                        >
-                          documentation
-                        </a>{' '}
-                        for more details.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
-
                   {Object.keys(provider.properties).map((x: string) => (
                     <FormField
                       key={x}
                       name={x}
                       properties={provider.properties[x]}
                       formValues={values}
-                      // TODO (Joel): Remove after 30th November when we disable the provider
                       disabled={
-                        ['EXTERNAL_LINKEDIN_CLIENT_ID', 'EXTERNAL_LINKEDIN_SECRET'].includes(x) ||
+                        // TODO (KM): Remove after 10th October 2024 when we disable the provider
+                        ['EXTERNAL_SLACK_CLIENT_ID', 'EXTERNAL_SLACK_SECRET'].includes(x) ||
                         !canUpdateConfig
                       }
                     />
@@ -212,7 +215,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                         value={
                           customDomainData?.customDomain?.status === 'active'
                             ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
-                            : `https://${projectRef}.supabase.co/auth/v1/callback`
+                            : `${apiUrl}/auth/v1/callback`
                         }
                         descriptionText={
                           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
@@ -234,34 +237,21 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                     >
                       Cancel
                     </Button>
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger type="button">
-                        <Button
-                          htmlType="submit"
-                          loading={isUpdatingConfig}
-                          disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
-                        >
-                          Save
-                        </Button>
-                      </Tooltip.Trigger>
-                      {!canUpdateConfig && (
-                        <Tooltip.Portal>
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                'border border-background',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs text-foreground">
-                                You need additional permissions to update provider settings
-                              </span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Portal>
-                      )}
-                    </Tooltip.Root>
+                    <ButtonTooltip
+                      htmlType="submit"
+                      loading={isUpdatingConfig}
+                      disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: !canUpdateConfig
+                            ? 'You need additional permissions to update provider settings'
+                            : undefined,
+                        },
+                      }}
+                    >
+                      Save
+                    </ButtonTooltip>
                   </div>
                 </div>
               </div>

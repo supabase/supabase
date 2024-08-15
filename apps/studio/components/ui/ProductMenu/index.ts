@@ -1,2 +1,1 @@
-import ProductMenu from './ProductMenu'
-export default ProductMenu
+export { default as ProductMenu } from './ProductMenu'

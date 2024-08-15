@@ -8,7 +8,7 @@ supabase secrets set SMTP_HOSTNAME="your.hostname.com" SMTP_PORT="2587" SMTP_USE
 supabase functions deploy send-email-smtp
 ```
 
-Note: `SMTP_PORT` must be a port other than `25`, `465`, and `587` as Deno Deploy does not support outgoing connections to ports. AWS SES (port 2587) is recommended.
+Note: `SMTP_PORT` must be a port other than `25` and `587` as Deno Deploy does not support outgoing connections to ports. AWS SES (port 2587) is recommended.
 
 ## Test locally
 

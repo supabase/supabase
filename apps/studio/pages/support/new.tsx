@@ -1,27 +1,29 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
 import SVG from 'react-inlinesvg'
-import { Button, IconLoader, IconTool } from 'ui'
 
 import Success from 'components/interfaces/Support/Success'
 import SupportForm from 'components/interfaces/Support/SupportForm'
-import { LayoutWrapper } from 'components/layouts/LayoutWrapper'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
-import { withAuth } from 'hooks'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
+import { Button, IconLoader, IconTool } from 'ui'
 
 const SupportPage = () => {
   const [sentCategory, setSentCategory] = useState<string>()
+  const [selectedProject, setSelectedProject] = useState<string>('no-project')
   const { data, isLoading } = usePlatformStatusQuery()
   const isHealthy = data?.isHealthy
 
+  const { data: projectsData, isLoading: isLoadingProjects } = useProjectsQuery()
+
   return (
-    <LayoutWrapper className="relative flex overflow-y-auto overflow-x-hidden">
-      <div className="mx-auto my-8 max-w-2xl px-4 lg:px-6">
+    <div className="relative flex overflow-y-auto overflow-x-hidden">
+      <div className="mx-auto my-8 max-w-2xl w-full px-4 lg:px-6">
         <div className="space-y-12 py-8">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2">
             <div className="flex items-center space-x-3">
               <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
               <h1 className="m-0 text-lg">Supabase support</h1>
@@ -55,8 +57,8 @@ const SupportPage = () => {
                       {isLoading
                         ? 'Checking status'
                         : isHealthy
-                        ? 'All systems operational'
-                        : 'Active incident ongoing'}
+                          ? 'All systems operational'
+                          : 'Active incident ongoing'}
                     </Link>
                   </Button>
                 </Tooltip.Trigger>
@@ -78,21 +80,28 @@ const SupportPage = () => {
           </div>
           <div
             className={[
-              'min-w-full space-y-12 rounded border bg-panel-body-light shadow-md',
+              'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md',
               `${sentCategory === undefined ? 'py-8' : 'pt-8'}`,
               'border-default',
             ].join(' ')}
           >
             {sentCategory !== undefined ? (
-              <Success sentCategory={sentCategory} />
+              <Success
+                sentCategory={sentCategory}
+                selectedProject={selectedProject}
+                projects={projectsData}
+              />
             ) : (
-              <SupportForm setSentCategory={setSentCategory} />
+              <SupportForm
+                setSentCategory={setSentCategory}
+                setSelectedProject={setSelectedProject}
+              />
             )}
           </div>
         </div>
       </div>
-    </LayoutWrapper>
+    </div>
   )
 }
 
-export default withAuth(observer(SupportPage), { useHighestAAL: false })
+export default withAuth(SupportPage, { useHighestAAL: false })

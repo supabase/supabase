@@ -1,6 +1,6 @@
-import { NextPage } from 'next'
-import { AppProps } from 'next/app'
-import { ComponentType, ReactElement, ReactNode } from 'react'
+import type { NextPage } from 'next'
+import type { AppProps } from 'next/app'
+import type { ComponentType, ReactElement, ReactNode } from 'react'
 
 export type AppPropsWithLayout = AppProps<{ dehydratedState: any }> & {
   Component: NextPageWithLayout

@@ -54,7 +54,7 @@ export const Section = ({ children, icon, img }) => (
 
 Supabase is SOC2 Type 2 compliant. This is an important security policy when handling sensitive customer data.
 
-Enterprise and Teams customers can access our SOC2 report [on the dashboard](/dashboard/org/_/documents).
+Enterprise and Team customers can access our SOC2 report [on the dashboard](/dashboard/org/_/documents).
 
 <div className="w-32">
   <img src="/images/security/soc2-type2.svg" />
@@ -67,7 +67,7 @@ Enterprise and Teams customers can access our SOC2 report [on the dashboard](/da
 
 Supabase is HIPAA compliant. You can store Protected Health Information (PHI) on our hosted platform once you enter into a Business Associate Agreement (BAA) with us and fulfill your HIPAA obligations under our [shared responsibility model](/docs/guides/platform/shared-responsibility-model#managing-healthcare-data).
 
-Enterprise and Teams customers can request to sign our BAA [on the dashboard](/dashboard/org/_/documents).
+Enterprise and Team customers can request to sign our BAA [on the dashboard](/dashboard/org/_/documents).
 
 <div className="w-32">
   <img src="/images/security/HIPAA.svg" />
@@ -84,19 +84,13 @@ Sensitive information like access tokens and keys are encrypted at the applicati
 
 </Section>
 
-<Section icon={<IconGitHub size={19} />}>
-
-### Github security integration
-
-We have [partnered with GitHub](https://github.blog/changelog/2022-03-28-supabase-is-now-a-github-secret-scanning-partner/) to scan for Supabase service role API keys. If any Supabase API keys are pushed to GitHub, they are automatically revoked.
-
-</Section>
-
 <Section icon={<UserGroupIcon strokeWidth={1}/>}>
 
 ### Role-based access control
 
 Members of organizations in Supabase can be granted access to specific resources.
+
+Read more about [fine grained access controls](/docs/guides/platform/access-control) including Read-Only and Billing-Only access.
 
 </Section>
 
@@ -106,7 +100,7 @@ Members of organizations in Supabase can be granted access to specific resources
 
 All paid customer databases are backed up every day.
 
-Point in Time Recovery allows restoring the database to any point in time. Customers from the Pro plan have access to this feature as an add-on.
+Point in Time Recovery allows restoring the database to any point in time. Customers from the Pro Plan have access to this feature as an add-on.
 
 </Section>
 
@@ -127,6 +121,16 @@ Stripe is a certified PCI Service Provider Level 1, which is the highest level 
 Supabase works with industry experts to conduct regular penetration tests.
 
 In addition to internal security reviews, we use various tools to scan our code for vulnerabilities including [GitHub](https://github.com), [Vanta](https://www.vanta.com/), and [Snyk](https://snyk.io/).
+
+</Section>
+
+<Section icon={<ShieldCheckIcon strokeWidth={1}/>}>
+
+### DDoS Protection
+
+Supabase combats Distributed Denial of Service attacks in several ways to mitigate resource abuse and prevent runaway bills.
+
+In addition to protection at the CDN level via Cloudflare, we employ [fail2ban](https://github.com/fail2ban/fail2ban) to prevent brute force logins. Users can [customize rate limits](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention) for critical API routes and set [spend caps](/docs/guides/platform/spend-cap) to prevent surprise bills.
 
 </Section>
 

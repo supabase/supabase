@@ -125,7 +125,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
 
   return (
     <LazyMotion features={domAnimation}>
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         {open && (
           <m.div
             variants={container}
@@ -188,7 +188,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                     <>
                       <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
                         <Button block type="default" asChild>
-                          <a type={undefined} className="">
+                          <a type={undefined} className="h-10 py-4">
                             Sign in
                           </a>
                         </Button>
@@ -208,7 +208,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
           </m.div>
         )}
       </AnimatePresence>
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         {open && (
           <m.div
             variants={container}

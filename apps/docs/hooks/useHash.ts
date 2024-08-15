@@ -14,7 +14,7 @@ const useHash = () => {
     return () => {
       window.removeEventListener('hashchange', hashChangeHandler)
     }
-  }, [])
+  }, [hashChangeHandler])
 
   const updateHash = useCallback(
     (newHash) => {
@@ -23,7 +23,7 @@ const useHash = () => {
     [hash]
   )
 
-  return [hash, updateHash]
+  return [hash, updateHash] as const
 }
 
 export default useHash

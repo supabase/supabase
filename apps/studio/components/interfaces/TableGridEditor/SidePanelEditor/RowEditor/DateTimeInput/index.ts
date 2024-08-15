@@ -1,3 +1,1 @@
-import DateTimeInput from './DateTimeInput'
-
-export default DateTimeInput
+export { default as DateTimeInput } from './DateTimeInput'

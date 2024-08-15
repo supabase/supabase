@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { uuidv4 } from 'lib/helpers'
@@ -55,9 +55,7 @@ const HTTPRequestFields = ({
 
   const edgeFunctions = functions ?? []
   const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'service_role key')
-    ? apiService.serviceApiKey
-    : '[YOUR API KEY]'
+  const apiKey = apiService?.serviceApiKey ?? '[YOUR API KEY]'
 
   return (
     <>
@@ -67,8 +65,8 @@ const HTTPRequestFields = ({
             {type === 'http_request'
               ? 'HTTP Request'
               : type === 'supabase_function'
-              ? 'Edge Function'
-              : ''}
+                ? 'Edge Function'
+                : ''}
           </FormSectionLabel>
         }
       >
@@ -180,7 +178,7 @@ const HTTPRequestFields = ({
                         onAddHeader({
                           id: uuidv4(),
                           name: 'Authorization',
-                          value: `Bearer ${anonKey}`,
+                          value: `Bearer ${apiKey}`,
                         })
                       }
                     >

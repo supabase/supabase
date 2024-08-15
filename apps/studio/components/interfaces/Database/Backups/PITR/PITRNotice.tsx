@@ -1,12 +1,12 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import Link from 'next/link'
-import { Button, IconCalendar } from 'ui'
 
-import { FormPanel } from 'components/ui/Forms'
+import { useParams } from 'common'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button, IconCalendar } from 'ui'
 import { getPITRRetentionDuration } from './PITR.utils'
 
 const PITRNotice = ({}) => {
@@ -29,7 +29,7 @@ const PITRNotice = ({}) => {
           </span>
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>
-              <Button asChild disabled={canUpdateSubscription} type="default">
+              <Button asChild disabled={!canUpdateSubscription} type="default">
                 <Link href={`/project/${projectRef}/settings/addons?panel=pitr`}>
                   Increase retention period
                 </Link>

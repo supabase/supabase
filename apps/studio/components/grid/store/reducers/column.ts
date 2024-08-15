@@ -1,6 +1,6 @@
 import update from 'immutability-helper'
-import { CalculatedColumn } from 'react-data-grid'
-import { cloneColumn, getInitialGridColumns } from '../../utils'
+import type { CalculatedColumn } from 'react-data-grid'
+import { cloneColumn, getInitialGridColumns } from '../../utils/column'
 import { INIT_ACTIONTYPE } from './base'
 
 export interface ColumnInitialState {

@@ -1,20 +1,28 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
-import { useFlag, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
-import { Tabs } from 'ui'
-import { AccountLayout } from './'
+import { useCurrentPath } from 'hooks/misc/useCurrentPath'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
+import Link from 'next/link'
+import { NavMenu, NavMenuItem } from 'ui'
+import { useOrgSubscriptionQuery } from '../../data/subscriptions/org-subscription-query'
+import AccountLayout from './AccountLayout/AccountLayout'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
+  const currentPath = useCurrentPath()
   const { slug } = useParams()
-  const id = router.asPath.split('/').at(-1)?.split('?')[0]?.split('#')[0]
 
-  const invoicesEnabled = useIsFeatureEnabled('billing:invoices')
+  const invoicesEnabledOnProfileLevel = useIsFeatureEnabled('billing:invoices')
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const isNotOrgWithPartnerBilling = !(subscription?.billing_via_partner ?? true)
+  const invoicesEnabled = invoicesEnabledOnProfileLevel && isNotOrgWithPartnerBilling
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
@@ -22,40 +30,65 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
     return <SettingsLayout>{children}</SettingsLayout>
   }
 
+  const navMenuItems = [
+    {
+      label: 'General',
+      href: `/org/${slug}/general`,
+    },
+    {
+      label: 'Team',
+      href: `/org/${slug}/team`,
+    },
+    {
+      label: 'Integrations',
+      href: `/org/${slug}/integrations`,
+    },
+    {
+      label: 'Billing',
+      href: `/org/${slug}/billing`,
+    },
+    {
+      label: 'Usage',
+      href: `/org/${slug}/usage`,
+    },
+    {
+      label: 'Invoices',
+      href: `/org/${slug}/invoices`,
+      hidden: !invoicesEnabled,
+    },
+    {
+      label: 'OAuth Apps',
+      href: `/org/${slug}/apps`,
+    },
+    {
+      label: 'Audit Logs',
+      href: `/org/${slug}/audit`,
+    },
+    {
+      label: 'Legal Documents',
+      href: `/org/${slug}/documents`,
+    },
+  ]
+
+  const filteredNavMenuItems = navMenuItems.filter((item) => !item.hidden)
+
   return (
     <AccountLayout
       title={selectedOrganization?.name ?? 'Supabase'}
       breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
     >
-      <ScaffoldHeader>
+      <ScaffoldHeader className="pb-0">
         <ScaffoldContainer id="billing-page-top">
-          <ScaffoldTitle>{selectedOrganization?.name ?? 'Organization'} settings</ScaffoldTitle>
-        </ScaffoldContainer>
-        <ScaffoldContainer>
-          <nav>
-            <Tabs
-              listClassNames="border-none"
-              size="small"
-              type="underlined"
-              activeId={id}
-              onChange={(id: any) => {
-                router.push(`/org/${slug}/${id}`)
-              }}
-            >
-              <Tabs.Panel id="general" label="General" className="!my-0" />
-              <Tabs.Panel id="team" label="Team" className="!my-0" />
-
-              <Tabs.Panel id="integrations" label="Integrations" className="!my-0" />
-
-              <Tabs.Panel id="billing" label="Billing" className="!my-0" />
-              <Tabs.Panel id="usage" label="Usage" className="!my-0" />
-              {invoicesEnabled && <Tabs.Panel id="invoices" label="Invoices" className="!my-0" />}
-              <Tabs.Panel id="apps" label="OAuth Apps" className="!my-0" />
-              <Tabs.Panel id="audit" label="Audit Logs" className="!my-0" />
-
-              <Tabs.Panel id="documents" label="Legal Documents" className="!my-0" />
-            </Tabs>
-          </nav>
+          <ScaffoldTitle className="pb-3">
+            {selectedOrganization?.name ?? 'Organization'} settings
+          </ScaffoldTitle>
+          <NavMenu className="border-none" aria-label="Organization menu navigation">
+            {filteredNavMenuItems.map((item) => (
+              <NavMenuItem key={item.label} active={currentPath === item.href}>
+                <Link href={item.href}>{item.label}</Link>
+              </NavMenuItem>
+            ))}
+          </NavMenu>
         </ScaffoldContainer>
       </ScaffoldHeader>
       <ScaffoldDivider />

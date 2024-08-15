@@ -1,5 +1,8 @@
 export class ApplicationError extends Error {
-  constructor(message: string, public data: Record<string, any> = {}) {
+  constructor(
+    message: string,
+    public data: Record<string, any> = {}
+  ) {
     super(message)
   }
 }
@@ -21,3 +24,5 @@ export class EmptySqlError extends ApplicationError {
     super('LLM did not generate any SQL')
   }
 }
+
+export class UserError extends ApplicationError {}

@@ -49,10 +49,78 @@ functions:
             )
           )
           ```
+      - id: api-schemas
+        name: With custom schemas
+        code: |
+          ```swift
+          let supabase = SupabaseClient(
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
+            supabaseKey: "public-anon-key",
+            options: SupabaseClientOptions(
+              db: .init(
+                // Provide a custom schema. Defaults to "public".
+                schema: "other_schema"
+              )
+            )
+          ) 
+          ```
+        description: |
+          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
+          Go to [Settings > API > Exposed schemas](/dashboard/project/_/settings/api) and add the schema which you want to expose to the API.
+
+          Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
   - id: auth-api
     title: "Overview"
     notes: |
-      - The auth methods can be accessed via the `supabase.auth` namespace.
+      The auth methods can be accessed via the `supabase.auth` namespace.
+
+      ### Handling deep links
+
+      #### UIKit app lifecycle
+
+      ```swift
+      public func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+      ) -> Bool {
+        if let url = launchOptions?[.url] as? URL {
+          supabase.auth.handle(url)
+        }
+
+        return true
+      }
+
+      func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey: Any]
+      ) -> Bool {
+        supabase.auth.handle(url)
+        return true
+      }
+
+      #### UIKit app lifecycle with scenes
+
+      In your `SceneDelegate.swift`:
+
+      ```swift
+      func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        supabase.auth.handle(url)
+      }
+      ```
+
+      #### SwiftUI app lifecycle
+
+      In your `AppDelegate.swift`:
+
+      ```swift
+      SomeView()
+        .onOpenURL { url in
+          supabase.auth.handle(url)
+        }
+      ```
+
     examples:
       - id: create-auth-client
         name: Create auth client
@@ -85,22 +153,70 @@ functions:
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
-          - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+        - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+        - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/swift/get-user).
+    overwriteParams:
+      - name: email
+        isOptional: true
+        type: String
+        description: One of `email` or `phone` must be provided.
+      - name: phone
+        isOptional: true
+        type: String
+        description: One of `email` or `phone` must be provided.
+      - name: password
+        type: String
+      - name: data
+        isOptional: true
+        type: JSONObject
+        description: >
+          A custom data object to store additional user metadata.
+      - name: redirectTo
+        isOptional: true
+        type: URL
+        description: >
+          Only for email signups.
+          The redirect URL embedded in the email link.
+          Must be a configured redirect URL for your Supabase instance.
+      - name: captchaToken
+        isOptional: true
+        type: String
     examples:
       - id: sign-up
-        name: Sign up
+        name: Sign up with email and password
         isSpotlight: true
-        description: |
-          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```swift
           try await supabase.auth.signUp(
             email: "example@email.com",
             password: "example-password"
+          )
+          ```
+      - id: sign-up-phone
+        name: Sign up with a phone number and password (SMS)
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.signUp(
+            phone: "123456789",
+            password: "example-password",
+            channel: "sms"
+          )
+          ```
+      - id: sign-up-phone-whatsapp
+        name: Sign up with a phone number and password (whatsapp)
+        isSpotlight: true
+        description: |
+          The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        code: |
+          ```swift
+          try await supabase.auth.signUp(
+            phone: "123456789",
+            password: "example-password",
+            channel: "whatsapp"
           )
           ```
       - id: sign-up-with-additional-user-metadata
@@ -122,6 +238,7 @@ functions:
       - id: sign-up-with-redirect
         name: Sign up with a redirect URL
         description: |
+          - You can provide a default redirect URL when initializing the client.
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```swift
@@ -131,10 +248,109 @@ functions:
             redirectTo: URL(string: "https://example.com/welcome")!
           )
           ```
+  - id: on-auth-state-change
+    title: "onAuthStateChange()"
+    notes: |
+      - Subscribes to important events occurring on the user's session.
+      - Emitted events:
+        - `INITIAL_SESSION`
+          - Emitted right after the Supabase client is constructed and the initial session from storage is loaded.
+        - `SIGNED_IN`
+          - Emitted each time a user session is confirmed or re-established, including on user sign in. 
+          - Avoid making assumptions as to when this event is fired, this may occur even when the user is already signed in. Instead, check the user object attached to the event to see if a new user has signed in and update your application's UI.
+        - `SIGNED_OUT`
+          - Emitted when the user signs out. This can be after:
+            - A call to `supabase.auth.signOut()`.
+            - After the user's session has expired for any reason:
+              - User has signed out on another device.
+              - The session has reached its timebox limit or inactivity timeout.
+              - User has signed in on another device with single session per user enabled.
+              - Check the [User Sessions](/docs/guides/auth/sessions) docs for more information.
+          - Use this to clean up any local storage your application has associated with the user.
+        - `TOKEN_REFRESHED`
+          - Emitted each time a new access and refresh token are fetched for the signed in user.
+          - It's best practice and highly recommended to extract the access token (JWT) and store it in memory for further use in your application.
+            - Avoid frequent calls to `supabase.auth.session` for the same purpose.
+          - There is a background process that keeps track of when the session should be refreshed so you will always receive valid tokens by listening to this event.
+          - The frequency of this event is related to the JWT expiry limit configured on your project.
+        - `USER_UPDATED`
+          - Emitted each time the `supabase.auth.update(user:)` method finishes successfully. Listen to it to update your application's UI based on new profile information.
+        - `PASSWORD_RECOVERY`
+          - Emitted instead of the `SIGNED_IN` event when the user lands on a page that includes a password recovery link in the URL.
+          - Use it to show a UI to the user where they can [reset their password](/docs/guides/auth/passwords#resetting-a-users-password-forgot-password).
+    examples:
+      - id: listen-to-auth-changes
+        name: Listen to auth changes
+        isSpotlight: true
+        code: |
+          ```swift
+
+          // Using AsyncStream
+          for await (event, session) in await supabase.auth.authStateChanges {
+            print(event, session)
+          }
+
+          // Using Closure
+          let subscription = await supabase.auth.onAuthStateChange { event, session in 
+            print(event, session)
+          }
+
+          // call remove() to remove subscription
+          subscription.remove()
+          ```
+        description: |
+          - When using closure based, remember to call `remove()` on the returned subscription.
+          - When using AsyncStream, it automatically removes the subscription when AsyncStream is canceled, or finishes.
+      - id: list-to-a-specific-event
+        name: Listen to a specific event
+        code: |
+          ```swift
+          for await (_, session) in await supabase.auth.authStateChanges
+            .filter({ $0.event == .signedIn }) {
+            // handle signIn event.
+          }
+          ```
+  - id: sign-in-anonymously
+    title: "signInAnonymously()"
+    notes: |
+      - Returns an anonymous user
+      - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
+    examples:
+      - id: sign-in-anonymously
+        name: Create an anonymous user
+        isSpotlight: true
+        code: |
+          ```swift
+          let session = try await supabase.auth.signInAnonymously(captchaToken: captchaToken)
+          ```
+      - id: sign-in-anonymously-with-user-metadata
+        name: Create an anonymous user with custom user metadata
+        isSpotlight: false
+        code: |
+          ```swift
+          let session = try await supabase.auth.signInAnonymously(
+            data: customData,
+            captchaToken: captchaToken
+          )
+          ```
   - id: sign-in-with-password
     title: "signInWithPassword()"
     notes: |
       - Requires either an email and password or a phone number and password.
+    overwriteParams:
+      - name: email
+        isOptional: true
+        type: String
+        description: One of `email` or `phone` must be provided.
+      - name: phone
+        isOptional: true
+        type: String
+        description: One of `email` or `phone` must be provided.
+      - name: password
+        type: String
+      - name: captchaToken
+        isOptional: true
+        type: String
     examples:
       - id: sign-in-with-email-and-password
         name: Sign in with email and password
@@ -165,15 +381,51 @@ functions:
           ```
   - id: sign-in-with-otp
     title: "signInWithOTP()"
+    overwriteParams:
+      - name: email
+        isOptional: true
+        type: String
+        description: One of `email` or `phone` must be provided.
+      - name: phone
+        isOptional: true
+        type: String
+        description: One of `email` or `phone` must be provided.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: >
+          Only for email signups.
+          The redirect URL embedded in the email link.
+          Must be a configured redirect URL for your Supabase instance.
+      - name: channel
+        isOptional: true
+        type: MessagingChannel
+        description: >
+          The channel to use for sending messages.
+          Only for phone signups.
+      - name: shouldCreateUser
+        isOptional: true
+        type: Bool
+        description: >
+          Whether to create the user if they don't already exist.
+          Defaults to true.
+      - name: data
+        isOptional: true
+        type: JSONObject
+        description: >
+          A custom data object to store additional user metadata.
+      - name: captchaToken
+        isOptional: true
+        type: String
     notes: |
+      - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
-      - If the user doesn't exist, `signInWithOTP()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` to `false`.
+      - If the user doesn't exist, `signInWithOTP()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` to `false``.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
-      - When using magic links, specify a `redirectTo` that matches a configured url scheme in your iOS app, so Supabase can correctly redirect back to your app.
       - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login/twilio) for details about configuring WhatsApp sign in.
     examples:
       - id: sign-in-with-email
@@ -195,13 +447,80 @@ functions:
           ```swift
           try await supabase.auth.signInWithOTP(phone: "+13334445555")
           ```
+      - id: sign-in-with-whatsapp-otp
+        name: Sign in with WhatsApp OTP
+        isSpotlight: false
+        description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        code: |
+          ```swift
+          try await supabase.auth.signInWithOTP(
+            phone: "+13334445555",
+            channel: "whatsapp"
+          )
+          ```
   - id: sign-in-with-oauth
-    title: "getOAuthSignInURL()"
+    title: "signInWithOAuth()"
+    overwriteParams:
+      - name: provider
+        type: Provider
+        description: >
+          The third-party provider.
+      - name: redirectTo
+        type: URL
+        isOptional: true
+        description: >
+          A URL to send the user to after they are confirmed.
+      - name: scopes
+        type: String
+        isOptional: true
+        description: >
+          A space-separated list of scopes granted to the OAuth application.
+      - name: queryParams
+        type: "[(name: String, value: String?)]"
+        isOptional: true
+        description: >
+          Additional query params.
+      - name: configure
+        type: Callback
+        isOptional: true
+        description: >
+          A custom configuration callback for opening the OAuth flow externally.
     notes: |
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
     examples:
-      - id: sign-in-using-a-third-party-provider
+      - id: sign-in-using-ASWebAuthenticationSession
+        name: Sign in with OAuth using ASWebAuthenticationSession
+        isSpotlight: true
+        description: |
+          - Use `configure` parameter to customize the `ASWebAuthenticationSession`
+        code: |
+          ```swift
+          let session = try await supabase.auth.signInWithOAuth(
+            provider: .github
+          ) { (session: ASWebAuthenticationSession) in 
+            // customize session
+          }
+          ```
+
+      - id: sign-in-using-generic-flow
+        name: Sign in with OAuth and customize flow
+        isSpotlight: true
+        description: |
+          - Use `launchFlow` parameter to customize the flow.
+        code: |
+          ```swift
+          let session = try await supabase.auth.signInWithOAuth(
+            provider: .github
+          ) { url in 
+            // use url to start OAuth flow
+            // and return a result url that contains the OAuth token.
+            // ...
+            return resultURL
+          }
+          ```
+
+      - id: sign-in-using-manual-implementation
         name: Sign in using a third-party provider
         isSpotlight: true
         description: |
@@ -210,7 +529,7 @@ functions:
           - When using `ASWebAuthenticationSession` or any other implementation, use the returning URL as input to `session(from:)` method.
         code: |
           ```swift
-          let url = try await supabase.auth.getOAuthSignInURL(provider: .github)
+          let url = try await supabase.auth.getOAuthSignInURL(provider: .github, redirectTo: URL(string: "my-app-scheme://"))
 
           let session = ASWebAuthenticationSession(url: url, callbackURLScheme: "my-app-scheme") { url, error in 
             guard let url else { return }
@@ -225,21 +544,6 @@ functions:
           session.start()
           ```
 
-      - id: sign-in-using-a-third-party-provider-with-redirect
-        name: Sign in using a third-party provider with redirect
-        isSpotlight: false
-        description: |
-          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
-          - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance.
-          - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
-        code: |
-          ```swift
-          let url = try await supabase.auth.getOAuthSignInURL(
-            provider: .google,
-            redirectTo: URL(string: "https://example.com/welcome")!
-          )
-          ```
       - id: sign-in-with-scopes
         name: Sign in with scopes
         isSpotlight: false
@@ -248,7 +552,7 @@ functions:
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
         code: |
           ```swift
-          let url = try await supabase.auth.getOAuthSignInURL(
+          let url = try await supabase.auth.signInWithOAuth(
             provider: .github,
             scopes: "repo gist notifications"
           )
@@ -269,6 +573,65 @@ functions:
             )
           )
           ```
+  - id: sign-in-with-sso
+    title: "signInWithSSO()"
+    overwriteParams:
+      - name: providerId
+        isOptional: true
+        type: String
+        description: >
+          UUID of the SSO provider.
+          One of `providerId` or `domain` is required.
+      - name: domain
+        isOptional: true
+        type: String
+        description: >
+          Domain name of the organization to use SSO with.
+          One of `providerId` or `domain` is required.
+      - name: redirectTo
+        type: String
+        description: >
+          The URL to redirect the user to after they have signed in.
+          Must be a configured redirect URL for your Supabase instance.
+      - name: captchaToken
+        type: String
+    notes: |
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
+      - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
+          - Mapping specific user email addresses with an identity provider.
+          - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
+    examples:
+      - id: sign-in-with-domain
+        name: Sign in with email domain
+        isSpotlight: true
+        code: |
+          ```swift
+            // You can extract the user's email domain and use it to trigger the
+            // authentication flow with the correct identity provider.
+
+            let url = try await await supabase.auth.signInWithSSO{
+              domain: "company.com"
+            }
+
+            // Open the URL using your preferred method to complete sign-in process.
+            UIApplication.shared.open(url)
+          ```
+      - id: sign-in-with-provider-uuid
+        name: Sign in with provider UUID
+        isSpotlight: true
+        code: |
+          ```swift
+            // Useful when you need to map a user's sign in request according
+            // to different rules that can't use email domains.
+
+            let url = try await supabase.auth.signInWithSSO{
+              providerId: "21648a9d-8d5a-4555-a9d1-d6375dc14e92"
+            }
+
+            // Open the URL using your preferred method to complete sign-in process.
+            UIApplication.shared.open(url)
+          ```
   - id: sign-out
     title: "signOut()"
     notes: |
@@ -283,6 +646,37 @@ functions:
           ```
   - id: verify-otp
     title: "verifyOTP()"
+    overwriteParams:
+      - name: email
+        isOptional: true
+        type: String
+        description: One of `phone`, `email`, or `token_hash` must be provided.
+      - name: phone
+        isOptional: true
+        type: String
+        description: One of `phone`, `email`, or `token_hash` must be provided.
+      - name: token_hash
+        isOptional: true
+        type: String
+        description: >
+          The token hash from the user's email link.
+          One of `phone`, `email`, or `token_hash` must be provided.
+      - name: type
+        type: EmailOTPType | MobileOTPType
+      - name: token
+        isOptional: true
+        type: String
+        description: The OTP sent to the user. Required if using `phone` or `email`.
+      - name: redirectTo
+        isOptional: true
+        type: URL
+        description: >
+          A URL to redirect the user to after they are confirmed.
+          Must be in your configured redirect URLs.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: Deprecated.
     notes: |
       - The `verifyOTP` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite`, `email_change`, or `email`.
       - The verification type used should be determined based on the corresponding auth method called before `verifyOTP` to sign up / sign-in a user.
@@ -321,6 +715,14 @@ functions:
           ```swift
           try await supabase.auth.session
           ```
+      - id: get-current-session-no-validation
+        name: Get the current session without validation
+        isSpotlight: true
+        description: The session returned by this property may be expired.
+        code: |
+          ```swift
+          let session = supabase.auth.currentSession
+          ```
   - id: get-user
     title: "user()"
     description: |
@@ -342,6 +744,14 @@ functions:
           ```swift
           let user = try await supabase.auth.user(jwt: "custom-jwt")
           ```
+      - id: get-current-user
+        name: Get current user
+        isSpotlight: true
+        description: The user returned by this property may be outdated.
+        code: |
+          ```swift
+          let user = supabase.auth.currentUser
+          ```
   - id: update-user
     title: "updateUser()"
     notes: |
@@ -357,11 +767,71 @@ functions:
           ```swift
           try await supabase.auth.update(user: UserAttributes(email: "new@email.com"))
           ```
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "aud": "authenticated",
+              "role": "authenticated",
+              "email": "example@email.com",
+              "email_confirmed_at": "2024-01-01T00:00:00Z",
+              "phone": "",
+              "confirmed_at": "2024-01-01T00:00:00Z",
+              "new_email": "new@email.com",
+              "email_change_sent_at": "2024-01-01T00:00:00Z",
+              "last_sign_in_at": "2024-01-01T00:00:00Z",
+              "app_metadata": {
+                "provider": "email",
+                "providers": [
+                  "email"
+                ]
+              },
+              "user_metadata": {
+                "email": "example@email.com",
+                "email_verified": false,
+                "phone_verified": false,
+                "sub": "11111111-1111-1111-1111-111111111111"
+              },
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "user_id": "11111111-1111-1111-1111-111111111111",
+                  "identity_data": {
+                    "email": "example@email.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "provider": "email",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "example@email.com"
+                }
+              ],
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-01T00:00:00Z",
+              "is_anonymous": false
+            }
+          }
+          ```
+      - id: update-the-phone-for-an-authenticated-user
+        name: Update the phone number for an authenticated user
+        description: Sends a one-time password (OTP) to the new phone number.
+        isSpotlight: false
+        code: |
+          ```swift
+          try await supabase.auth.update(
+            user: UserAttributes(
+              phone: "123456789"
+            )
+          )
+          ```
       - id: update-the-password-for-an-authenticated-user
         name: Update the password for an authenticated user
         isSpotlight: false
-        description: |
-          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```swift
           try await supabase.auth.update(user: UserAttributes(password: "newPassw0rd?"))
@@ -379,12 +849,106 @@ functions:
             )
           )
           ```
+      - id: update-password-with-reauthentication
+        name: Update the user's password with a nonce
+        description: |
+          If **Secure password change** is enabled in your [project's email provider settings](/dashboard/project/_/auth/providers), updating the user's password would require a nonce if the user **hasn't recently signed in**. The nonce is sent to the user's email or phone number. A user is deemed recently signed in if the session was created in the last 24 hours.
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.update(
+            user: UserAttributes(
+              password: "new password",
+              nonce: "123456"
+            )
+          )
+          ```
+  - id: get-user-identities
+    title: "userIdentities()"
+    notes: |
+      - The user needs to be signed in to call `userIdentities()`.
+    examples:
+      - id: get-user-identities
+        name: Returns a list of identities linked to the user
+        isSpotlight: true
+        code: |
+          ```swift
+          let identities = try await supabase.auth.userIdentities()
+          ```
+  - id: link-identity
+    title: "linkIdentity()"
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `linkIdentity()`.
+      - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
+    examples:
+      - id: link-identity
+        name: Link an identity to a user
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.linkIdentity(provider: provider)
+          ```
+        description: |
+          Uses:
+            - `NSWorkspace.shared.open` in macOS
+            - `UIApplication.shared.open` in iOS, tvOS, visionOS, and macOS Catalyst
+            - `WKExtension.shared().openSystemURL` in watchOS
+      - id: link-identity-custom-urlopener
+        name: Link an identity to a user with custom URL opening logic
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.linkIdentity(provider: provider) { url in 
+            // custom URL opening logic
+          }
+          ```
+  - id: unlink-identity
+    title: "unlinkIdentity()"
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `unlinkIdentity()`.
+      - The user must have at least 2 identities in order to unlink an identity.
+      - The identity to be unlinked must belong to the user.
+    examples:
+      - id: unlink-identity
+        name: Unlink an identity
+        isSpotlight: true
+        code: |
+          ```swift
+          // retrieve all identites linked to a user
+          let identities = try await supabase.auth.userIdentities()
+
+          // find the google identity 
+          let googleIdentity = identities.first {
+            $0.provider == .google
+          }
+
+          // unlink the google identity
+          try await supabase.auth.unlinkIdentity(googleIdentity)
+          ```
+  - id: send-password-reauthentication
+    title: "reauthenticate()"
+    notes: |
+      - This method is used together with `update(user:)` when a user's password needs to be updated.
+      - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
+      - A user is only require to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
+      - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+    examples:
+      - id: send-reauthentication-nonce
+        name: Send reauthentication nonce
+        description: Sends a reauthentication nonce to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.reauthenticate()
+          ```
   - id: resend-email-or-phone-otps
     title: "resend()"
     notes: |
       - Resends a signup confirmation, email change, or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOTP()` method again.
-      - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
+      - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
       - This method only resends an email or phone OTP to the user if there an initial signup, email change, or phone change request was made.
       - You can specify a redirect URL when you resend an email link using the `emailRedirectTo` option.
     examples:
@@ -465,29 +1029,7 @@ functions:
           ```swift
           let session = try await supabase.auth.refreshSession(refreshToken: "custom-refresh-token")
           ```
-  - id: on-auth-state-change
-    title: "authStateChanges"
-    notes: |
-      - Types of auth events: `INITIAL_SESSION`, `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `PASSWORD_RECOVERY`, `MFA_CHALLENGE_VERIFIED`
-      - The `INITIAL_SESSION` can be used to allow you to invoke the callback function when `authStateChanges` is first called.
-    examples:
-      - id: listen-to-auth-changes
-        name: Listen to auth changes
-        isSpotlight: true
-        code: |
-          ```swift
-          for await (event, session) in await supabase.auth.authStateChanges {
-            print(event, session)
-          }
-          ```
-      - id: list-to-a-specific-event
-        name: Listen to a specific event
-        code: |
-          ```swift
-          for await (_, session) in await supabase.auth.authStateChanges.filter({ $0.event == .signedIn }) {
-            // handle signIn event.
-          }
-          ```
+
   - id: exchange-code-for-session
     title: "exchangeCodeForSession()"
     notes: |
@@ -632,6 +1174,41 @@ functions:
           ```swift
           let factors = try await supabase.auth.mfa.listFactors()
           ```
+  - id: admin-api
+    title: "Overview"
+    notes: |
+      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+    examples:
+      - id: create-auth-admin-client
+        name: Create server-side auth client
+        isSpotlight: true
+        code: |
+          ```swift
+          import Supabase
+
+          let supabase = SupabaseClient(
+            supabaseURL: supabaseURL,
+            supabaseKey: serviceRoleKey
+          )
+
+          // Access auth admin api
+          let adminAuthClient = supabase.auth.admin
+          ```
+  - id: delete-user
+    title: "deleteUser()"
+    notes: |
+      - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
+    examples:
+      - id: removes-a-user
+        name: Removes a user
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.admin.deleteUser(
+            id: "715ed5db-f090-4b8c-a067-640ecee36aa0"
+          )
+          ```
   - id: select
     title: "Fetch data: select()"
     notes: |
@@ -651,7 +1228,7 @@ functions:
             let name: String
           }
 
-          let countries: [Country] = try await supabase.database
+          let countries: [Country] = try await supabase
             .from("countries")
             .select()
             .execute()
@@ -699,7 +1276,7 @@ functions:
             let name: String
           }
 
-          let countries: [Country] = try await supabase.database
+          let countries: [Country] = try await supabase
             .from("countries")
             .select("name")
             .execute()
@@ -751,7 +1328,7 @@ functions:
             let name: String
           }
 
-          let countries: [Country] = try await supabase.database
+          let countries: [Country] = try await supabase
             .from("countries")
             .select(
               """
@@ -825,7 +1402,7 @@ functions:
               let name: String
             }
 
-            let users: [User] = try await supabase.database
+            let users: [User] = try await supabase
               .from("users")
               .select(
                 """
@@ -925,7 +1502,7 @@ functions:
             let name: String
           }
 
-          let messages: [Message] = try await supabase.database
+          let messages: [Message] = try await supabase
             .from("messages")
             .select(
               """
@@ -997,7 +1574,7 @@ functions:
             let name: String
           }
 
-          let cities: [City] = try await supabase.database
+          let cities: [City] = try await supabase
             .from("cities")
             .select("name, countries(*)")
             .eq("countries.name", value: "Estonia")
@@ -1063,7 +1640,7 @@ functions:
             let count: Int
           }
 
-          let countries: [Country] = try await supabase.database
+          let countries: [Country] = try await supabase
             .from("countries")
             .select("*, cities(count)")
             .execute()
@@ -1115,7 +1692,7 @@ functions:
         name: Querying with count option
         code: |
           ```swift
-          let count = try await supabase.database
+          let count = try await supabase
             .from("countries")
             .select("*", head: true, count: .exact)
             .execute()
@@ -1156,7 +1733,7 @@ functions:
             let city: String
           }
 
-          let users: [User] = try await supabase.database
+          let users: [User] = try await supabase
             .from("users")
             .select(
               """
@@ -1208,17 +1785,17 @@ functions:
           ```swift
           struct City: Decodable {
             let name: String
-            let countries: [Country]
           }
 
           struct Country: Decodable {
             let name: String
+            let cities: [City]
           }
 
-          let cities: [City] = try await supabase.database
-            .from("cities")
-            .select("name, countries!inner(name)")
-            .eq("countries.name", value: "Indonesia")
+          let countries: [Country] = try await supabase
+            .from("countries")
+            .select("name, cities!inner(name)")
+            .eq("name", value: "united kingdom")
             .execute()
             .value
           ```
@@ -1251,8 +1828,21 @@ functions:
           {
             "data": [
               {
-                "name": "Bali",
-                "countries": {"name": "Indonesia"}
+                "name": "united kingdom",
+                "cities": [
+                  {
+                    "name": "London"
+                  },
+                  {
+                    "name": "Manchester"
+                  },
+                  {
+                    "name": "Liverpool"
+                  },
+                  {
+                    "name": "Bristol"
+                  }
+                ]
               }
             ],
             "status": 200,
@@ -1262,6 +1852,40 @@ functions:
         description: |
           If you don't want to return the foreign table contents, you can leave the parenthesis empty.
           Like `.select('name, countries!inner()')`.
+        hideCodeBlock: true
+      - id: switching-schemas-per-query
+        name: Switching schemas per query
+        code: |
+          ```swift
+          try await supabase
+            .schema("myschema")
+            .from("mytable")
+            .select()
+          ```
+        data:
+          sql: |
+            ```sql
+            create schema myschema;
+
+            create table myschema.mytable (
+              id uuid primary key default gen_random_uuid(),
+              data text
+            );
+
+            insert into myschema.mytable (data) values ('mydata');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": "4162e008-27b0-4c0f-82dc-ccaeee9a624d",
+              "data": "mydata"
+            }
+          ]
+          ```
+        description: |
+          In addition to setting the schema during initialization, you can also switch schemas on a per-query basis.
+          Make sure you've set up your [database privileges and API settings](/docs/guides/api/using-custom-schemas).
         hideCodeBlock: true
 
   - id: insert
@@ -1278,7 +1902,7 @@ functions:
 
           let country = Country(id: 1, name: "Denmark")
 
-          try await supabase.database
+          try await supabase
             .from("countries")
             .insert(country)
             .execute()
@@ -1307,10 +1931,10 @@ functions:
             let name: String
           }
 
-          let country: Country = try await supabase.database
+          let country: Country = try await supabase
             .from("countries")
-            // use `returning: .representation` to return the created object.
-            .insert(Country(id: 1, name: "Denmark"), returning: .representation)
+            .insert(Country(id: 1, name: "Denmark"))
+            .select()
             // specify you want a single value returned, otherwise it returns a list.
             .single() 
             .execute()
@@ -1350,7 +1974,7 @@ functions:
             Country(id: 1, name: "Vietnam"),
           ]
 
-          try await supabase.database
+          try await supabase
             .from("countries")
             .insert(countries)
             .execute()
@@ -1388,7 +2012,7 @@ functions:
         name: Updating your data
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .update(["name": "Australia"])
             .eq("id", value: 1)
@@ -1427,10 +2051,11 @@ functions:
             let name: String          
           }
 
-          let country: Country = try await supabase.database
+          let country: Country = try await supabase
             .from("countries")
-            .update(["name": "Australia"], returning: .representation)
+            .update(["name": "Australia"])
             .eq("id", value: 1)
+            .select()
              // If you know this query should return a single object, append a `single()` modifier to it.
             .single()
             .execute()
@@ -1480,7 +2105,7 @@ functions:
             let address: User.Address
           }
 
-          let users: [User] = try await supabase.database
+          let users: [User] = try await supabase
             .from("users")
             .update(
               UpdateUser(
@@ -1488,10 +2113,10 @@ functions:
                   street: "Melrose Place",
                   postcode: "90210"
                 )
-              ),
-              returning: .representation
+              )
             )
             .eq("address->postcode", value: "90210")
+            .select()
             .execute()
             .value
           ```
@@ -1546,7 +2171,7 @@ functions:
             let id: Int
             let name: String
           }
-          try await supabase.database
+          try await supabase
             .from("countries")
             .upsert(Country(id: 1, name: "Albania"))
             .execute()
@@ -1585,7 +2210,7 @@ functions:
             let id: Int
             let name: String
           }
-          try await supabase.database
+          try await supabase
             .from("countries")
             .upsert([
               Country(id: 1, name: "Albania"),
@@ -1638,7 +2263,7 @@ functions:
             }
           }
 
-          try await supabase.database
+          try await supabase
             .from("users")
             .upsert(
               User(id: 42, handle: "saoirse", displayName: "Saoirse"),
@@ -1698,7 +2323,7 @@ functions:
         name: Delete records
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .delete()
             .eq("id", value: 1)
@@ -1741,7 +2366,7 @@ functions:
         name: Call a Postgres function without arguments
         code: |
           ```swift
-          let value: String = try await supabase.database
+          let value: String = try await supabase
             .rpc("hello_world")
             .execute()
             .value
@@ -1767,7 +2392,7 @@ functions:
         name: Call a Postgres function with arguments
         code: |
           ```swift
-          let response: String = try await supabase.database
+          let response: String = try await supabase
             .rpc("echo", params: ["say": "👋"])
             .execute()
             .value
@@ -1792,7 +2417,7 @@ functions:
         name: Bulk processing
         code: |
           ```swift
-          let response: [Int] = try await supabase.database
+          let response: [Int] = try await supabase
             .rpc("add_one_each", params: ["arr": [1, 2, 3]])
             .execute()
             .value
@@ -1829,7 +2454,7 @@ functions:
             let name: String
           }
 
-          let country: Country = await supabase.database
+          let country: Country = await supabase
             .rpc("list_stored_countries")
             .eq("id", value: 1)
             .single()
@@ -1890,12 +2515,12 @@ functions:
           [modifiers](/docs/reference/swift/using-modifiers).
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("cities")
             .select("name, country_id")
             .eq("name", value: "The Shire")    // Correct
 
-          try await supabase.database
+          try await supabase
             .from("citites")
             .eq("name", value: "The Shire")    // Incorrect
             .select("name, country_id")
@@ -1907,7 +2532,7 @@ functions:
           to query cities with population between 1,000 and 10,000:
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("cities")
             .select("name, country_id")
             .gte("population", value: 1000)
@@ -1923,7 +2548,7 @@ functions:
           let filterPopLow: Int? = 1000
           let filterPopHigh: Int? = 10000
 
-          var query = await supabase.database
+          var query = await supabase
             .from("cities")
             .select("name, country_id")
 
@@ -1946,7 +2571,7 @@ functions:
         name: Filter by values within a JSON column
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("users")
             .select()
             .eq("address->postcode", value: 90210)
@@ -1987,7 +2612,7 @@ functions:
         name: Filter Foreign Tables
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select(
               """
@@ -2056,7 +2681,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select("name")
             .or("id.eq.2,name.eq.Algeria")
@@ -2095,7 +2720,7 @@ functions:
         name: Use `or` with `and`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select("name")
             .or("id.gt.3,and(id.eq.1,name.eq.Afghanistan)")
@@ -2147,7 +2772,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select()
             .not("name", operator: .is, value: "")
@@ -2161,7 +2786,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select("name")
             .match(["id": 2, "name": "Albania"])
@@ -2208,7 +2833,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select()
             .filter("name", operator: .in, value: #"("Algeria","Japan")"#)
@@ -2245,7 +2870,7 @@ functions:
         name: On a foreign table
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select(
               """
@@ -2319,7 +2944,7 @@ functions:
         name: With `upsert()`
         code: |
           ```swift
-            try await database.database
+            try await supabase
               .from("countries")
               .upsert(CountryModel(id: 1, name: "Algeria"))
               .select()
@@ -2360,7 +2985,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select("id, name")
             .order("id", ascending: false)
@@ -2406,7 +3031,7 @@ functions:
         name: On a foreign table
         code: |
           ```swift
-            try await supabase.database
+            try await supabase
               .from("countries")
               .select(
                 """
@@ -2480,7 +3105,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select("id, name")
             .limit(1)
@@ -2517,7 +3142,7 @@ functions:
         name: On a foreign table
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select(
               """
@@ -2579,7 +3204,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select(
               """
@@ -2632,7 +3257,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select("name")
             .limit(1)
@@ -2702,6 +3327,95 @@ functions:
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
         hideCodeBlock: true
         isSpotlight: true
+  - id: explain
+    title: Using Explain
+    description: |
+      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
+      using the `explain()` method. This works on any query, even for `rpc()` or writes.
+
+      Explain is not enabled by default as it can reveal sensitive information about your database.
+      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
+
+      Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
+    examples:
+      - id: get-execution-plan
+        name: Get the execution plan
+        code: |
+          ```swift
+          try await supabase
+            .from("countries")
+            .select()
+            .explain()
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
+                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: true
+
+      - id: get-execution-plan-with-analyze-and-verbose
+        name: Get the execution plan with analyze and verbose
+        code: |
+          ```swift
+          try await supabase
+            .from("countries")
+            .select()
+            .explain(
+              analyze: true,
+              verbose: true
+            )
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
+            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
+                  Output: countries.id, countries.name
+                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: countries.id, countries.name
+          Query Identifier: -4730654291623321173
+          Planning Time: 0.407 ms
+          Execution Time: 0.119 ms
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: false
   - id: invoke
     title: invoke()
     description: |
@@ -2744,6 +3458,18 @@ functions:
             )
 
           print(type(of: response)) // String?
+          ```
+      - id: invocation-with-streamed-response
+        name: Invocation with streamed response
+        description: |
+          - Use this method to return an `AsyncStream<Data>` when the function returns `Content-Type` = `text/event-stream`.
+        isSpotlight: true
+        code: |
+          ```swift
+          var response = Data()
+          for try await data try await supabase.functions._invokeWithStreamedResponse("hello") {
+            response.append(data)
+          }
           ```
       - id: error-handling
         name: Error handling
@@ -2788,6 +3514,37 @@ functions:
               )
             )
           ```
+      - id: regional-invocation
+        name: Invoking a Function in the UsEast1 region
+        description: |
+          Here are the available regions:
+          - `FunctionRegion.any`
+          - `FunctionRegion.apNortheast1`
+          - `FunctionRegion.apNortheast2`
+          - `FunctionRegion.apSouth1`
+          - `FunctionRegion.apSoutheast1`
+          - `FunctionRegion.apSoutheast2`
+          - `FunctionRegion.caCentral1`
+          - `FunctionRegion.euCentral1`
+          - `FunctionRegion.euWest1`
+          - `FunctionRegion.euWest2`
+          - `FunctionRegion.euWest3`
+          - `FunctionRegion.saEast1`
+          - `FunctionRegion.usEast1`
+          - `FunctionRegion.usWest1`
+          - `FunctionRegion.usWest2`
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello",
+              options: FunctionInvokeOptions(
+                body: ["foo": "bar"],
+                region: .usEast1
+              )
+            )
+          ```
       - id: calling-with-delete-verb
         name: Calling with DELETE HTTP verb
         description: |
@@ -2825,6 +3582,21 @@ functions:
               )
             )
           ```
+      - id: additional-query-params
+        name: Pass additional query params
+        description: |
+          You can pass additional query params when invoking a function.
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello",
+              options: FunctionInvokeOptions(
+                query: [URLQueryItem(name: "key", value: "value")]
+              )
+            )
+          ```
   - id: subscribe
     title: on().subscribe()
     notes: |
@@ -2832,139 +3604,285 @@ functions:
       - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
       - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
       - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
+      - Use AsyncStream or callbacks for listening to changes.
     examples:
       - id: listen-to-broadcast
         name: Listen to broadcast messages
         isSpotlight: true
         code: |
           ```swift
-          let channel = supabase
-            .realtime
-            .channel("room1")
+          let channel = await supabase.channel("room1")
 
-          channel
-            .on("broadcast", filter: ChannelFilter(event: "cursor-pos")) { message in 
-              print("Cursor position received!", message.payload)
+          let broadcastStream = await channel.broadcastStream(event: "cursor-pos")
+
+          await channel.subscribe()
+
+          Task {
+            for await message in broadcastMessage {
+              print("Cursor position received", message.payload)
             }
-            .subscribe { status, error in
-              if status == .subscribed {
-                Task {
-                  await channel.send(
-                    type: .broadcast,
-                    event: "cursor-pos",
-                    payload: ["x": Double.random(in: 0...1), "y": Double.random(in: 0...1)]
-                  )
-                }
-              }
-            }
+          }
+
+          Task {
+            await channel.broadcast(
+              event: "cursor-pos",
+              message: [
+                "x": .double(.random(in: 0...1)),
+                "y": .double(.random(in: 0...1))
+              ]
+            )
+          }
           ```
-      - id: listen-to-presence-sync
-        name: Listen to presence sync
+
+      - id: listen-to-broadcast-callback
+        name: Listen to broadcast messages using callback
         isSpotlight: true
         code: |
           ```swift
-          let channel = supabase.realtime.channel("room1")
-          channel
-            .on("presence", filter: ChannelFilter(event: "sync")) { _ in
-              print("Synced presence state: ", channel.presenceState())
-            }
-            .subscribe { status, error in
-              if status == .subscribed {
-                Task {
-                  await channel.track(["online_at": Date().ISO8601Format()])
-                }
-              }
-            }
+          let channel = await supabase.channel("room1")
+
+          let subscription = await channel.onBroadcast(event: "cursor-pos") { message in 
+            print("Cursor position received", message.payload)
+          }
+
+          await channel.subscribe()
+
+          await channel.broadcast(
+            event: "cursor-pos",
+            message: [
+              "x": .double(.random(in: 0...1)),
+              "y": .double(.random(in: 0...1))
+            ]
+          )
+
+          // remove subscription some time later
+          subscription.remove()
           ```
-      - id: listen-to-presence-join
-        name: Listen to presence join
-        isSpotlight: true
+
+      - id: listen-to-presence-updates
+        name: Listen to presence updates
         code: |
           ```swift
-          let channel = supabase.realtime.channel("room1")
-          channel
-            .on("presence", filter: ChannelFilter(event: "join")) { message in 
-              print("Newly joined presences: ", message.payload)
+          struct PresenceState: Codable {
+            let username: String
+          }
+
+          let channel = await supabase.channel("channelId") 
+
+          let presenceChange = await channel.presenceChange()
+
+          await channel.subscribe()
+
+          Task {
+            for await presence in presenceChange {
+              let joins = try presence.decodeJoins(as: PresenceState.self)
+              let leaves = try presence.decodeLeaves(as: PresenceState.self)
             }
-            .subscribe { status, error in
-              if status == .subscribed {
-                Task {
-                  await channel.track(["online_at": Date().ISO8601Format()])
-                }
-              }
-            }
-          ```
-      - id: listen-to-presence-leave
-        name: Listen to presence leave
-        isSpotlight: true
+          }
+
+          // Send your own state
+          Task {
+            try await channel.track(PresenceState(username: "John"))
+          }
+
+      - id: listen-to-presence-updates-callback
+        name: Listen to presence updates using callback
         code: |
           ```swift
-          let channel = supabase.realtime.channel("room1")
-          channel
-            .on("presence", filter: ChannelFilter(event: "leave")) { message in 
-              print("Newly left presences: ", message.payload)
-            }
-            .subscribe { status, error in
-              if status == .subscribed {
-                Task {
-                  await channel.track(["online_at": Date().ISO8601Format()])
-                  await channel.untrack()
-                }
-              }
-            }
+          struct PresenceState: Codable {
+            let username: String
+          }
+
+          let channel = await supabase.channel("channelId") 
+
+          let subscription = await channel.onPresenceChange() { presence in 
+            let joins = try presence.decodeJoins(as: PresenceState.self)
+            let leaves = try presence.decodeLeaves(as: PresenceState.self)
+          }
+
+          await channel.subscribe()
+
+          // Send your own state
+          try await channel.track(PresenceState(username: "John"))
+
+          // remove subscription some time later
+          subscription.remove()
           ```
+
       - id: listen-to-all-database-changes
         name: Listen to all database changes
-        isSpotlight: true
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on("postgres_changes", filter: ChannelFilter(event: "*", schema: "*")) { message in
-              print("Change received!", message.payload)
+          let channel = await supabase.channel("channelId") 
+
+          let changeStream = await channel.postgresChange(AnyAction.self, schema: "public")
+
+          await channel.subscribe()
+
+          for await change in changeStream {
+            switch change {
+              case .delete(let action): print("Deleted: \(action.oldRecord)")
+              case .insert(let action): print("Inserted: \(action.record)")
+              case .select(let action): print("Selected: \(action.record)")
+              case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
             }
-            .subscribe()
+          }
+          ```
+      - id: listen-to-all-database-changes-callback
+        name: Listen to all database changes using callback
+        code: |
+          ```swift
+          let channel = await supabase.channel("channelId") 
+
+          let subscription = await channel.onPostgresChange(AnyAction.self, schema: "public") { change in 
+            switch change {
+              case .delete(let action): print("Deleted: \(action.oldRecord)")
+              case .insert(let action): print("Inserted: \(action.record)")
+              case .select(let action): print("Selected: \(action.record)")
+              case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
+            }
+          }
+
+          await channel.subscribe()
+
+          // remove subscription some time later
+          subscription.remove()
           ```
       - id: listen-to-a-specific-table
         name: Listen to a specific table
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on("postgres_changes", filter: ChannelFilter(event: "*", schema: "public", table: "countries")) { message in
-              print("Change received!", message.payload)
+          let channel = await supabase.channel("channelId") 
+
+          let changeStream = await channel.postgresChange(
+            AnyAction.self, 
+            schema: "public",
+            table: "users"
+          )
+
+          await channel.subscribe()
+
+          for await change in changeStream {
+            switch change {
+              case .delete(let action): print("Deleted: \(action.oldRecord)")
+              case .insert(let action): print("Inserted: \(action.record)")
+              case .select(let action): print("Selected: \(action.record)")
+              case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
             }
-            .subscribe()
+          }
+          ```
+      - id: listen-to-a-specific-table-callback
+        name: Listen to a specific table using callback
+        code: |
+          ```swift
+          let channel = await supabase.channel("channelId") 
+
+          let subscription = await channel.onPostgresChange(
+            AnyAction.self, 
+            schema: "public",
+            table: "users"
+          ) { change in 
+            switch change {
+              case .delete(let action): print("Deleted: \(action.oldRecord)")
+              case .insert(let action): print("Inserted: \(action.record)")
+              case .select(let action): print("Selected: \(action.record)")
+              case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
+            }
+          }
+
+          await channel.subscribe()
+
+          // remove subscription some time later
+          subscription.remove()
           ```
       - id: listen-to-inserts
         name: Listen to inserts
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on("postgres_changes", filter: ChannelFilter(event: "INSERT", schema: "public", table: "countries")) { message in
-              print("Change received!", message.payload)
-            }
-            .subscribe()
+          let channel = await supabase.channel("channelId") 
+
+          let insertions = await channel.postgresChange(
+            InsertAction.self, 
+            schema: "public",
+            table: "users"
+          )
+
+          await channel.subscribe()
+
+          for await insert in insertions {
+            print("Inserted: \(insert.record)")
+          }
+          ```
+      - id: listen-to-inserts-callback
+        name: Listen to inserts using callback
+        code: |
+          ```swift
+          let channel = await supabase.channel("channelId") 
+
+          let subscription = await channel.onPostgresChange(
+            InsertAction.self, 
+            schema: "public",
+            table: "users"
+          ) { insert in 
+            print("Inserted: \(insert.record)")
+          }
+
+          await channel.subscribe()
+
+          // remove subscription some time later
+          subscription.remove()
           ```
       - id: listen-to-updates
         name: Listen to updates
         description: |
           By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
-          enable full replication for the table you are listening to:
+          enable full replication for the table you are listening too:
 
           ```sql
           alter table "your_table" replica identity full;
           ```
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on("postgres_changes", filter: ChannelFilter(event: "UPDATE", schema: "public", table: "countries")) { message in
-              print("Change received!", message.payload)
-            }
-            .subscribe()
+           let channel = await supabase.channel("channelId") 
+           
+           let updates = await channel.postgresChange(
+             UpdateAction.self, 
+             schema: "public",
+             table: "users"
+           )
+
+           await channel.subscribe()
+           
+           for await update in updates {
+             print("Updated: \(update.oldRecord) with \(update.record)")
+           }
+           ```
+      - id: listen-to-updates-callback
+        name: Listen to updates using callback
+        description: |
+          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          enable full replication for the table you are listening too:
+
+          ```sql
+          alter table "your_table" replica identity full;
           ```
+        code: |
+          ```swift
+           let channel = await supabase.channel("channelId") 
+           
+           let subscription = await channel.onPostgresChange(
+             UpdateAction.self, 
+             schema: "public",
+             table: "users"
+           ) { update in 
+            print("Updated: \(update.oldRecord) with \(update.record)")
+           }
+
+           await channel.subscribe()
+           
+           // remove subscription some time later
+          subscription.remove()
+           ```
       - id: listen-to-deletes
         name: Listen to deletes
         description: |
@@ -2976,131 +3894,142 @@ functions:
           ```
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on("postgres_changes", filter: ChannelFilter(event: "DELETE", schema: "public", table: "countries")) { message in
-              print("Change received!", message.payload)
-            }
-            .subscribe()
+          let channel = await supabase.channel("channelId") 
+
+          let deletions = await channel.postgresChange(
+            DeleteAction.self, 
+            schema: "public",
+            table: "users"
+          )
+
+          await channel.subscribe()
+
+          for await deletion in deletions {
+            print("Deleted: \(deletion.oldRecord)")
+          }
           ```
-      - id: listen-to-multiple-events
-        name: Listen to multiple events
-        description: You can chain listeners if you want to listen to multiple events for each table.
+      - id: listen-to-deletes-callback
+        name: Listen to deletes using callback
+        description: |
+          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          enable full replication for the table you are listening too:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on("postgres_changes", filter: ChannelFilter(event: "INSERT", schema: "public", table: "countries"), handler: handleRecordInserted)
-            .on("postgres_changes", filter: ChannelFilter(event: "DELETE", schema: "public", table: "countries"), handler: handleRecordDeleted)
-            .subscribe()
+          let channel = await supabase.channel("channelId") 
 
-          func handleRecordInserted(_ message: Message) {
-            // handle message
+          let subscription = await channel.onPostgresChange(
+            DeleteAction.self, 
+            schema: "public",
+            table: "users"
+          ) { deletion in
+            print("Deleted: \(deletion.oldRecord)")
           }
 
-          func handleRecordDeleted(_ message: Message) {
-            // handle message
-          }
+          await channel.subscribe()
+
+          // remove subscription some time later
+          subscription.remove()
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
-        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-        notes: |
-          - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on(
-              "postgres_changes",
-              filter: ChannelFilter(
-                event: "INSERT",
-                schema: "public",
-                table: "countries",
-                filter: "id=eq.200"
-              ),
-              handler: handleRecordInserted
-            )
-            .subscribe()
+          let channel = await supabase.channel("channelId") 
 
-            func handleRecordInserted(_ message: Message) {
-              // handle message
-            }
+          let deletions = await channel.postgresChange(
+            DeleteAction.self, 
+            schema: "public",
+            table: "users",
+            filter: "id=eq.1"
+          )
+
+          await channel.subscribe()
+
+          for await deletion in deletions {
+            print("Deleted: \(deletion.oldRecord)")
+          }
           ```
-  - id: broadcast-message
-    title: broadcastMessage()
-    description: |
-      Broadcast a message to all connected clients to a channel.
-    notes: |
-      - When using REST you don't need to subscribe to the channel
-    examples:
-      - id: send-a-message
-        name: Send a message via websocket
-        isSpotlight: true
+      - id: listening-to-row-level-changes-callback
+        name: Listen to row level changes using callback
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .subscribe { status, error in
-              if status == .subscribed {
-                Task {
-                  await channel.send(
-                    type: "broadcast",
-                    event: "cursor-pos",
-                    payload: ["x": Double.random(in: 0...1), "y": Double.random(in: 0...1)]
-                  )
-                }
-              }
-            }
-          ```
-      - id: send-a-message-via-rest
-        name: Send a message via REST
-        isSpotlight: true
-        code: |
-          ```swift
-          await supabase.realtime
-            .channel("room1")
-            .send(
-              type: "broadcast",
-              event: "cursor-pos",
-              payload: ["x": Double.random(in: 0...1), "y": Double.random(in: 0...1)]
-            )
-          ```
-  - id: get-channels
-    title: channels
-    examples:
-      - id: get-all-channels
-        name: Get all channels
-        isSpotlight: true
-        code: |
-          ```swift
-          let channels = supabase.realtime.channels
+          let channel = await supabase.channel("channelId") 
+
+          let subscription = await channel.onPostgresChange(
+            DeleteAction.self, 
+            schema: "public",
+            table: "users",
+            filter: "id=eq.1"
+          ) { deletion in 
+            print("Deleted: \(deletion.oldRecord)")
+          }
+
+          await channel.subscribe()
+
+          // remove subscription some time later
+          subscription.remove()
           ```
 
   - id: remove-channel
-    title: removeChannel()
+    description: |
+      Unsubscribes and removes Realtime channel from Realtime client.
+    title: "removeChannel()"
     notes: |
-      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes.
+      - Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - If you removed all channels, the client automatically disconnects from the Realtime websocket. This can be disabled in the Realtime config by setting `disconnectOnNoSubscriptions` to false.
     examples:
       - id: removes-a-channel
-        name: Removes a channel
+        name: Remove a channel
         isSpotlight: true
         code: |
           ```swift
-          supabase.realtime.remove(myChannel)
-          ```
+          let channel = await supabase.channel("channelId") 
 
+          //...
+          await supabase.removeChannel(channel)
+          ```
+      - id: unsubscribe-channel
+        name: Unsubscribe from a channel
+        isSpotlight: true
+        code: |
+          ```swift
+          let channel = await supabase.channel("channelId") 
+
+          //...
+          await channel.unsubscribe()
+          ```
   - id: remove-all-channels
     title: removeAllChannels()
+    $ref: "@supabase/supabase-js.index.SupabaseClient.removeAllChannels"
     notes: |
+      Unsubscribes and removes all Realtime channels from Realtime client.
       - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - If you removed all channels, the client automatically disconnects from the Realtime websocket. This can be disabled in the Realtime config by setting `disconnectOnNoSubscriptions` to false.
     examples:
       - id: remove-all-channels
         name: Remove all channels
         isSpotlight: true
         code: |
           ```swift
-          supabase.realtime.removeAllChannels()
+          await supabase.removeAllChannels()
+          ```
+  - id: get-channels
+    title: getChannels()
+    $ref: "@supabase/supabase-js.index.SupabaseClient.getChannels"
+    notes: |
+      Returns all Realtime channels.
+    examples:
+      - id: get-all-channels
+        name: Get all channels
+        isSpotlight: true
+        code: |
+          ```swift
+          let channels = await supabase.channels
           ```
 
   - id: list-buckets
@@ -3238,8 +4167,9 @@ functions:
             .upload(
               path: "public/\(fileName)",
               file: fileData,
-              fileOptions: FileOptions(
+              options: FileOptions(
                 cacheControl: "3600",
+                contentType: "image/png",
                 upsert: false
               )
             )
@@ -3265,8 +4195,9 @@ functions:
             .update(
               path: "public/\(fileName)",
               file: fileData,
-              fileOptions: FileOptions(
+              options: FileOptions(
                 cacheControl: "3600",
+                contentType: "image/png",
                 upsert: true
               )
             )
@@ -3357,6 +4288,25 @@ functions:
           ```
         note: |
           You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+
+  - id: from-create-signed-urls
+    title: from.createSignedUrls()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: create-signed-urls
+        name: Create Signed URLs
+        isSpotlight: true
+        code: |
+          ```swift
+          let urls = try await supabase
+            .storage
+            .from("avatars")
+            .createSignedURLs(paths: ["folder/avatar1.png", "folder/avatar2.png"], expiresIn: 60)
+          ```
 
   - id: from-get-public-url
     title: from.getPublicUrl()

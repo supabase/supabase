@@ -18,21 +18,19 @@
   "license": "MIT",
   "devDependencies": {
     "@faker-js/faker": "^6.1.2",
-    "@supabase/supabase-js": "^2.37.0",
+    "@supabase/supabase-js": "^2.44.3",
     "@testdeck/jest": "^0.3.3",
     "@types/jest": "^29.5.4",
-    "@types/node": "^17.0.24",
-    "@typescript-eslint/eslint-plugin": "^5.10.0",
-    "@typescript-eslint/parser": "^5.10.0",
+    "@types/node": "^20.11.16",
+    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/parser": "^6.19.1",
     "allure-commandline": "^2.17.2",
     "allure-js-commons": "^2.0.0-beta.14",
     "cross-fetch": "^3.1.5",
-    "eslint": "^8.45.0",
     "ts-jest": "^29.1.1",
     "jest-allure2-adapter": "^0.3.12",
     "jest-environment-jsdom": "^29.7.0",
     "postgres": "^3.0.5",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.5.0"
   }
 }

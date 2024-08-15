@@ -1,6 +1,22 @@
-import * as React from 'react'
 import { CalculatedColumn } from 'react-data-grid'
-import { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
+
+import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
+import { BooleanEditor } from '../components/editor/BooleanEditor'
+import { DateEditor } from '../components/editor/DateEditor'
+import { DateTimeEditor, DateTimeWithTimezoneEditor } from '../components/editor/DateTimeEditor'
+import { JsonEditor } from '../components/editor/JsonEditor'
+import { NumberEditor } from '../components/editor/NumberEditor'
+import { SelectEditor } from '../components/editor/SelectEditor'
+import { TextEditor } from '../components/editor/TextEditor'
+import { TimeEditor, TimeWithTimezoneEditor } from '../components/editor/TimeEditor'
+import { BooleanFormatter } from '../components/formatter/BooleanFormatter'
+import { DefaultFormatter } from '../components/formatter/DefaultFormatter'
+import { ForeignKeyFormatter } from '../components/formatter/ForeignKeyFormatter'
+import { JsonFormatter } from '../components/formatter/JsonFormatter'
+import { AddColumn } from '../components/grid/AddColumn'
+import { ColumnHeader } from '../components/grid/ColumnHeader'
+import { SelectColumn } from '../components/grid/SelectColumn'
+import type { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
   isArrayColumn,
   isBoolColumn,
@@ -14,26 +30,6 @@ import {
   isTextColumn,
   isTimeColumn,
 } from './types'
-import {
-  BooleanEditor,
-  DateEditor,
-  DateTimeEditor,
-  DateTimeWithTimezoneEditor,
-  JsonEditor,
-  NumberEditor,
-  SelectEditor,
-  TextEditor,
-  TimeEditor,
-  TimeWithTimezoneEditor,
-} from 'components/grid/components/editor'
-import { AddColumn, ColumnHeader, SelectColumn } from 'components/grid/components/grid'
-import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
-import {
-  BooleanFormatter,
-  DefaultFormatter,
-  ForeignKeyFormatter,
-  JsonFormatter,
-} from 'components/grid/components/formatter'
 
 export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 
@@ -46,6 +42,7 @@ export function getGridColumns(
     defaultWidth?: string | number
     onAddColumn?: () => void
     onExpandJSONEditor: (column: string, row: SupaRow) => void
+    onExpandTextEditor: (column: string, row: SupaRow) => void
   }
 ): any[] {
   const columns = table.columns.map((x, idx) => {
@@ -56,8 +53,8 @@ export function getGridColumns(
     const columnWidth = options?.defaultWidth
       ? options.defaultWidth
       : columnDefaultWidth < columnWidthBasedOnName
-      ? columnWidthBasedOnName
-      : columnDefaultWidth
+        ? columnWidthBasedOnName
+        : columnDefaultWidth
 
     const columnDefinition: CalculatedColumn<SupaRow> = {
       key: x.name,
@@ -81,7 +78,13 @@ export function getGridColumns(
         />
       ),
       renderEditCell: options
-        ? getCellEditor(x, columnType, options?.editable ?? false, options.onExpandJSONEditor)
+        ? getCellEditor(
+            x,
+            columnType,
+            options?.editable ?? false,
+            options.onExpandJSONEditor,
+            options.onExpandTextEditor
+          )
         : undefined,
       renderCell: getCellRenderer(x, columnType, {
         projectRef: options?.projectRef,
@@ -110,7 +113,8 @@ function getCellEditor(
   columnDefinition: SupaColumn,
   columnType: ColumnType,
   isEditable: boolean,
-  onExpandJSONEditor: (column: string, row: any) => void
+  onExpandJSONEditor: (column: string, row: any) => void,
+  onExpandTextEditor: (column: string, row: any) => void
 ) {
   if (!isEditable) {
     if (['array', 'json'].includes(columnType)) {
@@ -120,7 +124,9 @@ function getCellEditor(
       )
     } else if (!['number', 'boolean'].includes(columnType)) {
       // eslint-disable-next-line react/display-name
-      return (p: any) => <TextEditor {...p} isEditable={isEditable} />
+      return (p: any) => (
+        <TextEditor {...p} isEditable={isEditable} onExpandEditor={onExpandTextEditor} />
+      )
     } else {
       return
     }
@@ -164,7 +170,12 @@ function getCellEditor(
     case 'text': {
       // eslint-disable-next-line react/display-name
       return (p: any) => (
-        <TextEditor {...p} isEditable={isEditable} isNullable={columnDefinition.isNullable} />
+        <TextEditor
+          {...p}
+          isEditable={isEditable}
+          isNullable={columnDefinition.isNullable}
+          onExpandEditor={onExpandTextEditor}
+        />
       )
     }
     default: {
@@ -183,7 +194,7 @@ function getCellRenderer(
       return BooleanFormatter
     }
     case 'foreign_key': {
-      if (columnDef.isPrimaryKey || !columnDef.isUpdatable) {
+      if (!columnDef.isUpdatable) {
         return DefaultFormatter
       } else {
         // eslint-disable-next-line react/display-name

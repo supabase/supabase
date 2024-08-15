@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import {
@@ -8,14 +9,16 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Form, Input } from 'ui'
 
 const BillingEmail = () => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
@@ -25,40 +28,42 @@ const BillingEmail = () => {
   const initialValues = { billing_email: billing_email ?? '' }
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const canReadBillingEmail = useCheckPermissions(PermissionAction.READ, 'organizations')
-  const { mutateAsync: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
+  const canReadBillingEmail = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const onUpdateOrganizationEmail = async (values: any, { resetForm }: any) => {
     if (!canUpdateOrganization) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'You do not have the required permissions to update this organization',
-      })
+      return toast.error('You do not have the required permissions to update this organization')
     }
     if (!slug) return console.error('Slug is required')
     if (!name) return console.error('Organization name is required')
 
-    try {
-      const { billing_email } = await updateOrganization({
+    updateOrganization(
+      {
         slug,
         name,
         billing_email: values.billing_email,
-      })
-      resetForm({ values: { billing_email }, initialValues: { billing_email } })
-      invalidateOrganizationsQuery(queryClient)
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully saved settings',
-      })
-    } finally {
-    }
+      },
+      {
+        onSuccess: ({ billing_email }) => {
+          resetForm({ values: { billing_email }, initialValues: { billing_email } })
+          invalidateOrganizationsQuery(queryClient)
+          toast.success('Successfully saved settings')
+        },
+      }
+    )
   }
+
+  if (!canReadBillingEmail) return null
 
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12">
-          <p className="text-base m-0">Email Recipient</p>
+          <p className="text-foreground text-base m-0">Email Recipient</p>
           <p className="text-sm text-foreground-light m-0">
             All billing correspondence will go to this email
           </p>
@@ -102,7 +107,7 @@ const BillingEmail = () => {
                       id="billing_email"
                       size="small"
                       label="Email address"
-                      type={canReadBillingEmail ? 'text' : 'password'}
+                      type="text"
                       disabled={!canUpdateOrganization}
                     />
                   </FormSectionContent>

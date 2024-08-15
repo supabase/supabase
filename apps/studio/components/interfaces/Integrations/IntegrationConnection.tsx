@@ -1,6 +1,17 @@
+import { ChevronDown, Loader2, RefreshCw, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import {
+  IntegrationConnection,
+  IntegrationConnectionProps,
+} from 'components/interfaces/Integrations/IntegrationPanels'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import {
   Button,
   DropdownMenu,
@@ -8,21 +19,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconLoader,
-  IconRefreshCw,
-  IconTrash,
-  Modal,
 } from 'ui'
-
-import {
-  IntegrationConnection,
-  IntegrationConnectionProps,
-} from 'components/interfaces/Integrations/IntegrationPanels'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useStore } from 'hooks'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
@@ -31,19 +29,28 @@ interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
 
 const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
   ({ disabled, onDeleteConnection, ...props }, ref) => {
-    const { ui } = useStore()
-    const [isOpen, setIsOpen] = useState(false)
-    const [dropdownVisible, setDropdownVisible] = useState(false)
-
     const router = useRouter()
+
+    const { type, connection } = props
+    const { data: projects } = useProjectsQuery()
+    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
+    const isBranchingEnabled = project?.is_branch_enabled === true
+
+    const [isOpen, setIsOpen] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [dropdownVisible, setDropdownVisible] = useState(false)
 
     const onConfirm = useCallback(async () => {
       try {
-        await onDeleteConnection(props.connection)
+        setIsDeleting(true)
+        await onDeleteConnection(connection)
+      } catch (error) {
+        // [Joshen] No need for error handler
       } finally {
+        setIsDeleting(false)
         setIsOpen(false)
       }
-    }, [props.connection, onDeleteConnection])
+    }, [connection, onDeleteConnection])
 
     const onCancel = useCallback(() => {
       setIsOpen(false)
@@ -52,28 +59,36 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
     const { mutate: syncEnvs, isLoading: isSyncEnvLoading } =
       useIntegrationsVercelConnectionSyncEnvsMutation({
         onSuccess: () => {
-          ui.setNotification({
-            category: 'success',
-            message: 'Successfully synced environment variables',
-          })
+          toast.success('Successfully synced environment variables')
           setDropdownVisible(false)
         },
       })
 
     const onReSyncEnvVars = useCallback(async () => {
-      syncEnvs({ connectionId: props.connection.id })
-    }, [props.connection, syncEnvs])
+      syncEnvs({ connectionId: connection.id })
+    }, [connection, syncEnvs])
 
     const projectIntegrationUrl = `/project/[ref]/settings/integrations`
 
     return (
       <>
         <IntegrationConnection
+          showNode={false}
           actions={
             disabled ? (
-              <Button asChild disabled iconRight={<IconChevronDown />} type="default">
-                <span>Manage</span>
-              </Button>
+              <ButtonTooltip
+                disabled
+                iconRight={<ChevronDown size={14} />}
+                type="default"
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to manage this connection',
+                  },
+                }}
+              >
+                Manage
+              </ButtonTooltip>
             ) : (
               <DropdownMenu
                 open={dropdownVisible}
@@ -81,45 +96,45 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                 modal={false}
               >
                 <DropdownMenuTrigger asChild>
-                  <Button iconRight={<IconChevronDown />} type="default">
+                  <Button iconRight={<ChevronDown size={14} />} type="default">
                     <span>Manage</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="end">
-                  {props.type === 'Vercel' && (
-                    <>
-                      {router.pathname !== projectIntegrationUrl && (
-                        <DropdownMenuItem disabled={isSyncEnvLoading} asChild>
-                          <Link
-                            href={projectIntegrationUrl.replace(
-                              '[ref]',
-                              props.connection.supabase_project_ref
-                            )}
-                          >
-                            View project configuration
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem
-                        className="space-x-2"
-                        onSelect={(event) => {
-                          event.preventDefault()
-                          onReSyncEnvVars()
-                        }}
-                        disabled={isSyncEnvLoading}
-                      >
-                        {isSyncEnvLoading ? (
-                          <IconLoader className="animate-spin" size={14} />
-                        ) : (
-                          <IconRefreshCw size={14} />
+                  {router.pathname !== projectIntegrationUrl && (
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={projectIntegrationUrl.replace(
+                          '[ref]',
+                          connection.supabase_project_ref
                         )}
-                        <p>Resync environment variables</p>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
+                      >
+                        Configure connection
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  {type === 'Vercel' && (
+                    <DropdownMenuItem
+                      className="space-x-2"
+                      onSelect={(event) => {
+                        event.preventDefault()
+                        onReSyncEnvVars()
+                      }}
+                      disabled={isSyncEnvLoading}
+                    >
+                      {isSyncEnvLoading ? (
+                        <Loader2 className="animate-spin" size={14} />
+                      ) : (
+                        <RefreshCw size={14} />
+                      )}
+                      <p>Resync environment variables</p>
+                    </DropdownMenuItem>
+                  )}
+                  {(type === 'Vercel' || router.pathname !== projectIntegrationUrl) && (
+                    <DropdownMenuSeparator />
                   )}
                   <DropdownMenuItem className="space-x-2" onSelect={() => setIsOpen(true)}>
-                    <IconTrash size={14} />
+                    <Trash size={14} />
                     <p>Delete connection</p>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -130,18 +145,27 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
         />
 
         <ConfirmationModal
+          variant="destructive"
+          size={type === 'GitHub' && isBranchingEnabled ? 'medium' : 'small'}
           visible={isOpen}
-          danger={true}
-          header="Confirm to delete"
-          buttonLabel="Delete"
-          onSelectCancel={onCancel}
-          onSelectConfirm={onConfirm}
+          title={`Confirm to delete ${type} connection`}
+          confirmLabel="Delete connection"
+          onCancel={onCancel}
+          onConfirm={onConfirm}
+          loading={isDeleting}
+          alert={
+            type === 'GitHub' && isBranchingEnabled
+              ? {
+                  title: 'Branching will be disabled for this project',
+                  description: ` Deleting this GitHub connection will remove all preview branches on this project,
+                and also disable branching for ${project.name}`,
+                }
+              : undefined
+          }
         >
-          <Modal.Content>
-            <p className="py-4 text-sm text-foreground-light">
-              {`This action cannot be undone. Are you sure you want to delete this connection?`}
-            </p>
-          </Modal.Content>
+          <p className="text-sm text-foreground-light">
+            This action cannot be undone. Are you sure you want to delete this {type} connection?
+          </p>
         </ConfirmationModal>
       </>
     )

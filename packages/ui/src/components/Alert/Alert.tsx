@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react'
 import { IconAlertTriangle } from '../Icon/icons/IconAlertTriangle'
 
@@ -29,6 +31,9 @@ const icons: Record<AlertVariant, React.ReactElement> = {
   neutral: <></>,
 }
 
+/**
+ * @deprecated Use Alert_Shadcn_
+ */
 export function Alert({
   variant = 'neutral',
   className,

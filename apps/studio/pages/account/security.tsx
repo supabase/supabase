@@ -1,10 +1,9 @@
-import { NextPageWithLayout } from 'types'
-import { Badge, cn, Collapsible, IconSmartphone } from 'ui'
-
 import { TOTPFactors } from 'components/interfaces/Account'
-import { AccountLayout } from 'components/layouts'
-import { FormHeader } from 'components/ui/Forms'
+import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
+import type { NextPageWithLayout } from 'types'
+import { Badge, cn, Collapsible, IconSmartphone } from 'ui'
 
 const collapsibleClasses = [
   'bg-surface-100',
@@ -42,7 +41,7 @@ const Security: NextPageWithLayout = () => {
             </div>
 
             {data ? (
-              <Badge color={data.totp.length === 0 ? 'gray' : 'green'}>
+              <Badge variant={data.totp.length === 0 ? 'default' : 'brand'}>
                 {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
               </Badge>
             ) : null}

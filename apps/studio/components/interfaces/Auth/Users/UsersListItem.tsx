@@ -3,17 +3,29 @@ import { Badge } from 'ui'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Table from 'components/to-be-cleaned/Table'
-import { User } from 'data/auth/users-query'
+import type { User } from 'data/auth/users-query'
 import UserDropdown from './UserDropdown'
 import { getDisplayName } from './UserListItem.utils'
 
 interface UserListItemProps {
   user: User
-  canRemoveUser: boolean
-  canRemoveMFAFactors: boolean
+  permissions: {
+    canRemoveUser: boolean
+    canRemoveMFAFactors: boolean
+    canSendMagicLink: boolean
+    canSendRecovery: boolean
+    canSendOtp: boolean
+  }
+  setSelectedUser: (user: User) => void
+  setUserSidePanelOpen: (open: boolean) => void
 }
 
-const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItemProps) => {
+const UserListItem = ({
+  user,
+  permissions,
+  setSelectedUser,
+  setUserSidePanelOpen,
+}: UserListItemProps) => {
   const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
   const createdAt = dayjs(user.created_at)
   const lastSignedIn = dayjs(user.last_sign_in_at)
@@ -32,33 +44,34 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
         <span className="text-foreground">{!user.phone ? '-' : user.phone}</span>
       </Table.td>
       <Table.td className="table-cell">
-        <span className="capitalize text-foreground">{user?.raw_app_meta_data?.provider}</span>
+        <span className="capitalize text-foreground">
+          {user.is_anonymous ? 'Anonymous' : user?.raw_app_meta_data?.provider}
+        </span>
       </Table.td>
       <Table.td className="table-cell">
         <span className="text-foreground">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>
       </Table.td>
       <Table.td className="table-cell">
-        {!isUserConfirmed ? (
-          <Badge color="yellow">Waiting for verification..</Badge>
-        ) : user.last_sign_in_at ? (
+        {user?.last_sign_in_at ? (
           lastSignedIn?.format('DD MMM, YYYY HH:mm')
+        ) : !isUserConfirmed ? (
+          <Badge variant="warning">Waiting for verification..</Badge>
         ) : (
           'Never'
         )}
       </Table.td>
       <Table.td className="table-cell">
         <div className="flex max-w-[72px] items-baseline">
-          <SimpleCodeBlock metastring="" className="font-xs bash">
-            {user.id}
-          </SimpleCodeBlock>
+          <SimpleCodeBlock className="font-xs bash">{user.id}</SimpleCodeBlock>
           <div>...</div>
         </div>
       </Table.td>
       <Table.td className="table-cell">
         <UserDropdown
           user={user}
-          canRemoveUser={canRemoveUser}
-          canRemoveMFAFactors={canRemoveMFAFactors}
+          permissions={permissions}
+          setSelectedUser={setSelectedUser}
+          setUserSidePanelOpen={setUserSidePanelOpen}
         />
       </Table.td>
     </Table.tr>

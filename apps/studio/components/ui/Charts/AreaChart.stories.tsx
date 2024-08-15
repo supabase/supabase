@@ -1,11 +1,11 @@
-import { ComponentMeta } from '@storybook/react'
+import { StoryObj } from '@storybook/react'
 import dayjs from 'dayjs'
 import React from 'react'
 import Chart, { AreaChartProps } from './AreaChart'
 
 export default {
   title: 'Charts',
-} as ComponentMeta<typeof Chart>
+} as StoryObj<typeof Chart>
 
 const DATA = [290, 430, 649, 422, 321, 893, 111].map((value, index) => ({
   ram_usage: value,

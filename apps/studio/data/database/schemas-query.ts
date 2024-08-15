@@ -1,61 +1,41 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import pgMeta from '@supabase/pg-meta'
+import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { z } from 'zod'
 
-import { components } from 'data/api'
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { databaseKeys } from './keys'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
+import { sqlKeys } from 'data/sql/keys'
 
 export type SchemasVariables = {
   projectRef?: string
   connectionString?: string
 }
 
-export type Schema = components['schemas']['PostgresSchema']
+export type Schema = z.infer<typeof pgMeta.schemas.zod>
 
-export async function getSchemas(
-  { projectRef, connectionString }: SchemasVariables,
-  signal?: AbortSignal
-) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+const pgMetaSchemasList = pgMeta.schemas.list()
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/schemas', {
-    params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-      },
-      path: {
-        ref: projectRef,
-      },
-    },
-    headers: Object.fromEntries(headers),
-    signal,
-  })
-
-  if (error) {
-    throw error
-  }
-
-  return data
-}
-
-export type SchemasData = Awaited<ReturnType<typeof getSchemas>>
-export type SchemasError = ResponseError
+export type SchemasData = z.infer<typeof pgMetaSchemasList.zod>
+export type SchemasError = ExecuteSqlError
 
 export const useSchemasQuery = <TData = SchemasData>(
   { projectRef, connectionString }: SchemasVariables,
-  { enabled = true, ...options }: UseQueryOptions<SchemasData, SchemasError, TData> = {}
+  options: UseQueryOptions<ExecuteSqlData, SchemasError, TData> = {}
 ) =>
-  useQuery<SchemasData, SchemasError, TData>(
-    databaseKeys.schemaList(projectRef),
-    ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+  useExecuteSqlQuery(
+    {
+      projectRef,
+      connectionString,
+      sql: pgMetaSchemasList.sql,
+      queryKey: ['schemas', 'list'],
+    },
+    {
+      select(data) {
+        return data.result
+      },
+      ...options,
+    }
   )
 
 export function invalidateSchemasQuery(client: QueryClient, projectRef: string | undefined) {
-  return client.invalidateQueries(databaseKeys.schemaList(projectRef))
+  return client.invalidateQueries(sqlKeys.query(projectRef, ['schemas', 'list']))
 }

@@ -1,0 +1,46 @@
+---
+title: 'Dedicated IPv4 Address'
+description: 'Attach an IPv4 address to your database'
+subtitle: 'Attach an IPv4 address to your database'
+---
+
+The add-on is $4 per month - we're passing on the AWS costs to you. The add-on is available for all paid plans.
+
+## When is this add-on required?
+
+This add-on is not required if any of these conditions are met
+
+- you are only connecting to the database via Supavisor, our connection pooler, or via any of our client libraries.
+- If you are connecting to the database directly and the network from which you are connecting to the database supports IPv6 addresses.
+
+This add-on is only required if you are connecting to the database directly from an IPv6 incompatible network.
+
+<Admonition type="note" label="Add-on has no impact on PGBouncer removal">
+
+When you purchase this add-on, your project won't be migrated to IPv6. PGBouncer will still be removed for the project according to the timeline mentioned in [this discussion](https://github.com/orgs/supabase/discussions/17817);
+
+</Admonition>
+
+## Enabling the add-on
+
+You can enable the IPv4 add-on in your project [add-on settings](https://supabase.com/dashboard/project/_/settings/addons) page.
+
+<Admonition type="caution" label="Downtime when add-on is toggled.">
+  Note that there might be some downtime when toggling the add-on since some DNS clients might have
+  cached the old DNS entry and it might take some time for the updated DNS entry to be picked up.
+  Generally, this should be less than a minute.
+</Admonition>
+
+## Read Replicas
+
+When the IPv4 add-on is enabled, an IPv4 address is provisioned for each database in your project.
+
+By default, this is only the Primary database for your project. If [Read replicas](/docs/guides/platform/read-replicas) are being used, each replica also gets its own IPv4 address, with a corresponding $4 charge.
+
+## Caveats
+
+For regular use-cases like a restart or compute size changes, the IPv4 address remains unchanged.
+However, there are cases where maintaining the same IPv4 address isn't guaranteed. These include:
+
+- If the project gets paused and unpaused
+- If the add-on gets removed and added again

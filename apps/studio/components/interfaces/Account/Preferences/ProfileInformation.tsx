@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -11,12 +12,11 @@ import {
 } from 'ui'
 import z from 'zod'
 
-import { FormActions } from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
-import { Profile } from 'data/profile/types'
-import { useStore } from 'hooks'
-import { FormSchema } from 'types'
+import type { Profile } from 'data/profile/types'
+import type { FormSchema } from 'types'
 
 const FormSchema = z.object({
   first_name: z.string().optional(),
@@ -26,34 +26,21 @@ const FormSchema = z.object({
 const formId = 'profile-information-form'
 
 export const ProfileInformation = ({ profile }: { profile: Profile }) => {
-  const { ui } = useStore()
-
   const form = useForm({
     resolver: zodResolver(FormSchema),
-    defaultValues: { first_name: profile.first_name, last_name: profile.last_name },
+    defaultValues: { first_name: profile.first_name ?? '', last_name: profile.last_name ?? '' },
   })
 
-  const { mutateAsync: updateProfile, isLoading } = useProfileUpdateMutation({
-    onSuccess: () => {
-      ui.setNotification({ category: 'success', message: 'Successfully saved profile' })
+  const { mutate: updateProfile, isLoading } = useProfileUpdateMutation({
+    onSuccess: (data) => {
+      toast.success('Successfully saved profile')
+      form.reset({ first_name: data.first_name, last_name: data.last_name })
     },
-    onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: "Couldn't update profile. Please try again later.",
-      })
-    },
+    onError: (error) => toast.error(`Failed to update profile: ${error.message}`),
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
-    try {
-      await updateProfile({
-        firstName: data.first_name || '',
-        lastName: data.last_name || '',
-      })
-    } finally {
-    }
+    updateProfile({ firstName: data.first_name || '', lastName: data.last_name || '' })
   }
 
   return (

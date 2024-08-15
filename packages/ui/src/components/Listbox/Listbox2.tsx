@@ -1,12 +1,14 @@
+'use client'
+
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { flatten } from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
 
-import { cn } from '@ui/lib/utils'
-import { FormLayout } from '../../lib/Layout/FormLayout'
+import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
 import styleHandler from '../../lib/theme/styleHandler'
+import { cn } from '../../lib/utils/cn'
 import { useFormContext } from '../Form/FormContext'
 import { IconCheck } from '../Icon/icons/IconCheck'
 import { SelectContext } from './SelectContext'
@@ -19,7 +21,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
   error?: string
   icon?: any
   id?: string
-  label?: string
+  label?: string | React.ReactNode
   labelOptional?: string
   layout?: 'horizontal' | 'vertical'
   style?: React.CSSProperties
@@ -35,6 +37,9 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
   onChange?: (x: any) => void
 }
 
+/**
+ * @deprecated Use ./Select_shadcn_ or follow ComboBox convention or use ./ui-patterns/multi-select
+ */
 function Listbox({
   children,
   className,
@@ -207,6 +212,7 @@ function Listbox({
       <DropdownMenuPrimitive.Root>
         <DropdownMenuPrimitive.Trigger asChild disabled={disabled}>
           <button
+            data-size={size}
             ref={triggerRef}
             className={cn(selectClasses)}
             onBlur={handleBlurEvent}
@@ -215,7 +221,7 @@ function Listbox({
             id={id}
           >
             <span className={cn(addonBeforeClasses)}>
-              {icon && <InputIconContainer icon={icon} />}
+              {icon && <InputIconContainer size={size} icon={icon} />}
               {selectedNode?.addOnBefore && <selectedNode.addOnBefore />}
               <span className={__styles.label}>{selectedNode?.label}</span>
             </span>
@@ -274,6 +280,9 @@ type addOnBefore = {
   active: boolean
 }
 
+/**
+ * @deprecated Use ./Select_shadcn_ or follow ComboBox convention or use ./ui-patterns/multi-select
+ */
 function SelectOption({
   id,
   value,

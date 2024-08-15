@@ -1,16 +1,19 @@
-import { Button, IconX } from 'ui'
+import { MousePointerClick, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 
-import CopyButton from 'components/ui/CopyButton'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
+import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
 import useSingleLog from 'hooks/analytics/useSingleLog'
-import { useMemo } from 'react'
 import {
-  isDefaultLogPreviewFormat,
-  isUnixMicro,
-  LogsEndpointParams,
-  unixMicroToIsoTimestamp,
-} from '.'
-import { LogData, QueryType } from './Logs.types'
+  Button,
+  CodeBlock,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  cn,
+} from 'ui'
 import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
 import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
 import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
@@ -18,6 +21,8 @@ import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExp
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
+import type { LogData, LogsEndpointParams, QueryType } from './Logs.types'
+import { isDefaultLogPreviewFormat, isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
 
 export interface LogSelectionProps {
   log: LogData | null
@@ -25,6 +30,7 @@ export interface LogSelectionProps {
   queryType?: QueryType
   projectRef: string
   params: Partial<LogsEndpointParams>
+  collectionName?: string
 }
 
 const LogSelection = ({
@@ -33,6 +39,7 @@ const LogSelection = ({
   onClose,
   queryType,
   params = {},
+  collectionName,
 }: LogSelectionProps) => {
   const { logData: fullLog, isLoading } = useSingleLog(
     projectRef,
@@ -40,8 +47,50 @@ const LogSelection = ({
     params,
     partialLog?.id
   )
+  const [sql, setSql] = useState('')
+
+  const {
+    refetch: refetchWarehouseData,
+    data: warehouseQueryData,
+    isFetching: warehouseQueryFetching,
+  } = useWarehouseQueryQuery(
+    {
+      ref: projectRef,
+      sql,
+    },
+    {
+      enabled: queryType === 'warehouse',
+      onError: (error) => {
+        toast.error(error.message)
+      },
+    }
+  )
+
+  useEffect(() => {
+    const newSql = `select id, timestamp, event_message, metadata from \`${collectionName}\`
+    where id = '${partialLog?.id}' and timestamp > '2024-01-01' limit 1`
+
+    setSql(newSql)
+  }, [collectionName, partialLog?.id])
+
+  useEffect(() => {
+    if (queryType === 'warehouse') {
+      refetchWarehouseData()
+    }
+  }, [
+    warehouseQueryData,
+    collectionName,
+    projectRef,
+    partialLog?.id,
+    refetchWarehouseData,
+    queryType,
+  ])
+
   const Formatter = () => {
     switch (queryType) {
+      case 'warehouse':
+        if (!warehouseQueryData) return null
+        return <DefaultPreviewSelectionRenderer log={warehouseQueryData.result[0]} />
       case 'api':
         if (!fullLog) return null
         if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
@@ -82,33 +131,34 @@ const LogSelection = ({
   const selectionText = useMemo(() => {
     if (fullLog && queryType) {
       return `Log ID
-${fullLog.id}\n
-Log Timestamp (UTC)
-${isUnixMicro(fullLog.timestamp) ? unixMicroToIsoTimestamp(fullLog.timestamp) : fullLog.timestamp}\n
-Log Event Message
-${fullLog.event_message}\n
-Log Metadata
-${JSON.stringify(fullLog.metadata, null, 2)}
-`
+  ${fullLog.id}\n
+  Log Timestamp (UTC)
+  ${isUnixMicro(fullLog.timestamp) ? unixMicroToIsoTimestamp(fullLog.timestamp) : fullLog.timestamp}\n
+  Log Event Message
+  ${fullLog.event_message}\n
+  Log Metadata
+  ${JSON.stringify(fullLog.metadata, null, 2)}
+  `
     }
 
     return JSON.stringify(fullLog || partialLog, null, 2)
-  }, [fullLog])
+  }, [fullLog, partialLog, queryType])
 
   return (
     <div
-      className={[
-        'relative flex h-full flex-grow flex-col border border-l',
-        'border-overlay',
-        'overflow-y-scroll bg-background',
-      ].join(' ')}
+      className={cn(
+        'relative flex h-full flex-grow flex-col border border-l border-overlay',
+        'overflow-y-scroll bg-studio'
+      )}
     >
       <div
-        className={
-          `absolute flex
-          h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-background text-center opacity-0 transition-all ` +
-          (partialLog ? 'z-0 opacity-0' : 'z-10 opacity-100')
-        }
+        className={cn(
+          'absolute flex h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-studio text-center opacity-0 transition-all',
+          {
+            'z-0 opacity-0': partialLog,
+            'z-10 opacity-100': !partialLog,
+          }
+        )}
       >
         <div
           className={
@@ -129,51 +179,59 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
           <div className="relative flex h-4 w-32 items-center rounded border border-control px-2">
             <div className="h-0.5 w-2/3 rounded-full bg-surface-300"></div>
             <div className="absolute right-1 -bottom-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="1"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
-                />
-              </svg>
+              <MousePointerClick size="24" strokeWidth={1} />
             </div>
           </div>
           <div className="flex flex-col gap-1">
             <h3 className="text-sm text-foreground">Select an Event</h3>
             <p className="text-xs text-foreground-lighter">
-              Select an Event to view the code snippet (pretty view) or complete JSON payload (raw
-              view).
+              {queryType === 'warehouse'
+                ? 'Select an Event to view the complete JSON payload'
+                : 'Select an Event to view the code snippet (pretty view) or complete JSON payload (raw view).'}
             </p>
           </div>
         </div>
       </div>
-      <div className="relative h-px flex-grow bg-surface-100">
-        <div className="pt-4 px-4 flex flex-col gap-4">
-          <div className="flex flex-row justify-between items-center">
-            <div className={`transition ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
-              <CopyButton text={selectionText} type="default" title="Copy log to clipboard" />
-            </div>
+      <div className="relative flex-grow flex flex-col bg-surface-100">
+        <Tabs_Shadcn_ defaultValue="details" className="flex flex-col">
+          <TabsList_Shadcn_ className="px-2 pt-2">
+            <TabsTrigger_Shadcn_ className="px-3" value="details">
+              Details
+            </TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_ className="px-3" value="raw">
+              Raw
+            </TabsTrigger_Shadcn_>
             <Button
               type="text"
-              className="cursor-pointer transition hover:text-foreground h-8 w-8 px-0 py-0 flex items-center justify-center"
+              className="ml-auto absolute top-2 right-2 cursor-pointer transition hover:text-foreground h-6 w-6 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
-              <IconX size={14} strokeWidth={2} className="text-foreground-lighter" />
+              <X size={14} strokeWidth={2} className="text-foreground-lighter" />
             </Button>
+          </TabsList_Shadcn_>
+          <div className="flex-grow">
+            {isLoading || warehouseQueryFetching ? (
+              <div className="py-44">
+                <Loading />
+              </div>
+            ) : (
+              <>
+                <TabsContent_Shadcn_ className="bg-surface-100 space-y-6" value="details">
+                  <Formatter />
+                </TabsContent_Shadcn_>
+                <TabsContent_Shadcn_ value="raw">
+                  <CodeBlock
+                    hideLineNumbers
+                    language="json"
+                    className="prose w-full pt-0 max-w-full border-none"
+                  >
+                    {JSON.stringify(fullLog || partialLog, null, 2)}
+                  </CodeBlock>
+                </TabsContent_Shadcn_>
+              </>
+            )}
           </div>
-          <div className="h-px w-full bg-selection rounded " />
-        </div>
-        {isLoading && <Connecting />}
-        <div className="flex flex-col space-y-6 bg-surface-100 py-4">
-          {!isLoading && <Formatter />}
-        </div>
+        </Tabs_Shadcn_>
       </div>
     </div>
   )

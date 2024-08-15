@@ -1,5 +1,8 @@
-import { ProductMenuGroup, ProductMenuGroupItem } from 'components/ui/ProductMenu/ProductMenu.types'
-import { Project } from 'data/projects/project-detail-query'
+import type {
+  ProductMenuGroup,
+  ProductMenuGroupItem,
+} from 'components/ui/ProductMenu/ProductMenu.types'
+import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
 
 export const generateLogsMenu = (
@@ -14,13 +17,13 @@ export const generateLogsMenu = (
 
   return [
     {
-      title: 'Logs Explorer',
+      title: 'Explorer',
       items: (
         [
           { key: 'explorer', name: 'Query', root: true },
           IS_PLATFORM ? { key: 'saved', name: 'Saved Queries' } : null,
           { key: 'recent', name: 'Recent Queries' },
-          { key: 'templates', name: 'Templates' },
+          IS_PLATFORM ? { key: 'templates', name: 'Templates' } : null,
         ].filter((item) => item) as { name: string; key: string; root: boolean }[]
       ).map(({ key, name, root }) => ({
         name,
@@ -30,9 +33,10 @@ export const generateLogsMenu = (
       })),
     },
     {
+      title: 'Infrastructure Logs',
       items: [
         {
-          name: IS_PLATFORM ? 'API Edge Network' : 'Kong API',
+          name: 'API Gateway',
           key: 'edge-logs',
           url: `/project/${ref}/logs/edge-logs`,
           items: [],

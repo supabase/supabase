@@ -46,10 +46,10 @@ CREATE POLICY "policy_name"
 ON storage.objects FOR {operation} {USING | WITH CHECK} (
     -- restrict bucket
     bucket_id = {bucket_name}
-    and auth.uid()::text = (storage.foldername(name))[1]
+    and (select auth.uid()::text) = (storage.foldername(name))[1]
 );
     `.trim(),
-    definition: `bucket_id = {bucket_id} AND auth.uid()::text = (storage.foldername(name))[1]`,
+    definition: `bucket_id = {bucket_id} AND (select auth.uid()::text) = (storage.foldername(name))[1]`,
     allowedOperations: [],
   },
   {
@@ -64,7 +64,7 @@ ON storage.objects FOR {operation} {USING | WITH CHECK} (
     -- restrict bucket
     bucket_id = {bucket_name}
     AND (storage.foldername(name))[1] = 'private'
-    AND auth.role() = 'authenticated'
+    AND (select auth.role()) = 'authenticated'
 );
     `.trim(),
     definition: `bucket_id = {bucket_id} AND (storage.foldername(name))[1] = 'private' AND auth.role() = 'authenticated'`,
@@ -82,10 +82,10 @@ ON storage.objects FOR {operation} {USING | WITH CHECK} (
 	  -- restrict bucket
     bucket_id = {bucket_name}
     AND (storage.foldername(name))[1] = 'admin' AND (storage.foldername(name))[2] = 'assets'
-    AND auth.uid()::text = 'd7bed83c-44a0-4a4f-925f-efc384ea1e50'
+    AND (select auth.uid()::text) = 'd7bed83c-44a0-4a4f-925f-efc384ea1e50'
 );
     `.trim(),
-    definition: `bucket_id = {bucket_id} AND (storage.foldername(name))[1] = 'admin' AND (storage.foldername(name))[2] = 'assets' AND auth.uid()::text = 'd7bed83c-44a0-4a4f-925f-efc384ea1e50'`,
+    definition: `bucket_id = {bucket_id} AND (storage.foldername(name))[1] = 'admin' AND (storage.foldername(name))[2] = 'assets' AND (select auth.uid()::text) = 'd7bed83c-44a0-4a4f-925f-efc384ea1e50'`,
     allowedOperations: [],
   },
   {
@@ -99,10 +99,10 @@ ON storage.objects FOR {operation} {USING | WITH CHECK} (
 	  -- restrict bucket
     bucket_id = {bucket_name}
     AND name = 'admin/assets/Costa Rican Frog.jpg'
-    AND auth.uid()::text = 'd7bed83c-44a0-4a4f-925f-efc384ea1e50'
+    AND (select auth.uid()::text) = 'd7bed83c-44a0-4a4f-925f-efc384ea1e50'
 );
     `.trim(),
-    definition: `bucket_id = {bucket_id} AND name = 'admin/assets/Costa Rican Frog.jpg' AND auth.uid()::text = 'd7bed83c-44a0-4a4f-925f-efc384ea1e50'`,
+    definition: `bucket_id = {bucket_id} AND name = 'admin/assets/Costa Rican Frog.jpg' AND (select auth.uid()::text) = 'd7bed83c-44a0-4a4f-925f-efc384ea1e50'`,
     allowedOperations: [],
   },
 ]

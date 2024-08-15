@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import toast from 'react-hot-toast'
 
 import { post } from 'lib/common/fetch'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 
 export type UserCreateVariables = {
@@ -72,7 +72,7 @@ export const useUserCreateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        if (projectRef) await queryClient.invalidateQueries(authKeys.users(projectRef))
+        await queryClient.invalidateQueries(authKeys.users(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

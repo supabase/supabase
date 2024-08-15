@@ -1,25 +1,40 @@
 import { noop } from 'lodash'
-import { IconEdit, IconGrid, Modal } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconEdit,
+  IconExternalLink,
+  IconGrid,
+  Modal,
+} from 'ui'
 
 import CardButton from 'components/ui/CardButton'
+import { FlaskConical } from 'lucide-react'
+import { useAppStateSnapshot } from 'state/app-state'
 
 interface PolicySelectionProps {
   description: string
+  showAssistantPreview: boolean
   onViewTemplates: () => void
   onViewEditor: () => void
+  onToggleFeaturePreviewModal?: () => void
 }
 
 const PolicySelection = ({
   description = '',
+  showAssistantPreview,
   onViewTemplates = noop,
   onViewEditor = noop,
+  onToggleFeaturePreviewModal,
 }: PolicySelectionProps) => {
+  const snap = useAppStateSnapshot()
+
   return (
-    <Modal.Content>
-      <div className="space-y-6 py-8">
-        <div>
-          <p className="text-sm text-foreground-light">{description}</p>
-        </div>
+    <Modal.Content className="space-y-4 py-4">
+      <div className="flex flex-col gap-y-2">
+        <p className="text-sm text-foreground-light">{description}</p>
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-1">
           <CardButton
             title="Get started quickly"
@@ -30,7 +45,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-foreground text-background  
+                  rounded bg-foreground text-background
                 "
                 >
                   <IconGrid size={14} strokeWidth={2} />
@@ -48,7 +63,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-foreground text-background  
+                  rounded bg-foreground text-background
                 "
                 >
                   <IconEdit size={14} strokeWidth={2} />
@@ -58,19 +73,31 @@ const PolicySelection = ({
             onClick={onViewEditor}
           />
         </div>
-        <p className="text-sm text-foreground-light">
-          Not sure what policies are? Check out our resources{' '}
-          <a
-            target="_blank"
-            rel="noreferrer"
-            className="text-brand transition-colors hover:text-brand-600"
-            href="https://supabase.com/docs/guides/auth#policies"
-          >
-            here
-          </a>
-          .
-        </p>
       </div>
+
+      {showAssistantPreview && onToggleFeaturePreviewModal !== undefined && (
+        <Alert_Shadcn_>
+          <FlaskConical />
+          <AlertTitle_Shadcn_>Try the new Supabase Assistant for RLS policies</AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>
+            Create RLS policies for your tables with the help of AI
+          </AlertDescription_Shadcn_>
+          <div className="flex items-center gap-x-2 mt-3">
+            <Button type="default" onClick={onToggleFeaturePreviewModal}>
+              Toggle feature preview
+            </Button>
+            <Button asChild type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+              <a
+                href="https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Learn more
+              </a>
+            </Button>
+          </div>
+        </Alert_Shadcn_>
+      )}
     </Modal.Content>
   )
 }
