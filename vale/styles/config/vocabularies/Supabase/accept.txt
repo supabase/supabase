@@ -8,6 +8,7 @@ Colab
 [Cc]omposable
 CPUs?
 CTEs?
+DBeaver
 [Dd]eclarative(ly)?
 [Dd]eduplicat(e|ion)
 [Dd]eeplinks?
