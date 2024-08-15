@@ -5,19 +5,25 @@ import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import { Button } from 'ui'
 
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import FunctionsLayout from 'components/layouts/FunctionsLayout'
+import FunctionsLayout from 'components/layouts/FunctionsLayout/FunctionsLayout'
 import AreaChart from 'components/ui/Charts/AreaChart'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import NoPermission from 'components/ui/NoPermission'
 import { useFunctionsReqStatsQuery } from 'data/analytics/functions-req-stats-query'
 import { useFunctionsResourceUsageQuery } from 'data/analytics/functions-resource-usage-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useCheckPermissions } from 'hooks'
-import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
+import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ChartIntervals, NextPageWithLayout } from 'types'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  WarningIcon,
+} from 'ui'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -98,7 +104,11 @@ const PageLayout: NextPageWithLayout = () => {
     return [start, end]
   }, [selectedInterval])
 
-  const execTimeChartData = useFillTimeseriesSorted(
+  const {
+    data: execTimeChartData,
+    error: execTimeError,
+    isError: isErrorExecTime,
+  } = useFillTimeseriesSorted(
     reqStatsData,
     'timestamp',
     ['avg_execution_time'],
@@ -107,7 +117,11 @@ const PageLayout: NextPageWithLayout = () => {
     endDate.toISOString()
   )
 
-  const invocationsChartData = useFillTimeseriesSorted(
+  const {
+    data: invocationsChartData,
+    error: invocationsError,
+    isError: isErrorInvocations,
+  } = useFillTimeseriesSorted(
     reqStatsData,
     'timestamp',
     ['count', 'success_count', 'redirect_count', 'client_err_count', 'server_err_count'],
@@ -116,7 +130,11 @@ const PageLayout: NextPageWithLayout = () => {
     endDate.toISOString()
   )
 
-  const resourceUsageChartData = useFillTimeseriesSorted(
+  const {
+    data: resourceUsageChartData,
+    error: resourceUsageError,
+    isError: isErrorResourceUsage,
+  } = useFillTimeseriesSorted(
     resourceUsageData,
     'timestamp',
     ['avg_cpu_time_used', 'avg_memory_used'],
@@ -172,7 +190,13 @@ const PageLayout: NextPageWithLayout = () => {
             data={execTimeChartData}
             isLoading={reqStatsResult.isLoading}
             renderer={(props) => {
-              return (
+              return isErrorExecTime ? (
+                <Alert_Shadcn_ variant="warning">
+                  <WarningIcon />
+                  <AlertTitle_Shadcn_>Failed to reterieve execution time</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>{execTimeError.message}</AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              ) : (
                 <AreaChart
                   className="w-full"
                   xAxisKey="timestamp"
@@ -190,48 +214,58 @@ const PageLayout: NextPageWithLayout = () => {
             data={invocationsChartData}
             isLoading={reqStatsResult.isLoading}
             renderer={(props) => {
-              const data = props.data
-                .map((d: any) => [
-                  {
-                    status: '2xx',
-                    count: d.success_count,
-                    timestamp: d.timestamp,
-                  },
-                  {
-                    status: '3xx',
-                    count: d.redirect_count,
-                    timestamp: d.timestamp,
-                  },
-                  {
-                    status: '4xx',
-                    count: d.client_err_count,
-                    timestamp: d.timestamp,
-                  },
-                  {
-                    status: '5xx',
-                    count: d.server_err_count,
-                    timestamp: d.timestamp,
-                  },
-                ])
-                .flat()
+              if (isErrorInvocations) {
+                return (
+                  <Alert_Shadcn_ variant="warning">
+                    <WarningIcon />
+                    <AlertTitle_Shadcn_>Failed to reterieve invocations</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>{invocationsError.message}</AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )
+              } else {
+                const data = props.data
+                  .map((d: any) => [
+                    {
+                      status: '2xx',
+                      count: d.success_count,
+                      timestamp: d.timestamp,
+                    },
+                    {
+                      status: '3xx',
+                      count: d.redirect_count,
+                      timestamp: d.timestamp,
+                    },
+                    {
+                      status: '4xx',
+                      count: d.client_err_count,
+                      timestamp: d.timestamp,
+                    },
+                    {
+                      status: '5xx',
+                      count: d.server_err_count,
+                      timestamp: d.timestamp,
+                    },
+                  ])
+                  .flat()
 
-              return (
-                <StackedBarChart
-                  className="w-full"
-                  xAxisKey="timestamp"
-                  yAxisKey="count"
-                  stackKey="status"
-                  data={data}
-                  highlightedValue={sumBy(data, 'count')}
-                  customDateFormat={selectedInterval.format}
-                  stackColors={['brand', 'slate', 'yellow', 'red']}
-                  onBarClick={() => {
-                    router.push(
-                      `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}`
-                    )
-                  }}
-                />
-              )
+                return (
+                  <StackedBarChart
+                    className="w-full"
+                    xAxisKey="timestamp"
+                    yAxisKey="count"
+                    stackKey="status"
+                    data={data}
+                    highlightedValue={sumBy(data, 'count')}
+                    customDateFormat={selectedInterval.format}
+                    stackColors={['brand', 'slate', 'yellow', 'red']}
+                    onBarClick={() => {
+                      router.push(
+                        `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}`
+                      )
+                    }}
+                  />
+                )
+              }
             }}
           />
           <ReportWidget
@@ -240,7 +274,13 @@ const PageLayout: NextPageWithLayout = () => {
             data={resourceUsageChartData}
             isLoading={resourceUsageResult.isLoading}
             renderer={(props) => {
-              return (
+              return isErrorResourceUsage ? (
+                <Alert_Shadcn_ variant="warning">
+                  <WarningIcon />
+                  <AlertTitle_Shadcn_>Failed to retrieve CPU time</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>{resourceUsageError.message}</AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              ) : (
                 <AreaChart
                   className="w-full"
                   xAxisKey="timestamp"
@@ -259,7 +299,13 @@ const PageLayout: NextPageWithLayout = () => {
             data={resourceUsageChartData}
             isLoading={resourceUsageResult.isLoading}
             renderer={(props) => {
-              return (
+              return isErrorResourceUsage ? (
+                <Alert_Shadcn_ variant="warning">
+                  <WarningIcon />
+                  <AlertTitle_Shadcn_>Failed to retrieve memory usage</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>{resourceUsageError.message}</AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              ) : (
                 <AreaChart
                   className="w-full"
                   xAxisKey="timestamp"

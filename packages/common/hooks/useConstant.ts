@@ -1,3 +1,5 @@
+'use client'
+
 // based on https://github.com/Andarist/use-constant
 
 import { useRef } from 'react'

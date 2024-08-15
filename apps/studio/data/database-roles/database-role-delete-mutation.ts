@@ -1,35 +1,34 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import pgMeta from '@supabase/pg-meta'
 import { toast } from 'react-hot-toast'
 
-import { del } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { databaseRolesKeys } from './keys'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { invalidateRolesQuery } from './database-roles-query'
+
+type DropRoleBody = Parameters<typeof pgMeta.roles.remove>[1]
 
 export type DatabaseRoleDeleteVariables = {
   projectRef: string
   connectionString?: string
-  id: string
+  id: number
+  payload?: DropRoleBody
 }
 
 export async function deleteDatabaseRole({
   projectRef,
   connectionString,
   id,
+  payload,
 }: DatabaseRoleDeleteVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await del('/platform/pg-meta/{ref}/roles', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    headers,
+  const sql = pgMeta.roles.remove({ id }, payload).sql
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['roles', 'delete'],
   })
-
-  if (error) throw error
-  return data
+  return result
 }
 
 type DatabaseRoleDeleteData = Awaited<ReturnType<typeof deleteDatabaseRole>>
@@ -49,7 +48,7 @@ export const useDatabaseRoleDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseRolesKeys.list(projectRef))
+        await invalidateRolesQuery(queryClient, projectRef)
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

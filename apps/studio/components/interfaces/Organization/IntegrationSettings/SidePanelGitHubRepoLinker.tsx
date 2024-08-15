@@ -5,16 +5,16 @@ import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
 import { useGitHubConnectionCreateMutation } from 'data/integrations/github-connection-create-mutation'
+import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import type { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { Button, SidePanel } from 'ui'
-import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
@@ -36,11 +36,14 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
 
   const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
-    useGitHubAuthorizationQuery()
+    useGitHubAuthorizationQuery({ enabled: sidePanelStateSnapshot.githubConnectionsOpen })
 
   // [Alaister]: temp override with <any> until the typegen is fixed
-  const { data: githubReposData, isLoading: isLoadingGitHubRepos } =
-    useGitHubRepositoriesQuery<any[]>()
+  const { data: githubReposData, isLoading: isLoadingGitHubRepos } = useGitHubRepositoriesQuery<
+    any[]
+  >({
+    enabled: Boolean(gitHubAuthorization),
+  })
 
   /**
    * Supabase projects available
@@ -51,8 +54,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     () =>
       supabaseProjectsData
         ?.filter((project) => project.organization_id === selectedOrganization?.id)
-        .map((project) => ({ id: project.id.toString(), name: project.name, ref: project.ref })) ??
-      EMPTY_ARR,
+        .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
     [selectedOrganization?.id, supabaseProjectsData]
   )
 

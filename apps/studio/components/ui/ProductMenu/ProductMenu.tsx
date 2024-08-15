@@ -17,10 +17,9 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
             <div className="my-6 space-y-8">
               <div className="mx-3">
                 <Menu.Group
-                  //@ts-ignore
                   title={
                     group.title ? (
-                      <div className="flex flex-col space-y-2">
+                      <div className="flex flex-col space-y-2 uppercase font-mono">
                         <span>{group.title}</span>
                         {group.isPreview && <Badge variant="warning">Not production ready</Badge>}
                       </div>
@@ -34,6 +33,7 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
                       url={item.url}
                       name={item.name}
                       icon={item.icon}
+                      rightIcon={item.rightIcon}
                       isActive={page === item.key}
                       isExternal={item.isExternal}
                       target={item.isExternal ? '_blank' : '_self'}
@@ -43,7 +43,7 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
                 </div>
               </div>
             </div>
-            {idx !== menu.length - 1 && <div className="h-px w-full bg-overlay"></div>}
+            {idx !== menu.length - 1 && <div className="h-px w-full bg-border-overlay"></div>}
           </div>
         ))}
       </Menu>

@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { del } from 'data/fetchers'
+import { del, handleError } from 'data/fetchers'
 import { projectKeys } from 'data/projects/keys'
 import type { ResponseError } from 'types'
 import { deleteBranch } from './branch-delete-mutation'
@@ -32,7 +32,7 @@ export async function disableBranching({ branchIds, projectRef }: BranchesDisabl
   const { data, error } = await del('/v1/projects/{ref}/branches', {
     params: { path: { ref: projectRef } },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

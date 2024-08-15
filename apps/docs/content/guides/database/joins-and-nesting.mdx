@@ -136,6 +136,28 @@ final data = await supabase.from('countries').select('id, name, cities(id, name)
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Country: Codable {
+  let id: Int
+  let name: String
+  let cities: [City]
+
+  struct City: Codable {
+    let id: Int
+    let name: String
+  }
+}
+
+let countries: [Country] = try await supabase
+  .from("countries")
+  .select("id, name, cities(id, name)")
+  .execute()
+  .value
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -223,6 +245,38 @@ final data = await supabase.from('teams').select('id, team_name, users(id, name)
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Team: Codable {
+  let id: Int
+  let name: String
+  let users: [User]
+
+  struct User: Codable {
+    let id: Int
+    let name: String
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case id, users
+    case name = "team_name"
+  }
+}
+let teams [Team] = try await supabase
+  .from("teams")
+  .select(
+    """
+      id,
+      team_name,
+      users ( id, name )
+    """
+  )
+  .execute()
+  .value
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -289,9 +343,9 @@ create table shifts (
 );
 ```
 
-In this case, you need to explicitly define the join because the joining column on `shifts` is ambiguous.
+In this case, you need to explicitly define the join because the joining column on `shifts` is ambiguous as they are both referencing the `scans` table.
 
-To fetch all the `shifts` with `scan_id_start` related to a specific `scan`, use the following syntax:
+To fetch all the `shifts` with `scan_id_start` and `scan_id_end` related to a specific `scan`, use the following syntax:
 
 <Tabs
   scrollable
@@ -310,9 +364,133 @@ const { data, error } = await supabase.from('shifts').select(
       id,
       user_id,
       badge_scan_time
+    ),
+   scans:scan_id_end (
+     id, 
+     user_id,
+     badge_scan_time
     )
   `
 )
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.from('shifts').select('''
+  *,
+  scans:scan_id_start (
+    id,
+    user_id,
+    badge_scan_time
+  ),
+scans:scan_id_end (
+    id,
+    user_id,
+    badge_scan_time
+  )
+''');
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Shift: Codable {
+  let id: Int
+  let userId: Int
+  let attendanceStatus: String?
+
+  let scans: [Scan]
+
+  struct Scan: Codable {
+    let id: Int
+    let userId: Int
+    let badgeScanTime: TimeInterval
+
+    enum CodingKeys: String, CodingKey {
+      case id
+      case userId = "user_id"
+      case badgeScanTime = "badge_scan_time"
+    }
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case id
+    case userId = "user_id"
+    case attendanceStatus = "attendance_status"
+  }
+}
+
+let shifts: [Shift] = try await supabase
+  .from("shifts")
+  .select(
+    """
+      *,
+      scans:scan_id_start (
+        id,
+        user_id,
+        badge_scan_time
+      ),
+     scans: scan_id_end (
+        id,
+        user_id,
+        badge_scan_time
+     )
+    """
+  )
+  .execute()
+  .value
+```
+
+</TabPanel>
+
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("shifts").select(Columns.raw('''
+  *,
+  scans:scan_id_start (
+    id,
+    user_id,
+    badge_scan_time
+  ),
+scans:scan_id_end (
+    id,
+    user_id,
+    badge_scan_time
+  )
+'''));
+```
+
+</TabPanel>
+<TabPanel id="graphql" label="GraphQL">
+
+```javascript
+const Query = `
+  query {
+    shiftsCollection {
+      edges {
+        node {
+          id
+          user_id
+          attendance_status
+          scan_id_start {
+            id
+            user_id
+            badge_scan_time
+          }
+          scan_id_end {
+            id
+            user_id
+            badge_scan_time
+          }
+        }
+      }
+    }
+  }
+`
 ```
 
 </TabPanel>

@@ -1,9 +1,10 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { get } from 'data/fetchers'
+
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import type { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
-import type { ResponseError } from 'types'
 
 export type OrgDailyComputeStatsVariables = {
   // API parameters
@@ -34,7 +35,7 @@ export async function getOrgDailyComputeStats(
     params: { path: { slug: orgSlug }, query: { projectRef, startDate, endDate } },
     signal,
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data as AnalyticsData
 }
 

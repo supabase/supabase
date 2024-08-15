@@ -1,13 +1,13 @@
 // Import Swiper styles
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 
 import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
+import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Badge, Button, IconArrowUpRight, IconX, Tabs } from 'ui'
+import { Badge, Button, IconArrowUpRight, IconX, Image, Tabs } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 // data
@@ -18,9 +18,10 @@ import ExtensionsExamplesData from 'data/products/database/extensions-examples'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
 
-import { ThemeImage } from 'ui-patterns/ThemeImage'
 import { TweetCard } from 'ui-patterns/TweetCard'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import ProductsNav from '~/components/Products/ProductsNav'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
 const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
@@ -68,6 +69,7 @@ function Database() {
         }}
       />
       <DefaultLayout>
+        <ProductsNav activePage={PRODUCT_NAMES.DATABASE} />
         <ProductHeader
           icon={Solutions['database'].icon}
           title={Solutions['database'].name}
@@ -79,13 +81,13 @@ function Database() {
           ]}
           subheader={[
             'Every Supabase project is a dedicated PostgreSQL database, trusted by millions of developers.',
-            'PostgreSQL is one of the worlds most scalable databases.',
+            "PostgreSQL is one of the world's most scalable databases.",
           ]}
           image={[
-            <ThemeImage
+            <Image
               src={{
-                light: `${basePath}/images/product/database/header--light-2.png`,
                 dark: `${basePath}/images/product/database/header--dark-2.png`,
+                light: `${basePath}/images/product/database/header--light-2.png`,
               }}
               alt="database header"
               layout="responsive"
@@ -103,7 +105,7 @@ function Database() {
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <div className="flex w-fit items-center">
-                  <Image
+                  <NextImage
                     src={`${basePath}/images/product/database/postgresql-icon.svg`}
                     width={30}
                     height={30}

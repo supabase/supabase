@@ -170,4 +170,11 @@ response = supabase.table('todos').select("*").execute()
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await supabase.from("todos").select()
+```
+
+</TabPanel>
 </Tabs>

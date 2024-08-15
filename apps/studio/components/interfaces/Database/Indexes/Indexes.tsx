@@ -1,36 +1,22 @@
 import { partition, sortBy } from 'lodash'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconExternalLink,
-  IconSearch,
-  IconTrash,
-  Input,
-  Modal,
-  SidePanel,
-} from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { CodeEditor } from 'components/ui/CodeEditor'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { Button, IconAlertCircle, IconSearch, IconTrash, Input, SidePanel } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
-import { useParams } from 'common'
 
 const Indexes = () => {
   const { project } = useProjectContext()
@@ -110,35 +96,6 @@ const Indexes = () => {
   return (
     <>
       <div className="pb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="space-y-1">
-            <h3 className="text-xl text-foreground">Database Indexes</h3>
-            <div className="text-sm text-foreground-lighter">
-              Improve query performance against your database
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/query-optimization"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Documentation
-              </Link>
-            </Button>
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/extensions/index_advisor"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Optimization with index_advisor
-              </Link>
-            </Button>
-          </div>
-        </div>
-
         <div className="flex flex-col gap-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">

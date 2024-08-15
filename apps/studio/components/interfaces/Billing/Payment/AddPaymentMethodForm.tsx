@@ -55,23 +55,33 @@ const AddPaymentMethodForm = ({ returnUrl, onCancel, onConfirm }: AddPaymentMeth
 
   return (
     <form onSubmit={handleSubmit}>
-      <Modal.Content>
-        <div
-          className={`transition ${isSaving ? 'pointer-events-none opacity-75' : 'opacity-100'}`}
-        >
-          <PaymentElement />
-        </div>
+      <Modal.Content
+        className={`transition ${isSaving ? 'pointer-events-none opacity-75' : 'opacity-100'}`}
+      >
+        <PaymentElement className="[.p-LinkAutofillPrompt]:pt-0" />
       </Modal.Content>
       <Modal.Separator />
-      <Modal.Content>
-        <div className="flex items-center space-x-2 pt-2">
-          <Button block htmlType="submit" type="primary" loading={isSaving} disabled={isSaving}>
-            Save
-          </Button>
-          <Button htmlType="button" type="default" onClick={onCancel} block disabled={isSaving}>
-            Cancel
-          </Button>
-        </div>
+      <Modal.Content className="flex items-center space-x-2">
+        <Button
+          htmlType="button"
+          size="small"
+          type="default"
+          onClick={onCancel}
+          block
+          disabled={isSaving}
+        >
+          Cancel
+        </Button>
+        <Button
+          block
+          htmlType="submit"
+          size="small"
+          type="primary"
+          loading={isSaving}
+          disabled={isSaving}
+        >
+          Add payment method
+        </Button>
       </Modal.Content>
     </form>
   )

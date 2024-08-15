@@ -1,0 +1,30 @@
+---
+id: 'sql-to-rest'
+title: 'SQL to REST API Translator'
+subtitle: 'Translate SQL queries to HTTP requests and Supabase client code'
+description: 'Translate SQL queries to HTTP requests and Supabase client code'
+---
+
+Sometimes it's challenging to translate SQL queries to the equivalent [PostgREST](https://postgrest.org/) request or Supabase client code. Use this tool to help with this translation.
+
+<Admonition type="info">
+
+PostgREST supports a subset of SQL, so not all SQL queries will translate.
+
+</Admonition>
+
+<SqlToRest
+  defaultValue={`select
+  title,
+  description
+from
+  books
+where
+  description ilike '%cheese%'
+order by
+  title desc
+limit
+  5
+offset
+  10`}
+/>

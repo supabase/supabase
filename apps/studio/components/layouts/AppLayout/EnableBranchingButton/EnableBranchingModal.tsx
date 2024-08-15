@@ -5,17 +5,9 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import {
-  Button,
-  Form_Shadcn_,
-  IconDollarSign,
-  IconExternalLink,
-  IconFileText,
-  IconGitBranch,
-  Modal,
-} from 'ui'
 import * as z from 'zod'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -23,11 +15,13 @@ import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { DollarSign, FileText } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
+import { Button, Form_Shadcn_, IconExternalLink, IconGitBranch, Modal } from 'ui'
 import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPlanNotice from './BranchingPlanNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
@@ -43,13 +37,7 @@ const EnableBranchingModal = () => {
   // and makes the validation run onChange instead. This is a workaround
   const [isValid, setIsValid] = useState(false)
 
-  const {
-    data: repositories,
-    error: repositoriesError,
-    isLoading: isLoadingRepositories,
-    isSuccess: isSuccessRepositories,
-    isError: isErrorRepositories,
-  } = useGitHubRepositoriesQuery()
+  const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches')
 
   const {
     data: connections,
@@ -123,9 +111,9 @@ const EnableBranchingModal = () => {
     defaultValues: { branchName: '' },
   })
 
-  const isLoading = isLoadingRepositories
-  const isError = isErrorRepositories || isErrorUpgradeEligibility
-  const isSuccess = isSuccessRepositories && isSuccessUpgradeEligibility
+  const isLoading = isLoadingConnections || isLoadingUpgradeEligibility
+  const isError = isErrorConnections || isErrorUpgradeEligibility
+  const isSuccess = isSuccessConnections && isSuccessUpgradeEligibility
 
   const canSubmit = form.getValues('branchName').length > 0 && !isChecking && isValid
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
@@ -146,8 +134,9 @@ const EnableBranchingModal = () => {
         hideFooter
         visible={snap.showEnableBranchingModal}
         onCancel={() => snap.setShowEnableBranchingModal(false)}
-        className="!bg !max-w-[40rem]"
-        size="xlarge"
+        className="block"
+        size="medium"
+        hideClose
       >
         <Form_Shadcn_ {...form}>
           <form
@@ -155,7 +144,7 @@ const EnableBranchingModal = () => {
             onSubmit={form.handleSubmit(onSubmit)}
             onChange={() => setIsValid(false)}
           >
-            <Modal.Content className="px-7 py-5 flex items-center justify-between space-x-4">
+            <Modal.Content className="flex items-center justify-between space-x-4">
               <div className="flex items-center gap-x-4">
                 <IconGitBranch strokeWidth={2} size={20} />
                 <div>
@@ -187,11 +176,8 @@ const EnableBranchingModal = () => {
               <>
                 <Modal.Separator />
                 <Modal.Content className="px-7 py-6">
-                  {isErrorRepositories ? (
-                    <AlertError
-                      error={repositoriesError}
-                      subject="Failed to retrieve repositories"
-                    />
+                  {isErrorConnections ? (
+                    <AlertError error={connectionsError} subject="Failed to retrieve connections" />
                   ) : isErrorUpgradeEligibility ? (
                     <AlertError
                       error={upgradeEligibilityError}
@@ -219,14 +205,14 @@ const EnableBranchingModal = () => {
                     {!hasPitrEnabled && <BranchingPITRNotice />}
                   </>
                 )}
-                <Modal.Content className="px-7 py-6 flex flex-col gap-3">
+                <Modal.Content className="py-6 flex flex-col gap-3">
                   <p className="text-sm text-foreground-light">
                     Please keep in mind the following:
                   </p>
                   <div className="flex flex-row gap-4">
                     <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                        <IconDollarSign className="text-amber-900" size={20} strokeWidth={2} />
+                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-400 flex items-center justify-center">
+                        <DollarSign className="text-warning" size={20} strokeWidth={2} />
                       </figure>
                     </div>
                     <div className="flex flex-col gap-y-1">
@@ -242,8 +228,8 @@ const EnableBranchingModal = () => {
                   </div>
                   <div className="flex flex-row gap-4 mt-2">
                     <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                        <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
+                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-400 flex items-center justify-center">
+                        <FileText className="text-warning" size={20} strokeWidth={2} />
                       </figure>
                     </div>
                     <div className="flex flex-col gap-y-1">
@@ -263,29 +249,27 @@ const EnableBranchingModal = () => {
               </>
             )}
 
-            <Modal.Content className="px-7">
-              <div className="flex items-center space-x-2 py-2 pb-4">
-                <Button
-                  size="medium"
-                  block
-                  disabled={isCreating}
-                  type="default"
-                  onClick={() => snap.setShowEnableBranchingModal(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  block
-                  size="medium"
-                  form={formId}
-                  disabled={!isSuccess || isCreating || !canSubmit}
-                  loading={isCreating}
-                  type="primary"
-                  htmlType="submit"
-                >
-                  I understand, enable branching
-                </Button>
-              </div>
+            <Modal.Content className="flex items-center gap-3">
+              <Button
+                size="medium"
+                block
+                disabled={isCreating}
+                type="default"
+                onClick={() => snap.setShowEnableBranchingModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                block
+                size="medium"
+                form={formId}
+                disabled={!isSuccess || isCreating || !canSubmit}
+                loading={isCreating}
+                type="primary"
+                htmlType="submit"
+              >
+                I understand, enable branching
+              </Button>
             </Modal.Content>
           </form>
         </Form_Shadcn_>

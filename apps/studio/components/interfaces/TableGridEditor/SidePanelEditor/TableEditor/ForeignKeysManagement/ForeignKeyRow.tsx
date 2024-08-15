@@ -2,7 +2,8 @@ import clsx from 'clsx'
 import { useParams } from 'common'
 import Link from 'next/link'
 import SVG from 'react-inlinesvg'
-import { Badge, Button, IconArrowRight } from 'ui'
+import { Badge, Button, cn } from 'ui'
+import { ArrowRight } from 'lucide-react'
 
 import { BASE_PATH } from 'lib/constants'
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
@@ -89,8 +90,12 @@ export const ForeignKeyRow = ({
         <div className="flex flex-col gap-y-1">
           {foreignKey.columns.map((x, idx) => (
             <div key={`relation-${idx}}`} className="flex items-center gap-x-2">
-              <code className="text-xs">{x.source}</code>
-              <IconArrowRight />
+              <code
+                className={cn('text-xs', (x?.source ?? '').length === 0 && 'text-foreground-light')}
+              >
+                {x.source || '[column_name]'}
+              </code>
+              <ArrowRight size={16} />
               <code className="text-xs">
                 {foreignKey.schema}.{foreignKey.table}.{x.target}
               </code>

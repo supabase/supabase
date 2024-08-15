@@ -25,7 +25,7 @@ By default Realtime is disabled on your database. Let's turn on Realtime for a `
  <TabPanel id="dashboard" label="Dashboard">
 
 1.  Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
-2.  Click on **Replication** in the sidebar.
+2.  Click on **Publications** in the sidebar.
 3.  Control which database events are sent by toggling **Insert**, **Update**, and **Delete**.
 4.  Control which tables broadcast changes by selecting **Source** and toggling each table.
 
@@ -108,6 +108,33 @@ supabase
         table: 'todos',
         callback: handleInserts)
     .subscribe();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+// Initialize the Swift client
+import Supabase
+
+let supabase = SupabaseClient(supabaseURL: SUPABASE_URL, supabaseKey: SUPABASE_ANON_KEY)
+
+// Create channel
+let channel = await supabase.realtime.channel("todos")
+
+// Create the observations before subscribing
+let insertions = await channel.postgresChanges(
+  InsertAction.self,
+  schema: "public",
+  table: "todos"
+)
+
+await channel.subscribe()
+
+for await insertion in insertions {
+  let todo = try insertion.decoded(as: Todo.self)
+  print("Todo inserted", todo)
+}
 ```
 
 </TabPanel>

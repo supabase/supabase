@@ -2,7 +2,7 @@ import styles from './loading-anim.module.css'
 
 const LogoLoader = () => (
   <div className="w-full h-full flex flex-col items-center justify-center">
-    <div className="w-28">
+    <div>
       <svg
         width="60"
         height="62"

@@ -1,4 +1,4 @@
-import { ident, literal } from 'pg-format'
+import { ident, literal } from './pg-format'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { SCHEMAS_SQL } from './sql/schemas'
 import { z } from 'zod'
@@ -41,7 +41,10 @@ function list({
 
 function retrieve({ id }: { id: number }): { sql: string; zod: typeof pgSchemaOptionalZod }
 function retrieve({ name }: { name: string }): { sql: string; zod: typeof pgSchemaOptionalZod }
-function retrieve({ id, name }: { id?: number; name?: string }) {
+function retrieve({ id, name }: { id?: number; name?: string }): {
+  sql: string
+  zod: typeof pgSchemaOptionalZod
+} {
   if (id) {
     const sql = `${SCHEMAS_SQL} and n.oid = ${literal(id)};`
     return {

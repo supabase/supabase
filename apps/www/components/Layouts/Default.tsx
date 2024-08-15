@@ -1,6 +1,7 @@
 import Nav from 'components/Nav/index'
 import Footer from 'components/Footer/index'
 import { cn } from 'ui'
+import { useForceDeepDark } from '~/lib/theme.utils'
 
 type Props = {
   hideHeader?: boolean
@@ -18,6 +19,8 @@ const DefaultLayout = (props: Props) => {
     footerClassName = '',
     children,
   } = props
+
+  useForceDeepDark()
 
   return (
     <>

@@ -4,13 +4,7 @@ title: 'Anonymous Sign-Ins'
 subtitle: 'Create and use anonymous users to authenticate with Supabase'
 ---
 
-Enable Anonymous Sign-In to build apps which provide users an authenticated experience without requiring users to enter an email address, password, use an OAuth provider or provide any other PII (Personally Identifiable Information). Later, when ready, they can attach an authentication method to their account.
-
-It's most useful for:
-
-- E-commerce applications, such as shopping carts before check-out
-- Full-feature demos without collecting personal information
-- Temporary or throw-away accounts
+[Enable Anonymous Sign-Ins](/dashboard/project/_/settings/auth) to build apps which provide users an authenticated experience without requiring users to enter an email address, password, use an OAuth provider or provide any other PII (Personally Identifiable Information). Later, when ready, the user can link an authentication method to their account.
 
 <Admonition type="note" label="Anonymous user vs the anon key">
 
@@ -22,7 +16,11 @@ This is different from the `anon` API key which does not create a user and can b
 
 </Admonition>
 
-To get started, [enable anonymous sign-ins](/dashboard/project/_/settings/auth) for your Supabase Project.
+Anonymous sign-ins can be used to build:
+
+- E-commerce applications, such as shopping carts before check-out
+- Full-feature demos without collecting personal information
+- Temporary or throw-away accounts
 
 <Admonition type="caution">
 
@@ -34,7 +32,7 @@ See the [Access control section](#access-control) for more details.
 
 <Admonition type="note" label="Self hosting and local development">
 
-For self-hosting, you can update your project configuration using the files and environment variables provided. See the [self-hosting docs](/docs/guides/self-hosting#configuration) for more details.
+For self-hosting, you can update your project configuration using the files and environment variables provided. See the [local development docs](/docs/guides/cli/config) for more details.
 
 </Admonition>
 
@@ -56,6 +54,24 @@ const { data, error } = await supabase.auth.signInAnonymously()
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+Call the [`signInAnonymously()`](/docs/reference/dart/auth-signinanonymously) method:
+
+```dart
+await supabase.auth.signInAnonymously();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Call the [`signInAnonymously()`](/docs/reference/swift/auth-signinanonymously) method:
+
+```swift
+let session = try await supabase.auth.signInAnonymously()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 Call the [`signInAnonymously()`](/docs/reference/kotlin/auth-signinanonymously) method:
@@ -69,7 +85,7 @@ supabase.auth.signInAnonymously()
 
 ## Convert an anonymous user to a permanent user
 
-Converting an anonymous user to a permanent user requires linking an identity to the user.
+Converting an anonymous user to a permanent user requires [linking an identity](/docs/guides/auth/auth-identity-linking#manual-linking-beta) to the user. This requires you to [enable manual linking](/dashboard/project/_/settings/auth) in your Supabase project.
 
 ### Link an Email / Phone identity
 
@@ -82,10 +98,36 @@ Converting an anonymous user to a permanent user requires linking an identity to
 >
 <TabPanel id="js" label="JavaScript">
 
-You can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser) method to link an email or phone identity to the anonymous user.
+You can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
 
 ```js
 const { data, error } = await supabase.auth.updateUser({ email: 'example@email.com' })
+
+// verify the user's email by clicking on the email change link
+// or entering the 6-digit OTP sent to the email address
+
+// once the user has been verified, update the password
+const { data, error } = await supabase.auth.updateUser({ password: 'password' })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+You can use the [`updateUser()`](/docs/reference/dart/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```dart
+await supabase.auth.updateUser(UserAttributes(email: 'example@email.com'));
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+You can use the [`updateUser()`](/docs/reference/swift/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```swift
+try await supabase.auth.updateUser(
+  user: UserAttributes(email: "example@email.com")
+)
 ```
 
 </TabPanel>
@@ -120,6 +162,24 @@ const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+You can use the [`linkIdentity()`](/docs/reference/dart/auth-linkidentity) method to link an OAuth identity to the anonymous user.
+
+```dart
+await supabase.auth.linkIdentity(OAuthProvider.google);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+You can use the [`linkIdentity()`](/docs/reference/swift/auth-linkidentity) method to link an OAuth identity to the anonymous user.
+
+```swift
+try await supabase.auth.linkIdentity(provider: .google)
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 You can use the [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity) method to link an oauth identity to the anonymous user.
@@ -139,7 +199,7 @@ An anonymous user assumes the `authenticated` role just like a permanent user. Y
 create policy "Only permanent users can post to the news feed"
 on news_feed as restrictive for insert
 to authenticated
-with check ((auth.jwt()->>'is_anonymous')::boolean is false );
+with check ((select (auth.jwt()->>'is_anonymous')::boolean) is false );
 
 create policy "Anonymous and permanent users can view the news feed"
 on news_feed for select
@@ -177,7 +237,7 @@ where is_anonymous is true and created_at < now() - interval '30 days';
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
+- [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Supabase Flutter Client](https://github.com/supabase/supabase-flutter)
 - [Supabase Kotlin Client](https://github.com/supabase-community/supabase-kt)

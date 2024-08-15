@@ -1,16 +1,28 @@
 import type { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
-import { Filter, Query, Sort, SupaRow, SupaTable } from 'components/grid'
+import { Query } from 'components/grid/query/Query'
+import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
+import {
+  JSON_TYPES,
+  TEXT_TYPES,
+} from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { KB } from 'lib/constants'
 import {
   ImpersonationRole,
   ROLE_IMPERSONATION_NO_RESULTS,
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
 import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ExecuteSqlData, executeSql, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import {
+  ExecuteSqlData,
+  ExecuteSqlError,
+  executeSql,
+  useExecuteSqlQuery,
+} from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
 import { formatFilterValue } from './utils'
+import { THRESHOLD_COUNT } from './table-rows-count-query'
 
 type GetTableRowsArgs = {
   table?: SupaTable
@@ -21,6 +33,16 @@ type GetTableRowsArgs = {
   impersonatedRole?: ImpersonationRole
 }
 
+// [Joshen] We can probably make this reasonably high, but for now max aim to load 10kb
+export const MAX_CHARACTERS = 10 * KB
+
+// return the primary key column if exists, otherwise return the first column
+// to use as a default sort
+const getDefaultOrderByColumn = (table: SupaTable) => {
+  return table.columns.find((column) => column.isPrimaryKey)?.name || table.columns[0]?.name
+}
+
+// Updated fetchAllTableRows function
 export const fetchAllTableRows = async ({
   projectRef,
   connectionString,
@@ -51,9 +73,18 @@ export const fetchAllTableRows = async ({
       const value = formatFilterValue(table, filter)
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
-  sorts.forEach((sort) => {
-    queryChains = queryChains.order(sort.column, sort.ascending, sort.nullsFirst)
-  })
+
+  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
+  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
+    const primaryKey = getDefaultOrderByColumn(table)
+    if (primaryKey) {
+      queryChains = queryChains.order(table.name, primaryKey, true, true)
+    }
+  } else {
+    sorts.forEach((sort) => {
+      queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
+    })
+  }
 
   // Starting from page 0, fetch 500 records per call
   let page = -1
@@ -94,22 +125,17 @@ export const getTableRowsSqlQuery = ({
 }: GetTableRowsArgs) => {
   const query = new Query()
 
-  if (!table) {
-    return ``
-  }
+  if (!table) return ``
 
-  const enumArrayColumns = table.columns
-    .filter((column) => {
-      return (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
-    })
-    .map((column) => column.name)
+  const arrayBasedColumns = table.columns
+    .filter(
+      (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+    )
+    .map((column) => `"${column.name}"::text[]`)
 
-  let queryChains =
-    enumArrayColumns.length > 0
-      ? query
-          .from(table.name, table.schema ?? undefined)
-          .select(`*,${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`)
-      : query.from(table.name, table.schema ?? undefined).select()
+  let queryChains = query
+    .from(table.name, table.schema ?? undefined)
+    .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
 
   filters
     .filter((x) => x.value && x.value != '')
@@ -117,20 +143,40 @@ export const getTableRowsSqlQuery = ({
       const value = formatFilterValue(table, x)
       queryChains = queryChains.filter(x.column, x.operator, value)
     })
-  sorts.forEach((x) => {
-    queryChains = queryChains.order(x.column, x.ascending, x.nullsFirst)
-  })
+
+  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
+  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
+    const defaultOrderByColumn = getDefaultOrderByColumn(table)
+    if (defaultOrderByColumn) {
+      queryChains = queryChains.order(table.name, defaultOrderByColumn, true, true)
+    }
+  } else {
+    sorts.forEach((x) => {
+      queryChains = queryChains.order(x.table, x.column, x.ascending, x.nullsFirst)
+    })
+  }
 
   // getPagination is expecting to start from 0
   const { from, to } = getPagination((page ?? 1) - 1, limit)
-  const sql = queryChains.range(from, to).toSql()
+  const baseSql = queryChains.range(from, to).toSql()
 
-  return sql
+  // [Joshen] Only truncate text/json based columns as their length could go really big
+  // Note: Risk of payload being too large if the user has many many text/json based columns
+  // although possibly negligible risk.
+  const truncatedColumns = table.columns
+    .filter((column) => TEXT_TYPES.includes(column.format) || JSON_TYPES.includes(column.format))
+    .map((column) => {
+      return `case when length("${column.name}"::text) > ${MAX_CHARACTERS} then concat(left("${column.name}"::text, ${MAX_CHARACTERS}), '...') else "${column.name}"::text end "${column.name}"`
+    })
+  const outputSql =
+    truncatedColumns.length > 0
+      ? `with _temp as (${baseSql.slice(0, -1)}) select *, ${truncatedColumns.join(',')} from _temp`
+      : baseSql
+
+  return outputSql
 }
 
-export type TableRows = {
-  rows: SupaRow[]
-}
+export type TableRows = { rows: SupaRow[] }
 
 export type TableRowsVariables = GetTableRowsArgs & {
   projectRef?: string
@@ -139,7 +185,7 @@ export type TableRowsVariables = GetTableRowsArgs & {
 }
 
 export type TableRowsData = TableRows
-export type TableRowsError = unknown
+export type TableRowsError = ExecuteSqlError
 
 export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
   { projectRef, connectionString, queryKey, table, impersonatedRole, ...args }: TableRowsVariables,
@@ -158,7 +204,11 @@ export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
       queryKey: [
         ...(queryKey ?? []),
         {
-          table: { name: table?.name, schema: table?.schema },
+          table: {
+            name: table?.name,
+            schema: table?.schema,
+            columns: table?.columns.map((c) => c.name),
+          },
           impersonatedRole,
           ...args,
         },

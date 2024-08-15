@@ -2,12 +2,12 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import toast from 'react-hot-toast'
 
 import type { components } from 'data/api'
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
-export type InsertContentPayload = Omit<components['schemas']['CreateContentParams'], 'content'> & {
+export type InsertContentPayload = Omit<components['schemas']['CreateContentBody'], 'content'> & {
   content: Content['content']
 }
 
@@ -15,6 +15,8 @@ export type InsertContentVariables = {
   projectRef: string
   payload: InsertContentPayload
 }
+
+export type InsertContentResponse = components['schemas']['UserContentObject']
 
 export async function insertContent(
   { projectRef, payload }: InsertContentVariables,
@@ -33,9 +35,10 @@ export async function insertContent(
     },
     signal,
   })
-  if (error) throw error
+  if (error) handleError(error)
 
-  return data
+  // [Joshen] There's an issue with the API codegen due to content endpoint having 2 versions
+  return data as unknown as InsertContentResponse[]
 }
 
 export type InsertContentData = Awaited<ReturnType<typeof insertContent>>

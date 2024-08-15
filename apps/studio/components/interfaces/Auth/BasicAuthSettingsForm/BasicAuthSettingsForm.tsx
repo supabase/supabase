@@ -1,38 +1,34 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { ExternalLink, Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { boolean, number, object, string } from 'yup'
+
+import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import NoPermission from 'components/ui/NoPermission'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   Form,
-  IconAlertCircle,
-  IconEye,
-  IconEyeOff,
   Input,
   InputNumber,
   Toggle,
 } from 'ui'
-import { boolean, number, object, string } from 'yup'
-
-import { Markdown } from 'components/interfaces/Markdown'
-import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import Link from 'next/link'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import FormField from '../AuthProvidersForm/FormField'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
@@ -90,6 +86,7 @@ const BasicAuthSettingsForm = () => {
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const [hidden, setHidden] = useState(true)
+  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const organization = useSelectedOrganization()
@@ -145,11 +142,15 @@ const BasicAuthSettingsForm = () => {
   if (isError) {
     return (
       <Alert_Shadcn_ variant="destructive">
-        <IconAlertCircle strokeWidth={2} />
+        <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
+  }
+
+  if (!canReadConfig) {
+    return <NoPermission resourceText="view auth configuration settings" />
   }
 
   return (
@@ -233,17 +234,30 @@ const BasicAuthSettingsForm = () => {
                             Anonymous users will use the{' '}
                             <code className="text-xs">authenticated</code> role when signing in
                           </AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
-                            As a result, anonymous users will be subjected to RLS policies that
-                            apply to the <code className="text-xs">public</code> and{' '}
-                            <code className="text-xs">authenticated</code> roles. We strongly advise{' '}
-                            <Link
-                              href={`/project/${projectRef}/auth/policies`}
-                              className="text-foreground underline"
+                          <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
+                            <p>
+                              As a result, anonymous users will be subjected to RLS policies that
+                              apply to the <code className="text-xs">public</code> and{' '}
+                              <code className="text-xs">authenticated</code> roles. We strongly
+                              advise{' '}
+                              <Link
+                                href={`/project/${projectRef}/auth/policies`}
+                                className="text-foreground underline"
+                              >
+                                reviewing your RLS policies
+                              </Link>{' '}
+                              to ensure that access to your data is restricted where required.
+                            </p>
+                            <Button
+                              asChild
+                              type="default"
+                              className="w-min"
+                              icon={<ExternalLink size={14} />}
                             >
-                              reviewing your RLS policies
-                            </Link>{' '}
-                            to ensure that access to your data is restricted where required.
+                              <Link href="/docs/guides/auth/auth-anonymous#access-control">
+                                View access control docs
+                              </Link>
+                            </Button>
                           </AlertDescription_Shadcn_>
                         </div>
                       </Alert_Shadcn_>
@@ -318,8 +332,6 @@ const BasicAuthSettingsForm = () => {
                     <UpgradeToPro
                       primaryText="Upgrade to Pro"
                       secondaryText="Leaked password protection available on Pro plans and up."
-                      projectRef={projectRef!}
-                      organizationSlug={organization!.slug}
                     />
                   )}
                   <Toggle
@@ -340,9 +352,7 @@ const BasicAuthSettingsForm = () => {
                   ) : (
                     <UpgradeToPro
                       primaryText="Upgrade to Pro"
-                      secondaryText="Configuring user sessions requires the Pro plan."
-                      projectRef={projectRef!}
-                      organizationSlug={organization!.slug}
+                      secondaryText="Configuring user sessions requires the Pro Plan."
                     />
                   )}
                   <Toggle
@@ -424,7 +434,7 @@ const BasicAuthSettingsForm = () => {
                         disabled={!canUpdateConfig}
                         actions={
                           <Button
-                            icon={hidden ? <IconEye /> : <IconEyeOff />}
+                            icon={hidden ? <Eye /> : <EyeOff />}
                             type="default"
                             onClick={() => setHidden(!hidden)}
                           />

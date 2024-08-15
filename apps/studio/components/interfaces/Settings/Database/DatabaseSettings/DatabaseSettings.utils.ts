@@ -29,7 +29,7 @@ export const getConnectionStrings = (
     : `postgresql://${user}:${password}@` + `${host}:${port}` + `/${name}`
   const golangConnString = `user=${user} password=${password} host=${host} port=${port} dbname=${name}${showOptions ? ` options=reference=${projectRef}` : ''}`
   const psqlConnString = isMd5
-    ? `psql "postgresql://${user}:${password}@${host}:${port}/${name}${usePoolerConnection ? `?options=reference%3D${projectRef}` : ''}`
+    ? `psql "postgresql://${user}:${password}@${host}:${port}/${name}${usePoolerConnection ? `?options=reference%3D${projectRef}` : ''}"`
     : `psql -h ${host} -p ` + `${port} -d ${name} ` + `-U ${user}`
   const jdbcConnString = `jdbc:postgresql://${host}:${port}/${name}?user=${user}&password=${password}${showOptions ? `&options=reference%3D${projectRef}` : ''}`
   const dotNetConnString = `User Id=${user};Password=${password};Server=${host};Port=${port};Database=${name};${showOptions ? `Options='reference=${projectRef}'` : ''}`
@@ -90,7 +90,7 @@ export const constructConnStringSyntax = (
   if (selectedTab === 'uri' || selectedTab === 'nodejs') {
     if (isMd5) {
       return [
-        { value: 'postgres://', tooltip: undefined },
+        { value: 'postgresql://', tooltip: undefined },
         { value: '[user]', tooltip: DB_USER_DESC },
         { value: ':', tooltip: undefined },
         { value: '[password]', tooltip: DB_PASS_DESC },
@@ -109,7 +109,7 @@ export const constructConnStringSyntax = (
       ]
     } else {
       return [
-        { value: 'postgres://', tooltip: undefined },
+        { value: 'postgresql://', tooltip: undefined },
         { value: '[user]', tooltip: DB_USER_DESC },
         ...(usePoolerConnection
           ? [

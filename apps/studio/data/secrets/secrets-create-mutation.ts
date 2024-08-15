@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { secretsKeys } from './keys'
 
@@ -18,7 +18,7 @@ export async function createSecrets({ projectRef, secrets }: SecretsCreateVariab
     body: secrets,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

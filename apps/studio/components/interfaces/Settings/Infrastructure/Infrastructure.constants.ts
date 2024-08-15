@@ -84,6 +84,10 @@ export const INFRA_ACTIVITY_METRICS: CategoryMeta[] = [
             url: 'https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops',
           },
           {
+            name: 'Interpreting Disk IO budget',
+            url: 'https://supabase.com/docs/guides/platform/compute-add-ons#bursting-and-disk-io-budget',
+          },
+          {
             name: 'Metrics',
             url: 'https://supabase.com/docs/guides/platform/metrics',
           },

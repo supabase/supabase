@@ -35,25 +35,24 @@ const PROVIDER_EMAIL = {
       type: 'boolean',
     },
     MAILER_OTP_EXP: {
-      title: 'Mailer OTP Expiration',
+      title: 'Email OTP Expiration',
       type: 'number',
       description: 'Duration before an email otp / link expires.',
       units: 'seconds',
     },
-    PASSWORD_MIN_LENGTH: {
-      title: 'Min password length',
-      description: 'Users will not be able to use a password shorter than this.',
+    MAILER_OTP_LENGTH: {
+      title: 'Email OTP Length',
       type: 'number',
+      description: 'Number of digits in the email OTP',
+      units: 'number',
     },
   },
   validationSchema: object().shape({
-    PASSWORD_MIN_LENGTH: number()
-      .required('A password is required.')
-      .min(6, 'Password length must be at least 6 characters long'),
     MAILER_OTP_EXP: number()
       .min(0, 'Must be more than 0')
       .max(86400, 'Must be no more than 86400')
       .required('This is required'),
+    MAILER_OTP_LENGTH: number().min(6, 'Must be at least 6').max(10, 'Must be no more than 10'),
   }),
   misc: {
     iconKey: 'email-icon2',
@@ -1171,7 +1170,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
 const EXTERNAL_PROVIDER_SLACK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'Slack',
+  title: 'Slack (Deprecated)',
   properties: {
     EXTERNAL_SLACK_ENABLED: {
       title: 'Slack enabled',
@@ -1195,6 +1194,44 @@ const EXTERNAL_PROVIDER_SLACK = {
       otherwise: (schema) => schema,
     }),
     EXTERNAL_SLACK_SECRET: string().when('EXTERNAL_SLACK_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client Secret is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'slack-icon',
+    requiresRedirect: true,
+  },
+}
+
+const EXTERNAL_PROVIDER_SLACK_OIDC = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Slack (OIDC)',
+  properties: {
+    EXTERNAL_SLACK_OIDC_ENABLED: {
+      title: 'Slack enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_SLACK_OIDC_CLIENT_ID: {
+      title: 'Client ID',
+      type: 'string',
+    },
+    EXTERNAL_SLACK_OIDC_SECRET: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_SLACK_OIDC_ENABLED: boolean().required(),
+    EXTERNAL_SLACK_OIDC_CLIENT_ID: string().when('EXTERNAL_SLACK_OIDC_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client ID is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_SLACK_OIDC_SECRET: string().when('EXTERNAL_SLACK_OIDC_ENABLED', {
       is: true,
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
@@ -1342,9 +1379,17 @@ const PROVIDER_SAML = {
         'You will need to use the [Supabase CLI](https://supabase.com/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it',
       type: 'boolean',
     },
+    SAML_EXTERNAL_URL: {
+      title: 'SAML metadata URL',
+      description:
+        'You may use a different SAML metadata URL from what is defined with the API External URL. Please validate that your SAML External URL can reach the Custom Domain or Project URL',
+      descriptionOptional: 'Optional',
+      type: 'string',
+    },
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
+    SAML_EXTERNAL_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'saml-icon',
@@ -1370,6 +1415,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_NOTION,
   EXTERNAL_PROVIDER_TWITCH,
   EXTERNAL_PROVIDER_TWITTER,
+  EXTERNAL_PROVIDER_SLACK_OIDC,
   EXTERNAL_PROVIDER_SLACK,
   EXTERNAL_PROVIDER_SPOTIFY,
   EXTERNAL_PROVIDER_WORKOS,

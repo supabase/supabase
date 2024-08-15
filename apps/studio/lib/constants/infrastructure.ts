@@ -1,40 +1,13 @@
+import type { CloudProvider } from 'shared-data'
+import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
+
 import type { components } from 'data/api'
 
-export type CloudProvider = 'FLY' | 'AWS'
-export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
-
-// Alias regions remain as the starting point for project creation
-// they are immediately translated to their respective cloud regions
-// and are afterward never referred to
-
-export const AWS_REGIONS = {
-  WEST_US: 'West US (North California)',
-  EAST_US: 'East US (North Virginia)',
-  CENTRAL_CANADA: 'Canada (Central)',
-  WEST_EU: 'West EU (Ireland)',
-  WEST_EU_2: 'West EU (London)',
-  // 'North EU': 'North EU',
-  CENTRAL_EU: 'Central EU (Frankfurt)',
-  SOUTH_ASIA: 'South Asia (Mumbai)',
-  SOUTHEAST_ASIA: 'Southeast Asia (Singapore)',
-  NORTHEAST_ASIA: 'Northeast Asia (Tokyo)',
-  NORTHEAST_ASIA_2: 'Northeast Asia (Seoul)',
-  OCEANIA: 'Oceania (Sydney)',
-  SOUTH_AMERICA: 'South America (São Paulo)',
-  // SOUTH_AFRICA: 'South Africa (Cape Town)',
-} as const
-
-export type AWS_REGIONS_KEYS = keyof typeof AWS_REGIONS
-
-export const FLY_REGIONS = {
-  SOUTHEAST_ASIA: 'Singapore',
-} as const
-
 export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.EAST_US
 
 // TO DO, change default to US region for prod
-const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
+export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
 
 export const PRICING_TIER_LABELS_ORG = {
   FREE: 'Free - $0/month',
@@ -50,8 +23,7 @@ export const PRICING_TIER_PRODUCT_IDS = {
   ENTERPRISE: 'tier_enterprise',
 }
 
-export const DEFAULT_PROVIDER: CloudProvider =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? 'FLY' : 'AWS'
+export const DEFAULT_PROVIDER: CloudProvider = 'AWS'
 
 export const PROVIDERS = {
   FLY: {
@@ -70,7 +42,7 @@ export const PROVIDERS = {
 } as const
 
 export const PROJECT_STATUS: {
-  [key: string]: components['schemas']['ProjectDetailResponse']['status']
+  [key: string]: components['schemas']['ResourceWithServicesStatusResponse']['status']
 } = {
   INACTIVE: 'INACTIVE',
   ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',
@@ -80,12 +52,12 @@ export const PROJECT_STATUS: {
   GOING_DOWN: 'GOING_DOWN',
   INIT_FAILED: 'INIT_FAILED',
   REMOVED: 'REMOVED',
+  RESTARTING: 'RESTARTING',
   RESTORING: 'RESTORING',
+  RESTORE_FAILED: 'RESTORE_FAILED',
   UPGRADING: 'UPGRADING',
-  // @ts-ignore [Joshen] API codegen seems to be wrong here, pausing is still a valid status
   PAUSING: 'PAUSING',
-  // @ts-ignore [Joshen] This is no longer part of the project status enum, but leaving here for now just in case
-  RESTORATION_FAILED: 'RESTORATION_FAILED',
+  PAUSE_FAILED: 'PAUSE_FAILED',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4

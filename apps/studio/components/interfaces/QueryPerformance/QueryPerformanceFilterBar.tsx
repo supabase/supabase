@@ -1,5 +1,13 @@
+import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { FilterPopover } from 'components/ui/FilterPopover'
+import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
+import { DbQueryHook } from 'hooks/analytics/useDbQuery'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -7,139 +15,141 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  IconArrowDown,
-  IconArrowUp,
-  IconRefreshCw,
-  IconSearch,
-  Input,
 } from 'ui'
+import { QueryPerformanceSort } from '../Reports/Reports.queries'
+import { TextSearchPopover } from './TextSearchPopover'
 
 export const QueryPerformanceFilterBar = ({
-  isLoading,
-  onRefreshClick,
+  queryPerformanceQuery,
+  onResetReportClick,
 }: {
-  isLoading: boolean
-  onRefreshClick: () => void
+  queryPerformanceQuery: DbQueryHook<any>
+  onResetReportClick?: () => void
 }) => {
   const router = useRouter()
+  const { project } = useProjectContext()
+  const [showBottomSection] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
+    true
+  )
   const defaultSearchQueryValue = router.query.search ? String(router.query.search) : ''
-  const defaultSortByValue = router.query.sort ? String(router.query.sort) : 'lat_desc'
+  const defaultFilterRoles = router.query.roles ? (router.query.roles as string[]) : []
+  const defaultSortByValue = router.query.sort
+    ? ({ column: router.query.sort, order: router.query.order } as QueryPerformanceSort)
+    : undefined
+
   const [searchInputVal, setSearchInputVal] = useState(defaultSearchQueryValue)
-  const [sortByValue, setSortByValue] = useState(defaultSortByValue)
+  const [filters, setFilters] = useState<{ roles: string[]; query: string }>({
+    roles: typeof defaultFilterRoles === 'string' ? [defaultFilterRoles] : defaultFilterRoles,
+    query: '',
+  })
+  // [Joshen] This is for the old UI, can deprecated after
+  const [sortByValue, setSortByValue] = useState<QueryPerformanceSort>(
+    defaultSortByValue ?? { column: 'prop_total_time', order: 'desc' }
+  )
+
+  const { isLoading, isRefetching } = queryPerformanceQuery
+  const { data, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
+
+  const onSearchQueryChange = (value: string) => {
+    setSearchInputVal(value)
+
+    if (!value || typeof value !== 'string') {
+      // if user has deleted the search query, remove it from the url
+      const { search, ...rest } = router.query
+      router.push({ ...router, query: { ...rest } })
+    } else {
+      router.push({ ...router, query: { ...router.query, search: value } })
+    }
+  }
+
+  const onFilterRolesChange = (roles: string[]) => {
+    setFilters({ ...filters, roles })
+    router.push({ ...router, query: { ...router.query, roles } })
+  }
 
   function getSortButtonLabel() {
-    const sort = router.query.sort as 'lat_desc' | 'lat_asc'
-
-    if (sort === 'lat_desc') {
+    if (defaultSortByValue?.order === 'desc') {
       return 'Sorted by latency - high to low'
     } else {
       return 'Sorted by latency - low to high'
     }
   }
 
-  function onSortChange(sort: string) {
-    setSortByValue(sort)
-    router.push({
-      ...router,
-      query: {
-        ...router.query,
-        sort,
-      },
-    })
+  const onSortChange = (order: 'asc' | 'desc') => {
+    setSortByValue({ column: 'prop_total_time', order })
+    router.push({ ...router, query: { ...router.query, sort: 'prop_total_time', order } })
   }
 
-  const ButtonIcon = sortByValue === 'lat_desc' ? IconArrowDown : IconArrowUp
-
   return (
-    <>
-      <div className="flex justify-between items-center">
-        <form
-          className="py-3 flex gap-4"
-          id="log-panel-search"
-          onSubmit={(e) => {
-            e.preventDefault()
-            const formData = new FormData(e.target as HTMLFormElement)
-            const searchQuery = formData.get('search')
-
-            if (!searchQuery || typeof searchQuery !== 'string') {
-              // if user has deleted the search query, remove it from the url
-              const { search, ...rest } = router.query
-              router.push({
-                ...router,
-                query: {
-                  ...rest,
-                },
-              })
-              return
-            }
-
-            router.push({
-              ...router,
-              query: {
-                ...router.query,
-                search: searchQuery,
-              },
-            })
-          }}
-        >
-          <Input
-            className="w-60 group"
-            size="tiny"
-            placeholder="Search roles or queries"
-            name="search"
-            value={searchInputVal}
-            onChange={(e) => setSearchInputVal(e.target.value)}
-            autoComplete="off"
-            icon={
-              <div className="text-foreground-lighter">
-                <IconSearch size={14} />
-              </div>
-            }
-            actions={
-              searchInputVal !== '' && (
-                <button className="mx-2 text-foreground-light hover:text-foreground">{'↲'}</button>
-              )
-            }
+    <div className="flex justify-between items-center">
+      <div className="flex items-center gap-x-4">
+        <div className="flex items-center gap-x-2">
+          <p className="text-xs prose">Filter by</p>
+          <FilterPopover
+            name="Roles"
+            options={roles}
+            labelKey="name"
+            valueKey="name"
+            activeOptions={isLoadingRoles ? [] : filters.roles}
+            onSaveFilters={onFilterRolesChange}
           />
+          <TextSearchPopover name="Query" value={searchInputVal} onSaveText={onSearchQueryChange} />
+
+          <div className="border-r border-strong h-6" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button icon={<ButtonIcon />}>{getSortButtonLabel()}</Button>
+              <Button icon={sortByValue?.order === 'desc' ? <ArrowDown /> : <ArrowUp />}>
+                {getSortButtonLabel()}
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
-              <DropdownMenuRadioGroup value={sortByValue} onValueChange={onSortChange}>
-                <DropdownMenuRadioItem
-                  defaultChecked={router.query.sort === 'lat_desc'}
-                  value={'lat_desc'}
-                >
+              <DropdownMenuRadioGroup
+                value={sortByValue?.order}
+                onValueChange={(value: any) => onSortChange(value)}
+              >
+                <DropdownMenuRadioItem value="desc" defaultChecked={sortByValue?.order === 'desc'}>
                   Sort by latency - high to low
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem
-                  value={'lat_asc'}
-                  defaultChecked={router.query.sort === 'lat_asc'}
-                >
+                <DropdownMenuRadioItem value="asc" defaultChecked={sortByValue?.order === 'asc'}>
                   Sort by latency - low to high
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-        </form>
-        <div>
-          <Button
-            type="default"
-            size="tiny"
-            onClick={onRefreshClick}
-            disabled={isLoading ? true : false}
-            icon={
-              <IconRefreshCw
-                size="tiny"
-                className={`text-foreground-light ${isLoading ? 'animate-spin' : ''}`}
-              />
-            }
-          >
-            {isLoading ? 'Refreshing' : 'Refresh'}
-          </Button>
         </div>
       </div>
-    </>
+
+      <div className="flex gap-2 items-center">
+        {!showBottomSection && onResetReportClick && (
+          <Button
+            onClick={() => {
+              onResetReportClick()
+            }}
+            type="default"
+          >
+            Reset report
+          </Button>
+        )}
+        <Button
+          type="default"
+          size="tiny"
+          onClick={() => queryPerformanceQuery.runQuery()}
+          disabled={isLoading || isRefetching}
+          icon={
+            <RefreshCw
+              size={12}
+              className={`text-foreground-light ${isLoading || isRefetching ? 'animate-spin' : ''}`}
+            />
+          }
+        >
+          Refresh
+        </Button>
+      </div>
+    </div>
   )
 }

@@ -57,7 +57,7 @@ functions:
              scheme = "deeplink scheme"
 
              // On Android only, you can set OAuth and SSO logins to open in a custom tab, rather than an external browser:
-             defaultExternalAuthAction = ExternalAuthAction.CUSTOM_TABS //defaults to EXTERNAL_BROWSER
+             defaultExternalAuthAction = ExternalAuthAction.CustomTabs() //defaults to ExternalAuthAction.ExternalBrowser
           }
           ```
       4. **Call platform specific function on startup** \
@@ -684,10 +684,10 @@ functions:
         isOptional: true # Not directly `optional`, as there are two overloads one with and one without `parameters`.
         type: T
         description: Parameters to pass to the function. T can be any serializable type.
-      - name: head
+      - name: method
         isOptional: true
-        type: Boolean
-        description: If true, delete will delete the selected data.
+        type: RpcMethod
+        description: The HTTP method to use. Defaults  to `RpcMethod.POST`
       - name: request
         isOptional: true
         type: PostgrestRequestBuilder.() -> Unit
@@ -2163,7 +2163,7 @@ functions:
           with advanced operators.
 
           - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
-          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by `<->` operators, as if processed by phraseto_tsquery.
           - `OR`: the word “or” will be converted to the | operator.
           - `-`: a dash will be converted to the ! operator.
 
@@ -2811,7 +2811,7 @@ functions:
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, the return value is the user and you won't be logged in automatically.
         - If **Confirm email** is disabled, the return value is null and you will be logged in instead.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/guides/auth/concepts/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/guides/auth/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - If signUpWith() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
@@ -3050,7 +3050,7 @@ functions:
       - The method `signUpWith(OTP)` does the exact same thing as `signInWith(OTP)`, so it doesn't matter which one you use.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls).
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
@@ -3148,7 +3148,7 @@ functions:
         name: Create a custom url
         isSpotlight: false
         description: |
-          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectUrl` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls). It does not redirect the user immediately after invoking this method.
+          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectUrl` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls). It does not redirect the user immediately after invoking this method.
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
           - getOAuthUrl() provides the URL which needs to be opened in a browser.
           - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
@@ -3317,7 +3317,7 @@ functions:
     title: 'reauthenticate()'
     $ref: '@supabase/gotrue-js.GoTrueClient.reauthenticate'
     notes: |
-      - This method is used together with `modifyUser()` when a user's password needs to be updated.
+      - This method is used together with `updateUser()` when a user's password needs to be updated.
       - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
     examples:
       - id: send-reauthentication-nonce
@@ -3422,11 +3422,11 @@ functions:
           val user = supabase.auth.retrieveUser("JWT")
           ```
   - id: update-user
-    title: 'modifyUser()'
+    title: 'updateUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
       Modifies the user data.
-      - In order to use the `modifyUser()` method, the user needs to be signed in first.
+      - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
     params:
@@ -3469,7 +3469,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = supabase.auth.modifyUser {
+          val user = supabase.auth.updateUser {
              email = "newEmail@email.com"
           }
           ```
@@ -3478,7 +3478,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = supabase.auth.modifyUser {
+          val user = supabase.auth.updateUser {
              password = "secretPassword"
           }
           ```
@@ -3487,7 +3487,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = supabase.auth.modifyUser {
+          val user = supabase.auth.updateUser {
              data {
                 put("name", "John")
              }
@@ -3681,11 +3681,11 @@ functions:
       Sends a password reset request to the given email address.
       - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
       - The `resetPasswordForEmail()` only sends a password reset link to the user's email.
-      To update the user's password, see [`modifyUser()`](/docs/reference/kotlin/auth-updateuser).
+      To update the user's password, see [`updateUser()`](/docs/reference/kotlin/auth-updateuser).
       - The user gets redirected back to your app, assuming you setup [OTP handling](/docs/reference/kotlin/initializing)
-      - After the user has been redirected successfully, prompt them for a new password and call `modifyUser()`:
+      - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
         ```kotlin
-        supabase.auth.modifyUser {
+        supabase.auth.updateUser {
             password = "1234567"
         }
         ```
@@ -3945,8 +3945,7 @@ functions:
               supabaseKey = "supabaseKey"
           ) {
               install(Auth) {
-                  autoLoadFromStorage = false
-                  alwaysAutoRefresh = false
+                  minimalSettings() //disables session saving and auto-refreshing
               }
               // install other plugins (these will use the service role key)
           }
@@ -4380,6 +4379,10 @@ functions:
           isOptional: true
           type: T
           description: The body to send with the request. T can be any serializable type.
+        - name: region
+          isOptional: true
+          type: FunctionRegion
+          description: The region where the function is invoked. Defaults to `Functions.Config#defaultRegion`.
         - name: headers
           isOptional: true
           type: Headers
@@ -4390,7 +4393,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.functions.invoke("function_name")
+          val response = supabase.functions.invoke("function_name")
+
+          // Decode the response body to a serializable class
+          val data = response.body<FunctionResponse>()
           ```
       - id: basic-invocation-with-body
         name: Basic invocation with body
@@ -4407,6 +4413,8 @@ functions:
             }
           )
           ```
+        description: |
+          The return type of the invoking methods is an `HttpResponse`. You can access the response body via `response.body<T>()`, where `T` can be any serializable type.
       - id: reuse-function
         name: Reuse function by saving it to a variable
         isSpotlight: true
@@ -4430,6 +4438,74 @@ functions:
               parameter("Key", "Value") //url parameter
           }
           ```
+  - id: stream
+    title: 'stream()'
+    description: |
+      Return real-time data from your table as a [Flow](https://kotlinlang.org/docs/flow.html).
+      - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
+      - `selectAsFlow` and `selectSingleValueAsFlow` will emit the initial data and then listen for changes.
+      - Takes in a `filter` parameter to filter the data and a `primaryKey` parameter to cache the data by the primary key.
+      - This method requires both the `Realtime` and `Postgrest` plugins to be installed.
+      - The type parameter `T` must be a [serializable class](/docs/reference/kotlin/installing#serialization).
+      - If you want more control over the realtime updates, you can use the `Realtime` plugin directly.
+    params:
+      - name: primaryKey
+        isOptional: false
+        type: KProperty1<Data, Value> or PrimaryKey<Data>
+        description: The primary key to cache the data by. Can be a property reference or a custom primary key.
+      - name: channelName
+        isOptional: true
+        type: String
+        description: The name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
+      - name: filter
+        isOptional: true
+        type: PostgrestFilterBuilder.() -> Unit or FilterOperation
+        description: The filter to apply to the data.
+    examples:
+      - id: select-as-flow
+        name: Listen for changes in multiple rows
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val flow: Flow<List<Country>> = supabase.from("countries").selectAsFlow(Country::id)
+          flow.collect {
+              for (country in it) {
+                  println(country.name)
+              }
+          }
+          ```
+      - id: select-as-flow-filter
+        name: Listen for changes in multiple rows with a filter
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val flow: Flow<List<Country>> = supabase.from("countries").selectAsFlow(
+              Country::id,
+              filter = FilterOperation("name", FilterOperator.ILIKE, "a%")
+          )
+          flow.collect {
+              for (country in it) {
+                  println(country.name)
+              }
+          }
+          ```
+      - id: select-single-value-as-flow
+        name: Listen for changes in a single row
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val flow: Flow<Country> = supabase.from("countries").selectSingleValueAsFlow(Country::id) {
+              //You can use the same filter methods as in the `select` method, but the result is limited to a single row
+              Country::id eq 1
+              //or
+              eq("id", 1)
+          }
+          flow.collect {
+              println("My country is $it")
+          }
+          ```
+        description: |
+          The flow will end if the row is deleted.
   - id: subscribe
     description: |
       Subscribe to realtime changes in your database.
@@ -4448,15 +4524,15 @@ functions:
           data class Message(val content: String, val sender: String)
 
           val channel = supabase.channel("channelId") {
-              //optional config
+              // optional config
           }
 
           val broadcastFlow = channel.broadcastFlow<Message>(event = "message")
 
-          //Collect the flow
-          broadcastFlow.collect { //it: Message
+          // Collect the flow
+          broadcastFlow.onEach { // it: Message
               println(it)
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe(blockUntilSubscribed = true)
 
@@ -4477,11 +4553,11 @@ functions:
           val presenceFlow = channel.presenceDataFlow<PresenceState>() 
 
           //Collect the flow
-          presenceFlow.collect {
+          presenceFlow.onEach {
               for (presence in it) {
                   println(presence.username)
               }
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe(blockUntilSubscribed = true)
           //send your own state
@@ -4500,14 +4576,14 @@ functions:
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public")
 
           //Collect the flow
-          changeFlow.collect {
+          changeFlow.onEach {
               when(it) {
                   is PostgresAction.Delete -> println("Deleted: ${it.oldRecord}")
                   is PostgresAction.Insert -> println("Inserted: ${it.record}")
                   is PostgresAction.Select -> println("Selected: ${it.record}")
                   is PostgresAction.Update -> println("Updated: ${it.oldRecord} with ${it.record}")
               }
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe()
           ```
@@ -4529,14 +4605,14 @@ functions:
           }
 
           //Collect the flow
-          changeFlow.collect {
+          changeFlow.onEach {
               when(it) {
                   is PostgresAction.Delete -> println("Deleted: ${it.oldRecord}")
                   is PostgresAction.Insert -> println("Inserted: ${it.record}")
                   is PostgresAction.Select -> println("Selected: ${it.record}")
                   is PostgresAction.Update -> println("Updated: ${it.oldRecord} with ${it.record}")
               }
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe()
           ```
@@ -4556,9 +4632,9 @@ functions:
           }
 
           //Collect the flow
-          changeFlow.collect {
+          changeFlow.onEach {
               println(it.record)
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe()
           ```
@@ -4582,10 +4658,10 @@ functions:
           }
 
           //Collect the flow
-          changeFlow.collect {
+          changeFlow.onEach {
               println(it.record)
               println(it.oldRecord)
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe()
           ```
@@ -4609,9 +4685,9 @@ functions:
           }
 
           //Collect the flow
-          changeFlow.collect {
+          changeFlow.onEach {
               println(it.oldRecord)
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe()
           ```
@@ -4636,9 +4712,9 @@ functions:
           }
 
           //Collect the flow
-          changeFlow.collect {
+          changeFlow.onEach {
               println(it.oldRecord)
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe()
           ```
@@ -5027,6 +5103,10 @@ functions:
         isOptional: false
         type: String
         description: The new path of the file.
+      - name: destinationBucket
+        isOptional: true
+        type: String
+        description: The destination bucket of the file.
     examples:
       - id: move-file
         name: Move file
@@ -5053,6 +5133,10 @@ functions:
         isOptional: false
         type: String
         description: The new path of the file.
+      - name: destinationBucket
+        isOptional: true
+        type: String
+        description: The destination bucket of the file.
     examples:
       - id: copy-file
         name: Copy file

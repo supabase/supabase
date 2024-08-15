@@ -1,33 +1,26 @@
+import { ChevronDown, Loader2, RefreshCw, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
 import toast from 'react-hot-toast'
+
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
+  IntegrationConnection,
+  IntegrationConnectionProps,
+} from 'components/interfaces/Integrations/IntegrationPanels'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconLoader,
-  IconRefreshCw,
-  IconTrash,
-  Modal,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-
-import {
-  IntegrationConnection,
-  IntegrationConnectionProps,
-} from 'components/interfaces/Integrations/IntegrationPanels'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
-import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
@@ -44,12 +37,17 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
     const isBranchingEnabled = project?.is_branch_enabled === true
 
     const [isOpen, setIsOpen] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
     const [dropdownVisible, setDropdownVisible] = useState(false)
 
     const onConfirm = useCallback(async () => {
       try {
+        setIsDeleting(true)
         await onDeleteConnection(connection)
+      } catch (error) {
+        // [Joshen] No need for error handler
       } finally {
+        setIsDeleting(false)
         setIsOpen(false)
       }
     }, [connection, onDeleteConnection])
@@ -78,9 +76,19 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
           showNode={false}
           actions={
             disabled ? (
-              <Button asChild disabled iconRight={<IconChevronDown />} type="default">
-                <span>Manage</span>
-              </Button>
+              <ButtonTooltip
+                disabled
+                iconRight={<ChevronDown size={14} />}
+                type="default"
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to manage this connection',
+                  },
+                }}
+              >
+                Manage
+              </ButtonTooltip>
             ) : (
               <DropdownMenu
                 open={dropdownVisible}
@@ -88,7 +96,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                 modal={false}
               >
                 <DropdownMenuTrigger asChild>
-                  <Button iconRight={<IconChevronDown />} type="default">
+                  <Button iconRight={<ChevronDown size={14} />} type="default">
                     <span>Manage</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -115,9 +123,9 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                       disabled={isSyncEnvLoading}
                     >
                       {isSyncEnvLoading ? (
-                        <IconLoader className="animate-spin" size={14} />
+                        <Loader2 className="animate-spin" size={14} />
                       ) : (
-                        <IconRefreshCw size={14} />
+                        <RefreshCw size={14} />
                       )}
                       <p>Resync environment variables</p>
                     </DropdownMenuItem>
@@ -126,7 +134,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                     <DropdownMenuSeparator />
                   )}
                   <DropdownMenuItem className="space-x-2" onSelect={() => setIsOpen(true)}>
-                    <IconTrash size={14} />
+                    <Trash size={14} />
                     <p>Delete connection</p>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -144,6 +152,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
           confirmLabel="Delete connection"
           onCancel={onCancel}
           onConfirm={onConfirm}
+          loading={isDeleting}
           alert={
             type === 'GitHub' && isBranchingEnabled
               ? {
@@ -151,7 +160,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                   description: ` Deleting this GitHub connection will remove all preview branches on this project,
                 and also disable branching for ${project.name}`,
                 }
-              : {}
+              : undefined
           }
         >
           <p className="text-sm text-foreground-light">

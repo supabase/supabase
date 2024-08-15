@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Item, Menu, Separator } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
-import { IconClipboard, IconDownload, IconEdit, IconTrash2 } from 'ui'
 
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { IconClipboard, IconDownload, IconEdit, IconTrash2 } from 'ui'
 import { copyPathToFolder } from './StorageExplorer.utils'
 
 interface FolderContextMenuProps {

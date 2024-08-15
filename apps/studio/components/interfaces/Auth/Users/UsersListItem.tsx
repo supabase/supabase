@@ -9,16 +9,20 @@ import { getDisplayName } from './UserListItem.utils'
 
 interface UserListItemProps {
   user: User
-  canRemoveUser: boolean
-  canRemoveMFAFactors: boolean
+  permissions: {
+    canRemoveUser: boolean
+    canRemoveMFAFactors: boolean
+    canSendMagicLink: boolean
+    canSendRecovery: boolean
+    canSendOtp: boolean
+  }
   setSelectedUser: (user: User) => void
   setUserSidePanelOpen: (open: boolean) => void
 }
 
 const UserListItem = ({
   user,
-  canRemoveUser,
-  canRemoveMFAFactors,
+  permissions,
   setSelectedUser,
   setUserSidePanelOpen,
 }: UserListItemProps) => {
@@ -48,10 +52,10 @@ const UserListItem = ({
         <span className="text-foreground">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>
       </Table.td>
       <Table.td className="table-cell">
-        {!isUserConfirmed ? (
-          <Badge variant="warning">Waiting for verification..</Badge>
-        ) : user.last_sign_in_at ? (
+        {user?.last_sign_in_at ? (
           lastSignedIn?.format('DD MMM, YYYY HH:mm')
+        ) : !isUserConfirmed ? (
+          <Badge variant="warning">Waiting for verification..</Badge>
         ) : (
           'Never'
         )}
@@ -65,8 +69,7 @@ const UserListItem = ({
       <Table.td className="table-cell">
         <UserDropdown
           user={user}
-          canRemoveUser={canRemoveUser}
-          canRemoveMFAFactors={canRemoveMFAFactors}
+          permissions={permissions}
           setSelectedUser={setSelectedUser}
           setUserSidePanelOpen={setUserSidePanelOpen}
         />

@@ -39,7 +39,7 @@ for select using (true);`.trim(),
     statement: `
 create policy "Enable insert for authenticated users only"
 on "${schema}"."${table}"
-for insert to authenticated 
+for insert to authenticated
 with check (true);`.trim(),
     name: 'Enable insert for authenticated users only',
     definition: '',
@@ -57,13 +57,13 @@ with check (true);`.trim(),
 create policy "Enable update for users based on email"
 on "${schema}"."${table}"
 for update using (
-  auth.jwt() ->> 'email' = email
+  (select auth.jwt()) ->> 'email' = email
 ) with check (
-  auth.jwt() ->> 'email' = email
+  (select auth.jwt()) ->> 'email' = email
 );`.trim(),
     name: 'Enable update for users based on email',
-    definition: `auth.jwt() ->> 'email' = email`,
-    check: `auth.jwt() ->> 'email' = email`,
+    definition: `(select auth.jwt()) ->> 'email' = email`,
+    check: `(select auth.jwt()) ->> 'email' = email`,
     command: 'UPDATE',
     roles: [],
   },
@@ -77,10 +77,10 @@ for update using (
 create policy "Enable delete for users based on user_id"
 on "${schema}"."${table}"
 for delete using (
-  auth.uid() = user_id
+  (select auth.uid()) = user_id
 );`.trim(),
     name: 'Enable delete for users based on user_id',
-    definition: 'auth.uid() = user_id',
+    definition: '(select auth.uid()) = user_id',
     check: '',
     command: 'DELETE',
     roles: [],
@@ -95,11 +95,11 @@ for delete using (
 create policy "Enable insert for users based on user_id"
 on "${schema}"."${table}"
 for insert with check (
-  auth.uid() = user_id
+  (select auth.uid()) = user_id
 );`.trim(),
     name: 'Enable insert for users based on user_id',
     definition: '',
-    check: 'auth.uid() = user_id',
+    check: '(select auth.uid()) = user_id',
     command: 'INSERT',
     roles: [],
   },
@@ -110,17 +110,17 @@ for insert with check (
     templateName: 'Policy with table joins',
     description: `
 Query across tables to build more advanced RLS rules
-    
+
 Assuming 2 tables called \`teams\` and \`members\`, you can query both tables in the policy to control access to the members table.`,
     statement: `
 create policy "Members can update team details if they belong to the team"
 on teams for update using (
-  auth.uid() in (
+  (select auth.uid()) in (
     select user_id from members where team_id = id
   )
 );
 `.trim(),
-    definition: `auth.uid() in (select user_id from members where team_id = id)`,
+    definition: `(select auth.uid()) in (select user_id from members where team_id = id)`,
     check: '',
     command: 'UPDATE',
     roles: [],
@@ -130,8 +130,8 @@ on teams for update using (
     preview: true,
     templateName: 'Policy with security definer functions',
     description: `
-Useful in a many-to-many relationship where you want to restrict access to the linking table. 
-    
+Useful in a many-to-many relationship where you want to restrict access to the linking table.
+
 Assuming 2 tables called \`teams\` and \`members\`, you can use a security definer function in combination with a policy to control access to the members table.`.trim(),
     statement: `
 create or replace function get_teams_for_user(user_id uuid)
@@ -158,7 +158,7 @@ for all using (
     templateName: 'Policy to implement Time To Live (TTL)',
     description: `
 Implement a TTL-like feature that you see in Instagram stories or Snapchat where messages expire after a day.
-    
+
 Rows under the table are available only if they have been created within the last 24 hours.`,
     statement: `
 create policy "Stories are live for a day"
@@ -173,3 +173,137 @@ for select using (
     roles: [],
   },
 ]
+
+export const getRealtimePolicyTemplates = (): PolicyTemplate[] => {
+  const results = [
+    {
+      id: 'policy-broadcast-1',
+      preview: false,
+      templateName: 'Allow listening for broadcasts for authenticated users only',
+      description: 'This policy allows listening for broadcasts for authenticated users only.',
+      statement: `
+create policy  "Allow listening for broadcasts for authenticated users only"
+on realtime.messages for select
+to authenticated
+using ( realtime.messages.extension = 'broadcast' );`.trim(),
+      name: 'Allow listening for broadcasts for authenticated users only',
+      definition: "realtime.messages.extension = 'broadcast'",
+      check: '',
+      command: 'SELECT',
+      roles: ['authenticated'],
+    },
+    {
+      id: 'policy-broadcast-2',
+      preview: false,
+      templateName: 'Allow pushing broadcasts for authenticated users only',
+      description: 'This policy allows pushing broadcasts for authenticated users only.',
+      statement: `
+create policy "Allow pushing broadcasts for authenticated users only"
+ON realtime.messages for insert
+TO authenticated
+with check ( realtime.messages.extension = 'broadcast' );`.trim(),
+      name: 'Allow pushing broadcasts for authenticated users only',
+      definition: "realtime.messages.extension = 'broadcast'",
+      check: "realtime.messages.extension = 'broadcast'",
+      command: 'INSERT',
+      roles: ['authenticated'],
+    },
+    {
+      id: 'policy-broadcast-3',
+      preview: false,
+      templateName: 'Allow listening for broadcasts from a specific channel',
+      description: 'This policy allows listening for broadcasts from a specific channel.',
+      statement: `
+create policy "Allow listening for broadcasts from a specific channel"
+on realtime.messages for select
+using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' );`.trim(),
+      name: 'Allow listening for broadcasts from a specific channel',
+      definition: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
+      check: '',
+      command: 'SELECT',
+      roles: [],
+    },
+    {
+      id: 'policy-broadcast-4',
+      preview: false,
+      templateName: 'Allow pushing broadcasts to specific channel',
+      description: 'This policy allow pushing broadcasts to specific channel.',
+      statement: `
+create policy "Allow pushing broadcasts to specific channel"
+ON realtime.messages for insert
+with check ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' );`.trim(),
+      name: 'Allow pushing broadcasts to specific channel',
+      definition: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
+      check: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
+      command: 'INSERT',
+      roles: [],
+    },
+    {
+      id: 'policy-presences-1',
+      preview: false,
+      templateName: 'Allow listening for presences on all channels for authenticated users only',
+      description:
+        'This policy enables listening for presences on all channels for all authenticated users only.',
+      statement: `
+create policy "Allow listening for presences on all channels for authenticated users only"
+on realtime.messages for select
+to authenticated
+using ( realtime.messages.extension = 'presence' );`.trim(),
+      name: 'Allow listening for presences on all channels for authenticated users only',
+      definition: "realtime.messages.extension = 'presence'",
+      check: '',
+      command: 'SELECT',
+      roles: ['authenticated'],
+    },
+    {
+      id: 'policy-presences-2',
+      preview: false,
+      templateName: 'Allow broadcasting presences on all channels for authenticated users only',
+      description:
+        'This policy enables broadcasting presences on all channels for all authenticated users only.',
+      statement: `
+create policy "Allow broadcasting presences on all channels for authenticated users only"
+ON realtime.messages for insert
+TO authenticated
+with check ( realtime.messages.extension = 'presence' );
+  ;`.trim(),
+      name: 'Allow broadcasting presences on all channels for authenticated users only',
+      definition: "realtime.messages.extension = 'presence'",
+      check: "realtime.messages.extension = 'presence'",
+      command: 'INSERT',
+      roles: ['authenticated'],
+    },
+    {
+      id: 'policy-presences-3',
+      preview: false,
+      templateName: 'Allow listening for presences from a specific channel',
+      description: 'This policy enables listening for presences from a specific channel.',
+      statement: `
+create policy "Allow listening for presences from a specific channel"
+on realtime.messages for select
+using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' );`.trim(),
+      name: 'Allow listening for presences from a specific channel',
+      definition: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
+      check: '',
+      command: 'SELECT',
+      roles: [],
+    },
+    {
+      id: 'policy-presences-4',
+      preview: false,
+      templateName: 'Publish presence to a specific channel',
+      description: 'This policy allows publishing presence to a specific channel.',
+      statement: `
+create policy "Publish presence to a specific channel"
+ON realtime.messages for insert
+with check ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' );
+  ;`.trim(),
+      name: 'Publish presence to a specific channel',
+      definition: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
+      check: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
+      command: 'INSERT',
+      roles: [],
+    },
+  ] as PolicyTemplate[]
+  return results
+}

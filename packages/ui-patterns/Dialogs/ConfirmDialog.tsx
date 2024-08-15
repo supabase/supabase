@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 import { Button, Form, Modal } from 'ui'
 
@@ -59,11 +61,7 @@ const ConfirmModal = ({
       >
         {() => {
           return (
-            <div className="space-y-4 py-4">
-              <Modal.Content>
-                <p className="text-sm text-foreground-light">{description}</p>
-              </Modal.Content>
-              <Modal.Separator />
+            <>
               <Modal.Content>
                 <div className="flex items-center gap-2">
                   <Button
@@ -90,7 +88,7 @@ const ConfirmModal = ({
                   </Button>
                 </div>
               </Modal.Content>
-            </div>
+            </>
           )
         }}
       </Form>

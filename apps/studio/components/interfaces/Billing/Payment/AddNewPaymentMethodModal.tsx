@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 import { Modal } from 'ui'
 
 import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
@@ -132,15 +132,13 @@ const AddNewPaymentMethodModal = ({
         onCancel={onLocalCancel}
         className="PAYMENT"
       >
-        <div className="py-4 space-y-4">
-          <Elements stripe={stripePromise} options={options}>
-            <AddPaymentMethodForm
-              returnUrl={returnUrl}
-              onCancel={onLocalCancel}
-              onConfirm={onLocalConfirm}
-            />
-          </Elements>
-        </div>
+        <Elements stripe={stripePromise} options={options}>
+          <AddPaymentMethodForm
+            returnUrl={returnUrl}
+            onCancel={onLocalCancel}
+            onConfirm={onLocalConfirm}
+          />
+        </Elements>
       </Modal>
     </>
   )

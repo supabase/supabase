@@ -1,5 +1,5 @@
 // Import Swiper styles if swiper used on page
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 
 import { useState } from 'react'
 import { Button, IconArrowUpRight, Tabs } from 'ui'

@@ -221,7 +221,7 @@ Now that we have all the components in place, let's update `App.svelte`:
   import Account from './lib/Account.svelte'
   import Auth from './lib/Auth.svelte'
 
-  let session: AuthSession
+  let session: AuthSession | null
 
   onMount(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -269,9 +269,9 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
   import { supabase } from '../supabaseClient'
 
   export let size: number
-  export let url: string
+  export let url: string | null = null
 
-  let avatarUrl: string = null
+  let avatarUrl: string | null = null
   let uploading = false
   let files: FileList
 
@@ -341,8 +341,8 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
         id="single"
         accept="image/*"
         bind:files
-        on:change="{uploadAvatar}"
-        disabled="{uploading}"
+        on:change={uploadAvatar}
+        disabled={uploading}
       />
     </span>
   </div>

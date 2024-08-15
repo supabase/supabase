@@ -242,7 +242,7 @@ const uiConfig = ui({
               backgroundColor: 'hsl(var(--background-surface-200))',
               border: '1px solid ' + 'hsl(var(--background-surface-300))',
               borderRadius: theme('borderRadius.lg'),
-              wordBreak: 'break-all',
+              // wordBreak: 'break-all',
             },
             a: {
               position: 'relative',
@@ -372,10 +372,30 @@ const uiConfig = ui({
           '0%': { backgroundColor: 'rgba(63, 207, 142, 0.1)' },
           '100%': { backgroundColor: 'transparent' },
         },
+        'accordion-down': {
+          from: { height: 0 },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: 0 },
+        },
+        'collapsible-down': {
+          from: { height: 0 },
+          to: { height: 'var(--radix-collapsible-content-height)' },
+        },
+        'collapsible-up': {
+          from: { height: 'var(--radix-collapsible-content-height)' },
+          to: { height: 0 },
+        },
       },
       animation: {
         'flash-code': 'flash-code 1s forwards',
         'flash-code-slow': 'flash-code 2s forwards',
+        'accordion-down': 'accordion-down 0.15s ease-out',
+        'accordion-up': 'accordion-up 0.15s ease-out',
+        'collapsible-down': 'collapsible-down 0.10s ease-out',
+        'collapsible-up': 'collapsible-up 0.10s ease-out',
       },
       borderRadius: {
         // lg: `var(--radius)`,
@@ -394,16 +414,6 @@ const uiConfig = ui({
       // fontFamily: {
       //   sans: ['var(--font-sans)', ...fontFamily.sans],
       // },
-      keyframes: {
-        'accordion-down': {
-          from: { height: 0 },
-          to: { height: 'var(--radix-accordion-content-height)' },
-        },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: 0 },
-        },
-      },
       // shadcn defaults END
     },
   },

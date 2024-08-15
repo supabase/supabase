@@ -1,28 +1,25 @@
-import { useParams } from 'common'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { MessageCircle } from 'lucide-react'
+import { ExternalLink, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import NoPermission from 'components/ui/NoPermission'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-  IconGitHub,
-  Modal,
-} from 'ui'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useUrlState } from 'hooks/ui/useUrlState'
+import { Button, IconGitHub } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
@@ -33,6 +30,8 @@ import {
   PullRequestsEmptyState,
 } from './EmptyStates'
 import Overview from './Overview'
+
+type Tab = 'overview' | 'prs' | 'branches'
 
 const BranchManagement = () => {
   const router = useRouter()
@@ -46,10 +45,21 @@ const BranchManagement = () => {
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const [view, setView] = useState<'overview' | 'prs' | 'branches'>('overview')
+  const [urlParams, setParams] = useUrlState<{ tab: Tab }>()
+  const tab = urlParams.tab ?? 'overview'
+  const setTab = (tab: Tab) => setParams({ tab })
+
   const [showCreateBranch, setShowCreateBranch] = useState(false)
   const [showDisableBranching, setShowDisableBranching] = useState(false)
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
+
+  const canReadBranches = useCheckPermissions(PermissionAction.READ, 'preview_branches')
+  const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
+    resource: { is_default: false },
+  })
+  const canDisableBranching = useCheckPermissions(PermissionAction.DELETE, 'preview_branches', {
+    resource: { is_default: true },
+  })
 
   const {
     data: connections,
@@ -155,27 +165,27 @@ const BranchManagement = () => {
                   <Button
                     type="default"
                     className={`rounded-r-none transition hover:opacity-90 ${
-                      view === 'overview' ? 'opacity-100' : 'opacity-60'
+                      tab === 'overview' ? 'opacity-100' : 'opacity-60'
                     }`}
-                    onClick={() => setView('overview')}
+                    onClick={() => setTab('overview')}
                   >
                     Overview
                   </Button>
                   <Button
                     type="default"
                     className={`rounded-none transition hover:opacity-90 ${
-                      view === 'prs' ? 'opacity-100' : 'opacity-60'
+                      tab === 'prs' ? 'opacity-100' : 'opacity-60'
                     }`}
-                    onClick={() => setView('prs')}
+                    onClick={() => setTab('prs')}
                   >
                     Pull requests
                   </Button>
                   <Button
                     type="default"
                     className={`rounded-l-none transition hover:opacity-90 ${
-                      view === 'branches' ? 'opacity-100' : 'opacity-60'
+                      tab === 'branches' ? 'opacity-100' : 'opacity-60'
                     }`}
-                    onClick={() => setView('branches')}
+                    onClick={() => setTab('branches')}
                   >
                     All branches
                   </Button>
@@ -190,7 +200,7 @@ const BranchManagement = () => {
                       Branching Feedback
                     </a>
                   </Button>
-                  <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <Link
                       target="_blank"
                       rel="noreferrer"
@@ -199,123 +209,154 @@ const BranchManagement = () => {
                       Documentation
                     </Link>
                   </Button>
-                  <Button type="primary" onClick={() => setShowCreateBranch(true)}>
+                  <ButtonTooltip
+                    type="primary"
+                    disabled={!canCreateBranches}
+                    onClick={() => setShowCreateBranch(true)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: 'You need additional permissions to create branches',
+                      },
+                    }}
+                  >
                     Create branch
-                  </Button>
+                  </ButtonTooltip>
                 </div>
               </div>
 
-              {isErrorConnections && (
-                <AlertError
-                  error={connectionsError}
-                  subject="Failed to retrieve GitHub integration connection"
-                />
-              )}
-
-              {isSuccessConnections && (
-                <div className="border rounded-lg px-6 py-2 flex items-center justify-between">
-                  <div className="flex items-center gap-x-4">
-                    <div className="w-8 h-8 bg-scale-300 border rounded-md flex items-center justify-center">
-                      <IconGitHub size={18} strokeWidth={2} />
-                    </div>
-                    <p className="text-sm">GitHub branch workflow</p>
-                    <Button asChild type="default" iconRight={<IconExternalLink />}>
-                      <Link passHref href={`/project/${ref}/settings/integrations`}>
-                        Settings
-                      </Link>
-                    </Button>
-                    <Button
-                      type="text"
-                      size="small"
-                      className="text-light hover:text py-1 px-1.5"
-                      iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
-                    >
-                      <Link
-                        passHref
-                        target="_blank"
-                        rel="noreferrer"
-                        href={`https://github.com/${repo}`}
-                      >
-                        {repo}
-                      </Link>
-                    </Button>
-                  </div>
-                  <Button type="default" onClick={() => setShowDisableBranching(true)}>
-                    Disable branching
-                  </Button>
-                </div>
-              )}
-
-              {isErrorBranches && view === 'overview' && (
-                <AlertError error={branchesError} subject="Failed to retrieve preview branches" />
-              )}
-
-              {!isError && (
+              {!canReadBranches ? (
+                <NoPermission resourceText="view this project's branches" />
+              ) : (
                 <>
-                  {view === 'overview' && (
-                    <Overview
-                      isLoading={isLoading}
-                      isSuccess={isSuccess}
-                      repo={repo}
-                      mainBranch={mainBranch}
-                      previewBranches={previewBranches}
-                      onViewAllBranches={() => setView('branches')}
-                      onSelectCreateBranch={() => setShowCreateBranch(true)}
-                      onSelectDeleteBranch={setSelectedBranchToDelete}
-                      generateCreatePullRequestURL={generateCreatePullRequestURL}
+                  {isErrorConnections && (
+                    <AlertError
+                      error={connectionsError}
+                      subject="Failed to retrieve GitHub integration connection"
                     />
                   )}
-                  {view === 'prs' && (
-                    <BranchManagementSection
-                      header={`${branchesWithPRs.length} branches with pull requests found`}
-                    >
-                      {branchesWithPRs.length > 0 ? (
-                        branchesWithPRs.map((branch) => {
-                          return (
-                            <BranchRow
-                              key={branch.id}
-                              repo={repo}
-                              branch={branch}
-                              generateCreatePullRequestURL={generateCreatePullRequestURL}
-                              onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
-                            />
-                          )
-                        })
-                      ) : (
-                        <PullRequestsEmptyState
-                          url={generateCreatePullRequestURL()}
-                          hasBranches={previewBranches.length > 0}
-                        />
-                      )}
-                    </BranchManagementSection>
+
+                  {isSuccessConnections && (
+                    <div className="border rounded-lg px-6 py-2 flex items-center justify-between">
+                      <div className="flex items-center gap-x-4">
+                        <div className="w-8 h-8 bg-scale-300 border rounded-md flex items-center justify-center">
+                          <IconGitHub size={18} strokeWidth={2} />
+                        </div>
+                        <p className="text-sm">GitHub branch workflow</p>
+                        <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                          <Link passHref href={`/project/${ref}/settings/integrations`}>
+                            Settings
+                          </Link>
+                        </Button>
+                        <Button
+                          type="text"
+                          size="small"
+                          className="text-light hover:text py-1 px-1.5"
+                          iconRight={<ExternalLink size={14} strokeWidth={1.5} />}
+                        >
+                          <Link
+                            passHref
+                            target="_blank"
+                            rel="noreferrer"
+                            href={`https://github.com/${repo}`}
+                          >
+                            {repo}
+                          </Link>
+                        </Button>
+                      </div>
+                      <ButtonTooltip
+                        type="default"
+                        disabled={!canDisableBranching}
+                        onClick={() => setShowDisableBranching(true)}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: 'You need additional permissions to disable branching',
+                          },
+                        }}
+                      >
+                        Disable branching
+                      </ButtonTooltip>
+                    </div>
                   )}
-                  {view === 'branches' && (
-                    <BranchManagementSection header={`${previewBranches.length} branches found`}>
-                      {isLoadingBranches && <BranchLoader />}
-                      {isErrorBranches && (
-                        <AlertError
-                          error={branchesError}
-                          subject="Failed to retrieve preview branches"
-                        />
-                      )}
-                      {isSuccessBranches && previewBranches.length === 0 && (
-                        <PreviewBranchesEmptyState
+
+                  {isErrorBranches && tab === 'overview' && (
+                    <AlertError
+                      error={branchesError}
+                      subject="Failed to retrieve preview branches"
+                    />
+                  )}
+
+                  {!isError && (
+                    <>
+                      {tab === 'overview' && (
+                        <Overview
+                          isLoading={isLoading}
+                          isSuccess={isSuccess}
+                          repo={repo}
+                          mainBranch={mainBranch}
+                          previewBranches={previewBranches}
+                          onViewAllBranches={() => setTab('branches')}
                           onSelectCreateBranch={() => setShowCreateBranch(true)}
+                          onSelectDeleteBranch={setSelectedBranchToDelete}
+                          generateCreatePullRequestURL={generateCreatePullRequestURL}
                         />
                       )}
-                      {isSuccessBranches &&
-                        previewBranches.map((branch) => {
-                          return (
-                            <BranchRow
-                              key={branch.id}
-                              repo={repo}
-                              branch={branch}
-                              generateCreatePullRequestURL={generateCreatePullRequestURL}
-                              onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
+                      {tab === 'prs' && (
+                        <BranchManagementSection
+                          header={`${branchesWithPRs.length} branches with pull requests found`}
+                        >
+                          {branchesWithPRs.length > 0 ? (
+                            branchesWithPRs.map((branch) => {
+                              return (
+                                <BranchRow
+                                  key={branch.id}
+                                  repo={repo}
+                                  branch={branch}
+                                  generateCreatePullRequestURL={generateCreatePullRequestURL}
+                                  onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
+                                />
+                              )
+                            })
+                          ) : (
+                            <PullRequestsEmptyState
+                              url={generateCreatePullRequestURL()}
+                              hasBranches={previewBranches.length > 0}
                             />
-                          )
-                        })}
-                    </BranchManagementSection>
+                          )}
+                        </BranchManagementSection>
+                      )}
+                      {tab === 'branches' && (
+                        <BranchManagementSection
+                          header={`${previewBranches.length} branches found`}
+                        >
+                          {isLoadingBranches && <BranchLoader />}
+                          {isErrorBranches && (
+                            <AlertError
+                              error={branchesError}
+                              subject="Failed to retrieve preview branches"
+                            />
+                          )}
+                          {isSuccessBranches && previewBranches.length === 0 && (
+                            <PreviewBranchesEmptyState
+                              onSelectCreateBranch={() => setShowCreateBranch(true)}
+                            />
+                          )}
+                          {isSuccessBranches &&
+                            previewBranches.map((branch) => {
+                              return (
+                                <BranchRow
+                                  key={branch.id}
+                                  repo={repo}
+                                  branch={branch}
+                                  generateCreatePullRequestURL={generateCreatePullRequestURL}
+                                  onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
+                                />
+                              )
+                            })}
+                        </BranchManagementSection>
+                      )}
+                    </>
                   )}
                 </>
               )}

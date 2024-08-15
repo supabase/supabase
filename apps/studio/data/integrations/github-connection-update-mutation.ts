@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 
@@ -10,19 +10,20 @@ type UpdateVariables = {
   organizationId: number
   workdir: string
   supabaseChangesOnly: boolean
+  branchLimit: number
 }
 
 export async function updateConnection(
-  { connectionId, workdir, supabaseChangesOnly }: UpdateVariables,
+  { connectionId, workdir, supabaseChangesOnly, branchLimit }: UpdateVariables,
   signal?: AbortSignal
 ) {
   const { data, error } = await patch('/platform/integrations/github/connections/{connection_id}', {
     params: { path: { connection_id: String(connectionId) } },
     signal,
-    body: { workdir, supabase_changes_only: supabaseChangesOnly },
+    body: { workdir, supabase_changes_only: supabaseChangesOnly, branch_limit: branchLimit },
   })
-  if (error) throw error
 
+  if (error) handleError(error)
   return data
 }
 

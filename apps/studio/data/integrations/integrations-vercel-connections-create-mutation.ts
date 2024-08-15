@@ -1,11 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { integrationKeys } from './keys'
-import type { IntegrationConnectionsCreateVariables } from './integrations.types'
+import { handleError, post } from 'data/fetchers'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
+import type { ResponseError } from 'types'
+import type { IntegrationConnectionsCreateVariables } from './integrations.types'
+import { integrationKeys } from './keys'
 
 export async function createIntegrationVercelConnections({
   organizationIntegrationId,
@@ -21,10 +21,8 @@ export async function createIntegrationVercelConnections({
       },
     },
   })
-  if (error) {
-    throw error
-  }
 
+  if (error) handleError(error)
   return data
 }
 

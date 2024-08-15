@@ -1,4 +1,4 @@
-export const SCHEMAS_SQL = `
+export const SCHEMAS_SQL = /* SQL */ `
 -- Adapted from information_schema.schemata
 
 select

@@ -1,17 +1,10 @@
-import { useParams } from 'common'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  IconAlertTriangle,
-  Modal,
-} from 'ui'
 
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useParams } from 'common'
 import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
 import type { Database } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DropReplicaConfirmationModalProps {
   selectedReplica?: Database
@@ -26,7 +19,7 @@ const DropReplicaConfirmationModal = ({
 }: DropReplicaConfirmationModalProps) => {
   const { ref: projectRef } = useParams()
   const formattedId = formatDatabaseID(selectedReplica?.identifier ?? '')
-  const { mutateAsync: removeReadReplica, isLoading: isRemoving } = useReadReplicaRemoveMutation({
+  const { mutate: removeReadReplica, isLoading: isRemoving } = useReadReplicaRemoveMutation({
     onSuccess: () => {
       toast.success(`Tearing down read replica (ID: ${formattedId})`)
       onSuccess()
@@ -38,7 +31,11 @@ const DropReplicaConfirmationModal = ({
     if (!projectRef) return console.error('Project is required')
     if (selectedReplica === undefined) return toast.error('No replica selected')
 
-    await removeReadReplica({ projectRef, identifier: selectedReplica.identifier })
+    removeReadReplica({
+      projectRef,
+      identifier: selectedReplica.identifier,
+      invalidateReplicaQueries: true,
+    })
   }
 
   return (

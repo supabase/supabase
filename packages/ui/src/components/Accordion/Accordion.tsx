@@ -1,3 +1,5 @@
+'use client'
+
 import * as RadixAccordion from '@radix-ui/react-accordion'
 import React, { createContext, useContext, useState } from 'react'
 
@@ -36,6 +38,9 @@ export interface AccordionProps {
   chevronAlign?: Align
 }
 
+/**
+ * @deprecated Use ./Accordion_Shadcn_ instead
+ */
 function Accordion({
   children,
   className,
@@ -96,6 +101,9 @@ interface ItemProps {
   disabled?: boolean
 }
 
+/**
+ * @deprecated Use ./AccordionItem_Shadcn_ instead
+ */
 export function Item({ children, className, header, id, disabled }: ItemProps) {
   const __styles = styleHandler('accordion')
   const [open, setOpen] = useState(false)

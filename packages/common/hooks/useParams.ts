@@ -1,4 +1,15 @@
-import { useRouter } from 'next/router'
+/*
+ * next/compat/router is used so that this doesn't cause an error on App
+ * Router builds. However, no replacement for the functionality is provided if
+ * the router is missing (it just silently fails).
+ *
+ * This is fine because docs (the only site moving to App Router right now)
+ * doesn't use this hook. Skipping it silently is less troublesome than trying
+ * to make it work across both routers -- making search params work seamlessly
+ * is a giant pain, and too much critical studio functionality depends on this
+ * to mess with it lightly.
+ */
+import { useRouter } from 'next/compat/router'
 import { useMemo } from 'react'
 
 /**
@@ -22,7 +33,8 @@ function convertToCamelCase(key: string): string {
 export function useParams(): {
   [k: string]: string | undefined
 } {
-  const { query } = useRouter()
+  const router = useRouter()
+  const query = router?.query
 
   const modifiedQuery = {
     ...query,

@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { useTheme } from 'next-themes'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -10,6 +9,7 @@ import footerData from 'data/Footer'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
+import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 
 interface Props {
   className?: string
@@ -17,11 +17,11 @@ interface Props {
 }
 
 const Footer = (props: Props) => {
-  const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
-  const isLaunchWeek = pathname.includes('launch-week')
-  const forceDark = isLaunchWeek || pathname === '/'
+  const isDarkLaunchWeek = useDarkLaunchWeeks()
+  const isGAWeek = pathname.includes('/ga-week')
+  const forceDark = isDarkLaunchWeek || pathname === '/'
 
   if (props.hideFooter) {
     return null
@@ -29,7 +29,12 @@ const Footer = (props: Props) => {
 
   return (
     <footer
-      className={cn('bg-alternative', isLaunchWeek && 'bg-[#060809]', props.className)}
+      className={cn(
+        'bg-alternative',
+        isDarkLaunchWeek && 'bg-[#060809]',
+        isGAWeek && 'dark:bg-alternative',
+        props.className
+      )}
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
@@ -61,16 +66,20 @@ const Footer = (props: Props) => {
           <div className="space-y-8 xl:col-span-1">
             <Link href="#" as="/" className="w-40">
               <Image
-                src={
-                  forceDark
-                    ? supabaseLogoWordmarkDark
-                    : resolvedTheme?.includes('dark')
-                      ? supabaseLogoWordmarkDark
-                      : supabaseLogoWordmarkLight
-                }
+                src={supabaseLogoWordmarkLight}
                 width={160}
                 height={30}
-                alt="Supabase"
+                alt="Supabase Logo"
+                className="dark:hidden"
+                priority
+              />
+              <Image
+                src={supabaseLogoWordmarkDark}
+                width={160}
+                height={30}
+                alt="Supabase Logo"
+                className="hidden dark:block"
+                priority
               />
             </Link>
             <div className="flex space-x-5">

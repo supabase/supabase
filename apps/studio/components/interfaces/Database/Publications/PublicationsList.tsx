@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
+import { Button, IconAlertCircle, IconSearch, Input, Toggle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -11,7 +11,7 @@ import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import PublicationSkeleton from './PublicationSkeleton'
 
 interface PublicationEvent {
@@ -91,7 +91,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
             <div className="w-[500px]">
               <InformationBox
                 icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
-                title="You need additional permissions to update database replications"
+                title="You need additional permissions to update database publications"
               />
             </div>
           )}

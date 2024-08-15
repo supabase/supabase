@@ -1,16 +1,18 @@
 import { useState } from 'react'
 
-import { useParams } from 'common'
+import { useQueryClient } from '@tanstack/react-query'
 import { TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { Table } from 'data/tables/table-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
+  const queryClient = useQueryClient()
   const snap = useTableEditorStateSnapshot()
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table>()
 
@@ -19,6 +21,7 @@ const DatabaseTables: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
+            <FormHeader title="Database Tables" />
             <TableList
               onAddTable={snap.onAddTable}
               onEditTable={(table) => {

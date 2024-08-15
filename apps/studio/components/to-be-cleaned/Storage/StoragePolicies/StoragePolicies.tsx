@@ -4,7 +4,7 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { IconLoader } from 'ui'
 
-import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
+import PolicyEditorModal from 'components/interfaces/Auth/Policies/PolicyEditorModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
@@ -106,21 +106,24 @@ const StoragePolicies = () => {
       return true
     }
 
-    return await Promise.all(
-      payloads.map(async (payload) => {
-        try {
-          await createDatabasePolicy({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            payload,
-          })
-          return false
-        } catch (error: any) {
-          toast.error(`Error adding policy: ${error.message}`)
-          return true
-        }
-      })
-    )
+    try {
+      return await Promise.all(
+        payloads.map(async (payload) => {
+          try {
+            await createDatabasePolicy({
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              payload,
+            })
+            return false
+          } catch (error: any) {
+            toast.error(`Error adding policy: ${error.message}`)
+            return true
+          }
+        })
+      )
+    } finally {
+    }
   }
 
   const onCreatePolicy = async (payload: any) => {
@@ -209,7 +212,7 @@ const StoragePolicies = () => {
             )
           })}
 
-          <div className="!mb-4 w-full border-b border-gray-600" />
+          <div className="!mb-4 w-full border-b border-muted" />
           <p className="text-sm text-foreground-light">
             You may also write policies for the tables under the storage schema directly for greater
             control

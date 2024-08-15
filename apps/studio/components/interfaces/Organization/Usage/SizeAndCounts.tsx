@@ -38,15 +38,6 @@ const SizeAndCounts = ({
     endDate,
   })
 
-  const { data: functionCountData, isLoading: isLoadingFunctionCountData } = useOrgDailyStatsQuery({
-    orgSlug,
-    projectRef,
-    metric: PricingMetric.FUNCTION_COUNT,
-    interval: '1d',
-    startDate,
-    endDate,
-  })
-
   const chartMeta: {
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
@@ -59,11 +50,6 @@ const SizeAndCounts = ({
       isLoading: isLoadingStorageSizeData,
       margin: 14,
       data: storageSizeData?.data ?? [],
-    },
-    [PricingMetric.FUNCTION_COUNT]: {
-      isLoading: isLoadingFunctionCountData,
-      margin: 0,
-      data: functionCountData?.data ?? [],
     },
   }
 
