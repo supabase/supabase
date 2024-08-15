@@ -159,17 +159,9 @@ as $$
 $$;
 
 -- Assign appropriate permissions and revoke access
-grant execute
-  on function public.hook_mfa_verification_attempt
-  to supabase_auth_admin;
-
 grant all
   on table public.mfa_failed_verification_attempts
   to supabase_auth_admin;
-
-revoke execute
-  on function public.hook_mfa_verification_attempt
-  from authenticated, anon, public;
 
 revoke all
   on table public.mfa_failed_verification_attempts
