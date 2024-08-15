@@ -256,14 +256,6 @@ as $$
   end;
 $$;
 
-grant execute
-  on function public.custom_access_token_hook
-  to supabase_auth_admin;
-
-revoke execute
-  on function public.custom_access_token_hook
-  from authenticated, anon, public;
-
 grant all
   on table public.profiles
   to supabase_auth_admin;
