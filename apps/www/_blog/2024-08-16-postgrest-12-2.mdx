@@ -1,9 +1,9 @@
 ---
-title: 'What''s new in PostgREST 12.2'
+title: "What's new in PostgREST 12.2"
 description: New features in the latest 12.2 release of PostgREST
 author: steve_chavez
-image: aggregate_functions_og.jpg
-thumb: aggregate_functions_og.jpg
+image: lw12/day-5/OG_postgREST.png
+thumb: lw12/day-5/thumb_postgREST.png
 launchweek: '12'
 categories:
   - launch-week
@@ -52,13 +52,13 @@ And calling the function with the [RPC interface](https://supabase.com/docs/refe
 
 When doing `set statement_timeout`on the function, the `statement_timeout` will be “hoisted” and applied per transaction.
 
-By default this also works for other settings, namely `plan_filter.statement_cost_limit`  and `default_transaction_isolation`. The list of hoisted settings can be extended by modifying the [db-hoisted-tx-settings](https://postgrest.org/en/latest/references/configuration.html#db-hoisted-tx-settings) configuration.
+By default this also works for other settings, namely `plan_filter.statement_cost_limit` and `default_transaction_isolation`. The list of hoisted settings can be extended by modifying the [db-hoisted-tx-settings](https://postgrest.org/en/latest/references/configuration.html#db-hoisted-tx-settings) configuration.
 
 Before 12.2, this could be done by setting a `statement_timeout` on the API roles, but this affected all the SQL statements executed by those roles.
 
 ## Max Affected
 
-In prior versions of PostgREST, users could limit the number of records impacted by mutations (insert/update/delete) to 1 row using vendor media type `application/vnd.pgrst.object+json`. That supports a common use case but is not flexible enough to support user defined values. 
+In prior versions of PostgREST, users could limit the number of records impacted by mutations (insert/update/delete) to 1 row using vendor media type `application/vnd.pgrst.object+json`. That supports a common use case but is not flexible enough to support user defined values.
 
 12.2 introduces the `max-affected` preference to limit the affected rows up to a custom value.
 
