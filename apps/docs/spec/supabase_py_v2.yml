@@ -1362,23 +1362,6 @@ functions:
         isOptional: true
         type: CountMethod
         description: The property to use to get the count of rows returned.
-      - name: returning
-        isOptional: true
-        type: ReturnMethod
-        description:  Either 'minimal' or 'representation'. Defaults to 'representation'.
-      - name: ignore_duplicates
-        isOptional: true
-        type: bool
-        description:  Whether duplicate rows should be ignored.
-      - name: on_conflict
-        isOptional: true
-        type: string
-        description:  Specified columns to be made to work with UNIQUE constraint.
-      - name: default_to_null
-        isOptional: true
-        type: bool
-        description: |
-          Make missing fields default to `null`. Otherwise, use the default value for the column. This only applies when inserting new rows, not when merging with existing rows under `ignore_duplicates: false`. This also only applies when doing bulk upserts.
     examples:
       - id: updating-your-data
         name: Updating your data
