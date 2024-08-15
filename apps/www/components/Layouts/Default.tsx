@@ -1,6 +1,7 @@
 import Nav from 'components/Nav/index'
 import Footer from 'components/Footer/index'
 import { cn } from 'ui'
+import { useForceDeepDark } from '~/lib/theme.utils'
 
 type Props = {
   hideHeader?: boolean
@@ -19,11 +20,13 @@ const DefaultLayout = (props: Props) => {
     children,
   } = props
 
+  useForceDeepDark()
+
   return (
     <>
-      {!hideHeader && <Nav />}
+      <Nav hideNavbar={hideHeader} />
       <main className={cn('relative min-h-screen', className)}>{children}</main>
-      {!hideFooter && <Footer className={footerClassName} />}
+      <Footer className={footerClassName} hideFooter={hideFooter} />
     </>
   )
 }

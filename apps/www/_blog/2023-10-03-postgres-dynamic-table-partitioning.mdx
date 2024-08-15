@@ -7,7 +7,7 @@ tags:
   - postgres
 date: '2023-10-03'
 published_at: '2023-10-03T07:00:00.000-07:00'
-to_depth: 3
+toc_depth: 3
 author: michel
 image: partitions/dynamic-table-partitioning-og.png
 thumb: partitions/dynamic-table-partitioning-thumb.png
@@ -361,7 +361,7 @@ BEGIN
 END;
 $$;
 
-SELECT cron.schedule('new-chat-partition', '0 23 * * *', 'CALL app.create_daily_partition(now()::date + 'interval 1 day')');
+SELECT cron.schedule('new-chat-partition', '0 23 * * *', 'CALL app.create_daily_partition(now()::date + "interval 1 day")');
 COMMIT;
 ```
 

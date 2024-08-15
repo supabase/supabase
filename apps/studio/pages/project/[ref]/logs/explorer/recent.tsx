@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 
 import { useParams } from 'common'
@@ -6,8 +5,8 @@ import RecentQueriesItem from 'components/interfaces/Settings/Logs/RecentQueries
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
-import { useLocalStorage } from 'hooks'
-import { LogSqlSnippets, NextPageWithLayout } from 'types'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 import { Button, IconClock } from 'ui'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
@@ -60,4 +59,4 @@ export const LogsSavedPage: NextPageWithLayout = () => {
 
 LogsSavedPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
 
-export default observer(LogsSavedPage)
+export default LogsSavedPage

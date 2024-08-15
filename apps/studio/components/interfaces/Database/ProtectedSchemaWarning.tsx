@@ -31,7 +31,7 @@ export const ProtectedSchemaModal = ({
       }
       onCancel={() => onClose()}
     >
-      <Modal.Content className="py-4 space-y-2">
+      <Modal.Content className="space-y-2">
         <p className="text-sm">
           The following schemas are managed by Supabase and are currently protected from write
           access through the dashboard.

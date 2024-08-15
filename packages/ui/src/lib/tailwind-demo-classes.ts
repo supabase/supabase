@@ -1,17 +1,23 @@
 export default {
   "background": [
+    "bg-200",
     "bg",
     "bg-alternative-200",
     "bg-alternative",
     "bg-selection",
     "bg-control",
+    "bg-surface-75",
     "bg-surface-100",
     "bg-surface-200",
     "bg-surface-300",
+    "bg-surface-400",
     "bg-overlay",
     "bg-overlay-hover",
     "bg-muted",
-    "bg-button"
+    "bg-button",
+    "bg-dialog",
+    "bg-dash-sidebar",
+    "bg-dash-canvas"
   ],
   "border": [
     "border",
@@ -51,8 +57,8 @@ export default {
     "bg-brand-500",
     "bg-brand-600",
     "bg-brand",
-    "bg-brand-accent",
     "bg-brand-button",
+    "bg-brand-link",
     "bg-_secondary-200",
     "bg-_secondary-400",
     "bg-_secondary",

@@ -2,7 +2,7 @@ import { SYSTEM_ROLES } from 'components/interfaces/Database/Roles/Roles.constan
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 
-import MultiSelect from 'components/ui/MultiSelect'
+import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { sortBy } from 'lodash'
@@ -43,7 +43,7 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
       </div>
       <div className="relative w-2/3">
         {isLoading && <ShimmeringLoader className="py-4" />}
-        {isError && <AlertError error={error} subject="Failed to retrieve database roles" />}
+        {isError && <AlertError error={error as any} subject="Failed to retrieve database roles" />}
         {isSuccess && (
           <MultiSelect
             options={formattedRoles}

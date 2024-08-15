@@ -1,16 +1,16 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import dayjs from 'dayjs'
-import { observer } from 'mobx-react-lite'
-import { Button, IconAlertCircle } from 'ui'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { FormPanel } from 'components/ui/Forms'
+import dayjs from 'dayjs'
+import { AlertCircle } from 'lucide-react'
+
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useCheckPermissions } from 'hooks'
-import { Timezone } from './PITR.types'
-import TimezoneSelection from './TimezoneSelection'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button } from 'ui'
+import type { Timezone } from './PITR.types'
+import { TimezoneSelection } from './TimezoneSelection'
 
 interface PITRStatusProps {
   selectedTimezone: Timezone
@@ -54,7 +54,7 @@ const PITRStatus = ({
         footer={
           <div className="flex items-center justify-between p-6">
             <div className="flex items-center space-x-4">
-              <IconAlertCircle className="text-foreground-light" size={18} strokeWidth={1.5} />
+              <AlertCircle className="text-foreground-light" size={18} strokeWidth={1.5} />
               <span className="text-foreground-light text-sm">
                 You'll be able to pick the right date and time when you begin
               </span>
@@ -68,23 +68,28 @@ const PITRStatus = ({
                   Start a restore
                 </Button>
               </Tooltip.Trigger>
-              {!canTriggerPhysicalBackup && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="left">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to trigger a PITR recovery
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
+              {hasReadReplicas ||
+                (!canTriggerPhysicalBackup && (
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="left">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                          'border border-background',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-foreground">
+                          {hasReadReplicas
+                            ? 'You will need to remove all read replicas first to trigger a PITR recovery'
+                            : !canTriggerPhysicalBackup
+                              ? 'You need additional permissions to trigger a PITR recovery'
+                              : null}
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                ))}
             </Tooltip.Root>
           </div>
         }
@@ -92,7 +97,6 @@ const PITRStatus = ({
         <div className="p-6 space-y-6">
           <div className="w-[350px]">
             <TimezoneSelection
-              hideLabel
               selectedTimezone={selectedTimezone}
               onSelectTimezone={onUpdateTimezone}
             />
@@ -113,4 +117,4 @@ const PITRStatus = ({
   )
 }
 
-export default observer(PITRStatus)
+export default PITRStatus

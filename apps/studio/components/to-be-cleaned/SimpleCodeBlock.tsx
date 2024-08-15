@@ -5,15 +5,15 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import rangeParser from 'parse-numeric-range'
-import Highlight, { Language, defaultProps } from 'prism-react-renderer'
-import defaultTheme from 'prism-react-renderer/themes/palenight'
+import { Prism, themes, Highlight, Language } from 'prism-react-renderer'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
-
+import { useTheme } from 'next-themes'
 import { copyToClipboard } from 'lib/helpers'
+import { dart } from 'lib/constants/prism'
 
-const highlightLinesRangeRegex = /{([\d,-]+)}/
+dart(Prism)
+
 const prism = {
   defaultLanguage: 'js',
   plugins: ['line-numbers', 'show-language'],
@@ -22,7 +22,6 @@ const prism = {
 interface SimpleCodeBlockProps {
   parentClassName?: string
   className?: string
-  metastring?: string
   showCopy?: boolean
 }
 
@@ -30,18 +29,12 @@ const SimpleCodeBlock = ({
   children,
   parentClassName,
   className: languageClassName,
-  metastring,
   showCopy = true,
 }: PropsWithChildren<SimpleCodeBlockProps>) => {
+  const { resolvedTheme } = useTheme()
   const [showCopied, setShowCopied] = useState(false)
   const target = useRef(null)
-  const button = useRef(null)
   let highlightLines: any = []
-
-  if (metastring && highlightLinesRangeRegex.test(metastring)) {
-    const highlightLinesRange = metastring.match(highlightLinesRangeRegex)?.[1]
-    if (highlightLinesRange) highlightLines = rangeParser(highlightLinesRange).filter((n) => n > 0)
-  }
 
   useEffect(() => {
     if (!showCopied) return
@@ -61,8 +54,7 @@ const SimpleCodeBlock = ({
 
   return (
     <Highlight
-      {...defaultProps}
-      theme={(prism as any).theme || defaultTheme}
+      theme={resolvedTheme === 'dark' ? themes.nightOwl : themes.nightOwlLight}
       code={(children as string)?.trim() ?? ''}
       language={language as Language}
     >

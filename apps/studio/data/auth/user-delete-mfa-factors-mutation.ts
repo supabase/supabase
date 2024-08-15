@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type UserDeleteMFAFactorsVariables = {
   projectRef: string
@@ -35,7 +35,7 @@ export const useUserDeleteMFAFactorsMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to delete user MFA factors: ${data.message}`)
+          toast.error(`Failed to delete the user's MFA factors: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

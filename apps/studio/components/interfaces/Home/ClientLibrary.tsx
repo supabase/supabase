@@ -29,7 +29,7 @@ const ClientLibrary = ({
       <div className="space-y-4">
         <div>
           <h5 className="flex items-center gap-2 text-base text-foreground">
-            {language} {!officialSupport && <Badge color="green">Community</Badge>}
+            {language} {!officialSupport && <Badge variant="brand">Community</Badge>}
           </h5>
         </div>
         <div className="flex gap-2">

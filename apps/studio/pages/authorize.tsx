@@ -1,28 +1,28 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
-import { useParams } from 'common'
 import AuthorizeRequesterDetails from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
-import { FormPanel } from 'components/ui/Forms'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
 import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useStore, withAuth } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import { withAuth } from 'hooks/misc/withAuth'
+import type { NextPageWithLayout } from 'types'
 import { Alert, Button, Listbox } from 'ui'
 
 // Need to handle if no organizations in account
 // Need to handle if not logged in yet state
 
 const APIAuthorizationPage: NextPageWithLayout = () => {
-  const { ui } = useStore()
   const router = useRouter()
   const { auth_id } = useParams()
-  const [selectedOrg, setSelectedOrg] = useState<string>()
+  const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
 
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
   const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
@@ -36,7 +36,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   })
   const { mutate: declineRequest, isLoading: isDeclining } = useApiAuthorizationDeclineMutation({
     onSuccess: () => {
-      ui.setNotification({ category: 'success', message: 'Declined API authorization request' })
+      toast.success('Declined API authorization request')
       router.push('/projects')
     },
   })
@@ -44,41 +44,36 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (!isLoadingOrganizations) {
-      setSelectedOrg(organizations?.[0].slug ?? undefined)
+      setSelectedOrgSlug(organizations?.[0].slug ?? undefined)
     }
   }, [isLoadingOrganizations])
 
   const onApproveRequest = async () => {
     if (!auth_id) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Unable to approve request: auth_id is missing ',
-      })
+      return toast.error('Unable to approve request: auth_id is missing ')
     }
-    if (!selectedOrg) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Unable to approve request: No organization selected',
-      })
+    if (!selectedOrgSlug) {
+      return toast.error('Unable to approve request: No organization selected')
     }
 
-    approveRequest({ id: auth_id, organization_id: selectedOrg })
+    approveRequest({ id: auth_id, slug: selectedOrgSlug })
   }
 
   const onDeclineRequest = async () => {
-    if (!auth_id)
-      return ui.setNotification({
-        category: 'error',
-        message: 'Unable to decline request: auth_id is missing ',
-      })
+    if (!auth_id) {
+      return toast.error('Unable to decline request: auth_id is missing ')
+    }
+    if (!selectedOrgSlug) {
+      return toast.error('Unable to decline request: No organization selected')
+    }
 
-    declineRequest({ id: auth_id })
+    declineRequest({ id: auth_id, slug: selectedOrgSlug })
   }
 
   if (isLoading) {
     return (
       <FormPanel header={<p>Authorize API access</p>}>
-        <div className="w-[500px] px-8 py-6 space-y-2">
+        <div className="px-8 py-6 space-y-2">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />
           <ShimmeringLoader className="w-1/2" />
@@ -90,7 +85,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   if (auth_id === undefined) {
     return (
       <FormPanel header={<p>Authorization for API access</p>}>
-        <div className="w-[500px] px-8 py-6">
+        <div className="px-8 py-6">
           <Alert withIcon variant="warning" title="Missing authorization ID">
             Please provide a valid authorization ID in the URL
           </Alert>
@@ -102,7 +97,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   if (isError) {
     return (
       <FormPanel header={<p>Authorize API access</p>}>
-        <div className="w-[500px] px-8 py-6">
+        <div className="px-8 py-6">
           <Alert
             withIcon
             variant="warning"
@@ -123,7 +118,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
     return (
       <FormPanel header={<p>Authorize API access for {requester?.name}</p>}>
-        <div className="w-full md:w-[500px] px-8 py-6 space-y-8">
+        <div className="w-full px-8 py-6 space-y-8">
           <Alert withIcon variant="success" title="This authorization request has been approved">
             <p>
               {requester.name} has read and write access to the organization "
@@ -183,13 +178,13 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
         ) : (
           <Listbox
             label="Select an organization to grant API access to"
-            value={selectedOrg}
+            value={selectedOrgSlug}
             disabled={isExpired}
-            onChange={setSelectedOrg}
+            onChange={setSelectedOrgSlug}
           >
             {(organizations ?? []).map((organization) => (
               <Listbox.Option
-                key={organization.id}
+                key={organization.slug}
                 label={organization.name}
                 value={organization.slug}
               >
@@ -204,4 +199,5 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 }
 
 APIAuthorizationPage.getLayout = (page) => <APIAuthorizationLayout>{page}</APIAuthorizationLayout>
+
 export default withAuth(APIAuthorizationPage)

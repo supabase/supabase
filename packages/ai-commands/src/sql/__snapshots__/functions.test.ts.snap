@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`debug fix order of operations 1`] = `
+"create table departments (
+  id bigint primary key generated always as identity,
+  name text
+);
+
+create table employees (
+  id bigint primary key generated always as identity,
+  name text,
+  email text,
+  department_id bigint references departments (id)
+);"
+`;
+
+exports[`debug fix typos 1`] = `
+"select
+  *
+from
+  employees;"
+`;

@@ -1,39 +1,35 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import * as z from 'zod'
+
+import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   FormControl_Shadcn_,
+  FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
-  FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconAlertCircle,
   Input_Shadcn_,
+  WarningIcon,
 } from 'ui'
-import * as z from 'zod'
-
-import AlertError from 'components/ui/AlertError'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks'
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
-import toast from 'react-hot-toast'
 
 const RateLimits = () => {
   const formId = 'auth-rate-limits-form'
@@ -58,6 +54,7 @@ const RateLimits = () => {
 
   const canUpdateEmailLimit = authConfig?.EXTERNAL_EMAIL_ENABLED && isSmtpEnabled(authConfig)
   const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED && !authConfig?.SMS_AUTOCONFIRM
+  const canUpdateAnonymousUsersRateLimit = authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED
 
   const FormSchema = z.object({
     RATE_LIMIT_TOKEN_REFRESH: z.coerce
@@ -76,6 +73,14 @@ const RateLimits = () => {
       .number()
       .min(0, 'Must be not be lower than 0')
       .max(32767, 'Must not be more than 32,767 an hour'),
+    RATE_LIMIT_ANONYMOUS_USERS: z.coerce
+      .number()
+      .min(0, 'Must be not be lower than 0')
+      .max(32767, 'Must not be more than 32,767 an hour'),
+    RATE_LIMIT_OTP: z.coerce
+      .number()
+      .min(0, 'Must be not be lower than 0')
+      .max(32767, 'Must not be more than 32,767 an hour'),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -85,6 +90,7 @@ const RateLimits = () => {
       RATE_LIMIT_VERIFY: 0,
       RATE_LIMIT_EMAIL_SENT: 0,
       RATE_LIMIT_SMS_SENT: 0,
+      RATE_LIMIT_OTP: 0,
     },
   })
 
@@ -97,6 +103,8 @@ const RateLimits = () => {
       'RATE_LIMIT_VERIFY',
       'RATE_LIMIT_EMAIL_SENT',
       'RATE_LIMIT_SMS_SENT',
+      'RATE_LIMIT_ANONYMOUS_USERS',
+      'RATE_LIMIT_OTP',
     ] as (keyof typeof payload)[]
     params.forEach((param) => {
       if (data[param] !== authConfig?.[param]) payload[param] = data[param]
@@ -112,6 +120,8 @@ const RateLimits = () => {
         RATE_LIMIT_VERIFY: authConfig.RATE_LIMIT_VERIFY,
         RATE_LIMIT_EMAIL_SENT: authConfig.RATE_LIMIT_EMAIL_SENT,
         RATE_LIMIT_SMS_SENT: authConfig.RATE_LIMIT_SMS_SENT,
+        RATE_LIMIT_ANONYMOUS_USERS: authConfig.RATE_LIMIT_ANONYMOUS_USERS,
+        RATE_LIMIT_OTP: authConfig.RATE_LIMIT_OTP,
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -169,43 +179,50 @@ const RateLimits = () => {
                     control={form.control}
                     name="RATE_LIMIT_EMAIL_SENT"
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_ disabled={!canUpdateEmailLimit} type="number" {...field} />
+                          <Input_Shadcn_
+                            disabled={!canUpdateConfig || !canUpdateEmailLimit}
+                            type="number"
+                            {...field}
+                          />
                         </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                        {!canUpdateEmailLimit && (
+                        {!authConfig.EXTERNAL_EMAIL_ENABLED ? (
                           <Alert_Shadcn_>
-                            <IconAlertCircle strokeWidth={1.5} />
+                            <WarningIcon />
                             <AlertTitle_Shadcn_>
-                              {!authConfig.EXTERNAL_EMAIL_ENABLED &&
-                                'Enable email-based logins to update this configuration'}
-                              {!isSmtpEnabled(authConfig) &&
-                                'Custom SMTP provider is required to update this configuration'}
+                              Email-based logins are not enabled for your project
                             </AlertTitle_Shadcn_>
-                            <AlertDescription_Shadcn_>
+                            <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
                               <p className="!leading-tight">
-                                {!authConfig.EXTERNAL_EMAIL_ENABLED &&
-                                  'Head over to the providers page to enable email provider before updating your rate limit'}
-                                {!isSmtpEnabled(authConfig) &&
-                                  'The built-in email service has a fixed rate limit. You will need to set up your own custom SMTP provider to update your email rate limit'}
+                                Enable email-based logins to update this rate limit
                               </p>
-                              <Button asChild type="default" className="mt-2">
-                                <Link
-                                  href={
-                                    !authConfig.EXTERNAL_EMAIL_ENABLED
-                                      ? `/project/${projectRef}/auth/providers`
-                                      : `/project/${projectRef}/settings/auth`
-                                  }
-                                >
-                                  {!authConfig.EXTERNAL_EMAIL_ENABLED
-                                    ? 'View providers configuration'
-                                    : 'View SMTP settings'}
+                              <Button asChild type="default" className="w-min">
+                                <Link href={`/project/${projectRef}/auth/providers`}>
+                                  View auth providers
                                 </Link>
                               </Button>
                             </AlertDescription_Shadcn_>
                           </Alert_Shadcn_>
-                        )}
+                        ) : !isSmtpEnabled(authConfig) ? (
+                          <Alert_Shadcn_>
+                            <WarningIcon />
+                            <AlertTitle_Shadcn_>
+                              Custom SMTP provider is required to update this configuration
+                            </AlertTitle_Shadcn_>
+                            <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
+                              <p className="!leading-tight">
+                                The built-in email service has a fixed rate limit. You will need to
+                                set up your own custom SMTP provider to update your email rate limit
+                              </p>
+                              <Button asChild type="default" className="w-min">
+                                <Link href={`/project/${projectRef}/settings/auth`}>
+                                  View SMTP settings
+                                </Link>
+                              </Button>
+                            </AlertDescription_Shadcn_>
+                          </Alert_Shadcn_>
+                        ) : null}
                       </FormItem_Shadcn_>
                     )}
                   />
@@ -231,29 +248,27 @@ const RateLimits = () => {
                     control={form.control}
                     name="RATE_LIMIT_SMS_SENT"
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
-                            disabled={!canUpdateSMSRateLimit}
+                            disabled={!canUpdateConfig || !canUpdateSMSRateLimit}
                             type="number"
                             {...field}
                           />
                         </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
                         {!canUpdateSMSRateLimit && (
                           <Alert_Shadcn_>
-                            <IconAlertCircle strokeWidth={1.5} />
+                            <WarningIcon />
                             <AlertTitle_Shadcn_>
-                              Enable phone-based logins to update this configuration
+                              Phone-based logins are not enabled for your project
                             </AlertTitle_Shadcn_>
-                            <AlertDescription_Shadcn_>
+                            <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
                               <p className="!leading-tight">
-                                Head over to the providers page to enable phone provider and phone
-                                confirmations before updating your rate limit
+                                Enable phone-based logins to update this rate limit
                               </p>
-                              <Button asChild type="default" className="mt-2">
+                              <Button asChild type="default" className="w-min">
                                 <Link href={`/project/${projectRef}/auth/providers`}>
-                                  View providers configuration
+                                  View auth providers
                                 </Link>
                               </Button>
                             </AlertDescription_Shadcn_>
@@ -271,7 +286,8 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        Number of sessions that can be refreshed in a 5 minute interval
+                        Number of sessions that can be refreshed in a 5 minute interval per IP
+                        address.
                       </p>
                     }
                   >
@@ -286,7 +302,7 @@ const RateLimits = () => {
                     render={({ field }) => (
                       <FormItem_Shadcn_>
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_ type="number" {...field} />
+                          <Input_Shadcn_ type="number" {...field} disabled={!canUpdateConfig} />
                         </FormControl_Shadcn_>
                         {field.value > 0 && (
                           <>
@@ -295,7 +311,6 @@ const RateLimits = () => {
                             </p>
                           </>
                         )}
-                        <FormMessage_Shadcn_ />
                       </FormItem_Shadcn_>
                     )}
                   />
@@ -309,7 +324,7 @@ const RateLimits = () => {
                     description={
                       <p className="text-foreground-light text-sm">
                         Number of OTP/Magic link verifications that can be made in a 5 minute
-                        interval
+                        interval per IP address.
                       </p>
                     }
                   >
@@ -324,14 +339,98 @@ const RateLimits = () => {
                     render={({ field }) => (
                       <FormItem_Shadcn_>
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_ type="number" {...field} />
+                          <Input_Shadcn_ type="number" {...field} disabled={!canUpdateConfig} />
                         </FormControl_Shadcn_>
                         {field.value > 0 && (
                           <p className="text-foreground-lighter text-sm">
                             This is equivalent to {field.value * 12} requests per hour
                           </p>
                         )}
-                        <FormMessage_Shadcn_ />
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+                </FormSectionContent>
+              </FormSection>
+
+              <FormSection
+                id="anonymous-users"
+                header={
+                  <FormSectionLabel
+                    description={
+                      <p className="text-foreground-light text-sm">
+                        Number of anonymous sign-ins that can be made per hour per IP address.
+                      </p>
+                    }
+                  >
+                    Rate limit for anonymous users
+                  </FormSectionLabel>
+                }
+              >
+                <FormSectionContent loading={false}>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="RATE_LIMIT_ANONYMOUS_USERS"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_
+                            disabled={!canUpdateConfig || !canUpdateAnonymousUsersRateLimit}
+                            type="number"
+                            {...field}
+                          />
+                        </FormControl_Shadcn_>
+                        {!canUpdateAnonymousUsersRateLimit && (
+                          <Alert_Shadcn_>
+                            <WarningIcon />
+                            <AlertTitle_Shadcn_>
+                              Anonymous logins are not enabled for your project
+                            </AlertTitle_Shadcn_>
+                            <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
+                              <p className="!leading-tight">
+                                Enable anonymous logins to update this rate limit
+                              </p>
+                              <Button asChild type="default" className="w-min">
+                                <Link href={`/project/${projectRef}/settings/auth`}>
+                                  View auth settings
+                                </Link>
+                              </Button>
+                            </AlertDescription_Shadcn_>
+                          </Alert_Shadcn_>
+                        )}
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+                </FormSectionContent>
+              </FormSection>
+              <FormSection
+                id="otp"
+                header={
+                  <FormSectionLabel
+                    description={
+                      <p className="text-foreground-light text-sm">
+                        Number of sign up and sign-in requests that can be made per hour per IP
+                        address (excludes anonymous users).
+                      </p>
+                    }
+                  >
+                    Rate limit for sign ups and sign ins
+                  </FormSectionLabel>
+                }
+              >
+                <FormSectionContent loading={false}>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="RATE_LIMIT_OTP"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_>
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_ type="number" {...field} disabled={!canUpdateConfig} />
+                        </FormControl_Shadcn_>
+                        {field.value > 0 && (
+                          <FormDescription_Shadcn_ className="text-foreground-lighter">
+                            This is equivalent to {field.value * 12} requests per hour
+                          </FormDescription_Shadcn_>
+                        )}
                       </FormItem_Shadcn_>
                     )}
                   />

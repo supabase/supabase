@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { RenderEditCellProps } from 'react-data-grid'
+import type { RenderEditCellProps } from 'react-data-grid'
 
 function autoFocusAndSelect(input: HTMLInputElement | null) {
   input?.focus()

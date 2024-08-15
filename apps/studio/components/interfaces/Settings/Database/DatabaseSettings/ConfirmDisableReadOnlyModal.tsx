@@ -34,7 +34,7 @@ const ConfirmDisableReadOnlyModeModal = ({
         disableReadOnlyMode({ projectRef: ref })
       }}
     >
-      <Modal.Content className="py-4 space-y-2">
+      <Modal.Content className="space-y-2">
         <p className="text-sm">
           This will temporarily allow writes to your database for the{' '}
           <span className="text-amber-900">next 15 minutes</span>, during which you can reduce your

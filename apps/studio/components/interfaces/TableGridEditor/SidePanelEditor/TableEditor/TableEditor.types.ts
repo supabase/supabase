@@ -1,5 +1,5 @@
-import { Dictionary } from 'types'
-import { ColumnField } from '../SidePanelEditor.types'
+import type { Dictionary } from 'types'
+import type { ColumnField } from '../SidePanelEditor.types'
 
 export interface TableField {
   id: number

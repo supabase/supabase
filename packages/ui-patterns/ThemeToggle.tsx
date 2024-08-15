@@ -1,3 +1,5 @@
+'use client'
+
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
 import {
@@ -9,14 +11,22 @@ import {
   DropdownMenuTrigger,
   IconMoon,
   IconSun,
+  Theme,
+  cn,
   themes,
 } from 'ui'
 
 interface ThemeToggleProps {
   forceDark?: boolean
+  triggerClassName?: string
+  contentClassName?: string
 }
 
-export const ThemeToggle = ({ forceDark = false }: ThemeToggleProps) => {
+export const ThemeToggle = ({
+  forceDark = false,
+  triggerClassName,
+  contentClassName,
+}: ThemeToggleProps) => {
   const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
 
@@ -28,14 +38,17 @@ export const ThemeToggle = ({ forceDark = false }: ThemeToggleProps) => {
       <DropdownMenuTrigger asChild disabled={forceDark}>
         <button
           id="user-settings-dropdown"
-          className="flex items-center justify-center h-7 w-7 text-foreground"
+          className={cn(
+            'flex items-center justify-center h-7 w-7 text-foreground-light',
+            triggerClassName
+          )}
         >
           <IconSun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <IconMoon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Toggle theme</span>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-60">
+      <DropdownMenuContent align="end" className={cn('w-60', contentClassName)}>
         <DropdownMenuGroup>
           <DropdownMenuRadioGroup
             value={currentTheme} // Use the currentTheme variable here
@@ -43,11 +56,13 @@ export const ThemeToggle = ({ forceDark = false }: ThemeToggleProps) => {
               setTheme(value)
             }}
           >
-            {themes.map((theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                {theme.name}
-              </DropdownMenuRadioItem>
-            ))}
+            {themes
+              .filter((x) => x.value === 'dark' || x.value === 'light' || x.value === 'system')
+              .map((theme: Theme) => (
+                <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                  {theme.name}
+                </DropdownMenuRadioItem>
+              ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
       </DropdownMenuContent>

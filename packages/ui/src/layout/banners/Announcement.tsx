@@ -1,9 +1,12 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 
-import _announcement from './data/Announcement.json'
-import { IconX, cn } from 'ui'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
+import IconX from '../../components/Icon/icons/IconX/IconX'
+import { cn } from '../../lib/utils/cn'
+import _announcement from './data/Announcement.json'
 
 export interface AnnouncementProps {
   show: boolean
@@ -29,8 +32,8 @@ const Announcement = ({
 }: PropsWithChildren<AnnouncementComponentProps>) => {
   const [hidden, setHidden] = useState(false)
 
-  const router = useRouter()
-  const isLaunchWeekSection = router.pathname.includes('launch-week')
+  const pathname = usePathname()
+  const isLaunchWeekSection = pathname?.includes('launch-week') ?? false
 
   // override to hide announcement
   if (!show || !announcement.show) return null

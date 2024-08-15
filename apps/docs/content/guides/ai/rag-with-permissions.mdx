@@ -1,0 +1,272 @@
+---
+id: 'ai-rag-with-permissions'
+title: 'RAG with Permissions'
+subtitle: 'Fine-grain access control with Retrieval Augmented Generation.'
+description: 'Implement fine-grain access control with retrieval augmented generation'
+sidebar_label: 'RAG with Permissions'
+---
+
+Since pgvector is built on top of Postgres, you can implement fine-grain access control on your vector database using [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security). This means you can restrict which documents are returned during a vector similarity search to users that have access to them. Supabase also supports [Foreign Data Wrappers (FDW)](/docs/guides/database/extensions/wrappers/overview) which means you can use an external database or data source to determine these permissions if your user data doesn't exist in Supabase.
+
+Use this guide to learn how to restrict access to documents when performing retrieval augmented generation (RAG).
+
+## Example
+
+In a typical RAG setup, your documents are chunked into small subsections and similarity is performed over those sections:
+
+```sql
+-- Track documents/pages/files/etc
+create table documents (
+  id bigint primary key generated always as identity,
+  name text not null,
+  owner_id uuid not null references auth.users (id) default auth.uid(),
+  created_at timestamp with time zone not null default now()
+);
+
+-- Store the content and embedding vector for each section in the document
+-- with a reference to original document (one-to-many)
+create table document_sections (
+  id bigint primary key generated always as identity,
+  document_id bigint not null references documents (id),
+  content text not null,
+  embedding vector (384)
+);
+```
+
+Notice how we record the `owner_id` on each document. Let's create an RLS policy that restricts access to `document_sections` based on whether or not they own the linked document:
+
+```sql
+-- enable row level security
+alter table document_sections enable row level security;
+
+-- setup RLS for select operations
+create policy "Users can query their own document sections"
+on document_sections for select to authenticated using (
+  document_id in (
+    select id
+    from documents
+    where (owner_id = (select auth.uid()))
+  )
+);
+```
+
+<Admonition>
+
+In this example, the current user is determined using the built-in `auth.uid()` function when the query is executed through your project's auto-generated [REST API](/docs/guides/api). If you are connecting to your Supabase database through a direct Postgres connection, see [Direct Postgres Connection](#direct-postgres-connection) below for directions on how to achieve the same access control.
+
+</Admonition>
+
+Now every `select` query executed on `document_sections` will implicitly filter the returned sections based on whether or not the current user has access to them.
+
+For example, executing:
+
+```sql
+select * from document_sections;
+```
+
+as an authenticated user will only return rows that they are the owner of (as determined by the linked document). More importantly, semantic search over these sections (or any additional filtering for that matter) will continue to respect these RLS policies:
+
+```sql
+-- Perform inner product similarity based on a match_threshold
+select *
+from document_sections
+where document_sections.embedding <#> embedding < -match_threshold
+order by document_sections.embedding <#> embedding;
+```
+
+The above example only configures `select` access to users. If you wanted, you could create more RLS policies for inserts, updates, and deletes in order to apply the same permission logic for those other operations. See [Row Level Security](/docs/guides/database/postgres/row-level-security) for a more in-depth guide on RLS policies.
+
+## Alternative scenarios
+
+Every app has its own unique requirements and may differ from the above example. Here are some alternative scenarios we often see and how they are implemented in Supabase.
+
+### Documents owned by multiple people
+
+Instead of a one-to-many relationship between `users` and `documents`, you may require a many-to-many relationship so that multiple people can access the same document. Let's reimplement this using a join table:
+
+```sql
+create table document_owners (
+  id bigint primary key generated always as identity,
+  owner_id uuid not null references auth.users (id) default auth.uid(),
+  document_id bigint not null references documents (id)
+);
+```
+
+Then your RLS policy would change to:
+
+```sql
+create policy "Users can query their own document sections"
+on document_sections for select to authenticated using (
+  document_id in (
+    select document_id
+    from document_owners
+    where (owner_id = (select auth.uid()))
+  )
+);
+```
+
+Instead of directly querying the `documents` table, we query the join table.
+
+### User and document data live outside of Supabase
+
+You may have an existing system that stores users, documents, and their permissions in a separate database. Let's explore the scenario where this data exists in another Postgres database. We'll use a foreign data wrapper (FDW) to connect to the external DB from within your Supabase DB:
+
+<Admonition type="caution">
+
+RLS is latency-sensitive, so extra caution should be taken before implementing this method. Use the [query plan analyzer](https://supabase.com/docs/guides/platform/performance#optimizing-poor-performing-queries) to measure execution times for your queries to ensure they are within expected ranges. For enterprise applications, contact enterprise@supabase.io.
+
+</Admonition>
+
+<Admonition>
+
+For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, please contact [support](https://supabase.com/dashboard/support/new) and we'll be happy to discuss your use case.
+
+</Admonition>
+
+Let's assume your external DB contains a `users` and `documents` table like this:
+
+```sql
+create table public.users (
+  id bigint primary key generated always as identity,
+  email text not null,
+  created_at timestamp with time zone not null default now()
+);
+
+create table public.documents (
+  id bigint primary key generated always as identity,
+  name text not null,
+  owner_id bigint not null references public.users (id),
+  created_at timestamp with time zone not null default now()
+);
+```
+
+In your Supabase DB, let's create foreign tables that link to the above tables:
+
+```sql
+create schema external;
+create extension postgres_fdw with schema extensions;
+
+-- Setup the foreign server
+create server foreign_server
+  foreign data wrapper postgres_fdw
+  options (host '<db-host>', port '<db-port>', dbname '<db-name>');
+
+-- Map local 'authenticated' role to external 'postgres' user
+create user mapping for authenticated
+  server foreign_server
+  options (user 'postgres', password '<user-password>');
+
+-- Import foreign 'users' and 'documents' tables into 'external' schema
+import foreign schema public limit to (users, documents)
+  from server foreign_server into external;
+```
+
+<Admonition>
+
+This example maps the `authenticated` role in Supabase to the `postgres` user in the external DB. In production, it's best to create a custom user on the external DB that has the minimum permissions necessary to access the information you need.
+
+On the Supabase DB, we use the built-in `authenticated` role which is automatically used when end users make authenticated requests over your auto-generated REST API. If you plan to connect to your Supabase DB over a direct Postgres connection instead of the REST API, you can change this to any user you like. See [Direct Postgres Connection](#direct-postgres-connection) for more info.
+
+</Admonition>
+
+We'll store `document_sections` and their embeddings in Supabase so that we can perform similarity search over them via pgvector.
+
+```sql
+create table document_sections (
+  id bigint primary key generated always as identity,
+  document_id bigint not null,
+  content text not null,
+  embedding vector (384)
+);
+```
+
+We maintain a reference to the foreign document via `document_id`, but without a foreign key reference since foreign keys can only be added to local tables. Be sure to use the same ID data type that you use on your external documents table.
+
+Since we're managing users and authentication outside of Supabase, we have two options:
+
+1. Make a direct Postgres connection to the Supabase DB and set the current user every request
+2. Issue a custom JWT from your system and use it to authenticate with the REST API
+
+#### Direct Postgres connection
+
+You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/settings/database) on your project's database settings page. To use RLS with this method, we use a custom session variable that contains the current user's ID:
+
+```sql
+-- enable row level security
+alter table document_sections enable row level security;
+
+-- setup RLS for select operations
+create policy "Users can query their own document sections"
+on document_sections for select to authenticated using (
+  document_id in (
+    select id
+    from external.documents
+    where owner_id = current_setting('app.current_user_id')::bigint
+  )
+);
+```
+
+The session variable is accessed through the `current_setting()` function. We name the variable `app.current_user_id` here, but you can modify this to any name you like. We also cast it to a `bigint` since that was the data type of the `user.id` column. Change this to whatever data type you use for your ID.
+
+Now for every request, we set the user's ID at the beginning of the session:
+
+```sql
+set app.current_user_id = '<current-user-id>';
+```
+
+Then all subsequent queries will inherit the permission of that user:
+
+```sql
+-- Only document sections owned by the user are returned
+select *
+from document_sections
+where document_sections.embedding <#> embedding < -match_threshold
+order by document_sections.embedding <#> embedding;
+```
+
+<Admonition>
+
+You might be tempted to discard RLS completely and simply filter by user within the `where` clause. Though this will work, we recommend RLS as a general best practice since RLS is always applied even as new queries and application logic is introduced in the future.
+
+</Admonition>
+
+#### Custom JWT with REST API
+
+If you would like to use the auto-generated REST API to query your Supabase database using JWTs from an external auth provider, you can get your auth provider to issue a custom JWT for Supabase.
+
+See the [Clerk Supabase docs](https://clerk.com/docs/integrations/databases/supabase) for an example of how this can be done. Modify the instructions to work with your own auth provider as needed.
+
+Now we can simply use the same RLS policy from our first example:
+
+```sql
+-- enable row level security
+alter table document_sections enable row level security;
+
+-- setup RLS for select operations
+create policy "Users can query their own document sections"
+on document_sections for select to authenticated using (
+  document_id in (
+    select id
+    from documents
+    where (owner_id = (select auth.uid()))
+  )
+);
+```
+
+Under the hood, `auth.uid()` references `current_setting('request.jwt.claim.sub')` which corresponds to the JWT's `sub` (subject) claim. This setting is automatically set at the beginning of each request to the REST API.
+
+All subsequent queries will inherit the permission of that user:
+
+```sql
+-- Only document sections owned by the user are returned
+select *
+from document_sections
+where document_sections.embedding <#> embedding < -match_threshold
+order by document_sections.embedding <#> embedding;
+```
+
+### Other scenarios
+
+There are endless approaches to this problem based on the complexities of each system. Luckily Postgres comes with all the primitives needed to provide access control in the way that works best for your project.
+
+If the examples above didn't fit your use case or you need to adjust them slightly to better fit your existing system, feel free to reach out to [support](https://supabase.com/dashboard/support/new) and we'll be happy to assist you.

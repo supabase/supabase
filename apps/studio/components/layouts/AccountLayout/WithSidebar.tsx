@@ -1,11 +1,11 @@
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { ReactNode } from 'react'
-import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 
-import { useFlag } from 'hooks'
-import LayoutHeader from '../ProjectLayout/LayoutHeader'
-import { SidebarLink, SidebarSection } from './AccountLayout.types'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
+import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
+import type { SidebarLink, SidebarSection } from './AccountLayout.types'
 
 interface WithSidebarProps {
   title: string
@@ -39,7 +39,7 @@ const WithSidebar = ({
         <div
           id="with-sidebar"
           className={[
-            'h-full bg-background',
+            'h-full bg-dash-sidebar',
             'hide-scrollbar w-64 overflow-auto border-r border-default',
           ].join(' ')}
         >
@@ -98,7 +98,7 @@ const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWit
     {section.heading && <Menu.Group title={section.heading} />}
     {section.versionLabel && (
       <div className="mb-1 px-3">
-        <Badge color="yellow">{section.versionLabel}</Badge>
+        <Badge variant="warning">{section.versionLabel}</Badge>
       </div>
     )}
     {
@@ -174,7 +174,7 @@ const SidebarLinkItem = ({
       icon = <IconArrowUpRight size={'tiny'} />
     }
 
-    if (label === 'Logout') {
+    if (label === 'Log out') {
       icon = <IconLogOut size={'tiny'} />
     }
 

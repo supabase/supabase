@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -18,10 +18,17 @@ const CTABanner = dynamic(() => import('~/components/CTABanner'))
 export default function IndexPage() {
   const router = useRouter()
   const { asPath } = useRouter()
+  const [mounted, setMounted] = useState(false)
 
   const meta_title = 'Pricing & Fees | Supabase'
   const meta_description =
-    'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
+    'Explore Supabase fees and pricing information. Find our competitive pricing Plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up.'
+
+  useEffect(() => {
+    setTimeout(() => {
+      setMounted(true)
+    }, 200)
+  }, [])
 
   // Ability to scroll into pricing sections like storage
   useEffect(() => {
@@ -69,7 +76,7 @@ export default function IndexPage() {
               <br className="block lg:hidden" /> designed to scale
             </h1>
             <p className="p text-lg leading-5">
-              Start building for free, collaborate with a team, then scale to millions of users.
+              Start building for free, collaborate with your team, then scale to billions of users
             </p>
           </div>
         </div>
@@ -78,10 +85,6 @@ export default function IndexPage() {
       <PricingPlans />
 
       <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
-        <p className="text-foreground-lighter">
-          We will only bill extra for resources consumed
-          <br className="hidden md:block" /> exceeding the inclusive quota limits in your paid plan
-        </p>
         <div className="flex justify-center gap-2">
           <a href="#compare-plans">
             <Button size="tiny" type="secondary" iconRight={<ArrowDownIcon className="w-3" />}>
@@ -118,14 +121,16 @@ export default function IndexPage() {
         <PricingFAQs />
       </div>
       <CTABanner />
-      <ReactTooltip
-        wrapper="span"
-        effect="solid"
-        backgroundColor="hsl(var(--background-alternative-default))"
-        textColor="hsl(var(--foreground-light))"
-        className="!max-w-[320px] !px-3 whitespace-pre-line"
-        uuid="pricingtt"
-      />
+      {mounted && (
+        <ReactTooltip
+          wrapper="span"
+          effect="solid"
+          backgroundColor="hsl(var(--background-alternative-default))"
+          textColor="hsl(var(--foreground-light))"
+          className="!max-w-[320px] !px-3 whitespace-pre-line"
+          uuid="pricing-tt"
+        />
+      )}
     </DefaultLayout>
   )
 }

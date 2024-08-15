@@ -8,8 +8,8 @@ module.exports = {
   },
   setupFiles: ['./test/setup.ts'],
   setupFilesAfterEnv: ['./test/extensions.ts'],
-  testTimeout: 15000,
+  testTimeout: 30000,
   transformIgnorePatterns: [
-    'node_modules/(?!(mdast-.*|micromark|micromark-.*|unist-.*|decode-named-character-reference|character-entities)/)',
+    'node_modules/(?!(mdast-.*|micromark|micromark-.*|unist-.*|decode-named-character-reference|character-entities|chalk)/)',
   ],
 }

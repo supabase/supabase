@@ -399,6 +399,17 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.enable_anonymous_sign_ins'
+    title: 'auth.enable_anonymous_sign_ins'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Allow/disallow anonymous sign-ins to your project.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.email.enable_signup'
     title: 'auth.email.enable_signup'
     tags: ['auth']
@@ -431,6 +442,51 @@ parameters:
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.email.smtp.host'
+    title: 'auth.email.smtp.host'
+    tags: ['auth']
+    required: false
+    default: 'inbucket'
+    description: |
+      Hostname or IP address of the SMTP server.
+
+  - id: 'auth.email.smtp.port'
+    title: 'auth.email.smtp.port'
+    tags: ['auth']
+    required: false
+    default: 2500
+    description: |
+      Port number of the SMTP server.
+
+  - id: 'auth.email.smtp.user'
+    title: 'auth.email.smtp.user'
+    tags: ['auth']
+    required: false
+    description: |
+      Username for authenticating with the SMTP server.
+
+  - id: 'auth.email.smtp.pass'
+    title: 'auth.email.smtp.pass'
+    tags: ['auth']
+    required: false
+    description: |
+      Password for authenticating with the SMTP server.
+
+  - id: 'auth.email.smtp.admin_email'
+    title: 'auth.email.smtp.admin_email'
+    tags: ['auth']
+    required: false
+    default: 'admin@email.com'
+    description: |
+      Email used as the sender for emails sent from the application.
+
+  - id: 'auth.email.smtp.sender_name'
+    title: 'auth.email.smtp.sender_name'
+    tags: ['auth']
+    required: false
+    description: |
+      Display name used as the sender for emails sent from the application.
 
   - id: 'auth.email.template.type.subject'
     title: 'auth.email.template.<type>.subject'
@@ -644,6 +700,7 @@ parameters:
       - `github`
       - `gitlab`
       - `google`
+      - `kakao`
       - `keycloak`
       - `linkedin`
       - `notion`

@@ -1,15 +1,16 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { FileText } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
-import { useFlag } from 'hooks'
+import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'
-import { Button, IconFileText } from 'ui'
+import { Button } from 'ui'
 
 type SignInLayoutProps = {
   heading: string
@@ -63,11 +64,6 @@ const SignInLayout = ({
 
           await queryClient.resetQueries()
           router.push(getReturnToPath())
-        } else {
-          // if the user doesn't have a token, he needs to go back to the sign-in page
-          const redirectTo = buildPathWithParams('/sign-in')
-          router.replace(redirectTo)
-          return
         }
       })
       .catch(() => {}) // catch all errors thrown by auth methods
@@ -113,7 +109,7 @@ const SignInLayout = ({
             </div>
 
             <div className="items-center hidden space-x-3 md:ml-10 md:flex md:pr-4">
-              <Button asChild type="default" icon={<IconFileText />}>
+              <Button asChild type="default" icon={<FileText />}>
                 <Link href="https://supabase.com/docs" target="_blank" rel="noreferrer">
                   Documentation
                 </Link>
@@ -123,7 +119,7 @@ const SignInLayout = ({
         </div>
 
         <div className="flex flex-1">
-          <main className="flex flex-col items-center flex-1 flex-shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-background border-default">
+          <main className="flex flex-col items-center flex-1 flex-shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-studio border-default">
             <div className="flex-1 flex flex-col justify-center w-[330px] sm:w-[384px]">
               <div className="mb-10">
                 <h1 className="mt-8 mb-2 text-2xl lg:text-3xl">{heading}</h1>

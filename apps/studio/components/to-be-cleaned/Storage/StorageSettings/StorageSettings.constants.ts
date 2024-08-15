@@ -1,4 +1,4 @@
-export const STORAGE_FILE_SIZE_LIMIT_MAX_BYTES = 5 * 1024 * 1024 * 1024 // 5 GB
+export const STORAGE_FILE_SIZE_LIMIT_MAX_BYTES = 50 * 1024 * 1024 * 1024 // 50 GB
 
 export enum StorageSizeUnits {
   BYTES = 'bytes',

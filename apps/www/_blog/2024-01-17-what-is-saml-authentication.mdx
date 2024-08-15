@@ -135,7 +135,7 @@ on invited_users
 as restrictive
 for insert
 with check (
-	sso_provider_id = auth.jwt()#>>'{amr,0,provider}'
+	sso_provider_id = (select auth.jwt()#>>'{amr,0,provider}')
 );
 ```
 

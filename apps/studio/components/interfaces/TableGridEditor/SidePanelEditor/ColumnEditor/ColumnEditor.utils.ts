@@ -1,9 +1,9 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { find, isEqual, isNull } from 'lodash'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { uuidv4 } from 'lib/helpers'
 import {
   ColumnField,
@@ -92,8 +92,8 @@ export const generateCreateColumnPayload = (
   const payload: CreateColumnPayload = {
     tableId,
     isIdentity,
-    name: field.name,
-    comment: field.comment,
+    name: field.name.trim(),
+    comment: field.comment?.trim(),
     type: field.isArray ? `${field.format}[]` : field.format,
     check: field.check?.trim() || undefined,
     isUnique: field.isUnique,
@@ -123,18 +123,22 @@ export const generateUpdateColumnPayload = (
   const isOriginallyPrimaryKey = primaryKeyColumns.includes(originalColumn.name)
 
   // Only append the properties which are getting updated
+  const name = field.name.trim()
   const type = field.isArray ? `${field.format}[]` : field.format
-  const comment = (field.comment?.length ?? '') === 0 ? null : field.comment
+  const comment = ((field.comment?.length ?? '') === 0 ? null : field.comment)?.trim()
+  const check = field.check?.trim()
 
   const payload: Partial<UpdateColumnPayload> = {}
-  if (!isEqual(originalColumn.name, field.name)) {
-    payload.name = field.name
+  // [Joshen] Trimming on the original name as well so we don't rename columns that already
+  // contain whitespaces (and accidentally bringing user apps down)
+  if (!isEqual(originalColumn.name.trim(), name)) {
+    payload.name = name
   }
-  if (!isEqual(originalColumn.comment, comment)) {
+  if (!isEqual(originalColumn.comment?.trim(), comment)) {
     payload.comment = comment as string | undefined
   }
-  if (!isEqual(originalColumn.check?.trim(), field.check?.trim())) {
-    payload.check = field.check?.trim()
+  if (!isEqual(originalColumn.check?.trim(), check)) {
+    payload.check = check
   }
 
   if (!isEqual(originalColumn.format, type)) {

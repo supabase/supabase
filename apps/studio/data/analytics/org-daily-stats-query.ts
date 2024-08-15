@@ -1,8 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
+
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { AnalyticsData } from './constants'
+import type { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
 
 export enum EgressType {
@@ -10,6 +11,8 @@ export enum EgressType {
   AUTH = 'egress_auth',
   STORAGE = 'egress_storage',
   REALTIME = 'egress_realtime',
+  FUNCTIONS = 'egress_functions',
+  SUPAVISOR = 'egress_supavisor',
   UNIFIED = 'egress',
 }
 
@@ -18,13 +21,25 @@ export enum PricingMetric {
   EGRESS = 'EGRESS',
   DATABASE_SIZE = 'DATABASE_SIZE',
   STORAGE_SIZE = 'STORAGE_SIZE',
+  DISK_SIZE_GB_HOURS_GP3 = 'DISK_SIZE_GB_HOURS_GP3',
+  DISK_SIZE_GB_HOURS_IO2 = 'DISK_SIZE_GB_HOURS_IO2',
   MONTHLY_ACTIVE_USERS = 'MONTHLY_ACTIVE_USERS',
   MONTHLY_ACTIVE_SSO_USERS = 'MONTHLY_ACTIVE_SSO_USERS',
+  MONTHLY_ACTIVE_THIRD_PARTY_USERS = 'MONTHLY_ACTIVE_THIRD_PARTY_USERS',
   FUNCTION_INVOCATIONS = 'FUNCTION_INVOCATIONS',
-  FUNCTION_COUNT = 'FUNCTION_COUNT',
   STORAGE_IMAGES_TRANSFORMED = 'STORAGE_IMAGES_TRANSFORMED',
   REALTIME_MESSAGE_COUNT = 'REALTIME_MESSAGE_COUNT',
   REALTIME_PEAK_CONNECTIONS = 'REALTIME_PEAK_CONNECTIONS',
+  CUSTOM_DOMAIN = 'CUSTOM_DOMAIN',
+  IPV4 = 'IPV4',
+  PITR_7 = 'PITR_7',
+  PITR_14 = 'PITR_14',
+  PITR_28 = 'PITR_28',
+  DISK_IOPS_GP3 = 'DISK_IOPS_GP3',
+  DISK_IOPS_IO2 = 'DISK_IOPS_IO2',
+  DISK_THROUGHPUT_GP3 = 'DISK_THROUGHPUT_GP3',
+  LOG_DRAIN = 'LOG_DRAIN',
+  LOG_DRAIN_EVENTS = 'LOG_DRAIN_EVENTS',
 }
 
 export enum ComputeUsageMetric {

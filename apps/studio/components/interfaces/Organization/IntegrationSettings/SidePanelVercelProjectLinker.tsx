@@ -1,6 +1,8 @@
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
 import ProjectLinker, { ForeignProject } from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -9,7 +11,7 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization, useStore } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
@@ -22,7 +24,7 @@ const VERCEL_ICON = (
 )
 
 const SidePanelVercelProjectLinker = () => {
-  const { ui } = useStore()
+  const { ref } = useParams()
   const selectedOrganization = useSelectedOrganization()
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
   const organizationIntegrationId = sidePanelStateSnapshot.vercelConnectionsIntegrationId
@@ -52,8 +54,7 @@ const SidePanelVercelProjectLinker = () => {
     () =>
       supabaseProjectsData
         ?.filter((project) => project.organization_id === selectedOrganization?.id)
-        .map((project) => ({ id: project.id.toString(), name: project.name, ref: project.ref })) ??
-      EMPTY_ARR,
+        .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
     [selectedOrganization?.id, supabaseProjectsData]
   )
 
@@ -89,11 +90,9 @@ const SidePanelVercelProjectLinker = () => {
     useIntegrationVercelConnectionsCreateMutation({
       async onSuccess({ env_sync_error: envSyncError }) {
         if (envSyncError) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to sync environment variables: ${envSyncError.message}`,
-            description: 'Please try re-syncing manually from settings.',
-          })
+          toast.error(
+            `Failed to sync environment variables: ${envSyncError.message}. Please try re-syncing manually from settings.`
+          )
         }
 
         sidePanelStateSnapshot.setVercelConnectionsOpen(false)
@@ -122,13 +121,13 @@ const SidePanelVercelProjectLinker = () => {
 
   return (
     <SidePanel
-      header={'Add new Vercel Project Connection'}
-      size="large"
-      visible={sidePanelStateSnapshot.vercelConnectionsOpen}
       hideFooter
+      size="large"
+      header="Add new Vercel project connection"
+      visible={sidePanelStateSnapshot.vercelConnectionsOpen}
       onCancel={() => sidePanelStateSnapshot.setVercelConnectionsOpen(false)}
     >
-      <div className="py-10 flex flex-col gap-6 bg-background h-full">
+      <div className="py-6 flex flex-col gap-6 bg-studio h-full">
         <SidePanel.Content>
           <Markdown
             content={`
@@ -140,6 +139,7 @@ Check the details below before proceeding
         </SidePanel.Content>
         <SidePanel.Content className="flex flex-col gap-2">
           <ProjectLinker
+            defaultSupabaseProjectRef={ref}
             organizationIntegrationId={selectedIntegration?.id}
             foreignProjects={vercelProjects}
             supabaseProjects={supabaseProjects}
@@ -149,6 +149,7 @@ Check the details below before proceeding
             integrationIcon={VERCEL_ICON}
             getForeignProjectIcon={getForeignProjectIcon}
             choosePrompt="Choose Vercel Project"
+            mode="Vercel"
           />
           <Markdown
             content={`
