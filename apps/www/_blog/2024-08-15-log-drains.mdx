@@ -53,7 +53,7 @@ When self-hosting or during local development, Log Drains will be available thro
 
 ## The Supabase Analytics server
 
-Log Drains is built on [Logflare](https://github.com/Logflare/logflare), the analytics and observability server of the Supabase stack.
+Log Drains are built into [Logflare](https://github.com/Logflare/logflare), the analytics and observability server of the Supabase stack.
 
 The architecture of analytics server had to be rewritten to allow for efficient and scalable log dispatching to multiple destinations. This architecture revamp is part of a multi-year effort to allow multiple backends to be used with the server, as the initial architecture was heavily tied to Google BigQuery. This was first seen through our initial release of [Supabase Logs Self-Hosted](https://supabase.com/blog/supabase-logs-self-hosted) which utilizes a PostgreSQL backend out-of-the-box for self-hosted and CLI setups. User can optionally switch between a PostgreSQL backend and a BigQuery backend depending on their needs.
 
