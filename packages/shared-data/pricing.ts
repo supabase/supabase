@@ -438,7 +438,7 @@ export const pricing: Pricing = {
       {
         title: 'Number of functions',
         plans: {
-          free: '10 included',
+          free: '25 included',
           pro: '500 included',
           team: '1000 included',
           enterprise: 'Unlimited',

@@ -134,14 +134,16 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
       const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       if (IS_PLATFORM && hasAcknowledgedConsent === null) {
-        consentToastId.current = toast(
-          <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
-          {
-            id: 'consent-toast',
-            position: 'bottom-right',
-            duration: Infinity,
-          }
-        )
+        setTimeout(() => {
+          consentToastId.current = toast(
+            <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
+            {
+              id: 'consent-toast',
+              position: 'bottom-right',
+              duration: Infinity,
+            }
+          )
+        }, 300)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

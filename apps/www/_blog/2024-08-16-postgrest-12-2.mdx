@@ -1,5 +1,5 @@
 ---
-title: "PostgREST 12.2: Prometheus compatibility and statement timeouts"
+title: 'PostgREST 12.2: Prometheus compatibility and statement timeouts'
 description: New features in the latest 12.2 release of PostgREST
 author: steve_chavez
 image: lw12/day-5/OG_postgREST.png
@@ -17,11 +17,11 @@ date: '2024-08-16'
 toc_depth: 3
 ---
 
-[PostgREST 12.2](https://github.com/PostgREST/postgrest/releases/tag/v12.2.0) is out! It comes with Observability and API improvements. In this post, we’ll see what’s new.
+[PostgREST 12.2](https://github.com/PostgREST/postgrest/releases/tag/v12.2.0) is out! It comes with Observability and API improvements. In this post, we'll see what's new.
 
 ## Prometheus Metrics
 
-Version 12.2 ships with Prometheus-compatible metrics for PostgREST’s schema cache and connection pool. These are useful for troubleshooting, for example, when PostgREST’s pool is starved for connections.
+Version 12.2 ships with Prometheus-compatible metrics for PostgREST's schema cache and connection pool. These are useful for troubleshooting, for example, when PostgREST's pool is starved for connections.
 
 ```bash
 curl localhost:3001/metrics
@@ -37,7 +37,7 @@ A full list of supported metrics is available in the [PostgREST documentation](h
 
 ## Hoisted Function Settings
 
-Sometimes it’s handy to set a custom timeout per function. You can now do this on 12.2 projects with:
+Sometimes it's handy to set a custom timeout per function. You can now do this on 12.2 projects with:
 
 ```sql
 create or replace function special_function()
@@ -65,7 +65,7 @@ In prior versions of PostgREST, users could limit the number of records impacted
 For example:
 
 ```bash
-curl -i "http://localhost:3000/items?id=lt.15 -X DELETE \
+curl -i "http://localhost:3000/items?id=lt.15" -X DELETE \
   -H "Content-Type: application/json" \
   -H "Prefer: handling=strict, max-affected=10"
 ```

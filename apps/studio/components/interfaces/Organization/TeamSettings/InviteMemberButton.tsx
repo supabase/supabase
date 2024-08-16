@@ -74,9 +74,8 @@ export const InviteMemberButton = () => {
   const { data: projects } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
-  const orgScopedRoles = (allRoles?.org_scoped_roles ?? []).sort(
-    (a, b) => b.base_role_id - a.base_role_id
-  )
+  const orgScopedRoles = allRoles?.org_scoped_roles ?? []
+
   const orgProjects = (projects ?? [])
     .filter((project) => project.organization_id === organization?.id)
     .sort((a, b) => a.name.localeCompare(b.name))

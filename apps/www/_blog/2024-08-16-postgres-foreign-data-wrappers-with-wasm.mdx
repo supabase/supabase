@@ -19,7 +19,7 @@ toc_depth: 3
 
 Foreign Data Wrappers (FDWs) allow Postgres to interact with externally hosted data. To operate a FDW, the user creates a foreign table. When queried, the foreign table reaches out to the 3rd party service, collects the requested data, and returns it to the query in the shape defined by the foreign table. This allows seamless querying and data manipulation across different tools as if they were local tables from within Postgres.
 
-[Wrappers](https://github.com/supabase/wrappers) is a Rust framework for creating Postgres Foreign Data Wrappers. Today we’re releasing support for [Wasm (WebAssembly)](https://webassembly.org/) wrappers.
+[Wrappers](https://github.com/supabase/wrappers) is a Rust framework for creating Postgres Foreign Data Wrappers. Today we're releasing support for [Wasm (WebAssembly)](https://webassembly.org/) wrappers.
 
 With this feature, anyone can create a Wasm wrapper to an external service and run it directly from e.g. GitHub:
 
@@ -235,4 +235,4 @@ None of this innovation would have been possible without the relentless efforts 
 
 [Aayushya Vajpayee](https://github.com/AayushyaVajpayee), [Romain Graux](https://github.com/romaingrx)
 
-Want to join the Supabase Wrappers community contributors? [Check out our contribution docs](https://fdw.dev/contributing/core/).
+Want to join the Supabase Wrappers community contributors? [Check out our contribution docs](https://fdw.dev/contributing/core/).
