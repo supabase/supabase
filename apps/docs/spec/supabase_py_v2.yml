@@ -712,7 +712,7 @@ functions:
         subContent:
           - name: provider
             isOptional: false
-            type: '"google" | "apple" | "azure" | "facebook" | string'
+            type: '"google" | "apple" | "azure" | "facebook" | "kakao" | string'
             description: | 
               Provider name or OIDC `iss` value identifying which provider should be used to verify the provided token. Supported names: `google`, `apple`, `azure`, `facebook`, `kakao`, `keycloak` (deprecated).
           - name: token
