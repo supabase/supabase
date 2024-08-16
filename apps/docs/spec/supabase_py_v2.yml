@@ -162,7 +162,7 @@ functions:
         code: |
           ```python          
           response = supabase.auth.sign_up(
-              credentials={"email": "email@example.com", "password": "password"}
+              {"email": "email@example.com", "password": "password"}
           )
           ```
         response: |
@@ -267,10 +267,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_up(
-              credentials={
-                  "phone": "123456789",
-                  "password": "password",
-              }
+              {"phone": "123456789", "password": "password"}
           )
           ```
       - id: sign-up-phone-whatsapp
@@ -281,7 +278,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_up(
-              credentials={
+              {
                   "phone": "123456789",
                   "password": "password",
                   "options": {"channel": "whatsapp"},
@@ -293,7 +290,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_up(
-              credentials={
+              {
                   "email": "email@example.com",
                   "password": "password",
                   "options": {"data": {"first_name": "John", "age": 27}},
@@ -307,7 +304,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_up(
-              credentials={
+              {
                   "email": "hello1@example.com",
                   "password": "password",
                   "options": {
@@ -346,7 +343,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_in_anonymously(
-              credentials={"options": {"captcha_token": ""}}
+              {"options": {"captcha_token": ""}}
           )
           ```
         response: |
@@ -417,7 +414,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_in_anonymously(
-              credentials={"options": {"data": {}}}
+              {"options": {"data": {}}}
           )
           ```
   - id: sign-in-with-password
@@ -453,7 +450,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_in_with_password(
-              credentials={"email": "email@example.com", "password": "example-password"}
+              {"email": "email@example.com", "password": "example-password"}
           )
           ```
         response: |
@@ -534,7 +531,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_in_with_password(
-              credentials={"phone": "+13334445555", "password": "some-password"}
+              {"phone": "+13334445555", "password": "some-password"}
           )
           ```
   - id: sign-in-with-otp
@@ -598,7 +595,7 @@ functions:
         description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
         code: |
           ```python
-          supabase.auth.sign_in_with_otp(
+          response = supabase.auth.sign_in_with_otp(
               {
                   "email": "email@example.com",
                   "options": {"email_redirect_to": "https://example.com/welcome"},
@@ -619,7 +616,7 @@ functions:
         description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
         code: |
           ```python
-          supabase.auth.sign_in_with_otp({
+          response = supabase.auth.sign_in_with_otp({
             "phone": '+13334445555',
           })
           ```
