@@ -31,6 +31,12 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     expect(result).toBe(expected)
   })
 
+  // TODO
+  it('should handle PG JSON column', () => {})
+
+  // TODO
+  it('should handle PG array columns', () => {})
+
   it('should return an empty string for empty rows', () => {
     const result = formatTableRowsToSQL('people', [])
     expect(result).toBe('')
