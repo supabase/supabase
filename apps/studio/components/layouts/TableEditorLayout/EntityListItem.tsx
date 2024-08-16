@@ -30,6 +30,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   cn,
 } from 'ui'
@@ -385,32 +388,40 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 <span>View Policies</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              key="download-table-csv"
-              className="space-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                exportTableAsCSV()
-              }}
-            >
-              <Download size={12} />
-              <span>Export table as CSV</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              key="download-table-csv"
-              className="space-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                exportTableAsSQL()
-              }}
-            >
-              <Download size={12} />
-              <span>Export table as SQL</span>
-            </DropdownMenuItem>
+
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="gap-x-2">
+                <Download size={12} />
+                Export Data
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem
+                  key="download-table-csv"
+                  className="space-x-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    exportTableAsCSV()
+                  }}
+                >
+                  <span>Export table as CSV</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  key="download-table-sql"
+                  className="gap-x-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    exportTableAsSQL()
+                  }}
+                >
+                  <span>Export table as SQL</span>
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
             <DropdownMenuSeparator />
             <DropdownMenuItem
               key="delete-table"
-              className="space-x-2"
+              className="gap-x-2"
               onClick={(e) => {
                 e.stopPropagation()
                 snap.onDeleteTable()
