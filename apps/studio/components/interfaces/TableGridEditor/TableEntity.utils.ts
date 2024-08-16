@@ -24,19 +24,30 @@ export const getEntityLintDetails = (
 }
 
 export const formatTableRowsToSQL = (table: string, rows: any[]) => {
-  return rows
+  if (rows.length === 0) return ''
+
+  const firstRow = rows[0]
+  const columns = Object.keys(firstRow)
+    .filter((col) => col !== 'idx')
+    .map((col) => `"${col}"`)
+    .join(', ')
+
+  const valuesSets = rows
     .map((row) => {
       const filteredRow = { ...row }
       if ('idx' in filteredRow) delete filteredRow.idx
 
-      const columns = Object.keys(filteredRow)
-        .map((col) => `"${col}"`)
-        .join(', ')
-      const values = Object.values(filteredRow)
-        .map((val) => (typeof val === 'object' && val !== null ? JSON.stringify(val) : val))
-        .map((val) => `'${val}'`)
-        .join(', ')
-      return `INSERT INTO ${table} (${columns}) VALUES (${values});`
+      return (
+        '(' +
+        Object.values(filteredRow)
+          .map((val) =>
+            typeof val === 'object' && val !== null ? JSON.stringify(val) : `'${val}'`
+          )
+          .join(', ') +
+        ')'
+      )
     })
-    .join('\n')
+    .join(', ')
+
+  return `INSERT INTO ${table} (${columns}) VALUES ${valuesSets};`
 }
