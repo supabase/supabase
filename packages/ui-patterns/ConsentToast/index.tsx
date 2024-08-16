@@ -95,19 +95,21 @@ export const useConsent = () => {
 
   useEffect(() => {
     if (isClient && consentValue === null) {
-      consentToastId.current = toast(
-        <ConsentToast
-          onAccept={() => handleConsent('true')}
-          onOptOut={() => handleConsent('false')}
-        />,
-        {
-          id: 'consent-toast',
-          position: 'bottom-right',
-          duration: Infinity,
-          className:
-            '!w-screen !-m-4 !border-t !rounded-none !max-w-none !bg-overlay !text sm:!m-0 sm:!rounded-lg sm:!w-auto sm:!max-w-[400px] sm:border',
-        }
-      )
+      setTimeout(() => {
+        consentToastId.current = toast(
+          <ConsentToast
+            onAccept={() => handleConsent('true')}
+            onOptOut={() => handleConsent('false')}
+          />,
+          {
+            id: 'consent-toast',
+            position: 'bottom-right',
+            duration: Infinity,
+            className:
+              '!w-screen !-m-4 !border-t !rounded-none !max-w-none !bg-overlay !text sm:!m-0 sm:!rounded-lg sm:!w-auto sm:!max-w-[400px] sm:border',
+          }
+        )
+      }, 300)
     }
   }, [consentValue])
 

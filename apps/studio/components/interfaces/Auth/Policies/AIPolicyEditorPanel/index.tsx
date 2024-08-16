@@ -108,7 +108,7 @@ export const AIPolicyEditorPanel = memo(function ({
   const [using, setUsing] = useState('')
   const [check, setCheck] = useState('')
   const [fieldError, setFieldError] = useState<string>()
-  const [showCheckBlock, setShowCheckBlock] = useState(false)
+  const [showCheckBlock, setShowCheckBlock] = useState(true)
 
   const monacoOneRef = useRef<Monaco | null>(null)
   const editorOneRef = useRef<IStandaloneCodeEditor | null>(null)
@@ -549,7 +549,11 @@ export const AIPolicyEditorPanel = memo(function ({
                         form={form}
                         onUpdateCommand={(command: string) => {
                           setFieldError(undefined)
-                          if (!['update', 'all'].includes(command)) setShowCheckBlock(false)
+                          if (!['update', 'all'].includes(command)) {
+                            setShowCheckBlock(false)
+                          } else {
+                            setShowCheckBlock(true)
+                          }
                         }}
                         authContext={authContext}
                       />
@@ -627,7 +631,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         {showCheckBlock && (
                           <>
                             <div
-                              className={`mt-1 relative ${incomingChange ? 'hidden' : 'block'}`}
+                              className={`mt-1 min-h-[28px] relative ${incomingChange ? 'hidden' : 'block'}`}
                               style={{
                                 height:
                                   expTwoContentHeight <= 100
