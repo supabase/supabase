@@ -269,7 +269,7 @@ export const days: AdventDay[] = [
   },
   {
     title: 'python-support',
-    description: 'Supabase Python is now officially supported in Supabase.',
+    description: 'Supabase Python is now officially supported in Supabase',
     id: 'python-support',
     is_shipped: true,
     links: [
