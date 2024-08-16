@@ -493,5 +493,13 @@
     "position": "Guest Author",
     "author_url": "https://github.com/anas-araid",
     "author_image_url": "https://github.com/anas-araid.png"
+  },
+  {
+    "author_id": "activenode",
+    "author": "David Lorenz",
+    "username": "activenode",
+    "position": "Guest Author",
+    "author_url": "https://github.com/activenode",
+    "author_image_url": "https://github.com/activenode.png"
   }
 ]
