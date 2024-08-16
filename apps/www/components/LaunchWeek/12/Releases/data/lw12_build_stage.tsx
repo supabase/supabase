@@ -242,11 +242,11 @@ export const days: AdventDay[] = [
   {
     title: 'pg_graphql',
     description: 'Version update 1.5.7: pagination and multi-tenancy support',
-    id: 'pg_graphql-1-5-7',
+    id: 'pg-graphql-1-5-7',
     is_shipped: true,
     links: [
       {
-        url: '/blog/pg_graphql-1-5-7',
+        url: '/blog/pg-graphql-1-5-7',
         label: 'Blog post',
         target: '_blank',
       },
