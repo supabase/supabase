@@ -1,4 +1,7 @@
 import matter from 'gray-matter'
+import { type Heading } from 'mdast'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { toMarkdown } from 'mdast-util-to-markdown'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
@@ -175,8 +178,18 @@ const getContent = async (params: Params) => {
     ;({ remoteFile, meta } = federatedPage)
     const repoPath = `${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
     editLink = `${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`
+
     const response = await fetchRevalidatePerDay(`https://raw.githubusercontent.com/${repoPath}`)
-    content = await response.text()
+    const rawContent = await response.text()
+
+    const { content: contentWithoutFrontmatter } = matter(rawContent)
+
+    const mdxTree = fromMarkdown(contentWithoutFrontmatter)
+    const maybeH1 = mdxTree.children[0]
+    if (maybeH1 && maybeH1.type === 'heading' && (maybeH1 as Heading).depth === 1) {
+      mdxTree.children.shift()
+    }
+    content = toMarkdown(mdxTree)
   }
 
   return {
