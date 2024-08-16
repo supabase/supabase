@@ -281,7 +281,7 @@ const SmtpForm = () => {
                 <FormSectionContent loading={isLoading}>
                   {values['SMTP_HOST'] && values['SMTP_HOST'].endsWith('.gmail.com') && (
                     <Alert_Shadcn_ variant="warning">
-                      <IconAlertTriangle strokeWidth={2} />
+                      <WarningIcon />
                       <AlertTitle_Shadcn_>Check your SMTP provider</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
                         Not all SMTP providers are designed for the email sending required by
@@ -300,6 +300,7 @@ const SmtpForm = () => {
                     disabled={!canUpdateConfig}
                   />
                   <InputNumber
+                    size="small"
                     name="SMTP_PORT"
                     id="SMTP_PORT"
                     placeholder="587"
@@ -319,6 +320,7 @@ const SmtpForm = () => {
                     disabled={!canUpdateConfig}
                   />
                   <InputNumber
+                    size="small"
                     id="SMTP_MAX_FREQUENCY"
                     name="SMTP_MAX_FREQUENCY"
                     label="Minimum interval between emails being sent"
