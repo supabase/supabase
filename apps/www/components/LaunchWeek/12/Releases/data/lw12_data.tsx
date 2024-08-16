@@ -150,7 +150,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 3,
     dd: 'Wed',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/third-party-auth-mfa-phone-send-hooks',
     date: '14 August',
@@ -194,7 +194,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 4,
     dd: 'Thu',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/log-drains',
     date: '15 August',
@@ -231,21 +231,43 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-5',
     d: 5,
     dd: 'Fri',
-    shipped: false,
-    isToday: false,
-    hasCountdown: true,
-    blog: '',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/postgres-foreign-data-wrappers-with-wasm',
     date: '16 August',
     published_at: '2024-08-16T08:00:00.000-07:00',
-    title: '',
-    description: '',
+    title: 'Postgres Foreign Data Wrappers with Wasm',
+    description: (
+      <>
+        Postgres<span className="text-foreground sm:block"> Foreign Data Wrappers</span> with Wasm
+      </>
+    ),
     links: [
+      {
+        type: 'video',
+        href: 'wCwEWR4k0no',
+      },
       {
         type: 'xSpace',
         href: 'https://supabase.link/lw12-xspace-5',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: 'Postgres Foreign Data Wrappers with Wasm',
+        blog: '/blog/postgres-foreign-data-wrappers-with-wasm',
+        bg_layers: [
+          {
+            img: '/images/launchweek/12/d5/FDW-with-WASM-dark.svg',
+            mobileImg: '/images/launchweek/12/d5/FDW-with-WASM-dark-mobile.svg',
+            imgLight: '/images/launchweek/12/d5/FDW-with-WASM-light.svg',
+            mobileImgLight: '/images/launchweek/12/d5/FDW-with-WASM-light-mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
 ]
 
