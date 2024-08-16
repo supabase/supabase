@@ -70,6 +70,8 @@ const smsProviderValidation = (config: ProjectAuthConfigData, provider: string) 
   }
 }
 
+// getPhoneProviderValidationSchema generate the validation schema for the SMS providers
+// based on whether the SMS hook is enabled
 export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) => {
   return object().shape({
     EXTERNAL_PHONE_ENABLED: boolean().required(),

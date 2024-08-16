@@ -65,6 +65,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
 
   const showAlert = (title: string) => {
     switch (title) {
+      // TODO (KM): Remove after 10th October 2024 when we disable the provider
       case 'Slack (Deprecated)':
         return (
           <Alert_Shadcn_ variant="warning">
