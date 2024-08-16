@@ -26,7 +26,7 @@ toc_depth: 3
 
 ## Objective
 
-Our goal with https://github.com/supabase-community/vec2pg is to create an easy on-ramp to efficiently copy your data from various vector databases into Postgres with associated ids and metadata. The data loads into a new schema with a table name that matches the source e.g. `vec2pg.<collection_name>` . That output table uses https://github.com/pgvector/pgvector’s `vector` type for the embedding/vector and the builtin `json` type for additional metadata.
+Our goal with https://github.com/supabase-community/vec2pg is to create an easy on-ramp to efficiently copy your data from various vector databases into Postgres with associated ids and metadata. The data loads into a new schema with a table name that matches the source e.g. `vec2pg.<collection_name>` . That output table uses https://github.com/pgvector/pgvector's `vector` type for the embedding/vector and the builtin `json` type for additional metadata.
 
 <div>
   <Img alt="vec2pg qudrant 1" src="/images/blog/lw12/day-5/vec2pg_qdrant_2.png" />
@@ -34,11 +34,11 @@ Our goal with https://github.com/supabase-community/vec2pg is to create an easy 
 
 Once loaded, the data can be manipulated using SQL to transform it into your preferred schema.
 
-When migrating, be sure to increase your Supabase project’s [disk size](https://supabase.com/dashboard/project/_/settings/database) so there is enough space for the vectors.
+When migrating, be sure to increase your Supabase project's [disk size](https://supabase.com/dashboard/project/_/settings/database) so there is enough space for the vectors.
 
 ## Vendors
 
-At launch we support migrating to Postgres from [Pinecone](https://www.pinecone.io/) and [Qdrant](https://qdrant.tech/). You can vote for additional providers in the [issue tracker](https://github.com/supabase-community/vec2pg/issues/6) and we’ll reference that when deciding which vendor to support next.
+At launch we support migrating to Postgres from [Pinecone](https://www.pinecone.io/) and [Qdrant](https://qdrant.tech/). You can vote for additional providers in the [issue tracker](https://github.com/supabase-community/vec2pg/issues/6) and we'll reference that when deciding which vendor to support next.
 
 Throughput when migrating workloads is measured in records-per-second and is dependent on a few factors:
 
@@ -74,7 +74,7 @@ Again, with the conditions mentioned above, Qdrant collections migrate at betwee
 
 The main reasons to use Postgres for your vector workloads are the same reasons you use Postgres for all of your other data. Postgres is performant, scalable, and secure. Its a well understood technology with a wide ecosystem of tools that support needs from early stage startups through to large scale enterprise.
 
-A few game changing capabilities that are old hat for Postgres that haven’t made their way to upstart vector DBs include:
+A few game changing capabilities that are old hat for Postgres that haven't made their way to upstart vector DBs include:
 
 ### **Backups**
 
@@ -110,10 +110,10 @@ Keep an eye out for our upcoming post directly comparing pgvector with Pinecone 
 
 ## Next Steps
 
-To get started, head over to the [vec2pg GitHub Page](https://github.com/supabase-community/vec2pg), or if you’re comfortable with CLI help guides, you can install it using `pip` :
+To get started, head over to the [vec2pg GitHub Page](https://github.com/supabase-community/vec2pg), or if you're comfortable with CLI help guides, you can install it using `pip` :
 
 ```bash
 pip install vec2pg
 ```
 
-If your current vector database vendor isn’t supported, be sure to weigh in on the [vendor support issue](https://github.com/supabase-community/vec2pg/issues/6).
+If your current vector database vendor isn't supported, be sure to weigh in on the [vendor support issue](https://github.com/supabase-community/vec2pg/issues/6).
