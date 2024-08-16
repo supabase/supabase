@@ -41,7 +41,7 @@ export const formatTableRowsToSQL = (table: string, rows: any[]) => {
         '(' +
         Object.values(filteredRow)
           .map((val) =>
-            typeof val === 'object' && val !== null ? JSON.stringify(val) : `'${val}'`
+            val === null ? 'null' : typeof val === 'object' ? JSON.stringify(val) : `'${val}'`
           )
           .join(', ') +
         ')'
