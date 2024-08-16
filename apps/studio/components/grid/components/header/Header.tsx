@@ -29,6 +29,7 @@ import {
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
+import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -353,22 +354,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
         })
       : allRows.filter((x) => selectedRows.has(x.idx))
 
-    const sqlStatements = rows
-      .map((row) => {
-        const filteredRow = { ...row }
-        delete filteredRow.idx
-
-        const columns = Object.keys(filteredRow)
-          .map((col) => `"${col}"`)
-          .join(', ')
-        const values = Object.values(filteredRow)
-          .map((val) => (typeof val === 'object' && val !== null ? JSON.stringify(val) : val))
-          .map((val) => `'${val}'`)
-          .join(', ')
-        return `INSERT INTO ${table.name} (${columns}) VALUES (${values});`
-      })
-      .join('\n')
-
+    const sqlStatements = formatTableRowsToSQL(table.name, rows)
     const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
     saveAs(sqlData, `${state.table!.name}_rows.sql`)
     setIsExporting(false)

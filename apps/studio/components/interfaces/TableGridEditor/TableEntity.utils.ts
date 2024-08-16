@@ -22,3 +22,21 @@ export const getEntityLintDetails = (
     matchingLint,
   }
 }
+
+export const formatTableRowsToSQL = (table: string, rows: any[]) => {
+  return rows
+    .map((row) => {
+      const filteredRow = { ...row }
+      if ('idx' in filteredRow) delete filteredRow.idx
+
+      const columns = Object.keys(filteredRow)
+        .map((col) => `"${col}"`)
+        .join(', ')
+      const values = Object.values(filteredRow)
+        .map((val) => (typeof val === 'object' && val !== null ? JSON.stringify(val) : val))
+        .map((val) => `'${val}'`)
+        .join(', ')
+      return `INSERT INTO ${table} (${columns}) VALUES (${values});`
+    })
+    .join('\n')
+}

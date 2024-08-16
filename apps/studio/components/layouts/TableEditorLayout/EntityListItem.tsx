@@ -17,7 +17,10 @@ import toast from 'react-hot-toast'
 
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
+import {
+  formatTableRowsToSQL,
+  getEntityLintDetails,
+} from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import type { Entity } from 'data/entity-types/entity-type-query'
@@ -182,18 +185,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       })
 
       if (formattedRows.length > 0) {
-        const sqlStatements = formattedRows
-          .map((row) => {
-            const columns = Object.keys(row)
-              .map((col) => `"${col}"`)
-              .join(', ')
-            const values = Object.values(row)
-              .map((val) => `'${val}'`)
-              .join(', ')
-            return `INSERT INTO ${entity.name} (${columns}) VALUES (${values});`
-          })
-          .join('\n')
-
+        const sqlStatements = formatTableRowsToSQL(entity.name, formattedRows)
         const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
         saveAs(sqlData, `${entity!.name}_rows.sql`)
       }
