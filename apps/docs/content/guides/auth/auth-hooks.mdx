@@ -59,35 +59,31 @@ Sign the payload and grant permissions selectively in order to guard the integri
 >
 <TabPanel id="sql" label="SQL">
 
-You will need to assign additional permissions so that Supabase Auth can access the hook as well as the tables it interacts with.
+When you configure a postgres function as a hook, Supabase will automatically apply the following grants to the function for these reasons:
 
-The `supabase_auth_admin` role does not have permissions to the `public` schema. You need to grant the role permission to execute your hook function:
+- Allow the `supabase_auth_admin` role to execute the function. The `supabase_auth_admin` role is the postgres role that is used by Supabase Auth to make requests to your database.
+- Revoke permissions from other roles (e.g. `anon`, `authenticated`, `public`) to ensure the function is not accessible by Supabase Data APIs.
 
 ```sql
+-- Grant access to function to supabase_auth_admin
 grant execute
   on function public.custom_access_token_hook
   to supabase_auth_admin;
-```
 
-You also need to grant usage to `supabase_auth_admin`:
-
-```sql
+-- Grant access to schema to supabase_auth_admin
 grant usage on schema public to supabase_auth_admin;
-```
 
-Also revoke permissions from the `authenticated`, `public`, and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs. The `public` role has access to functions created on `public.*` by default and `anon` and `authenticated` inherit permissions from the `public` role. Permission is revoked from the `public` role in order to prevent the `anon` and `authenticated` roles from inheriting permissions to invoke the Postgres Hook.
-
-```sql
+-- Revoke function permissions from authenticated, anon and public
 revoke execute
   on function public.custom_access_token_hook
   from authenticated, anon, public;
 ```
 
-For security, we recommend against the use of the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
+<Admonition type="caution" label="Create postgres functions with security invoker">
 
-We recommend that you do not use any tag and explicitly grant permissions to `supabase_auth_admin` as described above.
+We do not recommend creating postgres functions with the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. Read more about the `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
 
-Read more about the `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
+</Admonition>
 
 </TabPanel>
 <TabPanel id="http" label="HTTP">

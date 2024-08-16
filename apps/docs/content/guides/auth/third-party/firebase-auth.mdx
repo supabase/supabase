@@ -69,6 +69,46 @@ let supabase = SupabaseClient(
 
 </TabPanel>
 
+<TabPanel id="kotlin" label="Kotlin (Android)">
+
+Create a Supabase client with the `accessToken` function that returns the Firebase Auth JWT of the current user. This code uses the [official Firebase SDK](https://firebase.google.com/docs/auth/android/start) for Android.
+
+```kotlin
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+
+val supabase = createSupabaseClient(
+    "https://<supabase-project>.supabase.co",
+    "SUPABASE_ANON_KEY"
+) {
+    accessToken = {
+        Firebase.auth.currentUser?.getIdToken(false)?.await()?.token
+    }
+}
+```
+
+</TabPanel>
+
+<TabPanel id="kotlinmp" label="Kotlin (Multiplatform)">
+
+Create a Supabase client with the `accessToken` function that returns the Firebase Auth JWT of the current user. This code uses a [community Firebase SDK](https://github.com/GitLiveApp/firebase-kotlin-sdk) which supports Kotlin Multiplatform.
+
+```kotlin
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.auth
+
+val supabase = createSupabaseClient(
+    "https://<supabase-project>.supabase.co",
+    "SUPABASE_ANON_KEY"
+) {
+    accessToken = {
+        Firebase.auth.currentUser?.getIdToken(false)
+    }
+}
+```
+
+</TabPanel>
+
 </Tabs>
 
 ## Add a new Third-Party Auth integration to your project

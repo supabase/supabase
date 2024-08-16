@@ -61,7 +61,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
             href={day.blog!}
             className={cn(
               `
-              dark:bg-[#111415] hover:dark:bg-[#121516] sm:!bg-transparent
+              bg-default sm:!bg-transparent
               min-h-[210px] group sm:aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
               hover:border-strong transition-colors border border-muted
               rounded-xl text-2xl bg-contain shadow-lg`,
