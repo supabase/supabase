@@ -4,10 +4,16 @@ import { cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } f
 interface PartnerIconProps {
   organization: Pick<Organization, 'managed_by'>
   showTooltip?: boolean
+  tooltipText?: string
   size?: 'small' | 'large'
 }
 
-function PartnerIcon({ organization, showTooltip = true, size = 'small' }: PartnerIconProps) {
+function PartnerIcon({
+  organization,
+  showTooltip = true,
+  tooltipText = 'This organization is managed by Vercel Marketplace.',
+  size = 'small',
+}: PartnerIconProps) {
   if (organization.managed_by === 'vercel-marketplace') {
     const icon = (
       <svg
@@ -47,9 +53,7 @@ function PartnerIcon({ organization, showTooltip = true, size = 'small' }: Partn
             {icon}
           </div>
         </TooltipTrigger_Shadcn_>
-        <TooltipContent_Shadcn_>
-          This organization is managed by Vercel Marketplace.
-        </TooltipContent_Shadcn_>
+        <TooltipContent_Shadcn_>{tooltipText}</TooltipContent_Shadcn_>
       </Tooltip_Shadcn_>
     )
   }

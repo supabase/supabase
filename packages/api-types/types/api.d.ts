@@ -55,6 +55,58 @@ export interface paths {
     /** Updates organization subscription linked to the provided Fly organization id */
     put: operations['FlyOrganizationsController_updateOrganization']
   }
+  '/partners/vercel/callback': {
+    /** Redirects to Supabase dashboard after completing Vercel sso flow */
+    get: operations['CallbackController_redirectToDashboardFlyioExtensionScreen']
+  }
+  '/partners/vercel/callback2': {
+    /** Redirects to Supabase dashboard after completing Vercel sso flow */
+    get: operations['Callback2Controller_redirectToDashboardFlyioExtensionScreen']
+  }
+  '/partners/vercel/identity/link': {
+    /** Links a new Vercel identity for a specific user */
+    post: operations['IdentityController_linkVercelIdentity']
+  }
+  '/partners/vercel/identity/verify': {
+    /** Verifies existing Vercel identity for a specific user */
+    get: operations['IdentityController_verifyVercelIdentity']
+  }
+  '/partners/vercel/mock-usage': {
+    /** Fake it till you make it */
+    get: operations['MockBillingController_mockUsage']
+  }
+  '/partners/vercel/v1/installations/{installation_id}': {
+    /** Upserts an installation for the account with installation_id */
+    put: operations['InstallationsController_createInstallation']
+    /** Deletes the installation with provided installation_id */
+    delete: operations['InstallationsController_deleteInstallation']
+  }
+  '/partners/vercel/v1/installations/{installation_id}/resources': {
+    /** Lists all resources */
+    get: operations['ResourcesController_listResources']
+    /** Provisions a resource */
+    post: operations['ResourcesController_createResource']
+  }
+  '/partners/vercel/v1/installations/{installation_id}/resources/{resource_id}': {
+    /** Fetches a resource by resource_id */
+    get: operations['ResourcesController_getResource']
+    /** Uninstalls and de-provisions a resource */
+    delete: operations['ResourcesController_deleteResource']
+    /** Updates a resource */
+    patch: operations['ResourcesController_updateResource']
+  }
+  '/partners/vercel/v1/installations/{installation_id}/resources/{resource_id}/plans': {
+    /** Returns the set of billing plans available to a specific resource */
+    get: operations['ResourcesController_getResourcePlans']
+  }
+  '/partners/vercel/v1/products/{product_id}/plans': {
+    /** Return quotes for different billing plans for a specific product */
+    get: operations['ProductsController_listResources']
+  }
+  '/partners/vercel/webhooks': {
+    /** Webhooks endpoint */
+    post: operations['WebhooksController_processWebhook']
+  }
   '/platform/auth/{ref}/config': {
     /** Gets GoTrue config */
     get: operations['GoTrueConfigController_getGoTrueConfig']
@@ -2131,6 +2183,7 @@ export interface components {
       | 'pitr_14'
       | 'pitr_28'
       | 'ipv4_default'
+      | 'auth_mfa_phone_default'
     AmiSearchOptions: {
       search_tags?: Record<string, never>
     }
@@ -2157,9 +2210,6 @@ export interface components {
     ApiKeyResponse: {
       api_key: string
       name: string
-    }
-    ApiResponse: {
-      autoApiService: components['schemas']['AutoApiService']
     }
     ApproveAuthorizationResponse: {
       url: string
@@ -2291,6 +2341,11 @@ export interface components {
       mailer_templates_reauthentication_content: string | null
       mailer_templates_recovery_content: string | null
       mfa_max_enrolled_factors: number | null
+      mfa_phone_enroll_enabled: boolean | null
+      mfa_phone_max_frequency: number | null
+      mfa_phone_otp_length: number
+      mfa_phone_template: string | null
+      mfa_phone_verify_enabled: boolean | null
       mfa_totp_enroll_enabled: boolean | null
       mfa_totp_verify_enabled: boolean | null
       password_hibp_enabled: boolean | null
@@ -2351,24 +2406,6 @@ export interface components {
       description: string
       name: string
       version: string
-    }
-    AutoApiService: {
-      app: {
-        id?: number
-        name?: string
-      }
-      app_config: Record<string, never>
-      defaultApiKey: string
-      endpoint: string
-      id: number
-      name: string
-      project: {
-        ref?: string
-      }
-      protocol: string
-      restUrl: string
-      service_api_keys: components['schemas']['ServiceApiKey'][]
-      serviceApiKey: string
     }
     AvailableAddonResponse: {
       name: string
@@ -2558,8 +2595,7 @@ export interface components {
       defaultValue?: Record<string, never>
       /** @enum {string} */
       defaultValueFormat?: 'expression' | 'literal'
-      /** @enum {string} */
-      identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
+      identityGeneration?: Record<string, never>
       isIdentity?: boolean
       isNullable?: boolean
       isPrimaryKey?: boolean
@@ -2666,8 +2702,7 @@ export interface components {
       name: string
       payment_method?: string
       size?: string
-      /** @enum {string} */
-      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
+      tier: Record<string, never>
     }
     CreateOrganizationBodyV1: {
       name: string
@@ -2692,10 +2727,15 @@ export interface components {
       data_api_use_api_schema?: boolean
       db_pass: string
       db_pricing_tier_id?: string
+      /**
+       * @description Provider region description
+       * @example Southeast Asia (Singapore)
+       */
       db_region: string
       db_sql?: string
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
       name: string
+      /** @deprecated */
       org_id?: number
       organization_slug?: string
     }
@@ -3148,10 +3188,8 @@ export interface components {
       count: number
     }
     GetMetricsBody: {
-      /** @enum {string} */
-      interval: '1d' | '3d' | '7d'
-      /** @enum {string} */
-      metric: 'user_queries'
+      interval: string
+      metric: string
       project_refs: string[]
       region: string
     }
@@ -3251,7 +3289,7 @@ export interface components {
       addons: components['schemas']['BillingSubscriptionAddon'][]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner: 'fly' | 'aws'
+      billing_partner: 'fly' | 'aws' | 'vercel_marketplace'
       billing_via_partner: boolean
       current_period_end: number
       current_period_start: number
@@ -3465,6 +3503,11 @@ export interface components {
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: string
       MAILER_TEMPLATES_RECOVERY_CONTENT: string
       MFA_MAX_ENROLLED_FACTORS: number
+      MFA_PHONE_ENROLL_ENABLED: boolean
+      MFA_PHONE_MAX_FREQUENCY: number
+      MFA_PHONE_OTP_LENGTH: number
+      MFA_PHONE_TEMPLATE: string
+      MFA_PHONE_VERIFY_ENABLED: boolean
       MFA_TOTP_ENROLL_ENABLED: boolean
       MFA_TOTP_VERIFY_ENABLED: boolean
       PASSWORD_HIBP_ENABLED: boolean
@@ -3614,11 +3657,11 @@ export interface components {
       id: string
       invoice_pdf: string
       number: string
+      payment_attempted: boolean
       period_end: number
       status: string
       subscription: string | null
       subtotal: number
-      payment_attempted: boolean
     }
     JoinResponse: {
       billing_email: string
@@ -3744,6 +3787,7 @@ export interface components {
     Member: {
       gotrue_id: string
       is_sso_user: boolean | null
+      metadata: unknown
       mfa_enabled: boolean
       primary_email: string | null
       role_ids: number[]
@@ -3956,7 +4000,14 @@ export interface components {
         | 'STORAGE_IMAGES_TRANSFORMED'
         | 'REALTIME_MESSAGE_COUNT'
         | 'REALTIME_PEAK_CONNECTIONS'
-        | 'DISK_SIZE_GB_HOURS'
+        | 'DISK_SIZE_GB_HOURS_GP3'
+        | 'DISK_SIZE_GB_HOURS_IO2'
+        | 'AUTH_MFA_PHONE'
+        | 'LOG_DRAIN_EVENTS'
+        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+        | 'DISK_THROUGHPUT_GP3'
+        | 'DISK_IOPS_GP3'
+        | 'DISK_IOPS_IO2'
         | 'COMPUTE_HOURS_BRANCH'
         | 'COMPUTE_HOURS_XS'
         | 'COMPUTE_HOURS_SM'
@@ -3973,12 +4024,13 @@ export interface components {
         | 'PITR_14'
         | 'PITR_28'
         | 'IPV4'
+        | 'LOG_DRAIN'
       pricing_free_units?: number
       pricing_package_price?: number
       pricing_package_size?: number
       pricing_per_unit_price?: number
       /** @enum {string} */
-      pricing_strategy: 'UNIT' | 'PACKAGE' | 'NONE'
+      pricing_strategy: 'UNIT' | 'PACKAGE' | 'TIERED' | 'NONE'
       project_allocations: components['schemas']['ProjectAllocation'][]
       unit_price_desc: string
       unlimited: boolean
@@ -4338,7 +4390,7 @@ export interface components {
       selected_addons: components['schemas']['SelectedAddonResponse'][]
     }
     /** @enum {string} */
-    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4'
+    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4' | 'auth_mfa_phone'
     /** @enum {string} */
     ProjectAddonVariantPricingType: 'fixed' | 'usage'
     ProjectAddonVariantResponse: {
@@ -4355,10 +4407,6 @@ export interface components {
       name: string
       ref: string
       usage: number
-    }
-    ProjectAppConfigResponse: {
-      db_schema: string
-      endpoint: string
     }
     ProjectDetailResponse: {
       cloud_provider: string
@@ -4499,47 +4547,6 @@ export interface components {
       need_pitr: 'critical' | 'warning' | null
       project: string
     }
-    ProjectResponse: {
-      cloud_provider: string
-      db_dns_name: string
-      db_host: string
-      db_name: string
-      db_port: string
-      db_user: string
-      id: number
-      inserted_at: string
-      jwt_secret: string
-      name: string
-      ref: string
-      region: string
-      services?: components['schemas']['ServiceResponse'][]
-      ssl_enforced: boolean
-      status: string
-    }
-    ProjectServiceApiKeyResponse: {
-      api_key: string
-      name: string
-      tags: string
-    }
-    ProjectSettingsResponse: {
-      app_config?: components['schemas']['ProjectAppConfigResponse']
-      cloud_provider: string
-      db_dns_name: string
-      db_host: string
-      /** @enum {string|null} */
-      db_ip_addr_config: 'legacy' | 'static-ipv4' | 'concurrent-ipv6' | 'ipv6' | null
-      db_name: string
-      db_port: string
-      db_user: string
-      inserted_at: string
-      jwt_secret?: string
-      name: string
-      ref: string
-      region: string
-      service_api_keys?: components['schemas']['ProjectServiceApiKeyResponse'][]
-      ssl_enforced: boolean
-      status: string
-    }
     ProjectUpgradeEligibilityResponse: {
       current_app_version: string
       duration_estimate_hours: number
@@ -4563,6 +4570,18 @@ export interface components {
       id: string
       saml?: components['schemas']['SamlDescriptor']
       updated_at?: string
+    }
+    ProvisionResourceRequest: {
+      /** @description Policies accepted by the customer. Ex: { toc: '2024-02-28T10:00:00Z' } */
+      acceptedPolicies?: Record<string, never>
+      /** @description Partner-provided billing plan. See "Get Offers". Ex: "pro200" */
+      billingPlanId: string
+      /** @description User-input based on the registered schema. Ex: { region: "us-east-1", eviction: false } */
+      metadata: Record<string, never>
+      /** @description User-input for product name. Ex: "redis_dev" */
+      name: string
+      /** @description The partner-specific ID of the product. Ex: "redis" */
+      productId: string
     }
     PublicUrlOptions: {
       download?: boolean
@@ -4727,7 +4746,7 @@ export interface components {
       /** @description Unique ID representing the fly extension */
       id: string
       /** @description Supabase project services health status */
-      services: components['schemas']['ServiceHealthResponse'][]
+      services: string[]
       /**
        * @description Supabase project status
        * @example ACTIVE_HEALTHY
@@ -4931,52 +4950,10 @@ export interface components {
       prevPlan?: string
       reasons: string[]
     }
-    ServiceApiKey: {
-      api_key_encrypted?: string
-      name: string
-      tags: string
-    }
-    ServiceApiKeyResponse: {
-      api_key?: string
-      api_key_encrypted?: string
-      name: string
-      tags: string
-    }
-    ServiceHealthResponse: {
-      /** @description Service health check error */
-      error?: string
-      /** @description Whether the service is healthy */
-      healthy: boolean
-      /**
-       * @description Service name
-       * @enum {string}
-       */
-      name: 'auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage'
-      /**
-       * @description Service health status
-       * @example COMING_UP
-       * @enum {string}
-       */
-      status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
-    }
-    ServiceResponse: {
-      app: {
-        id?: number
-        name?: string
-      }
-      app_config: Record<string, never>
-      id: number
-      name: string
-      service_api_keys: components['schemas']['ServiceApiKeyResponse'][]
-    }
     ServiceVersions: {
       gotrue: string
       postgrest: string
       'supabase-postgres': string
-    }
-    SettingsResponse: {
-      project: components['schemas']['ProjectResponse']
-      services: components['schemas']['ServiceResponse'][]
     }
     SetupIntentResponse: {
       client_secret: string
@@ -5121,12 +5098,10 @@ export interface components {
       order?: string
     }
     StorageObjectTransformOptions: {
-      /** @enum {string} */
-      format?: 'origin'
+      format?: string
       height?: number
       quality?: number
-      /** @enum {string} */
-      resize?: 'cover' | 'contain' | 'fill'
+      resize?: Record<string, never>
       width?: number
     }
     SubdomainAvailabilityResponse: {
@@ -5424,16 +5399,16 @@ export interface components {
       mailer_templates_reauthentication_content?: string
       mailer_templates_recovery_content?: string
       mfa_max_enrolled_factors?: number
+      mfa_phone_enroll_enabled?: boolean
+      mfa_phone_max_frequency?: number
+      mfa_phone_otp_length?: number
+      mfa_phone_template?: string
+      mfa_phone_verify_enabled?: boolean
       mfa_totp_enroll_enabled?: boolean
       mfa_totp_verify_enabled?: boolean
       password_hibp_enabled?: boolean
       password_min_length?: number
-      /** @enum {string} */
-      password_required_characters?:
-        | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
-        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
-        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\:"|<>?,./`~'
-        | ''
+      password_required_characters?: string
       rate_limit_anonymous_users?: number
       rate_limit_email_sent?: number
       rate_limit_otp?: number
@@ -5504,8 +5479,7 @@ export interface components {
       defaultValueFormat?: 'expression' | 'literal'
       dropDefault?: boolean
       id?: number
-      /** @enum {string} */
-      identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
+      identityGeneration?: Record<string, never>
       isIdentity?: boolean
       isNullable?: boolean
       isUnique?: boolean
@@ -5666,16 +5640,16 @@ export interface components {
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT?: string
       MAILER_TEMPLATES_RECOVERY_CONTENT?: string
       MFA_MAX_ENROLLED_FACTORS?: number
+      MFA_PHONE_ENROLL_ENABLED?: boolean
+      MFA_PHONE_MAX_FREQUENCY?: number
+      MFA_PHONE_OTP_LENGTH?: number
+      MFA_PHONE_TEMPLATE?: string
+      MFA_PHONE_VERIFY_ENABLED?: boolean
       MFA_TOTP_ENROLL_ENABLED?: boolean
       MFA_TOTP_VERIFY_ENABLED?: boolean
       PASSWORD_HIBP_ENABLED?: boolean
       PASSWORD_MIN_LENGTH?: number
-      /** @enum {string} */
-      PASSWORD_REQUIRED_CHARACTERS?:
-        | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
-        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
-        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\:"|<>?,./`~'
-        | ''
+      PASSWORD_REQUIRED_CHARACTERS?: string
       RATE_LIMIT_ANONYMOUS_USERS?: number
       RATE_LIMIT_EMAIL_SENT?: number
       RATE_LIMIT_OTP?: number
@@ -5737,8 +5711,7 @@ export interface components {
     }
     UpdateNotificationBodyV2: {
       id: string
-      /** @enum {string} */
-      status: 'new' | 'seen' | 'archived'
+      status: Record<string, never>
     }
     UpdateNotificationsBodyV1: {
       ids: string[]
@@ -5832,6 +5805,12 @@ export interface components {
       publish_update?: boolean
       tables?: string[] | null
     }
+    UpdateResourceRequest: {
+      billingPlanId?: string
+      metadata?: Record<string, never>
+      name?: string
+      status?: Record<string, never>
+    }
     UpdateRestrictionsBody: {
       no_notification?: boolean
       restriction_data?: components['schemas']['RestrictionData']
@@ -5883,15 +5862,13 @@ export interface components {
     }
     UpdateSubscriptionBody: {
       payment_method?: string
-      /** @enum {string} */
-      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
+      tier: Record<string, never>
     }
     UpdateSubscriptionV2AdminBody: {
       payment_method?: string
       price_id?: string
       skip_free_plan_validations?: boolean
-      /** @enum {string} */
-      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
+      tier: Record<string, never>
     }
     UpdateSupavisorConfigBody: {
       default_pool_size?: number | null
@@ -6292,7 +6269,7 @@ export type $defs = Record<string, never>
 export type external = Record<string, never>
 
 export interface operations {
-  /** Redirects to Supabase dashboard after completing Fly sso */
+  /** Redirects to Supabase dashboard after completing Vercel sso flow */
   CallbackController_redirectToDashboardFlyioExtensionScreen: {
     responses: {
       200: {
@@ -6443,6 +6420,192 @@ export interface operations {
     }
     responses: {
       200: {
+        content: never
+      }
+    }
+  }
+  /** Redirects to Supabase dashboard after completing Vercel sso flow */
+  Callback2Controller_redirectToDashboardFlyioExtensionScreen: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Links a new Vercel identity for a specific user */
+  IdentityController_linkVercelIdentity: {
+    responses: {
+      201: {
+        content: never
+      }
+    }
+  }
+  /** Verifies existing Vercel identity for a specific user */
+  IdentityController_verifyVercelIdentity: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Fake it till you make it */
+  MockBillingController_mockUsage: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Upserts an installation for the account with installation_id */
+  InstallationsController_createInstallation: {
+    parameters: {
+      path: {
+        installation_id: string
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+    }
+  }
+  /** Deletes the installation with provided installation_id */
+  InstallationsController_deleteInstallation: {
+    parameters: {
+      path: {
+        installation_id: string
+      }
+    }
+    responses: {
+      204: {
+        content: never
+      }
+    }
+  }
+  /** Lists all resources */
+  ResourcesController_listResources: {
+    parameters: {
+      path: {
+        installation_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Provisions a resource */
+  ResourcesController_createResource: {
+    parameters: {
+      path: {
+        installation_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProvisionResourceRequest']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Fetches a resource by resource_id */
+  ResourcesController_getResource: {
+    parameters: {
+      path: {
+        installation_id: string
+        resource_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Uninstalls and de-provisions a resource */
+  ResourcesController_deleteResource: {
+    parameters: {
+      path: {
+        installation_id: string
+        resource_id: string
+      }
+    }
+    responses: {
+      204: {
+        content: never
+      }
+    }
+  }
+  /** Updates a resource */
+  ResourcesController_updateResource: {
+    parameters: {
+      path: {
+        installation_id: string
+        resource_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateResourceRequest']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Returns the set of billing plans available to a specific resource */
+  ResourcesController_getResourcePlans: {
+    parameters: {
+      path: {
+        installation_id: string
+        resource_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Return quotes for different billing plans for a specific product */
+  ProductsController_listResources: {
+    parameters: {
+      path: {
+        product_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Webhooks endpoint */
+  WebhooksController_processWebhook: {
+    parameters: {
+      header: {
+        'x-vercel-signature': string
+      }
+    }
+    responses: {
+      201: {
         content: never
       }
     }
@@ -6609,13 +6772,7 @@ export interface operations {
     parameters: {
       path: {
         ref: string
-        template:
-          | 'confirmation'
-          | 'email-change'
-          | 'invite'
-          | 'magic-link'
-          | 'recovery'
-          | 'reauthentication'
+        template: string
       }
     }
     responses: {
@@ -7366,8 +7523,6 @@ export interface operations {
   NotificationsController_getNotificationsV2: {
     parameters: {
       query: {
-        status: 'new' | 'seen' | 'archived'
-        priority: 'Critical' | 'Warning' | 'Info'
         org_slug?: string[]
         project_ref?: string[]
         offset: number
@@ -7607,10 +7762,6 @@ export interface operations {
     }
     responses: {
       200: {
-        headers: {
-          /** @description total count value */
-          'X-Total-Count'?: unknown
-        }
         content: never
       }
       403: {
@@ -7848,7 +7999,14 @@ export interface operations {
           | 'STORAGE_IMAGES_TRANSFORMED'
           | 'REALTIME_MESSAGE_COUNT'
           | 'REALTIME_PEAK_CONNECTIONS'
-          | 'DISK_SIZE_GB_HOURS'
+          | 'DISK_SIZE_GB_HOURS_GP3'
+          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'AUTH_MFA_PHONE'
+          | 'LOG_DRAIN_EVENTS'
+          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+          | 'DISK_THROUGHPUT_GP3'
+          | 'DISK_IOPS_GP3'
+          | 'DISK_IOPS_IO2'
           | 'COMPUTE_HOURS_BRANCH'
           | 'COMPUTE_HOURS_XS'
           | 'COMPUTE_HOURS_SM'
@@ -7865,6 +8023,7 @@ export interface operations {
           | 'PITR_14'
           | 'PITR_28'
           | 'IPV4'
+          | 'LOG_DRAIN'
         interval: string
         endDate: string
         startDate: string
@@ -11673,8 +11832,8 @@ export interface operations {
   /** Gets the count of a user's content by type */
   ContentController_getContentCount: {
     parameters: {
-      query: {
-        type: string
+      query?: {
+        type?: string
       }
       path: {
         /** @description Project ref */
@@ -12142,9 +12301,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['ProjectSettingsResponse']
-        }
+        content: never
       }
       /** @description Failed to retrieve project's settings */
       500: {
@@ -12274,9 +12431,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['ApiResponse']
-        }
+        content: never
       }
       /** @description Failed to retrieve project's api info */
       500: {
@@ -12317,9 +12472,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['SettingsResponse']
-        }
+        content: never
       }
       /** @description Failed to retrieve project's settings */
       500: {
@@ -13040,13 +13193,7 @@ export interface operations {
     parameters: {
       path: {
         ref: string
-        template:
-          | 'confirmation'
-          | 'email-change'
-          | 'invite'
-          | 'magic-link'
-          | 'recovery'
-          | 'reauthentication'
+        template: string
       }
     }
     responses: {
@@ -13129,7 +13276,6 @@ export interface operations {
     parameters: {
       header: {
         'x-github-delivery': string
-        'x-github-event': string
         'x-hub-signature-256': string
       }
     }
@@ -13413,11 +13559,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['FunctionResponse'][]
-        }
-      }
       403: {
         content: never
       }
@@ -13495,9 +13636,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -13535,11 +13673,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['FunctionResponse']
-        }
-      }
       403: {
         content: never
       }
