@@ -1,11 +1,11 @@
 'use client'
 
-import React, { forwardRef, useEffect, useRef } from 'react'
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
 
 import { useBreakpoint } from 'common'
 import { CommandInput_Shadcn_, cn } from 'ui'
 
-import { useQuery, useSetQuery } from './hooks/queryHooks'
+import { useSetQuery } from './hooks/queryHooks'
 
 function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) {
   const isBelowSm = useBreakpoint('sm')
@@ -44,8 +44,13 @@ const CommandInput = forwardRef<
 >(({ className, ...props }, ref) => {
   const inputRef = useFocusInputOnWiderScreens(ref)
 
-  const query = useQuery()
   const setQuery = useSetQuery()
+  const [inputVal, setInputVal] = useState<string>("")
+
+  useEffect(() => {
+    setQuery(inputVal)
+  }, [inputVal])
+  
 
   return (
     <CommandInput_Shadcn_
@@ -53,8 +58,8 @@ const CommandInput = forwardRef<
       // delays from useEffect
       autoFocus={false}
       ref={inputRef}
-      value={query}
-      onValueChange={setQuery}
+      value={inputVal}
+      onValueChange={(val)=>setInputVal(val)}
       placeholder="Type a command or search..."
       className={cn(
         'flex h-11 w-full rounded-md bg-transparent px-4 py-7 outline-none',
