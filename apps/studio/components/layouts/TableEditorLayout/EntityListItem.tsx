@@ -356,7 +356,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           <DropdownMenuTrigger className="text-foreground-lighter transition-all hover:text-foreground data-[state=open]:text-foreground">
             <MoreHorizontal size={14} strokeWidth={2} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="start">
+          <DropdownMenuContent side="bottom" align="start" className="w-44">
             <DropdownMenuItem
               key="edit-table"
               className="space-x-2"
