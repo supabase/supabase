@@ -714,7 +714,7 @@ functions:
             isOptional: false
             type: '"google" | "apple" | "azure" | "facebook" | string'
             description: | 
-              Provider name or OIDC `iss` value identifying which provider should be used to verify the provided token. Supported names: `google`, `apple`, `azure`, `facebook`, `keycloak` (deprecated).
+              Provider name or OIDC `iss` value identifying which provider should be used to verify the provided token. Supported names: `google`, `apple`, `azure`, `facebook`, `kakao`, `keycloak` (deprecated).
           - name: token
             isOptional: false
             type: string
