@@ -37,6 +37,8 @@ export const formatTableRowsToSQL = (table: string, rows: any[]) => {
       const filteredRow = { ...row }
       if ('idx' in filteredRow) delete filteredRow.idx
 
+      // We only check for NULL and JSON types, everything else we stringify
+      // given that Postgres can implicitly cast the right type based on the column type
       return (
         '(' +
         Object.values(filteredRow)
