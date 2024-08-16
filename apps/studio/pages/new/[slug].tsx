@@ -691,7 +691,7 @@ const Wizard: NextPageWithLayout = () => {
                               <span>Compute Billing</span>
                               <div className="flex flex-col space-y-2">
                                 <Link
-                                  href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                                  href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
                                   target="_blank"
                                 >
                                   <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">

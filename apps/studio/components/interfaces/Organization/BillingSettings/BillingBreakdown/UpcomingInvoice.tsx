@@ -25,7 +25,7 @@ const feeTooltipData: TooltipData[] = [
     identifier: 'COMPUTE',
     text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the compute size of your project. Paused projects do not incur compute costs.',
     linkRef:
-      'https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute',
+      'https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
   },
 ]
 
@@ -180,8 +180,8 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                               ` (${billingMetricUnit(fee.usage_metric)})`}
                           </span>
                           {(() => {
-                            const matchingTooltipData = feeTooltipData.find((it) =>
-                              fee.usage_metric?.startsWith(it.identifier)
+                            const matchingTooltipData = feeTooltipData.find(
+                              (it) => fee.usage_metric?.startsWith(it.identifier)
                             )
                             return matchingTooltipData ? (
                               <InvoiceTooltip
