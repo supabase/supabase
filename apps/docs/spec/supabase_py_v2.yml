@@ -4569,10 +4569,6 @@ functions:
     title: broadcastMessage()
     description: |
       Broadcast a message to all connected clients to a channel.
-    notes: |
-      - When using REST you don't need to subscribe to the channel
-      - REST calls are only available from 2.37.0 onwards
-    $ref: '@supabase/realtime-js.RealtimeChannel.send'
     examples:
       - id: send-a-message
         name: Send a message via websocket
@@ -4591,21 +4587,8 @@ functions:
           ```
           ok | timed out | error
           ```
-      # - id: send-a-message-via-rest
-      #   name: Send a message via REST
-      #   isSpotlight: true
-      #   code: |
-      #     ```python
-      #     supabase
-      #       .channel('room1')
-      #       .send_broadcast(
-      #         'cursor-pos',
-      #         { "x": random.random(), "y": random.random() },
-      #       )
-      #     ```
   - id: get-channels
     title: getChannels()
-    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
     examples:
       - id: get-all-channels
         name: Get all channels
@@ -4617,7 +4600,6 @@ functions:
 
   - id: remove-channel
     title: removeChannel()
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
@@ -4631,7 +4613,6 @@ functions:
 
   - id: remove-all-channels
     title: removeAllChannels()
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
     notes: |
       - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
