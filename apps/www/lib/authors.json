@@ -145,6 +145,14 @@
     "author_image_url": "https://github.com/alaister.png"
   },
   {
+    "author_id": "hieu",
+    "author": "Hieu Pham",
+    "username": "hieu",
+    "position": "Engineering",
+    "author_url": "https://github.com/phamhieu",
+    "author_image_url": "https://github.com/phamhieu.png"
+  },
+  {
     "author_id": "tyler_shukert",
     "author": "Tyler Shukert",
     "username": "dshukertjr",
