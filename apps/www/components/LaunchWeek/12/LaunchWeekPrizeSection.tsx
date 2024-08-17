@@ -38,15 +38,15 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     <LabelBadge text="5 pieces" />
                     <p className="text-foreground">Win Wandrd Backpack</p>
                     <p className="text-foreground-lighter text-sm">
-                      Share your ticket to increase your chances of winning a{' '}
+                      Registrations are closed to participate in winning a{' '}
                       <a
                         className="text-foreground hover:underline"
                         href="https://eu.wandrd.com/products/prvke?variant=39360658473002"
                         target="_blank"
                       >
                         Wandrd backpack
-                      </a>{' '}
-                      and other limited swag.
+                      </a>
+                      .
                     </p>
                   </div>
                 </div>
