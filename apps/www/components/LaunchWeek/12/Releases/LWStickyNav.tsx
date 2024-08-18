@@ -87,8 +87,8 @@ const LWXStickyNav: FC = () => {
                   </Link>
                 </li>
                 <li className="hidden sm:block">
-                  <Link href="#ticket" className="p-1 transition-colors hover:text-foreground">
-                    Ticket
+                  <Link href="#awards" className="p-1 transition-colors hover:text-foreground">
+                    Awards
                   </Link>
                 </li>
               </div>
