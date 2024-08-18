@@ -31,12 +31,7 @@ const Hero = () => {
                           Launch Week <span className="hidden sm:inline ml-1"> 12</span>
                         </>
                       }
-                      announcement={
-                        <>
-                          <span className="hidden sm:inline">Day 5: </span>Foreign Data Wrappers{' '}
-                          <span className="hidden sm:inline">with Wasm</span>
-                        </>
-                      }
+                      announcement="Explore what we shipped"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">

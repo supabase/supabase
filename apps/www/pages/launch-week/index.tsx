@@ -21,7 +21,6 @@ const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/12/LaunchWeekPrizeSection')
 )
 const LW12Meetups = dynamic(() => import('~/components/LaunchWeek/12/LWMeetups'))
-const TicketingFlow = dynamic(() => import('~/components/LaunchWeek/12/Ticket/TicketingFlow'))
 
 interface Props {
   meetups?: Meetup[]
@@ -108,10 +107,7 @@ export default function LaunchWeekIndex({ meetups }: Props) {
           <SectionContainer id="meetups" className="scroll-mt-[60px] lw-nav-anchor">
             <LW12Meetups meetups={meetups} />
           </SectionContainer>
-          <SectionContainer className="!py-8 lw-nav-anchor" id="ticket">
-            <TicketingFlow />
-          </SectionContainer>
-          <SectionContainer className="!pt-8" id="awards">
+          <SectionContainer className="!pt-8 scroll-mt-[60px] lw-nav-anchor" id="awards">
             <LaunchWeekPrizeSection />
           </SectionContainer>
           <CTABanner />
