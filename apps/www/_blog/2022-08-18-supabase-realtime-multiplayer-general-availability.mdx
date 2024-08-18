@@ -97,7 +97,7 @@ channel
 .subscribe()
 
 // Handle a mouse event.
-const receivedCursorPosition({ event, payload }) => {
+const receivedCursorPosition = ({ event, payload }) => {
 	console.log(`
 		User: ${payload.userId}
 		x Position: ${payload.x}
@@ -106,7 +106,7 @@ const receivedCursorPosition({ event, payload }) => {
 }
 
 // Helper function for sending our own mouse position.
-const sendMousePosition(channel, userId, x, y) => {
+const sendMousePosition = (channel, userId, x, y) => {
 	return channel.send({
 		type: 'broadcast',
 		event: MOUSE_EVENT,
