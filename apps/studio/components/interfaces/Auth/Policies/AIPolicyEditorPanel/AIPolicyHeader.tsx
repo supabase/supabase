@@ -1,5 +1,5 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
-import { PanelLeftClose, PanelRightClose, X } from 'lucide-react'
+import { ChevronDown, PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -7,7 +7,6 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
-  IconChevronDown,
   SheetClose,
   SheetHeader,
   SheetTitle,
@@ -63,7 +62,7 @@ export const AIPolicyHeader = ({
                   <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                     View policy details
                   </p>
-                  <IconChevronDown
+                  <ChevronDown
                     className="transition-transform duration-200"
                     strokeWidth={1.5}
                     size={14}
