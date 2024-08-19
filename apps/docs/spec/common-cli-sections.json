@@ -19,7 +19,7 @@
     "items": [
       {
         "id": "supabase-bootstrap",
-        "title": "Launch a new project from template",
+        "title": "Launch a quick start template",
         "slug": "supabase-bootstrap",
         "type": "cli-command"
       },
