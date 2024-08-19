@@ -84,7 +84,7 @@ const PaymentMethods = () => {
             <PartnerManagedResource
               partner={selectedOrganization?.managed_by}
               resource="Payment Methods"
-              ctaUrl={`https://vercel.com/${'TBA'}/~/settings/payment-methods`}
+              ctaUrl={`https://vercel.com/${selectedOrganization.partner_id}/~/settings/payment-methods`}
             />
           ) : !canReadPaymentMethods ? (
             <NoPermission resourceText="view this organization's payment methods" />

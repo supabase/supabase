@@ -95,7 +95,7 @@ const BillingAddress = () => {
           <PartnerManagedResource
             partner={selectedOrganization?.managed_by}
             resource="Billing Addresses"
-            ctaUrl={`https://vercel.com/${'TBA'}/~/settings/billing-addresses`}
+            ctaUrl={`https://vercel.com/${selectedOrganization.partner_id}/~/settings/billing-addresses`}
           />
         ) : !canReadBillingAddress ? (
           <NoPermission resourceText="view this organization's billing address" />

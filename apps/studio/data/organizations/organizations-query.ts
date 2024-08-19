@@ -12,6 +12,7 @@ function castOrganizationResponseToOrganization(
     ...org,
     billing_email: org.billing_email ?? 'Unknown',
     managed_by: org.slug.startsWith('vercel_icfg_') ? 'vercel-marketplace' : 'supabase',
+    partner_id: org.slug.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
   }
 }
 

@@ -81,7 +81,7 @@ const InvoicesSettings = () => {
           resource="Invoices"
           ctaUrl={
             selectedOrganization?.managed_by === 'vercel-marketplace'
-              ? `https://vercel.com/${'TBA'}/~/settings/invoices`
+              ? `https://vercel.com/${selectedOrganization.partner_id}/~/settings/invoices`
               : `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
           }
         />
