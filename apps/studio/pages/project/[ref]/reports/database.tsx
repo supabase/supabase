@@ -21,12 +21,12 @@ import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mu
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import toast from 'react-hot-toast'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
-import { useUrlState } from 'hooks/ui/useUrlState'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -60,7 +60,7 @@ const DatabaseUsage = () => {
   const showIncreaseDiskSizeModal = show_increase_disk_size_modal === 'true'
   const setShowIncreaseDiskSizeModal = (value: SetStateAction<boolean>) => {
     const show = typeof value === 'function' ? value(showIncreaseDiskSizeModal) : value
-    setUrlParams({ show_increase_disk_size_modal: String(show) })
+    setUrlParams({ show_increase_disk_size_modal: show ? 'true' : undefined })
   }
 
   const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
