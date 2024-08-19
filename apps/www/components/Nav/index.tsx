@@ -13,7 +13,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { logOut, useIsLoggedIn, useIsUserLoading } from 'common'
 import ScrollProgress from '~/components/ScrollProgress'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
@@ -128,12 +128,19 @@ const Nav = (props: Props) => {
               </div>
               <div className="flex items-center gap-2 opacity-0 animate-fade-in !scale-100 delay-300">
                 <GitHubButton />
+
                 {!isUserLoading && (
                   <>
                     {isLoggedIn ? (
-                      <Button className="hidden lg:block" asChild>
-                        <Link href="/dashboard/projects">Dashboard</Link>
-                      </Button>
+                      <>
+                        <Button className="hidden lg:block" asChild>
+                          <Link href="/dashboard/projects">Dashboard</Link>
+                        </Button>
+                        {/* !Temporary! */}
+                        <Button className="hidden lg:block" onClick={logOut}>
+                          Log out
+                        </Button>
+                      </>
                     ) : (
                       <>
                         <Button type="default" className="hidden lg:block" asChild>

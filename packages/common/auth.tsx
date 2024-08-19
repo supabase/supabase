@@ -112,3 +112,10 @@ export const useIsLoggedIn = () => {
 
   return user !== null
 }
+
+export const signOut = async () => await gotrueClient.signOut()
+
+export const logOut = async () => {
+  await signOut()
+  if (typeof document !== 'undefined') location.reload()
+}
