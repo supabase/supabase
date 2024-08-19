@@ -1,99 +1,91 @@
 ---
 id: 'prisma-error-management'
-title: 'Prisma error troubleshooting'
+title: 'Troubleshooting prisma errors'
 description: 'Prisma error troubleshooting'
 breadcrumb: 'ORM Quickstarts'
 ---
 
-# Addressing Prisma Errors:
+This guide tackles common Prisma errors that you might encounter while using Supabase.
 
 <Admonition type="note">
 
-This only addresses common Prisma errors. A full list of errors can be found in [Prisma's official docs](https://www.prisma.io/docs/orm/reference/error-reference)
+A full list of errors can be found in [Prisma's official docs](https://www.prisma.io/docs/orm/reference/error-reference)
 
 </Admonition>
 
-Prisma, unlike other libraries, uses [query parameters for configurations](https://www.prisma.io/docs/orm/overview/databases/postgresql#arguments).
+Unlike other libraries, Prisma lets you configure [its settings](https://www.prisma.io/docs/orm/overview/databases/postgresql#arguments) through special options appended to your connection string. These options are called "query parameters."
 
-Some can be used to address specific errors and can be appended to end of your connection string like so:
+They can be altered to fix specific errors. This guide explores how to change them to manage Prisma errors.
 
 ```md
-.../postgres?KEY1=VALUE&KEY2=VALUE&KEY3=VALUE
+# Example of query parameters
+
+connection_string.../postgres?KEY1=VALUE&KEY2=VALUE&KEY3=VALUE
 ```
 
 ## Errors
 
+### ... prepared statement "" already exists
+
+Supavisor in transaction mode (port 6543) does not support prepared statements, which Prisma will try to create in the background.
+
+- **Solution:**
+  - Add `pgbouncer=true` to the connection string. This turns off prepared statements in Prisma.
+
 ### Can't reach database server at:
 
-Prisma attempted to form a connection with Postgres or the Supavisor pooler, but was unable to before the request expired.
+Prisma couldn't establish a connection with Postgres or Supavisor before the timeout
 
-### Likely causes:
+- **Likely Causes:**
 
-#### Database strain:
+  - Database overload: The database server is under heavy load, causing Prisma to struggle to connect.
+  - Malformed connection string: The connection string used by Prisma is incorrect or incomplete.
+  - Transient network issues: Temporary network problems are preventing the connection.
 
-Check your [Reports Dashboard](https://supabase.com/dashboard/project/_/reports/database) to see if memory, CPU, or IO is strained.
-
-If your database is under stress, [optimize your queries](https://supabase.com/docs/guides/database/query-optimization) or consider increasing your [compute size](https://supabase.com/docs/guides/platform/compute-add-ons)
-
-#### Malformed connection string:
-
-Double check your connection string to make sure it matches the one in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
-
-#### Transient networking errors:
-
-If the above causes are not clear, it's possible that networking interference is disrupting the connection.
-
-Consider changing the `connect_timeout` to `30s`. This gives Prisma more time to form new connections.
+- **Solutions:**
+  - Check database health: Use the [Reports Dashboard](https://supabase.com/dashboard/project/_/reports/database) to monitor CPU, memory, and I/O usage. If the database is overloaded, consider increasing your [compute size](https://supabase.com/docs/guides/platform/compute-add-ons) or [optimizing your queries](https://supabase.com/docs/guides/database/query-optimization).
+  - Verify connection string: Double-check the connection string in your Prisma configuration to ensure it matches one in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+  - Try a different connection method: If the connection is still failing, try using a different connection method (e.g., connecting directly to the database instead of using the Supavisor pooler).
+  - Increase timeout: If you're confident that the connection string is correct and the database is not overloaded, try increasing the `connect_timeout` parameter in your Prisma configuration to give it more time to establish a connection.
 
 ```md
 .../postgres?connect_timeout=30
 ```
 
-## `Timed out fetching a new connection from the connection pool`:
+### Timed out fetching a new connection from the connection pool:
 
-The error refers to Prisma's internal pooler and not the Supavisor pooler. Prisma is unable to allocate connections to pending queries fast enough to meet demand.
+Prisma is unable to allocate connections to pending queries fast enough to meet demand.
 
-#### Potential causes:
+- **Likely Causes:**
 
-- The server hosting Prisma is overwhelmed. By default, Prisma creates `2 * num_cpus / 2` connections. Increasing the `connection_limit` too much can cause resource strain, degrading performance
-- If you are using Supavisor, its pool size may be too low
-- Queries are executing too slowly
+  - Overwhelmed server: The server hosting Prisma is under heavy load, limiting its ability to manage connections. By default, Prisma will create the default `2 * num_cpus / 2` worth of connections. A common cause for server strain is increasing the `connection_limit` significantly past the default.
+  - Insufficient pool size: The Supavisor pooler does not have enough connections available to quickly satisfy Prisma's requests.
+  - Slow queries: Prisma's queries are taking too long to execute, preventing it from releasing connections for reuse.
 
-#### Solutions:
+- **Solutions:**
+  - Reduce the connection limit: If you've explicitly increased the `connection_limit` parameter in your Prisma configuration, try reducing it to a more reasonable value.
+  - Increase pool size: If you are connecting with Supavisor, try increasing the pool size in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+  - Optimize queries: [Improve the efficiency of your queries](https://supabase.com/docs/guides/database/query-optimization) to reduce execution time.
+  - Increase the pool timeout: Increase the `pool_timeout` parameter in your Prisma configuration to give the pooler more time to allocate connections.
 
-If the `connection_limit` was explicitly increased, reduce to be around the default value `2 * num_cpus / 2` or remove the setting from your connection string.
+### Server has closed the connection
 
-If you are connecting with Supavisor, increase the pool size in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+According to this [GitHub Issue for Prisma](https://github.com/prisma/prisma/discussions/7389), this error may be related to large return values for queries.
 
-Optimize your queries
+- **Solution:**
+  - Try to limit the total amount of rows returned for particularly large requests.
 
-Increase `pool_timeout`
+## Drift detected: Your database schema is not in sync with your migration history
 
-```md
-.../postgres?pool_timeout=30
-```
+Prisma uses migration files to ensure the schemas it manages align with your Prisma model. If the schemas are altered (outside of Prisma migrations), Prisma will detect drift and try to rewrite the schema, potentially losing data.
 
-## `... prepared statement "" already exists`
+- **Likely Causes:**
 
-#### Context
+  - Supabase managed schemas, such as `auth` and `storage` may be updated to accommodate new features. If Prisma is given access to them, then it may detect drifts during updates.
+  - A schema was modified by you, someone on your team, or an external tool you use to access your database, causing Prisma to detect drift.
 
-Supavisor in transaction mode (port 6543) does not support `prepared statements`, which Prisma will try to create in the background.
-
-#### Solution:
-
-Add `pgbouncer=true` to the connection string. Despite the settings odd name, it only disables prepared statements and nothing else.
-
-```md
-.../postgres?pgbouncer=true
-```
-
-## `Server has closed the connection`
-
-According to this [GitHub Issue for Prisma](https://github.com/prisma/prisma/discussions/7389), it may be related to large return values for queries. Try to limit the total amount of rows returned for particularly large requests.
-
-## `Drift detected: Your database schema is not in sync with your migration history`
-
-Prisma will try to act as the source of truth for your database structures. If a `CREATE`, `DROP`, or `ALTER` command was run outside of a Prisma Migration, it may invalidate Prisma's model of the database. To correct the situation, it may try to recreate your database, purging data in the process. To circumvent this issue, try [baselining your migrations](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining).
+- **Solution**
+  - Baselining migrations: [baselining](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining) re-syncs Prisma by capturing the current database schema as the starting point for future migrations.
 
 ## `Max client connections reached`
 
