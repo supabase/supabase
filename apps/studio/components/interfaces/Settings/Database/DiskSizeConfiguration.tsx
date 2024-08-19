@@ -35,13 +35,6 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
 
   const timeTillNextAvailableDatabaseResize =
     lastDatabaseResizeAt === null ? 0 : 6 * 60 - dayjs().diff(lastDatabaseResizeAt, 'minutes')
-  const isAbleToResizeDatabase = timeTillNextAvailableDatabaseResize <= 0
-  const formattedTimeTillNextAvailableResize =
-    timeTillNextAvailableDatabaseResize < 60
-      ? `${timeTillNextAvailableDatabaseResize} minute(s)`
-      : `${Math.floor(timeTillNextAvailableDatabaseResize / 60)} hours and ${
-          timeTillNextAvailableDatabaseResize % 60
-        } minute(s)`
 
   const [{ show_increase_disk_size_modal }, setUrlParams] = useUrlState()
   const showIncreaseDiskSizeModal = show_increase_disk_size_modal === 'true'
@@ -65,27 +58,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
       },
     })
 
-  const confirmResetDbPass = async (values: { [prop: string]: any }) => {
-    if (!projectRef) return console.error('Project ref is required')
-    const volumeSize = values['new-disk-size']
-    updateProjectUsage({ projectRef, volumeSize })
-  }
-
   const currentDiskSize = project?.volumeSizeGb ?? 0
-  // to do, update with max_disk_volume_size_gb
-  const maxDiskSize = 200
-
-  const INITIAL_VALUES = {
-    'new-disk-size': currentDiskSize,
-  }
-
-  const diskSizeValidationSchema = object({
-    'new-disk-size': number()
-      .required('Please enter a GB amount you want to resize the disk up to.')
-      .min(Number(currentDiskSize ?? 0), `Must be more than ${currentDiskSize} GB`)
-      // to do, update with max_disk_volume_size_gb
-      .max(Number(maxDiskSize), 'Must not be more than 200 GB'),
-  })
 
   const { data } = useDatabaseSizeQuery({
     projectRef: project?.ref,
