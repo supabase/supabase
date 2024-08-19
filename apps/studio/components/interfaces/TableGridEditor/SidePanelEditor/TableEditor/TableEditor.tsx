@@ -19,6 +19,7 @@ import {
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { ExternalLink } from 'lucide-react'
 import ActionBar from '../ActionBar'
@@ -38,6 +39,7 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -75,10 +77,19 @@ const TableEditor = ({
   saveChanges = noop,
   updateEditorDirty = noop,
 }: TableEditorProps) => {
+  const snap = useTableEditorStateSnapshot()
   const { project } = useProjectContext()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+
+  const [params, setParams] = useUrlState()
+  useEffect(() => {
+    if (params.create === 'table' && snap.ui.open === 'none') {
+      snap.onAddTable()
+      setParams({ ...params, create: undefined })
+    }
+  }, [snap, params, setParams])
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,

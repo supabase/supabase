@@ -5,9 +5,72 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 13 Aug 2024 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 15 Aug 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/vec2pg</guid>
+  <title>vec2pg: Migrate to pgvector from Pinecone and Qdrant</title>
+  <link>https://supabase.com/blog/vec2pg</link>
+  <description>Migrate vector data from vector DBs to Supabase</description>
+  <pubDate>Thu, 15 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-book-by-david-lorenz</guid>
+  <title>The Supabase Book by David Lorenz</title>
+  <link>https://supabase.com/blog/supabase-book-by-david-lorenz</link>
+  <description>Learn Supabase by building a Multi-Tenant platform.</description>
+  <pubDate>Thu, 15 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/python-support</guid>
+  <title>Supabase Python</title>
+  <link>https://supabase.com/blog/python-support</link>
+  <description>Supabase Python is now officially supported in Supabase.</description>
+  <pubDate>Thu, 15 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgrest-12-2</guid>
+  <title>PostgREST 12.2: Prometheus compatibility and statement timeouts</title>
+  <link>https://supabase.com/blog/postgrest-12-2</link>
+  <description>New features in the latest 12.2 release of PostgREST</description>
+  <pubDate>Thu, 15 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-foreign-data-wrappers-with-wasm</guid>
+  <title>Postgres Foreign Data Wrappers with Wasm</title>
+  <link>https://supabase.com/blog/postgres-foreign-data-wrappers-with-wasm</link>
+  <description>Build Wasm foreign data wrapper with Wrappers and use it on Supabase</description>
+  <pubDate>Thu, 15 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/platform-access-control</guid>
+  <title>Introducing New Platform Access Control</title>
+  <link>https://supabase.com/blog/platform-access-control</link>
+  <description>Granular permissions for adding users to specific projects in an Supabase organization.</description>
+  <pubDate>Thu, 15 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-12-top-10</guid>
+  <title>Top 10 Launches of Launch Week 12</title>
+  <link>https://supabase.com/blog/launch-week-12-top-10</link>
+  <description>Highlights from Launch Week 12</description>
+  <pubDate>Thu, 15 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pg-graphql-1-5-7</guid>
+  <title>pg_graphql 1.5.7: pagination and multi-tenancy support</title>
+  <link>https://supabase.com/blog/pg-graphql-1-5-7</link>
+  <description>Latest features of pg_graphql</description>
+  <pubDate>Wed, 14 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/log-drains</guid>
+  <title>Introducing Log Drains</title>
+  <link>https://supabase.com/blog/log-drains</link>
+  <description>Log Drains for exporting product logs is now available under Public Alpha</description>
+  <pubDate>Wed, 14 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/third-party-auth-mfa-phone-send-hooks</guid>
   <title>Supabase Auth: Bring-your-own Auth0, Cognito, or Firebase</title>
   <link>https://supabase.com/blog/third-party-auth-mfa-phone-send-hooks</link>

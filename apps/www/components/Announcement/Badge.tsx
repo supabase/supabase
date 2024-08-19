@@ -1,12 +1,12 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import Link from 'next/link'
 import { Badge, cn } from 'ui'
 import { ArrowNarrowRightIcon } from '@heroicons/react/outline'
 
 interface Props {
   url: string
-  announcement: string
-  badge?: string
+  announcement: string | ReactNode
+  badge?: string | ReactNode
   target?: '_self' | '_blank' | string
   className?: string
   hasArrow?: boolean

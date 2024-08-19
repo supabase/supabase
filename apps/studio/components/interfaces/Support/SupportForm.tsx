@@ -558,7 +558,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
               )}
 
             {isLoadingProjects && (
-              <div className="space-y-2">
+              <div className="px-6 space-y-2">
                 <p className="text-sm prose">Which project is affected?</p>
                 <ShimmeringLoader className="!py-[19px]" />
               </div>

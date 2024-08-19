@@ -162,7 +162,7 @@ functions:
         code: |
           ```python          
           response = supabase.auth.sign_up(
-              credentials={"email": "hello@example.com", "password": "password"}
+              {"email": "email@example.com", "password": "password"}
           )
           ```
         response: |
@@ -184,7 +184,7 @@ functions:
               "new_email": null,
               "invited_at": null,
               "action_link": null,
-              "email": "hello@example.com",
+              "email": "email@example.com",
               "phone": "",
               "created_at": "2024-06-17T00:19:25.760110Z",
               "confirmed_at": null,
@@ -198,7 +198,7 @@ functions:
                   "id": "11111111-1111-1111-1111-111111111111",
                   "user_id": "11111111-1111-1111-1111-111111111111",
                   "identity_data": {
-                    "email": "hello@example.com",
+                    "email": "email@example.com",
                     "sub": "11111111-1111-1111-1111-111111111111"
                   },
                   "provider": "email",
@@ -212,10 +212,10 @@ functions:
             "session": {
               "provider_token": null,
               "provider_refresh_token": null,
-              "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzE4NTg3MTY1LCJpYXQiOjE3MTg1ODM1NjUsImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6NTQzMjEvYXV0aC92MSIsInN1YiI6ImU0MTBkMTBmLTZlNTktNDBlNS1hMmRlLTY5NGE5MzVlNzJlZCIsImVtYWlsIjoiaGVsbG9AZXhhbXBsZS5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTcxODU4MzU2NX1dLCJzZXNzaW9uX2lkIjoiMjRmOGFlMmMtYWM4Mi00NzdhLWIxMTMtZTkwNmRlNzFiMDIxIn0.5KrE1AL4koBJs5dvNQfThMV1HxV8nPP-GPU24aRL9xI",
-              "refresh_token": "mNUp4-LDuYq-kNG61t-2Xw",
+              "access_token": "<ACCESS_TOKEN>",
+              "refresh_token": "<REFRESH_TOKEN>",
               "expires_in": 3600,
-              "expires_at": 1718587165,
+              "expires_at": 1700000000,
               "token_type": "bearer",
               "user": {
                 "id": "11111111-1111-1111-1111-111111111111",
@@ -233,7 +233,7 @@ functions:
                 "new_email": null,
                 "invited_at": null,
                 "action_link": null,
-                "email": "hello@example.com",
+                "email": "email@example.com",
                 "phone": "",
                 "created_at": "2024-06-17T00:19:25.760110Z",
                 "confirmed_at": null,
@@ -247,7 +247,7 @@ functions:
                     "id": "11111111-1111-1111-1111-111111111111",
                     "user_id": "11111111-1111-1111-1111-111111111111",
                     "identity_data": {
-                      "email": "hello@example.com",
+                      "email": "email@example.com",
                       "sub": "11111111-1111-1111-1111-111111111111"
                     },
                     "provider": "email",
@@ -267,10 +267,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_up(
-              credentials={
-                  "phone": "123456789",
-                  "password": "password",
-              }
+              {"phone": "123456789", "password": "password"}
           )
           ```
       - id: sign-up-phone-whatsapp
@@ -281,7 +278,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_up(
-              credentials={
+              {
                   "phone": "123456789",
                   "password": "password",
                   "options": {"channel": "whatsapp"},
@@ -293,8 +290,8 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_up(
-              credentials={
-                  "email": "hello@example.com",
+              {
+                  "email": "email@example.com",
                   "password": "password",
                   "options": {"data": {"first_name": "John", "age": 27}},
               }
@@ -307,7 +304,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_up(
-              credentials={
+              {
                   "email": "hello1@example.com",
                   "password": "password",
                   "options": {
@@ -346,7 +343,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_in_anonymously(
-              credentials={"options": {"captcha_token": ""}}
+              {"options": {"captcha_token": ""}}
           )
           ```
         response: |
@@ -365,15 +362,16 @@ functions:
               "action_link": null,
               "email": "",
               "phone": "",
-              "created_at": "2024-06-23T22:35:47.518626Z",
+              "created_at": "2024-06-25T19:57:25.870777Z",
               "confirmed_at": null,
               "email_confirmed_at": null,
               "phone_confirmed_at": null,
-              "last_sign_in_at": "2024-06-23T22:35:47.520855Z",
+              "last_sign_in_at": "2024-06-25T19:57:25.878874Z",
               "role": "authenticated",
-              "updated_at": "2024-06-23T22:35:47.522241Z",
+              "updated_at": "2024-06-25T19:57:25.880971Z",
               "identities": [],
-              "factors": null
+              "factors": null,
+              "is_anonymous": true
             },
             "session": {
               "provider_token": null,
@@ -381,7 +379,7 @@ functions:
               "access_token": "<ACCESS_TOKEN>",
               "refresh_token": "<REFRESH_TOKEN>",
               "expires_in": 3600,
-              "expires_at": 1719185747,
+              "expires_at": 1719349045,
               "token_type": "bearer",
               "user": {
                 "id": "11111111-1111-1111-1111-111111111111",
@@ -396,15 +394,16 @@ functions:
                 "action_link": null,
                 "email": "",
                 "phone": "",
-                "created_at": "2024-06-23T22:35:47.518626Z",
+                "created_at": "2024-06-25T19:57:25.870777Z",
                 "confirmed_at": null,
                 "email_confirmed_at": null,
                 "phone_confirmed_at": null,
-                "last_sign_in_at": "2024-06-23T22:35:47.520855Z",
+                "last_sign_in_at": "2024-06-25T19:57:25.878874Z",
                 "role": "authenticated",
-                "updated_at": "2024-06-23T22:35:47.522241Z",
+                "updated_at": "2024-06-25T19:57:25.880971Z",
                 "identities": [],
-                "factors": null
+                "factors": null,
+                "is_anonymous": true
               }
             }
           }
@@ -415,35 +414,171 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_in_anonymously(
-              credentials={"options": {"data": {}}}
+              {"options": {"data": {}}}
           )
           ```
   - id: sign-in-with-password
     title: 'sign_in_with_password'
+    params:
+      - name: credentials
+        type: SignInWithPasswordCredentials
+        subContent:
+          - name: email
+            isOptional: true
+            type: string
+            description: One of `email` or `phone` must be provided.
+          - name: phone
+            isOptional: true
+            type: string
+            description: One of `email` or `phone` must be provided.
+          - name: password
+            type: string
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: captcha_token
+                isOptional: true
+                type: string
     notes: |
+      Log in an existing user with an email and password or phone and password.
       - Requires either an email and password or a phone number and password.
     examples:
       - id: sign-in-with-email-and-password
         name: Sign in with email and password
         isSpotlight: true
         code: |
+          ```python
+          response = supabase.auth.sign_in_with_password(
+              {"email": "email@example.com", "password": "example-password"}
+          )
           ```
-          data = supabase.auth.sign_in_with_password({"email": "j0@supabase.io", "password": "testsupabasenow"})
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "app_metadata": {
+                "provider": "email",
+                "providers": [
+                  "email"
+                ]
+              },
+              "user_metadata": {},
+              "aud": "authenticated",
+              "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+              "recovery_sent_at": null,
+              "email_change_sent_at": null,
+              "new_email": null,
+              "invited_at": null,
+              "action_link": null,
+              "email": "email@example.com",
+              "phone": "",
+              "created_at": "2023-02-19T00:01:51.142802Z",
+              "confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "phone_confirmed_at": null,
+              "last_sign_in_at": "2024-06-25T19:50:31.744823Z",
+              "role": "authenticated",
+              "updated_at": "2024-06-25T19:50:31.757491Z",
+              "identities": [],
+              "factors": null,
+              "is_anonymous": false
+            },
+            "session": {
+              "provider_token": null,
+              "provider_refresh_token": null,
+              "access_token": "<ACCESS_TOKEN>",
+              "refresh_token": "<REFRESH_TOKEN>",
+              "expires_in": 3600,
+              "expires_at": 1719348631,
+              "token_type": "bearer",
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
+                },
+                "user_metadata": {},
+                "aud": "authenticated",
+                "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+                "recovery_sent_at": null,
+                "email_change_sent_at": null,
+                "new_email": null,
+                "invited_at": null,
+                "action_link": null,
+                "email": "email@example.com",
+                "phone": "",
+                "created_at": "2023-02-19T00:01:51.142802Z",
+                "confirmed_at": "2023-02-19T00:01:51.351735Z",
+                "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+                "phone_confirmed_at": null,
+                "last_sign_in_at": "2024-06-25T19:50:31.744823Z",
+                "role": "authenticated",
+                "updated_at": "2024-06-25T19:50:31.757491Z",
+                "identities": [],
+                "factors": null,
+                "is_anonymous": false
+              }
+            }
+          }
           ```
       - id: sign-in-with-phone-and-password
         name: Sign in with phone and password
         isSpotlight: false
         code: |
-          ```
-          data = supabase.auth.sign_in_with_password({"phone": "+1234566", password": "testsupabasenow"})
-          # After receiving a SMS with a OTP.
-          data = supabase.auth.verify_otp({
-            "phone": '+13334445555',
-            "token": '123456',
-          })
+          ```python
+          response = supabase.auth.sign_in_with_password(
+              {"phone": "+13334445555", "password": "some-password"}
+          )
           ```
   - id: sign-in-with-otp
     title: 'sign_in_with_otp'
+    params:
+      - name: credentials
+        type: SignInWithPasswordCredentials
+        subContent:
+          - name: email
+            isOptional: true
+            type: string
+            description: One of `email` or `phone` must be provided.
+          - name: phone
+            isOptional: true
+            type: string
+            description: One of `email` or `phone` must be provided.
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: email_redirect_to
+                isOptional: true
+                type: string
+                description: >
+                  Only for email signups.
+                  The redirect URL embedded in the email link.
+                  Must be a configured redirect URL for your Supabase instance.
+              - name: should_create_user
+                isOptional: true
+                type: boolean
+                description: >
+                  Whether to create the user if they don't already exist.
+                  Defaults to true.
+              - name: data
+                isOptional: true
+                type: object
+                description: >
+                  A custom data object to store additional user metadata.
+              - name: captcha_token
+                isOptional: true
+                type: string
+              - name: channel
+                isOptional: true
+                type: sms | whatsapp
+                description: >
+                  The channel to use for sending messages.
+                  Only for phone signups.
     notes: |
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
@@ -459,36 +594,82 @@ functions:
         isSpotlight: true
         description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
         code: |
+          ```python
+          response = supabase.auth.sign_in_with_otp(
+              {
+                  "email": "email@example.com",
+                  "options": {"email_redirect_to": "https://example.com/welcome"},
+              }
+          )
           ```
-          data = supabase.auth.sign_in_with_otp({
-            "email": 'example@email.com',
-            "options": {
-              "email_redirect_to": 'https://example.com/welcome'
-            }
-          })
+        response: |
+          ```json
+          {
+            "message_id": null,
+            "user": null,
+            "session": null
+          }
           ```
       - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP
         isSpotlight: false
         description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
         code: |
-          ```
-          data = supabase.auth.sign_in_with_otp({
+          ```python
+          response = supabase.auth.sign_in_with_otp({
             "phone": '+13334445555',
+          })
+          ```
+      - id: sign-in-with-whatsapp-otp
+        name: Sign in with WhatsApp OTP
+        isSpotlight: false
+        description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        code: |
+          ```python
+          supabase.auth.sign_in_with_otp({
+            "phone": "+13334445555",
+            "options": {
+              "channel": "whatsapp",
+            }
           })
           ```
   - id: sign-in-with-oauth
     title: 'sign_in_with_oauth'
+    params:
+      - name: credentials
+        isOptional: false
+        type: SignInWithOAuthCredentials
+        subContent:
+          - name: provider
+            isOptional: false
+            type: boolean
+            description: One of the providers supported by GoTrue.
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: scopes
+                isOptional: true
+                type: string
+                description: A space-separated list of scopes granted to the OAuth application.
+              - name: redirect_to
+                isOptional: true
+                type: string
+                description: A URL to send the user to after they are confirmed.
+              - name: query_params
+                isOptional: true
+                type: string
+                description: An object of query params
     notes: |
       - This method is used for signing in using a third-party provider.
-      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+      - Supabase supports many different [third-party providers](/docs/guides/auth#configure-third-party-providers).
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
         isSpotlight: true
         code: |
           ```
-          data = supabase.auth.sign_in_with_oauth({
+          response = supabase.auth.sign_in_with_oauth({
             "provider": 'github'
           })
           ```
@@ -500,7 +681,7 @@ functions:
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```
-          data = supabase.auth.sign_in_with_oauth({
+          response = supabase.auth.sign_in_with_oauth({
             "provider": 'github',
             "options": {
               "redirect_to": 'https://example.com/welcome'
@@ -515,36 +696,362 @@ functions:
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
         code: |
           ```
-          data = supabase.auth.sign_in_with_oauth({
+          response = supabase.auth.sign_in_with_oauth({
             "provider": 'github',
             "options": {
               "scopes": 'repo gist notifications'
             }
           })
-          oauth_token = data.session.provider_token # use to access provider API
+          ```
+  
+  - id: sign-in-with-id-token
+    title: 'sign_in_with_id_token'
+    params:
+      - name: credentials
+        type: SignInWithIdTokenCredentials
+        subContent:
+          - name: provider
+            isOptional: false
+            type: '"google" | "apple" | "azure" | "facebook" | "kakao" | string'
+            description: | 
+              Provider name or OIDC `iss` value identifying which provider should be used to verify the provided token. Supported names: `google`, `apple`, `azure`, `facebook`, `kakao`, `keycloak` (deprecated).
+          - name: token
+            isOptional: false
+            type: string
+            description: |
+              OIDC ID token issued by the specified provider. The `iss` claim in the ID token must match the supplied provider. Some ID tokens contain an `at_hash` which require that you provide an `access_token` value to be accepted properly. If the token contains a `nonce` claim you must supply the nonce used to obtain the ID token.
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: captcha_token
+                isOptional: true
+                type: string
+          - name: nonce
+            isOptional: true
+            type: string
+            description: |
+              If the ID token contains a `nonce` claim, then the hash of this value is compared to the value in the ID token.
+          - name: access_token
+            isOptional: true
+            type: string
+            description: |
+              If the ID token contains an `at_hash` claim, then the hash of this value is compared to the value in the ID token.
+    notes: |
+      Allows signing in with an OIDC ID token. The authentication provider used should be enabled and configured.
+    examples:
+      - id: sign-in-with-id-token
+        name: 'Sign In using ID Token'
+        code: |
+          ```python
+          response = supabase.auth.sign_in_with_id_token(
+            {"provider": "google", "token": "your-id-token"}
+          )
+          ```
+        response: |
+          ```json
+          {
+            "session": {
+              "access_token": "<ACCESS_TOKEN>",
+              "expires_at": 1721236789,
+              "expires_in": 60,
+              "provider_refresh_token": null,
+              "provider_token": null,
+              "refresh_token": "<REFRESH_TOKEN>",
+              "token_type": "bearer",
+              "user": {
+                "action_link": null,
+                "app_metadata": {
+                  ...
+                },
+                "aud": "authenticated",
+                "confirmation_sent_at": null,
+                "confirmed_at": "Wed, 17 Jul 2024 16:34:24 GMT",
+                "created_at": "Wed, 17 Jul 2024 16:34:24 GMT",
+                "email": "email@example.com",
+                "email_change_sent_at": null,
+                "email_confirmed_at": "Wed, 17 Jul 2024 16:34:24 GMT",
+                "factors": null,
+                "id": "11111111-1111-1111-1111-111111111111",
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "provider": "google",
+                    "user_id": "11111111-1111-1111-1111-111111111111"
+                  }
+                ],
+                "invited_at": null,
+                "last_sign_in_at": "Wed, 17 Jul 2024 17:18:49 GMT",
+                "new_email": null,
+                "phone": "",
+                "phone_confirmed_at": null,
+                "recovery_sent_at": null,
+                "role": "authenticated",
+                "updated_at": "Wed, 17 Jul 2024 17:18:49 GMT",
+                "user_metadata": {
+                  ...
+                }
+              }
+            },
+            "user": {
+              "action_link": null,
+              "app_metadata": {
+                ...
+              },
+              "aud": "authenticated",
+              "confirmation_sent_at": null,
+              "confirmed_at": "Wed, 17 Jul 2024 16:34:24 GMT",
+              "created_at": "Wed, 17 Jul 2024 16:34:24 GMT",
+              "email": "email@example.com",
+              "email_change_sent_at": null,
+              "email_confirmed_at": "Wed, 17 Jul 2024 16:34:24 GMT",
+              "factors": null,
+              "id": "11111111-1111-1111-1111-111111111111",
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "provider": "google",
+                  "user_id": "11111111-1111-1111-1111-111111111111"
+                }
+              ],
+              "invited_at": null,
+              "last_sign_in_at": "Wed, 17 Jul 2024 17:18:49 GMT",
+              "new_email": null,
+              "phone": "",
+              "phone_confirmed_at": null,
+              "recovery_sent_at": null,
+              "role": "authenticated",
+              "updated_at": "Wed, 17 Jul 2024 17:18:49 GMT",
+              "user_metadata": {
+                ...
+              }
+            }
+          }
+          ```
+  - id: sign-in-with-sso
+    title: 'sign_in_with_sso()'
+    overwriteParams:
+      - name: params
+        type: SignInWithSSOCredentials
+        subContent:
+          - name: provider_id
+            isOptional: true
+            type: string
+            description: >
+              UUID of the SSO provider.
+              One of `provider_id` or `domain` is required.
+          - name: domain
+            isOptional: true
+            type: string
+            description: >
+              Domain name of the organization to use SSO with.
+              One of `provider_id` or `domain` is required.
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: redirect_to
+                type: string
+                description: >
+                  The URL to redirect the user to after they have signed in.
+                  Must be a configured redirect URL for your Supabase instance.
+              - name: captcha_token
+                type: string
+    notes: |
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
+      - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `provider_id` property. For example:
+          - Mapping specific user email addresses with an identity provider.
+          - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
+    examples:
+      - id: sign-in-with-domain
+        name: Sign in with email domain
+        isSpotlight: true
+        description: |
+          You can extract the user's email domain and use it to trigger the authentication flow with the correct identity provider.
+        code: |
+          ```python
+            response = supabase.auth.sign_in_with_sso({"domain": "company.com"})
+          ```
+        response: |
+          ```json
+          {
+            "url": ""
+          }
+          ```
+      - id: sign-in-with-provider-uuid
+        name: Sign in with provider UUID
+        isSpotlight: true
+        description: |
+          Useful when you need to map a user's sign in request according to different rules that can't use email domains.
+        code: |
+          ```python
+            response = supabase.auth.sign_in_with_sso(
+              {"provider_id": "21648a9d-8d5a-4555-a9d1-d6375dc14e92"}
+            )
           ```
   - id: sign-out
     title: 'sign_out()'
+    params:
+      - name: options
+        isOptional: true
+        type: SignOutOptions
+        subContent:
+          - name: scope
+            isOptional: true
+            type: '"global" | "local" | "others"'
+            description: |
+              Determines which sessions should be logged out. Global means all sessions by this account. Local means only this session. Others means all other sessions except the current one. When using others, there is no sign-out event fired on the current session!
     notes: |
-      - In order to use the `signOut()` method, the user needs to be signed in first.
+      - In order to use the `sign_out()` method, the user needs to be signed in first.
+      - By default, `sign_out()` uses the global scope, which signs out all other sessions that the user is logged into as well.
+      - Since Supabase Auth uses JWTs for authentication, the access token JWT will be valid until it's expired. When the user signs out, Supabase revokes the refresh token and deletes the JWT from the client-side. This does not revoke the JWT and it will still be valid until it expires.
     examples:
       - id: sign-out
         name: Sign out
         code: |
-          ```
-          res = supabase.auth.sign_out()
+          ```python
+          response = supabase.auth.sign_out()
           ```
   - id: verify-otp
     title: 'verify_otp'
+    params:
+      - name: params
+        type: VerifyOtpParams
+        subContent:
+          - name: phone
+            isOptional: true
+            type: string
+            description: One of `phone`, `email`, or `token_hash` must be provided.
+          - name: email
+            isOptional: true
+            type: string
+            description: One of `phone`, `email`, or `token_hash` must be provided.
+          - name: token_hash
+            isOptional: true
+            type: string
+            description: >
+              The token hash from the user's email link.
+              One of `phone`, `email`, or `token_hash` must be provided.
+          - name: type
+            type: sms | phone_change | signup | invite | magiclink | recovery | email_change | email
+          - name: token
+            isOptional: true
+            type: string
+            description: The OTP sent to the user. Required if using `phone` or `email`.
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: redirect_to
+                isOptional: true
+                type: string
+                description: >
+                  A URL to redirect the user to after they are confirmed.
+                  Must be in your configured redirect URLs.
+              - name: captcha_token
+                isOptional: true
+                type: string
+                description: Deprecated.
     notes: |
-      - The `verify_otp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
+      - The `verify_otp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `email`, `recovery`, `invite` or `email_change` (`signup` and `magiclink` types are deprecated).
       - The verification type used should be determined based on the corresponding auth method called before `verify_otp` to sign up / sign-in a user.
+      - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in. You may wish to use the hash with Magic Links for the PKCE flow for Server Side Auth. See [this guide](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr) for more details.
     examples:
+      - id: verify-signup-one-time-password(otp)
+        name: Verify Signup One-Time Password (OTP)
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.verify_otp(
+            {"email": "email@example.com", "token": "123456", "type": "email"}
+          )
+          ```
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "app_metadata": {
+                "provider": "email",
+                "providers": []
+              },
+              "user_metadata": {},
+              "aud": "authenticated",
+              "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+              "recovery_sent_at": "2024-07-21T22:20:00.366959Z",
+              "email_change_sent_at": null,
+              "new_email": null,
+              "invited_at": null,
+              "action_link": null,
+              "email": "email@example.com",
+              "phone": "",
+              "created_at": "2023-02-19T00:01:51.142802Z",
+              "confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "phone_confirmed_at": null,
+              "last_sign_in_at": "2024-07-21T22:21:35.199451Z",
+              "role": "authenticated",
+              "updated_at": "2024-07-21T22:21:35.206985Z",
+              "identities": [],
+              "factors": null,
+              "is_anonymous": false
+            },
+            "session": {
+              "provider_token": null,
+              "provider_refresh_token": null,
+              "access_token": "<ACCESS_TOKEN>",
+              "refresh_token": "<REFRESH_TOKEN>",
+              "expires_in": 3600,
+              "expires_at": 1700000000,
+              "token_type": "bearer",
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": []
+                },
+                "user_metadata": {},
+                "aud": "authenticated",
+                "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+                "recovery_sent_at": "2024-07-21T22:20:00.366959Z",
+                "email_change_sent_at": null,
+                "new_email": null,
+                "invited_at": null,
+                "action_link": null,
+                "email": "email@example.com",
+                "phone": "",
+                "created_at": "2023-02-19T00:01:51.142802Z",
+                "confirmed_at": "2023-02-19T00:01:51.351735Z",
+                "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+                "phone_confirmed_at": null,
+                "last_sign_in_at": "2024-07-21T22:21:35.199451Z",
+                "role": "authenticated",
+                "updated_at": "2024-07-21T22:21:35.206985Z",
+                "identities": [],
+                "factors": null,
+                "is_anonymous": false
+              }
+            }
+          }
+          ```
       - id: verify-sms-one-time-password
         name: Verify SMS One-Time Password (OTP)
+        isSpotlight: true
         code: |
+          ```python
+          response = supabase.auth.verify_otp(
+            {"phone": "+13334445555", "token": "123456", "type": "sms"}
+          )
           ```
-          res = supabase.auth.verify_otp(phone, token)
+      - id: verify-email-auth(tokenhash)
+        name: Verify Email Auth (Token Hash)
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.verify_otp(
+            {"email": "email@example.com", "token_hash": "<token-hash>", "type": "email"}
+          )
           ```
   - id: auth-mfa-api
     title: 'Overview'
@@ -647,52 +1154,221 @@ functions:
           ```
   - id: get-user
     title: 'get_user'
+    params:
+      - name: jwt
+        isOptional: true
+        type: string
+        description: Takes in an optional access token JWT. If no JWT is provided, the JWT from the current session is used.
     notes: |
-      - This method gets the user object from the current session.
-      - Fetches the user object from the database instead of local session.
+      - This method fetches the user object from the database instead of local session.
+      - This method is useful for checking if the user is authorized because it validates the user's access token JWT on the server.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
         name: Get the logged in user with the current existing session
         isSpotlight: true
         code: |
           ```
-          data = supabase.auth.get_user()
+          response = supabase.auth.get_user()
+          ```
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "app_metadata": {
+                "provider": "email",
+                "providers": []
+              },
+              "user_metadata": {},
+              "aud": "authenticated",
+              "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+              "recovery_sent_at": "2024-07-21T22:20:00.366959Z",
+              "email_change_sent_at": null,
+              "new_email": null,
+              "new_phone": null,
+              "invited_at": null,
+              "action_link": null,
+              "email": "email@example.com",
+              "phone": "",
+              "created_at": "2023-02-19T00:01:51.142802Z",
+              "confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "phone_confirmed_at": null,
+              "last_sign_in_at": "2024-07-24T22:24:57.642878Z",
+              "role": "authenticated",
+              "updated_at": "2024-07-24T22:24:57.650021Z",
+              "identities": [],
+              "is_anonymous": false,
+              "factors": null
+            }
+          }
           ```
       - id: get-the-logged-in-user-with-a-custom-access-token-jwt
         name: Get the logged in user with a custom access token jwt
         isSpotlight: false
         code: |
           ```
-          data = supabase.auth.get_user(jwt)
+          response = supabase.auth.get_user(jwt)
           ```
 
   - id: get-session
     title: 'get_session'
+    notes: |
+      - This method retrieves the current local session (i.e in memory).
+      - The session contains a signed JWT and unencoded session data.
+      - Since the unencoded session data is retrieved from the local storage medium, **do not** rely on it as a source of trusted data on the server. It could be tampered with by the sender. If you need verified, trustworthy user data, call [`get_user`](/docs/reference/python/auth-getuser) instead.
+      - If the session has an expired access token, this method will use the refresh token to get a new session.
     examples:
-      - id: get-session
+      - id: get-the-session-data
         name: Get the session data
+        isSpotlight: true
         code: |
+          ```python
+          response = supabase.auth.get_session()
           ```
-          res = supabase.auth.get_session()
+        response: |
+          ```json
+          {
+            "provider_token": null,
+            "provider_refresh_token": null,
+            "access_token": "<ACCESS_TOKEN>",
+            "refresh_token": "<REFRESH_TOKEN>",
+            "expires_in": 3600,
+            "expires_at": 1700000000,
+            "token_type": "bearer",
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "app_metadata": {
+                "provider": "email",
+                "providers": []
+              },
+              "user_metadata": {},
+              "aud": "authenticated",
+              "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+              "recovery_sent_at": "2024-07-21T22:20:00.366959Z",
+              "email_change_sent_at": null,
+              "new_email": null,
+              "invited_at": null,
+              "action_link": null,
+              "email": "email@example.com",
+              "phone": "",
+              "created_at": "2023-02-19T00:01:51.142802Z",
+              "confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "phone_confirmed_at": null,
+              "last_sign_in_at": "2024-07-21T22:36:45.194120Z",
+              "role": "authenticated",
+              "updated_at": "2024-07-21T22:36:45.196044Z",
+              "identities": [],
+              "factors": null,
+              "is_anonymous": false
+            }
+          }
           ```
 
   - id: set-session
     title: 'set_session()'
+    params:
+      - name: access_token
+        isOptional: false
+        type: string
+      - name: refresh_token
+        isOptional: false
+        type: string
+    description: |
+      Sets the session data from the current session. If the current session is expired, setSession will take care of refreshing it to obtain a new session.
+      If the refresh token or access token in the current session is invalid, an error will be thrown.
     notes: |
-      - `setSession()` takes in a refresh token and uses it to get a new session.
-      - The refresh token can only be used once to obtain a new session.
-      - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
-      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - This method sets the session using an `access_token` and `refresh_token`.
+      - If successful, a `SIGNED_IN` event is emitted.
     examples:
       - id: set-session
         name: Refresh the session
-        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+        description: Sets the session data from refresh_token and returns current session or raise an error if the refresh_token is invalid.
         code: |
+          ```python
+          response = supabase.auth.set_session(access_token, refresh_token)
           ```
-          res = supabase.auth.set_session(access_token, refresh_token)
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "app_metadata": {
+                "provider": "email",
+                "providers": []
+              },
+              "user_metadata": {},
+              "aud": "authenticated",
+              "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+              "recovery_sent_at": "2024-07-21T22:20:00.366959Z",
+              "email_change_sent_at": null,
+              "new_email": null,
+              "new_phone": null,
+              "invited_at": null,
+              "action_link": null,
+              "email": "email@example.com",
+              "phone": "",
+              "created_at": "2023-02-19T00:01:51.142802Z",
+              "confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "phone_confirmed_at": null,
+              "last_sign_in_at": "2024-07-24T22:24:57.642878Z",
+              "role": "authenticated",
+              "updated_at": "2024-07-24T22:24:57.650021Z",
+              "identities": [],
+              "is_anonymous": false,
+              "factors": null
+            },
+            "session": {
+              "provider_token": null,
+              "provider_refresh_token": null,
+              "access_token": "<ACCESS_TOKEN>",
+              "refresh_token": "<REFRESH_TOKEN>",
+              "expires_in": 89,
+              "expires_at": 1721863497,
+              "token_type": "bearer",
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": []
+                },
+                "user_metadata": {},
+                "aud": "authenticated",
+                "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+                "recovery_sent_at": "2024-07-21T22:20:00.366959Z",
+                "email_change_sent_at": null,
+                "new_email": null,
+                "new_phone": null,
+                "invited_at": null,
+                "action_link": null,
+                "email": "email@example.com",
+                "phone": "",
+                "created_at": "2023-02-19T00:01:51.142802Z",
+                "confirmed_at": "2023-02-19T00:01:51.351735Z",
+                "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+                "phone_confirmed_at": null,
+                "last_sign_in_at": "2024-07-24T22:24:57.642878Z",
+                "role": "authenticated",
+                "updated_at": "2024-07-24T22:24:57.650021Z",
+                "identities": [],
+                "is_anonymous": false,
+                "factors": null
+              }
+            }
+          }
           ```
   - id: refresh-session
     title: 'refresh_session()'
+    params:
+      - name: refresh_token
+        isOptional: true
+        type: string
+    description: |
+      Returns a new session, regardless of expiry status.
+      Takes in an optional refresh token. If not passed in, then refresh_session() will attempt to retrieve it from get_session().
+      If the current session's refresh token is invalid, an error will be thrown.
     notes: |
       - This method will refresh the session whether the current one is expired or not.
     examples:
@@ -700,7 +1376,77 @@ functions:
         name: Refresh session using the current session
         code: |
           ```
-          res = supabase.auth.refresh_session()
+          response = supabase.auth.refresh_session()
+          ```
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "app_metadata": {
+                "provider": "email",
+                "providers": []
+              },
+              "user_metadata": {},
+              "aud": "authenticated",
+              "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+              "recovery_sent_at": "2024-07-21T22:20:00.366959Z",
+              "email_change_sent_at": null,
+              "new_email": null,
+              "new_phone": null,
+              "invited_at": null,
+              "action_link": null,
+              "email": "email@example.com",
+              "phone": "",
+              "created_at": "2023-02-19T00:01:51.142802Z",
+              "confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "phone_confirmed_at": null,
+              "last_sign_in_at": "2024-07-24T22:24:57.642878Z",
+              "role": "authenticated",
+              "updated_at": "2024-07-24T22:24:57.650021Z",
+              "identities": [],
+              "is_anonymous": false,
+              "factors": null
+            },
+            "session": {
+              "provider_token": null,
+              "provider_refresh_token": null,
+              "access_token": "<ACCESS_TOKEN>",
+              "refresh_token": "<REFRESH_TOKEN>",
+              "expires_in": 89,
+              "expires_at": 1721863497,
+              "token_type": "bearer",
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": []
+                },
+                "user_metadata": {},
+                "aud": "authenticated",
+                "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+                "recovery_sent_at": "2024-07-21T22:20:00.366959Z",
+                "email_change_sent_at": null,
+                "new_email": null,
+                "new_phone": null,
+                "invited_at": null,
+                "action_link": null,
+                "email": "email@example.com",
+                "phone": "",
+                "created_at": "2023-02-19T00:01:51.142802Z",
+                "confirmed_at": "2023-02-19T00:01:51.351735Z",
+                "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+                "phone_confirmed_at": null,
+                "last_sign_in_at": "2024-07-24T22:24:57.642878Z",
+                "role": "authenticated",
+                "updated_at": "2024-07-24T22:24:57.650021Z",
+                "identities": [],
+                "is_anonymous": false,
+                "factors": null
+              }
+            }
+          }
           ```
   - id: select
     title: 'Fetch data: select()'
@@ -1362,23 +2108,6 @@ functions:
         isOptional: true
         type: CountMethod
         description: The property to use to get the count of rows returned.
-      - name: returning
-        isOptional: true
-        type: ReturnMethod
-        description:  Either 'minimal' or 'representation'. Defaults to 'representation'.
-      - name: ignore_duplicates
-        isOptional: true
-        type: bool
-        description:  Whether duplicate rows should be ignored.
-      - name: on_conflict
-        isOptional: true
-        type: string
-        description:  Specified columns to be made to work with UNIQUE constraint.
-      - name: default_to_null
-        isOptional: true
-        type: bool
-        description: |
-          Make missing fields default to `null`. Otherwise, use the default value for the column. This only applies when inserting new rows, not when merging with existing rows under `ignore_duplicates: false`. This also only applies when doing bulk upserts.
     examples:
       - id: updating-your-data
         name: Updating your data
@@ -4425,6 +5154,222 @@ functions:
             }
           )
           ```
+
+  - id: subscribe
+    title: on().subscribe()
+    notes: |
+      - By default, Broadcast and Presence are enabled for all projects.
+      - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
+      - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
+      - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
+    examples:
+      - id: listen-to-broadcast
+        name: Listen to broadcast messages
+        isSpotlight: true
+        code: |
+          ```python
+          channel = supabase.channel("room1")
+
+          def on_subscribe(status, err):
+            if status == RealtimeSubscribeStates.SUBSCRIBED:
+              channel.send_broadcast('cursor-pos', { "x": random.random(), "y": random.random() })
+
+          def handle_broadcast(payload):
+            print("Cursor position received!", payload)
+
+          channel.on_broadcast(event="cursor-pos", callback=handle_broadcast).subscribe(on_subscribe)
+          ```
+      - id: listen-to-presence-sync
+        name: Listen to presence sync
+        isSpotlight: true
+        code: |
+          ```python
+          channel = supabase.channel('room1')
+
+          def on_subscribe(status, err):
+            if status == RealtimeSubscribeStates.SUBSCRIBED:
+              channel.track({ "online_at": datetime.datetime.now().isoformat() })
+
+          def handle_presence_sync():
+            print('Synced presence state: ', channel.presence.state)
+
+          channel.on_presence_sync(callback=handle_presence_sync).subscribe(on_subscribe)
+          ```
+      - id: listen-to-presence-join
+        name: Listen to presence join
+        isSpotlight: true
+        code: |
+          ```python
+          channel = supabase.channel('room1')
+
+          def handle_presence_join(key, current_presence, new_presence):
+            print('Newly joined presences: ', new_presence)
+
+          def on_subscribe(status, err):
+            if status == RealtimeSubscribeStates.SUBSCRIBED:
+              channel.track({ "online_at": datetime.datetime.now().isoformat() })
+
+          channel.on_presence_join(callback=handle_presence_join).subscribe(on_subscribe)
+          ```
+      - id: listen-to-presence-leave
+        name: Listen to presence leave
+        isSpotlight: true
+        code: |
+          ```python
+          channel = supabase.channel('room1')
+
+          def handle_presence_leave(key, current_presence, left_presence):
+            print('Newly left presences: ', left_presence)
+
+          def on_subscribe(status, err):
+            if status == RealtimeSubscribeStates.SUBSCRIBED:
+              channel.track({ "online_at": datetime.datetime.now().isoformat() })
+              channel.untrack()
+
+          channel.on_presence_leave(callback=handle_presence_leave).subscribe(on_subscribe)
+          ```
+      - id: listen-to-all-database-changes
+        name: Listen to all database changes
+        isSpotlight: true
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("*", schema="*", callback=handle_record_updated)
+            .subscribe()
+          ```
+      - id: listen-to-a-specific-table
+        name: Listen to a specific table
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("*", schema="public", table="countries", callback=handle_record_updated)
+            .subscribe()
+          ```
+      - id: listen-to-inserts
+        name: Listen to inserts
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
+            .subscribe()
+          ```
+      - id: listen-to-updates
+        name: Listen to updates
+        description: |
+          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          enable full replication for the table you are listening to:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("UPDATE", schema="public", table="countries", callback=handle_record_updated)
+            .subscribe()
+          ```
+      - id: listen-to-deletes
+        name: Listen to deletes
+        description: |
+          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          enable full replication for the table you are listening too:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
+            .subscribe()
+          ```
+      - id: listen-to-multiple-events
+        name: Listen to multiple events
+        description: You can chain listeners if you want to listen to multiple events for each table.
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
+            .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
+            .subscribe()
+          ```
+      - id: listening-to-row-level-changes
+        name: Listen to row level changes
+        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        notes: |
+          - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
+        code: |
+          ```python
+          supabase
+            .channel('room1')
+            .on_postgres_changes("UPDATE", schema="public", table="countries", filter="id=eq.200", callback=handle_record_updated)
+            .subscribe()
+          ```
+  - id: broadcast-message
+    title: broadcastMessage()
+    description: |
+      Broadcast a message to all connected clients to a channel.
+    examples:
+      - id: send-a-message
+        name: Send a message via websocket
+        isSpotlight: true
+        code: |
+          ```python
+          channel = supabase.channel('room1')
+
+          def on_subscribe(status, err):
+            if status == RealtimeSubscribeStates.SUBSCRIBED:
+              channel.send_broadcast('cursor-pos', { "x": random.random(), "y": random.random() })
+
+          channel.subscribe(on_subscribe)
+          ```
+        response: |
+          ```
+          ok | timed out | error
+          ```
+  - id: get-channels
+    title: getChannels()
+    examples:
+      - id: get-all-channels
+        name: Get all channels
+        isSpotlight: true
+        code: |
+          ```python
+          channels = supabase.get_channels()
+          ```
+
+  - id: remove-channel
+    title: removeChannel()
+    notes: |
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - id: removes-a-channel
+        name: Removes a channel
+        isSpotlight: true
+        code: |
+          ```python
+          supabase.remove_channel(myChannel)
+          ```
+
+  - id: remove-all-channels
+    title: removeAllChannels()
+    notes: |
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - id: remove-all-channels
+        name: Remove all channels
+        isSpotlight: true
+        code: |
+          ```python
+          supabase.remove_all_channels()
+          ```
+
 
   - id: list-buckets
     title: 'list_buckets()'
