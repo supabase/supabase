@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { SetStateAction, useEffect, useState } from 'react'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, IconExternalLink } from 'ui'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -26,6 +26,7 @@ import { formatBytes } from 'lib/helpers'
 import toast from 'react-hot-toast'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
+import { useUrlState } from 'hooks/ui/useUrlState'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -55,7 +56,13 @@ const DatabaseUsage = () => {
   const databaseSizeBytes = data?.result[0].db_size ?? 0
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
-  const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
+  const [{ show_increase_disk_size_modal }, setUrlParams] = useUrlState()
+  const showIncreaseDiskSizeModal = show_increase_disk_size_modal === 'true'
+  const setShowIncreaseDiskSizeModal = (value: SetStateAction<boolean>) => {
+    const show = typeof value === 'function' ? value(showIncreaseDiskSizeModal) : value
+    setUrlParams({ show_increase_disk_size_modal: String(show) })
+  }
+
   const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,
@@ -65,7 +72,7 @@ const DatabaseUsage = () => {
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (res, variables) => {
       toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
-      setshowIncreaseDiskSizeModal(false)
+      setShowIncreaseDiskSizeModal(false)
     },
   })
 
@@ -216,7 +223,7 @@ const DatabaseUsage = () => {
                     <ButtonTooltip
                       type="default"
                       disabled={!canUpdateDiskSizeConfig}
-                      onClick={() => setshowIncreaseDiskSizeModal(true)}
+                      onClick={() => setShowIncreaseDiskSizeModal(true)}
                       tooltip={{
                         content: {
                           side: 'bottom',
@@ -296,7 +303,7 @@ const DatabaseUsage = () => {
         <DiskSizeConfigurationModal
           visible={showIncreaseDiskSizeModal}
           loading={isUpdatingDiskSize}
-          hideModal={setshowIncreaseDiskSizeModal}
+          hideModal={setShowIncreaseDiskSizeModal}
         />
       </section>
     </>
