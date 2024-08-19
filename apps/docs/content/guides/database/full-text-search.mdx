@@ -814,7 +814,7 @@ val data = supabase.from("books").select {
 <TabPanel id="python" label="Python">
 
 ```python
-data = await client.from_('books').select().text_search('fts', "'little' & 'big'")
+data = await client.from_('books').select().text_search('fts', "'little' & 'big'").execute()
 ```
 
 </TabPanel>

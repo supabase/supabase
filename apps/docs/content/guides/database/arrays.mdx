@@ -102,11 +102,6 @@ try await supabase
 Insert a record from the Python client:
 
 ```python
-struct ArrayTest: Encodable {
-  let id: Int
-  let textarray: [String]
-}
-
 await supabase.from_('arraytest').insert(
   [
     {
