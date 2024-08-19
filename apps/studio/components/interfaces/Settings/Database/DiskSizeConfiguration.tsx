@@ -68,7 +68,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
 
   return (
     <div id="diskManagement">
-      <FormHeader title="Disk management" />
+      <FormHeader title="Disk Management" />
       {projectSubscriptionData?.usage_billing_enabled === true ? (
         <div className="flex flex-col gap-3">
           <Panel className="!m-0">
