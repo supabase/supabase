@@ -79,7 +79,11 @@ const InvoicesSettings = () => {
         <PartnerManagedResource
           partner={selectedOrganization?.managed_by}
           resource="Invoices"
-          ctaUrl={`https://vercel.com/${'TBA'}/~/settings/invoices`}
+          ctaUrl={
+            selectedOrganization?.managed_by === 'vercel-marketplace'
+              ? `https://vercel.com/${'TBA'}/~/settings/invoices`
+              : `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
+          }
         />
       </ScaffoldContainerLegacy>
     )
