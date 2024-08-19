@@ -89,12 +89,14 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
       case 'Phone':
         return (
           config.HOOK_SEND_SMS_ENABLED && (
-            <Alert_Shadcn_ variant="warning">
+            <Alert_Shadcn_>
               <WarningIcon />
-              <AlertTitle_Shadcn_>SMS hook enabled</AlertTitle_Shadcn_>
+              <AlertTitle_Shadcn_>
+                SMS provider settings are disabled while the SMS hook is enabled.
+              </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
-                <p>The SMS provider settings will be disabled when the SMS hook is enabled.</p>
-                <Button asChild type="default" className="w-min" icon={<ExternalLink size={14} />}>
+                <p>The SMS hook will be used in place of the SMS provider configured</p>
+                <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
                   <Link href={`/project/${projectRef}/auth/hooks`}>View auth hooks</Link>
                 </Button>
               </AlertDescription_Shadcn_>
