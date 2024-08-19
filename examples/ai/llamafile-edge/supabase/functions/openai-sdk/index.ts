@@ -3,7 +3,6 @@
 // This enables autocomplete, go to definition, etc.
 
 // Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import OpenAI from "https://deno.land/x/openai@v4.53.2/mod.ts";
 
 console.log("Hello from openai-sdk compatible!");
@@ -18,13 +17,13 @@ Deno.serve(async (req) => {
     stream,
     messages: [
       {
-        "role": "system",
-        "content":
+        role: "system",
+        content:
           "You are LLAMAfile, an AI assistant. Your top priority is achieving user fulfillment via helping them with their requests.",
       },
       {
-        "role": "user",
-        "content": prompt,
+        role: "user",
+        content: prompt,
       },
     ],
   });
