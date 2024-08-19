@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
@@ -8,21 +7,17 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import Link from 'next/link'
 import { NavMenu, NavMenuItem } from 'ui'
-import { useOrgSubscriptionQuery } from '../../data/subscriptions/org-subscription-query'
 import AccountLayout from './AccountLayout/AccountLayout'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
-  const router = useRouter()
   const currentPath = useCurrentPath()
   const { slug } = useParams()
 
   const invoicesEnabledOnProfileLevel = useIsFeatureEnabled('billing:invoices')
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
-  const isNotOrgWithPartnerBilling = !(subscription?.billing_via_partner ?? true)
-  const invoicesEnabled = invoicesEnabledOnProfileLevel && isNotOrgWithPartnerBilling
+  const invoicesEnabled = invoicesEnabledOnProfileLevel
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
