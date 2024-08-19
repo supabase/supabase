@@ -157,6 +157,7 @@ supabase.auth.unlinkIdentity(googleIdentity.identityId!!)
 <TabPanel id="python" label="Python">
 
 You can use [`get_user_identities()`](/docs/reference/python/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlink_identity()`](/docs/reference/python/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
+
 ```python
 # retrieve all identities linked to a user
 response = await supabase.auth.get_user_identities()
