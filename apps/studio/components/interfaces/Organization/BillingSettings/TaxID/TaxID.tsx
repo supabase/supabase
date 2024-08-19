@@ -146,7 +146,7 @@ const TaxID = () => {
           <PartnerManagedResource
             partner={selectedOrganization?.managed_by}
             resource="Tax IDs"
-            ctaUrl={`https://vercel.com/${selectedOrganization.partner_id}/~/settings/tax-ids`}
+            ctaUrl={`https://vercel.com/${'supabase'}/~/settings/billing`}
           />
         ) : !canReadTaxId ? (
           <NoPermission resourceText="view this organization's tax ID" />
