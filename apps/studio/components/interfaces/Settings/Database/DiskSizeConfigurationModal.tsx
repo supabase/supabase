@@ -139,7 +139,7 @@ const DiskSizeConfigurationModal = ({
                   id="new-disk-size"
                   label="New disk size"
                   labelOptional="GB"
-                  disabled={!isAbleToResizeDatabase}
+                  disabled={!isAbleToResizeDatabase || isLoading}
                 />
               </Modal.Content>
               <Modal.Separator />
