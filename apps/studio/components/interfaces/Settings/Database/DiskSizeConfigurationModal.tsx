@@ -32,12 +32,12 @@ const DiskSizeConfigurationModal = ({
   hideModal,
 }: DiskSizeConfigurationProps) => {
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
+  const { project, isLoading } = useProjectContext()
   const { lastDatabaseResizeAt } = project ?? {}
 
   const timeTillNextAvailableDatabaseResize =
     lastDatabaseResizeAt === null ? 0 : 6 * 60 - dayjs().diff(lastDatabaseResizeAt, 'minutes')
-  const isAbleToResizeDatabase = timeTillNextAvailableDatabaseResize <= 0
+  const isAbleToResizeDatabase = isLoading || timeTillNextAvailableDatabaseResize <= 0
   const formattedTimeTillNextAvailableResize =
     timeTillNextAvailableDatabaseResize < 60
       ? `${timeTillNextAvailableDatabaseResize} minute(s)`
@@ -150,7 +150,7 @@ const DiskSizeConfigurationModal = ({
                 <Button
                   htmlType="submit"
                   type="primary"
-                  disabled={!isAbleToResizeDatabase || isUpdatingDiskSize}
+                  disabled={!isAbleToResizeDatabase || isUpdatingDiskSize || isLoading}
                   loading={isUpdatingDiskSize}
                 >
                   Update disk size
