@@ -6,6 +6,8 @@ description: "Learn about your project's instance and additional add-ons."
 
 Every project on the Supabase Platform comes with its own dedicated Postgres instance running inside a virtual machine (VM). The following table describes the base instance with additional compute add-ons available if you need extra performance when scaling up Supabase.
 
+You can upgrade your compute from the [Supabase Dashboard](/dashboard/project/_/settings/addons).
+
 <Admonition type="note">
 
 Free Plan resources subject to changes.
@@ -101,3 +103,7 @@ The maximum number of replication slots and WAL senders depends on your compute 
 As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/), setting `max_replication_slots` to a lower value than the current number of replication slots will prevent the server from starting. If you are downgrading your compute add-on, please ensure that you are using fewer slots than the maximum number of replication slots available for the new compute add-on.
 
 </Admonition>
+
+## Upgrade downtime
+
+Compute add-on changes are usually applied with less than 2 minutes of downtime, but can take longer depending on the Cloud Provider.

@@ -187,7 +187,7 @@ const UtilityActions = ({
             {isFavorite ? 'Remove from' : 'Add to'} favorites
           </DropdownMenuItem>
           <DropdownMenuItem className="gap-x-2" onClick={prettifyQuery}>
-            <AlignLeft size={14} strokeWidth={2} />
+            <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
             Prettify SQL
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -243,7 +243,7 @@ const UtilityActions = ({
               type="text"
               onClick={prettifyQuery}
               className="px-1"
-              icon={<AlignLeft strokeWidth={2} />}
+              icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
             />
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_ side="bottom">Prettify SQL</TooltipContent_Shadcn_>

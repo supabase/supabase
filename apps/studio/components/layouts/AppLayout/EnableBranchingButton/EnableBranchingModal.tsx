@@ -211,36 +211,33 @@ const EnableBranchingModal = () => {
                   </p>
                   <div className="flex flex-row gap-4">
                     <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-400 flex items-center justify-center">
-                        <DollarSign className="text-warning" size={20} strokeWidth={2} />
+                      <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                        <DollarSign className="text-info" size={20} strokeWidth={2} />
                       </figure>
                     </div>
                     <div className="flex flex-col gap-y-1">
                       <p className="text-sm text-foreground">
-                        Preview branches are billed $0.32 per day (approximately $10 per month)
+                        Preview branches are billed $0.32 per day
                       </p>
                       <p className="text-sm text-foreground-light">
-                        Launching a new preview branch incurs additional compute costs at $0.32 per
-                        day. This cost will continue for as long as the branch has not been removed.
-                        This pricing is for Early Access and is subject to change.
+                        This cost will continue for as long as the branch has not been removed.
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-row gap-4 mt-2">
                     <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-400 flex items-center justify-center">
-                        <FileText className="text-warning" size={20} strokeWidth={2} />
+                      <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                        <FileText className="text-info" size={20} strokeWidth={2} />
                       </figure>
                     </div>
                     <div className="flex flex-col gap-y-1">
                       <p className="text-sm text-foreground">
-                        Branching uses your GitHub repository to apply migrations
+                        Migrations are applied from your GitHub repository
                       </p>
                       <p className="text-sm text-foreground-light">
-                        Database migrations are handled via the{' '}
-                        <code className="text-xs">./supabase</code> directory in your GitHub repo.
-                        Migration files will run on both Preview Branches and Production when
-                        pushing to and merging git branches.
+                        Migration files in your <code className="text-xs">./supabase</code>{' '}
+                        directory will run on both Preview Branches and Production when pushing and
+                        merging branches.
                       </p>
                     </div>
                   </div>

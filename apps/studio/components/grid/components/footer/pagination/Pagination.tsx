@@ -20,6 +20,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useParams } from 'common'
 import { useDispatch, useTrackedState } from '../../../store/Store'
 import { DropdownControl } from '../../common/DropdownControl'
+import { formatEstimatedCount } from './Pagination.utils'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },
@@ -71,6 +72,7 @@ const Pagination = () => {
     }
   )
 
+  const count = data?.is_estimate ? formatEstimatedCount(data.count) : data?.count.toLocaleString()
   const maxPages = Math.ceil((data?.count ?? 0) / snap.rowsPerPage)
   const totalPages = (data?.count ?? 0) > 0 ? maxPages : 1
 
@@ -193,9 +195,7 @@ const Pagination = () => {
 
           <div className="flex items-center gap-x-2">
             <p className="text-xs text-foreground-light">
-              {`${data.count.toLocaleString()} ${
-                data.count === 0 || data.count > 1 ? `records` : 'record'
-              }`}{' '}
+              {`${count} ${data.count === 0 || data.count > 1 ? `records` : 'record'}`}{' '}
               {data.is_estimate ? '(estimated)' : ''}
             </p>
 

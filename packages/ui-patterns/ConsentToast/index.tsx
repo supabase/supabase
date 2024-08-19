@@ -10,7 +10,6 @@ import {
 import { noop } from 'lodash'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useTimeout } from 'react-use'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 
@@ -84,7 +83,6 @@ export const useConsent = () => {
 
   const triggerConsentToast = useCallback(() => {
     if (isBrowser && consentValue === null) {
-      console.log('trigger')
       consentToastId.current = toast(
         <ConsentToast
           onAccept={() => handleConsent('true')}

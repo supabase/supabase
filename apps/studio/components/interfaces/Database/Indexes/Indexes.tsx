@@ -12,6 +12,7 @@ import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/Shimmerin
 import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { Button, IconAlertCircle, IconSearch, IconTrash, Input, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -23,7 +24,7 @@ const Indexes = () => {
   const { schema: urlSchema, table } = useParams()
 
   const [search, setSearch] = useState('')
-  const [selectedSchema, setSelectedSchema] = useState('public')
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [showCreateIndex, setShowCreateIndex] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<DatabaseIndex>()
   const [selectedIndexToDelete, setSelectedIndexToDelete] = useState<DatabaseIndex>()

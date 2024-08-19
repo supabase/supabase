@@ -6,6 +6,7 @@ import gaEvents from '~/lib/gaEvents'
 import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import AnnouncementBadge from '~/components/Announcement/Badge'
+import announcement from 'ui/src/layout/banners/data/Announcement.json'
 
 const Hero = () => {
   const router = useRouter()
@@ -24,9 +25,13 @@ const Hero = () => {
                 <div className="flex flex-col items-center">
                   <div className="z-40 w-full flex flex-col gap-4 items-center justify-center -mt-4 md:-mt-8 mb-8 lg:mb-8">
                     <AnnouncementBadge
-                      url="/launch-week"
-                      badge="Launch Week 12"
-                      announcement="Claim your ticket"
+                      url={announcement.link}
+                      badge={
+                        <>
+                          Launch Week <span className="hidden sm:inline ml-1"> 12</span>
+                        </>
+                      }
+                      announcement="Explore what we shipped"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">

@@ -186,20 +186,19 @@ const SidePanelEditor = ({
     }
   }
 
-  const onSaveForeignRow = async (value: any) => {
+  const onSaveForeignRow = async (value?: { [key: string]: any }) => {
     if (selectedTable === undefined || !(snap.sidePanel?.type === 'foreign-row-selector')) return
     const selectedForeignKeyToEdit = snap.sidePanel.foreignKey
 
     try {
-      const { row, column } = selectedForeignKeyToEdit
-      const payload = { [column.name]: value }
+      const { row } = selectedForeignKeyToEdit
       const identifiers = {} as Dictionary<any>
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
 
       const isNewRecord = false
       const configuration = { identifiers, rowIdx: row.idx }
 
-      saveRow(payload, isNewRecord, configuration, () => {})
+      saveRow(value, isNewRecord, configuration, () => {})
     } catch (error) {}
   }
 

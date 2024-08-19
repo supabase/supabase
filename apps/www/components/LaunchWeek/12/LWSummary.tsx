@@ -1,5 +1,4 @@
 import React from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { buildDays, mainDays } from './Releases/data'
 
@@ -10,28 +9,13 @@ const LW11Summary = () => {
     <div className="w-full border bg-alternative-200 flex flex-col rounded-lg text-foreground-lighter mt-12">
       <div className="w-full p-4 flex justify-between items-center">
         <Link
-          href="/ga-week"
-          className="flex items-center gap-1.5 leading-none uppercase text-xs opacity-80 transition-opacity hover:opacity-100"
+          href="/launch-week"
+          className="flex items-center text-foreground font-medium gap-1.5 leading-none uppercase text-xs opacity-80 transition-opacity hover:opacity-100"
         >
-          <Image
-            src="/images/launchweek/ga/ga-black.svg"
-            alt="GA logo"
-            className="dark:hidden w-5 aspect-[104/57] h-auto"
-            priority
-            width={30}
-            height={30}
-          />
-          <Image
-            src="/images/launchweek/ga/ga-white.svg"
-            alt="GA logo"
-            className="hidden dark:block w-5 aspect-[104/57] h-auto"
-            priority
-            width={30}
-            height={30}
-          />
-          <span className="text-foreground tracking-[1px] font-mono">Week</span>
+          Launch Week
+          <span className="font-mono">12</span>
         </Link>
-        <div className="font-mono uppercase tracking-wide text-xs">15-19 April</div>
+        <div className="font-mono uppercase tracking-wide text-xs">12-16 August</div>
       </div>
       <div className="pb-4 border-t p-4">
         <ul className="flex flex-col gap-2">
@@ -77,15 +61,7 @@ const LW11Summary = () => {
             )}
             <ol className="border-t pt-4 mt-2">
               <Link
-                href="/blog/supabase-oss-hackathon"
-                className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
-              >
-                Open Source Hackathon 2024
-              </Link>
-            </ol>
-            <ol>
-              <Link
-                href="/ga-week#meetups"
+                href="/launch-week#meetups"
                 className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
               >
                 Community Meetups

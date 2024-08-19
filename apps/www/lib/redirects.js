@@ -2545,6 +2545,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/log-drains',
+    destination: '/docs/platform/log-drains',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/functions/functions-headers',
     destination: '/docs/functions/logging',
   },
@@ -2568,5 +2573,10 @@ module.exports = [
     source: '/docs/guides/auth/phone-login/textlocal',
     destination:
       '/docs/guides/auth/phone-login?showSmsProvider=Textlocal%2520%28Community%2520Supported%29',
+  },
+  {
+    permanent: true,
+    source: '/launchweek',
+    destination: '/launch-week',
   },
 ]
