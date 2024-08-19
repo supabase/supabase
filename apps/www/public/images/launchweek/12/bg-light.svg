@@ -1,0 +1,47 @@
+<svg width="1364" height="886" viewBox="0 0 1364 886" fill="none" xmlns="http://www.w3.org/2000/svg">
+<mask id="mask0_610_2625" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="1364" height="886">
+<rect x="0.275391" y="0.671875" width="1363.21" height="885.002" fill="url(#paint0_linear_610_2625)"/>
+</mask>
+<g mask="url(#mask0_610_2625)">
+<path d="M80.0176 2.35547L80.0176 885.775" stroke="#EDEDED"/>
+<path d="M146.018 2.35547L146.018 885.775" stroke="#EDEDED"/>
+<path d="M278.018 2.35547L278.018 885.775" stroke="#EDEDED"/>
+<path d="M689.018 2.35547L689.018 885.775" stroke="#EDEDED"/>
+<path d="M887.018 2.35547L887.018 885.775" stroke="#EDEDED"/>
+<path d="M953.018 2.35547L953.018 885.775" stroke="#EDEDED"/>
+<path d="M1019.02 2.35547L1019.02 885.775" stroke="#EDEDED"/>
+<path d="M1670.23 2.25781L0.275309 2.25782" stroke="#EDEDED"/>
+<path d="M1670.23 36.2578L0.275309 36.2578" stroke="#EDEDED"/>
+<path d="M1670.23 70.2578L0.275309 70.2578" stroke="#EDEDED"/>
+<path d="M1670.23 104.258L0.275309 104.258" stroke="#EDEDED"/>
+<path d="M1670.23 138.258L0.275309 138.258" stroke="#EDEDED"/>
+<path d="M1670.23 172.258L0.275309 172.258" stroke="#EDEDED"/>
+<path d="M1670.23 206.258L0.275309 206.258" stroke="#EDEDED"/>
+<path d="M1670.23 240.258L0.275309 240.258" stroke="#EDEDED"/>
+<path d="M1670.23 274.258L0.275309 274.258" stroke="#EDEDED"/>
+<path d="M1670.23 308.258L0.275309 308.258" stroke="#EDEDED"/>
+<path d="M1670.23 342.258L0.275309 342.258" stroke="#EDEDED"/>
+<path d="M1670.23 376.258L0.275309 376.258" stroke="#EDEDED"/>
+<path d="M1670.23 410.258L0.275309 410.258" stroke="#EDEDED"/>
+<path d="M1670.23 444.258L0.275309 444.258" stroke="#EDEDED"/>
+<path d="M1670.23 478.258L0.275309 478.258" stroke="#EDEDED"/>
+<path d="M1670.23 512.258L0.275309 512.258" stroke="#EDEDED"/>
+<path d="M1670.23 546.258L0.275309 546.258" stroke="#EDEDED"/>
+<path d="M1670.23 580.258L0.275309 580.258" stroke="#EDEDED"/>
+<path d="M1670.23 614.258L0.275309 614.258" stroke="#EDEDED"/>
+<path d="M1670.23 648.258L0.275309 648.258" stroke="#EDEDED"/>
+<path d="M1670.23 682.258L0.275309 682.258" stroke="#EDEDED"/>
+<path d="M1670.23 716.258L0.275309 716.258" stroke="#EDEDED"/>
+<path d="M1670.23 750.258L0.275309 750.258" stroke="#EDEDED"/>
+<path d="M1670.23 784.258L0.275309 784.258" stroke="#EDEDED"/>
+<path d="M1670.23 818.258L0.275309 818.258" stroke="#EDEDED"/>
+<path d="M1670.23 852.258L0.275309 852.258" stroke="#EDEDED"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_610_2625" x1="77.4978" y1="443.173" x2="1327.45" y2="443.173" gradientUnits="userSpaceOnUse">
+<stop offset="0.0265152" stop-color="#0F0F0F" stop-opacity="0"/>
+<stop offset="0.535" stop-color="#FDFDFD"/>
+<stop offset="1" stop-color="#0F0F0F" stop-opacity="0"/>
+</linearGradient>
+</defs>
+</svg>

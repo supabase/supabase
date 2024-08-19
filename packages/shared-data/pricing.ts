@@ -90,9 +90,9 @@ export const pricing: Pricing = {
         },
         plans: {
           free: false,
-          pro: '$100 per 7 days',
-          team: '$100 per 7 days',
-          enterprise: '$100 per 7 days, >28 days available',
+          pro: '$100 per month per 7 days retention',
+          team: '$100 per month per 7 days retention',
+          enterprise: '$100 per month per 7 days retention, >28 days retention available',
         },
         usage_based: false,
       },
@@ -110,9 +110,19 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'Branching',
+        plans: {
+          free: false,
+          pro: '$0.32 per branch, per day',
+          team: '$0.32 per branch, per day',
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
         title: 'Bandwidth',
         tooltips: {
-          main: 'Billing is based on the total sum of outgoing traffic (includes Database, Storage, Realtime, Auth) in GB throughout your billing period.',
+          main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period.',
         },
         plans: {
           free: '5 GB included',
@@ -152,6 +162,33 @@ export const pricing: Pricing = {
         },
         usage_based: true,
       },
+      {
+        title: 'User data ownership',
+        tooltips: {
+          main: 'Full ownership and access to the underlying user data including encrypted passwords.',
+        },
+        plans: {
+          free: true,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Anonymous Sign-ins',
+        tooltips: {
+          main: 'Anonymous user requests count towards MAU, just like a permanent user.',
+        },
+        plans: {
+          free: true,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+
       {
         title: 'Social OAuth providers',
         plans: {
@@ -193,6 +230,45 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'Basic Multi-Factor Auth',
+        plans: {
+          free: true,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        tooltips: {
+          main: 'Multi-factor authentication (MFA), sometimes called two-factor authentication (2FA), using Time-based One Time Passwords (TOTP) via an Authenticator App.',
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Advanced Multi-Factor Auth - Phone',
+        plans: {
+          free: false,
+          pro: ['$75 per month for first project', 'then $10 per month per additional projects'],
+          team: ['$75 per month for first project', 'then $10 per month per additional projects'],
+          enterprise: 'Custom',
+        },
+        tooltips: {
+          main: 'Multi-factor authentication (MFA), sometimes called two-factor authentication (2FA), using SMS or WhatsApp messages.\nAdditional fees apply based on your provider.',
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Third-Party MAUs',
+        plans: {
+          free: '50 included',
+          pro: ['50 included', 'then $0.00325 per MAU'],
+          team: ['50 included', 'then $0.00325 per MAU'],
+          enterprise: 'Custom',
+        },
+        tooltips: {
+          main: 'Users who use the Supabase platform through a third-party authentication provider (Firebase Auth, Auth0 or Cognito).\nBilling is based on the sum of distinct third-party users requesting your API through the billing period. Resets every billing cycle.',
+        },
+        usage_based: true,
+      },
+      {
         title: 'Single Sign-On (SAML 2.0)',
         plans: {
           free: false,
@@ -200,6 +276,7 @@ export const pricing: Pricing = {
           team: ['50 included', 'then $0.015 per MAU'],
           enterprise: 'Contact Us',
         },
+
         usage_based: false,
       },
       {
@@ -235,8 +312,8 @@ export const pricing: Pricing = {
       {
         title: 'Auth Hooks',
         plans: {
-          free: 'Custom Access Token (JWT)',
-          pro: 'Custom Access Token (JWT)',
+          free: 'Custom Access Token (JWT), Send custom email/SMS',
+          pro: 'Custom Access Token (JWT), Send custom email/SMS',
           team: 'All',
           enterprise: 'All',
         },
@@ -294,6 +371,19 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'Content Delivery Network',
+        tooltips: {
+          main: 'Assets in Storage are automatically cached on a CDN. With Smart CDN caching enabled, the CDN cache is automatically re-validated when the underlying asset changes. CDN caching is enabled across all plans and assets in the paid plans are cached via the Smart CDN.',
+        },
+        plans: {
+          free: 'Basic CDN',
+          pro: 'Smart CDN',
+          team: 'Smart CDN',
+          enterprise: 'Smart CDN',
+        },
+        usage_based: false,
+      },
+      {
         title: 'Image Transformations',
         tooltips: {
           main: 'We count all images that were transformed in the billing period, ignoring any transformations.\nUsage example: You transform one image with four different size transformations and another image with just a single transformation. It counts as two, as only two images were transformed.\nBilling is based on the count of (origin) images that used transformations throughout the billing period. Resets every billing cycle.',
@@ -347,16 +437,13 @@ export const pricing: Pricing = {
       },
       {
         title: 'Number of functions',
-        tooltips: {
-          main: 'Billing is based on the maximum amount of functions at any point in time throughout your billing period.',
-        },
         plans: {
-          free: '10 included',
-          pro: ['100 included', 'then $10 per additional 100'],
-          team: ['100 included', 'then $10 per additional 100'],
-          enterprise: 'Custom',
+          free: '25 included',
+          pro: '500 included',
+          team: '1000 included',
+          enterprise: 'Unlimited',
         },
-        usage_based: true,
+        usage_based: false,
       },
     ],
   },
@@ -473,14 +560,21 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Log drain',
+        title: 'Log Drain',
+        tooltips: {
+          main: 'Only events processed and sent to destinations are counted. Bandwidth required to export logs count towards usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
+        },
         plans: {
           free: false,
           pro: false,
-          team: 'Coming soon',
-          enterprise: 'Coming soon',
+          team: [
+            '$60 per drain per month',
+            'and $0.20 per Million processed',
+            'and $0.09 per GB bandwidth',
+          ],
+          enterprise: 'Custom',
         },
-        usage_based: false,
+        usage_based: true,
       },
       {
         title: 'Metrics endpoint',
@@ -511,7 +605,7 @@ export const pricing: Pricing = {
           enterprise: 'Available as paid add-on',
         },
         tooltips: {
-          main: 'Available as a paid add-on on Team plan and above.',
+          main: 'Available as a paid add-on on Team Plan and above.',
         },
         usage_based: false,
       },
@@ -565,19 +659,6 @@ export const pricing: Pricing = {
           pro: '$10 per domain per month per project add on',
           team: '$10 per domain per month per project add on',
           enterprise: '1, additional $10/domain/month',
-        },
-        usage_based: false,
-      },
-      {
-        title: 'Bring your own cloud deployment options',
-        tooltips: {
-          main: 'On-Premises, single tenant, and managed dedicated cloud provider instance options',
-        },
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
         },
         usage_based: false,
       },

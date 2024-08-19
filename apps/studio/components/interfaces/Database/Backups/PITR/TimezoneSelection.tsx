@@ -16,7 +16,7 @@ import {
 
 import { CheckIcon, ChevronsUpDown } from 'lucide-react'
 import { ALL_TIMEZONES } from './PITR.constants'
-import { Timezone } from './PITR.types'
+import type { Timezone } from './PITR.types'
 
 interface TimezoneSelectionProps {
   selectedTimezone: Timezone

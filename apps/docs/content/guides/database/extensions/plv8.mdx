@@ -8,7 +8,7 @@ The `plv8` extension allows you use JavaScript within Postgres.
 
 ## Overview
 
-While Postgres natively runs SQL, it can also run other "procedural languages".
+While Postgres natively runs SQL, it can also run other procedural languages.
 `plv8` allows you to run JavaScript code - specifically any code that runs on the [V8 JavaScript engine](https://v8.dev).
 
 It can be used for database functions, triggers, queries and more.
@@ -39,7 +39,7 @@ create extension plv8;
 drop extension if exists plv8;
 ```
 
-Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+Even though the SQL code is `create extension`, this is the equivalent of enabling the extension.
 To disable an extension, call `drop extension`.
 
 Procedural languages are automatically installed within `pg_catalog`, so you don't need to specify a schema.

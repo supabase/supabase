@@ -62,7 +62,7 @@ In this example we'll set up a database table, secure it with Row Level Security
 
     <StepHikeCompact.Details title="Allow anonymous access">
 
-    In this example we'll turn on [Row Level Security](/docs/guides/auth/row-level-security) for this table and allow anonymous access. In production, be sure to secure your application with the appropriate permissions.
+    In this example we'll turn on [Row Level Security](/docs/guides/database/postgres/row-level-security) for this table and allow anonymous access. In production, be sure to secure your application with the appropriate permissions.
 
     </StepHikeCompact.Details>
 
@@ -86,17 +86,17 @@ In this example we'll set up a database table, secure it with Row Level Security
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-  
+
     <StepHikeCompact.Details title="Enable Postgres replication">
 
-      Go to your project's [Replication settings](https://supabase.com/dashboard/project/_/database/replication), and under `supabase_realtime`, toggle on the tables you want to listen to.
+      Go to your project's [Publications settings](https://supabase.com/dashboard/project/_/database/publications), and under `supabase_realtime`, toggle on the tables you want to listen to.
 
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
-  
+
     <StepHikeCompact.Details title="Install the client">
 
       Install the Supabase JavaScript client.
@@ -114,7 +114,7 @@ In this example we'll set up a database table, secure it with Row Level Security
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={5}>
-  
+
     <StepHikeCompact.Details title="Create the client">
 
       This client will be used to listen to Postgres changes.
@@ -126,7 +126,7 @@ In this example we'll set up a database table, secure it with Row Level Security
       ```js
         import { createClient } from '@supabase/supabase-js'
 
-        const client = createClient(
+        const supabase = createClient(
           'https://<project>.supabase.co',
           '<your-anon-key>'
         )
@@ -152,7 +152,7 @@ In this example we'll set up a database table, secure it with Row Level Security
     <StepHikeCompact.Code>
 
       ```js
-        const channelA = client
+        const channelA = supabase
           .channel('schema-db-changes')
           .on(
             'postgres_changes',
@@ -209,7 +209,7 @@ Subscribe to specific schema events using the `schema` parameter:
 
 {/* prettier-ignore */}
 ```js
-const changes = client
+const changes = supabase
   .channel('schema-db-changes')
   .on(
     'postgres_changes',
@@ -237,6 +237,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("schema-db-changes")
+
+let changes = await myChannel.postgresChange(AnyAction.self, schema: "public")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  switch change {
+  case .insert(let action): print(action)
+  case .update(let action): print(action)
+  case .delete(let action): print(action)
+  case .select(let action): print(action)
+  }
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -258,6 +278,18 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('schema-db-changes').on_postgres_changes(
+  "*",
+  schema="public",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
 </Tabs>
 
 The channel name can be any string except 'realtime'.
@@ -276,7 +308,7 @@ The channel name can be any string except 'realtime'.
 Use the `event` parameter to listen only to database `INSERT`s:
 
 ```js
-const changes = client
+const changes = supabase
   .channel('schema-db-changes')
   .on(
     'postgres_changes',
@@ -303,6 +335,23 @@ final changes = supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Use `InsertAction.self` as type to listen only to database `INSERT`s:
+
+```swift
+let myChannel = await supabase.channel("schema-db-changes")
+
+let changes = await myChannel.postgresChange(InsertAction.self, schema: "public")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 Use `PostgresAction.Insert` as type to listen only to database `INSERT`s:
@@ -319,6 +368,18 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('schema-db-changes').on_postgres_changes(
+  "INSERT", # Listen only to INSERTs
+  schema="public",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -340,7 +401,7 @@ The channel name can be any string except 'realtime'.
 Use the `event` parameter to listen only to database `UPDATE`s:
 
 ```js
-const changes = client
+const changes = supabase
   .channel('schema-db-changes')
   .on(
     'postgres_changes',
@@ -367,6 +428,23 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Use `UpdateAction.self` as type to listen only to database `UPDATE`s:
+
+```swift
+let myChannel = await supabase.channel("schema-db-changes")
+
+let changes = await myChannel.postgresChange(UpdateAction.self, schema: "public")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.oldRecord, change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 Use `PostgresAction.Update` as type to listen only to database `UPDATE`s:
@@ -383,6 +461,18 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('schema-db-changes').on_postgres_changes(
+  "UPDATE", # Listen only to UPDATEs
+  schema="public",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -404,7 +494,7 @@ The channel name can be any string except 'realtime'.
 Use the `event` parameter to listen only to database `DELETE`s:
 
 ```js
-const changes = client
+const changes = supabase
   .channel('schema-db-changes')
   .on(
     'postgres_changes',
@@ -431,6 +521,23 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Use `DeleteAction.self` as type to listen only to database `DELETE`s:
+
+```swift
+let myChannel = await supabase.channel("schema-db-changes")
+
+let changes = await myChannel.postgresChange(DeleteAction.self, schema: "public")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.oldRecord)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 Use `PostgresAction.Delete` as type to listen only to database `DELETE`s:
@@ -447,6 +554,18 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('schema-db-changes').on_postgres_changes(
+  "DELETE", # Listen only to DELETEs
+  schema="public",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -468,7 +587,7 @@ Subscribe to specific table events using the `table` parameter:
 <TabPanel id="js" label="JavaScript">
 
 ```js
-const changes = client
+const changes = supabase
   .channel('table-db-changes')
   .on(
     'postgres_changes',
@@ -497,6 +616,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(AnyAction.self, schema: "public", table: "todos")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  switch change {
+  case .insert(let action): print(action)
+  case .update(let action): print(action)
+  case .delete(let action): print(action)
+  case .select(let action): print(action)
+  }
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -513,6 +652,19 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="todos",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -577,6 +729,18 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let messageChanges = await myChannel.postgresChange(AnyAction.self, schema: "public", table: "messages")
+let userChanges = await myChannel.postgresChange(InsertAction.self, schema: "public", table: "users")
+
+await myChannel.subscribe()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -588,6 +752,23 @@ val userChanges = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "
     table = "users"
 }
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "*",
+  schema="public",
+  table="messages"
+  callback=lambda payload: print(payload)
+).on_postgres_changes(
+  "INSERT",
+  schema="public",
+  table="users",
+  callback=lambda payload: print(payload)
+).subscribe()
 ```
 
 </TabPanel>
@@ -607,7 +788,7 @@ Use the `filter` parameter for granular changes:
 <TabPanel id="js" label="JavaScript">
 
 ```js
-const changes = client
+const changes = supabase
   .channel('table-filter-changes')
   .on(
     'postgres_changes',
@@ -642,6 +823,26 @@ const changes = client
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "todos",
+  filter: "id=eq.1"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -659,6 +860,20 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "INSERT",
+  schema="public",
+  table="todos",
+  filter="id=eq.1",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -717,6 +932,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  UpdateAction.self,
+  schema: "public",
+  table: "messages",
+  filter: "body=eq.hey"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -734,6 +969,20 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="messages",
+  filter="body=eq.hey",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -790,6 +1039,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  UpdateAction.self,
+  schema: "public",
+  table: "messages",
+  filter: "body=neq.hey"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -808,6 +1077,20 @@ changes
 
 supabase.realtime.connect()
 myChannel.join()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "INSERT",
+  schema="public",
+  table="messages",
+  filter="body=neq.bye",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -864,6 +1147,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "profiles",
+  filter: "age=lt.65"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -881,6 +1184,20 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "INSERT",
+  schema="public",
+  table="profiles",
+  filter="age=lt.65",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -937,6 +1254,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "profiles",
+  filter: "age=lte.65"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -954,6 +1291,20 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="profiles",
+  filter="age=lte.65",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -1010,6 +1361,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "products",
+  filter: "quantity=gt.10"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1027,6 +1398,20 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="products",
+  filter="quantity=gt.10",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -1083,6 +1468,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "products",
+  filter: "quantity=gte.10"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1100,6 +1505,20 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="products",
+  filter="quantity=gte.10",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -1156,6 +1575,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "products",
+  filter: "name=in.(red, blue, yellow)"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1173,6 +1612,20 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="products",
+  filter="name=in.(red, blue, yellow)",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -1278,6 +1731,28 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+await supabase.realtime.setAuth("your-custom-jwt")
+
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  UpdateAction.self,
+  schema: "public",
+  table: "products",
+  filter: "name=in.(red, blue, yellow)"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1300,6 +1775,22 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+supabase.realtime.set_auth('your-custom-jwt')
+
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="products",
+  filter="name=in.(red, blue, yellow)",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -1334,6 +1825,13 @@ supabase.realtime.setAuth('fresh-token');
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+await supabase.realtime.setAuth("fresh-token")
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 In Kotlin, you have to update the token manually per channel:
@@ -1343,9 +1841,20 @@ myChannel.updateAuth("fresh-token")
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+supabase.realtime.set_auth('fresh-token')
+```
+
+</TabPanel>
 </Tabs>
 
 ## Limitations
+
+### Delete events are not filterable
+
+You can't filter Delete events when tracking Postgres Changes. This limitation is due to the way changes are pulled from Postgres.
 
 ### Spaces in table names
 

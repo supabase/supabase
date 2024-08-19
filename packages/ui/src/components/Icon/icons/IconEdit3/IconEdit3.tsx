@@ -9,5 +9,12 @@
     return <IconBase icon={Edit3} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { edit3 } from 'lucide-react'
+  */
   export default IconEdit3
   

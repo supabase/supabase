@@ -1,8 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { components } from 'data/api'
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationMembersVariables = {
@@ -23,20 +23,23 @@ export async function getOrganizationMembers(
 
   const [members, invites] = await Promise.all([
     get('/platform/organizations/{slug}/members', { params: { path: { slug } }, signal }),
-    get('/platform/organizations/{slug}/members/invite', { params: { path: { slug } }, signal }),
+    get('/platform/organizations/{slug}/members/invitations', {
+      params: { path: { slug } },
+      signal,
+    }),
   ])
 
   const { data: orgMembers, error: orgMembersError } = members
   const { data: orgInvites, error: orgInvitesError } = invites
 
-  if (orgMembersError) throw orgMembersError
-  if (orgInvitesError) throw orgInvitesError
+  if (orgMembersError) handleError(orgMembersError)
+  if (orgInvitesError) handleError(orgInvitesError)
 
   // Remap invite data to look like existing members data
-  const invitedMembers = orgInvites.map((invite) => {
+  const invitedMembers = orgInvites.invitations.map((invite) => {
     const member = {
       invited_at: invite.invited_at,
-      invited_id: invite.invited_id,
+      invited_id: invite.id,
       mfa_enabled: false,
       username: invite.invited_email.slice(0, 1),
       primary_email: invite.invited_email,

@@ -1,4 +1,7 @@
+import { useTelemetryProps } from 'common'
 import { PlusCircle } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { Dispatch, SetStateAction, useState } from 'react'
 import {
   Badge,
@@ -14,11 +17,11 @@ import {
   cn,
 } from 'ui'
 
-import Link from 'next/link'
-import { ApplyConfigModal } from '../ApplyConfigModal'
+import Telemetry from 'lib/telemetry'
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig
@@ -29,6 +32,8 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
   const [open, setOpen] = useState(false)
   const [applyConfigOpen, setApplyConfigOpen] = useState(false)
   const [tempConfig, setTempConfig] = useState(config)
+  const telemetryProps = useTelemetryProps()
+  const router = useRouter()
 
   const onOpen = (v: boolean) => {
     // when opening, copy the outside config into the intermediate one
@@ -55,7 +60,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             {isFiltered ? (
               <>
                 <span className="mr-1">Filtered by </span>
-                <Badge className="!bg-brand-400 !text-brand-600">table: {config.table}</Badge>
+                <Badge variant="brand">table: {config.table}</Badge>
               </>
             ) : (
               <span className="mr-1">Filter messages</span>
@@ -189,15 +194,33 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           </div>
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>
-      <ApplyConfigModal
+      <ConfirmationModal
+        title="Previously found messages will be lost"
+        variant="destructive"
+        confirmLabel="Confirm"
+        size="small"
         visible={applyConfigOpen}
-        onSelectCancel={() => setApplyConfigOpen(false)}
-        onSelectConfirm={() => {
+        onCancel={() => setApplyConfigOpen(false)}
+        onConfirm={() => {
+          Telemetry.sendEvent(
+            {
+              category: 'realtime_inspector',
+              action: 'applied_filters',
+              label: 'realtime_inspector_config',
+            },
+            telemetryProps,
+            router
+          )
           onChangeConfig(tempConfig)
           setApplyConfigOpen(false)
           setOpen(false)
         }}
-      />
+      >
+        <p className="text-sm text-foreground-light">
+          The realtime inspector will clear currently collected messages and start listening for new
+          messages matching the updated filters.
+        </p>
+      </ConfirmationModal>
     </>
   )
 }

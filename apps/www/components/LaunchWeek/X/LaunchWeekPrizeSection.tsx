@@ -14,7 +14,6 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
       )}
     >
       <h2 className="w-full text-sm font-mono uppercase tracking-[1px]">Awards</h2>
-      <p>Stay tuned on Launch Week X's final day to find out if you're one of the lucky winners.</p>
       <div className="w-full pt-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mx-auto h-auto text-[#EDEDED]">
           <LaunchWeekPrizeCard
@@ -34,6 +33,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     <Image
                       src="/images/launchweek/lwx/swag/lwx_keyboard.png"
                       fill
+                      sizes="100%"
                       quality={100}
                       alt="/images/launchweek/lwx/swag/lwx_keyboard.png"
                       className="h-full w-full block"

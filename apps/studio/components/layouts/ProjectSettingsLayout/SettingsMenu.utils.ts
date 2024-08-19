@@ -1,7 +1,7 @@
-import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { Project } from 'data/projects/project-detail-query'
+import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 
 export const generateSettingsMenu = (
   ref?: string,
@@ -12,14 +12,18 @@ export const generateSettingsMenu = (
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
+    warehouse?: boolean
+    logDrains?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}/building`
+  const buildingUrl = `/project/${ref}`
 
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
+  const warehouseEnabled = features?.warehouse ?? false
+  const logDrainsEnabled = features?.logDrains ?? false
 
   return [
     {
@@ -105,6 +109,26 @@ export const generateSettingsMenu = (
                 name: 'Edge Functions',
                 key: 'functions',
                 url: `/project/${ref}/settings/functions`,
+                items: [],
+              },
+            ]
+          : []),
+        ...(IS_PLATFORM && warehouseEnabled
+          ? [
+              {
+                name: 'Warehouse',
+                key: 'warehouse',
+                url: `/project/${ref}/settings/warehouse`,
+                items: [],
+              },
+            ]
+          : []),
+        ...(IS_PLATFORM && logDrainsEnabled
+          ? [
+              {
+                name: `Log Drains`,
+                key: `log-drains`,
+                url: `/project/${ref}/settings/log-drains`,
                 items: [],
               },
             ]

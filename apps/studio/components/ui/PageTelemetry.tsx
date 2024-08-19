@@ -1,18 +1,16 @@
-import { useIsLoggedIn, useParams, useTelemetryProps } from 'common'
-import { observer } from 'mobx-react-lite'
+import * as Sentry from '@sentry/nextjs'
+import { useTelemetryProps, useUser } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { useSelectedOrganization } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { getAnonId } from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 
 const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
-  const { ref } = useParams()
   const telemetryProps = useTelemetryProps()
-  const selectedOrganization = useSelectedOrganization()
   const snap = useAppStateSnapshot()
 
   useEffect(() => {
@@ -22,8 +20,6 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
         : null
     if (consent !== null) snap.setIsOptedInTelemetry(consent === 'true')
   }, [])
-
-  const isLoggedIn = useIsLoggedIn()
 
   useEffect(() => {
     function handleRouteChange(url: string) {
@@ -45,6 +41,26 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
       handlePageTelemetry(router.asPath)
     }
   }, [router.isReady, snap.isOptedInTelemetry])
+
+  const user = useUser()
+  useEffect(() => {
+    // don't set the sentry user id if the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)
+    if (!user?.id) {
+      return
+    }
+
+    const setSentryId = async () => {
+      let sentryUserId = localStorage.getItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID)
+      if (!sentryUserId) {
+        sentryUserId = await getAnonId(user?.id)
+        localStorage.setItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID, sentryUserId)
+      }
+      Sentry.setUser({ id: sentryUserId })
+    }
+
+    // if an error happens, continue without setting a sentry id
+    setSentryId().catch((e) => console.error(e))
+  }, [user?.id])
 
   /**
    * send page_view event
@@ -70,21 +86,10 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
           language: telemetryProps?.language,
         },
       })
-
-      if (isLoggedIn) {
-        post(`${API_URL}/telemetry/pageview`, {
-          ...(ref && { projectRef: ref }),
-          ...(selectedOrganization && { orgSlug: selectedOrganization.slug }),
-          referrer: referrer,
-          title: document.title,
-          path: router.route,
-          location: router.asPath,
-        })
-      }
     }
   }
 
   return <>{children}</>
 }
 
-export default observer(PageTelemetry)
+export default PageTelemetry

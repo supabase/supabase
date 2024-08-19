@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationCreateVariables = {
@@ -32,7 +32,7 @@ export async function createOrganization({
     },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

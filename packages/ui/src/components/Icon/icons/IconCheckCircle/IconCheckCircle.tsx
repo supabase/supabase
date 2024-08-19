@@ -9,5 +9,12 @@
     return <IconBase icon={CheckCircle} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { checkCircle } from 'lucide-react'
+  */
   export default IconCheckCircle
   

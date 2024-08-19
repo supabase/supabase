@@ -1,46 +1,33 @@
-import { observer } from 'mobx-react-lite'
-import Link from 'next/link'
-import { useState } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconExternalLink,
-  IconSearch,
-  IconTrash,
-  Input,
-  Modal,
-  SidePanel,
-} from 'ui'
+import { partition, sortBy } from 'lodash'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import CodeEditor from 'components/ui/CodeEditor'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { partition, sortBy } from 'lodash'
+import { Button, IconAlertCircle, IconSearch, IconTrash, Input, SidePanel } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
 
 const Indexes = () => {
-  const { ui } = useStore()
+  const { project } = useProjectContext()
+  const { schema: urlSchema, table } = useParams()
+
   const [search, setSearch] = useState('')
   const [selectedSchema, setSelectedSchema] = useState('public')
   const [showCreateIndex, setShowCreateIndex] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<DatabaseIndex>()
   const [selectedIndexToDelete, setSelectedIndexToDelete] = useState<DatabaseIndex>()
 
-  const { project } = useProjectContext()
   const {
     data: allIndexes,
     refetch: refetchIndexes,
@@ -67,14 +54,10 @@ const Indexes = () => {
     onSuccess() {
       refetchIndexes()
       setSelectedIndexToDelete(undefined)
-      ui.setNotification({ category: 'success', message: `Successfully deleted index` })
+      toast.success('Successfully deleted index')
     },
     onError(error) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to delete index: ${error.message}`,
-      })
+      toast.error(`Failed to delete index: ${error.message}`)
     },
   })
 
@@ -99,38 +82,20 @@ const Indexes = () => {
     })
   }
 
+  useEffect(() => {
+    if (urlSchema !== undefined) {
+      const schema = schemas?.find((s) => s.name === urlSchema)
+      if (schema !== undefined) setSelectedSchema(schema.name)
+    }
+  }, [urlSchema, isSuccessSchemas])
+
+  useEffect(() => {
+    if (table !== undefined) setSearch(table)
+  }, [table])
+
   return (
     <>
       <div className="pb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="space-y-1">
-            <h3 className="text-xl text-foreground">Database Indexes</h3>
-            <div className="text-sm text-foreground-lighter">
-              Improve query performance against your database
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/query-optimization"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Documentation
-              </Link>
-            </Button>
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/extensions/index_advisor"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Optimization with index_advisor
-              </Link>
-            </Button>
-          </div>
-        </div>
-
         <div className="flex flex-col gap-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -270,51 +235,44 @@ const Indexes = () => {
       <CreateIndexSidePanel visible={showCreateIndex} onClose={() => setShowCreateIndex(false)} />
 
       <ConfirmationModal
-        danger
+        variant="warning"
         size="medium"
         loading={isExecuting}
         visible={selectedIndexToDelete !== undefined}
-        header={
+        title={
           <>
             Confirm to delete index <code className="text-sm">{selectedIndexToDelete?.name}</code>
           </>
         }
-        buttonLabel="Confirm delete"
-        buttonLoadingLabel="Deleting..."
-        onSelectConfirm={() =>
+        confirmLabel="Confirm delete"
+        confirmLabelLoading="Deleting..."
+        onConfirm={() =>
           selectedIndexToDelete !== undefined ? onConfirmDeleteIndex(selectedIndexToDelete) : {}
         }
-        onSelectCancel={() => setSelectedIndexToDelete(undefined)}
+        onCancel={() => setSelectedIndexToDelete(undefined)}
+        alert={{
+          title: 'This action cannot be undone',
+          description:
+            'Deleting an index that is still in use will cause queries to slow down, and in some cases causing significant performance issues.',
+        }}
       >
-        <Modal.Content>
-          <div className="py-6">
-            <Alert_Shadcn_ variant="warning">
-              <IconAlertTriangle strokeWidth={2} />
-              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Deleting an index that is still in use will cause queries to slow down, and in some
-                cases causing significant performance issues.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-            <ul className="mt-4 space-y-5">
-              <li className="flex gap-3">
-                <div>
-                  <strong className="text-sm">Before deleting this index, consider:</strong>
-                  <ul className="space-y-2 mt-2 text-sm text-foreground-light">
-                    <li className="list-disc ml-6">This index is no longer in use</li>
-                    <li className="list-disc ml-6">
-                      The table which the index is on is not currently in use, as dropping an index
-                      requires a short exclusive access lock on the table.
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </Modal.Content>
+        <ul className="mt-4 space-y-5">
+          <li className="flex gap-3">
+            <div>
+              <strong className="text-sm">Before deleting this index, consider:</strong>
+              <ul className="space-y-2 mt-2 text-sm text-foreground-light">
+                <li className="list-disc ml-6">This index is no longer in use</li>
+                <li className="list-disc ml-6">
+                  The table which the index is on is not currently in use, as dropping an index
+                  requires a short exclusive access lock on the table.
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
       </ConfirmationModal>
     </>
   )
 }
 
-export default observer(Indexes)
+export default Indexes

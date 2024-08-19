@@ -1,4 +1,10 @@
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
+
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -11,18 +17,11 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
-  IconCheck,
-  IconCode,
-  IconLoader,
-  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useSchemasQuery } from 'data/database/schemas-query'
 
 interface SchemaSelectorProps {
   className?: string
@@ -31,6 +30,7 @@ interface SchemaSelectorProps {
   showError?: boolean
   selectedSchemaName: string
   supportSelectAll?: boolean
+  excludedSchemas?: string[]
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
 }
@@ -42,10 +42,12 @@ const SchemaSelector = ({
   showError = true,
   selectedSchemaName,
   supportSelectAll = false,
+  excludedSchemas = [],
   onSelectSchema,
   onSelectCreateSchema,
 }: SchemaSelectorProps) => {
   const [open, setOpen] = useState(false)
+  const canCreateSchemas = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'schemas')
 
   const { project } = useProjectContext()
   const {
@@ -60,21 +62,15 @@ const SchemaSelector = ({
     connectionString: project?.connectionString,
   })
 
-  const schemas = (data ?? []).sort((a, b) => (a.name > b.name ? 0 : -1))
+  const schemas = (data || [])
+    .filter((schema) => !excludedSchemas.includes(schema.name))
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <div className={className}>
       {isSchemasLoading && (
-        <Button
-          type="outline"
-          className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
-          size={size}
-          icon={<IconLoader className="animate-spin" size={12} />}
-          disabled={!!disabled}
-        >
-          <div className="w-full flex space-x-3 py-0.5">
-            <p className="text-xs text-foreground-light">Loading schemas...</p>
-          </div>
+        <Button type="default" className="justify-start" block size={size} loading>
+          Loading schemas...
         </Button>
       )}
 
@@ -84,7 +80,7 @@ const SchemaSelector = ({
             Failed to load schemas
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_ className="text-xs mb-2 break-words">
-            Error: {schemasError?.message}
+            Error: {(schemasError as any)?.message}
           </AlertDescription_Shadcn_>
           <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
             Reload schemas
@@ -98,21 +94,21 @@ const SchemaSelector = ({
             <Button
               size={size}
               disabled={disabled}
-              type="outline"
-              className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
+              type="default"
+              className={`w-full [&>span]:w-full`}
               iconRight={
-                <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
+                <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
               }
             >
-              <div className="w-full flex space-x-3 py-0.5">
-                <p className="text-xs text-foreground-light">schema</p>
-                <p className="text-xs">
+              <div className="w-full flex gap-1">
+                <p className="text-foreground-lighter">schema:</p>
+                <p className="text-foreground">
                   {selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}
                 </p>
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="start">
+          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Find schema..." />
               <CommandList_Shadcn_>
@@ -134,7 +130,7 @@ const SchemaSelector = ({
                       >
                         <span>All schemas</span>
                         {selectedSchemaName === '*' && (
-                          <IconCheck className="text-brand" strokeWidth={2} />
+                          <Check className="text-brand" strokeWidth={2} size={16} />
                         )}
                       </CommandItem_Shadcn_>
                     )}
@@ -153,13 +149,13 @@ const SchemaSelector = ({
                       >
                         <span>{schema.name}</span>
                         {selectedSchemaName === schema.name && (
-                          <IconCheck className="text-brand" strokeWidth={2} />
+                          <Check className="text-brand" strokeWidth={2} size={16} />
                         )}
                       </CommandItem_Shadcn_>
                     ))}
                   </ScrollArea>
                 </CommandGroup_Shadcn_>
-                {onSelectCreateSchema !== undefined && (
+                {onSelectCreateSchema !== undefined && canCreateSchemas && (
                   <>
                     <CommandSeparator_Shadcn_ />
                     <CommandGroup_Shadcn_>
@@ -174,7 +170,7 @@ const SchemaSelector = ({
                           setOpen(false)
                         }}
                       >
-                        <IconPlus />
+                        <Plus size={12} />
                         Create a new schema
                       </CommandItem_Shadcn_>
                     </CommandGroup_Shadcn_>

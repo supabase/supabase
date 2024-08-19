@@ -117,7 +117,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Let's create a new component for that called `Account.svelte`.
 
-```html src/lib/Account.svelte
+```tsx src/lib/Account.svelte
 <script lang="ts">
   import { onMount } from 'svelte'
   import type { AuthSession } from '@supabase/supabase-js'
@@ -204,8 +204,7 @@ Let's create a new component for that called `Account.svelte`.
       {loading ? 'Saving ...' : 'Update profile'}
     </button>
   </div>
-  <button type="button" class="button block" on:click="{()" ="">
-    supabase.auth.signOut()}> Sign Out
+  <button type="button" class="button block" on:click={() => supabase.auth.signOut()}> Sign Out
   </button>
 </form>
 ```
@@ -222,7 +221,7 @@ Now that we have all the components in place, let's update `App.svelte`:
   import Account from './lib/Account.svelte'
   import Auth from './lib/Auth.svelte'
 
-  let session: AuthSession
+  let session: AuthSession | null
 
   onMount(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -270,9 +269,9 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
   import { supabase } from '../supabaseClient'
 
   export let size: number
-  export let url: string
+  export let url: string | null = null
 
-  let avatarUrl: string = null
+  let avatarUrl: string | null = null
   let uploading = false
   let files: FileList
 
@@ -342,8 +341,8 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
         id="single"
         accept="image/*"
         bind:files
-        on:change="{uploadAvatar}"
-        disabled="{uploading}"
+        on:change={uploadAvatar}
+        disabled={uploading}
       />
     </span>
   </div>
@@ -367,9 +366,5 @@ And then we can add the widget to the Account page:
   <!-- Other form elements -->
 </form>
 ```
-
-### Storage management
-
-<StorageManagement />
 
 At this stage you have a fully functional application!

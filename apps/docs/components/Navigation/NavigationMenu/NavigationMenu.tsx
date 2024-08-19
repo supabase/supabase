@@ -1,18 +1,47 @@
-import { useRouter } from 'next/router'
-import { memo, useEffect } from 'react'
-import { menuState, useMenuLevelId } from '~/hooks/useMenuState'
-import NavigationMenuHome from './HomeMenu'
+import { memo } from 'react'
+
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
+import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 
-interface BaseMenu {
-  id: string
-  path: string
-  type: string
+enum MenuId {
+  GettingStarted = 'gettingstarted',
+  Database = 'database',
+  Api = 'api',
+  Graphql = 'graphql',
+  Auth = 'auth',
+  Functions = 'functions',
+  Realtime = 'realtime',
+  Storage = 'storage',
+  Ai = 'ai',
+  Platform = 'platform',
+  Resources = 'resources',
+  SelfHosting = 'self_hosting',
+  Integrations = 'integrations',
+  Cli = 'supabase_cli',
+  RefJavaScriptV1 = 'reference_javascript_v1',
+  RefJavaScriptV2 = 'reference_javascript_v2',
+  RefDartV1 = 'reference_dart_v1',
+  RefDartV2 = 'reference_dart_v2',
+  RefCSharpV0 = 'reference_csharp_v0',
+  RefCSharpV1 = 'reference_csharp_v1',
+  RefPythonV2 = 'reference_python_v2',
+  RefSwiftV1 = 'reference_swift_v1',
+  RefSwiftV2 = 'reference_swift_v2',
+  RefKotlinV1 = 'reference_kotlin_v1',
+  RefKotlinV2 = 'reference_kotlin_v2',
+  RefCli = 'reference_cli',
+  RefApi = 'reference_api',
+  SelfHostingAuth = 'reference_self_hosting_auth',
+  SelfHostingStorage = 'reference_self_hosting_storage',
+  SelfHostingRealtime = 'reference_self_hosting_realtime',
+  SelfHostingAnalytics = 'reference_self_hosting_analytics',
+  SelfHostingFunctions = 'reference_self_hosting_functions',
 }
 
-interface HomeMenu extends BaseMenu {
-  type: 'home'
+interface BaseMenu {
+  id: MenuId
+  type: string
 }
 
 interface GuideMenu extends BaseMenu {
@@ -21,226 +50,175 @@ interface GuideMenu extends BaseMenu {
 
 interface ReferenceMenu extends BaseMenu {
   type: 'reference'
-  commonSectionsFile: string
-  specFile?: string
+  path: string
+  commonSectionsFile?: string
 }
 
-type Menu = HomeMenu | GuideMenu | ReferenceMenu
+type Menu = GuideMenu | ReferenceMenu
 
 const menus: Menu[] = [
   {
-    id: 'home',
-    path: '/',
-    type: 'home',
-  },
-  {
-    id: 'gettingstarted',
-    path: '/guides/getting-started',
+    id: MenuId.GettingStarted,
     type: 'guide',
   },
   {
-    id: 'database',
-    path: '/guides/database',
+    id: MenuId.Database,
     type: 'guide',
   },
   {
-    id: 'api',
-    path: '/guides/api',
+    id: MenuId.Api,
     type: 'guide',
   },
   {
-    id: 'graphql',
-    path: '/guides/graphql',
+    id: MenuId.Graphql,
     type: 'guide',
   },
   {
-    id: 'auth',
-    path: '/guides/auth',
+    id: MenuId.Auth,
     type: 'guide',
   },
   {
-    id: 'auth',
-    path: '/learn/auth-deep-dive',
+    id: MenuId.Functions,
     type: 'guide',
   },
   {
-    id: 'functions',
-    path: '/guides/functions',
+    id: MenuId.Realtime,
     type: 'guide',
   },
   {
-    id: 'realtime',
-    path: '/guides/realtime',
+    id: MenuId.Storage,
     type: 'guide',
   },
   {
-    id: 'storage',
-    path: '/guides/storage',
+    id: MenuId.Ai,
     type: 'guide',
   },
   {
-    id: 'ai',
-    path: '/guides/ai',
+    id: MenuId.Platform,
     type: 'guide',
   },
   {
-    id: 'platform',
-    path: '/guides/platform',
+    id: MenuId.Resources,
     type: 'guide',
   },
   {
-    id: 'resources',
-    path: '/guides/resources',
+    id: MenuId.SelfHosting,
     type: 'guide',
   },
   {
-    id: 'self_hosting',
-    path: '/guides/self-hosting',
+    id: MenuId.Integrations,
     type: 'guide',
   },
   {
-    id: 'integrations',
-    path: '/guides/integrations',
+    id: MenuId.Cli,
     type: 'guide',
   },
   {
-    id: 'supabase_cli',
-    // TODO: Add path '/guides/cli/config'
-    path: '/guides/cli',
-    type: 'guide',
-  },
-  {
-    id: 'reference_javascript_v1',
+    id: MenuId.RefJavaScriptV1,
+    type: 'reference',
     path: '/reference/javascript/v1',
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_js_v1.yml',
-    type: 'reference',
   },
   {
-    id: 'reference_javascript_v2',
+    id: MenuId.RefJavaScriptV2,
+    type: 'reference',
     path: '/reference/javascript',
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_js_v2.yml',
-    type: 'reference',
   },
   {
-    id: 'reference_dart_v1',
+    id: MenuId.RefDartV1,
+    type: 'reference',
     path: '/reference/dart/v1',
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_dart_v1.yml',
-    type: 'reference',
   },
   {
-    id: 'reference_dart_v2',
+    id: MenuId.RefDartV2,
+    type: 'reference',
     path: '/reference/dart',
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_dart_v2.yml',
-    type: 'reference',
   },
   {
-    id: 'reference_csharp_v0',
+    id: MenuId.RefCSharpV0,
+    type: 'reference',
+    path: '/reference/csharp/v0',
+  },
+  {
+    id: MenuId.RefCSharpV1,
+    type: 'reference',
     path: '/reference/csharp',
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_csharp_v0.yml',
-    type: 'reference',
   },
   {
-    id: 'reference_python_v2',
+    id: MenuId.RefPythonV2,
+    type: 'reference',
     path: '/reference/python',
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_py_v2.yml',
-    type: 'reference',
   },
   {
-    id: 'reference_swift_v1',
+    id: MenuId.RefSwiftV1,
+    type: 'reference',
     path: '/reference/swift',
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_swift_v1.yml',
-    type: 'reference',
   },
   {
-    id: 'reference_swift_v2',
+    id: MenuId.RefSwiftV2,
+    type: 'reference',
     path: '/reference/swift',
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_swift_v2.yml',
-    type: 'reference',
   },
   {
-    id: 'reference_kotlin_v1',
+    id: MenuId.RefKotlinV1,
+    type: 'reference',
     path: '/reference/kotlin/v1',
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_kt_v1.yml',
-    type: 'reference',
   },
   {
-    id: 'reference_kotlin_v2',
+    id: MenuId.RefKotlinV2,
+    type: 'reference',
     path: '/reference/kotlin',
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_kt_v2.yml',
-    type: 'reference',
   },
   {
-    id: 'reference_cli',
+    id: MenuId.RefCli,
+    type: 'reference',
     path: '/reference/cli',
     commonSectionsFile: 'common-cli-sections.json',
-    type: 'reference',
   },
   {
-    id: 'reference_api',
+    id: MenuId.RefApi,
+    type: 'reference',
     path: '/reference/api',
     commonSectionsFile: 'common-api-sections.json',
-    type: 'reference',
   },
   {
-    id: 'reference_self_hosting_auth',
+    id: MenuId.SelfHostingAuth,
+    type: 'reference',
     path: '/reference/self-hosting-auth',
     commonSectionsFile: 'common-self-hosting-auth-sections.json',
-    type: 'reference',
   },
   {
-    id: 'reference_self_hosting_storage',
+    id: MenuId.SelfHostingStorage,
+    type: 'reference',
     path: '/reference/self-hosting-storage',
     commonSectionsFile: 'common-self-hosting-storage-sections.json',
-    type: 'reference',
   },
   {
-    id: 'reference_self_hosting_realtime',
+    id: MenuId.SelfHostingRealtime,
+    type: 'reference',
     path: '/reference/self-hosting-realtime',
     commonSectionsFile: 'common-self-hosting-realtime-sections.json',
-    type: 'reference',
   },
   {
-    id: 'reference_self_hosting_analytics',
+    id: MenuId.SelfHostingAnalytics,
+    type: 'reference',
     path: '/reference/self-hosting-analytics',
     commonSectionsFile: 'common-self-hosting-analytics-sections.json',
-    type: 'reference',
   },
   {
-    id: 'reference_self_hosting_functions',
+    id: MenuId.SelfHostingFunctions,
+    type: 'reference',
     path: '/reference/self-hosting-functions',
     commonSectionsFile: 'common-self-hosting-functions-sections.json',
-    type: 'reference',
   },
 ]
 
-function getMenuById(id: string) {
+function getMenuById(id: MenuId) {
   return menus.find((menu) => menu.id === id)
 }
 
-function getMenuByUrl(basePath: string, url: string) {
-  // If multiple matches, choose the menu with the longest path
-  const [menu] = menus
-    .filter(({ path }) => url.startsWith(`${basePath}${path}`))
-    .sort((a, b) => b.path.length - a.path.length)
-
-  return menu
-}
-
-function getMenuElement(menu: Menu) {
-  const menuType = menu.type
+function getMenuElement(menu: Menu | undefined) {
+  const menuType = menu?.type
   switch (menuType) {
-    case 'home':
-      return <NavigationMenuHome />
     case 'guide':
       return <NavigationMenuGuideList id={menu.id} />
     case 'reference':
@@ -249,37 +227,21 @@ function getMenuElement(menu: Menu) {
           id={menu.id}
           basePath={menu.path}
           commonSectionsFile={menu.commonSectionsFile}
-          specFile={menu.specFile}
         />
       )
     default:
-      throw new Error(`Unknown menu type '${menuType}'`)
+      return null
   }
 }
 
-const NavigationMenu = () => {
-  const router = useRouter()
-
-  useEffect(() => {
-    function handleRouteChange(url: string) {
-      const menu = getMenuByUrl(router.basePath, url)
-      if (menu) {
-        menuState.setMenuLevelId(menu.id)
-      }
-    }
-
-    handleRouteChange(router.basePath + router.asPath)
-    // Listen for page changes after a navigation or when the query changes
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router.asPath, router.basePath, router.events])
-
-  const level = useMenuLevelId()
+const NavigationMenu = ({ menuId }: { menuId: MenuId }) => {
+  const level = menuId
   const menu = getMenuById(level)
+
+  useCloseMenuOnRouteChange()
 
   return getMenuElement(menu)
 }
 
+export { MenuId, getMenuById }
 export default memo(NavigationMenu)

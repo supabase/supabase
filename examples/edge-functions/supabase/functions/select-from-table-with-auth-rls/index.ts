@@ -2,7 +2,7 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
 console.log(`Function "select-from-table-with-auth-rls" up and running!`)
@@ -28,10 +28,14 @@ Deno.serve(async (req: Request) => {
         },
       }
     )
+
+    // First get the token from the Authorization header
+    const token = req.headers.get('Authorization').replace('Bearer ', '')
+
     // Now we can get the session or user object
     const {
       data: { user },
-    } = await supabaseClient.auth.getUser()
+    } = await supabaseClient.auth.getUser(token)
 
     // And we can run queries in the context of our authenticated user
     const { data, error } = await supabaseClient.from('users').select('*')

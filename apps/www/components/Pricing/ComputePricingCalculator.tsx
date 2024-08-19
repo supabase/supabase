@@ -238,10 +238,10 @@ const ComputePricingCalculator = () => {
                 <div className="flex items-center gap-2">
                   <Badge
                     className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-                    color={
+                    variant={
                       findIntanceValueByColumn(activeInstance, 'plan') ===
                       findIntanceValueByColumn(computeInstances[0], 'plan')
-                        ? 'gray'
+                        ? 'default'
                         : 'brand'
                     }
                   >

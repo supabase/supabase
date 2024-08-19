@@ -1,3 +1,5 @@
+'use client'
+
 import * as Portal from '@radix-ui/react-portal'
 import React, { ComponentProps } from 'react'
 import {
@@ -57,6 +59,7 @@ function Description({ children, ...props }: ComponentProps<typeof Typography.Te
  *
  * `Toast.toast('Message', { description: 'Description', actions: [<SomeButton />] })`
  */
+
 function Toast({
   id,
   visible,

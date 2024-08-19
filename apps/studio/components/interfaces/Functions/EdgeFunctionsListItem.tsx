@@ -8,7 +8,7 @@ import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
+import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
