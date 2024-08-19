@@ -354,7 +354,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
         })
       : allRows.filter((x) => selectedRows.has(x.idx))
 
-    const sqlStatements = formatTableRowsToSQL(table.name, rows)
+    const sqlStatements = formatTableRowsToSQL(table, rows)
     const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
     saveAs(sqlData, `${state.table!.name}_rows.sql`)
     setIsExporting(false)

@@ -185,7 +185,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       })
 
       if (formattedRows.length > 0) {
-        const sqlStatements = formatTableRowsToSQL(entity.name, formattedRows)
+        const sqlStatements = formatTableRowsToSQL(supaTable, formattedRows)
         const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
         saveAs(sqlData, `${entity!.name}_rows.sql`)
       }
