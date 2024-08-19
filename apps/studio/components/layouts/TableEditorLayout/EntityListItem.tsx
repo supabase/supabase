@@ -16,6 +16,10 @@ import Papa from 'papaparse'
 import toast from 'react-hot-toast'
 
 import { IS_PLATFORM } from 'common'
+import {
+  MAX_EXPORT_ROW_COUNT,
+  MAX_EXPORT_ROW_COUNT_MESSAGE,
+} from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import {
   formatTableRowsToSQL,
@@ -29,6 +33,7 @@ import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { getTable } from 'data/tables/table-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -37,9 +42,9 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-  cn,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { Markdown } from 'components/interfaces/Markdown'
 
 export interface EntityListItemProps {
   id: number
@@ -106,6 +111,13 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         projectRef,
         connectionString: project?.connectionString,
       })
+      if (table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
+        return toast.error(
+          <Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />,
+          { id: toastId }
+        )
+      }
+
       const supaTable =
         table &&
         parseSupaTable(
@@ -158,6 +170,14 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         projectRef,
         connectionString: project?.connectionString,
       })
+
+      if (table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
+        return toast.error(
+          <Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />,
+          { id: toastId }
+        )
+      }
+
       const supaTable =
         table &&
         parseSupaTable(
