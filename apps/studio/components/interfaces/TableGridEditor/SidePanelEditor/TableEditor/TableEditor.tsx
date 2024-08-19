@@ -18,10 +18,10 @@ import {
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { ExternalLink } from 'lucide-react'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -39,6 +39,7 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -78,6 +79,7 @@ const TableEditor = ({
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
   const { project } = useProjectContext()
+  const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
 
@@ -187,7 +189,7 @@ const TableEditor = ({
       if (isEmpty(errors)) {
         const payload = {
           name: tableFields.name.trim(),
-          schema: snap.selectedSchemaName,
+          schema: selectedSchema,
           comment: tableFields.comment?.trim(),
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
         }
@@ -247,9 +249,7 @@ const TableEditor = ({
       size="large"
       key="TableEditor"
       visible={visible}
-      header={
-        <HeaderTitle schema={snap.selectedSchemaName} table={table} isDuplicating={isDuplicating} />
-      }
+      header={<HeaderTitle schema={selectedSchema} table={table} isDuplicating={isDuplicating} />}
       className={`transition-all duration-100 ease-in ${isImportingSpreadsheet ? ' mr-32' : ''}`}
       onCancel={closePanel}
       onConfirm={() => (resolve: () => void) => onSaveChanges(resolve)}

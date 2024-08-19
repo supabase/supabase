@@ -21,14 +21,14 @@ import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { uuidv4 } from 'lib/helpers'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import ActionBar from '../ActionBar'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
+import type { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
 import type { ForeignKey } from './ForeignKeySelector.types'
 import { generateCascadeActionDescription } from './ForeignKeySelector.utils'
-import type { ColumnField } from '../SidePanelEditor.types'
 
 const EMPTY_STATE: ForeignKey = {
   id: undefined,
@@ -61,7 +61,7 @@ export const ForeignKeySelector = ({
   onSaveRelation,
 }: ForeignKeySelectorProps) => {
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+  const { selectedSchema } = useQuerySchemaState()
 
   const [fk, setFk] = useState(EMPTY_STATE)
   const [errors, setErrors] = useState<{ columns?: string; types?: any[]; typeNotice?: any[] }>({})
@@ -302,8 +302,7 @@ export const ForeignKeySelector = ({
                 </label>
                 <div className="grid grid-cols-10 gap-y-2">
                   <div className="col-span-5 text-xs text-foreground-lighter">
-                    {snap.selectedSchemaName}.
-                    {table.name.length > 0 ? table.name : '[unnamed table]'}
+                    {selectedSchema}.{table.name.length > 0 ? table.name : '[unnamed table]'}
                   </div>
                   <div className="col-span-4 text-xs text-foreground-lighter text-right">
                     {fk.schema}.{fk.table}

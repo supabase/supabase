@@ -3,7 +3,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -16,6 +15,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
@@ -34,16 +34,10 @@ const FunctionsList = ({
 }: FunctionsListProps) => {
   const { project } = useProjectContext()
   const router = useRouter()
-  const { schema, search } = useParams()
-  const selectedSchema = schema ?? 'public'
+  const { search } = useParams()
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const filterString = search ?? ''
 
-  const setSelectedSchema = (s: string) => {
-    const url = new URL(document.URL)
-    url.searchParams.delete('search')
-    url.searchParams.set('schema', s)
-    router.push(url)
-  }
   const setFilterString = (str: string) => {
     const url = new URL(document.URL)
     if (str === '') {
@@ -53,13 +47,6 @@ const FunctionsList = ({
     }
     router.push(url)
   }
-
-  // update the url to point to public schema
-  useEffect(() => {
-    if (schema !== selectedSchema) {
-      setSelectedSchema(selectedSchema)
-    }
-  }, [])
 
   const canCreateFunctions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -118,7 +105,12 @@ const FunctionsList = ({
                 size="small"
                 showError={false}
                 selectedSchemaName={selectedSchema}
-                onSelectSchema={setSelectedSchema}
+                onSelectSchema={(schema) => {
+                  const url = new URL(document.URL)
+                  url.searchParams.delete('search')
+                  router.push(url)
+                  setSelectedSchema(schema)
+                }}
               />
               <Input
                 placeholder="Search for a function"

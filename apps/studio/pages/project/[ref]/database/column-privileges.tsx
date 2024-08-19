@@ -24,6 +24,7 @@ import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-quer
 import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -48,7 +49,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const { flags } = featurePreviewContext
   const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
 
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<string | undefined>(paramTable)
   const [selectedRole, setSelectedRole] = useState<string>('authenticated')
 
