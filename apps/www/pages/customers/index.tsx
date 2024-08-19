@@ -7,6 +7,7 @@ import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
 import { getSortedPosts } from '~/lib/posts'
 
+import AnnouncementBadge from '~/components/Announcement/Badge'
 import DefaultLayout from '~/components/Layouts/Default'
 import type PostTypes from '~/types/post'
 import { motion } from 'framer-motion'
@@ -85,6 +86,22 @@ function CustomerStoriesPage(props: any) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
               >
+                <div className="z-40 w-full flex flex-col gap-4 items-center justify-center -mt-4 md:-mt-8 mb-8 lg:mb-8">
+                  <AnnouncementBadge
+                    url="/events/scale-to-billions-generative-ai-humata"
+                    badge={
+                      <>
+                        Webinar <span className="hidden sm:inline ml-1">/ Aug 21</span>
+                      </>
+                    }
+                    announcement={
+                      <>
+                        Scale to Billions: Generative AI
+                        <span className="hidden sm:inline">/Humata</span>
+                      </>
+                    }
+                  />
+                </div>
                 <h1 className="text-foreground mb-3 text-3xl">Customer stories</h1>
                 <h2 className="text-foreground-light text-xl">
                   Discover case studies on how Supabase is being used around the world to quickly

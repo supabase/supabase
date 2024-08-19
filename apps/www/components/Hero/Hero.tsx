@@ -25,13 +25,18 @@ const Hero = () => {
                 <div className="flex flex-col items-center">
                   <div className="z-40 w-full flex flex-col gap-4 items-center justify-center -mt-4 md:-mt-8 mb-8 lg:mb-8">
                     <AnnouncementBadge
-                      url={announcement.link}
+                      url="/events/scale-to-billions-generative-ai-humata"
                       badge={
                         <>
-                          Launch Week <span className="hidden sm:inline ml-1"> 12</span>
+                          Webinar <span className="hidden sm:inline ml-1">/ Aug 21</span>
                         </>
                       }
-                      announcement="Explore what we shipped"
+                      announcement={
+                        <>
+                          Scale to Billions: Generative AI
+                          <span className="hidden sm:inline">/Humata</span>
+                        </>
+                      }
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
