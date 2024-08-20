@@ -23,6 +23,7 @@ import {
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { logOut, useUser } from 'common'
 import { LucideIcon } from 'icons/src/createSupabaseIcon'
+import Image from 'next/image'
 
 const AuthenticatedDropdownMenu = () => {
   const { theme, setTheme } = useTheme()
@@ -77,6 +78,8 @@ const AuthenticatedDropdownMenu = () => {
     ],
   ]
 
+  console.log(user)
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild className="flex">
@@ -84,10 +87,18 @@ const AuthenticatedDropdownMenu = () => {
           title="Menu dropdown button"
           className={cn(
             buttonVariants({ type: 'default' }),
-            'text-foreground-light border-default w-[26px] min-w-[26px] h-[26px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent'
+            // 'text-foreground-light border-default w-[26px] min-w-[26px] h-[26px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent'
+            'text-foreground-light rounded-full overflow-hidden border-default w-[26px] min-w-[26px] h-[26px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent'
           )}
         >
-          <Menu size={16} strokeWidth={1} />
+          <Image
+            src={user?.user_metadata.avatar_url}
+            alt={user?.email ?? ''}
+            fill
+            sizes="30px"
+            className="object-cover object-center"
+          />
+          {/* <Menu size={16} strokeWidth={1} /> */}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end" className="w-52">
