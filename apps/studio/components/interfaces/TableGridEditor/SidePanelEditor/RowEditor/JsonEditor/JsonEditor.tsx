@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresTable } from '@supabase/postgres-meta'
 import { AlignLeft } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
@@ -48,7 +48,7 @@ const JsonEdit = ({
   const [jsonStr, setJsonStr] = useState('')
   const isTruncated = jsonString.endsWith('...') && jsonString.length > MAX_CHARACTERS
 
-  const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
+  const { mutate: getCellValue, isLoading, isSuccess, reset } = useGetCellValueMutation()
 
   const validateJSON = async (resolve: () => void) => {
     try {
@@ -98,6 +98,13 @@ const JsonEdit = ({
       setJsonStr(temp)
     }
   }, [visible])
+
+  // reset the mutation when the panel closes. Fixes an issue where the value is truncated if you close and reopen the
+  // panel again
+  const onClose = useCallback(() => {
+    reset()
+    closePanel()
+  }, [reset])
 
   return (
     <SidePanel
@@ -151,11 +158,11 @@ const JsonEdit = ({
         </div>
       }
       visible={visible}
-      onCancel={closePanel}
+      onCancel={onClose}
       customFooter={
         <ActionBar
           hideApply={readOnly}
-          closePanel={closePanel}
+          closePanel={onClose}
           backButtonLabel={backButtonLabel}
           applyButtonLabel={applyButtonLabel}
           applyFunction={readOnly ? undefined : validateJSON}
