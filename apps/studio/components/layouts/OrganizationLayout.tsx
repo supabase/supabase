@@ -6,10 +6,13 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import Link from 'next/link'
-import { NavMenu, NavMenuItem } from 'ui'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, NavMenu, NavMenuItem } from 'ui'
 import AccountLayout from './AccountLayout/AccountLayout'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
+import PartnerIcon from 'components/ui/PartnerIcon'
+import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
+import { ExternalLink } from 'lucide-react'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
@@ -86,7 +89,29 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
           </NavMenu>
         </ScaffoldContainer>
       </ScaffoldHeader>
+
       <ScaffoldDivider />
+
+      {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
+        <ScaffoldContainer className="mt-8">
+          <Alert_Shadcn_ variant="default" className="flex items-center gap-4">
+            <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
+            <AlertTitle_Shadcn_ className="flex-1">
+              This organization is managed by {PARTNER_TO_NAME[selectedOrganization.managed_by]}.
+            </AlertTitle_Shadcn_>
+            <Button type="default" iconRight={<ExternalLink />} asChild>
+              <a
+                href={`https://vercel.com/${'supabase'}/~/integrations/products/${process.env.NEXT_PUBLIC_VERCEL_MARKETPLACE_INTEGRATION_NAME}/${selectedOrganization.partner_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Manage
+              </a>
+            </Button>
+          </Alert_Shadcn_>
+        </ScaffoldContainer>
+      )}
+
       {children}
     </AccountLayout>
   )

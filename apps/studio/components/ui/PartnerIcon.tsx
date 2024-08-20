@@ -5,7 +5,7 @@ interface PartnerIconProps {
   organization: Pick<Organization, 'managed_by'>
   showTooltip?: boolean
   tooltipText?: string
-  size?: 'small' | 'large'
+  size?: 'small' | 'medium' | 'large'
 }
 
 function PartnerIcon({
@@ -17,7 +17,11 @@ function PartnerIcon({
   if (organization.managed_by === 'vercel-marketplace') {
     const icon = (
       <svg
-        className={cn(size === 'small' && 'w-2.5 h-2.5', size === 'large' && 'w-5 h-5')}
+        className={cn(
+          size === 'small' && 'w-2.5 h-2.5',
+          size === 'medium' && 'w-3.5 h-3.5',
+          size === 'large' && 'w-5 h-5'
+        )}
         viewBox="0 0 76 65"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -32,6 +36,7 @@ function PartnerIcon({
           className={cn(
             'bg-surface-100 dark:bg-surface-200 border rounded flex items-center justify-center flex-shrink-0',
             size === 'small' && 'h-5 w-5',
+            size === 'medium' && 'w-7 h-7',
             size === 'large' && 'w-10 h-10'
           )}
         >
@@ -47,6 +52,7 @@ function PartnerIcon({
             className={cn(
               'bg-surface-100 dark:bg-surface-200 border rounded flex items-center justify-center hover:bg-surface-400 dark:hover:bg-surface-400 hover:border-stronger flex-shrink-0',
               size === 'small' && 'h-5 w-5',
+              size === 'medium' && 'w-7 h-7',
               size === 'large' && 'w-10 h-10'
             )}
           >

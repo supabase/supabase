@@ -9,7 +9,7 @@ interface PartnerManagedResourceProps {
   ctaUrl?: string
 }
 
-const PARTNER_TO_NAME = {
+export const PARTNER_TO_NAME = {
   'vercel-marketplace': 'Vercel Marketplace',
   'aws-marketplace': 'AWS Marketplace',
 } as const
