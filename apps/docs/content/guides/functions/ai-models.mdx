@@ -190,6 +190,12 @@ Create a new function with the following code
 supabase functions new llamafile-test
 ```
 
+<Admonition type="info">
+
+Note that the model parameter doesn't have any effect here! The model depends on which Llamafile is currently running!
+
+</Admonition>
+
 ```ts supabase/functions/llamafile-test/index.ts
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 const session = new Supabase.ai.Session('LLaMA_CPP')
@@ -214,7 +220,7 @@ Deno.serve(async (req: Request) => {
       ],
     },
     {
-      mode: 'openaicompatible',
+      mode: 'openaicompatible', // Mode for the inference API host. (default: 'ollama')
       stream: false,
     }
   )
@@ -239,6 +245,12 @@ Create a new function with the following code
 ```bash
 supabase functions new llamafile-test
 ```
+
+<Admonition type="info">
+
+Note that the model parameter doesn't have any effect here! The model depends on which Llamafile is currently running!
+
+</Admonition>
 
 ```ts supabase/functions/llamafile-test/index.ts
 import OpenAI from 'https://deno.land/x/openai@v4.53.2/mod.ts'

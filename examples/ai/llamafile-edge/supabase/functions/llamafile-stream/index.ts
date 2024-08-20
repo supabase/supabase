@@ -20,7 +20,7 @@ Deno.serve(async (req: Request) => {
       },
     ],
   }, {
-    mode: "openaicompatible",
+    mode: "openaicompatible", // Mode for the inference API host. (default: 'ollama')
     stream: true,
   }) as AsyncGenerator<any>;
 

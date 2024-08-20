@@ -13,7 +13,9 @@ date: '2024-08-21'
 toc_depth: 3
 ---
 
-In addition to [Ollama](/docs/guides/functions/ai-models#using-large-language-models), Supabase Edge Functions now supports [Mozilla Llamafile](https://github.com/Mozilla-Ocho/llamafile).
+A couple of months back, we introduced support to [run AI inferences directly from Supabase Edge Functions](/blog/ai-inference-now-available-in-supabase-edge-functions).
+
+We are adding [Mozilla Llamafile](https://github.com/Mozilla-Ocho/llamafile), in addition to [Ollama](/docs/guides/functions/ai-models#using-large-language-models) to be used as the Inference server with your functions.
 
 Mozilla Llamafile lets you distribute and run LLMs with a single file that runs locally on most computers, with no installation! In addition to a local web UI chat server, Llamafile also provides an OpneAI API compatible server, that is now integrated with Supabase Edge Functions.
 
@@ -87,7 +89,7 @@ Deno.serve(async (req: Request) => {
       ],
     },
     {
-      mode: 'openaicompatible',
+      mode: 'openaicompatible', // Mode for the inference API host. (default: 'ollama')
       stream: false,
     }
   )
@@ -166,6 +168,12 @@ Deno.serve(async (req) => {
   return Response.json(chatCompletion)
 })
 ```
+
+<Admonition type="info">
+
+Note that the model parameter doesn't have any effect here! The model depends on which Llamafile is currently running!
+
+</Admonition>
 
 ## Serve your functions locally
 
