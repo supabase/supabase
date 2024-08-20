@@ -13,7 +13,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
-import { logOut, useIsLoggedIn, useIsUserLoading } from 'common'
+import { isBrowser, STORAGE_KEY, useIsLoggedIn, useIsUserLoading } from 'common'
 import ScrollProgress from '~/components/ScrollProgress'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
@@ -22,6 +22,7 @@ import MenuItem from './MenuItem'
 import { menu } from '~/data/nav'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import LW12CountdownBanner from 'ui/src/layout/banners/LW12CountdownBanner/LW12CountdownBanner'
+import AuthenticatedDropdownMenu from './AuthenticatedDropdownMenu'
 
 interface Props {
   hideNavbar: boolean
@@ -29,11 +30,12 @@ interface Props {
 
 const Nav = (props: Props) => {
   const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
-  const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
+  const isLoggedIn =
+    (isBrowser && globalThis?.localStorage?.getItem(STORAGE_KEY)) || useIsLoggedIn()
 
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('/launch-week')
@@ -55,6 +57,10 @@ const Nav = (props: Props) => {
   React.useEffect(() => {
     if (width >= 1024) setOpen(false)
   }, [width])
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   if (props.hideNavbar) {
     return null
@@ -126,31 +132,29 @@ const Nav = (props: Props) => {
                   </NavigationMenuList>
                 </NavigationMenu>
               </div>
-              <div className="flex items-center gap-2 opacity-0 animate-fade-in !scale-100 delay-300">
+              <div
+                className={cn(
+                  'hidden lg:flex items-center gap-2 opacity-0 transition-opacity',
+                  mounted && 'animate-fade-in !scale-100 delay-100'
+                )}
+              >
                 <GitHubButton />
 
-                {!isUserLoading && (
+                {isLoggedIn ? (
                   <>
-                    {isLoggedIn ? (
-                      <>
-                        <Button className="hidden lg:block" asChild>
-                          <Link href="/dashboard/projects">Dashboard</Link>
-                        </Button>
-                        {/* !Temporary! */}
-                        <Button className="hidden lg:block" onClick={logOut}>
-                          Log out
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button type="default" className="hidden lg:block" asChild>
-                          <Link href="https://supabase.com/dashboard">Sign in</Link>
-                        </Button>
-                        <Button className="hidden lg:block" asChild>
-                          <Link href="https://supabase.com/dashboard">Start your project</Link>
-                        </Button>
-                      </>
-                    )}
+                    <Button asChild>
+                      <Link href="/dashboard/projects">Dashboard</Link>
+                    </Button>
+                    <AuthenticatedDropdownMenu />
+                  </>
+                ) : (
+                  <>
+                    <Button type="default" asChild>
+                      <Link href="https://supabase.com/sign-in">Sign in</Link>
+                    </Button>
+                    <Button asChild>
+                      <Link href="https://supabase.com/new">Start your project</Link>
+                    </Button>
                   </>
                 )}
               </div>

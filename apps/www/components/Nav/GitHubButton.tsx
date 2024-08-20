@@ -29,11 +29,7 @@ const GitHubButton = () => {
   }, [])
 
   return (
-    <Button
-      className="hidden group lg:flex text-foreground-light hover:text-foreground"
-      type="text"
-      asChild
-    >
+    <Button className="group flex text-foreground-light hover:text-foreground" type="text" asChild>
       <a type={undefined} href="https://github.com/supabase/supabase" target="_blank">
         <span className="flex items-center gap-1">
           <svg
