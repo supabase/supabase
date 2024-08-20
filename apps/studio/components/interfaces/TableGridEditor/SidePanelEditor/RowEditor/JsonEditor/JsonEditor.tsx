@@ -28,6 +28,15 @@ interface JsonEditProps {
   onSaveJSON: (value: string | number | null, resolve: () => void) => void
 }
 
+const isValidJSON = (value: unknown) => {
+  try {
+    JSON.parse(value as string)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
 const JsonEdit = ({
   row,
   column,
@@ -45,7 +54,9 @@ const JsonEdit = ({
 
   const [view, setView] = useState<'edit' | 'view'>('edit')
   const [jsonStr, setJsonStr] = useState('')
-  const jsonString = row?.[column as keyof typeof row] as unknown as string
+  // sometimes the value is a JSON object if it was truncated, then fully loaded from the grid.
+  const value = row?.[column as keyof typeof row] as unknown
+  const jsonString = isValidJSON(value) ? JSON.stringify(value) : (value as string)
   const isTruncated = isValueTruncated(jsonString)
 
   const { mutate: getCellValue, isLoading, isSuccess, reset } = useGetCellValueMutation()
