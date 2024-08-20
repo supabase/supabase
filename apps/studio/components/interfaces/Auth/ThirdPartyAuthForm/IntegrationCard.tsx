@@ -56,11 +56,11 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
     case 'awsCognito':
       return (
         <>
-          Allow users to use Supabase with AWS Cognito project. Additional setup may be required.
-          You can read more in the{' '}
+          Allow users to use Supabase with an Amazon Cognito. Additional setup may be required. You
+          can read more in the{' '}
           <a
             className="hover:decoration-brand underline hover:text-foreground transition"
-            href="https://supabase.com/docs/guides/auth"
+            href="https://supabase.com/docs/guides/auth/third-party/aws-cognito"
           >
             documentation
           </a>

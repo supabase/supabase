@@ -12,7 +12,7 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import ProviderForm from './ProviderForm'
 
@@ -57,14 +57,16 @@ const AuthProvidersForm = () => {
           </Alert_Shadcn_>
         )}
         {isLoading &&
-          PROVIDERS_SCHEMAS.map((provider) => (
-            <div
-              key={`provider_${provider.title}`}
-              className={[...ProviderCollapsibleClasses, 'px-6 py-3'].join(' ')}
-            >
-              <HorizontalShimmerWithIcon />
-            </div>
-          ))}
+          PROVIDERS_SCHEMAS.map((provider) => {
+            return (
+              <div
+                key={`provider_${provider.title}`}
+                className={[...ProviderCollapsibleClasses, 'px-6 py-3'].join(' ')}
+              >
+                <HorizontalShimmerWithIcon />
+              </div>
+            )
+          })}
         {isError && (
           <Alert_Shadcn_ variant="destructive">
             <WarningIcon />
@@ -74,11 +76,15 @@ const AuthProvidersForm = () => {
         )}
         {isSuccess &&
           PROVIDERS_SCHEMAS.map((provider) => {
+            const providerSchema =
+              provider.title === 'Phone'
+                ? { ...provider, validationSchema: getPhoneProviderValidationSchema(authConfig) }
+                : provider
             return (
               <ProviderForm
-                key={`provider_${provider.title}`}
+                key={`provider_${providerSchema.title}`}
                 config={authConfig}
-                provider={provider as any}
+                provider={providerSchema as any}
               />
             )
           })}
