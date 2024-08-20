@@ -11,6 +11,7 @@ import {
   useState,
 } from 'react'
 import { gotrueClient } from './gotrue'
+import { clearLocalStorage } from './local-storage'
 
 const DEFAULT_SESSION: any = {
   access_token: undefined,
@@ -117,5 +118,6 @@ export const signOut = async () => await gotrueClient.signOut()
 
 export const logOut = async () => {
   await signOut()
+  clearLocalStorage()
   if (typeof document !== 'undefined') location.reload()
 }

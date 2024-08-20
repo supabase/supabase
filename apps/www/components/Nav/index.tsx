@@ -13,7 +13,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
-import { isBrowser, STORAGE_KEY, useIsLoggedIn, useIsUserLoading } from 'common'
+import { isBrowser, STORAGE_KEY, useIsLoggedIn, useUser } from 'common'
 import ScrollProgress from '~/components/ScrollProgress'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
@@ -34,6 +34,7 @@ const Nav = (props: Props) => {
   const router = useRouter()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
+  const user = useUser()
   const isLoggedIn =
     (isBrowser && globalThis?.localStorage?.getItem(STORAGE_KEY)) || useIsLoggedIn()
 
@@ -145,7 +146,7 @@ const Nav = (props: Props) => {
                     <Button asChild>
                       <Link href="/dashboard/projects">Dashboard</Link>
                     </Button>
-                    <AuthenticatedDropdownMenu />
+                    <AuthenticatedDropdownMenu user={user} />
                   </>
                 ) : (
                   <>

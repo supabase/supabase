@@ -1,9 +1,10 @@
 'use client'
 
 import React, { Fragment } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import { Home, LogOut, Menu, Search, Settings, User } from 'lucide-react'
+import { Home, LogOut, Search, Settings, UserIcon } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,34 +22,39 @@ import {
   themes,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import { logOut, useUser } from 'common'
-import { LucideIcon } from 'icons/src/createSupabaseIcon'
-import Image from 'next/image'
+import { logOut } from 'common'
 
-const AuthenticatedDropdownMenu = () => {
-  const { theme, setTheme } = useTheme()
-  const setCommandMenuOpen = useSetCommandMenuOpen()
-  const user = useUser()
+import type { User } from '@supabase/supabase-js'
+import type { LucideIcon } from 'icons/src/createSupabaseIcon'
 
-  interface menuItem {
-    label: string
-    type?: 'link' | 'button' | 'text'
-    icon?: LucideIcon
-    href?: string
-    shortcut?: string
-    onClick?: VoidFunction
-    otherProps?: {
-      target?: '_blank'
-      rel?: 'noreferrer noopener'
-    }
+interface Props {
+  user: User | null
+}
+
+interface menuItem {
+  label: string
+  type?: 'link' | 'button' | 'text'
+  icon?: LucideIcon
+  href?: string
+  shortcut?: string
+  onClick?: VoidFunction
+  otherProps?: {
+    target?: '_blank'
+    rel?: 'noreferrer noopener'
   }
+}
+
+const AuthenticatedDropdownMenu = ({ user }: Props) => {
+  const setCommandMenuOpen = useSetCommandMenuOpen()
+  const { theme, setTheme } = useTheme()
+  const userAvatar = user && user.user_metadata?.avatar_url
 
   const menu: menuItem[][] = [
     [
       {
         label: user?.email ?? '',
         type: 'text',
-        icon: User,
+        icon: UserIcon,
       },
       {
         label: 'Projects',
@@ -78,8 +84,6 @@ const AuthenticatedDropdownMenu = () => {
     ],
   ]
 
-  console.log(user)
-
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild className="flex">
@@ -87,25 +91,30 @@ const AuthenticatedDropdownMenu = () => {
           title="Menu dropdown button"
           className={cn(
             buttonVariants({ type: 'default' }),
-            // 'text-foreground-light border-default w-[26px] min-w-[26px] h-[26px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent'
-            'text-foreground-light rounded-full overflow-hidden border-default w-[26px] min-w-[26px] h-[26px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent'
+            'text-foreground-light border-default w-[26px] min-w-[26px] h-[26px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent',
+            'rounded-full overflow-hidden'
           )}
         >
-          <Image
-            src={user?.user_metadata.avatar_url}
-            alt={user?.email ?? ''}
-            fill
-            sizes="30px"
-            className="object-cover object-center"
-          />
-          {/* <Menu size={16} strokeWidth={1} /> */}
+          {userAvatar ? (
+            <Image
+              src={userAvatar}
+              alt={user?.email ?? ''}
+              placeholder="blur"
+              blurDataURL="/images/blur.png"
+              fill
+              sizes="30px"
+              className="object-cover object-center"
+            />
+          ) : (
+            <UserIcon size={16} strokeWidth={1.5} />
+          )}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end" className="w-52">
         {menu.map((menuSection, sectionIdx) => (
           <Fragment key={`topnav--${sectionIdx}`}>
             {sectionIdx !== 0 && <DropdownMenuSeparator key={`topnav--${sectionIdx}`} />}
-            {menuSection.map(({ icon: Icon, ...sectionItem }, itemIdx) => {
+            {menuSection.map((sectionItem, itemIdx) => {
               switch (sectionItem.type) {
                 case 'text':
                   return (
@@ -114,11 +123,7 @@ const AuthenticatedDropdownMenu = () => {
                       className="flex cursor-text items-center text-foreground rounded-sm px-2 py-1.5 text-xs outline-none space-x-2"
                       {...sectionItem.otherProps}
                     >
-                      {Icon && <Icon className="w-3 h-3" />}
-                      <span className="grow truncate">{sectionItem.label}</span>
-                      {sectionItem.shortcut && (
-                        <DropdownMenuShortcut>{sectionItem.shortcut}</DropdownMenuShortcut>
-                      )}
+                      <DropdownItemContent {...sectionItem} />
                     </div>
                   )
                 case 'button':
@@ -129,13 +134,10 @@ const AuthenticatedDropdownMenu = () => {
                       onClick={sectionItem.onClick!}
                       {...sectionItem.otherProps}
                     >
-                      {Icon && <Icon className="w-3 h-3" />}
-                      <span className="grow">{sectionItem.label}</span>
-                      {sectionItem.shortcut && (
-                        <DropdownMenuShortcut>{sectionItem.shortcut}</DropdownMenuShortcut>
-                      )}
+                      <DropdownItemContent {...sectionItem} />
                     </DropdownMenuItem>
                   )
+                case 'link':
                 default:
                   return (
                     <Link
@@ -144,11 +146,7 @@ const AuthenticatedDropdownMenu = () => {
                       {...sectionItem.otherProps}
                     >
                       <DropdownMenuItem className="space-x-2" onClick={() => {}}>
-                        {Icon && <Icon className="w-3 h-3" />}
-                        <span className="grow">{sectionItem.label}</span>
-                        {sectionItem.shortcut && (
-                          <DropdownMenuShortcut>{sectionItem.shortcut}</DropdownMenuShortcut>
-                        )}
+                        <DropdownItemContent {...sectionItem} />
                       </DropdownMenuItem>
                     </Link>
                   )
@@ -178,5 +176,13 @@ const AuthenticatedDropdownMenu = () => {
     </DropdownMenu>
   )
 }
+
+const DropdownItemContent = ({ icon: Icon, ...sectionItem }: menuItem) => (
+  <>
+    {Icon && <Icon className="w-3 h-3" />}
+    <span className="grow truncate">{sectionItem.label}</span>
+    {sectionItem.shortcut && <DropdownMenuShortcut>{sectionItem.shortcut}</DropdownMenuShortcut>}
+  </>
+)
 
 export default AuthenticatedDropdownMenu
