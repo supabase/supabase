@@ -355,6 +355,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 const OneTapComponent = () => {
+  const supabase = createClient()
   const router = useRouter()
 
   // generate nonce to use for google id token sign-in
@@ -371,16 +372,26 @@ const OneTapComponent = () => {
 
   useEffect(() => {
     const initializeGoogleOneTap = () => {
-      window.onload = async () => {
+      console.log('Initializing Google One Tap')
+      window.addEventListener('load', async () => {
         const [nonce, hashedNonce] = await generateNonce()
         console.log('Nonce: ', nonce, hashedNonce)
+
+        // check if there's already an existing session before initializing the one-tap UI
+        const { data, error } = await supabase.auth.getSession()
+        if (error) {
+          console.error('Error getting session', error)
+        }
+        if (data.session) {
+          router.push('/')
+          return
+        }
+
         /* global google */
         google.accounts.id.initialize({
           client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
           callback: async (response: CredentialResponse) => {
             try {
-              const supabase = createClient()
-
               // send id token returned in response.credential to supabase
               const { data, error } = await supabase.auth.signInWithIdToken({
                 provider: 'google',
@@ -399,12 +410,14 @@ const OneTapComponent = () => {
             }
           },
           nonce: hashedNonce,
+          // with chrome's removal of third-party cookiesm, we need to use FedCM instead (https://developers.google.com/identity/gsi/web/guides/fedcm-migration)
           use_fedcm_for_prompt: true,
         })
         google.accounts.id.prompt() // Display the One Tap UI
-      }
+      })
     }
     initializeGoogleOneTap()
+    return () => window.removeEventListener('load', initializeGoogleOneTap)
   }, [])
 
   return (
