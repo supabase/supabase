@@ -224,7 +224,6 @@ const RowEditor = ({
               visible={isEditingJson}
               row={editedRow}
               column={selectedValueForJsonEdit?.column ?? ''}
-              jsonString={selectedValueForJsonEdit?.value ?? ''}
               closePanel={() => setSelectedValueForJsonEdit(undefined)}
               onSaveJSON={(value) => {
                 onUpdateField({ [selectedValueForJsonEdit?.column ?? '']: value })

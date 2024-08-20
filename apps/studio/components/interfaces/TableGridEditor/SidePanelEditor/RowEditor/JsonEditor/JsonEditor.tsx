@@ -13,13 +13,13 @@ import useTable from 'hooks/misc/useTable'
 import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import { Button, SidePanel, cn } from 'ui'
 import ActionBar from '../../ActionBar'
+import { isValueTruncated } from '../RowEditor.utils'
 import { DrilldownViewer } from './DrilldownViewer'
 import JsonCodeEditor from './JsonCodeEditor'
 
 interface JsonEditProps {
   row?: { [key: string]: any }
   column: string
-  jsonString: string
   visible: boolean
   backButtonLabel?: string
   applyButtonLabel?: string
@@ -31,7 +31,6 @@ interface JsonEditProps {
 const JsonEdit = ({
   row,
   column,
-  jsonString,
   visible,
   backButtonLabel,
   applyButtonLabel,
@@ -46,7 +45,8 @@ const JsonEdit = ({
 
   const [view, setView] = useState<'edit' | 'view'>('edit')
   const [jsonStr, setJsonStr] = useState('')
-  const isTruncated = jsonString.endsWith('...') && jsonString.length > MAX_CHARACTERS
+  const jsonString = row?.[column as keyof typeof row] as unknown as string
+  const isTruncated = isValueTruncated(jsonString)
 
   const { mutate: getCellValue, isLoading, isSuccess, reset } = useGetCellValueMutation()
 
