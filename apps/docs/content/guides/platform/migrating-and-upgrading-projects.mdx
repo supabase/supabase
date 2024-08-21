@@ -162,6 +162,15 @@ supabase db dump --db-url "$OLD_DB_URL" -f roles.sql --role-only
 supabase db dump --db-url "$OLD_DB_URL" -f schema.sql
 supabase db dump --db-url "$OLD_DB_URL" -f data.sql --use-copy --data-only
 ```
+##### NOTES:
+If you receive the following warning when running the last line above (`supabase db dump --db-url "$OLD_DB_URL" -f data.sql --use-copy --data-only`), you can safely ignore it:
+```bash
+pg_dump: warning: there are circular foreign-key constraints on this table:
+pg_dump: detail: key
+pg_dump: hint: You might not be able to restore the dump without using --disable-triggers or temporarily dropping the constraints.
+pg_dump: hint: Consider using a full dump instead of a --data-only dump to avoid this problem.
+```
+(This warning comes from an internal table that already exists on newly-created Supabase projects.)
 
 ### Restore to your new project
 
