@@ -119,10 +119,10 @@ If you plan to solely use Prisma instead of the Supabase Postgres API, turn it o
 
                 <TabPanel id="serverless" label="serverless deployments">
 
-                    Add a DATABASE_URL variable to your .env file. This is for your Supavisor Transaction mode string, which is necessary for managing serverless environments. It uses port 6543 and requires two flags appended to the the end of the string: "pgbouncer=true&connection_limit=1"
+                    Add a DATABASE_URL variable to your .env file. This is for your Supavisor Transaction mode string, which is necessary for managing serverless environments. It uses port 6543 and requires a flag appended to the the end of the string: "pgbouncer=true"
                     ```text .env
                     # Used in your application
-                    DATABASE_URL="postgres://prisma.qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+                    DATABASE_URL="postgres://prisma.qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
 
                     # Used for Prisma Migrations
                     DIRECT_URL="postgres://prisma.qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
