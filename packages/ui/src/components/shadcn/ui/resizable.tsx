@@ -3,6 +3,7 @@
 import { GripVertical } from 'lucide-react'
 import * as ResizablePrimitive from 'react-resizable-panels'
 
+import { ImperativePanelHandle } from 'react-resizable-panels'
 import { cn } from '../../../lib/utils/cn'
 
 const ResizablePanelGroup = ({
@@ -51,4 +52,4 @@ const ResizableHandle = ({
   </ResizablePrimitive.PanelResizeHandle>
 )
 
-export { ResizablePanelGroup, ResizablePanel, ResizableHandle }
+export { ResizableHandle, ResizablePanel, ResizablePanelGroup, type ImperativePanelHandle }

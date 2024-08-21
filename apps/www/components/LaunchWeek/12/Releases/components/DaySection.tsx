@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRightIcon } from '@heroicons/react/outline'
-import { cn } from 'ui'
+import { cn, Skeleton } from 'ui'
 import { Edit } from 'lucide-react'
 import { useBreakpoint } from 'common'
 
@@ -14,19 +14,11 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
   const isMobile = useBreakpoint(639)
   const cssGroup = 'group/d' + day.d
 
-  const [isMounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!isMounted) return null
-
   return (
     <section
       id={day.id}
       className={cn(
-        'lwx-nav-anchor border-b py-8 first:border-t dark:border-[#111718] text-foreground dark:text-[#575E61] scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3',
+        'lw-nav-anchor border-b py-8 first:border-t border-muted dark:border-muted/50 text-foreground scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-3',
         className
       )}
     >
@@ -55,20 +47,20 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
       </div>
 
       {/* Day card */}
-      <div className="flex col-span-2">
+      <div className="flex md:col-span-3 xl:col-span-2">
         {day.shipped && day.steps.length > 0 ? (
           <Link
             href={day.blog!}
             className={cn(
               `
-              dark:bg-[#111415] hover:dark:bg-[#121516] sm:!bg-transparent
+              bg-default sm:!bg-transparent
               min-h-[210px] group sm:aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
               hover:border-strong transition-colors border border-muted
               rounded-xl text-2xl bg-contain shadow-lg`,
               cssGroup
             )}
           >
-            <div className="relative text-foreground-light p-4 sm:p-6 md:p-8 z-20 flex-grow flex flex-col items-start justify-between gap-2 w-full lg:w-1/2 text-left">
+            <div className="relative text-foreground-light p-4 sm:px-6 md:py-6 md:px-8 z-20 flex-grow flex flex-col items-start justify-between gap-2 w-full lg:w-1/2 text-left">
               <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 !ease-[.24,0,.22,.99] duration-200 group-hover:-translate-x-6 transition-transform">
                 <Edit className="w-4 min-w-4 group-hover:opacity-0 transition-opacity" />
                 <span>Blog post</span>
@@ -80,9 +72,9 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
             </div>
             <div className="relative z-10 border-b border-muted/40 sm:border-none w-full order-first aspect-[2/1] sm:aspect-auto sm:absolute sm:inset-0">
               {day.steps[0]?.bg_layers &&
-                day.steps[0]?.bg_layers?.map(
-                  (layer, i) =>
-                    !!layer.img && (
+                day.steps[0]?.bg_layers?.map((layer, i) => (
+                  <>
+                    {!!layer.img && (
                       <div
                         key={`${day.title}-image-${i}`}
                         className="absolute sm:opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
@@ -90,7 +82,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                         <Image
                           src={!!layer.mobileImg && isMobile ? layer.mobileImg : layer.img}
                           className={`
-                            absolute md:opacity-50 lg:opacity-100 object-cover
+                            hidden dark:block absolute md:opacity-50 lg:opacity-100 object-cover
                             w-full h-full z-0 transition-all duration-300
                             object-center sm:object-right
                           `}
@@ -100,15 +92,39 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                           alt={day.title}
                         />
                       </div>
-                    )
-                )}
+                    )}
+                    {!!layer.imgLight && (
+                      <div
+                        key={`${day.title}-image-${i}`}
+                        className="absolute sm:opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                      >
+                        <Image
+                          src={
+                            !!layer.mobileImgLight && isMobile
+                              ? layer.mobileImgLight
+                              : layer.imgLight
+                          }
+                          className={`
+                            dark:hidden absolute md:opacity-50 lg:opacity-100 object-cover
+                            w-full h-full z-0 transition-all duration-300
+                            object-center sm:object-right
+                          `}
+                          fill
+                          sizes="100%"
+                          quality={100}
+                          alt={day.title}
+                        />
+                      </div>
+                    )}
+                  </>
+                ))}
             </div>
           </Link>
         ) : (
           <div
             className={cn(
-              `min-h-[210px] group aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-end
-              bg-surface-100/10 border border-dashed border-strong dark:border-[#14191B] dark:text-[#8B9092]
+              `min-h-[210px] group aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
+              bg-default border border-dashed border-strong dark:border-background-surface-300
               rounded-xl p-4 sm:p-6 md:p-8 text-2xl bg-contain`,
               cssGroup
             )}
@@ -131,6 +147,9 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                 </g>
               </svg>
               {day.hasCountdown && <CountdownComponent date={day.published_at} showCard={false} />}
+            </div>
+            <div>
+              <Skeleton className="w-full h-3 max-w-xs rounded-full will-change-contents" />
             </div>
           </div>
         )}

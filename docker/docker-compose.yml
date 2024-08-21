@@ -77,7 +77,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.151.0
+    image: supabase/gotrue:v2.158.1
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -292,7 +292,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.55.0
+    image: supabase/edge-runtime:v1.56.0
     restart: unless-stopped
     depends_on:
       analytics:

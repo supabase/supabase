@@ -9,6 +9,7 @@ import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constant
 export type LogDrainCreateVariables = {
   projectRef: string
   name: string
+  description: string
   config: Record<string, never>
   type: LogDrainType
 }
@@ -18,6 +19,7 @@ export async function createLogDrain(payload: LogDrainCreateVariables) {
     params: { path: { ref: payload.projectRef } },
     body: {
       name: payload.name,
+      description: payload.description,
       type: payload.type,
       config: payload.config,
     },

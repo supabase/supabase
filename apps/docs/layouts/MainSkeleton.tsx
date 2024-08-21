@@ -13,9 +13,6 @@ import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
-const NavigationMenu = dynamic(
-  () => import('~/components/Navigation/NavigationMenu/NavigationMenu')
-)
 
 const levelsData = {
   home: {

@@ -1,0 +1,12 @@
+Supabase Auth can throw or return various errors when using the API. All errors originating from the `supabase.auth` namespace of the client library will be wrapped by the `AuthException` class.
+
+Error objects are split in a few classes. `AuthApiException` is an exception which originates from the Supabase Auth API.
+
+Errors originating from the server API classed as `AuthApiException` always have a `code` property that can be used to identify the error returned by the server. The `statusCode` property is also present, encoding the HTTP status code received in the response.
+
+<AuthErrorCodesTable />
+
+### Tips for better error handling
+
+- Do not use string matching on error messages! Always use the error classes and `code` properties of error objects to identify the situation.
+- Although HTTP status codes generally don't change, they can suddenly change due to bugs, so avoid relying on them unless absolutely necessary.

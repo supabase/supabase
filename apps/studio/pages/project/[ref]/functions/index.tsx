@@ -17,7 +17,7 @@ import {
   FunctionsEmptyState,
   TerminalInstructions,
 } from 'components/interfaces/Functions'
-import FunctionsLayout from 'components/layouts/FunctionsLayout'
+import FunctionsLayout from 'components/layouts/FunctionsLayout/FunctionsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
