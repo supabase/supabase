@@ -8,7 +8,7 @@ The pre-configured Supabase Grafana Dashboard is a more advanced version of the 
 
 ![Supabase Grafana](/docs/img/guides/platform/supabase-grafana-prometheus.png)
 
-## Installing locally
+## Deploying locally
 
 Prerequisites:
 
@@ -123,6 +123,65 @@ Supabase Grafana can only record metrics when active. When monitoring for histor
             <StepHikeCompact.Code>
                 ![Grafana login](/docs/img/guides/platform/grafana-login.png)
             </StepHikeCompact.Code>
+    </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+## Deploying to Grafana cloud
+
+<StepHikeCompact>
+
+    <StepHikeCompact.Step step={1}>
+
+        <StepHikeCompact.Details title="Create a free Grafana Cloud account" >
+        Go to Grafana\'s [registration form](https://grafana.com/auth/sign-up/create-user?pg=login) and create an account
+        </StepHikeCompact.Details>
+            <StepHikeCompact.Code>
+                ![Grafana Registration Page](/docs/img/guides/platform/grafana-registration.png)
+            </StepHikeCompact.Code>
+    </StepHikeCompact.Step>
+
+
+    <StepHikeCompact.Step step={2} >
+
+    <StepHikeCompact.Details title="Give a name to your Grafana project">
+    Grafana will prompt you to create a stack. Give it a name and continue.
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+    ![Create Grafana Stack](/docs/img/guides/platform/create-grafana-stack.png)
+    </StepHikeCompact.Code>
+
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={3} >
+
+    <StepHikeCompact.Details title="Create a new Grafana Dashboard">
+        Create a new Dashboard
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+        ![Select Grafana Dashboard](/docs/img/guides/platform/select-grafana-dashboard.png)
+    </StepHikeCompact.Code>
+
+
+    </StepHikeCompact.Step>
+    <StepHikeCompact.Step step={4} >
+    <StepHikeCompact.Details title="Search for the Supabase template" />
+
+        <StepHikeCompact.Code>
+            ![Select Grafana Dashboard](/docs/img/guides/platform/supabase-grafana-template.png)
+        </StepHikeCompact.Code>
+
+
+    </StepHikeCompact.Step>
+
+        <StepHikeCompact.Step step={5} >
+    <StepHikeCompact.Details title="Add your credentials and deploy">
+        Add your service_role key from the [API Settings](https://supabase.com/dashboard/project/_/settings/api) and Reference ID from the [General Settings](https://supabase.com/dashboard/project/_/settings/general) to your Grafana credentials. Then install your dashboard.
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+        ![Add credentials](/docs/img/guides/platform/add-credentials-grafana.png)
+    </StepHikeCompact.Code>
+
     </StepHikeCompact.Step>
 
 </StepHikeCompact>
