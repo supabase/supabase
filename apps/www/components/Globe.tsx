@@ -56,7 +56,7 @@ const Globe = () => {
         state.height = width * 2
       },
     })
-    setTimeout(() => (canvasRef.current.style.opacity = '1'), 10)
+    setTimeout(() => (canvasRef.current.style.opacity = '0.8'), 10)
     return () => {
       window.removeEventListener('resize', onResize)
       cobe.destroy()
