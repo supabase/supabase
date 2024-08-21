@@ -11,8 +11,6 @@ import MenuItem from './MenuItem'
 import ComparisonsData from 'data/Comparisons'
 import CustomersData from 'data/CustomerStories'
 import SolutionsData from 'data/Solutions'
-import EventCallout from '../EventCallout'
-import Panel from '../Panel'
 
 const ProductDropdown = () => {
   const { basePath } = useRouter()
@@ -85,11 +83,6 @@ const ProductDropdown = () => {
                 </li>
               ))}
             </ul>
-          </div>
-          <div>
-            <Panel outerClassName="rounded-md" innerClassName="bg-surface-100 rounded-md">
-              <EventCallout className="px-4 py-2" />
-            </Panel>
           </div>
         </div>
       </div>
