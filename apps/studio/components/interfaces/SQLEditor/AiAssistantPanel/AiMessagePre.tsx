@@ -61,7 +61,7 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
         hideCopy
         hideLineNumbers
       />
-      <div className="absolute top-5 right-2 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
+      <div className="absolute top-2 right-2 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
         <Tooltip_Shadcn_>
           <TooltipTrigger_Shadcn_ asChild>
             <Button

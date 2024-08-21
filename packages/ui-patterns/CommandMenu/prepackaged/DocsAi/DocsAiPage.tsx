@@ -55,11 +55,6 @@ const DocsAiPage = () => {
     setIsLoading,
   })
 
-  useHistoryKeys({
-    enable: !isResponding,
-    stack: messages.filter(({ role }) => role === MessageRole.User).map(({ content }) => content),
-  })
-
   const handleSubmit = useCallback(
     (message: string) => {
       setQuery('')
@@ -73,12 +68,6 @@ const DocsAiPage = () => {
     reset()
   }, [reset])
 
-  useEffect(() => {
-    if (query) {
-      handleSubmit(query)
-    }
-  }, [])
-
   return (
     <CommandWrapper
       className={cn(
@@ -91,7 +80,8 @@ const DocsAiPage = () => {
         <Breadcrumb />
         {isBelowSm && (
           <PromptInput
-            submit={submit}
+            submit={handleSubmit}
+            reset={handleReset}
             messages={messages}
             isLoading={isLoading}
             isResponding={isResponding}
@@ -105,7 +95,8 @@ const DocsAiPage = () => {
       </div>
       {!isBelowSm && (
         <PromptInput
-          submit={submit}
+          submit={handleSubmit}
+          reset={handleReset}
           messages={messages}
           isLoading={isLoading}
           isResponding={isResponding}
@@ -120,37 +111,31 @@ const DocsAiPage = () => {
 
 function PromptInput({
   submit,
+  reset,
   messages,
   isLoading,
   isResponding,
   className,
 }: {
-  submit: (query: string) => Promise<void>
+  submit: (query: string) => void
+  reset: () => void
   messages: Array<Message>
   isLoading: boolean
   isResponding: boolean
   className?: string
 }) {
   const query = useQuery()
-  const setQuery = useSetQuery()
 
   useHistoryKeys({
     enable: !isResponding,
     stack: messages.filter(({ role }) => role === MessageRole.User).map(({ content }) => content),
   })
 
-  const handleSubmit = useCallback(
-    (message: string) => {
-      setQuery('')
-      submit(message)
-    },
-    [submit]
-  )
-
   useEffect(() => {
     if (query) {
-      handleSubmit(query)
+      submit(query)
     }
+    return reset
   }, [])
 
   // Detect an IME composition (so that we can ignore Enter keypress)
@@ -181,7 +166,7 @@ function PromptInput({
             if (!query || isLoading || isResponding || isImeComposing) {
               return
             }
-            return handleSubmit(query)
+            return submit(query)
           default:
             return
         }

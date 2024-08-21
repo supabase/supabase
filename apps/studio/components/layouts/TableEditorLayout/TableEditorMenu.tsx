@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -13,8 +12,10 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useTableQuery } from 'data/tables/table-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -38,12 +39,11 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-import { useTableQuery } from 'data/tables/table-query'
 
 const TableEditorMenu = () => {
-  const router = useRouter()
   const { id } = useParams()
   const snap = useTableEditorStateSnapshot()
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
@@ -67,7 +67,7 @@ const TableEditorMenu = () => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
+      schema: selectedSchema,
       search: searchText.trim() || undefined,
       sort,
       filterTypes: visibleTypes,
@@ -87,7 +87,7 @@ const TableEditorMenu = () => {
     connectionString: project?.connectionString,
   })
 
-  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
+  const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const [protectedSchemas] = partition(
@@ -108,7 +108,7 @@ const TableEditorMenu = () => {
 
   useEffect(() => {
     if (selectedTable) {
-      snap.setSelectedSchemaName(selectedTable.schema)
+      setSelectedSchema(selectedTable.schema)
     }
   }, [selectedTable])
 
@@ -121,11 +121,10 @@ const TableEditorMenu = () => {
         <div className="flex flex-col gap-y-1.5">
           <SchemaSelector
             className="mx-4"
-            selectedSchemaName={snap.selectedSchemaName}
+            selectedSchemaName={selectedSchema}
             onSelectSchema={(name: string) => {
               setSearchText('')
-              snap.setSelectedSchemaName(name)
-              router.push(`/project/${project?.ref}/editor`)
+              setSelectedSchema(name)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
           />

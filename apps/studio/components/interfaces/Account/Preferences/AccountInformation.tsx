@@ -1,19 +1,17 @@
-import {
-  Button,
-  Input,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  IconChevronDown,
-} from 'ui'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 
 import Panel from 'components/ui/Panel'
-import { useSession } from 'lib/auth'
 import type { Profile } from 'data/profile/types'
-import { ChevronDown } from 'lucide-react'
+import { useSession } from 'lib/auth'
+import {
+  Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
+  Input_Shadcn_,
+  Label_Shadcn_,
+} from 'ui'
 
 const AccountInformation = ({ profile }: { profile?: Profile }) => {
   const session = useSession()

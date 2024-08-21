@@ -15,7 +15,10 @@ import { useOrganizationRolesV2Query } from 'data/organization-members/organizat
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import {
+  useHasAccessToProjectLevelPermissions,
+  useOrgSubscriptionQuery,
+} from 'data/subscriptions/org-subscription-query'
 import {
   doPermissionsCheck,
   useCheckPermissions,
@@ -58,7 +61,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
-import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
@@ -72,9 +74,8 @@ export const InviteMemberButton = () => {
   const { data: projects } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
-  const orgScopedRoles = (allRoles?.org_scoped_roles ?? []).sort(
-    (a, b) => b.base_role_id - a.base_role_id
-  )
+  const orgScopedRoles = allRoles?.org_scoped_roles ?? []
+
   const orgProjects = (projects ?? [])
     .filter((project) => project.organization_id === organization?.id)
     .sort((a, b) => a.name.localeCompare(b.name))
@@ -87,8 +88,7 @@ export const InviteMemberButton = () => {
     { enabled: canReadSubscriptions }
   )
   const currentPlan = subscription?.plan
-  const isOptedIntoProjectLevelPermissions =
-    useIsOptedIntoProjectLevelPermissions(slug as string) && currentPlan?.id === 'enterprise'
+  const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
   const hasOrgRole =
@@ -149,7 +149,7 @@ export const InviteMemberButton = () => {
       }
     }
 
-    if (isOptedIntoProjectLevelPermissions) {
+    if (hasAccessToProjectLevelPermissions) {
       inviteMember(
         {
           slug,
@@ -247,7 +247,7 @@ export const InviteMemberButton = () => {
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              {isOptedIntoProjectLevelPermissions && (
+              {hasAccessToProjectLevelPermissions && (
                 <FormField_Shadcn_
                   name="applyToOrg"
                   control={form.control}

@@ -337,14 +337,6 @@ begin
 end;
 $$ language plpgsql;
 
-grant execute
-  on function public.send_sms
-  to supabase_auth_admin;
-
-revoke execute
-  on function public.send_sms
-  from authenticated, anon;
-
 grant all
   on table public.job_queue
   to supabase_auth_admin;

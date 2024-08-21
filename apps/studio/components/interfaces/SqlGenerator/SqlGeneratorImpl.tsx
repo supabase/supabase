@@ -3,8 +3,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useEffectOnce } from 'react-use'
 import { format } from 'sql-formatter'
 
+import { IS_PLATFORM } from 'common'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useAllowSendAiSchema } from 'hooks/misc/useAllowSendAiSchema'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -17,10 +19,10 @@ import {
   Input_Shadcn_,
   Modal,
   StatusIcon,
-  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
   cn,
 } from 'ui'
 import {
@@ -43,14 +45,17 @@ import { SAMPLE_QUERIES, generatePrompt } from './SqlGenerator.utils'
 import { SQLOutputActions } from './SqlOutputActions'
 
 function useSchemaMetadataForAi() {
-  const allowed = useAllowSendAiSchema()
+  const isOptedInToAI = useOrgOptedIntoAi()
   const project = useSelectedProject()
 
-  const includeMetadata = allowed && !!project
+  const [schemas] = useSchemasForAi(project?.ref!)
+  const includeMetadata = (isOptedInToAI || !IS_PLATFORM) && schemas.length > 0 && !!project
+
   const metadataSkipReason: AiMetadataSkipReason = !project ? 'no_project' : 'forbidden'
 
   const { data } = useEntityDefinitionsQuery(
     {
+      schemas: schemas,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },

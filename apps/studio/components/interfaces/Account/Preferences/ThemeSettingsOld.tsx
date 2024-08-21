@@ -1,8 +1,9 @@
+import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { IconMoon, IconSun, Listbox, Theme, themes } from 'ui'
+import { useEffect, useState } from 'react'
 
 import Panel from 'components/ui/Panel'
-import { useEffect, useState } from 'react'
+import { Listbox, Theme, themes } from 'ui'
 
 const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
@@ -30,7 +31,7 @@ const ThemeSettings = () => {
           descriptionText="Choose a theme preference"
           layout="horizontal"
           style={{ width: '50%' }}
-          icon={resolvedTheme === 'dark' ? <IconMoon /> : <IconSun />}
+          icon={resolvedTheme === 'dark' ? <Moon /> : <Sun />}
           onChange={(value: string) => setTheme(value)}
         >
           {themes

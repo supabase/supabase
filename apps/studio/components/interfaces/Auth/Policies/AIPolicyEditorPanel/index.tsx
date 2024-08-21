@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
-import { useParams, useTelemetryProps } from 'common'
+import { IS_PLATFORM, useParams, useTelemetryProps } from 'common'
 import { isEqual, uniqBy } from 'lodash'
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -28,19 +28,23 @@ import {
 import * as z from 'zod'
 
 import { Monaco } from '@monaco-editor/react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import {
   IStandaloneCodeEditor,
   IStandaloneDiffEditor,
 } from 'components/interfaces/SQLEditor/SQLEditor.types'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
@@ -62,9 +66,6 @@ import { PolicyDetailsV2 } from './PolicyDetailsV2'
 import { PolicyTemplates } from './PolicyTemplates'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -107,7 +108,7 @@ export const AIPolicyEditorPanel = memo(function ({
   const [using, setUsing] = useState('')
   const [check, setCheck] = useState('')
   const [fieldError, setFieldError] = useState<string>()
-  const [showCheckBlock, setShowCheckBlock] = useState(false)
+  const [showCheckBlock, setShowCheckBlock] = useState(true)
 
   const monacoOneRef = useRef<Monaco | null>(null)
   const editorOneRef = useRef<IStandaloneCodeEditor | null>(null)
@@ -164,8 +165,10 @@ export const AIPolicyEditorPanel = memo(function ({
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
+  const [selectedSchemas] = useSchemasForAi(selectedProject?.ref!)
   const { data: entities } = useEntityDefinitionsQuery(
     {
+      schemas: selectedSchemas,
       projectRef: selectedProject?.ref,
       connectionString: selectedProject?.connectionString,
     },
@@ -185,7 +188,7 @@ export const AIPolicyEditorPanel = memo(function ({
     id: chatId,
     api: `${BASE_PATH}/api/ai/sql/suggest`,
     body: {
-      entityDefinitions: isOptedInToAI ? entityDefinitions : undefined,
+      entityDefinitions: isOptedInToAI || !IS_PLATFORM ? entityDefinitions : undefined,
       policyDefinition:
         selectedPolicy !== undefined ? generatePolicyDefinition(selectedPolicy) : undefined,
     },
@@ -546,7 +549,11 @@ export const AIPolicyEditorPanel = memo(function ({
                         form={form}
                         onUpdateCommand={(command: string) => {
                           setFieldError(undefined)
-                          if (!['update', 'all'].includes(command)) setShowCheckBlock(false)
+                          if (!['update', 'all'].includes(command)) {
+                            setShowCheckBlock(false)
+                          } else {
+                            setShowCheckBlock(true)
+                          }
                         }}
                         authContext={authContext}
                       />
@@ -624,7 +631,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         {showCheckBlock && (
                           <>
                             <div
-                              className={`mt-1 relative ${incomingChange ? 'hidden' : 'block'}`}
+                              className={`mt-1 min-h-[28px] relative ${incomingChange ? 'hidden' : 'block'}`}
                               style={{
                                 height:
                                   expTwoContentHeight <= 100
