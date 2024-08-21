@@ -163,7 +163,7 @@ val data = supabase.from("books").select {
 <TabPanel id="python" label="Python">
 
 ```python
-data = await supabase.from('books').select().eq('title', 'Harry').execute()
+data = supabase.from_('books').select().eq('title', 'Harry').execute()
 ```
 
 </TabPanel>
@@ -294,7 +294,7 @@ val data = supabase.from("books").select {
 <TabPanel id="python" label="Python">
 
 ```python
-data = await supabase.from_('books').select().text_search('description', "'big'").execute()
+data = supabase.from_('books').select().text_search('description', "'big'").execute()
 ```
 
 </TabPanel>
@@ -414,7 +414,7 @@ $$ language sql immutable;
 ```
 
 ```python
-data = await supabase.from_('books').select().text_search('title_description', "little").execute()
+data = supabase.from_('books').select().text_search('title_description', "little").execute()
 ```
 
 </TabPanel>
@@ -501,7 +501,7 @@ val data = supabase.from("books").select {
 <TabPanel id="python" label="Python">
 
 ```python
-data = await supabase.from_('books').select().text_search('description', "'little' & 'big'").execute()
+data = supabase.from_('books').select().text_search('description', "'little' & 'big'").execute()
 ```
 
 </TabPanel>
@@ -587,7 +587,7 @@ val data = supabase.from("books").select {
 <TabPanel id="python" label="Python">
 
 ```python
-response = await client.from_('books').select().text_search('description', "'little' | 'big'").execute()
+response = client.from_('books').select().text_search('description', "'little' | 'big'").execute()
 ```
 
 </TabPanel>
@@ -681,7 +681,7 @@ val result = supabase.postgrest.rpc("search_books_by_title_prefix", rpcParams)
 <TabPanel id="python" label="Python">
 
 ```python
-data = await client.rpc('search_books_by_title_prefix', { 'prefix': 'Lit' }).execute()
+data = client.rpc('search_books_by_title_prefix', { 'prefix': 'Lit' }).execute()
 ```
 
 </TabPanel>
@@ -814,7 +814,7 @@ val data = supabase.from("books").select {
 <TabPanel id="python" label="Python">
 
 ```python
-data = await client.from_('books').select().text_search('fts', "'little' & 'big'").execute()
+data = client.from_('books').select().text_search('fts', "'little' & 'big'").execute()
 ```
 
 </TabPanel>
@@ -905,7 +905,7 @@ val data = supabase.from("books").select {
 <TabPanel id="python" label="Python">
 
 ```python
-data = await client.from_('books').select().text_search('description', "'big' <-> 'dreams'").execute()
+data = client.from_('books').select().text_search('description', "'big' <-> 'dreams'").execute()
 ```
 
 </TabPanel>
@@ -977,7 +977,7 @@ val data = supabase.from("books").select {
 <TabPanel id="python" label="Python">
 
 ```python
-data = await client.from_('books').select().text_search('description', "'year' <2> 'school'").execute()
+data = client.from_('books').select().text_search('description', "'year' <2> 'school'").execute()
 ```
 
 </TabPanel>
@@ -1052,7 +1052,7 @@ val data = supabase.from("books").select {
 <TabPanel id="python" label="Python">
 
 ```python
-data = await client.from_('books').select().text_search('description', "'big' & !'little'").execute()
+data = client.from_('books').select().text_search('description', "'big' & !'little'").execute()
 ```
 
 </TabPanel>

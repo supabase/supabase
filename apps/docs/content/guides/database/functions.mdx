@@ -116,7 +116,7 @@ Reference: [rpc()](../../reference/kotlin/rpc)
 <TabPanel id="python" label="Python">
 
 ```python
-data = await supabase.rpc('hello_world').execute()
+data = supabase.rpc('hello_world').execute()
 ```
 
 Reference: [rpc()](../../reference/python/rpc)
@@ -256,7 +256,7 @@ val data = supabase.postgrest.rpc("get_planets") {
 <TabPanel id="python" label="Python">
 
 ```python
-data = await supabase.rpc('get_planets').eq('id', 1).execute()
+data = supabase.rpc('get_planets').eq('id', 1).execute()
 ```
 
 </TabPanel>
@@ -356,7 +356,7 @@ val data = supabase.postgrest.rpc(
 <TabPanel id="python" label="Python">
 
 ```python
-data = await supabase.rpc('add_planet', params={'name': 'Jakku'}).execute()
+data = supabase.rpc('add_planet', params={'name': 'Jakku'}).execute()
 ```
 
 </TabPanel>

@@ -255,7 +255,7 @@ try await supabase.from("movies")
 <TabPanel id="python" label="Python">
 
 ```python
-await client.from_("movies").insert([
+client.from_("movies").insert([
     {
         "name": "The Empire Strikes Back",
         "description": "After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda."

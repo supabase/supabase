@@ -86,7 +86,7 @@ supabase.auth.signInAnonymously()
 Call the [`sign_in_anonymously()`](/docs/reference/python/auth-signinanonymously) method:
 
 ```python
-response = await supabase.auth.sign_in_anonymously()
+response = supabase.auth.sign_in_anonymously()
 ```
 
 </TabPanel>
@@ -156,7 +156,7 @@ supabase.auth.modifyUser {
 You can use the [`update_user()`](/docs/reference/python/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
 
 ```python
-response = await supabase.auth.update_user({
+response = supabase.auth.update_user({
   'email': 'example@email.com',
 })
 
@@ -164,7 +164,7 @@ response = await supabase.auth.update_user({
 # or entering the 6-digit OTP sent to the email address
 
 # once the user has been verified, update the password
-response = await supabase.auth.update_user({
+response = supabase.auth.update_user({
   'password': 'password',
 })
 ```
@@ -222,7 +222,7 @@ supabase.auth.linkIdentity(Google)
 You can use the [`link_identity()`](/docs/reference/python/auth-linkidentity) method to link an oauth identity to the anonymous user.
 
 ```python
-response = await supabase.auth.link_identity({'provider': 'google'})
+response = supabase.auth.link_identity({'provider': 'google'})
 ```
 
 </TabPanel>

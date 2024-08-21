@@ -70,7 +70,7 @@ supabase.auth.linkIdentity(Google)
 Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`link_identity()`](/docs/reference/python/auth-linkidentity):
 
 ```python
-response = await supabase.auth.link_identity({'provider': 'google'})
+response = supabase.auth.link_identity({'provider': 'google'})
 ```
 
 </TabPanel>
@@ -160,14 +160,14 @@ You can use [`get_user_identities()`](/docs/reference/python/auth-getuseridentit
 
 ```python
 # retrieve all identities linked to a user
-response = await supabase.auth.get_user_identities()
+response = supabase.auth.get_user_identities()
 
 # find the google identity linked to the user
 google_identity = next((identity for identity in response.identities if identity.provider == 'google'), None)
 
 # unlink the google identity from the user
 if google_identity:
-    response = await supabase.auth.unlink_identity(google_identity.identity_id)
+    response = supabase.auth.unlink_identity(google_identity.identity_id)
 ```
 
 </TabPanel>

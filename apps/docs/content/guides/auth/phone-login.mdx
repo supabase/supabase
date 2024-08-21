@@ -68,7 +68,7 @@ supabase.auth.signInWith(OTP) {
 <TabPanel id="python" label="Python">
 
 ```python
-response = await supabase.auth.sign_in_with_otp({
+response = supabase.auth.sign_in_with_otp({
   'phone': '+13334445555',
 })
 ```
@@ -148,7 +148,7 @@ supabase.auth.verifyPhoneOtp(
 You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verify_otp`:
 
 ```python
-response = await supabase.auth.verify_otp({
+response = supabase.auth.verify_otp({
   'phone': '13334445555',
   'token': '123456',
   'type': 'sms',
@@ -219,7 +219,7 @@ try await supabase.auth.updateUser(
 <TabPanel id="python" label="Python">
 
 ```python
-response = await supabase.auth.update_user({
+response = supabase.auth.update_user({
   'phone': '123456789',
 })
 ```

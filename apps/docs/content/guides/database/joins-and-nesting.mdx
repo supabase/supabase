@@ -168,7 +168,7 @@ val data = supabase.from("countries").select(Columns.raw("id, name, cities(id, n
 <TabPanel id="python" label="Python">
 
 ```python
-data = await supabase.from_('countries').select('id, name, cities(id, name)').execute()
+data = supabase.from_('countries').select('id, name, cities(id, name)').execute()
 ```
 
 </TabPanel>
@@ -294,7 +294,7 @@ val data = supabase.from("teams").select(Columns.raw("id, team_name, users(id, n
 <TabPanel id="python" label="Python">
 
 ```python
-data = await supabase.from_('teams').select('id, team_name, users(id, name)').execute()
+data = supabase.from_('teams').select('id, team_name, users(id, name)').execute()
 ```
 
 </TabPanel>
@@ -489,7 +489,7 @@ scans:scan_id_end (
 <TabPanel id="python" label="Python">
 
 ```python
-data = await supabase.from_('shifts').select("""
+data = supabase.from_('shifts').select("""
   *,
   scans:scan_id_start (
     id,

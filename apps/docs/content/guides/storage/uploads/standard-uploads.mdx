@@ -88,7 +88,7 @@ suspend fun uploadFile(file: File) {
 <TabPanel id="python" label="Python">
 
 ```python
-response = await supabase.storage.from_('bucket_name').upload('file_path', file)
+response = supabase.storage.from_('bucket_name').upload('file_path', file)
 ```
 
 </TabPanel>
@@ -151,7 +151,7 @@ try await supabase.storage.from("bucket_name")
 <TabPanel id="python" label="Python">
 
 ```python
-response = await supabase.storage.from_('bucket_name').upload('file_path', file, {
+response = supabase.storage.from_('bucket_name').upload('file_path', file, {
   'upsert': 'true',
 })
 ```
@@ -218,7 +218,7 @@ try await supabase.storage.from("bucket_name")
 <TabPanel id="python" label="Python">
 
 ```python
-response = await supabase.storage.from_('bucket_name').upload('file_path', file, {
+response = supabase.storage.from_('bucket_name').upload('file_path', file, {
   'content-type': 'image/jpeg',
 })
 ```

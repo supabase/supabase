@@ -102,7 +102,7 @@ try await supabase
 Insert a record from the Python client:
 
 ```python
-await supabase.from_('arraytest').insert(
+supabase.from_('arraytest').insert(
   [
     {
       id: 2,

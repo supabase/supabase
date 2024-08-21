@@ -329,7 +329,7 @@ val data = supabase.from("books").insert(listOf(
 <TabPanel id="python" label="Python">
 
 ```python
-await supabase.from_('books').insert([
+supabase.from_('books').insert([
   {
     'title': 'The Poky Little Puppy',
     'author': 'Janette Sebring Lowrey',
@@ -455,7 +455,7 @@ val data = supabase.from("books").select(Columns.raw("""
 <TabPanel id="python" label="Python">
 
 ```python
-data = await supabase.from_('books').select("""
+data = supabase.from_('books').select("""
   title,
   description: metadata->description,
   price: metadata->price,

@@ -78,7 +78,7 @@ try await supabase.storage.createBucket(
 <TabPanel id="python" label="Python">
 
 ```python
-await supabase.storage.create_bucket(
+supabase.storage.create_bucket(
   'avatars',
   options={"public": True}
 )
