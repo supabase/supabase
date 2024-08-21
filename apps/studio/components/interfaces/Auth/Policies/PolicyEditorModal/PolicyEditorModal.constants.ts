@@ -172,6 +172,24 @@ for select using (
     command: 'SELECT',
     roles: [],
   },
+  {
+    id: 'policy-9',
+    preview: false,
+    templateName: 'Enable users to view their own data only',
+    description:
+      'This policy grants read access (SELECT) to users so they can only view rows where the "user_id" or "created_by" column matches their own user ID.',
+    statement: 
+create policy "Enable users to view their own data only"
+on "${schema}"."${table}"
+for select
+to authenticated
+using (auth.uid() = user_id OR auth.uid() = created_by);.trim(),
+    name: 'Enable users to view their own data only',
+    definition: 'auth.uid() = user_id OR auth.uid() = created_by',
+    check: '',
+    command: 'SELECT',
+    roles: ['authenticated'],
+  },
 ]
 
 export const getRealtimePolicyTemplates = (): PolicyTemplate[] => {
