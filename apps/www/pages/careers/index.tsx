@@ -139,7 +139,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
 
           <div className="py-[1.25px] bg-gradient-to-r from-background via-border to-background">
             <div className="bg-alternative overflow-clip">
-              <SectionContainer className="!py-0 !pb-16 md:!pt-16 md:grid md:h-[500px] grid-cols-1 md:grid-cols-5 md:gap-8">
+              <SectionContainer className="md:!pt-16 md:grid md:h-[500px] grid-cols-1 md:grid-cols-5 md:gap-8">
                 <div
                   className="
                     relative md:col-span-2 aspect-square
@@ -169,7 +169,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                 </div>
               </SectionContainer>
 
-              <SectionContainer className="-mt-16 md:mt-0">
+              <SectionContainer className="-mt-16 md:mt-16">
                 <div className="md:flex md:gap-6">
                   <div className="md:w-1/2">
                     <div>
