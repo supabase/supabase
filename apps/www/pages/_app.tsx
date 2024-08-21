@@ -104,7 +104,7 @@ export default function App({ Component, pageProps }: AppProps) {
           site_name: 'Supabase',
           images: [
             {
-              url: `https://supabase.com${basePath}/images/og/og-image-v2.jpg`,
+              url: `https://supabase.com${basePath}/images/og/supabase-og.png`,
               width: 800,
               height: 600,
               alt: 'Supabase Og Image',
