@@ -8,7 +8,6 @@ import { Badge, Button, IconCheck, Separator, buttonVariants, cn } from 'ui'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { useTheme } from 'next-themes'
 import career from '~/data/career.json'
 import Styles from './career.module.css'
 import { GlobeAltIcon } from '@heroicons/react/outline'
@@ -44,9 +43,9 @@ export async function getStaticProps() {
       html_url: 'https://twitter.com/XquisiteDreamer',
     },
     {
-      login: 'marijanasimag',
+      login: 'marijanapav',
       avatar_url: 'https://avatars.githubusercontent.com/u/46031252?v=4',
-      html_url: 'https://github.com/marijanasimag',
+      html_url: 'https://github.com/marijanapav',
     },
     {
       login: 'lyqht',
@@ -77,7 +76,6 @@ export async function getStaticProps() {
 }
 
 const CareerPage: NextPage = ({ jobs, contributors }: any) => {
-  const { resolvedTheme } = useTheme()
   const { basePath } = useRouter()
 
   const meta_title = 'Careers | Supabase'
@@ -185,11 +183,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         <Image
                           src="/images/career/1.jpg"
                           alt="team photo"
-                          layout="fill"
-                          objectFit="cover"
+                          fill
+                          sizes="(min-width: 767px) 45vw, 100vw"
                           placeholder="blur"
                           blurDataURL="/images/blur.png"
-                          className="rounded-md"
+                          className="rounded-md object-cover"
+                          draggable={false}
                         />
                       </div>
                     </div>
@@ -199,11 +198,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           <Image
                             src="/images/career/2.jpg"
                             alt="team photo"
-                            layout="fill"
-                            objectFit="cover"
+                            fill
+                            sizes="(min-width: 767px) 45vw, 100vw"
                             placeholder="blur"
                             blurDataURL="/images/blur.png"
-                            className="rounded-md"
+                            className="rounded-md object-cover"
+                            draggable={false}
                           />
                         </div>
                       </div>
@@ -215,11 +215,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         <Image
                           src="/images/career/3.jpg"
                           alt="team photo"
-                          layout="fill"
-                          objectFit="cover"
+                          fill
+                          sizes="(min-width: 767px) 45vw, 100vw"
                           placeholder="blur"
                           blurDataURL="/images/blur.png"
-                          className="rounded-md"
+                          className="rounded-md object-cover"
+                          draggable={false}
                         />
                       </div>
                     </div>
@@ -229,11 +230,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           <Image
                             src="/images/career/4.jpg"
                             alt="team photo"
-                            layout="fill"
-                            objectFit="cover"
+                            fill
+                            sizes="(min-width: 767px) 45vw, 100vw"
                             placeholder="blur"
                             blurDataURL="/images/blur.png"
-                            className="rounded-md"
+                            className="rounded-md object-cover"
+                            draggable={false}
                           />
                         </div>
                       </div>
@@ -242,11 +244,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           <Image
                             src="/images/career/5.jpg"
                             alt="team photo"
-                            layout="fill"
-                            objectFit="cover"
+                            fill
+                            sizes="(min-width: 767px) 45vw, 100vw"
                             placeholder="blur"
                             blurDataURL="/images/blur.png"
-                            className="rounded-md"
+                            className="rounded-md object-cover"
+                            draggable={false}
                           />
                         </div>
                       </div>
@@ -256,11 +259,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         <Image
                           src="/images/career/6.jpg"
                           alt="team photo"
-                          layout="fill"
-                          objectFit="cover"
+                          fill
+                          sizes="(min-width: 767px) 45vw, 100vw"
                           placeholder="blur"
                           blurDataURL="/images/blur.png"
-                          className="rounded-md"
+                          className="rounded-md object-cover"
+                          draggable={false}
                         />
                       </div>
                     </div>
@@ -320,9 +324,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                             <Image
                               src={contributor.avatar_url}
                               alt={`${contributor.login} github avatar`}
-                              className="rounded-full"
-                              layout="fill"
-                              objectFit="cover"
+                              fill
+                              sizes="(min-width: 767px) 45vw, 100vw"
+                              placeholder="blur"
+                              blurDataURL="/images/blur.png"
+                              className="rounded-full object-cover"
+                              draggable={false}
                             />
                           </div>
                         </Link>
