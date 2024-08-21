@@ -31,7 +31,6 @@ const useDocsAiCommands = ({
           setCommandPage(DOCS_AI_COMMANDS.PAGE_NAME, true)
         },
         icon: () => <AiIconAnimation />,
-        className: 'text-brand',
       },
     ].map(modify),
     options

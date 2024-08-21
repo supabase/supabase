@@ -32,7 +32,7 @@ const UserListItem = ({
 
   return (
     <Table.tr className="relative" key={user.id}>
-      <Table.td className="whitespace-nowrap">
+      <Table.td className="whitespace-nowrap max-w-xs truncate" title={getDisplayName(user)}>
         <span className="text-foreground">{getDisplayName(user)}</span>
       </Table.td>
       <Table.td className="whitespace-nowrap">

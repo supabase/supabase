@@ -19,6 +19,7 @@ import {
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
+import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
@@ -63,28 +64,32 @@ const RowEditor = ({
     connectionString: project?.connectionString,
     schema: selectedTable.schema,
   })
-
+  const foreignKeys = formatForeignKeys(
+    (data ?? []).filter(
+      (fk) => fk.source_schema === selectedTable?.schema && fk.source_table === selectedTable?.name
+    )
+  )
   const foreignKey = useMemo(
     () =>
-      data && referenceRow?.foreignKey?.id
-        ? data.find((key) => key.id === referenceRow.foreignKey?.id)
+      foreignKeys && referenceRow?.foreignKey?.id
+        ? foreignKeys.find((key) => key.id === referenceRow.foreignKey?.id)
         : undefined,
-    [data, referenceRow?.foreignKey?.id]
+    [foreignKeys, referenceRow?.foreignKey?.id]
   )
 
   useEffect(() => {
     if (visible) {
       setErrors({})
-      const rowFields = generateRowFields(row, selectedTable)
+      const rowFields = generateRowFields(row, selectedTable, foreignKeys)
       setRowFields(rowFields)
     }
   }, [visible])
 
   const onUpdateField = (changes: Dictionary<any>) => {
-    const [name] = Object.keys(changes)
+    const updatedProperties = Object.keys(changes)
     const updatedFields = rowFields.map((field) => {
-      if (field.name === name) {
-        return { ...field, value: changes[name] }
+      if (updatedProperties.includes(field.name)) {
+        return { ...field, value: changes[field.name] }
       } else {
         return field
       }
@@ -98,10 +103,10 @@ const RowEditor = ({
     setReferenceRow(row)
   }
 
-  const onSelectForeignRowValue = (value: any) => {
-    if (!referenceRow) return
-
-    onUpdateField({ [referenceRow.name]: value })
+  const onSelectForeignRowValue = (value?: { [key: string]: any }) => {
+    if (referenceRow !== undefined && value !== undefined) {
+      onUpdateField(value)
+    }
 
     setIsSelectingForeignKey(false)
     setReferenceRow(undefined)

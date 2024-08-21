@@ -1,14 +1,14 @@
 ---
 id: 'firebase-auth'
-title: 'Firebase Auth Migration'
-description: 'Migrate Firebase auth users to a Supabase project.'
-sidebar_label: 'Firebase Auth'
+title: 'Migrate from Firebase Auth to Supabase'
+description: 'Migrate Firebase auth users to Supabase Auth.'
+subtitle: 'Migrate Firebase auth users to Supabase Auth.'
 ---
 
 Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth) to help migrate auth users from a Firebase project to a Supabase project. There are two parts to the migration process:
 
 - `firestoreusers2json` ([TypeScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/firestoreusers2json.ts), [JavaScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/firestoreusers2json.js)) exports users from an existing Firebase project to a `.json` file on your local system.
-- `import_users` ([TypeScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.ts), [JavaScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.js)) imports users from a saved `.json` file into your Supabase project (inserting those users into the `auth.users` table of your `PostgreSQL` database instance).
+- `import_users` ([TypeScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.ts), [JavaScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.js)) imports users from a saved `.json` file into your Supabase project (inserting those users into the `auth.users` table of your `Postgres` database instance).
 
 ## Set up the migration tool [#set-up-migration-tool]
 
@@ -69,7 +69,7 @@ hash_config {
 - `filename.json`: (optional) output filename (defaults to `./users.json`)
 - `batchSize`: (optional) number of users to fetch in each batch (defaults to 100)
 
-### Import JSON users file to Supabase Auth (PostgreSQL: auth.users) [#import-json-users-file]
+### Import JSON users file to Supabase Auth (Postgres: auth.users) [#import-json-users-file]
 
 `node import_users.js <path_to_json_file> [<batch_size>]`
 

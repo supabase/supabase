@@ -13,6 +13,7 @@ import { motion } from 'framer-motion'
 import styles from './customers.module.css'
 import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
+import WebinarAnnouncement from '~/components/Announcement/WebinarAnnouncement'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts({ directory: '_customers' })
@@ -85,6 +86,7 @@ function CustomerStoriesPage(props: any) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
               >
+                <WebinarAnnouncement />
                 <h1 className="text-foreground mb-3 text-3xl">Customer stories</h1>
                 <h2 className="text-foreground-light text-xl">
                   Discover case studies on how Supabase is being used around the world to quickly
