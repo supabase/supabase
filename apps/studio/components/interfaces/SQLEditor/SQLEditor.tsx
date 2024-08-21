@@ -414,7 +414,15 @@ const SQLEditor = () => {
         )
       }
     }
-  }, [debugSql, entityDefinitions, id, snap.results, snap.snippets])
+  }, [
+    debugSql,
+    entityDefinitions,
+    id,
+    snap.results,
+    snap.snippets,
+    snapV2.results,
+    snapV2.snippets,
+  ])
 
   const acceptAiHandler = useCallback(async () => {
     try {
