@@ -139,14 +139,14 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
 
           <div className="py-[1.25px] bg-gradient-to-r from-background via-border to-background">
             <div className="bg-alternative overflow-clip">
-              <SectionContainer className="md:!pt-16 md:grid md:h-[500px] grid-cols-1 md:grid-cols-5 md:gap-8">
+              <SectionContainer className="md:!pt-16 md:grid md:max-h-[500px] grid-cols-1 md:grid-cols-5 md:gap-8">
                 <div
                   className="
                     relative md:col-span-2 aspect-square
-                    w-[calc(100%+100px)] md:w-[calc(100%+330px)] xl:w-[calc(100%+200px)]
-                    -mb-[100px] md:mb-0
-                    -top-[100px] md:-top-[225px] xl:-top-[210px]
-                    -left-[100px] md:-left-[330px] xl:-left-[200px]
+                    w-[calc(100%+100px)] md:w-[calc(100%+450px)] xl:w-[calc(100%+200px)]
+                    -mb-[160px] md:mb-0
+                    -top-[160px] md:-top-[200px] xl:-top-[210px]
+                    -left-[100px] md:-left-[450px] xl:-left-[200px]
                   "
                 >
                   <Globe />

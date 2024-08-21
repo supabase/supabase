@@ -15,7 +15,7 @@ const Globe = () => {
   )
 
   useEffect(() => {
-    const debouncedResize = debounce(onResize, 100)
+    const debouncedResize = debounce(onResize, 10)
     window.addEventListener('resize', debouncedResize)
     onResize()
     const cobe = createGlobe(canvasRef.current, {
@@ -66,7 +66,7 @@ const Globe = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full opacity-0 rounded-full transition-opacity object-contain"
+      className="absolute inset-0 w-full h-full opacity-0 transition-opacity object-contain"
     />
   )
 }
