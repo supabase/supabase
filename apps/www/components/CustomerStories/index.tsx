@@ -54,7 +54,7 @@ const CustomerStories = () => {
           </Link>
         ))}
       </div>
-      <div className="mt-12">
+      <div className="mt-12 flex flex-col md:flex-row gap-8 justify-between">
         <TextLink url="/customers" label="Explore more" />
       </div>
     </SectionContainer>

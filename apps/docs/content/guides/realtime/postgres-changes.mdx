@@ -278,6 +278,18 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('schema-db-changes').on_postgres_changes(
+  "*",
+  schema="public",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
 </Tabs>
 
 The channel name can be any string except 'realtime'.
@@ -356,6 +368,18 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('schema-db-changes').on_postgres_changes(
+  "INSERT", # Listen only to INSERTs
+  schema="public",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -440,6 +464,18 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('schema-db-changes').on_postgres_changes(
+  "UPDATE", # Listen only to UPDATEs
+  schema="public",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
 </Tabs>
 
 The channel name can be any string except 'realtime'.
@@ -518,6 +554,18 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('schema-db-changes').on_postgres_changes(
+  "DELETE", # Listen only to DELETEs
+  schema="public",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -607,6 +655,19 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="todos",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
 </Tabs>
 
 The channel name can be any string except 'realtime'.
@@ -691,6 +752,23 @@ val userChanges = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "
     table = "users"
 }
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "*",
+  schema="public",
+  table="messages"
+  callback=lambda payload: print(payload)
+).on_postgres_changes(
+  "INSERT",
+  schema="public",
+  table="users",
+  callback=lambda payload: print(payload)
+).subscribe()
 ```
 
 </TabPanel>
@@ -782,6 +860,20 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "INSERT",
+  schema="public",
+  table="todos",
+  filter="id=eq.1",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -880,6 +972,20 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="messages",
+  filter="body=eq.hey",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
 </Tabs>
 
 This filter uses Postgres's `=` filter.
@@ -971,6 +1077,20 @@ changes
 
 supabase.realtime.connect()
 myChannel.join()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "INSERT",
+  schema="public",
+  table="messages",
+  filter="body=neq.bye",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -1067,6 +1187,20 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "INSERT",
+  schema="public",
+  table="profiles",
+  filter="age=lt.65",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
 </Tabs>
 
 This filter uses Postgres's `<` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
@@ -1157,6 +1291,20 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="profiles",
+  filter="age=lte.65",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -1253,6 +1401,20 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="products",
+  filter="quantity=gt.10",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
 </Tabs>
 
 This filter uses Postgres's `>` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
@@ -1346,6 +1508,20 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="products",
+  filter="quantity=gte.10",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
 </Tabs>
 
 This filter uses Postgres's `>=` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
@@ -1436,6 +1612,20 @@ changes
     .launchIn(yourCoroutineScope)
 
 myChannel.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="products",
+  filter="name=in.(red, blue, yellow)",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
 ```
 
 </TabPanel>
@@ -1588,6 +1778,22 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+supabase.realtime.set_auth('your-custom-jwt')
+
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="products",
+  filter="name=in.(red, blue, yellow)",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
 </Tabs>
 
 ### Refreshed tokens
@@ -1632,6 +1838,13 @@ In Kotlin, you have to update the token manually per channel:
 
 ```kotlin
 myChannel.updateAuth("fresh-token")
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+supabase.realtime.set_auth('fresh-token')
 ```
 
 </TabPanel>

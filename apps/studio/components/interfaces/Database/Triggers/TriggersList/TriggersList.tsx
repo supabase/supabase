@@ -14,6 +14,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import TriggerList from './TriggerList'
@@ -30,7 +31,7 @@ const TriggersList = ({
   deleteTrigger = noop,
 }: TriggersListProps) => {
   const { project } = useProjectContext()
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [filterString, setFilterString] = useState<string>('')
 
   const { data: schemas } = useSchemasQuery({

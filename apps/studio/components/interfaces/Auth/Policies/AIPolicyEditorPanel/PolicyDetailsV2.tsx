@@ -2,9 +2,11 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -60,6 +62,7 @@ export const PolicyDetailsV2 = ({
 }: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
   const [open, setOpen] = useState(false)
+  const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -112,6 +115,7 @@ export const PolicyDetailsV2 = ({
                 <FormControl_Shadcn_>
                   <Input_Shadcn_
                     {...field}
+                    disabled={!canUpdatePolicies}
                     className="bg-control border-control"
                     placeholder="Provide a name for your policy"
                   />
@@ -138,6 +142,7 @@ export const PolicyDetailsV2 = ({
                       <PopoverTrigger_Shadcn_ asChild>
                         <Button
                           type="default"
+                          disabled={!canUpdatePolicies}
                           className="w-full [&>span]:w-full h-[38px] text-sm"
                           iconRight={
                             <ChevronsUpDown
@@ -305,6 +310,7 @@ export const PolicyDetailsV2 = ({
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <MultiSelectV2
+                    disabled={!canUpdatePolicies}
                     options={formattedRoles}
                     value={field.value.length === 0 ? [] : field.value?.split(', ')}
                     placeholder="Defaults to all (public) roles if none selected"

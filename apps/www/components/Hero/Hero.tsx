@@ -26,7 +26,7 @@ const Hero = () => {
                       Build in a weekend
                     </span>
                     <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#3ECF8E] via-[#3ECF8E] to-[#3ecfb2] block md:ml-0">
-                      Scale to millions
+                      Scale to billions
                     </span>
                   </h1>
                   <p className="pt-2 text-foreground my-3 text-sm sm:mt-5 lg:mb-0 sm:text-base lg:text-lg">

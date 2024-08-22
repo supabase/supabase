@@ -57,6 +57,9 @@ After developing your project and deciding it's Production Ready, you should run
   - You can set up your own backup systems using tools like [pg_dump](https://www.postgresqltutorial.com/postgresql-backup-database/) or [wal-g](https://github.com/wal-g/wal-g).
   - Nightly backups for Pro Plan projects are available on the Supabase dashboard for up to 7 days.
   - Point in Time Recovery (PITR) allows a project to be backed up at much shorter intervals. This provides users an option to restore to any chosen point of up to seconds in granularity. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data. If a lower RPO is required, enable PITR.
+- Supabase Projects use disks that offer 99.8-99.9% durability by default.
+  - Use Read Replicas if you require availability resilience to a disk failure event
+  - Use PITR if you require durability resilience to a disk failure event
 - Upgrading to the Supabase Pro Plan will give you [access to our support team](https://supabase.com/dashboard/support/new).
 
 ## Rate limiting, resource allocation, & abuse prevention

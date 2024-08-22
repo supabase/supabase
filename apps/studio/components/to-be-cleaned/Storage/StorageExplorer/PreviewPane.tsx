@@ -23,6 +23,7 @@ import {
   IconX,
 } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
+import { useCopyUrl } from './useCopyUrl'
 
 const PreviewFile = ({ mimeType, previewUrl }: { mimeType?: string; previewUrl?: string }) => {
   if (!mimeType || !previewUrl) {
@@ -99,11 +100,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType?: string; previewUrl?:
   )
 }
 
-export interface PreviewPaneProps {
-  onCopyUrl: (name: string, url: string) => void
-}
-
-const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
+const PreviewPane = () => {
   const storageExplorerStore = useStorageStore()
   const {
     getFileUrl,
@@ -114,6 +111,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
     setSelectedItemsToDelete,
     setSelectedFileCustomExpiry,
   } = storageExplorerStore
+  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
 
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
@@ -208,7 +206,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                 <Button
                   type="outline"
                   icon={<IconClipboard size={16} strokeWidth={2} />}
-                  onClick={async () => onCopyUrl(file.name, await getFileUrl(file))}
+                  onClick={() => onCopyUrl(file.name, getFileUrl(file))}
                   disabled={file.isCorrupted}
                 >
                   Get URL
@@ -228,24 +226,24 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                   <DropdownMenuContent side="bottom" align="center">
                     <DropdownMenuItem
                       key="expires-one-week"
-                      onClick={async () =>
-                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
+                      onClick={() =>
+                        onCopyUrl(file.name, getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
                       }
                     >
                       Expire in 1 week
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       key="expires-one-month"
-                      onClick={async () =>
-                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
+                      onClick={() =>
+                        onCopyUrl(file.name, getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
                       }
                     >
                       Expire in 1 month
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       key="expires-one-year"
-                      onClick={async () =>
-                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
+                      onClick={() =>
+                        onCopyUrl(file.name, getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
                       }
                     >
                       Expire in 1 year

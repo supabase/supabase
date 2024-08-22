@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 
 import { useDispatch, useTrackedState } from 'components/grid/store/Store'
 import type { Filter, Sort, SupaTable } from 'components/grid/types'
+import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
@@ -21,19 +22,21 @@ import {
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  cn,
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
+import { Markdown } from 'components/interfaces/Markdown'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
 // exporting. Either that or export as multiple CSV sheets with max n rows each
-const MAX_EXPORT_ROW_COUNT = 500000
+export const MAX_EXPORT_ROW_COUNT = 500000
+export const MAX_EXPORT_ROW_COUNT_MESSAGE = `Sorry! We're unable to support exporting row counts larger than ${MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment. Alternatively, you may consider using [pg_dump](https://supabase.com/docs/reference/cli/supabase-db-dump) via our CLI instead.`
 
 export type HeaderProps = {
   table: SupaTable
@@ -288,9 +291,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     setIsExporting(true)
 
     if (allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
-      toast.error(
-        `Sorry! We're unable to support exporting of CSV for row counts larger than ${MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment.`
-      )
+      toast.error(<Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />)
       return setIsExporting(false)
     }
 
@@ -327,6 +328,35 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     setIsExporting(false)
   }
 
+  async function onRowsExportSQL() {
+    setIsExporting(true)
+
+    if (allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
+      toast.error(<Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />)
+      return setIsExporting(false)
+    }
+
+    if (!project) {
+      toast.error('Project is required')
+      return setIsExporting(false)
+    }
+
+    const rows = allRowsSelected
+      ? await fetchAllTableRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table,
+          filters,
+          sorts,
+          impersonatedRole: roleImpersonationState.role,
+        })
+      : allRows.filter((x) => selectedRows.has(x.idx))
+
+    const sqlStatements = formatTableRowsToSQL(table, rows)
+    const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
+    saveAs(sqlData, `${state.table!.name}_rows.sql`)
+    setIsExporting(false)
+  }
   function deselectRows() {
     dispatch({
       type: 'SELECTED_ROWS_CHANGE',
@@ -363,16 +393,26 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       </div>
       <div className="h-[20px] border-r border-strong" />
       <div className="flex items-center gap-2">
-        <Button
-          type="primary"
-          size="tiny"
-          icon={<Download />}
-          loading={isExporting}
-          disabled={isExporting}
-          onClick={onRowsExportCSV}
-        >
-          Export to CSV
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button
+              type="primary"
+              size="tiny"
+              icon={<Download />}
+              loading={isExporting}
+              disabled={isExporting}
+            >
+              Export
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-40">
+            <DropdownMenuItem onClick={onRowsExportCSV}>
+              <span className="text-foreground-light">Export to CSV</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onRowsExportSQL}>Export to SQL</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {editable && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>

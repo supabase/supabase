@@ -1,13 +1,14 @@
 import Link from 'next/link'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertTriangle } from 'ui'
+
 import { useParams } from 'common'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 
 export function EmailRateLimitsAlert() {
   const { ref: projectRef } = useParams()
 
   return (
     <Alert_Shadcn_ variant="warning">
-      <IconAlertTriangle strokeWidth={2} />
+      <WarningIcon />
       <AlertTitle_Shadcn_>Built-in email service is rate-limited!</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
         You're using the built-in email service. The service has rate limits and it's not meant to
