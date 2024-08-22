@@ -114,7 +114,7 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
         {!isFree && (
           <>
             <div className="space-y-1">
-              <h4 className="text-base">We're sad that you're leaving.</h4>
+              <h4 className="text-base">Help us improve.</h4>
               <p className="text-sm text-foreground-light">
                 We always strive to improve Supabase as much as we can. Please let us know the
                 reasons you are deleting your project so that we can improve in the future.
