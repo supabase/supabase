@@ -113,7 +113,7 @@ const SmtpForm = () => {
     }),
     SMTP_PASS: string().when([], {
       is: () => {
-        return enableSmtp
+        return enableSmtp && authConfig?.SMTP_PASS === null
       },
       then: (schema) => schema.required('SMTP password is required'),
       otherwise: (schema) => schema,
@@ -126,6 +126,10 @@ const SmtpForm = () => {
     // Format payload: Remove redundant value + convert port to string
     delete payload.ENABLE_SMTP
     payload.SMTP_PORT = payload.SMTP_PORT ? payload.SMTP_PORT.toString() : payload.SMTP_PORT
+
+    if (payload.SMTP_PASS === '') {
+      delete payload.SMTP_PASS
+    }
 
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
@@ -338,7 +342,7 @@ const SmtpForm = () => {
                     id="SMTP_PASS"
                     type={hidden ? 'password' : 'text'}
                     label="Password"
-                    placeholder="SMTP Password"
+                    placeholder={authConfig?.SMTP_PASS === null ? 'SMTP Password' : '••••••••'}
                     actions={
                       <Button
                         icon={hidden ? <IconEye /> : <IconEyeOff />}
