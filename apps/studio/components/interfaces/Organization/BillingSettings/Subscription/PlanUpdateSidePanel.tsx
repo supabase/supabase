@@ -181,145 +181,130 @@ const PlanUpdateSidePanel = () => {
         }
       >
         <SidePanel.Content>
-          {selectedOrganization?.managed_by === 'vercel-marketplace' ? (
-            <Alert_Shadcn_ className="flex flex-col items-center gap-4 mt-6">
-              <PartnerIcon
-                organization={{ managed_by: selectedOrganization.managed_by }}
-                showTooltip={false}
-                size="large"
-              />
+          <div className="py-6 grid grid-cols-12 gap-3">
+            {subscriptionsPlans.map((plan) => {
+              const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
+              const price = planMeta?.price ?? 0
+              const isDowngradeOption = planMeta?.change_type === 'downgrade'
+              const isCurrentPlan = planMeta?.id === subscription?.plan?.id
+              const features = pickFeatures(plan, billingPartner)
+              const footer = pickFooter(plan, billingPartner)
 
-              <AlertTitle_Shadcn_ className="text-lg">
-                Vercel Marketplace Billing Is Coming Soon
-              </AlertTitle_Shadcn_>
-
-              <AlertDescription_Shadcn_>
-                Currently, organizations managed by Vercel Marketplace are able to use the free plan
-                only.
-                <br />
-                We are working on enabling billing for these organizations soon.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          ) : (
-            <div className="py-6 grid grid-cols-12 gap-3">
-              {subscriptionsPlans.map((plan) => {
-                const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
-                const price = planMeta?.price ?? 0
-                const isDowngradeOption = planMeta?.change_type === 'downgrade'
-                const isCurrentPlan = planMeta?.id === subscription?.plan?.id
-                const features = pickFeatures(plan, billingPartner)
-                const footer = pickFooter(plan, billingPartner)
-
-                if (plan.id === 'tier_enterprise') {
-                  return (
-                    <EnterpriseCard
-                      key={plan.id}
-                      plan={plan}
-                      isCurrentPlan={isCurrentPlan}
-                      billingPartner={billingPartner}
-                    />
-                  )
-                }
-
+              if (plan.id === 'tier_enterprise') {
                 return (
-                  <div
+                  <EnterpriseCard
                     key={plan.id}
-                    className={
-                      'border rounded-md px-4 py-4 flex flex-col items-start justify-between col-span-12 md:col-span-4 bg-surface-200'
-                    }
-                  >
-                    <div className="w-full">
-                      <div className="flex items-center space-x-2">
-                        <p className={cn('text-brand text-sm uppercase')}>{plan.name}</p>
-                        {isCurrentPlan ? (
-                          <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
-                            Current plan
-                          </div>
-                        ) : plan.nameBadge ? (
-                          <div className="text-xs bg-brand-400 text-brand-600 rounded px-2 py-0.5">
-                            {plan.nameBadge}
-                          </div>
-                        ) : (
-                          <></>
-                        )}
-                      </div>
-                      <div className="mt-4 flex items-center space-x-1 mb-4">
-                        {(price ?? 0) > 0 && <p className="text-foreground-light text-sm">From</p>}
-                        {isLoadingPlans ? (
-                          <div className="h-[28px] flex items-center justify-center">
-                            <ShimmeringLoader className="w-[30px] h-[24px]" />
-                          </div>
-                        ) : (
-                          <p className="text-foreground text-lg">{formatCurrency(price)}</p>
-                        )}
-                        <p className="text-foreground-light text-sm">{plan.costUnit}</p>
-                      </div>
-                      {isCurrentPlan ? (
-                        <Button block disabled type="default">
-                          Current plan
-                        </Button>
-                      ) : (
-                        <ButtonTooltip
-                          block
-                          type={isDowngradeOption ? 'default' : 'primary'}
-                          disabled={
-                            subscription?.plan?.id === 'enterprise' || !canUpdateSubscription
-                          }
-                          onClick={() => setSelectedTier(plan.id as any)}
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text:
-                                subscription?.plan?.id === 'enterprise'
-                                  ? 'Reach out to us via support to update your plan from Enterprise'
-                                  : !canUpdateSubscription
-                                    ? 'You do not have permission to change the subscription plan'
-                                    : undefined,
-                            },
-                          }}
-                        >
-                          {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
-                        </ButtonTooltip>
-                      )}
-
-                      <div className="border-t my-4" />
-
-                      <ul role="list">
-                        {features.map((feature) => (
-                          <li
-                            key={typeof feature === 'string' ? feature : feature[0]}
-                            className="flex py-2"
-                          >
-                            <div className="w-[12px]">
-                              <IconCheck
-                                className="h-3 w-3 text-brand translate-y-[2.5px]"
-                                aria-hidden="true"
-                                strokeWidth={3}
-                              />
-                            </div>
-                            <div>
-                              <p className="ml-3 text-xs text-foreground-light">
-                                {typeof feature === 'string' ? feature : feature[0]}
-                              </p>
-                              {isArray(feature) && (
-                                <p className="ml-3 text-xs text-foreground-lighter">{feature[1]}</p>
-                              )}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {footer && (
-                      <div className="border-t pt-4 mt-4">
-                        <p className="text-foreground-light text-xs">{footer}</p>
-                      </div>
-                    )}
-                  </div>
+                    plan={plan}
+                    isCurrentPlan={isCurrentPlan}
+                    billingPartner={billingPartner}
+                  />
                 )
-              })}
-            </div>
-          )}
+              }
+
+              return (
+                <div
+                  key={plan.id}
+                  className={
+                    'border rounded-md px-4 py-4 flex flex-col items-start justify-between col-span-12 md:col-span-4 bg-surface-200'
+                  }
+                >
+                  <div className="w-full">
+                    <div className="flex items-center space-x-2">
+                      <p className={cn('text-brand text-sm uppercase')}>{plan.name}</p>
+                      {isCurrentPlan ? (
+                        <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
+                          Current plan
+                        </div>
+                      ) : plan.nameBadge ? (
+                        <div className="text-xs bg-brand-400 text-brand-600 rounded px-2 py-0.5">
+                          {plan.nameBadge}
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                    <div className="mt-4 flex items-center space-x-1 mb-4">
+                      {(price ?? 0) > 0 && <p className="text-foreground-light text-sm">From</p>}
+                      {isLoadingPlans ? (
+                        <div className="h-[28px] flex items-center justify-center">
+                          <ShimmeringLoader className="w-[30px] h-[24px]" />
+                        </div>
+                      ) : (
+                        <p className="text-foreground text-lg">{formatCurrency(price)}</p>
+                      )}
+                      <p className="text-foreground-light text-sm">{plan.costUnit}</p>
+                    </div>
+                    {isCurrentPlan ? (
+                      <Button block disabled type="default">
+                        Current plan
+                      </Button>
+                    ) : (
+                      <ButtonTooltip
+                        block
+                        type={isDowngradeOption ? 'default' : 'primary'}
+                        disabled={
+                          subscription?.plan?.id === 'enterprise' ||
+                          !canUpdateSubscription ||
+                          (plan.id === 'tier_team' &&
+                            selectedOrganization?.managed_by === 'vercel-marketplace')
+                        }
+                        onClick={() => setSelectedTier(plan.id as any)}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text:
+                              subscription?.plan?.id === 'enterprise'
+                                ? 'Reach out to us via support to update your plan from Enterprise'
+                                : !canUpdateSubscription
+                                  ? 'You do not have permission to change the subscription plan'
+                                  : plan.id === 'tier_team' &&
+                                      selectedOrganization?.managed_by === 'vercel-marketplace'
+                                    ? 'The Team plan is currently unavailable for Vercel Marketplace managed organizations'
+                                    : undefined,
+                          },
+                        }}
+                      >
+                        {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
+                      </ButtonTooltip>
+                    )}
+
+                    <div className="border-t my-4" />
+
+                    <ul role="list">
+                      {features.map((feature) => (
+                        <li
+                          key={typeof feature === 'string' ? feature : feature[0]}
+                          className="flex py-2"
+                        >
+                          <div className="w-[12px]">
+                            <IconCheck
+                              className="h-3 w-3 text-brand translate-y-[2.5px]"
+                              aria-hidden="true"
+                              strokeWidth={3}
+                            />
+                          </div>
+                          <div>
+                            <p className="ml-3 text-xs text-foreground-light">
+                              {typeof feature === 'string' ? feature : feature[0]}
+                            </p>
+                            {isArray(feature) && (
+                              <p className="ml-3 text-xs text-foreground-lighter">{feature[1]}</p>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {footer && (
+                    <div className="border-t pt-4 mt-4">
+                      <p className="text-foreground-light text-xs">{footer}</p>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         </SidePanel.Content>
       </SidePanel>
 
