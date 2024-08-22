@@ -465,13 +465,13 @@ SEND_EMAIL_HOOK_SECRET=<base64_secret>
 Set the secrets in your Supabase project:
 
 ```bash
-$ supabase secret set --env-file .env
+supabase secrets set --env-file .env
 ```
 
 Create a new edge function:
 
 ```bash
-$ supabase functions new send-email
+supabase functions new send-email
 ```
 
 Add the following code to your edge function:
@@ -484,6 +484,10 @@ const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
 const hookSecret = Deno.env.get("SEND_EMAIL_HOOK_SECRET") as string;
 
 Deno.serve(async (req) => {
+  if (req.method !== "POST") {
+    return new Response("not allowed", { status: 400 });
+  }
+
   const payload = await req.text();
   const headers = Object.fromEntries(req.headers);
   const wh = new Webhook(hookSecret);
