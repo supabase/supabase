@@ -2579,4 +2579,12 @@ module.exports = [
     source: '/launchweek',
     destination: '/launch-week',
   },
+
+  // marketing
+
+  {
+    permanent: true,
+    source: '/changelogpod',
+    destination: 'https://forms.supabase.com/changelog-podcast-sponsorship',
+  },
 ]
