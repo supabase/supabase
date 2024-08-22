@@ -15,12 +15,14 @@ export interface TelemetryProps {
   language: string
 }
 
+const noop = () => {}
+
 // This event is the same as in studio/lib/telemetry.tx
 // but uses different ENV variables for www
 
 const sendEvent = (event: TelemetryEvent, gaProps: TelemetryProps, router: NextRouter) => {
   const { hasAcceptedConsent } = useConsent()
-  if ((!IS_PROD && !IS_PREVIEW) || !hasAcceptedConsent) return
+  if ((!IS_PROD && !IS_PREVIEW) || !hasAcceptedConsent) return noop
 
   const { category, action, label, value } = event
 
