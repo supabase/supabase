@@ -2,26 +2,26 @@ import '@code-hike/mdx/styles'
 import 'config/code-hike.scss'
 import '../styles/index.css'
 
+import { useEffect } from 'react'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
-import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { DefaultSeo } from 'next-seo'
+
 import { PortalToast, themes } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
-
+import Telemetry from '~/lib/telemetry'
+import supabase from '~/lib/supabase'
+import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
 import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
-import { WwwCommandMenu } from '~/components/CommandMenu'
-import { APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
-import Telemetry from '~/lib/telemetry'
-import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
+import { APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
+import { WwwCommandMenu } from '~/components/CommandMenu'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
