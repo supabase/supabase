@@ -18,37 +18,31 @@ import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
 import { WwwCommandMenu } from '~/components/CommandMenu'
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
-import { post } from '~/lib/fetchWrapper'
+import { APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
+import Telemetry from '~/lib/telemetry'
 import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
-  const { consentValue, hasAcceptedConsent } = useConsent()
+  const { consentValue } = useConsent()
 
   useThemeSandbox()
 
-  function handlePageTelemetry(route: string) {
-    return post(`${API_URL}/telemetry/page`, {
-      referrer: document.referrer,
-      title: document.title,
-      route,
-      ga: {
-        screen_resolution: telemetryProps?.screenResolution,
-        language: telemetryProps?.language,
+  function handleRouteChange(url: string) {
+    Telemetry.sendEvent(
+      {
+        category: 'www',
+        action: 'page_views',
+        label: url,
       },
-    })
+      telemetryProps,
+      router
+    )
   }
 
   useEffect(() => {
-    if (!hasAcceptedConsent) return
-
-    function handleRouteChange(url: string) {
-      handlePageTelemetry(url)
-    }
-
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
     return () => {
@@ -57,12 +51,11 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.events, consentValue])
 
   useEffect(() => {
-    if (!hasAcceptedConsent) return
     /**
      * Send page telemetry on first page load
      */
     if (router.isReady) {
-      handlePageTelemetry(router.asPath)
+      handleRouteChange(router.asPath)
     }
   }, [router.isReady, consentValue])
 

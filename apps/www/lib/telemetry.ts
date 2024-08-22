@@ -1,7 +1,7 @@
 import { post } from '~/lib/fetchWrapper'
 import { API_URL, IS_PROD, IS_PREVIEW } from 'lib/constants'
 import { NextRouter } from 'next/router'
-import { useConsent } from 'ui-patterns'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 export interface TelemetryEvent {
   category: string
@@ -21,8 +21,19 @@ const noop = () => {}
 // but uses different ENV variables for www
 
 const sendEvent = (event: TelemetryEvent, gaProps: TelemetryProps, router: NextRouter) => {
-  const { hasAcceptedConsent } = useConsent()
-  if ((!IS_PROD && !IS_PREVIEW) || !hasAcceptedConsent) return noop
+  const consent =
+    typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null
+  const hasAcceptedConsent = consent === 'true'
+  const IS_DEV = !IS_PROD && !IS_PREVIEW
+  const blockEvent = IS_DEV || !hasAcceptedConsent
+
+  console.log('IS_DEV', IS_DEV)
+  console.log('hasAcceptedConsent', hasAcceptedConsent)
+  console.log('blockEvent', blockEvent)
+
+  if (blockEvent) return noop
 
   const { category, action, label, value } = event
 
