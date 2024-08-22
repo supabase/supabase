@@ -11,7 +11,7 @@ import {
 import * as React from 'npm:react@18.3.1'
 
 interface MagicLinkEmailProps {
-  url: string
+  supabase_url: string
   email_action_type: string
   redirect_to: string
   token_hash: string
@@ -20,7 +20,7 @@ interface MagicLinkEmailProps {
 
 export const MagicLinkEmail = ({
   token,
-  url,
+  supabase_url,
   email_action_type,
   redirect_to,
   token_hash,
@@ -32,7 +32,7 @@ export const MagicLinkEmail = ({
       <Container style={container}>
         <Heading style={h1}>Login</Heading>
         <Link
-          href={`${url}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=${redirect_to}`}
+          href={`${supabase_url}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=${redirect_to}`}
           target="_blank"
           style={{
             ...link,
