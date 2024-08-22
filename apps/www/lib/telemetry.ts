@@ -29,10 +29,6 @@ const sendEvent = (event: TelemetryEvent, gaProps: TelemetryProps, router: NextR
   const IS_DEV = !IS_PROD && !IS_PREVIEW
   const blockEvent = IS_DEV || !hasAcceptedConsent
 
-  console.log('IS_DEV', IS_DEV)
-  console.log('hasAcceptedConsent', hasAcceptedConsent)
-  console.log('blockEvent', blockEvent)
-
   if (blockEvent) return noop
 
   const { category, action, label, value } = event
