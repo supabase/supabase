@@ -5,7 +5,7 @@ description: 'Prisma error troubleshooting'
 breadcrumb: 'ORM Quickstarts'
 ---
 
-This guide adresses common Prisma errors that you might encounter while using Supabase.
+This guide addresses common Prisma errors that you might encounter while using Supabase.
 
 <Admonition type="note">
 
@@ -13,7 +13,7 @@ A full list of errors can be found in [Prisma's official docs](https://www.prism
 
 </Admonition>
 
-## Understanding Connection String Parameters:
+## Understanding connection string parameters:
 
 Unlike other libraries, Prisma lets you configure [its settings](https://www.prisma.io/docs/orm/overview/databases/postgresql#arguments) through special options appended to your connection string. These options are called "query parameters."
 
@@ -25,30 +25,32 @@ These options, called "query parameters," can be used to address specific errors
 connection_string.../postgres?KEY1=VALUE&KEY2=VALUE&KEY3=VALUE
 ```
 
-## Errors
+# Errors
 
-### ... prepared statement "" already exists
+## ... prepared statement "" already exists
 
 Supavisor in transaction mode (port 6543) does not support [prepared statements](https://www.postgresql.org/docs/current/sql-prepare.html), which Prisma will try to create in the background.
 
-- **Solution:**
-  - Add `pgbouncer=true` to the connection string. This turns off prepared statements in Prisma.
+### Solution:
 
-### Can't reach database server at:
+- Add `pgbouncer=true` to the connection string. This turns off prepared statements in Prisma.
+
+## Can't reach database server at:
 
 Prisma couldn't establish a connection with Postgres or Supavisor before the timeout
 
-- **Possible Causes:**
+### Possible causes:
 
-  - Database overload: The database server is under heavy load, causing Prisma to struggle to connect.
-  - Malformed connection string: The connection string used by Prisma is incorrect or incomplete.
-  - Transient network issues: Temporary network problems are preventing the connection.
+- **Database overload**: The database server is under heavy load, causing Prisma to struggle to connect.
+- **Malformed connection string**: The connection string used by Prisma is incorrect or incomplete.
+- **Transient network issues**: Temporary network problems are preventing the connection.
 
-- **Solutions:**
-  - Check database health: Use the [Reports Dashboard](https://supabase.com/dashboard/project/_/reports/database) to monitor CPU, memory, and I/O usage. If the database is overloaded, consider increasing your [compute size](https://supabase.com/docs/guides/platform/compute-add-ons) or [optimizing your queries](https://supabase.com/docs/guides/database/query-optimization).
-  - Verify connection string: Double-check the connection string in your Prisma configuration to ensure it matches one in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
-  - Try a different connection method: If the connection is still failing, try using a different connection method (e.g., connecting directly to the database instead of using the Supavisor pooler).
-  - Increase timeout: If you're confident that the connection string is correct and the database is not overloaded, try increasing the `connect_timeout` parameter in your Prisma configuration to give it more time to establish a connection.
+### Solutions:
+
+- **Check database health**: Use the [Reports Dashboard](https://supabase.com/dashboard/project/_/reports/database) to monitor CPU, memory, and I/O usage. If the database is overloaded, consider increasing your [compute size](https://supabase.com/docs/guides/platform/compute-add-ons) or [optimizing your queries](https://supabase.com/docs/guides/database/query-optimization).
+- **Verify connection string**: Double-check the connection string in your Prisma configuration to ensure it matches one in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+- **Try a different connection method**: If the connection is still failing, try using a different connection method (for example, connecting directly to the database instead of using the Supavisor pooler).
+- **Increase connection timeout**: If you're confident that the connection string is correct and the database is not overloaded, try increasing the `connect_timeout` parameter in your Prisma configuration to give it more time to establish a connection.
 
 ```md
 .../postgres?connect_timeout=30
@@ -58,49 +60,53 @@ Prisma couldn't establish a connection with Postgres or Supavisor before the tim
 
 Prisma is unable to allocate connections to pending queries fast enough to meet demand.
 
-- **Likely Causes:**
+### Possible causes:
 
-  - Overwhelmed server: The server hosting Prisma is under heavy load, limiting its ability to manage connections. By default, Prisma will create the default `2 * num_cpus / 2` worth of connections. A common cause for server strain is increasing the `connection_limit` significantly past the default.
-  - Insufficient pool size: The Supavisor pooler does not have enough connections available to quickly satisfy Prisma's requests.
-  - Slow queries: Prisma's queries are taking too long to execute, preventing it from releasing connections for reuse.
+- **Overwhelmed server**: The server hosting Prisma is under heavy load, limiting its ability to manage connections. By default, Prisma will create the default `2 * num_cpus / 2` worth of connections. A common cause for server strain is increasing the `connection_limit` significantly past the default.
+- **Insufficient pool size**: The Supavisor pooler does not have enough connections available to quickly satisfy Prisma's requests.
+- **Slow queries**: Prisma's queries are taking too long to execute, preventing it from releasing connections for reuse.
 
-- **Solutions:**
-  - Reduce the connection limit: If you've explicitly increased the `connection_limit` parameter in your Prisma configuration, try reducing it to a more reasonable value.
-  - Increase pool size: If you are connecting with Supavisor, try increasing the pool size in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
-  - Optimize queries: [Improve the efficiency of your queries](https://supabase.com/docs/guides/database/query-optimization) to reduce execution time.
-  - Increase compute size: Like the preceding option, this is a strategy to reduce query execution time.
-  - Increase the pool timeout: Increase the `pool_timeout` parameter in your Prisma configuration to give the pooler more time to allocate connections.
+### Solutions:
 
-### Server has closed the connection
+- **Increase the pool timeout**: Increase the `pool_timeout` parameter in your Prisma configuration to give the pooler more time to allocate connections.
+- **Reduce the connection limit**: If you've explicitly increased the `connection_limit` parameter in your Prisma configuration, try reducing it to a more reasonable value.
+- **Increase pool size**: If you are connecting with Supavisor, try increasing the pool size in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+- **Optimize queries**: [Improve the efficiency of your queries](https://supabase.com/docs/guides/database/query-optimization) to reduce execution time.
+- **Increase compute size**: Like the preceding option, this is a strategy to reduce query execution time.
+
+## Server has closed the connection
 
 According to this [GitHub Issue for Prisma](https://github.com/prisma/prisma/discussions/7389), this error may be related to large return values for queries. It may also be caused by significant database strain.
 
-- **Solution:**
-  - Try to limit the total amount of rows returned for particularly large requests.
-  - Check the Reports Page for database strain. If there is obvious strain, consider [optomizing](https://supabase.com/docs/guides/database/query-optimization) or increasing compute size
+### Solutions:
+
+- **Limit row return sizes**: Try to limit the total amount of rows returned for particularly large requests.
+- **Minimize database strain**:Check the Reports Page for database strain. If there is obvious strain, consider [optimizing](https://supabase.com/docs/guides/database/query-optimization) or increasing compute size
 
 ## Drift detected: Your database schema is not in sync with your migration history
 
 Prisma relies on migration files to ensure your database aligns with Prisma's model. External schema changes are detected as "drift", which Prisma will try to overwrite, potentially causing data loss.
 
-- **Likely Causes:**
+### Possible causes:
 
-  - Supabase Managed Schemas: Supabase may update managed schemas like auth and storage to introduce new features. Granting Prisma access to these schemas can lead to drift during updates.
-  - External Schema Modifications: Your team or another tool might have modified the database schema outside of Prisma, causing drift.
+- **Supabase Managed Schemas**: Supabase may update managed schemas like auth and storage to introduce new features. Granting Prisma access to these schemas can lead to drift during updates.
+- **External Schema Modifications**: Your team or another tool might have modified the database schema outside of Prisma, causing drift.
 
-- **Solution**
-  - Baselining migrations: [baselining](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining) re-syncs Prisma by capturing the current database schema as the starting point for future migrations.
+### Solution:
+
+- **Baselining migrations**: [baselining](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining) re-syncs Prisma by capturing the current database schema as the starting point for future migrations.
 
 ## Max client connections reached
 
 Postgres or Supavisor rejected a request for more connections
 
-- **Likely Causes:**
-- When working in transaction mode (port 6543): The error "Max client connections reached" occurs when clients try to form more connections with the pooler than it can support.
-- When working in session mode (port 5432), the max amount of clients is restricted to the "Pool Size" value in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database). If the "Pool Size" is set to 15, even if the pooler can handle 200 client connections, it will still be effectively capped at 15 for each unique ["database-role+database" combination](https://github.com/orgs/supabase/discussions/21566).
-- When working with direct connections: Postgres is already servicing the max amount of connections
+### Possible causes:
 
-- **Solutions**
+- **When working in transaction mode (port 6543):** The error "Max client connections reached" occurs when clients try to form more connections with the pooler than it can support.
+- **When working in session mode (port 5432):** The max amount of clients is restricted to the "Pool Size" value in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database). If the "Pool Size" is set to 15, even if the pooler can handle 200 client connections, it will still be effectively capped at 15 for each unique ["database-role+database" combination](https://github.com/orgs/supabase/discussions/21566).
+- **When working with direct connections**: Postgres is already servicing the max amount of connections
+
+### Solutions
 
 - **Transaction Mode for Serverless Apps**: If you are using serverless functions (Supabase Edge, Vercel, AWS Lambda), switch to transaction mode (port 6543). It handles more connections than session mode or direct connections.
 - **Reduce the number of connections**: A single client-server can establish multiple connections with a pooler. Typically, serverless setups do not need many connections. Starting with fewer, like five or three, or even just one, is often sufficient. In serverless setups, begin with `connection_limit=1`, increasing cautiously if needed to avoid maxing out connections.
@@ -113,21 +119,17 @@ Postgres or Supavisor rejected a request for more connections
 
 - **Increase your pool size**: If the pooler lacks sufficient direct connections (due to a small pool size), it may struggle to allocate database connections to clients, leading to an overflow in the queue of waiting clients. This overflow could result in exceeding the client connection limits.
 
-Typically, when using the REST API, you can increase your "Pool Size" in the [Dashboard](https://supabase.com/dashboard/project/_/settings/database) to 40% of your total database connections, and up to 80% if you're not using the REST API. For example, if your instance supported 60 direct connections, you could cautiously raise the pool size to 24 if you were relying on the REST API or 48 if you were not.
-
-However, the recommended maximums provided are imperfect estimates and it may be possible that your usage patterns may allow for higher values. It's also possible that you'd end up using too many database connections, preventing critical servers from interacting with your database. It's best to tailor the number based on your current usage.
-
 ## Cross schema references are only allowed when the target schema is listed in the schemas property of your datasource
 
 A Prisma migration is referencing a schema it is not permitted to manage.
 
-- **Likely Causes:**
+### Possible causes:
 
-  - A baselined migration references a schema that Prisma is not permitted to manage
+- A migration references a schema that Prisma is not permitted to manage
 
-- **Solutions:**
+### Solutions:
 
-  - Multi-Schema support: If the external schema isn't Supabase managed, modify your prisma.schema file to enable the multiSchema preview
+- Multi-Schema support: If the external schema isn't Supabase managed, modify your `prisma.schema` file to enable the multi-Schema preview
 
 ```ts prisma.schema
 generator client {

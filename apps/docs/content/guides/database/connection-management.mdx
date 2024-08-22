@@ -5,19 +5,14 @@ description: 'Managing connections'
 subtitle: 'Using your connections resourcefully'
 ---
 
-### Connection Management
-
-This guide is a technical explainer for optimizing connection usage.
-
 ### Connecting to your database
 
-Supabase offers three connection URLs to for connecting your database with ORMs like Prisma and SQLAlchemy, as well as external tools like PSQL and pgAdmin.
-
+Beyond the [Supabase client-libraries](https://supabase.com/docs/guides/api/rest/client-libs), Supabase offers three connection strings for direct database access, compatible with database libraries like [Prisma](/docs/guides/database/prisma) and [Drizzle](/docs/guides/database/drizzle), as well as tools like [PSQL](/docs/guides/database/psql) and [pgAdmin](/docs/guides/database/pgadmin).
 You can find these connection strings in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
 
-### Direct connections:
+### Direct connection string:
 
-Ideal for persistent servers (AWS EC2, Fly.io VMs, DigitalOcean Droplets...).
+It connects directly to your Postgres instance. It is ideal for persistent servers (AWS EC2, Fly.io VMs, DigitalOcean Droplets...).
 
 <Admonition type="caution">
   Direct connections use IPv6 addresses by default. If your environment isn't compatible or you're
@@ -31,7 +26,7 @@ postgresql://postgres:[YOUR-PASSWORD]@db.apbkobhfnmcqqzqeeqss.supabase.co:5432/p
 
 #### Supavisor session mode (port 5432):
 
-Session mode, like direct connections, reserves a database connection for a single client. Because it works in IPv4 environments, it can act as an IPv4 proxy alternative for direct connections.
+Session mode is not uses the Supavisor pooler to proxy connections to your database. Because it works in IPv4 environments, it can act as an IPv4 proxy alternative for direct connections.
 
 ```md
 // Example String
@@ -40,34 +35,32 @@ postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pool
 
 #### Transaction mode (port 6543):
 
-Like most poolers, it only allows clients to access a direct connection when a query is pending. Transaction mode has amazing scaling capacity, and is best used with temporary servers, such as serverless/edge functions or auto scaling servers.
+Supavisor in transaction mode forms hot connections with the database and only allows clients to access them connection when a query is pending. Transaction mode has amazing scaling capacity, and is best used with temporary servers, such as serverless/Edge Functions or auto scaling servers.
 
 ```md
 // Example String
 postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:6543/postgres
 ```
 
-## Managing Connections with a Pooler
+## What problems do poolers solve?
 
-A pooler can be thought of as a load balancer for database connections. It maintains hot connections with the database and intelligently shares them with clients ( application servers) when they need to make a query.
+A database can only sustain a limited amount of connections. Postgres connections are like websockets, once established, they are preserved until the client (application servers) disconnects. A server might only make a single 10 ms query, but needlessly reserve its database connection for seconds or longer.
 
-## What Problems Do Poolers Solve?
+Serverside-poolers, such as Supavisor, sit between clients and the database and can be thought of as load balancers for Postgres connections. They maintain hot connections with the database and intelligently share them with clients only when needed. They prevent idle or greedy clients from reserving all connections, while also maximizing the amount of queries a single connection can service.
 
-A database can only sustain a limited amount of connections. Postgres connections are like websockets, once established, the connection is preserved until the client disconnects. A client might make a single 10ms query, but exclusively reserve its database connection for seconds or longer.
-
-Poolers allow database access only when a query is pending, preventing idle or greedy server clients from reserving all connections, while also maximizing the amount of queries a single connection can service.
+Application-side poolers are built into connection libraries and API servers, such as Prisma, SQLAlchemy, and PostgREST. They form several hot connections with Postgres or a serverside-pooler and exist to minimize the overhead of reforming new connections with the database between queries.
 
 ### When to use a pooler
 
-#### Stationary Clients
+#### Stationary clients
 
-ORMs and connection libraries, such as Prisma, SQLAlchemy, and Postgres.js, all have built in poolers that manage connections for you. They will claim a certain amount of hot connections based on your library's settings, and queue queries for them as necessary. When working with stationary servers, often times, the built-in poolers are optimal.
+External connection libraries, such as Prisma, SQLAlchemy, and Postgres.js, all have built in poolers that manage connections for you. They will claim a certain amount of hot connections based on your library's settings, and queue queries for them as necessary. When deploying your application to stationary servers, often times, the built-in poolers are optimal.
 
 #### Serverless and auto-scaling clients
 
 Temporary or autos-scaling environments, such as AWS Lambda, Vercel, or Supabase Edge Functions, connect/disconnect rapidly and scale unpredictably. Even when using a library with an internal pooler, an external pooler, such as Supabase's Supavisor in transaction mode, is required.
 
-### Allocating supavisor connections
+### Allocating Supavisor-connections
 
 "Pool size" refers to the maximum number of direct connections the pooler can manage on behalf of your database per `user+db+mode` combination.
 
@@ -103,20 +96,40 @@ postgres://[USER].shfmmplnqscentnakbkl:[password]@aws-0-ca-central-1.pooler.supa
 
 In session mode, Supavisor will commission a new direct connection as long as the pool size permits. In transaction mode, the pooler will only create a new direct connection when there are more pending queries than available direct connections.
 
-In all cases, if the pooler and other servers collectively try to claim more direct connections than your database supports, the database will reject the newer connection with a `53300` "too_many_connections" error.
+In all cases, if the pooler and other servers collectively try to claim more direct connections than your database supports, the database will reject the newer connection with a `53300` "too_many_connections" error. Postgres displays the errors with one of two messages:
+
+- `sorry, too many clients already`
+- `remaining connection slots are reserved for non-replication superuser connections`
 
 ### Configuring your Supavisor pool size
 
 If your Supavisor pooler uses most of the available connections, you risk depriving other servers, such as Auth, from accessing your database. Still, as much as possible, you want to give your pooler freedom to grow its pool as needed to service demand.
 
-It's important to note that the Storage server also uses Supavisor as a unique "user+db+mode" combination, so the pool size you set for your general application will apply to it, too.
-
-As a rule of thumb, if you're using the REST API or multiple app-based "user+db+mode" combinations, try to keep the pooler's usage under 40% of available connections. Otherwise, you can cautiously increase usage to around 80%.
+As a rule of thumb, if you're heavily using the Supabase Postgres API, try to keep the pooler's usage under 40% of available connections. Otherwise, you can increase usage to around 80%. This leaves room for other services, such as auth, realtime, and even the Dashboard.
 
 These percentages are flexible and depend on your application's usage and setup. Monitor connection usage to determine the optimal allocation without depriving other servers of necessary connections.
 
-### How to Monitor Connections?
+### How to monitor connections?
 
-Connection usage can be monitored with a Supabase Grafana Dashboard. It provides realtime visibility of over 200 database metrics, such as graphs of CPU, EBS, and active direct/pooler connections. It can be extremely useful for monitoring and debugging instances.
+For viewing active connections, you can utilize [pg_stat_activity](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW). It is a Postgres `view` that keeps track of live processes run by your database, including connections. It's particularly useful for determining if idle clients are monopolizing connection slots.
 
-You can check our [GitHub repo](https://github.com/supabase/supabase-grafana) for setup instructions for local deployments or free cloud deployments on [Fly.io](http://fly.io/). I recommend referring to our concise [documentation](https://supabase.com/docs/guides/platform/metrics) to learn more about the metrics endpoint.
+This is a query you can use to observe the clients currently connected to your database:
+
+```sql
+select
+  pg_stat_activity.pid,
+  ssl AS ssl_connection,
+  datname AS database,
+  usename AS connected_role,
+  application_name,
+  client_addr,
+  query,
+  query_start,
+  state,
+backend_start
+from pg_stat_ssl
+join pg_stat_activity
+  on pg_stat_ssl.pid = pg_stat_activity.pid;
+```
+
+Connection usage over time can be monitored with a [Supabase Grafana Dashboard](/docs/guides/platform/supabase-grafana). It provides realtime visibility of over 200 database metrics, such as graphs of CPU, EBS, and active direct/pooler connections. It can be extremely useful for monitoring and debugging instances.

@@ -1,5 +1,6 @@
 APIs
 [Aa]uth
+[Bb]aselining
 Berri
 [Cc]hatbots?
 ChatGPT
@@ -8,6 +9,7 @@ Colab
 [Cc]omposable
 CPUs?
 CTEs?
+datasource
 DBeaver
 [Dd]eclarative(ly)?
 [Dd]eduplicat(e|ion)
@@ -45,8 +47,10 @@ OpenAI
 [Pp]asscodes?
 [Pp]asswordless
 [Pp]erformant
+pgAdmin
 PGAudit
 PGroonga
+pg_stat_activity
 pgvector
 Pinecone
 plpgsql
@@ -55,6 +59,7 @@ plpgsql
 [Pp]ostgres
 [Pp]rebuild
 Prisma
+PSQL
 [Rr]ealtime
 Refine's
 [Rr]eindex(ed|es|ing)?
@@ -64,6 +69,7 @@ RESTful
 Roboflow
 [Ss]crollable
 [Ss]erializ(e|ed|es|ing)
+[Ss]erverless
 [Ss]igncryption
 [Ss]ignins?
 [Ss]ignouts?

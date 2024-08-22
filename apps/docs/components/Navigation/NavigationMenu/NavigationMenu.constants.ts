@@ -717,7 +717,6 @@ export const database: NavMenuConstant = {
           name: 'Postgres.js',
           url: '/guides/database/postgres-js',
         },
-        { name: 'SQLAlchemy', url: '/guides/database/postgres/sqlalchemy' },
       ],
     },
     {

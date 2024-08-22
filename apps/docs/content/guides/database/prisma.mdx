@@ -74,58 +74,50 @@ If you plan to solely use Prisma instead of the Supabase Postgres API, turn it o
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={2}>
-    <StepHikeCompact.Details title="Get your connection credentials">
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Add your connection information to your .env file">
     - Visit the [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
+    ![Session Mode](/docs/img/database/session_mode.png)
     - Find your Supavisor Session Mode string. It should end with 5432.
     <Admonition type="note">
       If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
     </Admonition>
-    ![Session Mode](/docs/img/database/session_mode.png)
 
     - If you plan on deploying Prisma to a serverless or auto-scaling environment, you'll also need your Supavisor transaction mode string.
+    ![Session Mode](/docs/img/guides/database/transaction-mode.png)
     - The string is identical to the session mode string but uses port 6543 at the end.
 
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-
-      Example Supavisor Session Mode String:
-      ```md
-      # Used for migrations and long standing servers
-      postgresql://[DB-USER].vbpslbepnxiiqzefpmpl:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
-      ```
-
-      Example Supavisor Transaction Mode String:
-      ```md
-      # Best for auto-scaling or serverless deployments
-      postgresql://[DB-USER].vbpslbepnxiiqzefpmpl:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
-      ```
-
-      Copy your strings and change their `DB-USER` to `prisma`
-      ```md
-      postgres://prisma.qjqzlvutjxbyodxrrvhb...
-      ```
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Add your connection information to your .env file" />
-
-    <StepHikeCompact.Code>
             <Tabs>
+                <TabPanel id="serverful" label="server-based deployments">
 
+                    ```text .env
+                    # Used for Prisma Migrations and within your application
+                    DIRECT_URL="postgres://[DB-USER].qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
+                    ```
+
+                    Change your string's `[DB-USER]` to `prisma`
+                    ```md
+                    postgres://prisma.qjqzlvutjxbyodxrrvhb...
+                    ```
+                </TabPanel>
                 <TabPanel id="serverless" label="serverless deployments">
 
                     Add a DATABASE_URL variable to your .env file. This is for your Supavisor Transaction mode string, which is necessary for managing serverless environments. It uses port 6543 and requires a flag appended to the the end of the string: "pgbouncer=true"
                     ```text .env
-                    # Used in your application
-                    DATABASE_URL="postgres://prisma.qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+                    # Used in your application (use transaction mode)
+                    DATABASE_URL="postgres://[DB-USER].qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
 
-                    # Used for Prisma Migrations
-                    DIRECT_URL="postgres://prisma.qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
+                    # Used for Prisma Migrations (use session mode or direct connection)
+                    DIRECT_URL="postgres://[DB-USER].qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
+                    ```
+
+                    Change both your strings' `[DB-USER]` to `prisma`
+                    ```md
+                    postgres://prisma.qjqzlvutjxbyodxrrvhb...
                     ```
 
                     In your schema.prisma file, edit your datasource db configs to reference your DATABASE_URL
@@ -139,22 +131,17 @@ If you plan to solely use Prisma instead of the Supabase Postgres API, turn it o
 
 
                 </TabPanel>
-                <TabPanel id="serverful" label="server-based deployments">
-
-                    ```text .env
-                    # Used for Prisma Migrations and within your application
-                    DIRECT_URL="postgres://prisma.qjqzlvutjxbyodxrrvhb:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
-                    ```
-                </TabPanel>
 
             </Tabs>
+
+
 
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={4}>
+  <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Create your migrations">
 
     If you have already modified your Supabase database, synchronize it with your migration file. Otherwise create new tables for your database
@@ -225,7 +212,7 @@ If you plan to solely use Prisma instead of the Supabase Postgres API, turn it o
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
-  <StepHikeCompact.Step step={5}>
+  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Install the prisma client">
     install the prisma client and generate its model
     </StepHikeCompact.Details>
@@ -238,7 +225,7 @@ If you plan to solely use Prisma instead of the Supabase Postgres API, turn it o
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
-    <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Step step={7}>
     <StepHikeCompact.Details title="Test your API">
       Create a index.ts file and run it to test your connection
     </StepHikeCompact.Details>
