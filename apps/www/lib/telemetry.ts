@@ -1,6 +1,7 @@
 import { post } from '~/lib/fetchWrapper'
 import { API_URL, IS_PROD, IS_PREVIEW } from 'lib/constants'
 import { NextRouter } from 'next/router'
+import { useConsent } from 'ui-patterns'
 
 export interface TelemetryEvent {
   category: string
@@ -18,7 +19,8 @@ export interface TelemetryProps {
 // but uses different ENV variables for www
 
 const sendEvent = (event: TelemetryEvent, gaProps: TelemetryProps, router: NextRouter) => {
-  if (!IS_PROD && !IS_PREVIEW) return
+  const { hasAcceptedConsent } = useConsent()
+  if ((!IS_PROD && !IS_PREVIEW) || !hasAcceptedConsent) return
 
   const { category, action, label, value } = event
 
