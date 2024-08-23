@@ -361,20 +361,33 @@ const SQLEditor = () => {
       setAiQueryCount((count) => count + 1)
 
       const existingValue = editorRef.current?.getValue() ?? ''
-      if (existingValue.length === 0) {
-        // if the editor is empty, just copy over the code
+
+      const applyDirectly = (content: string) => {
         editorRef.current?.executeEdits('apply-ai-message', [
           {
-            text: `${sqlAiDisclaimerComment}\n\n${sql}`,
+            text: content,
             range: editorModel.getFullModelRange(),
           },
         ])
-      } else {
+      }
+
+      const setupDiffView = (original: string, modified: string) => {
         setSelectedMessage(id)
-        const currentSql = editorRef.current?.getValue()
-        const diff = { original: currentSql || '', modified: sql }
-        setSourceSqlDiff(diff)
+        setSourceSqlDiff({ original, modified })
         setSelectedDiffType(diffType)
+      }
+
+      const sqlWithDisclaimer = `${sqlAiDisclaimerComment}\n\n${sql}`
+
+      switch (true) {
+        case existingValue.length === 0:
+          applyDirectly(sqlWithDisclaimer)
+          break
+        case diffType === DiffType.Overwrite:
+          applyDirectly(sqlWithDisclaimer)
+          break
+        default:
+          setupDiffView(existingValue, sql)
       }
     },
     [setAiQueryCount]
@@ -554,6 +567,12 @@ const SQLEditor = () => {
             return
           }
 
+          case DiffType.Overwrite: {
+            const transformedDiff = compareAsNewSnippet(sourceSqlDiff)
+            applyDiff(transformedDiff)
+            return
+          }
+
           default:
             throw new Error(`Unknown diff type '${selectedDiffType}'`)
         }
@@ -589,6 +608,10 @@ const SQLEditor = () => {
       }
 
       case DiffType.NewSnippet: {
+        return compareAsNewSnippet(sourceSqlDiff)
+      }
+
+      case DiffType.Overwrite: {
         return compareAsNewSnippet(sourceSqlDiff)
       }
 

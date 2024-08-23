@@ -1,6 +1,6 @@
 import { useTelemetryProps } from 'common'
 import { InsertCode, ReplaceCode } from 'icons'
-import { Check, Copy } from 'lucide-react'
+import { ArrowLeftRight, Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { format } from 'sql-formatter'
@@ -111,6 +111,31 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_ side="bottom" className="font-sans">
             Replace code
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
+            <Button
+              type="text"
+              size="tiny"
+              onClick={() => {
+                onDiff(DiffType.Overwrite, formatted)
+                Telemetry.sendEvent(
+                  {
+                    category: 'sql_editor_ai_assistant',
+                    action: 'ai_suggestion_overwritten',
+                    label: 'sql-editor-ai-assistant',
+                  },
+                  telemetryProps,
+                  router
+                )
+              }}
+            >
+              <ArrowLeftRight className="h-3.5 w-3.5 text-foreground-light" strokeWidth={1.5} />
+            </Button>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom" className="font-sans">
+            Overwrite code
           </TooltipContent_Shadcn_>
         </Tooltip_Shadcn_>
 

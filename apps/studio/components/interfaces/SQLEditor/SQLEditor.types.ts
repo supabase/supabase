@@ -31,4 +31,5 @@ export enum DiffType {
   Modification = 'modification',
   Addition = 'addition',
   NewSnippet = 'new-snippet',
+  Overwrite = 'overwrite',
 }

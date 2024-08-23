@@ -76,6 +76,8 @@ export function getDiffTypeButtonLabel(diffType: DiffType) {
       return 'Accept addition'
     case DiffType.NewSnippet:
       return 'Create new snippet'
+    case DiffType.Overwrite:
+      return 'Overwrite with snippet'
     default:
       throw new Error(`Unknown diff type '${diffType}'`)
   }
@@ -89,6 +91,8 @@ export function getDiffTypeDropdownLabel(diffType: DiffType) {
       return 'Compare as addition'
     case DiffType.NewSnippet:
       return 'Compare as new snippet'
+    case DiffType.Overwrite:
+      return 'Overwrite as new snippet'
     default:
       throw new Error(`Unknown diff type '${diffType}'`)
   }
