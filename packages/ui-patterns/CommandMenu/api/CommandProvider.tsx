@@ -1,14 +1,16 @@
 'use client'
 
-import { useConstant } from 'common'
+import { useRouter as useLegacyRouter } from 'next/compat/router'
 import { type PropsWithChildren, useEffect, useMemo, useCallback } from 'react'
+
+import { useConstant } from 'common'
 
 import { CommandContext } from '../internal/Context'
 import { initCommandsState } from '../internal/state/commandsState'
 import { initPagesState } from '../internal/state/pagesState'
 import { initQueryState } from '../internal/state/queryState'
 import { initViewState } from '../internal/state/viewState'
-import { useCrossCompatRouter } from './hooks/useCrossCompatRouter'
+import { CrossCompatRouterContext } from './hooks/useCrossCompatRouter'
 import { useSetCommandMenuOpen, useToggleCommandMenu } from './hooks/viewHooks'
 
 const CommandProviderInternal = ({ children }: PropsWithChildren) => {
@@ -44,21 +46,33 @@ const CommandShortcut = ({ openKey }: { openKey: string }) => {
   return null
 }
 
-// This is a component not a hook so it can access the wrapping context.
-function CloseOnNavigation() {
+function CloseOnNavigation({ children }: PropsWithChildren) {
   const setIsOpen = useSetCommandMenuOpen()
-  const router = useCrossCompatRouter()
+
+  const legacyRouter = useLegacyRouter()
+  const isUsingLegacyRouting = !!legacyRouter
 
   const completeNavigation = useCallback(() => {
     setIsOpen(false)
   }, [setIsOpen])
 
-  useEffect(() => {
-    router.events.onRouteChangeComplete(completeNavigation)
-    return () => router.events.offRouteChangeComplete(completeNavigation)
-  }, [router])
+  const ctx = useMemo(
+    () => ({
+      onPendingEnd: new Set([completeNavigation]),
+    }),
+    [completeNavigation]
+  )
 
-  return null
+  useEffect(() => {
+    if (!isUsingLegacyRouting) return
+
+    legacyRouter.events.on('routeChangeComplete', completeNavigation)
+    return () => legacyRouter.events.off('routeChangeComplete', completeNavigation)
+  }, [isUsingLegacyRouting, legacyRouter])
+
+  return (
+    <CrossCompatRouterContext.Provider value={ctx}>{children}</CrossCompatRouterContext.Provider>
+  )
 }
 
 interface CommandProviderProps extends PropsWithChildren {
@@ -74,8 +88,7 @@ interface CommandProviderProps extends PropsWithChildren {
 const CommandProvider = ({ children, openKey }: CommandProviderProps) => (
   <CommandProviderInternal>
     <CommandShortcut openKey={openKey ?? 'k'} />
-    <CloseOnNavigation />
-    {children}
+    <CloseOnNavigation>{children}</CloseOnNavigation>
   </CommandProviderInternal>
 )
 

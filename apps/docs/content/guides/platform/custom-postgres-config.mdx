@@ -32,7 +32,6 @@ The following parameters are available for overrides:
 1. [max_worker_processes](https://postgresqlco.nf/doc/en/param/max_worker_processes/)
 1. [session_replication_role](https://postgresqlco.nf/doc/en/param/session_replication_role/)
 1. [shared_buffers](https://postgresqlco.nf/doc/en/param/shared_buffers/)
-1. [statement_timeout](https://postgresqlco.nf/doc/en/param/statement_timeout/)
 1. [work_mem](https://postgresqlco.nf/doc/en/param/work_mem/)
 
 ### Setting config using the CLI
@@ -61,17 +60,6 @@ $ supabase --experimental --project-ref <project-ref> postgres-config update --c
 - Custom Postgres Config -
 Config                  |Value    |
 max_parallel_workers    |3        |
-- End of Custom Postgres Config -
-```
-
-When configuring parameters that require time units, such as `statement_timeout`, the CLI expects a string value with a time unit. Supported units include `ms`, `s`, and `min`.
-
-```bash
-$ supabase --experimental --project-ref <project-ref> postgres-config update --config statement_timeout=1000ms
-
-- Custom Postgres Config -
-Config            |Value   |
-statement_timeout |1000ms  |
 - End of Custom Postgres Config -
 ```
 

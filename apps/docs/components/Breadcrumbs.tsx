@@ -1,8 +1,10 @@
 'use client'
 
-import React, { Fragment } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import React, { Fragment } from 'react'
+
+import { useBreakpoint } from 'common'
 import {
   Breadcrumb_Shadcn_ as Breadcrumb,
   BreadcrumbList_Shadcn_ as BreadcrumbList,
@@ -23,9 +25,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+
+import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
-import { useBreakpoint } from 'common'
-import * as NavItems from './Navigation/NavigationMenu/NavigationMenu.constants'
 
 const Breadcrumbs = ({ className }: { className?: string }) => {
   const pathname = usePathname()

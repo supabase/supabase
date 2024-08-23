@@ -53,7 +53,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
           {menuItem.subMenu['navigation'].map((column: any) => (
             <div key={column.label} className="flex flex-col gap-3">
               {column.label !== 'Developers' && (
-                <label className="text-muted text-xs uppercase tracking-widest font-mono mt-4">
+                <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono mt-4">
                   {column.label}
                 </label>
               )}
@@ -150,7 +150,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
               <button
                 onClick={() => setOpen(false)}
                 type="button"
-                className="inline-flex items-center justify-center p-2 rounded-md text-foreground-lighter focus:ring-brand bg-surface-100 hover:bg-surface-200 focus:outline-none focus:ring-2 focus:ring-inset"
+                className="inline-flex items-center justify-center p-2 rounded-md text-foreground-lighter focus:ring-brand hover:text-foreground-light transition-colors focus:outline-none focus:ring-2 focus:ring-inset"
               >
                 <span className="sr-only">Close menu</span>
                 <svg

@@ -7,17 +7,22 @@ import Table from 'components/to-be-cleaned/Table'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import { Badge, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
+import PartnerIcon from 'components/ui/PartnerIcon'
 
 interface MemberRowProps {
   member: OrganizationMember
 }
+
+const MEMBER_ORIGIN_TO_MANAGED_BY = {
+  vercel: 'vercel-marketplace',
+} as const
 
 export const MemberRow = ({ member }: MemberRowProps) => {
   const { slug } = useParams()
@@ -25,7 +30,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   const { data: projects } = useProjectsQuery()
   const selectedOrganization = useSelectedOrganization()
   const [hasInvalidImg, setHasInvalidImg] = useState(false)
-  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
@@ -85,6 +90,18 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             )}
             {member.primary_email === profile?.primary_email && <Badge color="scale">You</Badge>}
           </div>
+
+          {(member.metadata as any)?.origin && (
+            <PartnerIcon
+              organization={{
+                managed_by:
+                  MEMBER_ORIGIN_TO_MANAGED_BY[
+                    (member.metadata as any).origin as keyof typeof MEMBER_ORIGIN_TO_MANAGED_BY
+                  ] ?? 'supabase',
+              }}
+              tooltipText="This user is managed by Vercel Marketplace."
+            />
+          )}
         </div>
       </Table.td>
 
@@ -128,8 +145,6 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                     })
                     .filter((x) => x.length > 0)
 
-            if (projectsApplied.length === 0) return null
-
             return (
               <div key={`role-${id}`} className="flex items-center gap-x-2">
                 <p>{roleName}</p>
@@ -149,17 +164,19 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                               : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
                           </span>
                         </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
-                          {projectsApplied
-                            ?.slice(0, 2)
-                            .map((name) => <span key={name}>{name}</span>)}
-                          {projectsApplied.length > 2 && (
-                            <span>
-                              And {projectsApplied.length - 2} other project
-                              {projectsApplied.length > 4 ? 's' : ''}
-                            </span>
-                          )}
-                        </TooltipContent_Shadcn_>
+                        {role?.project_ids !== null && projectsApplied.length > 1 && (
+                          <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
+                            {projectsApplied
+                              ?.slice(0, 2)
+                              .map((name) => <span key={name}>{name}</span>)}
+                            {projectsApplied.length > 2 && (
+                              <span>
+                                And {projectsApplied.length - 2} other project
+                                {projectsApplied.length > 4 ? 's' : ''}
+                              </span>
+                            )}
+                          </TooltipContent_Shadcn_>
+                        )}
                       </Tooltip_Shadcn_>
                     )}
                   </>

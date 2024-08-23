@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Check, ChevronUp } from 'lucide-react'
+import { Check, ChevronUp, ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
@@ -26,6 +26,7 @@ import {
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
+import Link from 'next/link'
 
 export interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -38,7 +39,74 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig: boolean = useCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
+
+  const shouldDisableField = (field: string): boolean => {
+    const shouldDisableSmsFields =
+      config.HOOK_SEND_SMS_ENABLED &&
+      field.startsWith('SMS_') &&
+      ![
+        'SMS_AUTOCONFIRM',
+        'SMS_OTP_EXP',
+        'SMS_OTP_LENGTH',
+        'SMS_OTP_LENGTH',
+        'SMS_TEMPLATE',
+        'SMS_TEST_OTP',
+        'SMS_TEST_OTP_VALID_UNTIL',
+      ].includes(field)
+    return (
+      ['EXTERNAL_SLACK_CLIENT_ID', 'EXTERNAL_SLACK_SECRET'].includes(field) ||
+      shouldDisableSmsFields
+    )
+  }
+
+  const showAlert = (title: string) => {
+    switch (title) {
+      // TODO (KM): Remove after 10th October 2024 when we disable the provider
+      case 'Slack (Deprecated)':
+        return (
+          <Alert_Shadcn_ variant="warning">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>Slack (Deprecated) Provider</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Recently, Slack has updated their OAuth API. Please use the new Slack (OIDC) provider
+              below. Developers using this provider should move over to the new provider. Please
+              refer to our{' '}
+              <a
+                href="https://supabase.com/docs/guides/auth/social-login/auth-slack"
+                className="underline"
+                target="_blank"
+              >
+                documentation
+              </a>{' '}
+              for more details.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )
+      case 'Phone':
+        return (
+          config.HOOK_SEND_SMS_ENABLED && (
+            <Alert_Shadcn_>
+              <WarningIcon />
+              <AlertTitle_Shadcn_>
+                SMS provider settings are disabled while the SMS hook is enabled.
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
+                <p>The SMS hook will be used in place of the SMS provider configured</p>
+                <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
+                  <Link href={`/project/${projectRef}/auth/hooks`}>View auth hooks</Link>
+                </Button>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )
+        )
+      default:
+        return null
+    }
+  }
 
   const { data: settings } = useProjectApiQuery({ projectRef })
   const apiUrl = `${settings?.autoApiService.protocol}://${settings?.autoApiService.endpoint}`
@@ -165,26 +233,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           return (
             <Collapsible.Content>
               <div className="group border-t border-strong bg-surface-100 py-6 px-6 text-foreground">
-                {provider.title === 'Slack (Deprecated)' && (
-                  <Alert_Shadcn_ variant="warning">
-                    <WarningIcon />
-                    <AlertTitle_Shadcn_>Slack (Deprecated) Provider</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      Recently, Slack has updated their OAuth API. Please use the new Slack (OIDC)
-                      provider below. Developers using this provider should move over to the new
-                      provider. Please refer to our{' '}
-                      <a
-                        href="https://supabase.com/docs/guides/auth/social-login/auth-slack"
-                        className="underline"
-                        target="_blank"
-                      >
-                        documentation
-                      </a>{' '}
-                      for more details.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
                 <div className="mx-auto my-6 max-w-lg space-y-6">
+                  {showAlert(provider.title)}
                   {Object.keys(provider.properties).map((x: string) => (
                     <FormField
                       key={x}
@@ -193,8 +243,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                       formValues={values}
                       disabled={
                         // TODO (KM): Remove after 10th October 2024 when we disable the provider
-                        ['EXTERNAL_SLACK_CLIENT_ID', 'EXTERNAL_SLACK_SECRET'].includes(x) ||
-                        !canUpdateConfig
+                        shouldDisableField(x) || !canUpdateConfig
                       }
                     />
                   ))}

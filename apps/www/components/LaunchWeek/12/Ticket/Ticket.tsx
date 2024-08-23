@@ -48,7 +48,7 @@ export default function Ticket() {
   .from('tickets')
   .select('*')
   .eq('launch_week', 'lw12')
-  .eq('username', ${username})
+  .eq('username', '${username}')
   .single()
 `
 
