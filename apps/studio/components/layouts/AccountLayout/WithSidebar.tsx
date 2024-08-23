@@ -6,6 +6,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
 import type { SidebarLink, SidebarSection } from './AccountLayout.types'
+import PartnerIcon from 'components/ui/PartnerIcon'
 
 interface WithSidebarProps {
   title: string
@@ -132,6 +133,7 @@ const SidebarItem = ({ links, subitems, subitemsParentKey }: SidebarItemProps) =
             href={link.href}
             onClick={link.onClick}
             isExternal={link.isExternal || false}
+            icon={link.icon}
           />
         )
 
@@ -144,6 +146,7 @@ const SidebarItem = ({ links, subitems, subitemsParentKey }: SidebarItemProps) =
               label={y.label}
               onClick={y.onClick}
               isExternal={link.isExternal || false}
+              icon={link.icon}
             />
           ))
           render = [render, ...subItemsRender]
@@ -167,6 +170,7 @@ const SidebarLinkItem = ({
   isSubitem,
   isExternal,
   onClick,
+  icon,
 }: SidebarLinkProps) => {
   if (isUndefined(href)) {
     let icon
@@ -202,12 +206,15 @@ const SidebarLinkItem = ({
             <IconArrowUpRight size={'tiny'} />
           </span>
         )}
-        <span
-          title={label}
-          className="w-full truncate text-sm text-foreground-light transition group-hover:text-foreground"
-        >
-          {isSubitem ? <p>{label}</p> : label}
-        </span>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <span
+            title={label}
+            className="w-full truncate text-sm text-foreground-light transition group-hover:text-foreground"
+          >
+            {isSubitem ? <p>{label}</p> : label}
+          </span>
+          {icon}
+        </div>
       </span>
     </Link>
   )
