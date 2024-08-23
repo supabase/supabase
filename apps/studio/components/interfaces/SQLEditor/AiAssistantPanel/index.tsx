@@ -1,51 +1,41 @@
 import { Message as MessageType } from 'ai'
 import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
-import { ChevronsUpDown } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useChat } from 'ai/react'
-import { useTelemetryProps, useParams } from 'common'
+import { useTelemetryProps } from 'common'
 import { SchemaComboBox } from 'components/ui/SchemaComboBox'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, OPT_IN_TAGS, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { BASE_PATH, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
 import {
   AiIconAnimation,
+  Button,
+  cn,
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Button,
-  cn,
-  CriticalIcon,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
   WarningIcon,
-  ScrollArea,
 } from 'ui'
 import { AssistantChatForm } from 'ui-patterns'
 import { DiffType } from '../SQLEditor.types'
+
 import Message from './Message'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { DeleteAccountButton } from 'components/interfaces/Account/Preferences/DeleteAccountButton'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import OptInToOpenAIToggle from '../../Organization/GeneralSettings/OptInToOpenAIToggle'
-import toast from 'react-hot-toast'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { useQueryClient } from '@tanstack/react-query'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import toast from 'react-hot-toast'
 import { useLocalStorage } from '../../../../hooks/misc/useLocalStorage'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
@@ -68,16 +58,10 @@ export const AiAssistantPanel = ({
   const project = useSelectedProject()
   const router = useRouter()
   const { profile } = useProfile()
-  const { ref } = useParams()
   const isOptedIntoAi = useOrgOptedIntoAi()
-
   const queryClient = useQueryClient()
-  const selectedOrganization = useSelectedOrganization()
-  const { data: projectDetails } = useProjectDetailQuery({ ref })
-  console.log({ projectDetails })
+
   const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
-  const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
-  console.log({ project })
 
   const { data } = useEntityDefinitionsQuery(
     {
@@ -124,6 +108,27 @@ export const AiAssistantPanel = ({
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
   const pendingReply = isLoading && last(messages)?.role === 'user'
 
+  useEffect(() => {
+    if (!isLoading) {
+      setValue('')
+      if (inputRef.current) inputRef.current.focus()
+    }
+
+    // Try to scroll on each rerender to the bottom
+    setTimeout(
+      () => {
+        if (bottomRef.current) {
+          bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+        }
+      },
+      isLoading ? 100 : 500
+    )
+  }, [isLoading])
+
+  const selectedOrganization = useSelectedOrganization()
+
+  const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
+
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
@@ -145,9 +150,9 @@ export const AiAssistantPanel = ({
       { slug: selectedOrganization?.slug, opt_in_tags: updatedOptInTags },
       {
         onSuccess: () => {
-          setIsConfirmOptInModalOpen(false)
-          invalidateOrganizationsQuery(queryClient)
           toast.success('Successfully opted-in')
+          invalidateOrganizationsQuery(queryClient)
+          setIsConfirmOptInModalOpen(false)
         },
       }
     )
@@ -174,23 +179,6 @@ export const AiAssistantPanel = ({
       }
     }
   }, [selectedOrganization, isOptedIntoAi, showAiNotOptimizedWarningSetting])
-
-  useEffect(() => {
-    if (!isLoading) {
-      setValue('')
-      if (inputRef.current) inputRef.current.focus()
-    }
-
-    // Try to scroll on each rerender to the bottom
-    setTimeout(
-      () => {
-        if (bottomRef.current) {
-          bottomRef.current.scrollIntoView({ behavior: 'smooth' })
-        }
-      },
-      isLoading ? 100 : 500
-    )
-  }, [isLoading])
 
   return (
     <div className="flex flex-col h-full border-l border-control">
