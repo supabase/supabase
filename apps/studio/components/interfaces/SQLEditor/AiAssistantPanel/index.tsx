@@ -21,6 +21,9 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   WarningIcon,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import { AssistantChatForm } from 'ui-patterns'
 import { DiffType } from '../SQLEditor.types'
@@ -37,7 +40,7 @@ import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import toast from 'react-hot-toast'
 import { useLocalStorage } from '../../../../hooks/misc/useLocalStorage'
-import { History } from 'lucide-react'
+import { History, Info, InfoIcon } from 'lucide-react'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
 
@@ -204,67 +207,83 @@ export const AiAssistantPanel = ({
             </Button>
           }
         >
-          <div className="flex flex-row justify-between space-x-2 ">
-            {includeSchemaMetadata ? (
-              <SchemaComboBox
-                disabled={!includeSchemaMetadata}
-                selectedSchemas={selectedSchemas}
-                onSelectSchemas={setSelectedSchemas}
-                label={
-                  includeSchemaMetadata && selectedSchemas.length > 0
-                    ? `${selectedSchemas.length} schema${
-                        selectedSchemas.length > 1 ? 's' : ''
-                      } selected`
-                    : 'No schemas selected'
-                }
-              />
-            ) : (
-              <>
-                {shouldShowNotOptimizedAlert ? (
-                  <Alert_Shadcn_ className="[&>svg]:left-5 border-l-0 border-r-0 rounded-none -mx-5 px-5 w-[calc(100%+40px)]">
-                    <WarningIcon />
-                    <AlertTitle_Shadcn_>AI Assistant is not optimized</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      You need to aggree to share anonymous schema data with OpenAI for the best
-                      experience.
-                    </AlertDescription_Shadcn_>
-                    <div className="flex items-center gap-4 mt-6">
-                      <Button type="default" onClick={() => setIsConfirmOptInModalOpen(true)}>
-                        Update AI settings
-                      </Button>
+          <div className="mt-2">
+            <span className="inline-block text-lighter">
+              Include these schemas in your prompts:
+            </span>
+            <div className="flex flex-row justify-between space-x-2 mt-2">
+              {includeSchemaMetadata ? (
+                <div className="flex items-center gap-2">
+                  <SchemaComboBox
+                    disabled={!includeSchemaMetadata}
+                    selectedSchemas={selectedSchemas}
+                    onSelectSchemas={setSelectedSchemas}
+                    label={
+                      includeSchemaMetadata && selectedSchemas.length > 0
+                        ? `${selectedSchemas.length} schema${
+                            selectedSchemas.length > 1 ? 's' : ''
+                          } selected`
+                        : 'No schemas selected'
+                    }
+                  />
+                  <Tooltip_Shadcn_>
+                    <TooltipTrigger_Shadcn_ className="flex items-center gap-2 text-lighter">
+                      <Info className="text-lighter w-4 h-4" />
+                    </TooltipTrigger_Shadcn_>
+                    <TooltipContent_Shadcn_ className="w-72" side="right">
+                      Select specific schemas to send with your queries. Supabase AI can use this
+                      data to improve the responses it shows you.
+                    </TooltipContent_Shadcn_>
+                  </Tooltip_Shadcn_>
+                </div>
+              ) : (
+                <>
+                  {shouldShowNotOptimizedAlert ? (
+                    <Alert_Shadcn_ className="[&>svg]:left-5 border-l-0 border-r-0 rounded-none -mx-5 px-5 w-[calc(100%+40px)]">
+                      <WarningIcon />
+                      <AlertTitle_Shadcn_>AI Assistant is not optimized</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        You need to aggree to share anonymous schema data with OpenAI for the best
+                        experience.
+                      </AlertDescription_Shadcn_>
+                      <div className="flex items-center gap-4 mt-6">
+                        <Button type="default" onClick={() => setIsConfirmOptInModalOpen(true)}>
+                          Update AI settings
+                        </Button>
 
-                      <Button
-                        type="text"
-                        onClick={() => {
-                          setNotOptimizedAlertVisibility(false)
-                        }}
+                        <Button
+                          type="text"
+                          onClick={() => {
+                            setNotOptimizedAlertVisibility(false)
+                          }}
+                        >
+                          Dismiss
+                        </Button>
+                      </div>
+                      <ConfirmationModal
+                        visible={isConfirmOptInModalOpen}
+                        size="large"
+                        title="Confirm sending anonymous data to OpenAI"
+                        confirmLabel="Confirm"
+                        onCancel={() => setIsConfirmOptInModalOpen(false)}
+                        onConfirm={confirmOptInToShareSchemaData}
+                        loading={isUpdating}
                       >
-                        Dismiss
-                      </Button>
-                    </div>
-                    <ConfirmationModal
-                      visible={isConfirmOptInModalOpen}
-                      size="large"
-                      title="Confirm sending anonymous data to OpenAI"
-                      confirmLabel="Confirm"
-                      onCancel={() => setIsConfirmOptInModalOpen(false)}
-                      onConfirm={confirmOptInToShareSchemaData}
-                      loading={isUpdating}
-                    >
-                      <p className="text-sm text-foreground-light">
-                        By opting into sending anonymous data, Supabase AI can improve the answers
-                        it shows you. This is an organization-wide setting, and affects all projects
-                        in your organization.
-                      </p>
+                        <p className="text-sm text-foreground-light">
+                          By opting into sending anonymous data, Supabase AI can improve the answers
+                          it shows you. This is an organization-wide setting, and affects all
+                          projects in your organization.
+                        </p>
 
-                      <OptInToOpenAIToggle />
-                    </ConfirmationModal>
-                  </Alert_Shadcn_>
-                ) : (
-                  <></>
-                )}
-              </>
-            )}
+                        <OptInToOpenAIToggle />
+                      </ConfirmationModal>
+                    </Alert_Shadcn_>
+                  ) : (
+                    <></>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </Message>
         <div>
