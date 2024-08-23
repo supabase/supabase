@@ -4,7 +4,7 @@ import React, { Fragment } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import { Home, LogOut, Search, Settings, UserIcon } from 'lucide-react'
+import { Home, LogOut, Globe, LifeBuoy, Settings, UserIcon } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,12 +16,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
+  IconGitHub,
   Theme,
   buttonVariants,
   cn,
   themes,
 } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { logOut } from 'common'
 
 import type { User } from '@supabase/supabase-js'
@@ -45,7 +45,6 @@ interface menuItem {
 }
 
 const AuthenticatedDropdownMenu = ({ user }: Props) => {
-  const setCommandMenuOpen = useSetCommandMenuOpen()
   const { theme, setTheme } = useTheme()
   const userAvatar = user && user.user_metadata?.avatar_url
 
@@ -75,11 +74,31 @@ const AuthenticatedDropdownMenu = ({ user }: Props) => {
     ],
     [
       {
-        label: 'Search',
-        type: 'button',
-        icon: Search,
-        onClick: () => setCommandMenuOpen(true),
-        shortcut: '⌘K',
+        label: 'Supabase.com',
+        icon: Globe,
+        href: 'https://supabase.com',
+        otherProps: {
+          target: '_blank',
+          rel: 'noreferrer noopener',
+        },
+      },
+      {
+        label: 'GitHub',
+        icon: IconGitHub as any,
+        href: 'https://github.com/supabase/supabase',
+        otherProps: {
+          target: '_blank',
+          rel: 'noreferrer noopener',
+        },
+      },
+      {
+        label: 'Support',
+        icon: LifeBuoy,
+        href: 'https://supabase.com/support',
+        otherProps: {
+          target: '_blank',
+          rel: 'noreferrer noopener',
+        },
       },
     ],
   ]

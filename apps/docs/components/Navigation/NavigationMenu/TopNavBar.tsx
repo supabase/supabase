@@ -5,15 +5,17 @@ import Link from 'next/link'
 import type { FC } from 'react'
 import { memo, useState } from 'react'
 
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
 import { CommandMenuTrigger, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import GlobalNavigationMenu from './GlobalNavigationMenu'
+import AuthenticatedDropdownMenu from './AuthenticatedDropdownMenu'
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 
 const TopNavBar: FC = () => {
+  const user = useUser()
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -96,7 +98,9 @@ const TopNavBar: FC = () => {
                 <Link href="/__dev-secret-auth">Dev-only secret sign-in</Link>
               </Button>
             )}
-            <TopNavDropdown />
+            {isLoggedIn ? <AuthenticatedDropdownMenu user={user} />
+            :<TopNavDropdown />
+            }
           </div>
         </div>
       </nav>
