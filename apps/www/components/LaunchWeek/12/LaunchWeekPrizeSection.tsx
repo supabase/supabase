@@ -36,17 +36,17 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                 <div className="flex flex-col justify-center lg:w-1/2 gap-1 p-4 md:p-8 lg:pl-0 lg:h-full">
                   <div className="flex flex-col gap-2">
                     <LabelBadge text="5 pieces" />
-                    <p className="text-foreground">Win Wandrd Backpack</p>
+                    <p className="text-foreground">Wandrd Backpack</p>
                     <p className="text-foreground-lighter text-sm">
-                      Share your ticket to increase your chances of winning a{' '}
+                      Registrations are closed to participate in winning a{' '}
                       <a
                         className="text-foreground hover:underline"
                         href="https://eu.wandrd.com/products/prvke?variant=39360658473002"
                         target="_blank"
                       >
                         Wandrd backpack
-                      </a>{' '}
-                      and other limited swag.
+                      </a>
+                      .
                     </p>
                   </div>
                 </div>
@@ -72,7 +72,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                   <div className="relative flex flex-col justify-center w-full gap-1 p-4 md:p-6 bg-surface-75 border-t border-muted">
                     <div className="flex flex-col gap-2">
                       <LabelBadge text="30 t-shirts" />
-                      <p>World Tour T-Shirt</p>
+                      <p className="text-foreground">World Tour T-Shirt</p>
                     </div>
                   </div>
                 </div>

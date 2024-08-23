@@ -18,6 +18,12 @@
     "title": "General",
     "items": [
       {
+        "id": "supabase-bootstrap",
+        "title": "Launch a quick start template",
+        "slug": "supabase-bootstrap",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-init",
         "title": "Initialize a local project",
         "slug": "supabase-init",

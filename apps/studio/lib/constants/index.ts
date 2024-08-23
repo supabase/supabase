@@ -66,6 +66,9 @@ export const LOCAL_STORAGE_KEYS = {
 
   // Used for storing the last sign in method used by the user
   LAST_SIGN_IN_METHOD: 'supabase-last-sign-in-method',
+
+  // Key to track the last selected schema. The project ref is intentionally put at the end for easier search in the browser console.
+  LAST_SELECTED_SCHEMA: (ref: string) => `last-selected-schema-${ref}`,
 }
 
 export const OPT_IN_TAGS = {

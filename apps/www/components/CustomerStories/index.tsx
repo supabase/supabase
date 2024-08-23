@@ -6,7 +6,6 @@ import TextLink from '../TextLink'
 import SectionHeader from 'components/UI/SectionHeader'
 import customerStories from '~/data/CustomerStories'
 import Panel from '../Panel'
-import EventCallout from '../EventCallout'
 
 const CustomerStories = () => {
   // const selection = ['Pebblely', 'Chatbase', 'Mendable.ai']
@@ -57,7 +56,6 @@ const CustomerStories = () => {
       </div>
       <div className="mt-12 flex flex-col md:flex-row gap-8 justify-between">
         <TextLink url="/customers" label="Explore more" />
-        <EventCallout size="small" className="border-t pt-8 md:border-t-0 md:pt-3" />
       </div>
     </SectionContainer>
   )
