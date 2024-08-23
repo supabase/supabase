@@ -59,27 +59,27 @@ export interface paths {
     /** Redirects to Supabase dashboard after completing Vercel sso flow */
     get: operations['CallbackController_redirectToDashboardFlyioExtensionScreen']
   }
-  '/partners/vercel/callback2': {
-    /** Redirects to Supabase dashboard after completing Vercel sso flow */
-    get: operations['Callback2Controller_redirectToDashboardFlyioExtensionScreen']
-  }
-  '/partners/vercel/identity/link': {
-    /** Links a new Vercel identity for a specific user */
-    post: operations['IdentityController_linkVercelIdentity']
-  }
-  '/partners/vercel/identity/verify': {
-    /** Verifies existing Vercel identity for a specific user */
-    get: operations['IdentityController_verifyVercelIdentity']
-  }
   '/partners/vercel/mock-usage': {
     /** Fake it till you make it */
     get: operations['MockBillingController_mockUsage']
   }
+  '/partners/vercel/mock-usage/invoice': {
+    /** Fake it till you make it */
+    get: operations['MockBillingController_sendInvoice']
+  }
   '/partners/vercel/v1/installations/{installation_id}': {
+    /** Gets the set of billing plans available to a specific Installation */
+    get: operations['InstallationsController_getInstallation']
     /** Upserts an installation for the account with installation_id */
     put: operations['InstallationsController_createInstallation']
     /** Deletes the installation with provided installation_id */
     delete: operations['InstallationsController_deleteInstallation']
+    /** Updates an installation for the account with installation_id */
+    patch: operations['InstallationsController_updateInstallation']
+  }
+  '/partners/vercel/v1/installations/{installation_id}/plans': {
+    /** Gets the set of billing plans available to a specific Installation */
+    get: operations['InstallationsController_getInstallationBillingPlans']
   }
   '/partners/vercel/v1/installations/{installation_id}/resources': {
     /** Lists all resources */
@@ -2184,6 +2184,7 @@ export interface components {
       | 'pitr_28'
       | 'ipv4_default'
       | 'auth_mfa_phone_default'
+      | 'log_drain_default'
     AmiSearchOptions: {
       search_tags?: Record<string, never>
     }
@@ -2581,7 +2582,9 @@ export interface components {
     }
     CreateBranchBody: {
       branch_name: string
+      desired_instance_size?: components['schemas']['DesiredInstanceSize']
       git_branch?: string
+      persistent?: boolean
       region?: string
     }
     CreateCliLoginSessionBody: {
@@ -4390,7 +4393,13 @@ export interface components {
       selected_addons: components['schemas']['SelectedAddonResponse'][]
     }
     /** @enum {string} */
-    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4' | 'auth_mfa_phone'
+    ProjectAddonType:
+      | 'custom_domain'
+      | 'compute_instance'
+      | 'pitr'
+      | 'ipv4'
+      | 'auth_mfa_phone'
+      | 'log_drain'
     /** @enum {string} */
     ProjectAddonVariantPricingType: 'fixed' | 'usage'
     ProjectAddonVariantResponse: {
@@ -4570,18 +4579,6 @@ export interface components {
       id: string
       saml?: components['schemas']['SamlDescriptor']
       updated_at?: string
-    }
-    ProvisionResourceRequest: {
-      /** @description Policies accepted by the customer. Ex: { toc: '2024-02-28T10:00:00Z' } */
-      acceptedPolicies?: Record<string, never>
-      /** @description Partner-provided billing plan. See "Get Offers". Ex: "pro200" */
-      billingPlanId: string
-      /** @description User-input based on the registered schema. Ex: { region: "us-east-1", eviction: false } */
-      metadata: Record<string, never>
-      /** @description User-input for product name. Ex: "redis_dev" */
-      name: string
-      /** @description The partner-specific ID of the product. Ex: "redis" */
-      productId: string
     }
     PublicUrlOptions: {
       download?: boolean
@@ -4967,6 +4964,7 @@ export interface components {
        */
       read_replica_region:
         | 'us-east-1'
+        | 'us-east-2'
         | 'us-west-1'
         | 'us-west-2'
         | 'ap-east-1'
@@ -4977,7 +4975,9 @@ export interface components {
         | 'eu-west-1'
         | 'eu-west-2'
         | 'eu-west-3'
+        | 'eu-north-1'
         | 'eu-central-1'
+        | 'eu-central-2'
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
@@ -5159,6 +5159,7 @@ export interface components {
        */
       region:
         | 'us-east-1'
+        | 'us-east-2'
         | 'us-west-1'
         | 'us-west-2'
         | 'ap-east-1'
@@ -5169,7 +5170,9 @@ export interface components {
         | 'eu-west-1'
         | 'eu-west-2'
         | 'eu-west-3'
+        | 'eu-north-1'
         | 'eu-central-1'
+        | 'eu-central-2'
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
@@ -5470,6 +5473,14 @@ export interface components {
       git_branch?: string
       persistent?: boolean
       reset_on_push?: boolean
+      /** @enum {string} */
+      status?:
+        | 'CREATING_PROJECT'
+        | 'RUNNING_MIGRATIONS'
+        | 'MIGRATIONS_PASSED'
+        | 'MIGRATIONS_FAILED'
+        | 'FUNCTIONS_DEPLOYED'
+        | 'FUNCTIONS_FAILED'
     }
     UpdateColumnBody: {
       check?: string
@@ -5805,12 +5816,6 @@ export interface components {
       publish_update?: boolean
       tables?: string[] | null
     }
-    UpdateResourceRequest: {
-      billingPlanId?: string
-      metadata?: Record<string, never>
-      name?: string
-      status?: Record<string, never>
-    }
     UpdateRestrictionsBody: {
       no_notification?: boolean
       restriction_data?: components['schemas']['RestrictionData']
@@ -6094,6 +6099,7 @@ export interface components {
        */
       region:
         | 'us-east-1'
+        | 'us-east-2'
         | 'us-west-1'
         | 'us-west-2'
         | 'ap-east-1'
@@ -6104,7 +6110,9 @@ export interface components {
         | 'eu-west-1'
         | 'eu-west-2'
         | 'eu-west-3'
+        | 'eu-north-1'
         | 'eu-central-1'
+        | 'eu-central-2'
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
@@ -6424,24 +6432,8 @@ export interface operations {
       }
     }
   }
-  /** Redirects to Supabase dashboard after completing Vercel sso flow */
-  Callback2Controller_redirectToDashboardFlyioExtensionScreen: {
-    responses: {
-      200: {
-        content: never
-      }
-    }
-  }
-  /** Links a new Vercel identity for a specific user */
-  IdentityController_linkVercelIdentity: {
-    responses: {
-      201: {
-        content: never
-      }
-    }
-  }
-  /** Verifies existing Vercel identity for a specific user */
-  IdentityController_verifyVercelIdentity: {
+  /** Fake it till you make it */
+  MockBillingController_mockUsage: {
     responses: {
       200: {
         content: never
@@ -6449,7 +6441,20 @@ export interface operations {
     }
   }
   /** Fake it till you make it */
-  MockBillingController_mockUsage: {
+  MockBillingController_sendInvoice: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Gets the set of billing plans available to a specific Installation */
+  InstallationsController_getInstallation: {
+    parameters: {
+      path: {
+        installation_id: string
+      }
+    }
     responses: {
       200: {
         content: never
@@ -6482,6 +6487,32 @@ export interface operations {
       }
     }
   }
+  /** Updates an installation for the account with installation_id */
+  InstallationsController_updateInstallation: {
+    parameters: {
+      path: {
+        installation_id: string
+      }
+    }
+    responses: {
+      204: {
+        content: never
+      }
+    }
+  }
+  /** Gets the set of billing plans available to a specific Installation */
+  InstallationsController_getInstallationBillingPlans: {
+    parameters: {
+      path: {
+        installation_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
   /** Lists all resources */
   ResourcesController_listResources: {
     parameters: {
@@ -6502,11 +6533,6 @@ export interface operations {
     parameters: {
       path: {
         installation_id: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ProvisionResourceRequest']
       }
     }
     responses: {
@@ -6555,11 +6581,6 @@ export interface operations {
         resource_id: string
       }
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateResourceRequest']
-      }
-    }
     responses: {
       200: {
         content: {
@@ -6573,14 +6594,11 @@ export interface operations {
     parameters: {
       path: {
         installation_id: string
-        resource_id: string
       }
     }
     responses: {
       200: {
-        content: {
-          'application/json': Record<string, never>
-        }
+        content: never
       }
     }
   }
