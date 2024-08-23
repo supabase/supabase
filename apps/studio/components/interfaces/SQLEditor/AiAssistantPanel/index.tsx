@@ -7,27 +7,46 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useChat } from 'ai/react'
-import { useTelemetryProps } from 'common'
+import { useTelemetryProps, useParams } from 'common'
 import { SchemaComboBox } from 'components/ui/SchemaComboBox'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, OPT_IN_TAGS, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
 import {
   AiIconAnimation,
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   cn,
+  CriticalIcon,
   Tooltip_Shadcn_,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
+  WarningIcon,
+  ScrollArea,
 } from 'ui'
 import { AssistantChatForm } from 'ui-patterns'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { DeleteAccountButton } from 'components/interfaces/Account/Preferences/DeleteAccountButton'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import OptInToOpenAIToggle from '../../Organization/GeneralSettings/OptInToOpenAIToggle'
+import toast from 'react-hot-toast'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
+import { useQueryClient } from '@tanstack/react-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useLocalStorage } from '../../../../hooks/misc/useLocalStorage'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
 
@@ -47,9 +66,18 @@ export const AiAssistantPanel = ({
   includeSchemaMetadata,
 }: AiAssistantPanelProps) => {
   const project = useSelectedProject()
-  const selectedOrganization = useSelectedOrganization()
+  const router = useRouter()
+  const { profile } = useProfile()
+  const { ref } = useParams()
+  const isOptedIntoAi = useOrgOptedIntoAi()
 
+  const queryClient = useQueryClient()
+  const selectedOrganization = useSelectedOrganization()
+  const { data: projectDetails } = useProjectDetailQuery({ ref })
+  console.log({ projectDetails })
   const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
+  const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
+  console.log({ project })
 
   const { data } = useEntityDefinitionsQuery(
     {
@@ -87,8 +115,6 @@ export const AiAssistantPanel = ({
     )
   }, [chatMessages])
 
-  const router = useRouter()
-  const { profile } = useProfile()
   const bottomRef = useRef<HTMLDivElement>(null)
   const telemetryProps = useTelemetryProps()
 
@@ -97,6 +123,57 @@ export const AiAssistantPanel = ({
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
   const pendingReply = isLoading && last(messages)?.role === 'user'
+
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+
+  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
+
+  const confirmOptInToShareSchemaData = async () => {
+    if (!canUpdateOrganization) {
+      return toast.error('You do not have the required permissions to update this organization')
+    }
+
+    if (!selectedOrganization?.slug) return console.error('Organization slug is required')
+
+    const existingOptInTags = selectedOrganization?.opt_in_tags ?? []
+
+    const updatedOptInTags = existingOptInTags.includes(OPT_IN_TAGS.AI_SQL)
+      ? existingOptInTags
+      : [...existingOptInTags, OPT_IN_TAGS.AI_SQL]
+
+    updateOrganization(
+      { slug: selectedOrganization?.slug, opt_in_tags: updatedOptInTags },
+      {
+        onSuccess: () => {
+          setIsConfirmOptInModalOpen(false)
+          invalidateOrganizationsQuery(queryClient)
+          toast.success('Successfully opted-in')
+        },
+      }
+    )
+  }
+
+  const [shouldShowNotOptimizedAlert, setShouldShowNotOptimizedAlert] = useState(false)
+  const [showAiNotOptimizedWarningSetting, setShowAiNotOptimizedWarningSetting] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.SHOW_AI_NOT_OPTIMIZED_WARNING,
+    true
+  )
+
+  const setNotOptimizedAlertVisibility = (visible: boolean) => {
+    setShouldShowNotOptimizedAlert(visible)
+    setShowAiNotOptimizedWarningSetting(visible)
+  }
+
+  useEffect(() => {
+    // need to wait for selectedOrg to get isOptedIntoAi
+    if (selectedOrganization) {
+      if (!isOptedIntoAi && showAiNotOptimizedWarningSetting) {
+        setShouldShowNotOptimizedAlert(true)
+      } else {
+        setShouldShowNotOptimizedAlert(false)
+      }
+    }
+  }, [selectedOrganization, isOptedIntoAi, showAiNotOptimizedWarningSetting])
 
   useEffect(() => {
     if (!isLoading) {
@@ -137,7 +214,7 @@ export const AiAssistantPanel = ({
             </Button>
           }
         >
-          <div className="flex flex-row justify-between space-x-2">
+          <div className="flex flex-row justify-between space-x-2 ">
             {includeSchemaMetadata ? (
               <SchemaComboBox
                 disabled={!includeSchemaMetadata}
@@ -152,37 +229,57 @@ export const AiAssistantPanel = ({
                 }
               />
             ) : (
-              <ButtonTooltip
-                disabled
-                size="tiny"
-                type="default"
-                className="w-min"
-                iconRight={<ChevronsUpDown size={14} />}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    className: 'w-72',
-                    text: (
-                      <>
-                        Opt in to sending anonymous data to OpenAI in your{' '}
-                        <Link
-                          className="underline"
-                          href={`/org/${selectedOrganization?.slug}/general`}
-                        >
-                          organization settings
-                        </Link>{' '}
-                        to share schemas with the Assistant for more accurate responses.
-                      </>
-                    ),
-                  },
-                }}
-              >
-                No schemas selected
-              </ButtonTooltip>
+              <>
+                {shouldShowNotOptimizedAlert ? (
+                  <Alert_Shadcn_ className="[&>svg]:left-5 border-l-0 border-r-0 rounded-none -mx-5 px-5 w-[calc(100%+40px)]">
+                    <WarningIcon />
+                    <AlertTitle_Shadcn_>AI Assistant is not optimized</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      You need to aggree to share anonymous schema data with OpenAI for the best
+                      experience.
+                    </AlertDescription_Shadcn_>
+                    <div className="flex items-center gap-4 mt-6">
+                      <Button type="default" onClick={() => setIsConfirmOptInModalOpen(true)}>
+                        Update AI settings
+                      </Button>
+
+                      <Button
+                        type="text"
+                        onClick={() => {
+                          setNotOptimizedAlertVisibility(false)
+                        }}
+                      >
+                        Dismiss
+                      </Button>
+                    </div>
+                    <ConfirmationModal
+                      visible={isConfirmOptInModalOpen}
+                      size="large"
+                      title="Confirm sending anonymous data to OpenAI"
+                      confirmLabel="Confirm"
+                      onCancel={() => setIsConfirmOptInModalOpen(false)}
+                      onConfirm={confirmOptInToShareSchemaData}
+                      loading={isUpdating}
+                    >
+                      <p className="text-sm text-foreground-light">
+                        By opting into sending anonymous data, Supabase AI can improve the answers
+                        it shows you. This is an organization-wide setting, and affects all projects
+                        in your organization.
+                      </p>
+
+                      <OptInToOpenAIToggle />
+                    </ConfirmationModal>
+                  </Alert_Shadcn_>
+                ) : (
+                  <></>
+                )}
+              </>
             )}
-            <Button type="warning" onClick={() => setChatId(uuidv4())}>
-              Clear history
-            </Button>
+            {messages.length > 0 && (
+              <Button type="warning" onClick={() => setChatId(uuidv4())}>
+                Clear history
+              </Button>
+            )}
           </div>
         </Message>
 
