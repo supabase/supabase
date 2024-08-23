@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useChat } from 'ai/react'
-import { useTelemetryProps } from 'common'
+import { useTelemetryProps, useParams } from 'common'
 import { SchemaComboBox } from 'components/ui/SchemaComboBox'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
@@ -37,6 +37,7 @@ import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import toast from 'react-hot-toast'
 import { useLocalStorage } from '../../../../hooks/misc/useLocalStorage'
+import { History } from 'lucide-react'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
 
@@ -57,6 +58,7 @@ export const AiAssistantPanel = ({
 }: AiAssistantPanelProps) => {
   const project = useSelectedProject()
   const router = useRouter()
+  const { ref } = useParams()
   const { profile } = useProfile()
   const isOptedIntoAi = useOrgOptedIntoAi()
   const queryClient = useQueryClient()
@@ -88,7 +90,6 @@ export const AiAssistantPanel = ({
       entityDefinitions: entityDefinitions,
     },
   })
-
   const messages = useMemo(() => {
     const merged = [...chatMessages.map((m) => ({ ...m, isDebug: false }))]
 
@@ -98,6 +99,7 @@ export const AiAssistantPanel = ({
         a.role.localeCompare(b.role)
     )
   }, [chatMessages])
+  console.log({ messages })
 
   const bottomRef = useRef<HTMLDivElement>(null)
   const telemetryProps = useTelemetryProps()
@@ -160,7 +162,7 @@ export const AiAssistantPanel = ({
 
   const [shouldShowNotOptimizedAlert, setShouldShowNotOptimizedAlert] = useState(false)
   const [showAiNotOptimizedWarningSetting, setShowAiNotOptimizedWarningSetting] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.SHOW_AI_NOT_OPTIMIZED_WARNING,
+    LOCAL_STORAGE_KEYS.SHOW_AI_NOT_OPTIMIZED_WARNING(ref as string),
     true
   )
 
@@ -263,29 +265,49 @@ export const AiAssistantPanel = ({
                 )}
               </>
             )}
-            {messages.length > 0 && (
-              <Button type="warning" onClick={() => setChatId(uuidv4())}>
-                Clear history
-              </Button>
-            )}
           </div>
         </Message>
+        <div>
+          {messages.length > 0 && (
+            <div className="flex justify-end mb-2">
+              <Button type="text" onClick={() => setChatId(uuidv4())}>
+                Clear history
+              </Button>
+            </div>
+          )}
+          {messages.map((m, index) => {
+            const isFirstUserMessage =
+              m.role === 'user' && messages.slice(0, index).every((msg) => msg.role !== 'user')
 
-        {messages.map((m) => (
-          <Message
-            key={`message-${m.id}`}
-            name={m.name}
-            role={m.role}
-            content={m.content}
-            createdAt={new Date(m.createdAt || new Date()).getTime()}
-            isDebug={m.isDebug}
-            isSelected={selectedMessage === m.id}
-            onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
-          />
-        ))}
-
+            return (
+              <>
+                <Message
+                  key={`message-${m.id}`}
+                  name={m.name}
+                  role={m.role}
+                  content={m.content}
+                  createdAt={new Date(m.createdAt || new Date()).getTime()}
+                  isDebug={m.isDebug}
+                  isSelected={selectedMessage === m.id}
+                  onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
+                />
+                {isFirstUserMessage && !isOptedIntoAi && (
+                  <Alert_Shadcn_ className="mx-5 mb-4  ">
+                    <AlertDescription_Shadcn_ className="mb-4">
+                      Quick reminder that you're not sending project metadata with your queries. By
+                      opting into sending anonymous data, Supabase AI can improve the answers it
+                      shows you.
+                    </AlertDescription_Shadcn_>
+                    <Button type="default" onClick={() => setIsConfirmOptInModalOpen(true)}>
+                      Update AI settings
+                    </Button>
+                  </Alert_Shadcn_>
+                )}
+              </>
+            )
+          })}
+        </div>
         {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
-
         <div ref={bottomRef} className="h-1" />
       </div>
 

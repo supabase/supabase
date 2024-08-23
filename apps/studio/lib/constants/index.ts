@@ -71,7 +71,7 @@ export const LOCAL_STORAGE_KEYS = {
   LAST_SELECTED_SCHEMA: (ref: string) => `last-selected-schema-${ref}`,
 
   // Key to show a warning on the SQL Editor AI Assistant that the org hasn't opted-in to sending anon data
-  SHOW_AI_NOT_OPTIMIZED_WARNING: 'supabase-show-ai-not-optimized',
+  SHOW_AI_NOT_OPTIMIZED_WARNING: (ref: string) => `supabase-show-ai-not-optimized-${ref}`,
 }
 
 export const OPT_IN_TAGS = {
