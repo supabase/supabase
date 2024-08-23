@@ -95,8 +95,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             <PartnerIcon
               organization={{
                 managed_by:
-                  MEMBER_ORIGIN_TO_MANAGED_BY[(member.metadata as any).origin as 'vercel'] ??
-                  'supabase',
+                  MEMBER_ORIGIN_TO_MANAGED_BY[
+                    (member.metadata as any).origin as keyof typeof MEMBER_ORIGIN_TO_MANAGED_BY
+                  ] ?? 'supabase',
               }}
               tooltipText="This user is managed by Vercel Marketplace."
             />
