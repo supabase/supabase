@@ -1,4 +1,3 @@
-import React from 'react'
 import Link from 'next/link'
 import { cn, Collapsible_Shadcn_, CollapsibleTrigger_Shadcn_, CollapsibleContent_Shadcn_ } from 'ui'
 import { useState } from 'react'
