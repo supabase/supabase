@@ -292,7 +292,7 @@ export const AiAssistantPanel = ({
                   onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
                 />
                 {isFirstUserMessage && !isOptedIntoAi && (
-                  <Alert_Shadcn_ className="mx-5 mb-4  ">
+                  <Alert_Shadcn_ className="mx-5 mb-4 w-[calc(100%-40px)]">
                     <AlertDescription_Shadcn_ className="mb-4">
                       Quick reminder that you're not sending project metadata with your queries. By
                       opting into sending anonymous data, Supabase AI can improve the answers it
