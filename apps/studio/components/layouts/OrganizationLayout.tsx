@@ -1,18 +1,19 @@
 import type { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
+import PartnerIcon from 'components/ui/PartnerIcon'
+import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
+import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, NavMenu, NavMenuItem } from 'ui'
 import AccountLayout from './AccountLayout/AccountLayout'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
-import { ExternalLink } from 'lucide-react'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
@@ -23,6 +24,10 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const invoicesEnabled = invoicesEnabledOnProfileLevel
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
+
+  const { data, isSuccess } = useVercelRedirectQuery({
+    installationId: selectedOrganization?.partner_id,
+  })
 
   if (navLayoutV2) {
     return <SettingsLayout>{children}</SettingsLayout>
@@ -99,12 +104,8 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
             <AlertTitle_Shadcn_ className="flex-1">
               This organization is managed by {PARTNER_TO_NAME[selectedOrganization.managed_by]}.
             </AlertTitle_Shadcn_>
-            <Button type="default" iconRight={<ExternalLink />} asChild>
-              <a
-                href={`https://vercel.com/${'supabase'}/~/integrations/products/${process.env.NEXT_PUBLIC_VERCEL_MARKETPLACE_INTEGRATION_NAME}/${selectedOrganization.partner_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+            <Button type="default" iconRight={<ExternalLink />} asChild disabled={!isSuccess}>
+              <a href={data?.url} target="_blank" rel="noopener noreferrer">
                 Manage
               </a>
             </Button>

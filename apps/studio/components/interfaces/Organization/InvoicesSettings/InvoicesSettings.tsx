@@ -72,18 +72,16 @@ const InvoicesSettings = () => {
     selectedOrganization?.managed_by !== undefined &&
     selectedOrganization?.managed_by !== 'supabase'
   ) {
-    // TODO: get vercel invoices link
-
     return (
       <ScaffoldContainerLegacy>
         <PartnerManagedResource
           partner={selectedOrganization?.managed_by}
           resource="Invoices"
-          ctaUrl={
-            selectedOrganization?.managed_by === 'vercel-marketplace'
-              ? `https://vercel.com/${'supabase'}/~/integrations/products/${process.env.NEXT_PUBLIC_VERCEL_MARKETPLACE_INTEGRATION_NAME}/${selectedOrganization.partner_id}/invoices`
-              : `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
-          }
+          cta={{
+            installationId: selectedOrganization?.partner_id,
+            path: '/invoices',
+          }}
+          // TODO: support AWS marketplace here: `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
         />
       </ScaffoldContainerLegacy>
     )

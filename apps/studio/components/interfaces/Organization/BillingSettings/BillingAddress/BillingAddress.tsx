@@ -95,7 +95,9 @@ const BillingAddress = () => {
           <PartnerManagedResource
             partner={selectedOrganization?.managed_by}
             resource="Billing Addresses"
-            ctaUrl={`https://vercel.com/${'supabase'}/~/settings/billing`}
+            cta={{
+              installationId: selectedOrganization?.partner_id,
+            }}
           />
         ) : !canReadBillingAddress ? (
           <NoPermission resourceText="view this organization's billing address" />
