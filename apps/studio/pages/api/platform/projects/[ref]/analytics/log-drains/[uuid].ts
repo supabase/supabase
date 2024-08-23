@@ -22,48 +22,47 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       // get log drain
       const url = new URL(PROJECT_ANALYTICS_URL)
       url.pathname = `/api/backends/${uuid}`
-      const result = await get(url.toString(), {
+      const result = await fetch(url, {
+        method: "GET",
         headers: {
-          'x-api-key': process.env.LOGFLARE_PUBLIC_ACCESS_TOKEN,
+          Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      })
+      }).then(r=>r.json())
+
 
       return res.status(200).json(result)
     case 'PUT':
       // create the log drain
       const putUrl = new URL(PROJECT_ANALYTICS_URL)
       putUrl.pathname = `/api/backends/${uuid}`
+      delete req.body["metadata"]
       const putResult = await fetch(putUrl, {
         body: JSON.stringify(req.body),
         method: 'PUT',
         headers: {
-          'x-api-key': process.env.LOGFLARE_PUBLIC_ACCESS_TOKEN as string,
+          Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      }).then((res) => {
-        if (!res || typeof res.body !== 'string') {
-          return
-        }
-        return JSON.parse(res.body)
-      })
+      }).then(async r =>  await r.json())
       return res.status(200).json(putResult)
 
     case 'DELETE':
       // create the log drain
       const deleteUrl = new URL(PROJECT_ANALYTICS_URL)
       deleteUrl.pathname = `/api/backends/${uuid}`
+      console.log('deleteUrl', deleteUrl)
       await fetch(deleteUrl, {
         headers: {
-          'x-api-key': process.env.LOGFLARE_PUBLIC_ACCESS_TOKEN as string,
+          Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
         method: 'DELETE',
-      })
-      return res.status(204)
+      }).then(async r =>  await r.json())
+      return res.status(204).json({error: null})
     default:
       res.setHeader('Allow', ['GET', 'POST'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })

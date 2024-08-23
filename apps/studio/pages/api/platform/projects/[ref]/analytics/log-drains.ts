@@ -45,6 +45,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const postResult = await fetch(postUrl, {
         body: JSON.stringify({
           ...req.body,
+          config: req.body.config,
           metadata: {
             type: "log-drain"
           }
@@ -75,11 +76,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         if (name.includes('realtime')) {
           return {
             backend_id: postResult.id,
-            lql_string: `metadata.project:${ref}`,
+            lql_string: `~".*?"`,
             source_id: source.id,
           }
         } else {
-          return { backend_id: postResult.id, lql_string: `project:${ref}`, source_id: source.id }
+          return { backend_id: postResult.id, lql_string: `~".*?"`, source_id: source.id }
         }
       })
       const rulesPostUrl = new URL(PROJECT_ANALYTICS_URL)
