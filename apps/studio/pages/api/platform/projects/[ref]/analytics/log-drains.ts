@@ -33,7 +33,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      }).then(res =>{
+      }).then((res) => {
         return res.json()
       })
 
@@ -47,48 +47,62 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           ...req.body,
           config: req.body.config,
           metadata: {
-            type: "log-drain"
-          }
+            type: 'log-drain',
+          },
         }),
-        method: "POST",
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      }).then(async r =>  await r.json())
+      }).then(async (r) => await r.json())
 
       console.log('postResult', postResult)
       const sourcesGetUrl = new URL(PROJECT_ANALYTICS_URL)
       sourcesGetUrl.pathname = '/api/sources'
       const sources = await fetch(sourcesGetUrl, {
-        method: "GET",
+        method: 'GET',
         headers: {
           Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      }).then(r=>r.json())
+      }).then((r) => r.json())
       console.log('sources', sources)
 
-      const params = sources.map((source: { name: string; id: number }) => {
-        const name = (source.name as string).toLowerCase()
-        if (name.includes('realtime')) {
-          return {
-            backend_id: postResult.id,
-            lql_string: `~".*?"`,
-            source_id: source.id,
+      const params = sources
+        .filter((source: { name: string; metadata: { type: string } }) =>
+          [
+            'cloudflare.logs.prod',
+            'deno-relay-logs',
+            'deno-subhosting-events',
+            'gotrue.logs.prod',
+            'pgbouncer.logs.prod',
+            'postgrest.logs.prod',
+            'postgres.logs',
+            'realtime.logs.prod',
+            'storage.logs.prod.2',
+          ].includes(source.name.toLocaleLowerCase())
+        )
+        .map((source: { name: string; id: number }) => {
+          const name = (source.name as string).toLowerCase()
+          if (name.includes('realtime')) {
+            return {
+              backend_id: postResult.id,
+              lql_string: `~".*?"`,
+              source_id: source.id,
+            }
+          } else {
+            return { backend_id: postResult.id, lql_string: `~".*?"`, source_id: source.id }
           }
-        } else {
-          return { backend_id: postResult.id, lql_string: `~".*?"`, source_id: source.id }
-        }
-      })
+        })
       const rulesPostUrl = new URL(PROJECT_ANALYTICS_URL)
       rulesPostUrl.pathname = '/api/rules'
       await Promise.all(
         params.map((param: any) =>
           fetch(rulesPostUrl, {
-            method: "POST",
+            method: 'POST',
             body: JSON.stringify(param),
             headers: {
               Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
