@@ -516,46 +516,44 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
               <h3 className="text-xl">How can we help?</h3>
             </div>
 
-            {isSuccessProjects &&
-              values.projectRef === 'no-project' &&
-              values.category !== 'Login_issues' && (
-                <div className="px-6">
-                  {isLoadingOrganizations && (
-                    <div className="space-y-2">
-                      <p className="text-sm prose">Which organization is affected?</p>
-                      <ShimmeringLoader className="!py-[19px]" />
+            {isSuccessProjects && values.category !== 'Login_issues' && (
+              <div className="px-6">
+                {isLoadingOrganizations && (
+                  <div className="space-y-2">
+                    <p className="text-sm prose">Which organization is affected?</p>
+                    <ShimmeringLoader className="!py-[19px]" />
+                  </div>
+                )}
+                {isErrorOrganizations && (
+                  <div className="space-y-2">
+                    <p className="text-sm prose">Which organization is affected?</p>
+                    <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
+                      <AlertCircle size={16} strokeWidth={2} className="text-foreground-light" />
+                      <p className="text-sm prose">Failed to retrieve organizations</p>
                     </div>
-                  )}
-                  {isErrorOrganizations && (
-                    <div className="space-y-2">
-                      <p className="text-sm prose">Which organization is affected?</p>
-                      <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                        <AlertCircle size={16} strokeWidth={2} className="text-foreground-light" />
-                        <p className="text-sm prose">Failed to retrieve organizations</p>
-                      </div>
-                    </div>
-                  )}
-                  {isSuccessOrganizations && (
-                    <Listbox
-                      id="organizationSlug"
-                      layout="vertical"
-                      label="Which organization is affected?"
-                    >
-                      {organizations?.map((option) => {
-                        return (
-                          <Listbox.Option
-                            key={`option-${option.slug}`}
-                            label={option.name || ''}
-                            value={option.slug}
-                          >
-                            <span>{option.name}</span>
-                          </Listbox.Option>
-                        )
-                      })}
-                    </Listbox>
-                  )}
-                </div>
-              )}
+                  </div>
+                )}
+                {isSuccessOrganizations && (
+                  <Listbox
+                    id="organizationSlug"
+                    layout="vertical"
+                    label="Which organization is affected?"
+                  >
+                    {organizations?.map((option) => {
+                      return (
+                        <Listbox.Option
+                          key={`option-${option.slug}`}
+                          label={option.name || ''}
+                          value={option.slug}
+                        >
+                          <span>{option.name}</span>
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                )}
+              </div>
+            )}
 
             {isLoadingProjects && (
               <div className="px-6 space-y-2">
