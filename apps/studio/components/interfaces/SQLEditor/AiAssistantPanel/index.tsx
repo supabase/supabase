@@ -40,7 +40,7 @@ import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import toast from 'react-hot-toast'
 import { useLocalStorage } from '../../../../hooks/misc/useLocalStorage'
-import { History, Info, InfoIcon } from 'lucide-react'
+import { Info } from 'lucide-react'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
 
