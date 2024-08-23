@@ -21,6 +21,10 @@ interface RegionSelectorProps {
   form: UseFormReturn<any>
 }
 
+// [Joshen] Let's use a library to maintain the flag SVGs in the future
+// I tried using https://flagpack.xyz/docs/development/react/ but couldn't get it to render
+// ^ can try again next time
+
 export const RegionSelector = ({ cloudProvider, field }: RegionSelectorProps) => {
   const router = useRouter()
   const showNonProdFields =
