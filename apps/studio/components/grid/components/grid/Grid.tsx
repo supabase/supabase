@@ -146,6 +146,7 @@ export const Grid = memo(
 
         const fk = data?.find(
           (key: any) =>
+            key.source_columns == columnName &&
             key.target_schema == targetTableSchema &&
             key.target_table == targetTableName &&
             key.target_columns == targetColumnName
