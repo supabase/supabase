@@ -2545,6 +2545,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/log-drains',
+    destination: '/docs/platform/log-drains',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/functions/functions-headers',
     destination: '/docs/functions/logging',
   },
@@ -2573,5 +2578,13 @@ module.exports = [
     permanent: true,
     source: '/launchweek',
     destination: '/launch-week',
+  },
+
+  // marketing
+
+  {
+    permanent: true,
+    source: '/changelogpod',
+    destination: 'https://forms.supabase.com/changelog-podcast-sponsorship',
   },
 ]

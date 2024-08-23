@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { SetStateAction } from 'react'
 import toast from 'react-hot-toast'
 import { number, object } from 'yup'
 
@@ -18,6 +18,7 @@ import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { formatBytes } from 'lib/helpers'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
@@ -34,15 +35,13 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
 
   const timeTillNextAvailableDatabaseResize =
     lastDatabaseResizeAt === null ? 0 : 6 * 60 - dayjs().diff(lastDatabaseResizeAt, 'minutes')
-  const isAbleToResizeDatabase = timeTillNextAvailableDatabaseResize <= 0
-  const formattedTimeTillNextAvailableResize =
-    timeTillNextAvailableDatabaseResize < 60
-      ? `${timeTillNextAvailableDatabaseResize} minute(s)`
-      : `${Math.floor(timeTillNextAvailableDatabaseResize / 60)} hours and ${
-          timeTillNextAvailableDatabaseResize % 60
-        } minute(s)`
 
-  const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
+  const [{ show_increase_disk_size_modal }, setUrlParams] = useUrlState()
+  const showIncreaseDiskSizeModal = show_increase_disk_size_modal === 'true'
+  const setShowIncreaseDiskSizeModal = (value: SetStateAction<boolean>) => {
+    const show = typeof value === 'function' ? value(showIncreaseDiskSizeModal) : value
+    setUrlParams({ show_increase_disk_size_modal: show ? 'true' : undefined })
+  }
 
   const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
@@ -55,31 +54,11 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
     useProjectDiskResizeMutation({
       onSuccess: (res, variables) => {
         toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
-        setshowIncreaseDiskSizeModal(false)
+        setShowIncreaseDiskSizeModal(false)
       },
     })
 
-  const confirmResetDbPass = async (values: { [prop: string]: any }) => {
-    if (!projectRef) return console.error('Project ref is required')
-    const volumeSize = values['new-disk-size']
-    updateProjectUsage({ projectRef, volumeSize })
-  }
-
   const currentDiskSize = project?.volumeSizeGb ?? 0
-  // to do, update with max_disk_volume_size_gb
-  const maxDiskSize = 200
-
-  const INITIAL_VALUES = {
-    'new-disk-size': currentDiskSize,
-  }
-
-  const diskSizeValidationSchema = object({
-    'new-disk-size': number()
-      .required('Please enter a GB amount you want to resize the disk up to.')
-      .min(Number(currentDiskSize ?? 0), `Must be more than ${currentDiskSize} GB`)
-      // to do, update with max_disk_volume_size_gb
-      .max(Number(maxDiskSize), 'Must not be more than 200 GB'),
-  })
 
   const { data } = useDatabaseSizeQuery({
     projectRef: project?.ref,
@@ -89,7 +68,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
 
   return (
     <div id="diskManagement">
-      <FormHeader title="Disk management" />
+      <FormHeader title="Disk Management" />
       {projectSubscriptionData?.usage_billing_enabled === true ? (
         <div className="flex flex-col gap-3">
           <Panel className="!m-0">
@@ -110,7 +89,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                       <ButtonTooltip
                         type="default"
                         disabled={!canUpdateDiskSizeConfig || disabled}
-                        onClick={() => setshowIncreaseDiskSizeModal(true)}
+                        onClick={() => setShowIncreaseDiskSizeModal(true)}
                         tooltip={{
                           content: {
                             side: 'bottom',
@@ -213,7 +192,7 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
       <DiskSizeConfigurationModal
         visible={showIncreaseDiskSizeModal}
         loading={isUpdatingDiskSize}
-        hideModal={setshowIncreaseDiskSizeModal}
+        hideModal={setShowIncreaseDiskSizeModal}
       />
     </div>
   )

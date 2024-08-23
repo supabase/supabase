@@ -7,7 +7,7 @@
 }
 
 .contributors-1 {
-  @apply hidden xl:block xl:left-[70%] xl:top-[61%];
+  @apply hidden xl:block xl:left-[70%] xl:top-[81%];
 }
 
 .contributors-2 {
@@ -15,7 +15,7 @@
 }
 
 .contributors-3 {
-  @apply left-[11%] top-[52%] md:left-[9%] md:top-[55%] xl:left-[21%] xl:top-[85%];
+  @apply left-[11%] top-[52%] md:left-[9%] md:top-[55%] xl:left-[41%] xl:top-[55%];
 }
 
 .contributors-4 {
@@ -23,15 +23,15 @@
 }
 
 .contributors-5 {
-  @apply left-[61%] top-[93%] xl:left-[33%] xl:top-[75%];
+  @apply left-[61%] top-[93%] xl:left-[37%] xl:top-[75%];
 }
 
 .contributors-6 {
-  @apply hidden md:block md:z-10 md:left-[50%] md:top-[61%] xl:block xl:left-[83%] xl:top-[60%];
+  @apply hidden md:block md:z-10 md:left-[50%] md:top-[61%] xl:block xl:left-[78%] xl:top-[62%];
 }
 
 .contributors-7 {
-  @apply hidden xl:block xl:left-[78%] xl:top-[45%];
+  @apply hidden xl:block xl:left-[63%] xl:top-[50%];
 }
 
 .contributors-8 {
@@ -39,11 +39,11 @@
 }
 
 .contributors-9 {
-  @apply hidden md:block md:z-10 md:left-[32%] md:top-[89%] xl:block xl:left-[94%] xl:top-[74%];
+  @apply hidden md:block md:z-10 md:left-[32%] md:top-[89%] xl:block xl:left-[88%] xl:top-[89%];
 }
 
 .contributors-10 {
-  @apply z-10 hidden xl:block xl:left-[58%] xl:top-[58%];
+  @apply z-10 hidden xl:block xl:left-[56%] xl:top-[65%];
 }
 
 .contributors-11 {

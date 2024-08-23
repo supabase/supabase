@@ -9,7 +9,7 @@ export default {
           Build in a weekend
         </span>
         <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#3ECF8E] via-[#3ECF8E] to-[#3ecfb2] block md:ml-0">
-          Scale to millions
+          Scale to billions
         </span>
       </>
     ),

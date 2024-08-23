@@ -17,7 +17,7 @@ const CTABanner = ({ darkerBg, className }: Props) => {
       <div className="col-span-12">
         <h2 className="h2">
           <span className="text-foreground-lighter">Build in a weekend,</span>
-          <span className="text-foreground block sm:inline"> scale to millions</span>
+          <span className="text-foreground block sm:inline"> scale to billions</span>
         </h2>
       </div>
       <div className="col-span-12 mt-4">
