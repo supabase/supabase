@@ -5,7 +5,7 @@ import React, { forwardRef, useEffect, useRef, useState } from 'react'
 import { useBreakpoint } from 'common'
 import { CommandInput_Shadcn_, cn } from 'ui'
 
-import { useSetQuery } from './hooks/queryHooks'
+import { useQuery, useSetQuery } from './hooks/queryHooks'
 
 function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) {
   const isBelowSm = useBreakpoint('sm')
@@ -44,8 +44,9 @@ const CommandInput = forwardRef<
 >(({ className, ...props }, ref) => {
   const inputRef = useFocusInputOnWiderScreens(ref)
 
+  const query = useQuery()
   const setQuery = useSetQuery()
-  const [inputVal, setInputVal] = useState<string>("")
+  const [inputVal, setInputVal] = useState(query)
 
   useEffect(() => {
     setQuery(inputVal)
