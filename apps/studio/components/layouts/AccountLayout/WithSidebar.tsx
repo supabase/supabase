@@ -3,10 +3,10 @@ import Link from 'next/link'
 import { ReactNode } from 'react'
 
 import { useFlag } from 'hooks/ui/useFlag'
-import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
+import { ArrowUpRight, LogOut } from 'lucide-react'
+import { Badge, cn, IconArrowUpRight, Menu } from 'ui'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
 import type { SidebarLink, SidebarSection } from './AccountLayout.types'
-import PartnerIcon from 'components/ui/PartnerIcon'
 
 interface WithSidebarProps {
   title: string
@@ -151,6 +151,7 @@ const SidebarItem = ({ links, subitems, subitemsParentKey }: SidebarItemProps) =
           ))
           render = [render, ...subItemsRender]
         }
+
         return render
       })}
     </ul>
@@ -175,11 +176,11 @@ const SidebarLinkItem = ({
   if (isUndefined(href)) {
     let icon
     if (isExternal) {
-      icon = <IconArrowUpRight size={'tiny'} />
+      icon = <ArrowUpRight size={14} />
     }
 
     if (label === 'Log out') {
-      icon = <IconLogOut size={'tiny'} />
+      icon = <LogOut size={14} />
     }
 
     return (
@@ -189,7 +190,7 @@ const SidebarLinkItem = ({
         style={{
           marginLeft: isSubitem ? '.5rem' : '0rem',
         }}
-        active={isActive ? true : false}
+        active={isActive}
         onClick={onClick || (() => {})}
         icon={icon}
       >
@@ -198,18 +199,23 @@ const SidebarLinkItem = ({
     )
   }
 
+  console.log(label, isActive)
+
   return (
     <Link href={href || ''} className="block" target={isExternal ? '_blank' : '_self'}>
       <span className="group flex max-w-full cursor-pointer items-center space-x-2 border-default py-1 font-normal outline-none ring-foreground focus-visible:z-10 focus-visible:ring-1 group-hover:border-foreground-muted">
         {isExternal && (
           <span className="truncate text-sm text-foreground-lighter transition group-hover:text-foreground-light">
-            <IconArrowUpRight size={'tiny'} />
+            <ArrowUpRight size={14} />
           </span>
         )}
         <div className="flex items-center gap-1.5 flex-shrink-0">
           <span
             title={label}
-            className="w-full truncate text-sm text-foreground-light transition group-hover:text-foreground"
+            className={cn(
+              'w-full truncate text-sm transition',
+              isActive ? 'text-foreground' : 'text-foreground-light group-hover:text-foreground'
+            )}
           >
             {isSubitem ? <p>{label}</p> : label}
           </span>
