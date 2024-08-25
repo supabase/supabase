@@ -55,6 +55,58 @@ export interface paths {
     /** Updates organization subscription linked to the provided Fly organization id */
     put: operations['FlyOrganizationsController_updateOrganization']
   }
+  '/partners/vercel/callback': {
+    /** Redirects to Supabase dashboard after completing Vercel sso flow */
+    get: operations['CallbackController_redirectToDashboardFlyioExtensionScreen']
+  }
+  '/partners/vercel/mock-usage': {
+    /** Fake it till you make it */
+    get: operations['MockBillingController_mockUsage']
+  }
+  '/partners/vercel/mock-usage/invoice': {
+    /** Fake it till you make it */
+    get: operations['MockBillingController_sendInvoice']
+  }
+  '/partners/vercel/v1/installations/{installation_id}': {
+    /** Gets the set of billing plans available to a specific Installation */
+    get: operations['InstallationsController_getInstallation']
+    /** Upserts an installation for the account with installation_id */
+    put: operations['InstallationsController_createInstallation']
+    /** Deletes the installation with provided installation_id */
+    delete: operations['InstallationsController_deleteInstallation']
+    /** Updates an installation for the account with installation_id */
+    patch: operations['InstallationsController_updateInstallation']
+  }
+  '/partners/vercel/v1/installations/{installation_id}/plans': {
+    /** Gets the set of billing plans available to a specific Installation */
+    get: operations['InstallationsController_getInstallationBillingPlans']
+  }
+  '/partners/vercel/v1/installations/{installation_id}/resources': {
+    /** Lists all resources */
+    get: operations['ResourcesController_listResources']
+    /** Provisions a resource */
+    post: operations['ResourcesController_createResource']
+  }
+  '/partners/vercel/v1/installations/{installation_id}/resources/{resource_id}': {
+    /** Fetches a resource by resource_id */
+    get: operations['ResourcesController_getResource']
+    /** Uninstalls and de-provisions a resource */
+    delete: operations['ResourcesController_deleteResource']
+    /** Updates a resource */
+    patch: operations['ResourcesController_updateResource']
+  }
+  '/partners/vercel/v1/installations/{installation_id}/resources/{resource_id}/plans': {
+    /** Returns the set of billing plans available to a specific resource */
+    get: operations['ResourcesController_getResourcePlans']
+  }
+  '/partners/vercel/v1/products/{product_id}/plans': {
+    /** Return quotes for different billing plans for a specific product */
+    get: operations['ProductsController_listResources']
+  }
+  '/partners/vercel/webhooks': {
+    /** Webhooks endpoint */
+    post: operations['WebhooksController_processWebhook']
+  }
   '/platform/auth/{ref}/config': {
     /** Gets GoTrue config */
     get: operations['GoTrueConfigController_getGoTrueConfig']
@@ -1028,6 +1080,10 @@ export interface paths {
     get: operations['VercelEnvironmentVariablesController_getEnvironmentVariables']
     /** Creates the environment variable for the given project ID on behalf of the given team ID */
     post: operations['VercelEnvironmentVariablesController_createEnvironmentVariable']
+  }
+  '/platform/vercel/redirect/{installation_id}': {
+    /** Gets the Vercel redirect url */
+    get: operations['VercelRedirectController_getRedirectUrl']
   }
   '/platform/vercel/token': {
     /** Gets the Vercel access token for the given code */
@@ -2132,6 +2188,7 @@ export interface components {
       | 'pitr_28'
       | 'ipv4_default'
       | 'auth_mfa_phone_default'
+      | 'log_drain_default'
     AmiSearchOptions: {
       search_tags?: Record<string, never>
     }
@@ -2550,7 +2607,9 @@ export interface components {
     }
     CreateBranchBody: {
       branch_name: string
+      desired_instance_size?: components['schemas']['DesiredInstanceSize']
       git_branch?: string
+      persistent?: boolean
       region?: string
     }
     CreateCliLoginSessionBody: {
@@ -3262,7 +3321,7 @@ export interface components {
       addons: components['schemas']['BillingSubscriptionAddon'][]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner: 'fly' | 'aws'
+      billing_partner: 'fly' | 'aws' | 'vercel_marketplace'
       billing_via_partner: boolean
       current_period_end: number
       current_period_start: number
@@ -3760,6 +3819,7 @@ export interface components {
     Member: {
       gotrue_id: string
       is_sso_user: boolean | null
+      metadata: unknown
       mfa_enabled: boolean
       primary_email: string | null
       role_ids: number[]
@@ -4362,7 +4422,13 @@ export interface components {
       selected_addons: components['schemas']['SelectedAddonResponse'][]
     }
     /** @enum {string} */
-    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4' | 'auth_mfa_phone'
+    ProjectAddonType:
+      | 'custom_domain'
+      | 'compute_instance'
+      | 'pitr'
+      | 'ipv4'
+      | 'auth_mfa_phone'
+      | 'log_drain'
     /** @enum {string} */
     ProjectAddonVariantPricingType: 'fixed' | 'usage'
     ProjectAddonVariantResponse: {
@@ -5014,6 +5080,7 @@ export interface components {
        */
       read_replica_region:
         | 'us-east-1'
+        | 'us-east-2'
         | 'us-west-1'
         | 'us-west-2'
         | 'ap-east-1'
@@ -5024,7 +5091,9 @@ export interface components {
         | 'eu-west-1'
         | 'eu-west-2'
         | 'eu-west-3'
+        | 'eu-north-1'
         | 'eu-central-1'
+        | 'eu-central-2'
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
@@ -5208,6 +5277,7 @@ export interface components {
        */
       region:
         | 'us-east-1'
+        | 'us-east-2'
         | 'us-west-1'
         | 'us-west-2'
         | 'ap-east-1'
@@ -5218,7 +5288,9 @@ export interface components {
         | 'eu-west-1'
         | 'eu-west-2'
         | 'eu-west-3'
+        | 'eu-north-1'
         | 'eu-central-1'
+        | 'eu-central-2'
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
@@ -5524,6 +5596,14 @@ export interface components {
       git_branch?: string
       persistent?: boolean
       reset_on_push?: boolean
+      /** @enum {string} */
+      status?:
+        | 'CREATING_PROJECT'
+        | 'RUNNING_MIGRATIONS'
+        | 'MIGRATIONS_PASSED'
+        | 'MIGRATIONS_FAILED'
+        | 'FUNCTIONS_DEPLOYED'
+        | 'FUNCTIONS_FAILED'
     }
     UpdateColumnBody: {
       check?: string
@@ -6151,6 +6231,7 @@ export interface components {
        */
       region:
         | 'us-east-1'
+        | 'us-east-2'
         | 'us-west-1'
         | 'us-west-2'
         | 'ap-east-1'
@@ -6161,7 +6242,9 @@ export interface components {
         | 'eu-west-1'
         | 'eu-west-2'
         | 'eu-west-3'
+        | 'eu-north-1'
         | 'eu-central-1'
+        | 'eu-central-2'
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
@@ -6313,6 +6396,9 @@ export interface components {
       productionBranch?: string
       type?: string
     }
+    VercelRedirectResponse: {
+      url: string
+    }
   }
   responses: never
   parameters: never
@@ -6326,7 +6412,7 @@ export type $defs = Record<string, never>
 export type external = Record<string, never>
 
 export interface operations {
-  /** Redirects to Supabase dashboard after completing Fly sso */
+  /** Redirects to Supabase dashboard after completing Vercel sso flow */
   CallbackController_redirectToDashboardFlyioExtensionScreen: {
     responses: {
       200: {
@@ -6477,6 +6563,159 @@ export interface operations {
     }
     responses: {
       200: {
+        content: never
+      }
+    }
+  }
+  /** Fake it till you make it */
+  MockBillingController_mockUsage: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Fake it till you make it */
+  MockBillingController_sendInvoice: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Gets the set of billing plans available to a specific Installation */
+  InstallationsController_getInstallation: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Upserts an installation for the account with installation_id */
+  InstallationsController_createInstallation: {
+    responses: {
+      201: {
+        content: never
+      }
+    }
+  }
+  /** Deletes the installation with provided installation_id */
+  InstallationsController_deleteInstallation: {
+    responses: {
+      204: {
+        content: never
+      }
+    }
+  }
+  /** Updates an installation for the account with installation_id */
+  InstallationsController_updateInstallation: {
+    responses: {
+      204: {
+        content: never
+      }
+    }
+  }
+  /** Gets the set of billing plans available to a specific Installation */
+  InstallationsController_getInstallationBillingPlans: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Lists all resources */
+  ResourcesController_listResources: {
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Provisions a resource */
+  ResourcesController_createResource: {
+    responses: {
+      201: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Fetches a resource by resource_id */
+  ResourcesController_getResource: {
+    parameters: {
+      path: {
+        resource_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Uninstalls and de-provisions a resource */
+  ResourcesController_deleteResource: {
+    parameters: {
+      path: {
+        resource_id: string
+      }
+    }
+    responses: {
+      204: {
+        content: never
+      }
+    }
+  }
+  /** Updates a resource */
+  ResourcesController_updateResource: {
+    parameters: {
+      path: {
+        resource_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Returns the set of billing plans available to a specific resource */
+  ResourcesController_getResourcePlans: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Return quotes for different billing plans for a specific product */
+  ProductsController_listResources: {
+    parameters: {
+      path: {
+        product_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Webhooks endpoint */
+  WebhooksController_processWebhook: {
+    parameters: {
+      header: {
+        'x-vercel-signature': string
+      }
+    }
+    responses: {
+      201: {
         content: never
       }
     }
@@ -13055,6 +13294,25 @@ export interface operations {
         }
       }
       /** @description Failed to get the environment variables */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets the Vercel redirect url */
+  VercelRedirectController_getRedirectUrl: {
+    parameters: {
+      path: {
+        installation_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['VercelRedirectResponse']
+        }
+      }
+      /** @description Failed to get Vercel redirect url */
       500: {
         content: never
       }

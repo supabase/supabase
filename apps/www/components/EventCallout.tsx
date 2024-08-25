@@ -68,7 +68,7 @@ const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<
                 <span className="mx-3 pl-3 border-l">21 Aug 2024 at 8PM PST</span>
               </div>
 
-              <span className="text-foreground text-3xl">Scale to Millions</span>
+              <span className="text-foreground text-3xl">Scale to Billions</span>
               <p>
                 Quickly and cost effectively build Generative AI applications that you can use to
                 chat with your company’s documents.

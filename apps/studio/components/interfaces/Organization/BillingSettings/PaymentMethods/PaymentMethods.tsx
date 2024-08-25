@@ -15,11 +15,13 @@ import AlertError from 'components/ui/AlertError'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import {
@@ -40,6 +42,7 @@ import DeletePaymentMethodModal from './DeletePaymentMethodModal'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
+  const selectedOrganization = useSelectedOrganization()
   const queryClient = useQueryClient()
   const [selectedMethodForUse, setSelectedMethodForUse] = useState<any>()
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
@@ -76,7 +79,16 @@ const PaymentMethods = () => {
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadPaymentMethods ? (
+          {selectedOrganization?.managed_by !== undefined &&
+          selectedOrganization?.managed_by !== 'supabase' ? (
+            <PartnerManagedResource
+              partner={selectedOrganization?.managed_by}
+              resource="Payment Methods"
+              cta={{
+                installationId: selectedOrganization?.partner_id,
+              }}
+            />
+          ) : !canReadPaymentMethods ? (
             <NoPermission resourceText="view this organization's payment methods" />
           ) : (
             <>

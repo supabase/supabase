@@ -62,7 +62,7 @@ export default function IndexPage() {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+              url: `https://supabase.com/images/og/supabase-og.png`,
             },
           ],
         }}

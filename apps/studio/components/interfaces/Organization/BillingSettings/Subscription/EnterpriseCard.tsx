@@ -6,7 +6,7 @@ import { pickFeatures } from 'shared-data/plans'
 export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
-  billingPartner: 'fly' | 'aws' | undefined
+  billingPartner: 'fly' | 'aws' | 'vercel_marketplace' | undefined
 }
 
 const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardProps) => {
