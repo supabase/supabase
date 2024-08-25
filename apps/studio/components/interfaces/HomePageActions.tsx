@@ -20,10 +20,13 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 
 interface HomePageActionsProps {
-  organizations: { name: string; slug: string }[]
+  organizations: { name: string; slug: string; managed_by: string }[]
   search: string
   filterStatus: string[]
   setSearch: (value: string) => void
@@ -56,9 +59,21 @@ const HomePageActions = ({
             {organizations
               .sort((a, b) => a.name.localeCompare(b.name))
               .map((x) => (
-                <DropdownMenuItem key={x.slug} onClick={() => router.push(`/new/${x.slug}`)}>
-                  {x.name}
-                </DropdownMenuItem>
+                <Tooltip_Shadcn_ key={x.slug}>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <DropdownMenuItem
+                      onClick={() => router.push(`/new/${x.slug}`)}
+                      disabled={x.managed_by === 'vercel-marketplace'}
+                    >
+                      {x.name}
+                    </DropdownMenuItem>
+                  </TooltipTrigger_Shadcn_>
+                  {x.managed_by === 'vercel-marketplace' && (
+                    <TooltipContent_Shadcn_ side="top" className="w-72">
+                      Create new projects via Vercel Marketplace
+                    </TooltipContent_Shadcn_>
+                  )}
+                </Tooltip_Shadcn_>
               ))}
           </>
         </DropdownMenuContent>
