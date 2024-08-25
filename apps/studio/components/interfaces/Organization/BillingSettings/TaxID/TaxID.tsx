@@ -16,10 +16,12 @@ import AlertError from 'components/ui/AlertError'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   FormControl_Shadcn_,
@@ -39,6 +41,8 @@ import { checkTaxIdEqual, sanitizeTaxIdValue } from './TaxID.utils'
 
 const TaxID = () => {
   const { slug } = useParams()
+  const selectedOrganization = useSelectedOrganization()
+
   const { data: taxId, error, isLoading, isSuccess, isError } = useOrganizationTaxIdQuery({ slug })
   const { mutate: updateTaxId, isLoading: isUpdating } = useOrganizationTaxIdUpdateMutation({
     onSuccess: () => {
@@ -137,7 +141,16 @@ const TaxID = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!canReadTaxId ? (
+        {selectedOrganization?.managed_by !== undefined &&
+        selectedOrganization?.managed_by !== 'supabase' ? (
+          <PartnerManagedResource
+            partner={selectedOrganization?.managed_by}
+            resource="Tax IDs"
+            cta={{
+              installationId: selectedOrganization?.partner_id,
+            }}
+          />
+        ) : !canReadTaxId ? (
           <NoPermission resourceText="view this organization's tax ID" />
         ) : (
           <>
