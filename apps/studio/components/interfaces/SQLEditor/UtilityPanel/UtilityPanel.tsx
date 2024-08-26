@@ -47,13 +47,12 @@ const UtilityPanel = ({
   const { ref } = useParams()
   const queryClient = useQueryClient()
 
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const enableFolders = useFlag('sqlFolderOrganization')
 
-  const snippet = snap.snippets[id]?.snippet
+  const snippet = snapV2.snippets[id]?.snippet
   const queryKeys = contentKeys.list(ref)
-  const result = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
+  const result = enableFolders ? snapV2.results[id]?.[0] : snapV2.results[id]?.[0]
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -77,7 +76,7 @@ const UtilityPanel = ({
       }
 
       if (enableFolders) snapV2.updateSnippet({ id, snippet: newSnippet as unknown as Snippet })
-      else snap.updateSnippet(id, newSnippet)
+      else snapV2.updateSnippet({ id, snippet: newSnippet })
     },
     onError: async (err, newContent, context) => {
       toast.error(`Failed to update chart. Please try again.`)
