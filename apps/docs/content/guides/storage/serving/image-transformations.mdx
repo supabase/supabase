@@ -71,6 +71,21 @@ val url = supabase.storage.from("bucket").publicRenderUrl("image.jpg") {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+url = supabase.storage.from_('avatars').get_public_url(
+  'image.jpg',
+  {
+    'transform': {
+      'width': 500,
+      'height': 500,
+    },
+  }
+)
+```
+
+</TabPanel>
 </Tabs>
 
 An example URL could look like this:
@@ -207,6 +222,19 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket').download(
+  'image.jpg',
+  {
+    'width': 800,
+    'height': 300,
+  },
+)
+```
+
+</TabPanel>
 </Tabs>
 
 ## Automatic image optimization (WebP)
@@ -288,6 +316,22 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
     size(200, 200)
 	format = "origin"
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket').download(
+  'image.jpeg',
+  {
+    'transform': {
+      'width': 200,
+      'height': 200,
+      'format': 'origin',
+    },
+  }
+)
 ```
 
 </TabPanel>
@@ -396,6 +440,20 @@ supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket').download(
+  'image.jpg',
+  {
+    'transform': {
+      'quality': 50,
+    },
+  }
+)
+```
+
+</TabPanel>
 </Tabs>
 
 ### Resizing
@@ -479,6 +537,22 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
     size(800, 300)
     resize = ImageTransformation.Resize.CONTAIN
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket').download(
+  'image.jpg',
+  {
+    'transform': {
+      'width': 800,
+      'height': 300,
+      'resize': 'contain', # 'cover' | 'fill'
+    }
+  }
+)
 ```
 
 </TabPanel>
