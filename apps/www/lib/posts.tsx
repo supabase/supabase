@@ -59,7 +59,6 @@ export const getSortedPosts = ({
         ...data,
         date: formattedDate,
         readingTime,
-        publishedAt: data.published_at ?? null,
         url: url,
         path: contentPath,
       }
@@ -74,15 +73,7 @@ export const getSortedPosts = ({
 
   let sortedPosts = [...allPosts]
 
-  sortedPosts = sortedPosts.sort((a: any, b: any) => {
-    const isPublishedAtBefore =
-      a.publishedAt && b.publishedAt && Date.parse(a.publishedAt) < Date.parse(b.publishedAt)
-    if (isPublishedAtBefore || new Date(a.date) < new Date(b.date)) {
-      return 1
-    } else {
-      return -1
-    }
-  })
+  sortedPosts = sortedPosts.sort((a: any, b: any) => (new Date(a.date) < new Date(b.date) ? 1 : -1))
 
   if (categories) {
     sortedPosts = sortedPosts.filter((post: any) => {
