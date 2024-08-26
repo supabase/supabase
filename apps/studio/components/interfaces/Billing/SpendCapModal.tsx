@@ -1,3 +1,4 @@
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Modal } from 'ui'
 import {
@@ -18,17 +19,33 @@ interface SpendCapModalProps {
 
 const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
   return (
-    <Modal hideFooter visible={visible} size="xlarge" header="Spend cap" onCancel={() => onHide()}>
+    <Modal
+      hideFooter
+      visible={visible}
+      size="xlarge"
+      header={
+        <div className="flex justify-between items-center">
+          <span>Spend Cap</span>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+            <a target="_blank" href="https://supabase.com/docs/guides/platform/spend-cap">
+              Documentation
+            </a>
+          </Button>
+        </div>
+      }
+      showCloseButton={false}
+      onCancel={() => onHide()}
+    >
       <Modal.Content>
         <div className="space-y-4">
           <p className="text-sm">
-            Enabling the spend cap sets a limit on your usage to stay within your plan's quota,
-            which controls costs but can limit service. Disabling the spend cap removes these
-            limits, but any extra usage beyond the plan's limit will be charged per usage.
+            Enabling the Spend Cap limits your usage to your plan's quota, which controls costs but
+            can restrict your service. Disabling the spend cap removes these limits, but any extra
+            usage beyond the plan's limit will be charged per usage.
           </p>
           <p className="text-sm">
             Launching additional projects or enabling project add-ons will incur additional monthly
-            fees independent of your spend cap.
+            fees independent of your Spend Cap.
           </p>
 
           {/* Maybe instead of a table, show something more interactive like a spend cap playground */}
@@ -104,28 +121,6 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
               </TableRow>
             </TableBody>
           </Table>
-
-          <p className="text-sm">
-            See{' '}
-            <Link
-              href="https://supabase.com/docs/guides/platform/spend-cap"
-              className="text-brand"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span>spend cap docs</span>
-            </Link>{' '}
-            for further details and{' '}
-            <Link
-              href="https://supabase.com/pricing"
-              className="text-brand"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span>pricing page</span>
-            </Link>{' '}
-            for a full overview.
-          </p>
         </div>
       </Modal.Content>
       <Modal.Separator />
