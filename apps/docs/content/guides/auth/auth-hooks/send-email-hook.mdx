@@ -453,7 +453,9 @@ select
   defaultActiveId="http-send-email-with-resend"
 >
 <TabPanel id="http-send-email-with-resend" label="Use Resend as an email provider">
-You can configure [Resend](https://resend.com/) as the custom email provider through the "Send Email" hook. This allows you to take advantage of Resend's developer-friendly APIs to send emails and leverage [React Email](https://react.email/) for managing your email templates. If you want to send emails through the Supabase Resend integration, which uses Resend's SMTP server, check out [this integration](/partners/integrations/resend) instead.
+You can configure [Resend](https://resend.com/) as the custom email provider through the "Send Email" hook. This allows you to take advantage of Resend's developer-friendly APIs to send emails and leverage [React Email](https://react.email/) for managing your email templates. For a more advanced React Email tutorial, refer to [this guide](/docs/guides/functions/examples/auth-send-email-hook-react-email-resend).
+
+If you want to send emails through the Supabase Resend integration, which uses Resend's SMTP server, check out [this integration](/partners/integrations/resend) instead.
 
 Create a `.env` file with the following environment variables:
 
@@ -462,16 +464,22 @@ RESEND_API_KEY=your_resend_api_key
 SEND_EMAIL_HOOK_SECRET=<base64_secret>
 ```
 
+<Admonition type="info">
+
+You can generate the secret in the [Auth Hooks](/dashboard/project/_/auth/hooks) section of the Supabase dashboard. Make sure to remove the `v1,whsec_` prefix!
+
+</Admonition>
+
 Set the secrets in your Supabase project:
 
 ```bash
-$ supabase secret set --env-file .env
+supabase secrets set --env-file .env
 ```
 
 Create a new edge function:
 
 ```bash
-$ supabase functions new send-email
+supabase functions new send-email
 ```
 
 Add the following code to your edge function:
@@ -484,6 +492,10 @@ const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
 const hookSecret = Deno.env.get("SEND_EMAIL_HOOK_SECRET") as string;
 
 Deno.serve(async (req) => {
+  if (req.method !== "POST") {
+    return new Response("not allowed", { status: 400 });
+  }
+
   const payload = await req.text();
   const headers = Object.fromEntries(req.headers);
   const wh = new Webhook(hookSecret);

@@ -23,7 +23,7 @@ export const NavigationIconButton = forwardRef<
         props.className
       )}
     >
-      <div className="absolute left-2 text-foreground-muted">{icon}</div>
+      <div className="absolute left-2 text-foreground-lighter">{icon}</div>
       <span
         className={cn(
           'absolute left-7 group-data-[state=expanded]:left-10',

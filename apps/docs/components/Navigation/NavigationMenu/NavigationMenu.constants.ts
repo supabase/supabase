@@ -1224,6 +1224,10 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         {
+          name: 'Auth Send Email Hook',
+          url: '/guides/functions/examples/auth-send-email-hook-react-email-resend',
+        },
+        {
           name: 'CORS support for invoking from the browser',
           url: '/guides/functions/cors',
         },
@@ -1295,6 +1299,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/examples/sentry-monitoring',
         },
         { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
+        {
+          name: 'React Email',
+          url: '/guides/functions/examples/auth-send-email-hook-react-email-resend',
+        },
         {
           name: 'Sending Emails with Resend',
           url: '/guides/functions/examples/send-emails',

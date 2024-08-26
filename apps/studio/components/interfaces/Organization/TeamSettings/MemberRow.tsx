@@ -14,10 +14,15 @@ import { Badge, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ 
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
+import PartnerIcon from 'components/ui/PartnerIcon'
 
 interface MemberRowProps {
   member: OrganizationMember
 }
+
+const MEMBER_ORIGIN_TO_MANAGED_BY = {
+  vercel: 'vercel-marketplace',
+} as const
 
 export const MemberRow = ({ member }: MemberRowProps) => {
   const { slug } = useParams()
@@ -85,6 +90,18 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             )}
             {member.primary_email === profile?.primary_email && <Badge color="scale">You</Badge>}
           </div>
+
+          {(member.metadata as any)?.origin && (
+            <PartnerIcon
+              organization={{
+                managed_by:
+                  MEMBER_ORIGIN_TO_MANAGED_BY[
+                    (member.metadata as any).origin as keyof typeof MEMBER_ORIGIN_TO_MANAGED_BY
+                  ] ?? 'supabase',
+              }}
+              tooltipText="This user is managed by Vercel Marketplace."
+            />
+          )}
         </div>
       </Table.td>
 
