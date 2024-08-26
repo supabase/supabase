@@ -73,9 +73,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -498,21 +495,9 @@ const Wizard: NextPageWithLayout = () => {
                             <SelectContent_Shadcn_>
                               <SelectGroup_Shadcn_>
                                 {organizations?.map((x: any) => (
-                                  <Tooltip_Shadcn_ key={x.slug}>
-                                    <TooltipTrigger_Shadcn_ asChild>
-                                      <SelectItem_Shadcn_
-                                        value={x.slug}
-                                        disabled={x.managed_by === 'vercel-marketplace'}
-                                      >
-                                        {x.name}
-                                      </SelectItem_Shadcn_>
-                                    </TooltipTrigger_Shadcn_>
-                                    {x.managed_by === 'vercel-marketplace' && (
-                                      <TooltipContent_Shadcn_ side="top" className="w-72">
-                                        Create new projects via Vercel Marketplace
-                                      </TooltipContent_Shadcn_>
-                                    )}
-                                  </Tooltip_Shadcn_>
+                                  <SelectItem_Shadcn_ key={x.id} value={x.slug}>
+                                    {x.name}
+                                  </SelectItem_Shadcn_>
                                 ))}
                               </SelectGroup_Shadcn_>
                             </SelectContent_Shadcn_>
