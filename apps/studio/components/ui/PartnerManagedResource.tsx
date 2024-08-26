@@ -10,6 +10,7 @@ interface PartnerManagedResourceProps {
   cta?: {
     installationId?: string
     path?: string
+    message?: string
   }
 }
 
@@ -43,7 +44,7 @@ function PartnerManagedResource({ partner, resource, cta }: PartnerManagedResour
       {ctaEnabled && (
         <Button asChild iconRight={<ExternalLink />} disabled={isLoading || isError}>
           <a href={ctaUrl} target="_blank" rel="noopener noreferrer">
-            View {resource} on {PARTNER_TO_NAME[partner]}
+            {cta.message || `View ${resource} on ${PARTNER_TO_NAME[partner]}`}
           </a>
         </Button>
       )}
