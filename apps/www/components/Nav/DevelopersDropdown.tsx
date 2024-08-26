@@ -15,15 +15,7 @@ type Props = {
 
 const DevelopersDropdown = () => {
   const latestPosts = allBlogPosts
-    .sort((a: BlogPost, b: BlogPost) => {
-      const isPublishedAtBefore =
-        a.published_at && b.published_at && Date.parse(a.published_at) < Date.parse(b.published_at)
-      if (isPublishedAtBefore || new Date(a.date) < new Date(b.date)) {
-        return 1
-      } else {
-        return -1
-      }
-    })
+    .sort((a: BlogPost, b: BlogPost) => (new Date(a.date) < new Date(b.date) ? 1 : -1))
     .slice(0, 2)
 
   return (
