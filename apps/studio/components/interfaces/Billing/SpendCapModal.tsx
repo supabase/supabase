@@ -28,7 +28,7 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
           </p>
           <p className="text-sm">
             Launching additional projects or enabling project add-ons will incur additional monthly
-            fees indepdent of your spend cap.
+            fees independent of your spend cap.
           </p>
 
           {/* Maybe instead of a table, show something more interactive like a spend cap playground */}
