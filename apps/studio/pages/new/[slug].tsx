@@ -1059,7 +1059,7 @@ const Wizard: NextPageWithLayout = () => {
                       resource="Projects"
                       cta={{
                         installationId: currentOrg?.partner_id,
-                        message: 'Visit Vercel to Create a Project',
+                        message: 'Visit Vercel to create a project',
                       }}
                     />
                   </Panel.Content>
