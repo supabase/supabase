@@ -32,7 +32,9 @@ const DeleteProjectPanel = () => {
               <AlertDescription_Shadcn_>
                 Make sure you have made a backup if you want to keep your data.
               </AlertDescription_Shadcn_>
-              <DeleteProjectButton />
+              <div className="mt-2">
+                <DeleteProjectButton />
+              </div>
             </Alert_Shadcn_>
           ) : (
             <PartnerManagedResource
