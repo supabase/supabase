@@ -1,11 +1,12 @@
 'use client'
 
-import React, { Fragment } from 'react'
+import { Fragment } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import { Home, LogOut, Search, Settings, UserIcon } from 'lucide-react'
+import { UserIcon } from 'lucide-react'
 import {
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -16,22 +17,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-  Theme,
   buttonVariants,
-  cn,
-  themes,
 } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import { logOut } from 'common'
+import { themes } from 'ui/src/components/ThemeProvider/themes'
 
 import type { User } from '@supabase/supabase-js'
 import type { LucideIcon } from 'icons/src/createSupabaseIcon'
+import type { Theme } from 'ui/src/components/ThemeProvider/themes'
 
 interface Props {
+  menu: menuItem[][]
   user: User | null
+  hasThemeSelector?: boolean
+  site?: 'docs' | 'www' | 'studio'
 }
 
-interface menuItem {
+export interface menuItem {
   label: string
   type?: 'link' | 'button' | 'text'
   icon?: LucideIcon
@@ -44,45 +45,9 @@ interface menuItem {
   }
 }
 
-const AuthenticatedDropdownMenu = ({ user }: Props) => {
-  const setCommandMenuOpen = useSetCommandMenuOpen()
+const AuthenticatedDropdownMenu = ({ user, menu, hasThemeSelector = true, site }: Props) => {
   const { theme, setTheme } = useTheme()
   const userAvatar = user && user.user_metadata?.avatar_url
-
-  const menu: menuItem[][] = [
-    [
-      {
-        label: user?.email ?? '',
-        type: 'text',
-        icon: UserIcon,
-      },
-      {
-        label: 'Projects',
-        icon: Home,
-        href: 'https://supabase.com/dashboard/projects',
-      },
-      {
-        label: 'Account Preferences',
-        icon: Settings,
-        href: 'https://supabase.com/dashboard/account/me',
-      },
-      {
-        label: 'Logout',
-        type: 'button',
-        icon: LogOut,
-        onClick: () => logOut(),
-      },
-    ],
-    [
-      {
-        label: 'Search',
-        type: 'button',
-        icon: Search,
-        onClick: () => setCommandMenuOpen(true),
-        shortcut: '⌘K',
-      },
-    ],
-  ]
 
   return (
     <DropdownMenu modal={false}>
@@ -112,14 +77,14 @@ const AuthenticatedDropdownMenu = ({ user }: Props) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end" className="w-52">
         {menu.map((menuSection, sectionIdx) => (
-          <Fragment key={`topnav--${sectionIdx}`}>
-            {sectionIdx !== 0 && <DropdownMenuSeparator key={`topnav--${sectionIdx}`} />}
+          <Fragment key={`${site}-topnav--${sectionIdx}`}>
+            {sectionIdx !== 0 && <DropdownMenuSeparator key={`${site}-topnav--${sectionIdx}`} />}
             {menuSection.map((sectionItem, itemIdx) => {
               switch (sectionItem.type) {
                 case 'text':
                   return (
                     <div
-                      key={`topnav-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
+                      key={`${site}-topnav-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
                       className="flex cursor-text items-center text-foreground rounded-sm px-2 py-1.5 text-xs outline-none space-x-2"
                       {...sectionItem.otherProps}
                     >
@@ -129,7 +94,7 @@ const AuthenticatedDropdownMenu = ({ user }: Props) => {
                 case 'button':
                   return (
                     <DropdownMenuItem
-                      key={`topnav-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
+                      key={`${site}-topnav-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
                       className="space-x-2"
                       onClick={sectionItem.onClick!}
                       {...sectionItem.otherProps}
@@ -141,7 +106,7 @@ const AuthenticatedDropdownMenu = ({ user }: Props) => {
                 default:
                   return (
                     <Link
-                      key={`topnav-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
+                      key={`${site}-topnav-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
                       href={sectionItem.href!}
                       {...sectionItem.otherProps}
                     >
@@ -166,7 +131,10 @@ const AuthenticatedDropdownMenu = ({ user }: Props) => {
             {themes
               .filter((x) => x.value === 'light' || x.value === 'dark' || x.value === 'system')
               .map((theme: Theme) => (
-                <DropdownMenuRadioItem key={`topnav-theme-${theme.value}`} value={theme.value}>
+                <DropdownMenuRadioItem
+                  key={`${site}-topnav-theme-${theme.value}`}
+                  value={theme.value}
+                >
                   {theme.name}
                 </DropdownMenuRadioItem>
               ))}

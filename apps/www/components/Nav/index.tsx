@@ -13,6 +13,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
+import AuthenticatedDropdownMenu from 'ui-patterns/AuthenticatedDropdownMenu'
 import { isBrowser, STORAGE_KEY, useIsLoggedIn, useUser } from 'common'
 import ScrollProgress from '~/components/ScrollProgress'
 import GitHubButton from './GitHubButton'
@@ -22,7 +23,7 @@ import MenuItem from './MenuItem'
 import { menu } from '~/data/nav'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import LW12CountdownBanner from 'ui/src/layout/banners/LW12CountdownBanner/LW12CountdownBanner'
-import AuthenticatedDropdownMenu from './AuthenticatedDropdownMenu'
+import useDropdownMenu from './useDropdownMenu'
 
 interface Props {
   hideNavbar: boolean
@@ -35,6 +36,7 @@ const Nav = (props: Props) => {
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const user = useUser()
+  const dropdownMenu = useDropdownMenu(user)
   const isLoggedIn =
     (isBrowser && globalThis?.localStorage?.getItem(STORAGE_KEY)) || useIsLoggedIn()
 
@@ -133,32 +135,39 @@ const Nav = (props: Props) => {
                   </NavigationMenuList>
                 </NavigationMenu>
               </div>
-              <div
-                className={cn(
-                  'hidden lg:flex items-center gap-2 opacity-0 transition-opacity',
-                  mounted && 'animate-fade-in !scale-100 delay-100'
-                )}
-              >
-                <GitHubButton />
+              {mounted && (
+                <div
+                  className={cn(
+                    'hidden lg:flex items-center gap-2 opacity-0 transition-opacity',
+                    'animate-fade-in !scale-100 delay-100'
+                  )}
+                >
+                  {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
+                    <Button type="text" asChild>
+                      <Link href="/__dev-secret-auth">Dev sign-in</Link>
+                    </Button>
+                  )}
+                  <GitHubButton />
 
-                {isLoggedIn ? (
-                  <>
-                    <Button asChild>
-                      <Link href="/dashboard/projects">Dashboard</Link>
-                    </Button>
-                    <AuthenticatedDropdownMenu user={user} />
-                  </>
-                ) : (
-                  <>
-                    <Button type="default" asChild>
-                      <Link href="https://supabase.com/sign-in">Sign in</Link>
-                    </Button>
-                    <Button asChild>
-                      <Link href="https://supabase.com/new">Start your project</Link>
-                    </Button>
-                  </>
-                )}
-              </div>
+                  {isLoggedIn ? (
+                    <>
+                      <Button asChild>
+                        <Link href="/dashboard/projects">Dashboard</Link>
+                      </Button>
+                      <AuthenticatedDropdownMenu menu={dropdownMenu} user={user} site="www" />
+                    </>
+                  ) : (
+                    <>
+                      <Button type="default" asChild>
+                        <Link href="/contact-us">Contact us</Link>
+                      </Button>
+                      <Button asChild>
+                        <Link href="https://supabase.com/sign-in">Start your project</Link>
+                      </Button>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
             <HamburgerButton
               toggleFlyOut={() => setOpen(true)}

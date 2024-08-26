@@ -119,5 +119,4 @@ export const signOut = async () => await gotrueClient.signOut()
 export const logOut = async () => {
   await signOut()
   clearLocalStorage()
-  if (typeof document !== 'undefined') location.reload()
 }

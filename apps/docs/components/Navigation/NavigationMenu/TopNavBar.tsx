@@ -7,19 +7,21 @@ import { memo, useState } from 'react'
 
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
-import { CommandMenuTrigger, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { CommandMenuTrigger } from 'ui-patterns/CommandMenu'
 
 import GlobalNavigationMenu from './GlobalNavigationMenu'
-import AuthenticatedDropdownMenu from './AuthenticatedDropdownMenu'
+import AuthenticatedDropdownMenu from 'ui-patterns/AuthenticatedDropdownMenu'
+import useDropdownMenu from './useDropdownMenu'
+
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
-const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
+const UnauthenticatedDropdownMenu = dynamic(() => import('./TopNavDropdown'))
 
 const TopNavBar: FC = () => {
-  const user = useUser()
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
+  const user = useUser()
+  const menu = useDropdownMenu(user)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   return (
     <>
@@ -38,6 +40,11 @@ const TopNavBar: FC = () => {
             </div>
 
             <div className="flex gap-2 items-center">
+              {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
+                <Button type="text" asChild>
+                  <Link href="/__dev-secret-auth">Dev sign-in</Link>
+                </Button>
+              )}
               <CommandMenuTrigger>
                 <button
                   className={cn(
@@ -93,14 +100,11 @@ const TopNavBar: FC = () => {
                 </a>
               </Button>
             )}
-            {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
-              <Button asChild>
-                <Link href="/__dev-secret-auth">Dev-only secret sign-in</Link>
-              </Button>
+            {isLoggedIn ? (
+              <AuthenticatedDropdownMenu menu={menu} user={user} site="docs" />
+            ) : (
+              <UnauthenticatedDropdownMenu />
             )}
-            {isLoggedIn ? <AuthenticatedDropdownMenu user={user} />
-            :<TopNavDropdown />
-            }
           </div>
         </div>
       </nav>
