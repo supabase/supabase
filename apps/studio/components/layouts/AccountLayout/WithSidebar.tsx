@@ -199,8 +199,6 @@ const SidebarLinkItem = ({
     )
   }
 
-  console.log(label, isActive)
-
   return (
     <Link href={href || ''} className="block" target={isExternal ? '_blank' : '_self'}>
       <span className="group flex max-w-full cursor-pointer items-center space-x-2 border-default py-1 font-normal outline-none ring-foreground focus-visible:z-10 focus-visible:ring-1 group-hover:border-foreground-muted">
