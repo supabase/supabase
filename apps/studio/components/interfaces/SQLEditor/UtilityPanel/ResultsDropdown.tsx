@@ -17,6 +17,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -127,7 +130,16 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button type="text" iconRight={<ChevronDownIcon size={14} />}>
-          Export
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
+              <Button type="text" className="p-0">
+                <Download className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom" align="center">
+              Export results
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
         </Button>
       </DropdownMenuTrigger>
 

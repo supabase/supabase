@@ -5,7 +5,16 @@ import { useParams } from 'common'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { contentKeys } from 'data/content/keys'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
+import {
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  Button,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 import { ChartConfig } from './ChartConfig'
 import ResultsDropdown from './ResultsDropdown'
 import UtilityActions from './UtilityActions'
@@ -13,6 +22,7 @@ import UtilityTabResults from './UtilityTabResults'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Snippet } from 'data/content/sql-folders-query'
+import { BarChart, ChevronDownIcon, Download, Table } from 'lucide-react'
 
 export type UtilityPanelProps = {
   id: string
@@ -119,14 +129,34 @@ const UtilityPanel = ({
 
   return (
     <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
-      <TabsList_Shadcn_ className="flex justify-between gap-2 pl-6 pr-2">
-        <div className="flex items-center gap-4">
+      <TabsList_Shadcn_ className="flex justify-between gap-2 pl-2 pr-2">
+        <div className="flex items-center gap-1">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
-            <span className="translate-y-[1px]">Results</span>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <Button type="text">
+                  <Table className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" align="center">
+                View results
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           </TabsTrigger_Shadcn_>
+
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
-            <span className="translate-y-[1px]">Chart</span>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <Button type="text">
+                  <BarChart className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" align="center">
+                Chart results
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           </TabsTrigger_Shadcn_>
+
           {result?.rows && <ResultsDropdown id={id} />}
         </div>
         <UtilityActions
