@@ -509,5 +509,13 @@
     "position": "Guest Author",
     "author_url": "https://github.com/activenode",
     "author_image_url": "https://github.com/activenode.png"
+  },
+  {
+    "author_id": "craig_cannon",
+    "author": "Craig Cannon",
+    "username": "CraigCannon",
+    "position": "Marketing",
+    "author_url": "https://x.com/CraigCannon",
+    "author_image_url": "https://github.com/craigcannon.png"
   }
 ]
