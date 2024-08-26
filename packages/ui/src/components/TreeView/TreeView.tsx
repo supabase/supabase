@@ -158,7 +158,7 @@ const TreeViewItem = forwardRef<
                 'transition-colors',
                 'fill-foreground-muted',
                 'group-aria-selected:fill-foreground',
-                'w-5 h-5',
+                'w-5 h-5 shrink-0',
                 '-ml-0.5'
               )}
               size={16}
