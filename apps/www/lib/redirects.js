@@ -2581,8 +2581,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs//guides/platform/enterprise-billing',
-    destination: '/docs//guides/platform/org-based-billing',
+    source: '/docs/guides/platform/enterprise-billing',
+    destination: '/docs/guides/platform/org-based-billing',
   },
 
   // marketing
