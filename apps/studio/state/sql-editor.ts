@@ -13,10 +13,6 @@ export type StateSnippet = {
   projectRef: string
 }
 
-function isSQL(snippet: SqlSnippet): boolean {
-  return snippet.type === 'sql'
-}
-
 export const sqlEditorState = proxy({
   snippets: {} as {
     [key: string]: StateSnippet

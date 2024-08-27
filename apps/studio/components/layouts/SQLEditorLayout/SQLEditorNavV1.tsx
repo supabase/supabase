@@ -45,6 +45,10 @@ export const SQLEditorNavV1 = ({
   const enableFolders = useFlag('sqlFolderOrganization')
 
   const snippets = useSnippets(ref)
+  const sqlSnippets = useMemo(() => {
+    return snippets.filter((snippet) => snippet.type === 'sql')
+  }, [snippets])
+
   const snap = useSqlEditorStateSnapshot()
 
   const { isLoading, isSuccess, isError, error } = useSqlSnippetsQuery(ref, {
@@ -116,7 +120,8 @@ export const SQLEditorNavV1 = ({
   }
 
   const projectSnippets = useMemo(() => {
-    return snippets.filter((snippet) => snippet.visibility === 'project')
+    const sqlSnippets = snippets.filter((snippet) => snippet.visibility === 'project')
+    return sqlSnippets.filter((snippet) => snippet.type === 'sql')
   }, [snippets])
 
   const filteredProjectSnippets = useMemo(() => {
@@ -129,19 +134,25 @@ export const SQLEditorNavV1 = ({
   }, [projectSnippets, searchText])
 
   const personalSnippets = useMemo(() => {
-    const ss = snippets.filter(
-      (snippet) => snippet.visibility === 'user' && !snippet.content.favorite
+    const ss = sqlSnippets.filter(
+      (snippet) =>
+        snippet.visibility === 'user' && !snippet.content.favorite && snippet.type === 'sql'
     )
 
     if (searchText.length > 0) {
-      return ss.filter((tab) => tab.name.toLowerCase().includes(searchText.toLowerCase()))
+      return sqlSnippets.filter((tab) => tab.name.toLowerCase().includes(searchText.toLowerCase()))
     }
     return ss
-  }, [searchText, snippets])
+  }, [searchText, sqlSnippets])
 
   const favoriteSnippets = useMemo(() => {
-    return snippets.filter((snippet) => snippet.content.favorite)
-  }, [snippets])
+    return sqlSnippets.filter((snippet) => {
+      if (snippet.type === 'sql') {
+        return snippet.content.favorite
+      }
+      return false
+    })
+  }, [sqlSnippets])
 
   const filteredFavoriteSnippets = useMemo(() => {
     if (searchText.length > 0) {
