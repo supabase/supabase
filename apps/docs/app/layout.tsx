@@ -4,7 +4,7 @@ import '../styles/main.scss'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
-import { genFaviconData } from 'common/MetaFavicons/app-router'
+import { genFaviconData, genManifestData } from 'common/MetaFavicons/app-router'
 import { type Metadata, type Viewport } from 'next'
 
 import { BASE_PATH } from '~/lib/constants'
