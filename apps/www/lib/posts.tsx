@@ -73,7 +73,9 @@ export const getSortedPosts = ({
 
   let sortedPosts = [...allPosts]
 
-  sortedPosts = sortedPosts.sort((a: any, b: any) => (new Date(a.date) < new Date(b.date) ? 1 : -1))
+  sortedPosts = sortedPosts.sort(
+    (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
 
   if (categories) {
     sortedPosts = sortedPosts.filter((post: any) => {

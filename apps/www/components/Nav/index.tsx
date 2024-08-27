@@ -36,7 +36,7 @@ const Nav = (props: Props) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const latestBlogPosts = allBlogPosts
-    .sort((a: BlogPost, b: BlogPost) => (new Date(a.date) < new Date(b.date) ? 1 : -1))
+    .sort((a: BlogPost, b: BlogPost) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 2)
   const menu = getMenu(latestBlogPosts)
 
