@@ -13,7 +13,9 @@ import { motion } from 'framer-motion'
 import styles from './customers.module.css'
 import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
-import WebinarAnnouncement from '~/components/Announcement/WebinarAnnouncement'
+import { useState } from 'react'
+import CustomersFilters from '../../components/CaseStudies/CustomersFilters'
+import { BlogPost } from '../../.contentlayer/generated'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts({ directory: '_customers' })
@@ -30,8 +32,13 @@ export async function getStaticProps() {
   }
 }
 
-function CustomerStoriesPage(props: any) {
+interface Props {
+  blogs: PostTypes[]
+}
+
+function CustomerStoriesPage(props: Props) {
   const { basePath } = useRouter()
+  const [pages, setPages] = useState(props.blogs)
 
   const meta = {
     title: 'Customer Stories | Supabase',
@@ -40,7 +47,7 @@ function CustomerStoriesPage(props: any) {
       'See how Supabase empowers companies of all sizes to accelerate their growth and streamline their work.',
   }
 
-  const caseStudyThumbs = props.blogs?.map((blog: PostTypes, idx: number) => {
+  const caseStudyThumbs = pages?.map((blog: PostTypes, idx: number) => {
     return {
       logo: blog.logo,
       logoInverse: blog.logo_inverse,
@@ -86,12 +93,12 @@ function CustomerStoriesPage(props: any) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
               >
-                <WebinarAnnouncement />
                 <h1 className="text-foreground mb-3 text-3xl">Customer stories</h1>
-                <h2 className="text-foreground-light text-xl">
+                <p className="text-foreground-light text-xl">
                   Discover case studies on how Supabase is being used around the world to quickly
                   create outstanding products and set new industry standards.
-                </h2>
+                </p>
+                <CustomersFilters allPosts={props.blogs} setPosts={setPages} />
               </motion.div>
               <div className="mx-auto my-12 md:my-20 grid grid-cols-12 gap-6 not-prose">
                 {caseStudyThumbs.map((caseStudy: any, i: number) => (

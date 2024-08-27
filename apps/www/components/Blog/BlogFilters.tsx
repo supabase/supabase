@@ -38,7 +38,7 @@ interface Props {
  * ✅ search via category and reset q param if present
  */
 
-function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
+function BlogFilters({ allPosts = [], setPosts, view, setView }: Props) {
   const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
   const isList = view === 'list'
   const [category, setCategory] = useState<string>('all')
