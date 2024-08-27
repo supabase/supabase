@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -18,20 +17,21 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  CriticalIcon,
   IconAlertTriangle,
   IconExternalLink,
   Radio,
   SidePanel,
+  WarningIcon,
   cn,
 } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -54,7 +54,6 @@ const PITR_CATEGORY_OPTIONS: {
 ]
 
 const PITRSidePanel = () => {
-  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { resolvedTheme } = useTheme()
   const project = useSelectedProject()
@@ -67,15 +66,8 @@ const PITRSidePanel = () => {
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
-  const snap = useSubscriptionPageStateSnapshot()
-  const visible = snap.panelKey === 'pitr'
-  const onClose = () => {
-    const { panel, ...queryWithoutPanel } = router.query
-    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
-      shallow: true,
-    })
-    snap.setPanelKey(undefined)
-  }
+  const { panel, setPanel, closePanel } = useAddonsPagePanel()
+  const visible = panel === 'pitr'
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
@@ -85,7 +77,7 @@ const PITRSidePanel = () => {
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated point in time recovery duration`)
-      onClose()
+      closePanel()
     },
     onError: (error) => {
       toast.error(`Unable to update PITR: ${error.message}`)
@@ -94,7 +86,7 @@ const PITRSidePanel = () => {
   const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled point in time recovery`)
-      onClose()
+      closePanel()
     },
     onError: (error) => {
       toast.error(`Unable to disable PITR: ${error.message}`)
@@ -142,7 +134,7 @@ const PITRSidePanel = () => {
     <SidePanel
       size="xlarge"
       visible={visible}
-      onCancel={onClose}
+      onCancel={closePanel}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
       disabled={
@@ -306,7 +298,7 @@ const PITRSidePanel = () => {
                     <Button
                       key="change-compute"
                       type="default"
-                      onClick={() => snap.setPanelKey('computeInstance')}
+                      onClick={() => setPanel('computeInstance')}
                     >
                       Change compute size
                     </Button>,

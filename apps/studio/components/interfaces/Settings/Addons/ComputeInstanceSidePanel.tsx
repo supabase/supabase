@@ -7,7 +7,10 @@ import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -20,7 +23,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { INSTANCE_MICRO_SPECS, PROJECT_STATUS } from 'lib/constants'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert,
   Alert_Shadcn_,
@@ -52,15 +55,10 @@ const ComputeInstanceSidePanel = () => {
     'stripe.subscriptions'
   )
 
-  const snap = useSubscriptionPageStateSnapshot()
-  const visible = snap.panelKey === 'computeInstance'
-  const onClose = () => {
-    const { panel, ...queryWithoutPanel } = router.query
-    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
-      shallow: true,
-    })
-    snap.setPanelKey(undefined)
-  }
+  const isProjectActive = useIsProjectActive()
+
+  const { panel, setPanel, closePanel } = useAddonsPagePanel()
+  const visible = panel === 'computeInstance'
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
@@ -72,7 +70,7 @@ const ComputeInstanceSidePanel = () => {
         { duration: 8000 }
       )
       setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
-      onClose()
+      closePanel()
       router.push(`/project/${projectRef}`)
     },
     onError: (error) => {
@@ -86,7 +84,7 @@ const ComputeInstanceSidePanel = () => {
         { duration: 8000 }
       )
       setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
-      onClose()
+      closePanel()
       router.push(`/project/${projectRef}`)
     },
     onError: (error) => {
@@ -212,7 +210,7 @@ const ComputeInstanceSidePanel = () => {
       <SidePanel
         size="xxlarge"
         visible={visible}
-        onCancel={onClose}
+        onCancel={closePanel}
         onConfirm={() => setShowConfirmationModal(true)}
         loading={isLoading}
         disabled={
@@ -221,14 +219,17 @@ const ComputeInstanceSidePanel = () => {
           !hasChanges ||
           blockDowngradeDueToPitr ||
           blockDowngradeDueToReadReplicas ||
-          !canUpdateCompute
+          !canUpdateCompute ||
+          !isProjectActive
         }
         tooltip={
           isFreePlan
             ? 'Unable to update compute instance on a Free Plan'
-            : !canUpdateCompute
-              ? 'You do not have permission to update compute instance'
-              : undefined
+            : !isProjectActive
+              ? 'Unable to update compute as project is currently not active'
+              : !canUpdateCompute
+                ? 'You do not have permission to update compute instance'
+                : undefined
         }
         header={
           <div className="flex items-center justify-between">
@@ -420,7 +421,7 @@ const ComputeInstanceSidePanel = () => {
                   <Button asChild type="default">
                     <Link
                       href={`/project/${projectRef}/settings/infrastructure`}
-                      onClick={() => snap.setPanelKey(undefined)}
+                      onClick={closePanel}
                     >
                       Manage read replicas
                     </Link>
@@ -440,7 +441,7 @@ const ComputeInstanceSidePanel = () => {
                   Small compute instance.
                 </AlertDescription_Shadcn_>
                 <AlertDescription_Shadcn_ className="mt-2">
-                  <Button type="default" onClick={() => snap.setPanelKey('pitr')}>
+                  <Button type="default" onClick={() => setPanel('pitr')}>
                     Change PITR
                   </Button>
                 </AlertDescription_Shadcn_>
