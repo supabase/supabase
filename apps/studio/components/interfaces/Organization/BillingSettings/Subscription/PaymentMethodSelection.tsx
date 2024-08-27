@@ -1,11 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
-import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -24,7 +22,6 @@ const PaymentMethodSelection = ({
   onSelectPaymentMethod,
   layout = 'vertical',
 }: PaymentMethodSelectionProps) => {
-  const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
   const [showAddNewPaymentMethodModal, setShowAddNewPaymentMethodModal] = useState(false)
@@ -163,18 +160,6 @@ const PaymentMethodSelection = ({
               refetchedPaymentMethods.data[0]
             )
             onSelectPaymentMethod(mostRecentPaymentMethod.id)
-
-            queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
-              if (!prev) return prev
-              return {
-                ...prev,
-                defaultPaymentMethodId: mostRecentPaymentMethod.id,
-                data: prev.data.map((pm: any) => ({
-                  ...pm,
-                  is_default: pm.id === mostRecentPaymentMethod.id,
-                })),
-              }
-            })
           }
         }}
       />
