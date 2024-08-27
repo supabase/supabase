@@ -6,7 +6,7 @@ import type { FC } from 'react'
 import { memo, useState } from 'react'
 
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
-import { Button, buttonVariants, cn } from 'ui'
+import { Button, buttonVariants, cn, Skeleton } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns/CommandMenu'
 
 import GlobalNavigationMenu from './GlobalNavigationMenu'
@@ -29,7 +29,7 @@ const TopNavBar: FC = () => {
         aria-label="top bar"
         className="w-full z-40 flex flex-col border-b backdrop-blur backdrop-filter bg bg-opacity-75"
       >
-        <div className="w-full px-5 lg:pl-10 flex justify-between h-[var(--header-height)] gap-3">
+        <div className="w-full px-5 lg:pl-10 flex justify-between h-[var(--header-height)] gap-2">
           <div className="hidden lg:flex h-full items-center justify-center gap-2">
             <HeaderLogo />
             <GlobalNavigationMenu />
@@ -87,12 +87,14 @@ const TopNavBar: FC = () => {
               </button>
             </div>
           </div>
-          <div className="hidden lg:flex items-center justify-end gap-3">
-            {!isUserLoading && (
+          <div className="hidden lg:flex items-center justify-end gap-2">
+            {isUserLoading ? (
+              <Skeleton className="w-20 h-[30px]" />
+            ) : (
               <Button asChild>
                 <a
                   href="https://supabase.com/dashboard"
-                  className="h-[30px]"
+                  className="h-[30px] opacity-0 transition-opacity animate-fade-in"
                   target="_blank"
                   rel="noreferrer noopener"
                 >
@@ -100,11 +102,14 @@ const TopNavBar: FC = () => {
                 </a>
               </Button>
             )}
-            {isLoggedIn ? (
-              <AuthenticatedDropdownMenu menu={menu} user={user} site="docs" />
-            ) : (
-              <UnauthenticatedDropdownMenu />
-            )}
+
+            <div className="w-[30px] min-w-[30px] flex items-center">
+              {isLoggedIn ? (
+                <AuthenticatedDropdownMenu menu={menu} user={user} site="docs" />
+              ) : (
+                <UnauthenticatedDropdownMenu />
+              )}
+            </div>
           </div>
         </div>
       </nav>
