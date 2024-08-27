@@ -127,6 +127,8 @@ const SmtpForm = () => {
     delete payload.ENABLE_SMTP
     payload.SMTP_PORT = payload.SMTP_PORT ? payload.SMTP_PORT.toString() : payload.SMTP_PORT
 
+    // the SMTP_PASS is write-only, it's never shown. If we don't delete it from the payload, it will replace the
+    // previously saved value with an empty one
     if (payload.SMTP_PASS === '') {
       delete payload.SMTP_PASS
     }
@@ -351,6 +353,12 @@ const SmtpForm = () => {
                       />
                     }
                     disabled={!canUpdateConfig}
+                    descriptionText={
+                      <span>
+                        For security reasons, the password is write-only. Once saved, it cannot be
+                        retrieved or displayed.
+                      </span>
+                    }
                   />
                 </FormSectionContent>
               </FormSection>
