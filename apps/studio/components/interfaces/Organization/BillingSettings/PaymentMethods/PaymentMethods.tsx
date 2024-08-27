@@ -73,8 +73,7 @@ const PaymentMethods = () => {
           <div className="sticky space-y-2 top-12">
             <p className="text-foreground text-base m-0">Payment Methods</p>
             <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
-              After adding a payment method, make sure to mark it as active to use it for billing.
-              You can remove unused cards.
+              Payments for your subscription are made using the default card.
             </p>
           </div>
         </ScaffoldSectionDetail>
@@ -232,11 +231,11 @@ const PaymentMethods = () => {
         visible={showAddPaymentMethodModal}
         returnUrl={`${getURL()}/org/${slug}/billing`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
-        onConfirm={async () => {
+        onConfirm={() => {
           setShowAddPaymentMethodModal(false)
           toast.success('Successfully added new payment method')
-          await queryClient.invalidateQueries(organizationKeys.paymentMethods(slug))
         }}
+        showSetDefaultCheckbox={true}
       />
 
       <ChangePaymentMethodModal

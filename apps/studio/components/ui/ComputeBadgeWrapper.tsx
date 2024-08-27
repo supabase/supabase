@@ -139,7 +139,7 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
                 <div className="flex flex-col gap-0">
                   <p className="text-foreground">
                     {isEligibleForFreeUpgrade
-                      ? 'Free upgrade to Micro available.'
+                      ? 'Free upgrade to Micro available'
                       : 'Unlock more compute'}
                   </p>
                   <p className="text-foreground-light">
