@@ -1,13 +1,6 @@
 import type { CloudProvider } from 'shared-data'
-import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 
 import type { components } from 'data/api'
-
-export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.EAST_US
-
-// TO DO, change default to US region for prod
-export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
 
 export const PRICING_TIER_LABELS_ORG = {
   FREE: 'Free - $0/month',
@@ -24,22 +17,6 @@ export const PRICING_TIER_PRODUCT_IDS = {
 }
 
 export const DEFAULT_PROVIDER: CloudProvider = 'AWS'
-
-export const PROVIDERS = {
-  FLY: {
-    id: 'FLY',
-    name: 'Fly.io',
-    default_region: FLY_REGIONS_DEFAULT,
-    regions: { ...FLY_REGIONS },
-  },
-  AWS: {
-    id: 'AWS',
-    name: 'AWS',
-    DEFAULT_SSH_KEY: 'supabase-app-instance',
-    default_region: AWS_REGIONS_DEFAULT,
-    regions: { ...AWS_REGIONS },
-  },
-} as const
 
 export const PROJECT_STATUS: {
   [key: string]: components['schemas']['ResourceWithServicesStatusResponse']['status']

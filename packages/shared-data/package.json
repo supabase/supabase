@@ -5,6 +5,9 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "scripts": {},
+  "dependencies": {
+    "api-types": "*"
+  },
   "author": "",
   "license": "MIT"
 }

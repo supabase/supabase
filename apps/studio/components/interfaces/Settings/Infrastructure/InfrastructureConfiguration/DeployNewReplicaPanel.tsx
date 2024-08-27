@@ -12,9 +12,9 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
-import { AWS_REGIONS } from 'shared-data'
+import { AWS_REGIONS, AWS_REGIONS_DEFAULT } from 'shared-data'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -22,8 +22,8 @@ import {
   Button,
   Listbox,
   SidePanel,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually

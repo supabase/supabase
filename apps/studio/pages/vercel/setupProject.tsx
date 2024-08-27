@@ -7,7 +7,6 @@ import { ChangeEvent, createContext, useContext, useEffect, useRef, useState } f
 import { toast } from 'react-hot-toast'
 import { Button, Input, Listbox } from 'ui'
 
-import type { Dictionary } from 'types'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,
@@ -17,14 +16,11 @@ import {
 import { Loading } from 'components/ui/Loading'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import {
-  DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  PRICING_TIER_PRODUCT_IDS,
-  PROVIDERS,
-} from 'lib/constants'
+import { DEFAULT_MINIMUM_PASSWORD_STRENGTH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
 import { VERCEL_INTEGRATION_CONFIGS } from 'lib/vercelConfigs'
-import { AWS_REGIONS } from 'shared-data'
+import { AWS_REGIONS, PROVIDERS } from 'shared-data'
+import type { Dictionary } from 'types'
 
 interface ISetupProjectStore {
   token: string

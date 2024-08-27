@@ -1,10 +1,10 @@
 import * as Sentry from '@sentry/nextjs'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
+import { PROVIDERS } from 'shared-data'
 
 import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
-import { PROVIDERS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 

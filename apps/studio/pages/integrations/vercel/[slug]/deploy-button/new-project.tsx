@@ -18,10 +18,9 @@ import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-pr
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import passwordStrength from 'lib/password-strength'
-import { AWS_REGIONS } from 'shared-data'
+import { AWS_REGIONS, PROVIDERS } from 'shared-data'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout } from 'types'
 

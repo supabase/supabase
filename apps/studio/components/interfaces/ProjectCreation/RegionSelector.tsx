@@ -3,8 +3,7 @@ import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFlag } from 'hooks/ui/useFlag'
-import { PROVIDERS } from 'lib/constants'
-import type { CloudProvider } from 'shared-data'
+import { PROVIDERS, type CloudProvider } from 'shared-data'
 import {
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,

@@ -1,4 +1,4 @@
-import { PROVIDERS } from './constants'
+import { PROVIDERS } from 'shared-data'
 
 export function getCloudProviderArchitecture(cloudProvider: string | undefined) {
   switch (cloudProvider) {
