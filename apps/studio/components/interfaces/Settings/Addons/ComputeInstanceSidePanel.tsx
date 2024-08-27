@@ -20,7 +20,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { INSTANCE_MICRO_SPECS, PROJECT_STATUS } from 'lib/constants'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert,
   Alert_Shadcn_,
@@ -52,15 +52,8 @@ const ComputeInstanceSidePanel = () => {
     'stripe.subscriptions'
   )
 
-  const snap = useSubscriptionPageStateSnapshot()
-  const visible = snap.panelKey === 'computeInstance'
-  const onClose = () => {
-    const { panel, ...queryWithoutPanel } = router.query
-    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
-      shallow: true,
-    })
-    snap.setPanelKey(undefined)
-  }
+  const { panel, setPanel, closePanel } = useAddonsPagePanel()
+  const visible = panel === 'computeInstance'
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
@@ -72,7 +65,7 @@ const ComputeInstanceSidePanel = () => {
         { duration: 8000 }
       )
       setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
-      onClose()
+      closePanel()
       router.push(`/project/${projectRef}`)
     },
     onError: (error) => {
@@ -86,7 +79,7 @@ const ComputeInstanceSidePanel = () => {
         { duration: 8000 }
       )
       setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
-      onClose()
+      closePanel()
       router.push(`/project/${projectRef}`)
     },
     onError: (error) => {
@@ -212,7 +205,7 @@ const ComputeInstanceSidePanel = () => {
       <SidePanel
         size="xxlarge"
         visible={visible}
-        onCancel={onClose}
+        onCancel={closePanel}
         onConfirm={() => setShowConfirmationModal(true)}
         loading={isLoading}
         disabled={
@@ -420,7 +413,7 @@ const ComputeInstanceSidePanel = () => {
                   <Button asChild type="default">
                     <Link
                       href={`/project/${projectRef}/settings/infrastructure`}
-                      onClick={() => snap.setPanelKey(undefined)}
+                      onClick={closePanel}
                     >
                       Manage read replicas
                     </Link>
@@ -440,7 +433,7 @@ const ComputeInstanceSidePanel = () => {
                   Small compute instance.
                 </AlertDescription_Shadcn_>
                 <AlertDescription_Shadcn_ className="mt-2">
-                  <Button type="default" onClick={() => snap.setPanelKey('pitr')}>
+                  <Button type="default" onClick={() => setPanel('pitr')}>
                     Change PITR
                   </Button>
                 </AlertDescription_Shadcn_>

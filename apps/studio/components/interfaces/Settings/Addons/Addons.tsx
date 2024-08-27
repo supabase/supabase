@@ -35,7 +35,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
-import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert,
   AlertDescription_Shadcn_,
@@ -55,8 +55,8 @@ import PITRSidePanel from './PITRSidePanel'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
-  const { ref: projectRef, panel } = useParams()
-  const snap = useSubscriptionPageStateSnapshot()
+  const { ref: projectRef } = useParams()
+  const { setPanel } = useAddonsPagePanel()
   const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
   const selectedOrg = useSelectedOrganization()
@@ -65,10 +65,6 @@ const Addons = () => {
   const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
   const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
-  const allowedPanelValues = ['computeInstance', 'pitr', 'customDomain']
-  if (panel && typeof panel === 'string' && allowedPanelValues.includes(panel)) {
-    snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
-  }
 
   const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -251,7 +247,7 @@ const Addons = () => {
                       <Button
                         type="default"
                         className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('computeInstance')}
+                        onClick={() => setPanel('computeInstance')}
                         disabled={
                           isBranch ||
                           !isProjectActive ||
@@ -438,7 +434,7 @@ const Addons = () => {
                           <Button
                             type="default"
                             className="mt-2 pointer-events-auto"
-                            onClick={() => snap.setPanelKey('ipv4')}
+                            onClick={() => setPanel('ipv4')}
                             disabled={
                               isBranch ||
                               !isProjectActive ||
@@ -567,7 +563,7 @@ const Addons = () => {
                         <Button
                           type="default"
                           className="mt-2 pointer-events-auto"
-                          onClick={() => snap.setPanelKey('pitr')}
+                          onClick={() => setPanel('pitr')}
                           disabled={
                             isBranch ||
                             !isProjectActive ||
@@ -644,7 +640,7 @@ const Addons = () => {
                       <Button
                         type="default"
                         className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('customDomain')}
+                        onClick={() => setPanel('customDomain')}
                         disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
                         Change custom domain

@@ -63,7 +63,7 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
     e.preventDefault()
     e.stopPropagation()
 
-    router.push(`/project/${project?.ref}/settings/addons`)
+    router.push(`/project/${project?.ref}/settings/addons?panel=computeInstance`)
   }
 
   const isHighestCompute =
