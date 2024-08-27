@@ -93,4 +93,7 @@ const genFaviconData = (basePath: string): Metadata['icons'] => ({
   ],
 })
 
-export { genFaviconData }
+const genManifestData = (basePath: string): Metadata['manifest'] =>
+  `${basePath}/favicon/manifest.json`
+
+export { genFaviconData, genManifestData }

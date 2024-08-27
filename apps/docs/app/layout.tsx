@@ -18,6 +18,7 @@ const metadata: Metadata = {
     'Supabase is an open source Firebase alternative providing all the backend features you need to build a product.',
   metadataBase: new URL('https://supabase.com'),
   icons: genFaviconData(BASE_PATH),
+  manifest: genManifestData(BASE_PATH),
   robots: {
     index: true,
     follow: true,

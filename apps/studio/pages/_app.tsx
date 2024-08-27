@@ -163,7 +163,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   <title>Supabase</title>
                   <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                 </Head>
-                <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
+                <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
                 <PageTelemetry>
                   <TooltipProvider>
                     <RouteValidationWrapper>
