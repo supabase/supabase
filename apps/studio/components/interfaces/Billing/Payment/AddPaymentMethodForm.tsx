@@ -66,6 +66,10 @@ const AddPaymentMethodForm = ({
             paymentMethodId: setupIntent.payment_method,
           })
 
+          await queryClient.invalidateQueries(
+            organizationKeys.paymentMethods(selectedOrganization.slug)
+          )
+
           queryClient.setQueriesData(
             organizationKeys.paymentMethods(selectedOrganization.slug),
             (prev: any) => {

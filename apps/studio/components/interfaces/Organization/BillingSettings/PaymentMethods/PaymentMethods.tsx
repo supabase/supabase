@@ -232,10 +232,9 @@ const PaymentMethods = () => {
         visible={showAddPaymentMethodModal}
         returnUrl={`${getURL()}/org/${slug}/billing`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
-        onConfirm={async () => {
+        onConfirm={() => {
           setShowAddPaymentMethodModal(false)
           toast.success('Successfully added new payment method')
-          await queryClient.invalidateQueries(organizationKeys.paymentMethods(slug))
         }}
         showSetDefaultCheckbox={true}
       />
