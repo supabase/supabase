@@ -1,9 +1,9 @@
 import React from 'react'
 import Link from 'next/link'
-import { IconChevronRight } from 'ui'
+import { ChevronRight } from 'lucide-react'
 
 import { data as DevelopersData } from 'data/Developers'
-import { allBlogPosts, BlogPost } from 'contentlayer/generated'
+import { BlogPost } from 'contentlayer/generated'
 
 type Props = {
   blogPosts?: BlogPost[]
@@ -34,7 +34,7 @@ const DevelopersDropdown = ({ blogPosts }: Props) => (
                 >
                   {Icon && <Icon size={16} strokeWidth={1.2} />}
                   <span>{link.text}</span>
-                  <IconChevronRight
+                  <ChevronRight
                     strokeWidth={2}
                     className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
                   />
@@ -52,7 +52,7 @@ const DevelopersDropdown = ({ blogPosts }: Props) => (
           className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-5 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground"
         >
           <span>Blog</span>
-          <IconChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
+          <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
         </Link>
         <ul className="flex flex-col gap-5">
           {blogPosts?.map((post: any) => (
