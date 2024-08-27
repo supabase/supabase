@@ -7,6 +7,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
+import { INSTANCE_MICRO_SPECS } from 'lib/constants'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
@@ -49,7 +50,11 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
 
   const { computeInstance } = getAddons(selectedAddons)
 
-  const meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
+  let meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
+  // some older instances on micro compute are missing metadata
+  if (meta === undefined && project.infra_compute_size === 'micro') {
+    meta = INSTANCE_MICRO_SPECS
+  }
 
   const availableCompute = addons?.available_addons.find(
     (addon) => addon.name === 'Compute Instance'
