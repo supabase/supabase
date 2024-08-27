@@ -7,7 +7,10 @@ import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -51,6 +54,8 @@ const ComputeInstanceSidePanel = () => {
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
+
+  const isProjectActive = useIsProjectActive()
 
   const { panel, setPanel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'computeInstance'
@@ -214,14 +219,17 @@ const ComputeInstanceSidePanel = () => {
           !hasChanges ||
           blockDowngradeDueToPitr ||
           blockDowngradeDueToReadReplicas ||
-          !canUpdateCompute
+          !canUpdateCompute ||
+          !isProjectActive
         }
         tooltip={
           isFreePlan
             ? 'Unable to update compute instance on a Free Plan'
-            : !canUpdateCompute
-              ? 'You do not have permission to update compute instance'
-              : undefined
+            : !isProjectActive
+              ? 'Unable to update compute as project is currently not active'
+              : !canUpdateCompute
+                ? 'You do not have permission to update compute instance'
+                : undefined
         }
         header={
           <div className="flex items-center justify-between">
