@@ -9,14 +9,14 @@ import { SecurityStatus } from 'components/interfaces/Home/SecurityStatus'
 import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
+import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
+import { ProjectInfo } from 'data/projects/projects-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
-import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
-import { ProjectInfo } from 'data/projects/projects-query'
 
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -41,16 +41,14 @@ const Home: NextPageWithLayout = () => {
   return (
     <div className="w-full mx-auto my-16 space-y-16 max-w-7xl">
       <div className="flex items-center justify-between mx-6 space-x-6">
-        <h1 className="text-3xl">{projectName}</h1>
+        <div className="flex flex-row items-center gap-3">
+          <h1 className="text-3xl">{projectName}</h1>
+          <ComputeBadgeWrapper project={{ ...project } as ProjectInfo} />
+        </div>
         <div className="flex items-center gap-x-3">
-          <div className="flex flex-row items-center gap-3">
-            <h1 className="text-3xl">{projectName}</h1>
-            <ComputeBadgeWrapper project={{ ...project } as ProjectInfo} />
-          </div>
-          <div className="flex items-center gap-x-3">
-            {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
-            {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
-          </div>
+          <SecurityStatus />
+          {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
+          {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
         </div>
       </div>
 

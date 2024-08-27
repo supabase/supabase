@@ -1,7 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { capitalize } from 'lodash'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -48,11 +47,11 @@ import {
   IconExternalLink,
   IconInfo,
 } from 'ui'
+import { ComputeBadge } from 'ui-patterns'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
-import { ComputeBadge } from 'ui-patterns'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -238,9 +237,6 @@ const Addons = () => {
                       <ShimmeringLoader className="w-32" />
                     ) : (
                       <div className="flex py-3">
-                        {/* {computeInstance?.variant.name ??
-                          capitalize(selectedProject?.infra_compute_size) ??
-                          'Micro'} */}
                         <ComputeBadge
                           infraComputeSize={selectedProject?.infra_compute_size}
                           size={'large'}

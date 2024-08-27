@@ -1,6 +1,7 @@
 import { GitBranch, Github } from 'lucide-react'
 
 import CardButton from 'components/ui/CardButton'
+import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import type { ProjectInfo } from 'data/projects/projects-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
@@ -8,8 +9,6 @@ import { BASE_PATH } from 'lib/constants'
 import InlineSVG from 'react-inlinesvg'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 
 export interface ProjectCardProps {
   project: ProjectInfo
