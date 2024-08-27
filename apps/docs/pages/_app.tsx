@@ -13,7 +13,7 @@ import { GlobalProviders } from '~/features/app.providers'
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
-      <MetaFaviconsPagesRouter applicationName="Supabase Docs" />
+      <MetaFaviconsPagesRouter applicationName="Supabase Docs" includeManifest />
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Supabase Docs</title>
