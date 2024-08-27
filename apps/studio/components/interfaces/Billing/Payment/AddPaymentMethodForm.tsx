@@ -87,6 +87,12 @@ const AddPaymentMethodForm = ({
         } catch (error) {
           toast.error('Failed to set payment method as default')
         }
+      } else {
+        if (selectedOrganization) {
+          await queryClient.invalidateQueries(
+            organizationKeys.paymentMethods(selectedOrganization.slug)
+          )
+        }
       }
 
       setIsSaving(false)
