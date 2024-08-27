@@ -1,6 +1,7 @@
 import { useRouter } from 'next/compat/router'
-import { Button_Shadcn_ } from 'ui'
+import { Button } from 'ui'
 import { auth } from '~/lib/userAuth'
+import DefaultLayout from '~/components/Layouts/Default'
 
 export function getServerSideProps() {
   if (process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true') {
@@ -37,23 +38,23 @@ export default function DevOnlySecretAuth() {
   }
 
   return (
-    <div className="p-10 flex items-center justify-center">
-      <section className="space-y-4">
-        <h1>Sign in</h1>
-        <p>
+    <DefaultLayout className="px-4 py-16 flex items-center justify-center !min-h-[calc(90vh-60px)]">
+      <section className="gap-4 text-center flex flex-col items-center max-w-2xl">
+        <h1 className="text-xl">Sign in</h1>
+        <p className="text-light text-sm mb-4">
           This is a dev-only route to sign in and test authenticated actions within docs. In staging
           and production, signin is managed via dashboard because docs and dashboard are proxied to
           the same domain.
         </p>
-        <form className="flex flex-col gap-2 max-w-sm">
-          <Button_Shadcn_ type="button" onClick={signInWithGitHub}>
+        <form className="flex gap-2 max-w-sm">
+          <Button type="primary" size="small" onClick={signInWithGitHub}>
             Sign in with GitHub
-          </Button_Shadcn_>
-          <Button_Shadcn_ type="button" onClick={signOut}>
+          </Button>
+          <Button type="default" size="small" onClick={signOut}>
             Sign out
-          </Button_Shadcn_>
+          </Button>
         </form>
       </section>
-    </div>
+    </DefaultLayout>
   )
 }
