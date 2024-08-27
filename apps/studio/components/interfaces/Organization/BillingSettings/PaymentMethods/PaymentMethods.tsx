@@ -237,6 +237,7 @@ const PaymentMethods = () => {
           toast.success('Successfully added new payment method')
           await queryClient.invalidateQueries(organizationKeys.paymentMethods(slug))
         }}
+        showSetDefaultCheckbox={true}
       />
 
       <ChangePaymentMethodModal
