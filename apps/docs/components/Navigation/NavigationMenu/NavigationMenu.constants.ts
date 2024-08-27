@@ -1817,10 +1817,6 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/spend-cap',
         },
         {
-          name: 'Enterprise Billing',
-          url: '/guides/platform/enterprise-billing',
-        },
-        {
           name: 'Billing FAQ',
           url: '/guides/platform/billing-faq',
         },
