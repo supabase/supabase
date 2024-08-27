@@ -215,7 +215,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.0.6
+    image: supabase/storage-api:v1.10.1
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -292,7 +292,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.56.0
+    image: supabase/edge-runtime:v1.56.1
     restart: unless-stopped
     depends_on:
       analytics:

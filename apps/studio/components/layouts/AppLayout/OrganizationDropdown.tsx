@@ -23,6 +23,7 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+import PartnerIcon from 'components/ui/PartnerIcon'
 
 interface OrganizationDropdownProps {
   isNewNav?: boolean
@@ -83,7 +84,10 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                         onClick={() => setOpen(false)}
                       >
                         <Link href={href} className="w-full flex items-center justify-between">
-                          {org.name}
+                          <div className="flex items-center gap-2">
+                            <span>{org.name}</span>
+                            <PartnerIcon organization={org} />
+                          </div>
                           {org.slug === slug && <Check size={16} />}
                         </Link>
                       </CommandItem_Shadcn_>
