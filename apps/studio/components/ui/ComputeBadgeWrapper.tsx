@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router'
 import { MouseEvent, useState } from 'react'
 
+import { components } from 'api-types'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { ProjectInfo } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
@@ -20,19 +20,28 @@ const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string })
   )
 }
 
-export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
+interface ComputeBadgeWrapperProps {
+  project: {
+    ref?: string
+    organization_slug?: string
+    cloud_provider?: string
+    infra_compute_size?: components['schemas']['DbInstanceSize']
+  }
+}
+
+export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   const router = useRouter()
   // handles the state of the hover card
   // once open it will fetch the addons
   const [open, setOpenState] = useState(false)
 
   // returns hardcoded values for infra
-  const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
+  const cpuArchitecture = getCloudProviderArchitecture(project.cloud_provider)
 
   // fetches addons
   const { data: addons, isLoading: isLoadingAddons } = useProjectAddonsQuery(
     {
-      projectRef: project?.ref,
+      projectRef: project.ref,
     },
     { enabled: open }
   )
@@ -77,7 +86,7 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
       <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
         <HoverCardTrigger className="group" asChild>
           <button onClick={navigateToAddons} type="button" role="button">
-            <ComputeBadge infraComputeSize={project?.infra_compute_size} />
+            <ComputeBadge infraComputeSize={project.infra_compute_size} />
           </button>
         </HoverCardTrigger>
         <HoverCardContent side="bottom" align="start" className="p-0 overflow-hidden w-96">

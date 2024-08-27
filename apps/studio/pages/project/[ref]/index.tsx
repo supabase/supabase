@@ -11,7 +11,7 @@ import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectL
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
-import { ProjectInfo } from 'data/projects/projects-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -19,6 +19,7 @@ import type { NextPageWithLayout } from 'types'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
 const Home: NextPageWithLayout = () => {
+  const organization = useSelectedOrganization()
   const project = useSelectedProject()
 
   const snap = useAppStateSnapshot()
@@ -43,7 +44,14 @@ const Home: NextPageWithLayout = () => {
       <div className="flex items-center justify-between mx-6 space-x-6">
         <div className="flex flex-row items-center gap-3">
           <h1 className="text-3xl">{projectName}</h1>
-          <ComputeBadgeWrapper project={{ ...project } as ProjectInfo} />
+          <ComputeBadgeWrapper
+            project={{
+              ref: project?.ref,
+              organization_slug: organization?.slug,
+              cloud_provider: project?.cloud_provider,
+              infra_compute_size: project?.infra_compute_size,
+            }}
+          />
         </div>
         <div className="flex items-center gap-x-3">
           <SecurityStatus />
