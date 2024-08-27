@@ -1,3 +1,6 @@
+import { useRouter } from 'next/router'
+import { useMemo, useState, MouseEvent } from 'react'
+
 import {
   generateComputeInstanceMeta,
   getAddons,
@@ -5,8 +8,6 @@ import {
 import { ProjectInfo } from 'data/projects/projects-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
@@ -52,22 +53,29 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
   }
 
   const availableCompute = addons?.available_addons.find(
-    (addon: any) => addon.name === 'Compute Instance'
+    (addon) => addon.name === 'Compute Instance'
   )?.variants
 
-  const NANO_PRICE = '$0.0/hour (~$0/month)'
   const HIGHEST_COMPUTE_AVAILABLE = availableCompute?.[availableCompute.length - 1].identifier
-  const LINK_HREF = `/project/${project?.ref}/settings/addons`
+  const navigateToAddons = (e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
+    // These are required as the button is inside an a tag
+    // side note: not the best idea to nest clickables 🥲
+    e.preventDefault()
+    e.stopPropagation()
+
+    router.push(`/project/${project?.ref}/settings/addons`)
+  }
+
   const isHighestCompute =
     project?.infra_compute_size === HIGHEST_COMPUTE_AVAILABLE?.replace('ci_', '')
 
-  if (!project?.infra_compute_size) return <></>
+  if (!project?.infra_compute_size) return null
 
   return (
     <>
       <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
         <HoverCardTrigger className="group" asChild>
-          <button onClick={() => router.push(LINK_HREF)} type="button" role="button">
+          <button onClick={navigateToAddons} type="button" role="button">
             <ComputeBadge infraComputeSize={project?.infra_compute_size} />
           </button>
         </HoverCardTrigger>
@@ -90,16 +98,12 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
               ) : (
                 <>
                   <div className="flex flex-col gap-1">
-                    <Row label="CPU" stat={`${meta?.cpu_cores ?? '?'}-core ${cpuArchitecture}`} />
+                    <Row
+                      label="CPU"
+                      stat={`${meta?.cpu_cores ?? '?'}-core ${cpuArchitecture} ${meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}`}
+                    />
                     <Row label="Memory" stat={`${meta?.memory_gb ?? '-'} GB`} />
                   </div>
-                  <p className="text-sm">
-                    {computeInstance ? (
-                      <span>{computeInstance?.variant.price_description}</span>
-                    ) : (
-                      <span>{NANO_PRICE}</span>
-                    )}
-                  </p>
                 </>
               )}
             </div>
@@ -115,12 +119,7 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
                   </p>
                 </div>
                 <div>
-                  <Button
-                    type="default"
-                    onClick={() => router.push(LINK_HREF)}
-                    htmlType="button"
-                    role="button"
-                  >
+                  <Button type="default" onClick={navigateToAddons} htmlType="button" role="button">
                     Upgrade compute
                   </Button>
                 </div>
