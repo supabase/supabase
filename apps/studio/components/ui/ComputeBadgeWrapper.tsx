@@ -1,16 +1,24 @@
 import { useRouter } from 'next/router'
-import { useMemo, useState, MouseEvent } from 'react'
+import { MouseEvent, useState } from 'react'
 
-import {
-  generateComputeInstanceMeta,
-  getAddons,
-} from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { ProjectInfo } from 'data/projects/projects-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
+
+const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
+  return (
+    <div className="flex flex-row gap-2">
+      <span className="text-sm text-foreground-light w-16">{label}</span>
+      <span className="text-sm">{stat}</span>
+    </div>
+  )
+}
 
 export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
   const router = useRouter()
@@ -32,31 +40,12 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
 
   const { computeInstance } = getAddons(selectedAddons)
 
-  const meta = useMemo(() => {
-    // if project is not available, return null
-    if (project) {
-      // returns the compute instance meta
-      // if nano or micro instance is selected, it will return harcoded values
-      return generateComputeInstanceMeta(computeInstance, project)
-    } else {
-      return null
-    }
-  }, [project, computeInstance])
-
-  const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
-    return (
-      <div className="flex flex-row gap-2">
-        <span className="text-sm text-foreground-light w-16">{label}</span>
-        <span className="text-sm">{stat}</span>
-      </div>
-    )
-  }
+  const meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
 
   const availableCompute = addons?.available_addons.find(
     (addon) => addon.name === 'Compute Instance'
   )?.variants
 
-  const HIGHEST_COMPUTE_AVAILABLE = availableCompute?.[availableCompute.length - 1].identifier
   const navigateToAddons = (e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
     // These are required as the button is inside an a tag
     // side note: not the best idea to nest clickables 🥲
@@ -66,8 +55,15 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
     router.push(`/project/${project?.ref}/settings/addons?panel=computeInstance`)
   }
 
+  const highestComputeAvailable = availableCompute?.[availableCompute.length - 1].identifier
+
   const isHighestCompute =
-    project?.infra_compute_size === HIGHEST_COMPUTE_AVAILABLE?.replace('ci_', '')
+    project?.infra_compute_size === highestComputeAvailable?.replace('ci_', '')
+
+  const { data } = useOrgSubscriptionQuery({ orgSlug: project?.organization_slug })
+
+  const isEligibleForFreeUpgrade =
+    data?.plan.id !== 'free' && project?.infra_compute_size === 'nano'
 
   if (!project?.infra_compute_size) return null
 
@@ -98,24 +94,40 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
               ) : (
                 <>
                   <div className="flex flex-col gap-1">
-                    <Row
-                      label="CPU"
-                      stat={`${meta?.cpu_cores ?? '?'}-core ${cpuArchitecture} ${meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}`}
-                    />
-                    <Row label="Memory" stat={`${meta?.memory_gb ?? '-'} GB`} />
+                    {meta !== undefined ? (
+                      <>
+                        <Row
+                          label="CPU"
+                          stat={`${meta.cpu_cores ?? '?'}-core ${cpuArchitecture} ${meta.cpu_dedicated ? '(Dedicated)' : '(Shared)'}`}
+                        />
+                        <Row label="Memory" stat={`${meta.memory_gb ?? '-'} GB`} />
+                      </>
+                    ) : (
+                      <>
+                        {/* meta is only undefined for nano sized compute */}
+                        <Row label="CPU" stat="Shared" />
+                        <Row label="Memory" stat="Up to 0.5 GB" />
+                      </>
+                    )}
                   </div>
                 </>
               )}
             </div>
           </div>
-          {!isHighestCompute && (
+          {(!isHighestCompute || isEligibleForFreeUpgrade) && (
             <>
               <Separator />
               <div className="p-3 px-5 text-sm flex flex-col gap-2 bg-studio">
                 <div className="flex flex-col gap-0">
-                  <p className="text-foreground">Unlock more compute</p>
+                  <p className="text-foreground">
+                    {isEligibleForFreeUpgrade
+                      ? 'Free upgrade to Micro available.'
+                      : 'Unlock more compute'}
+                  </p>
                   <p className="text-foreground-light">
-                    Scale your project up to 64 cores and 256 GB RAM.
+                    {isEligibleForFreeUpgrade
+                      ? 'Paid plans include a free upgrade to Micro compute.'
+                      : 'Scale your project up to 64 cores and 256 GB RAM.'}
                   </p>
                 </div>
                 <div>
