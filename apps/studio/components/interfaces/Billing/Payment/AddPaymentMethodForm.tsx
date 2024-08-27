@@ -1,4 +1,6 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import { useQueryClient } from '@tanstack/react-query'
+import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useState } from 'react'
@@ -29,6 +31,7 @@ const AddPaymentMethodForm = ({
   const [isSaving, setIsSaving] = useState(false)
   const [isDefault, setIsDefault] = useState(showSetDefaultCheckbox)
 
+  const queryClient = useQueryClient()
   const { mutateAsync: markAsDefault } = useOrganizationPaymentMethodMarkAsDefaultMutation()
 
   const handleSubmit = async (event: any) => {
@@ -62,6 +65,21 @@ const AddPaymentMethodForm = ({
             slug: selectedOrganization.slug,
             paymentMethodId: setupIntent.payment_method,
           })
+
+          queryClient.setQueriesData(
+            organizationKeys.paymentMethods(selectedOrganization.slug),
+            (prev: any) => {
+              if (!prev) return prev
+              return {
+                ...prev,
+                defaultPaymentMethodId: setupIntent.payment_method,
+                data: prev.data.map((pm: any) => ({
+                  ...pm,
+                  is_default: pm.id === setupIntent.payment_method,
+                })),
+              }
+            }
+          )
         } catch (error) {
           toast.error('Failed to set payment method as default')
         }
