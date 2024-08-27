@@ -83,7 +83,6 @@ export const SQLEditorTreeViewItem = ({
 
   // [Joshen] Folder contents are loaded on demand too
   const onOpenFolder = async (id: string) => {
-    console.log('2 id:', id)
     if (!ref) return console.error('Project ref is required')
 
     try {
