@@ -1749,7 +1749,6 @@ export const platform: NavMenuConstant = {
         { name: 'Advanced Log Filtering', url: '/guides/platform/advanced-log-filtering' },
         { name: 'Log Drains', url: '/guides/platform/log-drains' },
         { name: 'Metrics', url: '/guides/platform/metrics' },
-        { name: 'Supabase Grafana', url: '/guides/platform/supabase-grafana' },
         { name: 'Monitoring with Sentry', url: '/guides/platform/sentry-monitoring' },
       ],
     },
