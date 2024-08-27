@@ -60,10 +60,15 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
   const isHighestCompute =
     project?.infra_compute_size === highestComputeAvailable?.replace('ci_', '')
 
-  const { data } = useOrgSubscriptionQuery({ orgSlug: project?.organization_slug })
+  const { data, isLoading: isLoadingSubscriptions } = useOrgSubscriptionQuery(
+    { orgSlug: project?.organization_slug },
+    { enabled: open }
+  )
 
   const isEligibleForFreeUpgrade =
     data?.plan.id !== 'free' && project?.infra_compute_size === 'nano'
+
+  const isLoading = isLoadingAddons || isLoadingSubscriptions
 
   if (!project?.infra_compute_size) return null
 
@@ -83,13 +88,12 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
               <ComputeBadge infraComputeSize={project?.infra_compute_size} />
             </div>
             <div className="flex flex-col gap-4">
-              {isLoadingAddons ? (
+              {isLoading ? (
                 <>
                   <div className="flex flex-col gap-1">
                     <ShimmeringLoader className="h-[20px] py-0 w-32" />
                     <ShimmeringLoader className="h-[20px] py-0 w-32" />
                   </div>
-                  <ShimmeringLoader className="h-[20px] py-0 w-48" />
                 </>
               ) : (
                 <>
