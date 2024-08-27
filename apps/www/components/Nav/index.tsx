@@ -159,7 +159,7 @@ const Nav = (props: Props) => {
                   ) : (
                     <>
                       <Button type="default" asChild>
-                        <Link href="/contact-us">Contact us</Link>
+                        <Link href="https://forms.supabase.com/enterprise">Contact us</Link>
                       </Button>
                       <Button asChild>
                         <Link href="https://supabase.com/sign-in">Start your project</Link>
