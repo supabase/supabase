@@ -17,7 +17,7 @@ export const instanceSizes: DesiredInstanceSize[] = [
 ]
 
 export const instanceSizeSpecs: Record<
-  DesiredInstanceSize,
+  'nano' | DesiredInstanceSize,
   {
     label: string
     ram: string
@@ -27,6 +27,15 @@ export const instanceSizeSpecs: Record<
     cloud_providers: string[]
   }
 > = {
+  nano: {
+    label: 'Micro',
+    ram: 'Up to 0.5 BG',
+    cpu: 'Shared',
+    // Set to 0 because it costs the customer 0$ on their invoice
+    priceHourly: 0,
+    priceMonthly: 0,
+    cloud_providers: [PROVIDERS.AWS.id],
+  },
   micro: {
     label: 'Micro',
     ram: '1 GB',
