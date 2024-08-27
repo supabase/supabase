@@ -102,6 +102,12 @@ When upgrading, the Supabase platform will "right-size" your disk based on the c
 pg_upgrade does not support upgrading of databases containing reg\* data types referencing system OIDs.
 If you have created any objects that depend on the following extensions, you will need to recreate them after the upgrade.
 
+#### pg_cron records
+
+[pg_cron](https://github.com/citusdata/pg_cron#viewing-job-run-details) does not automatically clean up historical records. This can lead to extremely large `cron.job_run_details` tables if the records are not regularly pruned; you should clean unnecessary records from this table prior to an upgrade.
+
+During the `pg_upgrade` process, the `pg_cron` extension gets dropped and recreated. Prior to this process, the `cron.job_run_details` table is duplicated to avoid losing historical logs. The instantaneous disk pressure created by duplicating an extremely large details table can cause at best unnecessary performance degradation, or at worst, upgrade process failures.
+
 #### Extensions
 
 pg_upgrade does not currently support upgrading of databases using extensions older than the following versions:

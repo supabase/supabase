@@ -85,6 +85,13 @@ suspend fun uploadFile(file: File) {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket_name').upload('file_path', file)
+```
+
+</TabPanel>
 </Tabs>
 
 ## Overwriting files
@@ -138,6 +145,15 @@ try await supabase.storage.from("bucket_name")
       upsert: true
     )
   )
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket_name').upload('file_path', file, {
+  'upsert': 'true',
+})
 ```
 
 </TabPanel>
@@ -196,6 +212,15 @@ try await supabase.storage.from("bucket_name")
       contentType: "image/jpeg"
     )
   )
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket_name').upload('file_path', file, {
+  'content-type': 'image/jpeg',
+})
 ```
 
 </TabPanel>

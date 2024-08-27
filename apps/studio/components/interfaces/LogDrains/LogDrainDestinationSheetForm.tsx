@@ -1,23 +1,25 @@
-import { useParams } from 'common'
-import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { ExternalLink, TrashIcon } from 'lucide-react'
+import Link from 'next/link'
+import { ReactNode, useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import { z } from 'zod'
 
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
+import { useParams } from 'common'
+import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import {
   Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  Switch,
-  Sheet,
-  SheetContent,
-  SheetSection,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -25,21 +27,17 @@ import {
   SelectLabel_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  cn,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+  Switch,
 } from 'ui'
-
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
-import { ReactNode, useEffect, useState } from 'react'
-import { ExternalLink, TrashIcon } from 'lucide-react'
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import Link from 'next/link'
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
-import { FormDescription } from '@ui/components/shadcn/ui/form'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -152,7 +150,7 @@ export function LogDrainDestinationSheetForm({
       description: defaultValues?.description || '',
       type: defaultType,
       http: defaultValues?.config?.http || 'http2',
-      gzip: defaultValues?.config?.gzip || true,
+      gzip: mode === 'create' ? true : defaultValues?.config?.gzip || false,
       headers: DEFAULT_HEADERS,
       url: defaultValues?.config?.url || '',
       api_key: defaultValues?.config?.api_key || '',
@@ -236,12 +234,12 @@ export function LogDrainDestinationSheetForm({
                   label="Name"
                   formControl={form.control}
                 />
-                {/* <LogDrainFormItem
+                <LogDrainFormItem
                   value="description"
                   placeholder="My Destination"
                   label="Description"
                   formControl={form.control}
-                /> */}
+                />
                 {mode === 'create' && (
                   <FormItemLayout
                     layout="horizontal"
@@ -308,11 +306,11 @@ export function LogDrainDestinationSheetForm({
                       />
                     </div>
 
-                    {/* <FormField_Shadcn_
+                    <FormField_Shadcn_
                       control={form.control}
                       name="gzip"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="space-y-2">
+                        <FormItem_Shadcn_ className="space-y-2 px-4">
                           <div className="flex gap-2 items-center">
                             <FormControl_Shadcn_>
                               <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -324,7 +322,7 @@ export function LogDrainDestinationSheetForm({
                           </div>
                         </FormItem_Shadcn_>
                       )}
-                    /> */}
+                    />
 
                     <div className="border-t">
                       <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
@@ -367,14 +365,14 @@ export function LogDrainDestinationSheetForm({
                       description={
                         <>
                           The API Key obtained from the Datadog dashboard{' '}
-                          <Link
+                          <a
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm underline text-foreground"
+                            className="text-sm underline transition hover:text-foreground"
                             href="https://app.datadoghq.com/organization-settings/api-keys"
                           >
                             here
-                          </Link>
+                          </a>
                         </>
                       }
                     />
@@ -385,7 +383,20 @@ export function LogDrainDestinationSheetForm({
                         <FormItemLayout
                           layout="horizontal"
                           label={'Region'}
-                          description="The Datadog region to send logs to."
+                          description={
+                            <p>
+                              The Datadog region to send logs to. Read more about Datadog regions{' '}
+                              <a
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline hover:text-foreground transition"
+                                href="https://docs.datadoghq.com/getting_started/site/#access-the-datadog-site"
+                              >
+                                here
+                              </a>
+                              .
+                            </p>
+                          }
                         >
                           <FormControl_Shadcn_>
                             <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>

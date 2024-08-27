@@ -25,13 +25,24 @@ import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Button, IconCheck, IconInfo, Modal, SidePanel, cn } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconCheck,
+  IconInfo,
+  Modal,
+  SidePanel,
+  cn,
+} from 'ui'
 import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import UpgradeSurveyModal from './UpgradeModal'
+import PartnerIcon from 'components/ui/PartnerIcon'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
@@ -231,7 +242,12 @@ const PlanUpdateSidePanel = () => {
                       <ButtonTooltip
                         block
                         type={isDowngradeOption ? 'default' : 'primary'}
-                        disabled={subscription?.plan?.id === 'enterprise' || !canUpdateSubscription}
+                        disabled={
+                          subscription?.plan?.id === 'enterprise' ||
+                          !canUpdateSubscription ||
+                          (plan.id === 'tier_team' &&
+                            selectedOrganization?.managed_by === 'vercel-marketplace')
+                        }
                         onClick={() => setSelectedTier(plan.id as any)}
                         tooltip={{
                           content: {
@@ -241,7 +257,10 @@ const PlanUpdateSidePanel = () => {
                                 ? 'Reach out to us via support to update your plan from Enterprise'
                                 : !canUpdateSubscription
                                   ? 'You do not have permission to change the subscription plan'
-                                  : undefined,
+                                  : plan.id === 'tier_team' &&
+                                      selectedOrganization?.managed_by === 'vercel-marketplace'
+                                    ? 'The Team plan is currently unavailable for Vercel Marketplace managed organizations'
+                                    : undefined,
                           },
                         }}
                       >

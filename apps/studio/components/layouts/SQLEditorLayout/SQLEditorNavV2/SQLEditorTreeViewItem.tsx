@@ -125,6 +125,12 @@ export const SQLEditorTreeViewItem = ({
                   router.push(`/project/${ref}/sql/${element.id}`)
                 }
               } else {
+                // Prevent expanding folder while editing text
+                // as the user may double click to select etc
+                if (isEditing) {
+                  return
+                }
+
                 onClick(e)
                 if (!isExpanded) onOpenFolder(element.id)
               }

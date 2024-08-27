@@ -18,6 +18,7 @@ Deno
 [Dd]otenv
 [Ee]nv
 [Ee]nums?
+event_message
 Firestore
 Hashicorp
 [Gg]eospatial
@@ -56,6 +57,7 @@ plpgsql
 Prisma
 [Rr]ealtime
 Refine's
+regexp_contains
 [Rr]eindex(ed|es|ing)?
 repo
 RESTful
@@ -68,12 +70,16 @@ Roboflow
 [Ss]ignouts?
 [Ss]ignups?
 SQLAlchemy
+subquery
+subqueries
 [Ss]upabase
 Snaplet
 Supavisor
 [Ss]upersets?
 Terraform
 [Tt]odos?
+unnesting
+unnested
 [Uu]npaus(e|es|ed|ing)
 [Uu]psert(s|ed|ing)?
 [Uu]pvot(es|ed|ing)

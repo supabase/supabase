@@ -19,13 +19,7 @@
     },
     "docs#build": {
       "dependsOn": ["^build"],
-      "env": [
-        "ANALYZE",
-        "NEXT_PUBLIC_*",
-        "NODE_ENV",
-        "OPENAI_API_KEY",
-        "SKIP_BUILD_STATIC_GENERATION"
-      ],
+      "env": ["ANALYZE", "NEXT_PUBLIC_*", "NODE_ENV", "OPENAI_API_KEY"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "studio#build": {

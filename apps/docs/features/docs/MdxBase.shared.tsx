@@ -13,6 +13,7 @@ import ButtonCard from '~/components/ButtonCard'
 import { Extensions } from '~/components/Extensions'
 import { JwtGenerator } from '~/components/JwtGenerator'
 import {
+  AuthErrorCodesTable,
   AuthRateLimits,
   CreateClientSnippet,
   DatabaseSetup,
@@ -41,6 +42,7 @@ const components = {
   Accordion,
   AccordionItem,
   Admonition,
+  AuthErrorCodesTable,
   AuthRateLimits,
   AuthSmsProviderConfig,
   AppleSecretGenerator,

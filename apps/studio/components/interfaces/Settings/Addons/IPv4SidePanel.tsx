@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -13,7 +12,7 @@ import type { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert,
   AlertDescription_Shadcn_,
@@ -27,7 +26,6 @@ import {
 } from 'ui'
 
 const IPv4SidePanel = () => {
-  const router = useRouter()
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
 
@@ -35,22 +33,15 @@ const IPv4SidePanel = () => {
 
   const canUpdateIPv4 = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
 
-  const snap = useSubscriptionPageStateSnapshot()
-  const visible = snap.panelKey === 'ipv4'
-  const onClose = () => {
-    const { panel, ...queryWithoutPanel } = router.query
-    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
-      shallow: true,
-    })
-    snap.setPanelKey(undefined)
-  }
+  const { panel, closePanel } = useAddonsPagePanel()
+  const visible = panel === 'ipv4'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled IPv4`)
-      onClose()
+      closePanel()
     },
     onError: (error) => {
       toast.error(`Unable to enable IPv4: ${error.message}`)
@@ -59,7 +50,7 @@ const IPv4SidePanel = () => {
   const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled IPv4.`)
-      onClose()
+      closePanel()
     },
     onError: (error) => {
       toast.error(`Unable to disable IPv4: ${error.message}`)
@@ -100,7 +91,7 @@ const IPv4SidePanel = () => {
     <SidePanel
       size="large"
       visible={visible}
-      onCancel={onClose}
+      onCancel={closePanel}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
       disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4}

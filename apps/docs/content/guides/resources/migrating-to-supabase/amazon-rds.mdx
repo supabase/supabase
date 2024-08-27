@@ -1,6 +1,7 @@
 ---
 title: 'Migrate from Amazon RDS to Supabase'
-description: 'Migrate your Amazon RDS MySQL or MS SQL database to Supabase Postgres database.'
+description: 'Migrate your Amazon RDS MySQL or MS SQL database to Supabase.'
+subtitle: 'Migrate your Amazon RDS MySQL or MS SQL database to Supabase.'
 ---
 
 This guide aims to exhibit the process of transferring your Amazon RDS database from any of these engines Postgres, MySQL or MS SQL to Supabase's Postgres database. Although Amazon RDS is a favored managed database service provided by AWS, it may not suffice for all use cases. Supabase, on the other hand, provides an excellent free and open source option that encompasses all the necessary backend features to develop a product: a Postgres database, authentication, instant APIs, edge functions, real-time subscriptions, and storage.
@@ -21,9 +22,7 @@ Supabase's core is Postgres, enabling the use of row-level security and providin
 
 ## Retrieve your Supabase host [#retrieve-supabase-host]
 
-1. If you're new to Supabase, [create a project](https://supabase.com/dashboard).
-   Make a note of your password, you will need this later. If you forget it, you can [reset it here](https://supabase.com/dashboard/project/_/settings/database).
-
+1. If you're new to Supabase, [create a project](https://database.new). Make a note of your password, you will need this later. If you forget it, you can [reset it here](https://supabase.com/dashboard/project/_/settings/database).
 1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
 1. Under **Connection Info**, note your Host (`$SUPABASE_HOST`).
 
