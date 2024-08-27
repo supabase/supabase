@@ -300,7 +300,16 @@ export const CreateHookSheet = ({
               control={form.control}
               name="enabled"
               render={({ field }) => (
-                <FormItemLayout className="px-8" label={`Enable ${values.hookType}`} layout="flex">
+                <FormItemLayout
+                  layout="flex"
+                  className="px-8"
+                  label={`Enable ${values.hookType}`}
+                  description={
+                    values.hookType === 'Send SMS hook'
+                      ? 'SMS Provider settings will be disabled in favor of SMS hooks'
+                      : undefined
+                  }
+                >
                   <FormControl_Shadcn_>
                     <Switch
                       checked={field.value}

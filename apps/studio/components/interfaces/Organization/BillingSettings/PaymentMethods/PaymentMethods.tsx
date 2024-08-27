@@ -15,11 +15,13 @@ import AlertError from 'components/ui/AlertError'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import {
@@ -40,6 +42,7 @@ import DeletePaymentMethodModal from './DeletePaymentMethodModal'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
+  const selectedOrganization = useSelectedOrganization()
   const queryClient = useQueryClient()
   const [selectedMethodForUse, setSelectedMethodForUse] = useState<any>()
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
@@ -70,13 +73,21 @@ const PaymentMethods = () => {
           <div className="sticky space-y-2 top-12">
             <p className="text-foreground text-base m-0">Payment Methods</p>
             <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
-              After adding a payment method, make sure to mark it as active to use it for billing.
-              You can remove unused cards.
+              Payments for your subscription are made using the default card.
             </p>
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadPaymentMethods ? (
+          {selectedOrganization?.managed_by !== undefined &&
+          selectedOrganization?.managed_by !== 'supabase' ? (
+            <PartnerManagedResource
+              partner={selectedOrganization?.managed_by}
+              resource="Payment Methods"
+              cta={{
+                installationId: selectedOrganization?.partner_id,
+              }}
+            />
+          ) : !canReadPaymentMethods ? (
             <NoPermission resourceText="view this organization's payment methods" />
           ) : (
             <>
@@ -220,11 +231,11 @@ const PaymentMethods = () => {
         visible={showAddPaymentMethodModal}
         returnUrl={`${getURL()}/org/${slug}/billing`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
-        onConfirm={async () => {
+        onConfirm={() => {
           setShowAddPaymentMethodModal(false)
           toast.success('Successfully added new payment method')
-          await queryClient.invalidateQueries(organizationKeys.paymentMethods(slug))
         }}
+        showSetDefaultCheckbox={true}
       />
 
       <ChangePaymentMethodModal

@@ -18,6 +18,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 
 const PAGE_LIMIT = 10
 
@@ -30,14 +31,20 @@ const InvoicesSettings = () => {
 
   const canReadInvoices = useCheckPermissions(PermissionAction.READ, 'invoices')
 
-  const { data: count, isError: isErrorCount } = useInvoicesCountQuery({
-    slug,
-  })
-  const { data, error, isLoading, isError, isSuccess } = useInvoicesQuery({
-    slug,
-    offset,
-    limit: PAGE_LIMIT,
-  })
+  const { data: count, isError: isErrorCount } = useInvoicesCountQuery(
+    {
+      slug,
+    },
+    { enabled: selectedOrganization?.managed_by === 'supabase' }
+  )
+  const { data, error, isLoading, isError, isSuccess } = useInvoicesQuery(
+    {
+      slug,
+      offset,
+      limit: PAGE_LIMIT,
+    },
+    { enabled: selectedOrganization?.managed_by === 'supabase' }
+  )
   const invoices = data || []
 
   useEffect(() => {
@@ -57,6 +64,25 @@ const InvoicesSettings = () => {
     return (
       <ScaffoldContainerLegacy>
         <NoPermission resourceText="view invoices" />
+      </ScaffoldContainerLegacy>
+    )
+  }
+
+  if (
+    selectedOrganization?.managed_by !== undefined &&
+    selectedOrganization?.managed_by !== 'supabase'
+  ) {
+    return (
+      <ScaffoldContainerLegacy>
+        <PartnerManagedResource
+          partner={selectedOrganization?.managed_by}
+          resource="Invoices"
+          cta={{
+            installationId: selectedOrganization?.partner_id,
+            path: '/invoices',
+          }}
+          // TODO: support AWS marketplace here: `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
+        />
       </ScaffoldContainerLegacy>
     )
   }

@@ -314,10 +314,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 descriptionText={
                   <div>
                     <p>
-                      By default, Pro Plan organizations have a spend cap to control costs. When
-                      enabled, usage is limited to the plan's quota, with restrictions when limits
-                      are exceeded. To scale beyond Pro limits without restrictions, disable the
-                      spend cap and pay for over-usage beyond the quota.
+                      With Spend Cap enabled, usage is limited to the plan's quota, with
+                      restrictions when limits are exceeded. To scale beyond Pro Plan limits,
+                      disable the Spend Cap to pay over-usage.
                     </p>
                   </div>
                 }
