@@ -4,7 +4,7 @@ title: 'Customizing Postgres Configs'
 description: 'Configuring Postgres for your Supabase project.'
 ---
 
-Supabase projects come with a pre-configured Postgres cluster optimized for various workloads based on [compute add-on size](/docs/guides/platform/compute-add-ons). While Postgres offers hundreds of settings, you can override _some_ to better suit your specific needs.
+Each Supabase project is a pre-configured Postgres cluster. You can override some configuration settings to suit your needs. This is an advanced topic, and we don't recommend touching these settings unless you need to.
 
 <Admonition type="note">
 
@@ -44,9 +44,9 @@ To verify the change, execute:
 show "statement_timeout";
 ```
 
-### Supautils enabled settings
+### Superuser settings
 
-Some settings require superuser privileges to modify. Supabase pre-enables the [supautils extension](https://supabase.com/blog/roles-postgres-hooks#setting-up-the-supautils-extension), which allows the postgres role to retain certain superuser privileges. It enables modification of the below reserved configurations at the `role` level:
+Some settings can only be modified by a superuser. Supabase pre-enables the [`supautils` extension](https://supabase.com/blog/roles-postgres-hooks#setting-up-the-supautils-extension), which allows the `postgres` role to retain certain superuser privileges. It enables modification of the below reserved configurations at the `role` level:
 
 | Setting                              | Description                                                                                                                                                  |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -114,19 +114,24 @@ To start:
 1. [Install](/docs/guides/resources/supabase-cli) Supabase CLI 1.69.0+.
 1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
 
-To update Postgres configurations, use the [`postgres config`](https://supabase.com/docs/reference/cli/supabase-postgres-config) command:
+To update Postgres configurations, use the [`postgres config`](/docs/reference/cli/supabase-postgres-config) command:
 
 ```bash
-$ supabase --experimental --project-ref <project-ref> postgres-config update --config shared_buffers=250MB
+supabase --experimental \
+--project-ref <project-ref> \
+postgres-config update --config shared_buffers=250MB
 ```
 
 By default, the CLI will merge any provided config overrides with any existing ones. The `--replace-existing-overrides` flag can be used to instead force all existing overrides to be replaced with the ones being provided:
 
 ```bash
-$ supabase --experimental --project-ref <project-ref> postgres-config update --config max_parallel_workers=3 --replace-existing-overrides
+supabase --experimental \
+--project-ref <project-ref> \
+postgres-config update --config max_parallel_workers=3 \
+--replace-existing-overrides
 ```
 
-### Resetting custom configs
+### Resetting to default config
 
 To reset a setting to its default value at the database level:
 

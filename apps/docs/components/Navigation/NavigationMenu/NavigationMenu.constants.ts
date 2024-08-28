@@ -798,7 +798,7 @@ export const database: NavMenuConstant = {
         },
         { name: 'Testing your database', url: '/guides/database/testing' },
         {
-          name: 'Customizing Postgres configs',
+          name: 'Customizing Postgres config',
           url: '/guides/database/custom-postgres-config',
         },
       ],
