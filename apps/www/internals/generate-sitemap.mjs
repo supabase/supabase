@@ -14,7 +14,7 @@ async function generate() {
     'pages/*.js',
     'pages/*.tsx',
     'pages/*.mdx',
-    'pages/*/*.tsx',
+    'pages/**/*.tsx',
     'data/**/*.mdx',
     '_blog/*.mdx',
     '_case-studies/*.mdx',
@@ -62,7 +62,11 @@ async function generate() {
             if (route === '/case-studies/[slug]') return null
             if (route === '/customers/[slug]') return null
             if (route === '/events/[slug]') return null
+            if (route === '/blog/categories/[category]') return null
+            if (route === '/partners/experts/[slug]') return null
+            if (route === '/partners/integrations/[slug]') return null
             if (route === '/launch-week/ticket-image') return null
+            if (route === '/launch-week/tickets/[username]') return null
 
             /**
              * Blog based urls
