@@ -400,7 +400,7 @@ const PricingComparisonTable = ({
                                 gaEvents[`www_pricing_comparison_${plan.name.toLowerCase()}_mobile`]
                               )
                             }
-                            size="medium"
+                            size="tiny"
                           />
                         ) : (
                           <Button
