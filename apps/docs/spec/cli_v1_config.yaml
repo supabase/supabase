@@ -261,7 +261,7 @@ parameters:
     title: 'inbucket.port'
     tags: ['local']
     required: false
-    default: 'true'
+    default: '54324'
     description: |
       Port to use for the email testing server web interface.
 
@@ -823,7 +823,7 @@ parameters:
     default: '"postgres"'
     description: |
       Configure one of the supported backends:
-      
+
       - `postgres`
       - `bigquery`
     links:
