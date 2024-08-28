@@ -2,7 +2,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
   AlignLeft,
   Check,
-  ChevronDown,
   Command,
   CornerDownLeft,
   Heart,
@@ -26,8 +25,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   TooltipContent_Shadcn_,
@@ -39,6 +36,7 @@ import SavingIndicator from './SavingIndicator'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Snippet } from 'data/content/sql-folders-query'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export type UtilityActionsProps = {
   id: string
