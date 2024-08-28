@@ -58,12 +58,12 @@ export const pricing: Pricing = {
       {
         title: 'Database size',
         tooltips: {
-          main: 'Billing is based on the average daily database size in GB throughout the billing period.',
+          main: 'Billing is based on the provisioned disk size. Paid plan projects get provisioned with 8GB of disk by default and autoscale to 1.5x the size once you get close to the limit. The first 8GB of disk per project comes with no additional fees.\nFree plan customers are limited to 500MB database space usage per organization.',
         },
         plans: {
-          free: '500 MB included',
-          pro: ['8 GB included', 'then $0.125 per GB'],
-          team: ['8 GB included', 'then $0.125 per GB'],
+          free: '500 MB database space included',
+          pro: ['8 GB disk size per project included', 'then $0.125 per GB'],
+          team: ['8 GB disk size per project included', 'then $0.125 per GB'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -339,7 +339,7 @@ export const pricing: Pricing = {
       {
         title: 'Storage',
         tooltips: {
-          main: "The sum of all objects' size in your storage buckets.\nBilling is based on the average daily size in GB throughout your billing period.",
+          main: "The sum of all objects' size in your storage buckets.\nBilling is prorated down to the hour and will be displayed as GB-Hrs on your invoice.",
         },
         plans: {
           free: '1 GB included',

@@ -45,7 +45,8 @@ const QueryItem = ({
 
   const { ref, id: activeId } = useParams()
   const snap = useSqlEditorStateSnapshot()
-  const { id, name, description, content, visibility } = tabInfo || {}
+  const { id, name, description, content, visibility, type } = tabInfo || {}
+  const isSQLSnippet = type === 'sql'
   const isActive = id === activeId
   const activeItemRef = useRef<HTMLElement | null>(null)
 
@@ -147,7 +148,7 @@ const QueryItem = ({
             )}
           </InnerSideMenuItem>
         </HoverCardTrigger_Shadcn_>
-        {!hideTooltip && (
+        {!hideTooltip && isSQLSnippet && (
           <HoverCardContent_Shadcn_ side="right" align="center" className="w-96" animate="slide-in">
             <>
               {content.sql.trim() ? (

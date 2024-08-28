@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { isArray } from 'lodash'
 import { ChevronRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
@@ -13,6 +14,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
@@ -25,29 +27,20 @@ import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconCheck,
-  IconInfo,
-  Modal,
-  SidePanel,
-  cn,
-} from 'ui'
+import { Button, IconCheck, IconInfo, Modal, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import UpgradeSurveyModal from './UpgradeModal'
-import PartnerIcon from 'components/ui/PartnerIcon'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
+
+  const queryClient = useQueryClient()
 
   const originalPlanRef = useRef<string>()
 
@@ -147,6 +140,20 @@ const PlanUpdateSidePanel = () => {
     if (!selectedTier) return console.error('Selected plan is required')
     if (!selectedPaymentMethod && !paymentViaInvoice) {
       return toast.error('Please select a payment method')
+    }
+
+    if (selectedPaymentMethod) {
+      queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          defaultPaymentMethodId: selectedPaymentMethod,
+          data: prev.data.map((pm: any) => ({
+            ...pm,
+            is_default: pm.id === selectedPaymentMethod,
+          })),
+        }
+      })
     }
 
     // If the user is downgrading from team, should have spend cap disabled by default

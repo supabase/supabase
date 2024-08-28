@@ -252,6 +252,22 @@ try await supabase.from("movies")
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+client.from_("movies").insert([
+    {
+        "name": "The Empire Strikes Back",
+        "description": "After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda."
+    },
+    {
+        "name": "Return of the Jedi",
+        "description": "After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star."
+    }
+]).execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
