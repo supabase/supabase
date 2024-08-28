@@ -13,6 +13,7 @@ import {
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
+  CommandList_Shadcn_,
 } from 'ui'
 import {
   Form_Shadcn_,
@@ -96,26 +97,28 @@ export default function ComboboxForm() {
                 <PopoverContent_Shadcn_ className="w-[200px] p-0">
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search language..." />
-                    <CommandEmpty_Shadcn_>No language found.</CommandEmpty_Shadcn_>
-                    <CommandGroup_Shadcn_>
-                      {languages.map((language) => (
-                        <CommandItem_Shadcn_
-                          value={language.label}
-                          key={language.value}
-                          onSelect={() => {
-                            form.setValue('language', language.value)
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              'mr-2 h-4 w-4',
-                              language.value === field.value ? 'opacity-100' : 'opacity-0'
-                            )}
-                          />
-                          {language.label}
-                        </CommandItem_Shadcn_>
-                      ))}
-                    </CommandGroup_Shadcn_>
+                    <CommandList_Shadcn_>
+                      <CommandEmpty_Shadcn_>No language found.</CommandEmpty_Shadcn_>
+                      <CommandGroup_Shadcn_>
+                        {languages.map((language) => (
+                          <CommandItem_Shadcn_
+                            value={language.label}
+                            key={language.value}
+                            onSelect={() => {
+                              form.setValue('language', language.value)
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                language.value === field.value ? 'opacity-100' : 'opacity-0'
+                              )}
+                            />
+                            {language.label}
+                          </CommandItem_Shadcn_>
+                        ))}
+                      </CommandGroup_Shadcn_>
+                    </CommandList_Shadcn_>
                   </Command_Shadcn_>
                 </PopoverContent_Shadcn_>
               </Popover_Shadcn_>
