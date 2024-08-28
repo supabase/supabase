@@ -9,7 +9,7 @@ import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import career from '~/data/career.json'
-import Styles from './career.module.css'
+import Styles from '~/styles/career.module.css'
 import { GlobeAltIcon } from '@heroicons/react/outline'
 
 export async function getStaticProps() {
