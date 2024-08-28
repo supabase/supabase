@@ -62,7 +62,9 @@ const MobileHeader = ({
         <UpgradePlan
           organizations={organizations}
           onClick={() =>
-            sendTelemetryEvent(gaEvents[`www_pricing_comparison_${plan.toLowerCase()}_mobile`])
+            sendTelemetryEvent(
+              gaEvents[`www_pricing_comparison_${plan.toLowerCase()}_mobile_upgrade`]
+            )
           }
           size="medium"
         />
@@ -397,7 +399,9 @@ const PricingComparisonTable = ({
                             organizations={organizations}
                             onClick={() =>
                               sendTelemetryEvent(
-                                gaEvents[`www_pricing_comparison_${plan.name.toLowerCase()}_mobile`]
+                                gaEvents[
+                                  `www_pricing_comparison_${plan.name.toLowerCase()}_upgrade`
+                                ]
                               )
                             }
                             size="tiny"
