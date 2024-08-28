@@ -1,6 +1,8 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -13,8 +15,6 @@ import { invalidateOrganizationsQuery } from 'data/organizations/organizations-q
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { Button, IconEdit2, IconHelpCircle, Input, Listbox, Toggle } from 'ui'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -265,17 +265,18 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         <Panel.Content>
           <Listbox
             label={
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <span>Plan</span>
 
-                <div className="flex flex-col space-y-2">
-                  <Link href="https://supabase.com/pricing" target="_blank">
-                    <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                      <p className="text-sm m-0">Pricing</p>
-                      <ExternalLink size={16} strokeWidth={1.5} />
-                    </div>
-                  </Link>
-                </div>
+                <a
+                  href="https://supabase.com/pricing"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-sm flex items-center gap-2 opacity-75 hover:opacity-100 transition"
+                >
+                  Pricing
+                  <ExternalLink size={16} strokeWidth={1.5} />
+                </a>
               </div>
             }
             layout="horizontal"
