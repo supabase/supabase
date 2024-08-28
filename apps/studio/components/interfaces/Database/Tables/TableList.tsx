@@ -198,7 +198,7 @@ const TableList = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-x-4">
           <div className="flex items-center gap-x-2">
             <SchemaSelector
@@ -266,6 +266,7 @@ const TableList = ({
 
         {!isLocked && (
           <ButtonTooltip
+            className="ml-auto"
             icon={<Plus />}
             disabled={!canUpdateTables}
             onClick={() => onAddTable()}
