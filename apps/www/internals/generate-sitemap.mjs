@@ -13,6 +13,7 @@ async function generate() {
   const pages = await globby([
     'pages/*.js',
     'pages/*.tsx',
+    'pages/*.mdx',
     'pages/*/*.tsx',
     'data/**/*.mdx',
     '_blog/*.mdx',
@@ -20,10 +21,9 @@ async function generate() {
     '_customers/*.mdx',
     '_events/*.mdx',
     '_alternatives/*.mdx',
-    '!pages/index.tsx',
     '!data/*.mdx',
     '!pages/_*.js',
-    '!pages/*/index.tsx',
+    '!pages/_*.tsx',
     '!pages/api',
     '!pages/404.js',
     '.next/server/pages/partners/integrations/*.html',
@@ -39,7 +39,6 @@ async function generate() {
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
         ${pages
-          .filter((page) => !page.includes('_document.tsx'))
           .map((page) => {
             const path = page
               .replace('.next/server/pages', '')
@@ -53,13 +52,8 @@ async function generate() {
               .replace('_alternatives', '/alternatives')
               .replace('.tsx', '')
               .replace('.mdx', '')
-              // replace the paths for nested 'index' based routes
-              .replace('/auth/Auth', '/auth')
-              .replace('/database/Database', '/database')
-              .replace('/storage/Storage', '/storage')
-              .replace('/realtime/Realtime', '/realtime')
-              .replace('/edge-functions/edge-functions', '/edge-functions')
-              .replace('/nextjs/Nextjs', '/nextjs')
+              // replace /{directory}/index with /{directory}
+              .replace(/\/([^\/]+)\/index/, '/$1')
 
             let route = path === '/index' ? '' : path
 
