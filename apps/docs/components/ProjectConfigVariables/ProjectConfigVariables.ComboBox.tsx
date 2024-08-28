@@ -41,8 +41,9 @@ export function ComboBox<Opt extends ComboBoxOption>({
 }) {
   const [open, setOpen] = useState(false)
 
-  const selectedOptionDisplayName = options.find((option) => option.value === selectedOption)
-    ?.displayName
+  const selectedOptionDisplayName = options.find(
+    (option) => option.value === selectedOption
+  )?.displayName
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
