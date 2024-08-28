@@ -88,7 +88,9 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large' }: UpgradePla
                         value={organization.slug}
                         onSelect={(currentValue) => {
                           setValue(currentValue === value ? '' : currentValue)
+                          setOpen(false)
                         }}
+                        keywords={[organization.name]}
                       >
                         <Check
                           className={cn(
@@ -106,7 +108,9 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large' }: UpgradePla
                       value="new-organization"
                       onSelect={(currentValue) => {
                         setValue(currentValue === value ? '' : currentValue)
+                        setOpen(false)
                       }}
+                      keywords={['Create a new organization']}
                     >
                       <Check
                         className={cn(
