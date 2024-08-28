@@ -382,7 +382,7 @@ import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
 
 Deno.serve(async (req) => {
   const payload = await req.text()
-  const base64_secret = Deno.env.get('AUTH_CUSTOM_ACCESS_TOKEN_SECRET')
+  const base64_secret = Deno.env.get('CUSTOM_ACCESS_TOKEN_SECRET').replace('v1,whsec_', '')
   const headers = Object.fromEntries(req.headers)
   const wh = new Webhook(base64_secret)
   try {
@@ -428,7 +428,7 @@ import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
 
 Deno.serve(async (req) => {
   const payload = await req.text()
-  const base64_secret = Deno.env.get('AUTH_CUSTOM_ACCESS_TOKEN_SECRET')
+  const base64_secret = Deno.env.get('CUSTOM_ACCESS_TOKEN_SECRET').replace('v1,whsec_', '')
   const headers = Object.fromEntries(req.headers)
   const wh = new Webhook(base64_secret)
   try {
