@@ -286,7 +286,8 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             descriptionText={
               dbPricingTierKey !== 'FREE' ? (
                 <p>
-                  The plan applies to your entire organization. To upgrade an existing organization,{' '}
+                  The plan applies only to this new organization. To upgrade an existing
+                  organization,{' '}
                   <Link className="underline" href="/org/_/billing?panel=subscriptionPlan">
                     click here
                   </Link>
