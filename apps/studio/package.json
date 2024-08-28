@@ -62,7 +62,7 @@
     "ip-num": "^1.5.1",
     "json-logic-js": "^2.0.2",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.338.0",
+    "lucide-react": "^0.436.0",
     "markdown-table": "^3.0.3",
     "mime-db": "^1.53.0",
     "mobx": "^6.10.2",
