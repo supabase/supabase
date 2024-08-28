@@ -6,6 +6,7 @@ ChatGPT
 Clippy
 Colab
 [Cc]omposable
+[Cc]onfigs?
 CPUs?
 CTEs?
 [Dd]eclarative(ly)?
@@ -45,6 +46,7 @@ OpenAI
 [Pp]asscodes?
 [Pp]asswordless
 [Pp]erformant
+pg_plan_filter
 PGAudit
 PGroonga
 pgvector
@@ -75,6 +77,7 @@ subqueries
 [Ss]upabase
 Snaplet
 Supavisor
+[Ss]upautils
 [Ss]upersets?
 Terraform
 [Tt]odos?
