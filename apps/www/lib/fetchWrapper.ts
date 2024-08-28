@@ -18,7 +18,7 @@ export async function get(url: string, options?: RequestInit) {
 
   return fetch(url, {
     method: 'GET',
-    headers: headers,
+    headers,
     referrerPolicy: 'no-referrer-when-downgrade',
     ...options,
   })
