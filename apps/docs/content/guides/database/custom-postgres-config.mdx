@@ -1,5 +1,5 @@
 ---
-id: 'custom-postgres-config'
+id: 'customizing-postgres-configs'
 title: 'Customizing Postgres Configs'
 description: 'Configuring Postgres for your Supabase project.'
 ---
@@ -8,7 +8,7 @@ Supabase projects come with a pre-configured Postgres cluster optimized for vari
 
 <Admonition type="note">
 
-Customizing Postgres configurations provides advanced control over your database, but inappropriate settings can lead to severe performance degradation or project instability.
+Customizing Postgres configurations provides _advanced_ control over your database, but inappropriate settings can lead to severe performance degradation or project instability.
 
 </Admonition>
 
@@ -77,7 +77,7 @@ where rolname = 'postgres';
 
 ### CLI configurable settings
 
-While many Postgres parameters are configurable directly, some can only be modified through the Supabase CLI.
+While many Postgres parameters are configurable directly, some configurations can be changed with the Supabase CLI at the [`system`](https://www.postgresql.org/docs/current/config-setting.html#CONFIG-SETTING-SQL) level.
 
 <Admonition type="caution">
 
@@ -95,10 +95,17 @@ If a setting you need is not yet configurable, [share your use case with us](htt
 
 The following parameters are available for overrides:
 
-1. [`max_connections`](https://postgresqlco.nf/doc/en/param/max_connections/)
-1. [`max_locks_per_transaction`](https://postgresqlco.nf/doc/en/param/max_locks_per_transaction/)
-1. [`max_worker_processes`](https://postgresqlco.nf/doc/en/param/max_worker_processes/)
-1. [`shared_buffers`](https://postgresqlco.nf/doc/en/param/shared_buffers/)
+1. [effective_cache_size](https://postgresqlco.nf/doc/en/param/effective_cache_size/)
+1. [maintenance_work_mem](https://postgresqlco.nf/doc/en/param/maintenance_work_mem/)
+1. [max_connections](https://postgresqlco.nf/doc/en/param/max_connections/) (CLI only)
+1. [max_locks_per_transaction](https://postgresqlco.nf/doc/en/param/max_locks_per_transaction/) (CLI only)
+1. [max_parallel_maintenance_workers](https://postgresqlco.nf/doc/en/param/max_parallel_maintenance_workers/)
+1. [max_parallel_workers_per_gather](https://postgresqlco.nf/doc/en/param/max_parallel_workers_per_gather/)
+1. [max_parallel_workers](https://postgresqlco.nf/doc/en/param/max_parallel_workers/)
+1. [max_worker_processes](https://postgresqlco.nf/doc/en/param/max_worker_processes/) (CLI only)
+1. [session_replication_role](https://postgresqlco.nf/doc/en/param/session_replication_role/)
+1. [shared_buffers](https://postgresqlco.nf/doc/en/param/shared_buffers/) (CLI only)
+1. [work_mem](https://postgresqlco.nf/doc/en/param/work_mem/)
 
 #### Altering configs with the CLI
 
