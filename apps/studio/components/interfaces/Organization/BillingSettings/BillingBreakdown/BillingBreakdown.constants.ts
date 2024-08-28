@@ -128,7 +128,6 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     key: PricingMetric.LOG_DRAIN_EVENTS,
     name: 'Log Drain Events',
     units: 'absolute',
-    unitName: 'hours',
     category: 'Database',
   },
 ]

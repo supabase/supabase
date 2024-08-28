@@ -290,14 +290,14 @@ export const FormLayout = React.forwardRef<
         >
           {description}
         </FormDescription_Shadcn_>
-      ) : (
+      ) : description ? (
         <p
           className={cn(DescriptionVariants({ size, layout }), 'text-sm text-foreground-light')}
           data-formlayout-id={'description'}
         >
           {description}
         </p>
-      )
+      ) : null
 
     const LabelContents = () => (
       <>
@@ -338,7 +338,7 @@ export const FormLayout = React.forwardRef<
             >
               {hasLabel && isReactForm ? (
                 <FormLabel_Shadcn_
-                  className="flex gap-2 items-center"
+                  className="flex gap-2 items-center break-all"
                   data-formlayout-id={'formLabel'}
                 >
                   <LabelContents />
@@ -347,7 +347,7 @@ export const FormLayout = React.forwardRef<
                 <Label_Shadcn_
                   htmlFor={props.name}
                   data-formlayout-id={'label'}
-                  className="flex gap-2 items-center"
+                  className="flex gap-2 items-center break-all"
                 >
                   <LabelContents />
                 </Label_Shadcn_>

@@ -31,7 +31,7 @@ import {
   cn,
   singleThemes,
 } from 'ui'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
@@ -53,7 +53,7 @@ const NavigationBar = () => {
   const { project } = useProjectContext()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const { setIsOpen } = useCommandMenu()
+  const setCommandMenuOpen = useSetCommandMenuOpen()
   const snap = useAppStateSnapshot()
 
   const signOut = useSignOut()
@@ -116,7 +116,7 @@ const NavigationBar = () => {
           if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
         }}
       >
-        <ul className="flex flex-col gap-y-1 justify-start px-2">
+        <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
           {(!navLayoutV2 || !IS_PLATFORM) && (
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
@@ -176,7 +176,7 @@ const NavigationBar = () => {
               )
             } else if (route.key === 'advisors') {
               return (
-                <div className="relative">
+                <div className="relative" key={route.key}>
                   {securityLints.length > 0 && (
                     <div
                       className={cn(
@@ -187,7 +187,6 @@ const NavigationBar = () => {
                   )}
 
                   <NavigationIconLink
-                    key={route.key}
                     route={route}
                     isActive={activeRoute === route.key}
                     onClick={onCloseNavigationIconLink}
@@ -233,7 +232,7 @@ const NavigationBar = () => {
             <NavigationIconButton
               size="tiny"
               onClick={() => {
-                setIsOpen(true)
+                setCommandMenuOpen(true)
                 snap.setNavigationPanelOpen(false)
               }}
               type="text"
@@ -342,7 +341,7 @@ const NavigationBar = () => {
                   <DropdownMenuGroup>
                     <DropdownMenuItem className="flex gap-2" asChild>
                       <Link href="/account/me">
-                        <Settings size={14} strokeWidth={1.5} className="text-foreground-muted" />
+                        <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                         Account preferences
                       </Link>
                     </DropdownMenuItem>
@@ -351,7 +350,11 @@ const NavigationBar = () => {
                       onClick={() => snap.setShowFeaturePreviewModal(true)}
                       onSelect={() => snap.setShowFeaturePreviewModal(true)}
                     >
-                      <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-muted" />
+                      <FlaskConical
+                        size={14}
+                        strokeWidth={1.5}
+                        className="text-foreground-lighter"
+                      />
                       Feature previews
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

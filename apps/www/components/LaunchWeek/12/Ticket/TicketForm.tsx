@@ -67,12 +67,9 @@ export default function TicketForm() {
     // Prefetch GitHub avatar
     new Image().src = `https://github.com/${username}.png`
 
-    console.log('about to fetch username page to generate the og')
     // Prefetch the twitter share URL to eagerly generate the page
     // fetch(`/launch-week/tickets/${username}?came_from_signup=true`).catch((_) => {})
     await fetch(`/api-v2/ticket-og?username=${username}`)
-
-    console.log('should have fetched')
 
     if (!realtimeChannel) {
       const channel = supabase

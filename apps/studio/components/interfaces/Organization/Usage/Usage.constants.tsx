@@ -90,7 +90,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         name: 'Total Egress',
         unit: 'bytes',
         description:
-          'Contains any outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor) from your database.\nBilling is based on the total sum of egress in GB throughout your billing period.',
+          'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor and Log Drains.\nBilling is based on the total sum of egress in GB throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
       },
     ],
@@ -175,7 +175,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         chartPrefix: 'Average',
         unit: 'bytes',
         description:
-          'Sum of all objects in your storage buckets.\nBilling is based on the average daily size in GB throughout your billing period.',
+          'Sum of all objects in your storage buckets.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
         chartDescription: 'The data refreshes every 24 hours.',
         links: [
           {

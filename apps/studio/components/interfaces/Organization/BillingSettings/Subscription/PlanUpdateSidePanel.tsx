@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { isArray } from 'lodash'
 import { ChevronRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
@@ -13,6 +14,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
@@ -37,6 +39,8 @@ const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
+
+  const queryClient = useQueryClient()
 
   const originalPlanRef = useRef<string>()
 
@@ -138,6 +142,20 @@ const PlanUpdateSidePanel = () => {
       return toast.error('Please select a payment method')
     }
 
+    if (selectedPaymentMethod) {
+      queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          defaultPaymentMethodId: selectedPaymentMethod,
+          data: prev.data.map((pm: any) => ({
+            ...pm,
+            is_default: pm.id === selectedPaymentMethod,
+          })),
+        }
+      })
+    }
+
     // If the user is downgrading from team, should have spend cap disabled by default
     const tier =
       subscription?.plan?.id === 'team' && selectedTier === PRICING_TIER_PRODUCT_IDS.PRO
@@ -231,7 +249,12 @@ const PlanUpdateSidePanel = () => {
                       <ButtonTooltip
                         block
                         type={isDowngradeOption ? 'default' : 'primary'}
-                        disabled={subscription?.plan?.id === 'enterprise' || !canUpdateSubscription}
+                        disabled={
+                          subscription?.plan?.id === 'enterprise' ||
+                          !canUpdateSubscription ||
+                          (plan.id === 'tier_team' &&
+                            selectedOrganization?.managed_by === 'vercel-marketplace')
+                        }
                         onClick={() => setSelectedTier(plan.id as any)}
                         tooltip={{
                           content: {
@@ -241,7 +264,10 @@ const PlanUpdateSidePanel = () => {
                                 ? 'Reach out to us via support to update your plan from Enterprise'
                                 : !canUpdateSubscription
                                   ? 'You do not have permission to change the subscription plan'
-                                  : undefined,
+                                  : plan.id === 'tier_team' &&
+                                      selectedOrganization?.managed_by === 'vercel-marketplace'
+                                    ? 'The Team plan is currently unavailable for Vercel Marketplace managed organizations'
+                                    : undefined,
                           },
                         }}
                       >

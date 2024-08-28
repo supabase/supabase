@@ -129,9 +129,10 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             ...selectedLogDrain,
           }}
           isLoading={isLoading}
-          onSubmit={({ name, type, ...values }) => {
+          onSubmit={({ name, description, type, ...values }) => {
             const logDrainValues = {
               name,
+              description: description || '',
               type,
               config: values as any, // TODO: fix generated API types from backend
               id: selectedLogDrain?.id,
