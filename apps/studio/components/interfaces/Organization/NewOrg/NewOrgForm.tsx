@@ -13,6 +13,8 @@ import { invalidateOrganizationsQuery } from 'data/organizations/organizations-q
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { Button, IconEdit2, IconHelpCircle, Input, Listbox, Toggle } from 'ui'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -262,24 +264,35 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
         <Panel.Content>
           <Listbox
-            label="Pricing Plan"
+            label={
+              <div className="space-y-2">
+                <span>Plan</span>
+
+                <div className="flex flex-col space-y-2">
+                  <Link href="https://supabase.com/pricing" target="_blank">
+                    <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                      <p className="text-sm m-0">Pricing</p>
+                      <ExternalLink size={16} strokeWidth={1.5} />
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            }
             layout="horizontal"
             value={dbPricingTierKey}
             // @ts-ignore
             onChange={onDbPricingPlanChange}
             // @ts-ignore
             descriptionText={
-              <>
-                Select a plan that suits your needs.&nbsp;
-                <a
-                  className="underline"
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://supabase.com/pricing"
-                >
-                  More details
-                </a>
-              </>
+              dbPricingTierKey !== 'FREE' ? (
+                <p>
+                  The plan applies to your entire organization. To upgrade an existing organization,{' '}
+                  <Link className="underline" href="/org/_/billing?panel=subscriptionPlan">
+                    click here
+                  </Link>
+                  .
+                </p>
+              ) : undefined
             }
           >
             {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => {
