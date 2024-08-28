@@ -145,13 +145,40 @@ supabase start
 
 The Supabase CLI uses Docker containers to manage the local development stack. To get started,
 
-- Install [Docker Desktop](https://docs.docker.com/desktop)
+- Install [Docker Desktop](https://docs.docker.com/desktop) and apply the following configurations
 
-<Admonition type="tip" label="Intel-based Mac">
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="macos"
+  queryGroup="platform"
+>
+<TabPanel id="macos" label="macOS">
 
-If you are running Supabase on Intel-based Mac, disable [MacOS Virtualization Framework](https://github.com/supabase/cli/issues/1083#issuecomment-1691431279) to prevent Studio from being stuck in a crashloop.
+<Image
+  alt="Docker settings on Mac: Select Integrated, Virtualization Framework, and osxfs"
+  src={{
+    dark: '/docs/img/guides/cli/docker-mac.png',
+    light: '/docs/img/guides/cli/docker-mac-light.png',
+  }}
+  zoomable
+/>
 
-</Admonition>
+</TabPanel>
+<TabPanel id="windows" label="Windows">
+
+<Image
+  alt="Docker settings on Windows: Select Integrated, Expose Daemon, WSL2, and Add to /etc/hosts file."
+  src={{
+    dark: '/docs/img/guides/cli/docker-win.png',
+    light: '/docs/img/guides/cli/docker-win-light.png',
+  }}
+  zoomable
+/>
+
+</TabPanel>
+</Tabs>
 
 Inside the folder where you want to create your project, run:
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import * as z from 'zod'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -26,6 +27,27 @@ import {
   Input_Shadcn_,
 } from 'ui'
 
+const setDeletionRequestFlag = () => {
+  const expiryDate = new Date()
+  expiryDate.setDate(expiryDate.getDate() + 30)
+  localStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST, expiryDate.toString())
+}
+
+const hasActiveDeletionRequest = () => {
+  const expiryDateStr = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
+  if (!expiryDateStr) return false
+
+  const expiryDate = new Date(expiryDateStr)
+  const now = new Date()
+
+  if (now > expiryDate) {
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
+    return false
+  }
+
+  return true
+}
+
 export const DeleteAccountButton = () => {
   const { profile } = useProfile()
   const [isOpen, setIsOpen] = useState(false)
@@ -44,6 +66,7 @@ export const DeleteAccountButton = () => {
   const { mutate: submitSupportTicket, isLoading } = useSendSupportTicketMutation({
     onSuccess: () => {
       setIsOpen(false)
+      setDeletionRequestFlag()
       toast.success(
         'Successfully submitted account deletion request - we will reach out to you via email once the request is completed!',
         { duration: 8000 }
@@ -57,10 +80,14 @@ export const DeleteAccountButton = () => {
   const onConfirmDelete = async () => {
     if (!accountEmail) return console.error('Account information is required')
 
+    if (hasActiveDeletionRequest()) {
+      return toast.error('You have already submitted a deletion request within the last 30 days.')
+    }
+
     const payload = {
       subject: 'Account Deletion Request',
       message: 'I want to delete my account.',
-      category: SupportCategories.PROBLEM,
+      category: SupportCategories.ACCOUNT_DELETION,
       severity: 'Low',
       allowSupportAccess: false,
       verified: true,

@@ -3,6 +3,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
 import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
+
+import type { ItemRenderer } from 'components/ui/InfiniteList'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   Checkbox,
   DropdownMenu,
@@ -27,12 +33,6 @@ import {
   IconMusic,
   IconTrash2,
 } from 'ui'
-
-import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { useCheckPermissions } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   CONTEXT_MENU_KEYS,
   STORAGE_ROW_STATUS,
@@ -40,10 +40,22 @@ import {
   STORAGE_VIEWS,
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
+import { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import FileExplorerRowEditing from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
+import { useCopyUrl } from './useCopyUrl'
 
-export const RowIcon = ({ view, status, fileType, mimeType }: any) => {
+export const RowIcon = ({
+  view,
+  status,
+  fileType,
+  mimeType,
+}: {
+  view: STORAGE_VIEWS
+  status: STORAGE_ROW_STATUS
+  fileType: string
+  mimeType: string | undefined
+}) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
     return <IconLoader size={16} strokeWidth={2} className="animate-spin" />
   }
@@ -81,23 +93,21 @@ export const RowIcon = ({ view, status, fileType, mimeType }: any) => {
 }
 
 export interface FileExplorerRowProps {
-  view: string
+  view: STORAGE_VIEWS
   columnIndex: number
-  selectedItems: any[]
-  openedFolders: any[]
-  selectedFilePreview: any
-  onCopyUrl: (name: string, url: string) => void
+  selectedItems: StorageItemWithColumn[]
+  openedFolders: StorageItem[]
+  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
 }
 
-const FileExplorerRow: ItemRenderer<any, FileExplorerRowProps> = ({
+const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   index: itemIndex,
-  item = {},
+  item,
   view = STORAGE_VIEWS.COLUMNS,
   columnIndex = 0,
   selectedItems = [],
   openedFolders = [],
-  selectedFilePreview = {},
-  onCopyUrl,
+  selectedFilePreview,
 }) => {
   const storageExplorerStore = useStorageStore()
   const {
@@ -119,25 +129,26 @@ const FileExplorerRow: ItemRenderer<any, FileExplorerRowProps> = ({
     downloadFolder,
     selectRangeItems,
   } = storageExplorerStore
+  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
-  const isSelected = find(selectedItems, item) !== undefined
+  const isSelected = !!selectedItems.find((i) => i.id === item.id)
   const isOpened =
     openedFolders.length > columnIndex ? isEqual(openedFolders[columnIndex], item) : false
-  const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview.id, item.id)
+  const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const { show } = useContextMenu()
 
-  const onSelectFile = async (columnIndex: number, file: any) => {
+  const onSelectFile = async (columnIndex: number, file: StorageItem) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
-    setFilePreview(file)
+    setFilePreview(itemWithColumnIndex)
     clearSelectedItems()
   }
 
-  const onSelectFolder = async (columnIndex: number, folder: any) => {
+  const onSelectFolder = async (columnIndex: number, folder: StorageItem) => {
     closeFilePreview()
     clearSelectedItems(columnIndex + 1)
     popOpenedFoldersAtIndex(columnIndex - 1)
@@ -151,9 +162,9 @@ const FileExplorerRow: ItemRenderer<any, FileExplorerRowProps> = ({
       selectRangeItems(columnIndex, itemIndex)
       return
     }
-    if (find(selectedItems, (item: any) => itemWithColumnIndex.id === item.id) !== undefined) {
+    if (find(selectedItems, (item) => itemWithColumnIndex.id === item.id) !== undefined) {
       setSelectedItems(
-        selectedItems.filter((selectedItem: any) => itemWithColumnIndex.id !== selectedItem.id)
+        selectedItems.filter((selectedItem) => itemWithColumnIndex.id !== selectedItem.id)
       )
     } else {
       setSelectedItems([...selectedItems, itemWithColumnIndex])
@@ -202,11 +213,8 @@ const FileExplorerRow: ItemRenderer<any, FileExplorerRowProps> = ({
                       {
                         name: 'Get URL',
                         icon: <IconClipboard size="tiny" />,
-                        onClick: async () =>
-                          onCopyUrl(
-                            itemWithColumnIndex.name,
-                            await getFileUrl(itemWithColumnIndex)
-                          ),
+                        onClick: () =>
+                          onCopyUrl(itemWithColumnIndex.name, getFileUrl(itemWithColumnIndex)),
                       },
                     ]
                   : [
@@ -216,26 +224,26 @@ const FileExplorerRow: ItemRenderer<any, FileExplorerRowProps> = ({
                         children: [
                           {
                             name: 'Expire in 1 week',
-                            onClick: async () =>
+                            onClick: () =>
                               onCopyUrl(
                                 itemWithColumnIndex.name,
-                                await getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK)
+                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK)
                               ),
                           },
                           {
                             name: 'Expire in 1 month',
-                            onClick: async () =>
+                            onClick: () =>
                               onCopyUrl(
                                 itemWithColumnIndex.name,
-                                await getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.MONTH)
+                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.MONTH)
                               ),
                           },
                           {
                             name: 'Expire in 1 year',
-                            onClick: async () =>
+                            onClick: () =>
                               onCopyUrl(
                                 itemWithColumnIndex.name,
-                                await getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR)
+                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR)
                               ),
                           },
                           {
@@ -283,7 +291,7 @@ const FileExplorerRow: ItemRenderer<any, FileExplorerRowProps> = ({
   const createdAt = item.created_at ? new Date(item.created_at).toLocaleString() : '-'
   const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-'
 
-  const displayMenu = (event: any, rowType: any) => {
+  const displayMenu = (event: any, rowType: STORAGE_ROW_TYPES) => {
     show(event, {
       id:
         rowType === STORAGE_ROW_TYPES.FILE

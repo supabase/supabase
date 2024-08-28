@@ -77,14 +77,12 @@ const FirstStep = ({ visible, name, enroll, setName, isEnrolling, onClose }: Fir
         })
       }}
     >
-      <div className="pt-6 pb-5">
-        <Input
-          label="Provide a name to identify this app"
-          descriptionText="A string will be randomly generated if a name is not provided"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
+      <Input
+        label="Provide a name to identify this app"
+        descriptionText="A string will be randomly generated if a name is not provided"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
     </ConfirmationModal>
   )
 }

@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 import type { components } from 'data/api'
-import { patch } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
 export type UpdateColumnBody = components['schemas']['UpdateColumnBody']
@@ -33,7 +33,7 @@ export async function updateDatabaseColumn({
     headers,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

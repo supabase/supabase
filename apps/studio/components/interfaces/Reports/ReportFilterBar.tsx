@@ -2,8 +2,9 @@ import { ChevronDown, Database, Plus, X } from 'lucide-react'
 import { ComponentProps, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useParams } from 'common'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Auth, Realtime, Storage } from 'icons'
 import { BASE_PATH } from 'lib/constants'
 import {
@@ -84,9 +85,8 @@ const ReportFilterBar = ({
   onRemoveFilters,
   datepickerHelpers,
 }: ReportFilterBarProps) => {
-  const { project } = useProjectContext()
-  // [Joshen] TODO: Once API  support is out
-  const showReadReplicasUI = false // project?.is_read_replicas_enabled
+  const { ref } = useParams()
+  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
   const filterKeys = [
     'request.path',
@@ -304,7 +304,12 @@ const ReportFilterBar = ({
           </Button>
         </Popover>
       </div>
-      {showReadReplicasUI && <DatabaseSelector />}
+
+      <DatabaseSelector
+        additionalOptions={
+          (loadBalancers ?? []).length > 0 ? [{ id: `${ref}-all`, name: 'API Load Balancer' }] : []
+        }
+      />
     </div>
   )
 }

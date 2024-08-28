@@ -158,6 +158,36 @@ export const lintInfoMap: LintInfo[] = [
     docsLink:
       'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0015_rls_references_user_metadata',
   },
+  {
+    name: 'materialized_view_in_api',
+    title: 'Materialized View in API',
+    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: () =>
+      `https://supabase.com/docs/guides/database/database-advisors?lint=0016_materialized_view_in_api`,
+    linkText: 'View docs',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-advisors?lint=0016_materialized_view_in_api',
+  },
+  {
+    name: 'foreign_table_in_api',
+    title: 'Foreign Table in API',
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: () =>
+      `https://supabase.com/docs/guides/database/database-linter?lint=0017_foreign_table_in_api`,
+    linkText: 'View docs',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?lint=0017_foreign_table_in_api',
+  },
+  {
+    name: 'unsupported_reg_types',
+    title: 'Unsupported reg types',
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: () =>
+      `https://supabase.com/docs/guides/database/database-advisors?lint=0018_unsupported_reg_types&queryGroups=lint`,
+    linkText: 'View docs',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-advisors?lint=0018_unsupported_reg_types&queryGroups=lint',
+  },
 ]
 
 export const LintCTA = ({

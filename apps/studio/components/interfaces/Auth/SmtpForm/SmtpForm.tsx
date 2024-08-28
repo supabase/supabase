@@ -2,34 +2,31 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { number, object, string } from 'yup'
+
+import { Markdown } from 'components/interfaces/Markdown'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import NoPermission from 'components/ui/NoPermission'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   Form,
-  IconAlertCircle,
   IconAlertTriangle,
   IconEye,
   IconEyeOff,
   Input,
   InputNumber,
   Toggle,
+  WarningIcon,
 } from 'ui'
-import { number, object, string } from 'yup'
-
-import { Markdown } from 'components/interfaces/Markdown'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
@@ -51,6 +48,7 @@ const SmtpForm = () => {
 
   const formId = 'auth-config-smtp-form'
   const initialValues = generateFormValues(authConfig)
+  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   useEffect(() => {
@@ -115,7 +113,7 @@ const SmtpForm = () => {
     }),
     SMTP_PASS: string().when([], {
       is: () => {
-        return enableSmtp
+        return enableSmtp && authConfig?.SMTP_PASS === null
       },
       then: (schema) => schema.required('SMTP password is required'),
       otherwise: (schema) => schema,
@@ -128,6 +126,12 @@ const SmtpForm = () => {
     // Format payload: Remove redundant value + convert port to string
     delete payload.ENABLE_SMTP
     payload.SMTP_PORT = payload.SMTP_PORT ? payload.SMTP_PORT.toString() : payload.SMTP_PORT
+
+    // the SMTP_PASS is write-only, it's never shown. If we don't delete it from the payload, it will replace the
+    // previously saved value with an empty one
+    if (payload.SMTP_PASS === '') {
+      delete payload.SMTP_PASS
+    }
 
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
@@ -148,11 +152,15 @@ const SmtpForm = () => {
   if (isError) {
     return (
       <Alert_Shadcn_ variant="destructive">
-        <IconAlertCircle strokeWidth={2} />
+        <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
+  }
+
+  if (!canReadConfig) {
+    return <NoPermission resourceText="view SMTP settings" />
   }
 
   return (
@@ -336,7 +344,7 @@ const SmtpForm = () => {
                     id="SMTP_PASS"
                     type={hidden ? 'password' : 'text'}
                     label="Password"
-                    placeholder="SMTP Password"
+                    placeholder={authConfig?.SMTP_PASS === null ? 'SMTP Password' : '••••••••'}
                     actions={
                       <Button
                         icon={hidden ? <IconEye /> : <IconEyeOff />}
@@ -345,6 +353,12 @@ const SmtpForm = () => {
                       />
                     }
                     disabled={!canUpdateConfig}
+                    descriptionText={
+                      <span>
+                        For security reasons, the password is write-only. Once saved, it cannot be
+                        retrieved or displayed.
+                      </span>
+                    }
                   />
                 </FormSectionContent>
               </FormSection>

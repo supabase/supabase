@@ -1,36 +1,37 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
-import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
-import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
-import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useSelectedOrganization, useSelectedProject } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
+import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  CriticalIcon,
   IconAlertTriangle,
   IconExternalLink,
   Radio,
   SidePanel,
+  WarningIcon,
   cn,
 } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -53,7 +54,6 @@ const PITR_CATEGORY_OPTIONS: {
 ]
 
 const PITRSidePanel = () => {
-  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { resolvedTheme } = useTheme()
   const project = useSelectedProject()
@@ -66,15 +66,8 @@ const PITRSidePanel = () => {
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
-  const snap = useSubscriptionPageStateSnapshot()
-  const visible = snap.panelKey === 'pitr'
-  const onClose = () => {
-    const { panel, ...queryWithoutPanel } = router.query
-    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
-      shallow: true,
-    })
-    snap.setPanelKey(undefined)
-  }
+  const { panel, setPanel, closePanel } = useAddonsPagePanel()
+  const visible = panel === 'pitr'
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
@@ -84,7 +77,7 @@ const PITRSidePanel = () => {
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated point in time recovery duration`)
-      onClose()
+      closePanel()
     },
     onError: (error) => {
       toast.error(`Unable to update PITR: ${error.message}`)
@@ -93,7 +86,7 @@ const PITRSidePanel = () => {
   const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled point in time recovery`)
-      onClose()
+      closePanel()
     },
     onError: (error) => {
       toast.error(`Unable to disable PITR: ${error.message}`)
@@ -124,18 +117,6 @@ const PITRSidePanel = () => {
         setSelectedCategory('off')
         setSelectedOption('pitr_0')
       }
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Point in Time Recovery',
-            section: 'Add ons',
-          },
-          projectRef,
-        },
-        router
-      )
     }
   }, [visible, isLoading])
 
@@ -153,7 +134,7 @@ const PITRSidePanel = () => {
     <SidePanel
       size="xlarge"
       visible={visible}
-      onCancel={onClose}
+      onCancel={closePanel}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
       disabled={
@@ -169,7 +150,7 @@ const PITRSidePanel = () => {
         hasHipaaAddon
           ? 'Unable to change PITR with HIPAA add-on'
           : isFreePlan
-            ? 'Unable to enable point in time recovery on a free plan'
+            ? 'Unable to enable point in time recovery on a Free Plan'
             : !canUpdatePitr
               ? 'You do not have permission to update PITR'
               : undefined
@@ -228,19 +209,6 @@ const PITRSidePanel = () => {
                       } else {
                         setSelectedOption('pitr_7')
                       }
-                      Telemetry.sendActivity(
-                        {
-                          activity: 'Option Selected',
-                          source: 'Dashboard',
-                          data: {
-                            title: 'Point in Time Recovery',
-                            section: 'Add ons',
-                            option: option.name,
-                          },
-                          projectRef,
-                        },
-                        router
-                      )
                     }}
                   >
                     <img
@@ -288,8 +256,8 @@ const PITRSidePanel = () => {
               <WarningIcon />
               <AlertTitle_Shadcn_>Remove all read replicas before downgrading</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                You currently have active read replicas. The minimum compute instance size for using
-                read replicas is the Small Compute. You need to remove all read replicas before
+                You currently have active read replicas. The minimum compute size for using read
+                replicas is the Small Compute. You need to remove all read replicas before
                 downgrading Compute as it requires at least a Small compute instance.
               </AlertDescription_Shadcn_>
               <AlertDescription_Shadcn_ className="mt-2">
@@ -309,7 +277,7 @@ const PITRSidePanel = () => {
                   withIcon
                   variant="info"
                   className="mb-4"
-                  title="Changing your Point-In-Time-Recovery is only available on the Pro plan"
+                  title="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
                   actions={
                     <Button asChild type="default">
                       <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
@@ -330,7 +298,7 @@ const PITRSidePanel = () => {
                     <Button
                       key="change-compute"
                       type="default"
-                      onClick={() => snap.setPanelKey('computeInstance')}
+                      onClick={() => setPanel('computeInstance')}
                     >
                       Change compute size
                     </Button>,
@@ -382,44 +350,54 @@ const PITRSidePanel = () => {
           {hasChanges && !blockDowngradeDueToReadReplicas && (
             <>
               {selectedOption === 'pitr_0' ||
-              (selectedPitr?.price ?? 0) < (subscriptionPitr?.variant.price ?? 0) ? (
-                subscription?.billing_via_partner === false && (
-                  <p className="text-sm text-foreground-light">
-                    Upon clicking confirm, the add-on is removed immediately and any unused time in
-                    the current billing cycle is added as prorated credits to your organization and
-                    used in subsequent billing cycles.
-                  </p>
-                )
-              ) : (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the amount of{' '}
-                  <span className="text-foreground">{formatCurrency(selectedPitr?.price)}</span>{' '}
-                  will be added to your monthly invoice.{' '}
-                  {subscription?.billing_via_partner ? (
-                    <>
-                      For the current billing cycle you'll be charged a prorated amount at the end
-                      of the cycle.{' '}
-                    </>
-                  ) : (
-                    <>
-                      The addon is prepaid per month and in case of a downgrade, you get credits for
-                      the remaining time. For the current billing cycle you're immediately charged a
-                      prorated amount for the remaining days.
-                    </>
+              (selectedPitr?.price ?? 0) < (subscriptionPitr?.variant.price ?? 0)
+                ? subscription?.billing_via_partner === false &&
+                  // Old addon billing with upfront payment
+                  subscription.usage_based_billing_project_addons === false && (
+                    <p className="text-sm text-foreground-light">
+                      Upon clicking confirm, the add-on is removed immediately and any unused time
+                      in the current billing cycle is added as prorated credits to your organization
+                      and used in subsequent billing cycles.
+                    </p>
+                  )
+                : !subscription?.billing_via_partner && (
+                    <p className="text-sm text-foreground-light">
+                      {subscription?.usage_based_billing_project_addons === false ? (
+                        <span>
+                          Upon clicking confirm, the amount of{' '}
+                          <span className="text-foreground">
+                            {formatCurrency(selectedPitr?.price)}
+                          </span>{' '}
+                          will be added to your monthly invoice. The addon is prepaid per month and
+                          in case of a downgrade, you get credits for the remaining time. For the
+                          current billing cycle you're immediately charged a prorated amount for the
+                          remaining days.
+                        </span>
+                      ) : (
+                        <span>
+                          There are no immediate charges. The addon is billed at the end of your
+                          billing cycle based on your usage and prorated to the hour.
+                        </span>
+                      )}
+                    </p>
                   )}
-                </p>
-              )}
 
-              {subscription?.billing_via_partner &&
-                subscription.scheduled_plan_change?.target_plan !== undefined && (
-                  <Alert_Shadcn_ variant={'warning'} className="mb-2">
-                    <IconAlertTriangle className="h-4 w-4" />
-                    <AlertDescription_Shadcn_>
-                      You have a scheduled subscription change that will be canceled if you change
-                      your PITR add on.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
+              {
+                // Billed via partner
+                subscription?.billing_via_partner &&
+                  // Project addons are still billed the old way (upfront payment)
+                  subscription?.usage_based_billing_project_addons === false &&
+                  // Scheduled billing plan change
+                  subscription.scheduled_plan_change?.target_plan !== undefined && (
+                    <Alert_Shadcn_ variant={'warning'} className="mb-2">
+                      <IconAlertTriangle className="h-4 w-4" />
+                      <AlertDescription_Shadcn_>
+                        You have a scheduled subscription change that will be canceled if you change
+                        your PITR add on.
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )
+              }
             </>
           )}
         </div>

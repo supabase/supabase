@@ -1,20 +1,20 @@
+import { ChevronDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+
+import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import {
   Alert,
   Button,
+  DialogFooter,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Form,
-  IconChevronDown,
-  IconExternalLink,
   Input,
   Modal,
 } from 'ui'
-
-import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
@@ -58,13 +58,10 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  asChild
                   type="primary"
                   className="rounded-l-none px-[4px] py-[5px]"
-                  icon={<IconChevronDown />}
-                >
-                  <span></span>
-                </Button>
+                  icon={<ChevronDown />}
+                />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="bottom">
                 <DropdownMenuItem
@@ -87,7 +84,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
       <Modal
         closable
         hideFooter
-        size="medium"
+        size="small"
         visible={isOpen}
         onCancel={() => setIsOpen(!isOpen)}
         header={
@@ -105,7 +102,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
           validate={validate}
         >
           {() => (
-            <div className="py-3 space-y-4">
+            <>
               {tokenScope === 'V0' && (
                 <Modal.Content>
                   <Alert
@@ -118,7 +115,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                       such, be very careful when using this API.
                     </p>
                     <div className="mt-4">
-                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                      <Button asChild type="default" icon={<ExternalLink />}>
                         <Link
                           href="https://api.supabase.com/api/v0"
                           target="_blank"
@@ -139,8 +136,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                   className="w-full"
                 />
               </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content>
+              <DialogFooter>
                 <div className="flex items-center space-x-2 justify-end">
                   <Button type="default" disabled={isLoading} onClick={() => setIsOpen(false)}>
                     Cancel
@@ -149,8 +145,8 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                     Generate token
                   </Button>
                 </div>
-              </Modal.Content>
-            </div>
+              </DialogFooter>
+            </>
           )}
         </Form>
       </Modal>

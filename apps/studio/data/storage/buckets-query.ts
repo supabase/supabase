@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { storageKeys } from './keys'
@@ -26,7 +26,7 @@ export async function getBuckets({ projectRef }: BucketsVariables, signal?: Abor
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data as Bucket[]
 }
 

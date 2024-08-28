@@ -1,7 +1,7 @@
-import { useParams } from 'common'
+import { useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { replicaKeys } from 'data/read-replicas/keys'
 import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -29,24 +29,28 @@ const DropAllReplicasConfirmationModal = ({
     if (databases.length === 1) toast('Your project has no read replicas')
 
     const replicas = databases.filter((db) => db.identifier !== projectRef)
-    await Promise.all(
-      replicas.map((db) =>
-        removeReadReplica({
-          projectRef,
-          identifier: db.identifier,
-          invalidateReplicaQueries: false,
-        })
+    try {
+      await Promise.all(
+        replicas.map((db) =>
+          removeReadReplica({
+            projectRef,
+            identifier: db.identifier,
+            invalidateReplicaQueries: false,
+          })
+        )
       )
-    )
-    toast.success(`Tearing down all read replicas`)
+      toast.success(`Tearing down all read replicas`)
 
-    await Promise.all([
-      queryClient.invalidateQueries(replicaKeys.list(projectRef)),
-      queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef)),
-    ])
+      await Promise.all([
+        queryClient.invalidateQueries(replicaKeys.list(projectRef)),
+        queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef)),
+      ])
 
-    onSuccess()
-    onCancel()
+      onSuccess()
+      onCancel()
+    } catch (error) {
+      toast.error('Failed to drop all replicas')
+    }
   }
 
   return (

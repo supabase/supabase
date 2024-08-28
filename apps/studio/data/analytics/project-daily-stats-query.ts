@@ -57,7 +57,7 @@ export async function getProjectDailyStats(
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data as unknown as AnalyticsData
 }
 

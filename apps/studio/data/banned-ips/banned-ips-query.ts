@@ -1,4 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { BannedIPKeys } from './keys'

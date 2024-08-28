@@ -7,11 +7,20 @@ import { useProfile } from 'lib/profile'
 
 interface SuccessProps {
   sentCategory?: string
+  selectedProject?: string
+  projects?: any[]
 }
 
-const Success = ({ sentCategory = '' }: SuccessProps) => {
+const Success = ({
+  sentCategory = '',
+  selectedProject = 'no-project',
+  projects = [],
+}: SuccessProps) => {
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
+
+  const project = projects.find((p) => p.ref === selectedProject)
+  const projectName = project ? project.name : 'No specific project'
 
   const categoriesToShowAdditionalResources = ['Problem', 'Unresponsive', 'Performance']
 
@@ -26,20 +35,27 @@ const Success = ({ sentCategory = '' }: SuccessProps) => {
           <IconCheck strokeWidth={4} size={18} />
         </div>
       </div>
-      <div className="flex items-center flex-col space-y-2">
+      <div className="flex items-center flex-col space-y-2 text-center">
         <h3 className="text-xl">Support request successfully sent!</h3>
         <p className="text-sm text-foreground-light">
-          We will reach out to you at <span className="text-foreground">{respondToEmail}</span>
+          We will reach out to you at <span className="text-foreground">{respondToEmail}</span>.
         </p>
+        {selectedProject !== 'no-project' && (
+          <p className="text-sm text-foreground-light">
+            Your ticket has been logged for the project{' '}
+            <span className="text-foreground">{projectName}</span>, reference ID:{' '}
+            <span className="text-foreground">{selectedProject}</span>.
+          </p>
+        )}
       </div>
       {categoriesToShowAdditionalResources.includes(sentCategory) && (
         <>
           <div className="!my-10 w-full">
             <Separator />
           </div>
-          <div className="flex flex-col items-center px-12 space-y-2">
+          <div className="flex flex-col items-center px-12 space-y-2 text-center">
             <p>In the meantime, tap into our community</p>
-            <p className="text-sm text-foreground-light text-center">
+            <p className="text-sm text-foreground-light">
               Find the answers you need with fellow developers building with Supabase by joining our
               GitHub discussions or on Discord - build the next best thing together
             </p>

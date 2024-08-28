@@ -21,6 +21,7 @@ export const sqlEditorState = proxy({
     [key: string]: {
       rows: any[]
       error?: any
+      autoLimit?: number
     }[]
   },
   // Project ref as the key, ids of each snippet as the order
@@ -30,12 +31,14 @@ export const sqlEditorState = proxy({
   loaded: {} as {
     [key: string]: boolean
   },
+  limit: 100,
 
   needsSaving: proxySet<string>([]),
   savingStates: {} as {
     [key: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
   },
 
+  setLimit: (value: number) => (sqlEditorState.limit = value),
   orderSnippets: (snippets: SqlSnippet[]) => {
     return (
       snippets
@@ -117,7 +120,7 @@ export const sqlEditorState = proxy({
     }
   },
   setSql: (id: string, sql: string) => {
-    if (sqlEditorState.snippets[id]) {
+    if (sqlEditorState.snippets[id] && sqlEditorState.snippets[id].snippet.type === 'sql') {
       sqlEditorState.snippets[id].snippet.content.sql = sql
       sqlEditorState.needsSaving.add(id)
     }
@@ -151,24 +154,25 @@ export const sqlEditorState = proxy({
       sqlEditorState.results[id] = []
     }
   },
-  addResult: (id: string, results: any[]) => {
+  addResult: (id: string, results: any[], autoLimit?: number) => {
     if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id].unshift({ rows: results })
+      sqlEditorState.results[id].unshift({ rows: results, autoLimit })
     }
   },
-  addResultError: (id: string, error: any) => {
+  addResultError: (id: string, error: any, autoLimit?: number) => {
     if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id].unshift({ rows: [], error })
+      sqlEditorState.results[id].unshift({ rows: [], error, autoLimit })
     }
   },
+  // [Jordi] Only SQL snippets can be favorites for now.
   addFavorite: (id: string) => {
-    if (sqlEditorState.snippets[id]) {
+    if (sqlEditorState.snippets[id] && sqlEditorState.snippets[id].snippet.type === 'sql') {
       sqlEditorState.snippets[id].snippet.content.favorite = true
       sqlEditorState.needsSaving.add(id)
     }
   },
   removeFavorite: (id: string) => {
-    if (sqlEditorState.snippets[id]) {
+    if (sqlEditorState.snippets[id] && sqlEditorState.snippets[id].snippet.type === 'sql') {
       sqlEditorState.snippets[id].snippet.content.favorite = false
       sqlEditorState.needsSaving.add(id)
     }
@@ -208,7 +212,11 @@ const debouncedUpdate = (id: string, projectRef: string, payload: UpsertContentP
   memoizedUpdate(id)(id, projectRef, payload)
 
 if (typeof window !== 'undefined') {
-  devtools(sqlEditorState, { name: 'sqlEditorState', enabled: true })
+  devtools(sqlEditorState, {
+    name: 'sqlEditorState',
+    // [Joshen] So that jest unit tests can ignore this
+    enabled: process.env.NEXT_PUBLIC_ENVIRONMENT !== undefined,
+  })
 
   subscribe(sqlEditorState.needsSaving, () => {
     const state = getSqlEditorStateSnapshot()

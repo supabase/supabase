@@ -3,7 +3,7 @@ import { noop } from 'lodash'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import Panel from 'components/ui/Panel'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import PolicyRow from './PolicyRow'
@@ -56,12 +56,11 @@ const PolicyTableRow = ({
                 Row Level Security is enabled for this table, but no policies are set
               </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                Select queries will return an{' '}
-                <span className="text-foreground underline">empty array</span> of results.
+                Select queries may return 0 results.
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
           )}
-          {!table.rls_enabled && (
+          {!table.rls_enabled && !isLocked && (
             <Alert_Shadcn_ variant="warning">
               <WarningIcon />
               <AlertTitle_Shadcn_>

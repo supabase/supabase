@@ -116,7 +116,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
       >
         {({ values }: { values: any }) => {
           return (
-            <div className="space-y-4 py-4">
+            <>
               <Modal.Content>
                 <Input
                   id="name"
@@ -164,8 +164,8 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   </div>
                 </Collapsible.Trigger>
                 <Collapsible.Content className="py-4">
-                  <div className="w-full space-y-4 px-5">
-                    <div className="space-y-2">
+                  <div className="w-full space-y-5 px-5">
+                    <div className="space-y-5">
                       <Toggle
                         id="has_file_size_limit"
                         name="has_file_size_limit"
@@ -236,28 +236,21 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   </div>
                 </Collapsible.Content>
               </Collapsible>
-              <div className="w-full border-t border-default !mt-0" />
-              <Modal.Content>
-                <div className="flex items-center space-x-2 justify-end">
-                  <Button
-                    type="default"
-                    htmlType="button"
-                    disabled={isCreating}
-                    onClick={() => onClose()}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={isCreating}
-                    disabled={isCreating}
-                  >
-                    Save
-                  </Button>
-                </div>
+              <Modal.Separator />
+              <Modal.Content className="flex items-center space-x-2 justify-end">
+                <Button
+                  type="default"
+                  htmlType="button"
+                  disabled={isCreating}
+                  onClick={() => onClose()}
+                >
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit" loading={isCreating} disabled={isCreating}>
+                  Save
+                </Button>
               </Modal.Content>
-            </div>
+            </>
           )
         }}
       </Form>

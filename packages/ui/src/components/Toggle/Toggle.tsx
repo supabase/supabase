@@ -26,6 +26,9 @@ interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'size'> {
   validation?: (x: any) => void
 }
 
+/**
+ * @deprecated Use ./Switch instead
+ */
 function Toggle({
   disabled,
   id = '',

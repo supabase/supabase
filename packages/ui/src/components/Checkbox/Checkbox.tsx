@@ -35,6 +35,9 @@ interface GroupProps {
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
 }
 
+/**
+ * @deprecated Use ./Checkbox_shadcn_ instead
+ */
 function Group({
   id,
   layout = 'vertical',
@@ -95,6 +98,9 @@ function Group({
   )
 }
 
+/**
+ * @deprecated Use ./Checkbox_shadcn_ instead
+ */
 export function Checkbox({
   className,
   id = '',

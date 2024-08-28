@@ -3,11 +3,11 @@ import path from 'path'
 import matter from 'gray-matter'
 import { generateReadingTime } from './helpers'
 
-type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives'
+type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'
 
 // substring amount for file names
 // based on YYYY-MM-DD format
-const FILENAME_SUBSTRING = 11
+export const FILENAME_SUBSTRING = 11
 
 type GetSortedPostsParams = {
   directory: Directories
@@ -59,7 +59,6 @@ export const getSortedPosts = ({
         ...data,
         date: formattedDate,
         readingTime,
-        publishedAt: data.published_at ?? null,
         url: url,
         path: contentPath,
       }
@@ -74,15 +73,9 @@ export const getSortedPosts = ({
 
   let sortedPosts = [...allPosts]
 
-  sortedPosts = sortedPosts.sort((a: any, b: any) => {
-    const isPublishedAtBefore =
-      a.publishedAt && b.publishedAt && Date.parse(a.publishedAt) < Date.parse(b.publishedAt)
-    if (isPublishedAtBefore || new Date(a.date) < new Date(b.date)) {
-      return 1
-    } else {
-      return -1
-    }
-  })
+  sortedPosts = sortedPosts.sort(
+    (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
 
   if (categories) {
     sortedPosts = sortedPosts.filter((post: any) => {

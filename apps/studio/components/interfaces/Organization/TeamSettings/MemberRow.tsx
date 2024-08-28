@@ -1,78 +1,64 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { Check, Minus, User, X } from 'lucide-react'
 import Image from 'next/legacy/image'
-import { Dispatch, SetStateAction, useState } from 'react'
-import toast from 'react-hot-toast'
+import { useState } from 'react'
 
+import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganization } from 'hooks'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
-import { Role } from 'types'
-import { Badge, IconAlertCircle, IconCheck, IconLoader, IconUser, IconX, Listbox } from 'ui'
+import { Badge, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
-import MemberActions from './MemberActions'
-import { useGetRolesManagementPermissions } from './TeamSettings.utils'
-
-export interface SelectedMember extends OrganizationMember {
-  oldRoleId: number
-  newRoleId: number
-}
+import { MemberActions } from './MemberActions'
+import PartnerIcon from 'components/ui/PartnerIcon'
 
 interface MemberRowProps {
   member: OrganizationMember
-  roles: Role[]
-  isLoadingRoles?: boolean
-  showMfaEnabledColumn?: boolean
-  setUserRoleChangeModalVisible: Dispatch<SetStateAction<boolean>>
-  setSelectedMember: Dispatch<SetStateAction<SelectedMember | undefined>>
 }
 
-const MemberRow = ({
-  member,
-  roles,
-  isLoadingRoles = false,
-  showMfaEnabledColumn = false,
-  setUserRoleChangeModalVisible,
-  setSelectedMember,
-}: MemberRowProps) => {
+const MEMBER_ORIGIN_TO_MANAGED_BY = {
+  vercel: 'vercel-marketplace',
+} as const
+
+export const MemberRow = ({ member }: MemberRowProps) => {
+  const { slug } = useParams()
   const { profile } = useProfile()
+  const { data: projects } = useProjectsQuery()
   const selectedOrganization = useSelectedOrganization()
+  const [hasInvalidImg, setHasInvalidImg] = useState(false)
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
-  const { data: permissions } = usePermissionsQuery()
+  const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
+    slug: selectedOrganization?.slug,
+  })
 
-  const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
-    selectedOrganization?.id,
-    roles,
-    permissions ?? []
-  )
-
-  const [memberRoleId] = member.role_ids ?? []
-  const role = (roles || []).find((role) => role.id === memberRoleId)
-  const memberIsUser = member.primary_email == profile?.primary_email
+  const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const isInvitedUser = Boolean(member.invited_id)
-  const canRemoveRole = rolesRemovable.includes(memberRoleId)
-  const disableRoleEdit = !canRemoveRole || memberIsUser || isInvitedUser
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
 
-  const validateSelectedRoleToChange = (roleId: any) => {
-    if (!role || role.id === roleId) return
+  // [Joshen] From project role POV, mask any roles for other projects
+  const isObfuscated =
+    member.role_ids.filter((id) => {
+      const role = [
+        ...(roles?.org_scoped_roles ?? []),
+        ...(roles?.project_scoped_roles ?? []),
+      ].find((role) => role.id === id)
+      const isOrgScope = role?.project_ids === null
+      if (isOrgScope) return false
 
-    const selectedRole = (roles || []).find((role) => role.id === roleId)
-    const canAddRole = rolesAddable.includes(selectedRole?.id ?? -1)
+      const appliedProjects = (role?.project_ids ?? [])
+        .map((id) => {
+          return projects?.find((p) => p.id === id)?.name ?? ''
+        })
+        .filter((x) => x.length > 0)
 
-    if (!canAddRole) {
-      return toast.error(
-        `You do not have permission to update this team member to ${selectedRole!.name}`
-      )
-    }
-
-    setUserRoleChangeModalVisible(true)
-    setSelectedMember({ ...member, oldRoleId: role.id, newRoleId: roleId })
-  }
-
-  const [hasInvalidImg, setHasInvalidImg] = useState(false)
+      return appliedProjects.length === 0
+    }).length > 0
 
   return (
     <Table.tr>
@@ -81,7 +67,7 @@ const MemberRow = ({
           <div>
             {isInvitedUser || isEmailUser || isFlyUser || hasInvalidImg ? (
               <div className="w-[40px] h-[40px] bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center">
-                <IconUser strokeWidth={1.5} />
+                <User size={20} strokeWidth={1.5} />
               </div>
             ) : (
               <Image
@@ -96,12 +82,26 @@ const MemberRow = ({
               />
             )}
           </div>
-          <div>
-            <p className="text-foreground">{getUserDisplayName(member)}</p>
-            {isInvitedUser === undefined && (
-              <p className="text-foreground-light">{member.primary_email}</p>
+          <div className="flex item-center gap-x-2">
+            {isInvitedUser === undefined ? (
+              <p className="text-foreground-light truncate">{member.primary_email}</p>
+            ) : (
+              <p className="text-foreground truncate">{getUserDisplayName(member)}</p>
             )}
+            {member.primary_email === profile?.primary_email && <Badge color="scale">You</Badge>}
           </div>
+
+          {(member.metadata as any)?.origin && (
+            <PartnerIcon
+              organization={{
+                managed_by:
+                  MEMBER_ORIGIN_TO_MANAGED_BY[
+                    (member.metadata as any).origin as keyof typeof MEMBER_ORIGIN_TO_MANAGED_BY
+                  ] ?? 'supabase',
+              }}
+              tooltipText="This user is managed by Vercel Marketplace."
+            />
+          )}
         </div>
       </Table.td>
 
@@ -113,112 +113,81 @@ const MemberRow = ({
         )}
       </Table.td>
 
-      {showMfaEnabledColumn && (
-        <Table.td>
-          <div className="flex items-center justify-center">
-            {member.mfa_enabled ? (
-              <IconCheck className="text-brand" strokeWidth={2} />
-            ) : (
-              <IconX className="text-foreground-light" strokeWidth={1.5} />
-            )}
-          </div>
-        </Table.td>
-      )}
-
       <Table.td>
+        <div className="flex items-center justify-center">
+          {member.mfa_enabled ? (
+            <Check className="text-brand" strokeWidth={2} size={20} />
+          ) : (
+            <X className="text-foreground-light" strokeWidth={1.5} size={20} />
+          )}
+        </div>
+      </Table.td>
+
+      <Table.td className="max-w-64">
         {isLoadingRoles ? (
-          <div className="w-[140px]">
-            <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
-          </div>
-        ) : role !== undefined ? (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="w-[140px]" asChild>
-              <div>
-                <Listbox
-                  className={disableRoleEdit ? 'pointer-events-none' : ''}
-                  disabled={disableRoleEdit}
-                  value={role.id}
-                  onChange={validateSelectedRoleToChange}
-                >
-                  {roles.map((r: any) => (
-                    <Listbox.Option
-                      key={r.id}
-                      value={r.id}
-                      label={r.name}
-                      disabled={disableRoleEdit}
-                      className="w-36"
-                    >
-                      {r.name}
-                    </Listbox.Option>
-                  ))}
-                </Listbox>
-              </div>
-            </Tooltip.Trigger>
-            {isInvitedUser ? (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                      'border border-background', //border
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      Role can only be changed after the user has accepted the invite
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            ) : !memberIsUser && !canRemoveRole ? (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                      'border border-background', //border
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to manage this team member
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            ) : (
-              <></>
-            )}
-          </Tooltip.Root>
+          <ShimmeringLoader className="w-32" />
+        ) : isObfuscated ? (
+          <Minus strokeWidth={1.5} size={20} />
         ) : (
-          <div className="flex items-center space-x-2">
-            <p className="text-sm text-foreground-light">Invalid role</p>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <IconAlertCircle size={16} strokeWidth={1.5} />
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                      'border border-background', //border
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      This user has an invalid role, please reach out to us via support
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          </div>
+          member.role_ids.map((id) => {
+            const orgScopedRole = (roles?.org_scoped_roles ?? []).find((role) => role.id === id)
+            const projectScopedRole = (roles?.project_scoped_roles ?? []).find(
+              (role) => role.id === id
+            )
+            const role = orgScopedRole || projectScopedRole
+            const roleName = (role?.name ?? '').split('_')[0]
+            const projectsApplied =
+              role?.project_ids === null
+                ? projects?.map((p) => p.name) ?? []
+                : (role?.project_ids ?? [])
+                    .map((id) => {
+                      return projects?.find((p) => p.id === id)?.name ?? ''
+                    })
+                    .filter((x) => x.length > 0)
+
+            return (
+              <div key={`role-${id}`} className="flex items-center gap-x-2">
+                <p>{roleName}</p>
+                {isOptedIntoProjectLevelPermissions && (
+                  <>
+                    <span>•</span>
+                    {projectsApplied.length === 1 ? (
+                      <span className="text-foreground truncate" title={projectsApplied[0]}>
+                        {projectsApplied[0]}
+                      </span>
+                    ) : (
+                      <Tooltip_Shadcn_>
+                        <TooltipTrigger_Shadcn_ asChild>
+                          <span className="text-foreground">
+                            {role?.project_ids === null
+                              ? 'Organization'
+                              : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
+                          </span>
+                        </TooltipTrigger_Shadcn_>
+                        {role?.project_ids !== null && projectsApplied.length > 1 && (
+                          <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
+                            {projectsApplied
+                              ?.slice(0, 2)
+                              .map((name) => <span key={name}>{name}</span>)}
+                            {projectsApplied.length > 2 && (
+                              <span>
+                                And {projectsApplied.length - 2} other project
+                                {projectsApplied.length > 4 ? 's' : ''}
+                              </span>
+                            )}
+                          </TooltipContent_Shadcn_>
+                        )}
+                      </Tooltip_Shadcn_>
+                    )}
+                  </>
+                )}
+              </div>
+            )
+          })
         )}
       </Table.td>
-      <Table.td>{!memberIsUser && <MemberActions member={member} roles={roles} />}</Table.td>
+
+      <Table.td>{!memberIsUser && <MemberActions member={member} />}</Table.td>
     </Table.tr>
   )
 }
-
-export default MemberRow

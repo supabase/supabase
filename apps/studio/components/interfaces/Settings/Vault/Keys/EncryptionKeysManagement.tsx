@@ -11,7 +11,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-delete-mutation'
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Alert,
   Button,
@@ -38,8 +38,6 @@ const EncryptionKeysManagement = () => {
   const [selectedSort, setSelectedSort] = useState<'name' | 'created'>('created')
   const [showAddKeyModal, setShowAddKeyModal] = useState(false)
   const [selectedKeyToRemove, setSelectedKeyToRemove] = useState<any>()
-  const [isDeletingKey, setIsDeletingKey] = useState(false)
-
   const canManageKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   useEffect(() => {
@@ -50,8 +48,18 @@ const EncryptionKeysManagement = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
-  const { mutateAsync: deleteKeyMutation } = usePgSodiumKeyDeleteMutation()
+  const { mutate: addKeyMutation, isLoading: isCreating } = usePgSodiumKeyCreateMutation({
+    onSuccess: () => {
+      toast.success('Successfully added new key')
+      setShowAddKeyModal(false)
+    },
+  })
+  const { mutate: deleteKeyMutation, isLoading: isDeleting } = usePgSodiumKeyDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted encryption key`)
+      setSelectedKeyToRemove(undefined)
+    },
+  })
 
   const allKeys = data || []
   const keys = sortBy(
@@ -74,38 +82,22 @@ const EncryptionKeysManagement = () => {
   const addKey = async (values: any, { setSubmitting }: any) => {
     if (!project) return console.error('Project is required')
 
-    setSubmitting(true)
-    const res = await addKeyMutation({
+    addKeyMutation({
       projectRef: project.ref,
       connectionString: project.connectionString,
       name: values.name,
     })
-    if (!res.error) {
-      toast.success('Successfully added new key')
-      setShowAddKeyModal(false)
-    } else {
-      toast.error(`Failed to add new key: ${res.error.message}`)
-    }
-    setSubmitting(false)
   }
 
   const confirmDeleteKey = async () => {
     if (!selectedKeyToRemove) return
     if (!project) return console.error('Project is required')
 
-    setIsDeletingKey(true)
-    const res = await deleteKeyMutation({
+    deleteKeyMutation({
       projectRef: project.ref,
       connectionString: project.connectionString,
       id: selectedKeyToRemove.id,
     })
-    if (!res.error) {
-      toast.success(`Successfully deleted encryption key`)
-      setSelectedKeyToRemove(undefined)
-    } else {
-      toast.error(`Failed to delete encryption key: ${res.error.message}`)
-    }
-    setIsDeletingKey(false)
   }
 
   return (
@@ -299,33 +291,29 @@ const EncryptionKeysManagement = () => {
         visible={selectedKeyToRemove !== undefined}
         onCancel={() => setSelectedKeyToRemove(undefined)}
         onConfirm={confirmDeleteKey}
-        loading={isDeletingKey}
-        header={<h5 className="text-sm text-foreground">Confirm to delete key</h5>}
+        loading={isDeleting}
+        header="Confirm to delete key"
       >
-        <div className="py-4">
-          <Modal.Content>
-            <div className="space-y-4">
-              <Alert
-                withIcon
-                variant="warning"
-                title="Deleting a key that's in use will cause any secret or column which depends on it to be unusable."
-              >
-                Do ensure that the key is not currently in use to prevent any issues.
-              </Alert>
-              <p className="text-sm">
-                The following key will be permanently removed and cannot be recovered.
-              </p>
-              <div className="space-y-2">
-                <p className="text-sm text-foreground">
-                  {selectedKeyToRemove?.name ?? DEFAULT_KEY_NAME}
-                </p>
-                <p className="text-xs text-foreground-light">
-                  <code className="!mx-0">ID: {selectedKeyToRemove?.id}</code>
-                </p>
-              </div>
-            </div>
-          </Modal.Content>
-        </div>
+        <Modal.Content className="space-y-4">
+          <Alert
+            withIcon
+            variant="warning"
+            title="Deleting a key that's in use will cause any secret or column which depends on it to be unusable."
+          >
+            Do ensure that the key is not currently in use to prevent any issues.
+          </Alert>
+          <p className="text-sm">
+            The following key will be permanently removed and cannot be recovered.
+          </p>
+          <div className="space-y-2">
+            <p className="text-sm text-foreground">
+              {selectedKeyToRemove?.name ?? DEFAULT_KEY_NAME}
+            </p>
+            <p className="text-xs text-foreground-light">
+              <code className="!mx-0">ID: {selectedKeyToRemove?.id}</code>
+            </p>
+          </div>
+        </Modal.Content>
       </Modal>
 
       <Modal
@@ -334,7 +322,7 @@ const EncryptionKeysManagement = () => {
         size="medium"
         visible={showAddKeyModal}
         onCancel={() => setShowAddKeyModal(false)}
-        header={<h5 className="text-sm text-foreground">Add a new key</h5>}
+        header="Add a new key"
       >
         <Form
           id="add-new-key-form"
@@ -347,33 +335,27 @@ const EncryptionKeysManagement = () => {
           }}
           onSubmit={addKey}
         >
-          {({ isSubmitting }: any) => {
+          {() => {
             return (
-              <div className="py-4">
-                <Modal.Content>
-                  <p className="text-sm mb-4">
-                    Provide a name for your key for easier identification.
-                  </p>
-                  <div className="space-y-4 pb-4">
-                    <Input id="name" label="Key Name" />
-                  </div>
+              <>
+                <Modal.Content className="space-y-4">
+                  <p className="text-sm">Provide a name for your key for easier identification.</p>
+                  <Input id="name" label="Key Name" />
                 </Modal.Content>
                 <Modal.Separator />
-                <Modal.Content>
-                  <div className="flex items-center justify-end space-x-2">
-                    <Button
-                      type="default"
-                      disabled={isSubmitting}
-                      onClick={() => setShowAddKeyModal(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
-                      Add key
-                    </Button>
-                  </div>
+                <Modal.Content className="flex items-center justify-end space-x-2">
+                  <Button
+                    type="default"
+                    disabled={isCreating}
+                    onClick={() => setShowAddKeyModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button htmlType="submit" disabled={isCreating} loading={isCreating}>
+                    Add key
+                  </Button>
                 </Modal.Content>
-              </div>
+              </>
             )
           }}
         </Form>

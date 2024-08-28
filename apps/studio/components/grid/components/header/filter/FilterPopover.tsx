@@ -1,13 +1,21 @@
-import { useUrlState } from 'hooks'
 import update from 'immutability-helper'
 import { isEqual } from 'lodash'
+import { FilterIcon, Plus } from 'lucide-react'
 import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
-import { Button, IconFilter, IconPlus, Popover } from 'ui'
 
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
+import { useUrlState } from 'hooks/ui/useUrlState'
+import {
+  Button,
+  PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+} from 'ui'
 import { FilterOperatorOptions } from './Filter.constants'
 import FilterRow from './FilterRow'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface FilterPopoverProps {
   table: SupaTable
@@ -16,38 +24,53 @@ export interface FilterPopoverProps {
 }
 
 const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
+  const [open, setOpen] = useState(false)
+  const snap = useTableEditorStateSnapshot()
+
   const btnText =
     (filters || []).length > 0
       ? `Filtered by ${filters.length} rule${filters.length > 1 ? 's' : ''}`
       : 'Filter'
 
+  const onApplyFilters = (appliedFilters: Filter[]) => {
+    snap.setEnforceExactCount(false)
+    setParams((prevParams) => {
+      return {
+        ...prevParams,
+        filter: appliedFilters.map((filter) => {
+          const selectedOperator = FilterOperatorOptions.find(
+            (option) => option.value === filter.operator
+          )
+
+          return `${filter.column}:${selectedOperator?.abbrev}:${filter.value}`
+        }),
+      }
+    })
+  }
+
   return (
-    <Popover
-      size="large"
-      align="start"
-      className="sb-grid-filter-popover"
-      overlay={<FilterOverlay table={table} filters={filters} setParams={setParams} />}
-    >
-      <Button
-        asChild
-        type={(filters || []).length > 0 ? 'link' : 'text'}
-        icon={
-          <div className="text-foreground-light">
-            <IconFilter strokeWidth={1.5} />
-          </div>
-        }
-      >
-        <span>{btnText}</span>
-      </Button>
-    </Popover>
+    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger_Shadcn_ asChild>
+        <Button type={(filters || []).length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
+          {btnText}
+        </Button>
+      </PopoverTrigger_Shadcn_>
+      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
+        <FilterOverlay table={table} filters={filters} onApplyFilters={onApplyFilters} />
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
   )
 }
 
 export default FilterPopover
 
-export interface FilterOverlayProps extends FilterPopoverProps {}
+interface FilterOverlayProps {
+  table: SupaTable
+  filters: string[]
+  onApplyFilters: (filter: Filter[]) => void
+}
 
-const FilterOverlay = ({ table, filters: filtersFromUrl, setParams }: FilterOverlayProps) => {
+const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: FilterOverlayProps) => {
   const initialFilters = useMemo(
     () => formatFilterURLParams((filtersFromUrl as string[]) ?? []),
     [filtersFromUrl]
@@ -87,25 +110,19 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, setParams }: FilterOver
     )
   }, [])
 
-  function onApplyFilter() {
-    setParams((prevParams) => {
-      return {
-        ...prevParams,
-        filter: filters.map((filter) => {
-          const selectedOperator = FilterOperatorOptions.find(
-            (option) => option.value === filter.operator
-          )
-
-          return `${filter.column}:${selectedOperator?.abbrev}:${filter.value}`
-        }),
-      }
+  const onSelectApplyFilters = () => {
+    // [Joshen] Trim empty spaces in input for only UUID type columns
+    const formattedFilters = filters.map((f) => {
+      const column = table.columns.find((c) => c.name === f.column)
+      if (column?.format === 'uuid') return { ...f, value: f.value.trim() }
+      else return f
     })
+    setFilters(formattedFilters)
+    onApplyFilters(formattedFilters)
   }
 
   function handleEnterKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') {
-      onApplyFilter()
-    }
+    if (event.key === 'Enter') onSelectApplyFilters()
   }
 
   return (
@@ -129,12 +146,16 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, setParams }: FilterOver
           </div>
         )}
       </div>
-      <Popover.Separator />
+      <PopoverSeparator_Shadcn_ />
       <div className="px-3 flex flex-row justify-between">
-        <Button icon={<IconPlus />} type="text" onClick={onAddFilter}>
+        <Button icon={<Plus />} type="text" onClick={onAddFilter}>
           Add filter
         </Button>
-        <Button disabled={isEqual(filters, initialFilters)} type="default" onClick={onApplyFilter}>
+        <Button
+          disabled={isEqual(filters, initialFilters)}
+          type="default"
+          onClick={() => onSelectApplyFilters()}
+        >
           Apply filter
         </Button>
       </div>

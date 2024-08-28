@@ -1,0 +1,7 @@
+graph TD;
+  InitS((Setup flow)) --> SAAL1[/Session is AAL1/] --> Enroll[Enroll API] --> ShowQR[Show QR code] --> Scan([User: Scan QR code in authenticator]) --> Enter([User: Enter code]) --> Verify[Challenge + Verify API] --> Check{{Is code correct?}}
+  Check -->|Yes| AAL2[/Upgrade to AAL2/] --> Done((Done))
+  Check -->|No| Enter
+  InitA((Login flow)) --> SignIn([User: Sign-in]) --> AAL1[/Upgrade to AAL1/] --> ListFactors[List Factors API]
+  ListFactors -->|1 or more factors| OpenAuth([User: Open authenticator]) --> Enter
+  ListFactors -->|0 factors| Setup[[Setup flow]]

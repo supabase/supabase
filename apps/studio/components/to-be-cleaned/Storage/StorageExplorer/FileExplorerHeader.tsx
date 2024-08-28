@@ -2,6 +2,12 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { compact, debounce, isEqual, noop } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import APIDocsButton from 'components/ui/APIDocsButton'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
   DropdownMenu,
@@ -26,12 +32,6 @@ import {
   IconX,
   Input,
 } from 'ui'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import APIDocsButton from 'components/ui/APIDocsButton'
-import { useCheckPermissions } from 'hooks'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 
 const VIEW_OPTIONS = [
@@ -78,7 +78,17 @@ const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: a
   )
 }
 
-const HeaderBreadcrumbs = ({ loading, isSearching, breadcrumbs, selectBreadcrumb }: any) => {
+const HeaderBreadcrumbs = ({
+  loading,
+  isSearching,
+  breadcrumbs,
+  selectBreadcrumb,
+}: {
+  loading: { isLoading: boolean; message: string }
+  isSearching: boolean
+  breadcrumbs: string[]
+  selectBreadcrumb: (i: number) => void
+}) => {
   // Max 5 crumbs, otherwise replace middle segment with ellipsis and only
   // have the first 2 and last 2 crumbs visible
   const ellipsis = '...'
@@ -106,7 +116,7 @@ const HeaderBreadcrumbs = ({ loading, isSearching, breadcrumbs, selectBreadcrumb
     </div>
   ) : (
     <div className={`ml-3 flex items-center ${isSearching && 'max-w-[140px] overflow-x-auto'}`}>
-      {formattedBreadcrumbs.map((crumb: any, idx: number) => (
+      {formattedBreadcrumbs.map((crumb, idx: number) => (
         <div className="flex items-center" key={crumb.name}>
           {idx !== 0 && <IconChevronRight size={10} strokeWidth={2} className="mx-3" />}
           <p
@@ -169,7 +179,7 @@ const FileExplorerHeader = ({
     selectedBucket,
   } = storageExplorerStore
 
-  const breadcrumbs = columns.map((column: any) => column.name)
+  const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
   const canUpdateStorage = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
@@ -225,7 +235,7 @@ const FileExplorerHeader = ({
     onSetPathByString(compact(pathString.split('/')))
   }
 
-  const onSetPathByString = async (paths: any[]) => {
+  const onSetPathByString = async (paths: string[]) => {
     if (paths.length === 0) {
       popColumnAtIndex(0)
       clearOpenedFolders()

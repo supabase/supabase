@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { Home, User } from 'icons'
 import { isUndefined } from 'lodash'
 import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
@@ -7,6 +6,15 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useFlag } from 'hooks/ui/useFlag'
+import { useSignOut } from 'lib/auth'
+import { IS_PLATFORM } from 'lib/constants'
+import { detectOS } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   DropdownMenu,
@@ -21,16 +29,9 @@ import {
   Separator,
   Theme,
   cn,
-  themes,
+  singleThemes,
 } from 'ui'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useSignOut } from 'lib/auth'
-import { IS_PLATFORM } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
@@ -40,6 +41,7 @@ import {
 } from './NavigationBar.utils'
 import { NavigationIconButton } from './NavigationIconButton'
 import NavigationIconLink from './NavigationIconLink'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -51,7 +53,7 @@ const NavigationBar = () => {
   const { project } = useProjectContext()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const { setIsOpen } = useCommandMenu()
+  const setCommandMenuOpen = useSetCommandMenuOpen()
   const snap = useAppStateSnapshot()
 
   const signOut = useSignOut()
@@ -72,6 +74,13 @@ const NavigationBar = () => {
     'realtime:all',
   ])
 
+  const { data } = useProjectLintsQuery({
+    projectRef: project?.ref,
+  })
+
+  const securityLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
+  const errorLints = securityLints.filter((lint) => lint.level === 'ERROR')
+
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project)
   const productRoutes = generateProductRoutes(projectRef, project, {
@@ -80,6 +89,7 @@ const NavigationBar = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
+  const showWarehouse = useFlag('warehouse')
 
   const otherRoutes = generateOtherRoutes(projectRef, project)
   const settingsRoutes = generateSettingsRoutes(projectRef, project)
@@ -97,7 +107,7 @@ const NavigationBar = () => {
         data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
         className={cn(
           'group py-2 z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
-          'border-r bg-studio border-default data-[state=expanded]:shadow-xl',
+          'border-r bg-dash-sidebar border-default data-[state=expanded]:shadow-xl',
           'transition-width duration-200',
           'hide-scrollbar flex flex-col justify-between overflow-y-auto'
         )}
@@ -106,7 +116,7 @@ const NavigationBar = () => {
           if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
         }}
       >
-        <ul className="flex flex-col gap-y-1 justify-start px-2">
+        <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
           {(!navLayoutV2 || !IS_PLATFORM) && (
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
@@ -148,6 +158,7 @@ const NavigationBar = () => {
               onClick={onCloseNavigationIconLink}
             />
           ))}
+
           <Separator className="my-1 bg-border-muted" />
           {otherRoutes.map((route) => {
             if (route.key === 'api' && isNewAPIDocsEnabled) {
@@ -162,6 +173,37 @@ const NavigationBar = () => {
                 >
                   Project API
                 </NavigationIconButton>
+              )
+            } else if (route.key === 'advisors') {
+              return (
+                <div className="relative" key={route.key}>
+                  {securityLints.length > 0 && (
+                    <div
+                      className={cn(
+                        'absolute flex h-2 w-2 left-6 top-2 z-10 rounded-full',
+                        errorLints.length > 0 ? 'bg-destructive-600' : 'bg-warning-600'
+                      )}
+                    />
+                  )}
+
+                  <NavigationIconLink
+                    route={route}
+                    isActive={activeRoute === route.key}
+                    onClick={onCloseNavigationIconLink}
+                  />
+                </div>
+              )
+            } else if (route.key === 'logs') {
+              // TODO: Undo this when warehouse flag is removed
+              const label = showWarehouse ? 'Logs & Analytics' : route.label
+              const newRoute = { ...route, label }
+              return (
+                <NavigationIconLink
+                  key={newRoute.key}
+                  route={newRoute}
+                  isActive={activeRoute === newRoute.key}
+                  onClick={onCloseNavigationIconLink}
+                />
               )
             } else {
               return (
@@ -190,11 +232,11 @@ const NavigationBar = () => {
             <NavigationIconButton
               size="tiny"
               onClick={() => {
-                setIsOpen(true)
+                setCommandMenuOpen(true)
                 snap.setNavigationPanelOpen(false)
               }}
               type="text"
-              icon={<Search size={ICON_SIZE} strokeWidth={2} />}
+              icon={<Search size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
               rightText={
                 <div
                   className={cn(
@@ -299,7 +341,7 @@ const NavigationBar = () => {
                   <DropdownMenuGroup>
                     <DropdownMenuItem className="flex gap-2" asChild>
                       <Link href="/account/me">
-                        <Settings size={14} strokeWidth={1.5} className="text-foreground-muted" />
+                        <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                         Account preferences
                       </Link>
                     </DropdownMenuItem>
@@ -308,7 +350,11 @@ const NavigationBar = () => {
                       onClick={() => snap.setShowFeaturePreviewModal(true)}
                       onSelect={() => snap.setShowFeaturePreviewModal(true)}
                     >
-                      <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-muted" />
+                      <FlaskConical
+                        size={14}
+                        strokeWidth={1.5}
+                        className="text-foreground-lighter"
+                      />
                       Feature previews
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -323,15 +369,11 @@ const NavigationBar = () => {
                     setTheme(value)
                   }}
                 >
-                  {themes
-                    .filter(
-                      (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
-                    )
-                    .map((theme: Theme) => (
-                      <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                        {theme.name}
-                      </DropdownMenuRadioItem>
-                    ))}
+                  {singleThemes.map((theme: Theme) => (
+                    <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                      {theme.name}
+                    </DropdownMenuRadioItem>
+                  ))}
                 </DropdownMenuRadioGroup>
               </DropdownMenuGroup>
               {IS_PLATFORM && (

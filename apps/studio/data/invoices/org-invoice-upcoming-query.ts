@@ -1,8 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { invoicesKeys } from './keys'
-import type { ResponseError } from 'types'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
+import { invoicesKeys } from './keys'
 
 export type UpcomingInvoiceVariables = {
   orgSlug?: string
@@ -49,7 +49,7 @@ export async function getUpcomingInvoice(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data as unknown as UpcomingInvoiceResponse
 }
 

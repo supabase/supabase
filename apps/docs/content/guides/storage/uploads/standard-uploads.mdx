@@ -45,6 +45,16 @@ async function uploadFile(file) {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+// Upload file using standard upload
+Future<void> uploadFile(File file) async {
+  await supabase.storage.from('bucket_name').upload('file_path', file);
+}
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -75,6 +85,13 @@ suspend fun uploadFile(file: File) {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket_name').upload('file_path', file)
+```
+
+</TabPanel>
 </Tabs>
 
 ## Overwriting files
@@ -101,6 +118,17 @@ await supabase.storage.from('bucket_name').upload('file_path', file, {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+await supabase.storage.from('bucket_name').upload(
+      'file_path',
+      file,
+      fileOptions: const FileOptions(upsert: true),
+    );
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -117,6 +145,15 @@ try await supabase.storage.from("bucket_name")
       upsert: true
     )
   )
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket_name').upload('file_path', file, {
+  'upsert': 'true',
+})
 ```
 
 </TabPanel>
@@ -148,6 +185,17 @@ await supabase.storage.from('bucket_name').upload('file_path', file, {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+await supabase.storage.from('bucket_name').upload(
+      'file_path',
+      file,
+      fileOptions: const FileOptions(contentType: 'image/jpeg'),
+    );
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -164,6 +212,15 @@ try await supabase.storage.from("bucket_name")
       contentType: "image/jpeg"
     )
   )
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket_name').upload('file_path', file, {
+  'content-type': 'image/jpeg',
+})
 ```
 
 </TabPanel>

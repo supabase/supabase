@@ -20,7 +20,7 @@ import {
 } from 'ui'
 import { z } from 'zod'
 import { Input } from '../DataInputs/Input'
-import { InfoTooltip } from '../InfoTooltip/InfoTooltip'
+import { InfoTooltip } from '../info-tooltip'
 import { FormItemLayout } from './FormItemLayout/FormItemLayout'
 
 /**
@@ -144,11 +144,7 @@ export const Page = () => {
               layout="flex"
             >
               <FormControl_Shadcn_>
-                <Switch
-                  placeholder="mildtomato"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl_Shadcn_>
             </FormItemLayout>
           )}

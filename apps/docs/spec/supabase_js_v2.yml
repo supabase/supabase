@@ -186,6 +186,7 @@ functions:
           - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
           - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
           - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
+
   - id: auth-api
     title: 'Overview'
     notes: |
@@ -247,6 +248,94 @@ functions:
             email: 'example@email.com',
             password: 'example-password',
           })
+          ```
+        response: |
+          ```json
+          // Some fields may be null if "confirm email" is enabled.
+          {
+            "data": {
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "email": "example@email.com",
+                "email_confirmed_at": "2024-01-01T00:00:00Z",
+                "phone": "",
+                "last_sign_in_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
+                },
+                "user_metadata": {},
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": false,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "example@email.com"
+                  }
+                ],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z"
+              },
+              "session": {
+                "access_token": "<ACCESS_TOKEN>",
+                "token_type": "bearer",
+                "expires_in": 3600,
+                "expires_at": 1700000000,
+                "refresh_token": "<REFRESH_TOKEN>",
+                "user": {
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "aud": "authenticated",
+                  "role": "authenticated",
+                  "email": "example@email.com",
+                  "email_confirmed_at": "2024-01-01T00:00:00Z",
+                  "phone": "",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "app_metadata": {
+                    "provider": "email",
+                    "providers": [
+                      "email"
+                    ]
+                  },
+                  "user_metadata": {},
+                  "identities": [
+                    {
+                      "identity_id": "22222222-2222-2222-2222-222222222222",
+                      "id": "11111111-1111-1111-1111-111111111111",
+                      "user_id": "11111111-1111-1111-1111-111111111111",
+                      "identity_data": {
+                        "email": "example@email.com",
+                        "email_verified": false,
+                        "phone_verified": false,
+                        "sub": "11111111-1111-1111-1111-111111111111"
+                      },
+                      "provider": "email",
+                      "last_sign_in_at": "2024-01-01T00:00:00Z",
+                      "created_at": "2024-01-01T00:00:00Z",
+                      "updated_at": "2024-01-01T00:00:00Z",
+                      "email": "example@email.com"
+                    }
+                  ],
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z"
+                }
+              }
+            },
+            "error": null
+          }
           ```
       - id: sign-up-phone
         name: Sign up with a phone number and password (SMS)
@@ -448,7 +537,7 @@ functions:
             const [session, setSession] = React.useState(null)
 
             React.useEffect(() => {
-              const subscription = supabase.auth.onAuthStateChange(
+              const {data: { subscription }} = supabase.auth.onAuthStateChange(
                 (event, session) => {
                   if (event === 'SIGNED_OUT') {
                     setSession(null)
@@ -524,6 +613,49 @@ functions:
             }
           });
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "email": "",
+                "phone": "",
+                "last_sign_in_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {},
+                "user_metadata": {},
+                "identities": [],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+                "is_anonymous": true
+              },
+              "session": {
+                "access_token": "<ACCESS_TOKEN>",
+                "token_type": "bearer",
+                "expires_in": 3600,
+                "expires_at": 1700000000,
+                "refresh_token": "<REFRESH_TOKEN>",
+                "user": {
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "aud": "authenticated",
+                  "role": "authenticated",
+                  "email": "",
+                  "phone": "",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "app_metadata": {},
+                  "user_metadata": {},
+                  "identities": [],
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "is_anonymous": true
+                }
+              }
+            },
+            "error": null
+          }
+          ```
       - id: sign-in-anonymously-with-user-metadata
         name: Create an anonymous user with custom user metadata
         isSpotlight: false
@@ -552,6 +684,93 @@ functions:
             password: 'example-password',
           })
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "email": "example@email.com",
+                "email_confirmed_at": "2024-01-01T00:00:00Z",
+                "phone": "",
+                "last_sign_in_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
+                },
+                "user_metadata": {},
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": false,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "example@email.com"
+                  }
+                ],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z"
+              },
+              "session": {
+                "access_token": "<ACCESS_TOKEN>",
+                "token_type": "bearer",
+                "expires_in": 3600,
+                "expires_at": 1700000000,
+                "refresh_token": "<REFRESH_TOKEN>",
+                "user": {
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "aud": "authenticated",
+                  "role": "authenticated",
+                  "email": "example@email.com",
+                  "email_confirmed_at": "2024-01-01T00:00:00Z",
+                  "phone": "",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "app_metadata": {
+                    "provider": "email",
+                    "providers": [
+                      "email"
+                    ]
+                  },
+                  "user_metadata": {},
+                  "identities": [
+                    {
+                      "identity_id": "22222222-2222-2222-2222-222222222222",
+                      "id": "11111111-1111-1111-1111-111111111111",
+                      "user_id": "11111111-1111-1111-1111-111111111111",
+                      "identity_data": {
+                        "email": "example@email.com",
+                        "email_verified": false,
+                        "phone_verified": false,
+                        "sub": "11111111-1111-1111-1111-111111111111"
+                      },
+                      "provider": "email",
+                      "last_sign_in_at": "2024-01-01T00:00:00Z",
+                      "created_at": "2024-01-01T00:00:00Z",
+                      "updated_at": "2024-01-01T00:00:00Z",
+                      "email": "example@email.com"
+                    }
+                  ],
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z"
+                }
+              }
+            },
+            "error": null
+          }
+          ```
       - id: sign-in-with-phone-and-password
         name: Sign in with phone and password
         isSpotlight: false
@@ -574,7 +793,7 @@ functions:
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
-      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login/twilio) for details about configuring WhatsApp sign in.
+      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login?showSmsProvider=Twilio) for details about configuring WhatsApp sign in.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -588,6 +807,16 @@ functions:
               emailRedirectTo: 'https://example.com/welcome'
             }
           })
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "user": null,
+              "session": null
+            },
+            "error": null
+          }
           ```
       - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP
@@ -627,6 +856,16 @@ functions:
           const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'github'
           })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              provider: 'github',
+              url: <PROVIDER_URL_TO_REDIRECT_TO>
+            },
+            error: null
+          }
           ```
       - id: sign-in-using-a-third-party-provider-with-redirect
         name: Sign in using a third-party provider with redirect
@@ -695,6 +934,61 @@ functions:
             token: 'your-id-token'
           })
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "last_sign_in_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {
+                  ...
+                },
+                "user_metadata": {
+                  ...
+                },
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "provider": "google",
+                  }
+                ],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+              },
+              "session": {
+                "access_token": "<ACCESS_TOKEN>",
+                "token_type": "bearer",
+                "expires_in": 3600,
+                "expires_at": 1700000000,
+                "refresh_token": "<REFRESH_TOKEN>",
+                "user": {
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "aud": "authenticated",
+                  "role": "authenticated",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "app_metadata": {
+                    ...
+                  },
+                  "user_metadata": {
+                    ...
+                  },
+                  "identities": [
+                    {
+                      "identity_id": "22222222-2222-2222-2222-222222222222",
+                      "provider": "google",
+                    }
+                  ],
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                }
+              }
+            },
+            "error": null
+          }
+          ```
   - id: sign-in-with-sso
     title: 'signInWithSSO()'
     $ref: '@supabase/auth-js.GoTrueClient.signInWithSSO'
@@ -762,19 +1056,122 @@ functions:
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
       - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in. You may wish to use the hash with Magic Links for the PKCE flow for Server Side Auth. See [this guide](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr) for more details.
     examples:
-      - id: verify-sms-one-time-password(otp)
-        name: Verify Sms One-Time Password (OTP)
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms'})
-          ```
       - id: verify-signup-one-time-password(otp)
         name: Verify Signup One-Time Password (OTP)
         isSpotlight: false
         code: |
           ```js
           const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email'})
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "email": "example@email.com",
+                "email_confirmed_at": "2024-01-01T00:00:00Z",
+                "phone": "",
+                "confirmed_at": "2024-01-01T00:00:00Z",
+                "recovery_sent_at": "2024-01-01T00:00:00Z",
+                "last_sign_in_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
+                },
+                "user_metadata": {
+                  "email": "example@email.com",
+                  "email_verified": false,
+                  "phone_verified": false,
+                  "sub": "11111111-1111-1111-1111-111111111111"
+                },
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": false,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "example@email.com"
+                  }
+                ],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+                "is_anonymous": false
+              },
+              "session": {
+                "access_token": "<ACCESS_TOKEN>",
+                "token_type": "bearer",
+                "expires_in": 3600,
+                "expires_at": 1700000000,
+                "refresh_token": "<REFRESH_TOKEN>",
+                "user": {
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "aud": "authenticated",
+                  "role": "authenticated",
+                  "email": "example@email.com",
+                  "email_confirmed_at": "2024-01-01T00:00:00Z",
+                  "phone": "",
+                  "confirmed_at": "2024-01-01T00:00:00Z",
+                  "recovery_sent_at": "2024-01-01T00:00:00Z",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "app_metadata": {
+                    "provider": "email",
+                    "providers": [
+                      "email"
+                    ]
+                  },
+                  "user_metadata": {
+                    "email": "example@email.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "identities": [
+                    {
+                      "identity_id": "22222222-2222-2222-2222-222222222222",
+                      "id": "11111111-1111-1111-1111-111111111111",
+                      "user_id": "11111111-1111-1111-1111-111111111111",
+                      "identity_data": {
+                        "email": "example@email.com",
+                        "email_verified": false,
+                        "phone_verified": false,
+                        "sub": "11111111-1111-1111-1111-111111111111"
+                      },
+                      "provider": "email",
+                      "last_sign_in_at": "2024-01-01T00:00:00Z",
+                      "created_at": "2024-01-01T00:00:00Z",
+                      "updated_at": "2024-01-01T00:00:00Z",
+                      "email": "example@email.com"
+                    }
+                  ],
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "is_anonymous": false
+                }
+              }
+            },
+            "error": null
+          }
+          ```
+      - id: verify-sms-one-time-password(otp)
+        name: Verify Sms One-Time Password (OTP)
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms'})
           ```
       - id: verify-email-auth(tokenhash)
         name: Verify Email Auth (Token Hash)
@@ -798,6 +1195,63 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.getSession()
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "session": {
+                "access_token": "<ACCESS_TOKEN>",
+                "token_type": "bearer",
+                "expires_in": 3600,
+                "expires_at": 1700000000,
+                "refresh_token": "<REFRESH_TOKEN>",
+                "user": {
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "aud": "authenticated",
+                  "role": "authenticated",
+                  "email": "example@email.com",
+                  "email_confirmed_at": "2024-01-01T00:00:00Z",
+                  "phone": "",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "app_metadata": {
+                    "provider": "email",
+                    "providers": [
+                      "email"
+                    ]
+                  },
+                  "user_metadata": {
+                    "email": "example@email.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "identities": [
+                    {
+                      "identity_id": "22222222-2222-2222-2222-222222222222",
+                      "id": "11111111-1111-1111-1111-111111111111",
+                      "user_id": "11111111-1111-1111-1111-111111111111",
+                      "identity_data": {
+                        "email": "example@email.com",
+                        "email_verified": false,
+                        "phone_verified": false,
+                        "sub": "11111111-1111-1111-1111-111111111111"
+                      },
+                      "provider": "email",
+                      "last_sign_in_at": "2024-01-01T00:00:00Z",
+                      "created_at": "2024-01-01T00:00:00Z",
+                      "updated_at": "2024-01-01T00:00:00Z",
+                      "email": "example@email.com"
+                    }
+                  ],
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "is_anonymous": false
+                }
+              }
+            },
+            "error": null
+          }
           ```
   - id: start-auto-refresh
     title: 'startAutoRefresh()'
@@ -864,6 +1318,57 @@ functions:
           ```js
           const { data: { user } } = await supabase.auth.getUser()
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "email": "example@email.com",
+                "email_confirmed_at": "2024-01-01T00:00:00Z",
+                "phone": "",
+                "confirmed_at": "2024-01-01T00:00:00Z",
+                "last_sign_in_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
+                },
+                "user_metadata": {
+                  "email": "example@email.com",
+                  "email_verified": false,
+                  "phone_verified": false,
+                  "sub": "11111111-1111-1111-1111-111111111111"
+                },
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": false,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "example@email.com"
+                  }
+                ],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+                "is_anonymous": false
+              }
+            },
+            "error": null
+          }
+          ```
       - id: get-the-logged-in-user-with-a-custom-access-token-jwt
         name: Get the logged in user with a custom access token jwt
         isSpotlight: false
@@ -889,6 +1394,59 @@ functions:
           const { data, error } = await supabase.auth.updateUser({
             email: 'new@email.com'
           })
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "email": "example@email.com",
+                "email_confirmed_at": "2024-01-01T00:00:00Z",
+                "phone": "",
+                "confirmed_at": "2024-01-01T00:00:00Z",
+                "new_email": "new@email.com",
+                "email_change_sent_at": "2024-01-01T00:00:00Z",
+                "last_sign_in_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
+                },
+                "user_metadata": {
+                  "email": "example@email.com",
+                  "email_verified": false,
+                  "phone_verified": false,
+                  "sub": "11111111-1111-1111-1111-111111111111"
+                },
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": false,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "example@email.com"
+                  }
+                ],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+                "is_anonymous": false
+              }
+            },
+            "error": null
+          }
           ```
       - id: update-the-phone-for-an-authenticated-user
         name: Update the phone number for an authenticated user
@@ -943,6 +1501,32 @@ functions:
           ```js
           const { data, error } = await supabase.auth.getUserIdentities()
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "id": "2024-01-01T00:00:00Z",
+                  "user_id": "2024-01-01T00:00:00Z",
+                  "identity_data": {
+                    "email": "example@email.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "provider": "email",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "example@email.com"
+                }
+              ]
+            },
+            "error": null
+          }
+          ```
   - id: link-identity
     title: 'linkIdentity()'
     $ref: '@supabase/auth-js.GoTrueClient.linkIdentity'
@@ -950,13 +1534,26 @@ functions:
       - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
       - The user needs to be signed in to call `linkIdentity()`.
       - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
+      - If `linkIdentity` is run in the browser, the user is automatically redirected to the returned URL. On the server, you should handle the redirect.
     examples:
       - id: link-identity
         name: Link an identity to a user
         isSpotlight: true
         code: |
           ```js
-          const { data, error } = await supabase.auth.linkIdentity()
+          const { data, error } = await supabase.auth.linkIdentity({
+            provider: 'github'
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              provider: 'github',
+              url: <PROVIDER_URL_TO_REDIRECT_TO>
+            },
+            error: null
+          }
           ```
   - id: unlink-identity
     title: 'unlinkIdentity()'
@@ -981,7 +1578,7 @@ functions:
           )
 
           // unlink the google identity
-          const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
+          const { error } = await supabase.auth.unlinkIdentity(googleIdentity)
           ```
   - id: send-password-reauthentication
     title: 'reauthenticate()'
@@ -998,7 +1595,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data, error } = await supabase.auth.reauthenticate()
+          const { error } = await supabase.auth.reauthenticate()
           ```
   - id: resend-email-or-phone-otps
     title: 'resend()'
@@ -1016,7 +1613,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data, error } = await supabase.auth.resend({
+          const { error } = await supabase.auth.resend({
             type: 'signup',
             email: 'email@example.com',
             options: {
@@ -1029,7 +1626,7 @@ functions:
         description: Resends the phone signup confirmation email to the user
         code: |
           ```js
-          const { data, error } = await supabase.auth.resend({
+          const { error } = await supabase.auth.resend({
             type: 'sms',
             phone: '1234567890'
           })
@@ -1039,7 +1636,7 @@ functions:
         description: Resends the email change email to the user
         code: |
           ```js
-          const { data, error } = await supabase.auth.resend({
+          const { error } = await supabase.auth.resend({
             type: 'email_change',
             email: 'email@example.com'
           })
@@ -1049,7 +1646,7 @@ functions:
         description: Resends the phone change OTP to the user
         code: |
           ```js
-          const { data, error } = await supabase.auth.resend({
+          const { error } = await supabase.auth.resend({
             type: 'phone_change',
             phone: '1234567890'
           })
@@ -1058,14 +1655,12 @@ functions:
     title: 'setSession()'
     $ref: '@supabase/auth-js.GoTrueClient.setSession'
     notes: |
-      - `setSession()` takes in a refresh token and uses it to get a new session.
-      - The refresh token can only be used once to obtain a new session.
-      - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
-      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - This method sets the session using an `access_token` and `refresh_token`.
+      - If successful, a `SIGNED_IN` event is emitted.
     examples:
-      - id: refresh-the-session
-        name: Refresh the session
-        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+      - id: set-the-session
+        name: Set the session
+        description: Sets the session data from an access_token and refresh_token, then returns an auth response or error.
         isSpotlight: true
         code: |
           ```js
@@ -1073,6 +1668,107 @@ functions:
               access_token,
               refresh_token
             })
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "email": "example@email.com",
+                "email_confirmed_at": "2024-01-01T00:00:00Z",
+                "phone": "",
+                "confirmed_at": "2024-01-01T00:00:00Z",
+                "last_sign_in_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
+                },
+                "user_metadata": {
+                  "email": "example@email.com",
+                  "email_verified": false,
+                  "phone_verified": false,
+                  "sub": "11111111-1111-1111-1111-111111111111"
+                },
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": false,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "example@email.com"
+                  }
+                ],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+                "is_anonymous": false
+              },
+              "session": {
+                "access_token": "<ACCESS_TOKEN>",
+                "refresh_token": "<REFRESH_TOKEN>",
+                "user": {
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "aud": "authenticated",
+                  "role": "authenticated",
+                  "email": "example@email.com",
+                  "email_confirmed_at": "2024-01-01T00:00:00Z",
+                  "phone": "",
+                  "confirmed_at": "2024-01-01T00:00:00Z",
+                  "last_sign_in_at": "11111111-1111-1111-1111-111111111111",
+                  "app_metadata": {
+                    "provider": "email",
+                    "providers": [
+                      "email"
+                    ]
+                  },
+                  "user_metadata": {
+                    "email": "example@email.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "identities": [
+                    {
+                      "identity_id": "2024-01-01T00:00:00Z",
+                      "id": "11111111-1111-1111-1111-111111111111",
+                      "user_id": "11111111-1111-1111-1111-111111111111",
+                      "identity_data": {
+                        "email": "example@email.com",
+                        "email_verified": false,
+                        "phone_verified": false,
+                        "sub": "11111111-1111-1111-1111-111111111111"
+                      },
+                      "provider": "email",
+                      "last_sign_in_at": "2024-01-01T00:00:00Z",
+                      "created_at": "2024-01-01T00:00:00Z",
+                      "updated_at": "2024-01-01T00:00:00Z",
+                      "email": "example@email.com"
+                    }
+                  ],
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "is_anonymous": false
+                },
+                "token_type": "bearer",
+                "expires_in": 3500,
+                "expires_at": 1700000000
+              }
+            },
+            "error": null
+          }
           ```
   - id: refresh-session
     title: 'refreshSession()'
@@ -1087,6 +1783,107 @@ functions:
           ```js
           const { data, error } = await supabase.auth.refreshSession()
           const { session, user } = data
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "email": "example@email.com",
+                "email_confirmed_at": "2024-01-01T00:00:00Z",
+                "phone": "",
+                "confirmed_at": "2024-01-01T00:00:00Z",
+                "last_sign_in_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
+                },
+                "user_metadata": {
+                  "email": "example@email.com",
+                  "email_verified": false,
+                  "phone_verified": false,
+                  "sub": "11111111-1111-1111-1111-111111111111"
+                },
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": false,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "example@email.com"
+                  }
+                ],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+                "is_anonymous": false
+              },
+              "session": {
+                "access_token": "<ACCESS_TOKEN>",
+                "token_type": "bearer",
+                "expires_in": 3600,
+                "expires_at": 1700000000,
+                "refresh_token": "<REFRESH_TOKEN>",
+                "user": {
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "aud": "authenticated",
+                  "role": "authenticated",
+                  "email": "example@email.com",
+                  "email_confirmed_at": "2024-01-01T00:00:00Z",
+                  "phone": "",
+                  "confirmed_at": "2024-01-01T00:00:00Z",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "app_metadata": {
+                    "provider": "email",
+                    "providers": [
+                      "email"
+                    ]
+                  },
+                  "user_metadata": {
+                    "email": "example@email.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "identities": [
+                    {
+                      "identity_id": "22222222-2222-2222-2222-222222222222",
+                      "id": "11111111-1111-1111-1111-111111111111",
+                      "user_id": "11111111-1111-1111-1111-111111111111",
+                      "identity_data": {
+                        "email": "example@email.com",
+                        "email_verified": false,
+                        "phone_verified": false,
+                        "sub": "11111111-1111-1111-1111-111111111111"
+                      },
+                      "provider": "email",
+                      "last_sign_in_at": "2024-01-01T00:00:00Z",
+                      "created_at": "2024-01-01T00:00:00Z",
+                      "updated_at": "2024-01-01T00:00:00Z",
+                      "email": "example@email.com"
+                    }
+                  ],
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "is_anonymous": false
+                }
+              }
+            },
+            "error": null
+          }
           ```
       - id: refresh-session-using-a-passed-in-session
         name: Refresh session using a refresh token
@@ -1110,26 +1907,183 @@ functions:
           ```js
           supabase.auth.exchangeCodeForSession('34e770dd-9ff9-416c-87fa-43b31d7ef225')
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              session: {
+                access_token: '<ACCESS_TOKEN>',
+                token_type: 'bearer',
+                expires_in: 3600,
+                expires_at: 1700000000,
+                refresh_token: '<REFRESH_TOKEN>',
+                user: {
+                  id: '11111111-1111-1111-1111-111111111111',
+                  aud: 'authenticated',
+                  role: 'authenticated',
+                  email: 'example@email.com'
+                  email_confirmed_at: '2024-01-01T00:00:00Z',
+                  phone: '',
+                  confirmation_sent_at: '2024-01-01T00:00:00Z',
+                  confirmed_at: '2024-01-01T00:00:00Z',
+                  last_sign_in_at: '2024-01-01T00:00:00Z',
+                  app_metadata: {
+                    "provider": "email",
+                    "providers": [
+                      "email",
+                      "<OTHER_PROVIDER>"
+                    ]
+                  },
+                  user_metadata: {
+                    email: 'email@email.com',
+                    email_verified: true,
+                    full_name: 'User Name',
+                    iss: '<ISS>',
+                    name: 'User Name',
+                    phone_verified: false,
+                    provider_id: '<PROVIDER_ID>',
+                    sub: '<SUB>'
+                  },
+                  identities: [
+                    {
+                      "identity_id": "22222222-2222-2222-2222-222222222222",
+                      "id": "11111111-1111-1111-1111-111111111111",
+                      "user_id": "11111111-1111-1111-1111-111111111111",
+                      "identity_data": {
+                        "email": "example@email.com",
+                        "email_verified": false,
+                        "phone_verified": false,
+                        "sub": "11111111-1111-1111-1111-111111111111"
+                      },
+                      "provider": "email",
+                      "last_sign_in_at": "2024-01-01T00:00:00Z",
+                      "created_at": "2024-01-01T00:00:00Z",
+                      "updated_at": "2024-01-01T00:00:00Z",
+                      "email": "email@example.com"
+                    },
+                    {
+                      "identity_id": "33333333-3333-3333-3333-333333333333",
+                      "id": "<ID>",
+                      "user_id": "<USER_ID>",
+                      "identity_data": {
+                        "email": "example@email.com",
+                        "email_verified": true,
+                        "full_name": "User Name",
+                        "iss": "<ISS>",
+                        "name": "User Name",
+                        "phone_verified": false,
+                        "provider_id": "<PROVIDER_ID>",
+                        "sub": "<SUB>"
+                      },
+                      "provider": "<PROVIDER>",
+                      "last_sign_in_at": "2024-01-01T00:00:00Z",
+                      "created_at": "2024-01-01T00:00:00Z",
+                      "updated_at": "2024-01-01T00:00:00Z",
+                      "email": "example@email.com"
+                    }
+                  ],
+                  created_at: '2024-01-01T00:00:00Z',
+                  updated_at: '2024-01-01T00:00:00Z',
+                  is_anonymous: false
+                },
+                provider_token: '<PROVIDER_TOKEN>',
+                provider_refresh_token: '<PROVIDER_REFRESH_TOKEN>'
+              },
+              user: {
+                id: '11111111-1111-1111-1111-111111111111',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'example@email.com',
+                email_confirmed_at: '2024-01-01T00:00:00Z',
+                phone: '',
+                confirmation_sent_at: '2024-01-01T00:00:00Z',
+                confirmed_at: '2024-01-01T00:00:00Z',
+                last_sign_in_at: '2024-01-01T00:00:00Z',
+                app_metadata: {
+                  provider: 'email',
+                  providers: [
+                    "email",
+                    "<OTHER_PROVIDER>"
+                  ]        
+                },
+                user_metadata: {
+                  email: 'email@email.com',
+                  email_verified: true,
+                  full_name: 'User Name',
+                  iss: '<ISS>',
+                  name: 'User Name',
+                  phone_verified: false,
+                  provider_id: '<PROVIDER_ID>',
+                  sub: '<SUB>'
+                },
+                identities: [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": false,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "email@example.com"
+                  },
+                  {
+                    "identity_id": "33333333-3333-3333-3333-333333333333",
+                    "id": "<ID>",
+                    "user_id": "<USER_ID>",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": true,
+                      "full_name": "User Name",
+                      "iss": "<ISS>",
+                      "name": "User Name",
+                      "phone_verified": false,
+                      "provider_id": "<PROVIDER_ID>",
+                      "sub": "<SUB>"
+                    },
+                    "provider": "<PROVIDER>",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "example@email.com"
+                  }
+                ],
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z',
+                is_anonymous: false
+              },
+              redirectType: null
+            },
+            "error": null
+          }
+          ```
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
       This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
-      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+      Currently, there is support for time-based one-time password (TOTP) and phone verification code as the 2nd factor. Recovery codes are not supported but users can enroll multiple factors, with an upper limit of 10.
 
-      Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
+      Having a 2nd factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup factor.
   - id: mfa-enroll
     title: 'mfa.enroll()'
     $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'
     notes: |
-      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - Use `totp` or `phone` as the `factorType` and use the returned `id` to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
-      - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/javascript/auth-mfa-challengeandverify).
-      - To generate a QR code for the `totp` secret in nextjs, you can do the following:
+      - To create and verify a TOTP challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/javascript/auth-mfa-challengeandverify).
+      - To generate a QR code for the `totp` secret in Next.js, you can do the following:
       ```html
       <Image src={data.totp.qr_code} alt={data.totp.uri} layout="fill"></Image>
       ```
+      - The `challenge` and `verify` steps are separated when using Phone factors as the user will need time to receive and input the code obtained from the SMS in challenge.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
@@ -1145,6 +2099,51 @@ functions:
           // The challenge can be verified by entering the code generated from the authenticator app.
           // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
           const { id, type, totp: { qr_code, secret, uri }, friendly_name } = data
+          const challenge = await supabase.auth.mfa.challenge({ factorId: id });
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'totp'
+              totp: {
+                qr_code: '<QR_CODE_AS_SVG_DATA>',
+                secret: '<SECRET>',
+                uri: '<URI>',
+              }
+              friendly_name?: 'Important app'
+            },
+            error: null
+          }
+          ```
+      - id: enroll-phone-factor
+        name: Enroll a Phone Factor
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.enroll({
+            factorType: 'phone',
+            friendlyName: 'your_friendly_name',
+            phone: '+12345678',
+          })
+
+          // Use the id to create a challenge and send an SMS with a code to the user.
+          const { id, type, friendly_name, phone } = data
+
+          const challenge = await supabase.auth.mfa.challenge({ factorId: id });
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'phone',
+              friendly_name?: 'Important app',
+              phone: '+5787123456'
+            },
+            error: null
+          }
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
@@ -1152,6 +2151,7 @@ functions:
     notes: |
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
+      - A phone factor sends a code to the user upon challenge. The channel defaults to `sms` unless otherwise specified.
     examples:
       - id: create-mfa-challenge
         name: Create a challenge for a factor
@@ -1161,6 +2161,57 @@ functions:
           const { data, error } = await supabase.auth.mfa.challenge({
             factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225'
           })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'totp',
+              expires_at: 1700000000
+            },
+            error: null
+          }
+          ```
+      - id: create-mfa-phone-challenge
+        name: Create a challenge for a phone factor
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'phone',
+              expires_at: 1700000000
+            },
+            error: null
+          }
+          ```
+      - id: create-mfa-phone-challenge-whatsapp
+        name: Create a challenge for a phone factor (WhatsApp)
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            channel: 'whatsapp',
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              expires_at: 1700000000
+            },
+            error: null
+          }
           ```
   - id: mfa-verify
     title: 'mfa.verify()'
@@ -1179,10 +2230,70 @@ functions:
             code: '123456'
           })
           ```
+        response: |
+          ```json
+          {
+            data: {
+              access_token: '<ACCESS_TOKEN>',
+              token_type: 'Bearer',
+              expires_in: 3600,
+              refresh_token: '<REFRESH_TOKEN>',
+              user: {
+                id: '11111111-1111-1111-1111-111111111111',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'example@email.com',
+                email_confirmed_at: '2024-01-01T00:00:00Z',
+                phone: '',
+                confirmation_sent_at: '2024-01-01T00:00:00Z',
+                confirmed_at: '2024-01-01T00:00:00Z',
+                last_sign_in_at: '2024-01-01T00:00:00Z',
+                app_metadata: {
+                  provider: 'email',
+                  providers: [
+                    "email",
+                  ]        
+                },
+                user_metadata: {},
+                identities: [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": true,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "email@example.com"
+                  },
+                ],
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z',
+                is_anonymous: false,
+                factors: [
+                  "id": '<ID>',
+                  "friendly_name": 'Important Auth App',
+                  "factor_type": 'totp',
+                  "status": 'verified',
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z"
+                ]
+              }
+            }
+            error: null
+          }
+          ```
   - id: mfa-challenge-and-verify
     title: 'mfa.challengeAndVerify()'
     $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
+      - Intended for use with only TOTP factors.
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
       - Executes [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify) in a single step.
     examples:
@@ -1195,6 +2306,65 @@ functions:
             factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
             code: '123456'
           })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              access_token: '<ACCESS_TOKEN>',
+              token_type: 'Bearer',
+              expires_in: 3600,
+              refresh_token: '<REFRESH_TOKEN>',
+              user: {
+                id: '11111111-1111-1111-1111-111111111111',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'example@email.com',
+                email_confirmed_at: '2024-01-01T00:00:00Z',
+                phone: '',
+                confirmation_sent_at: '2024-01-01T00:00:00Z',
+                confirmed_at: '2024-01-01T00:00:00Z',
+                last_sign_in_at: '2024-01-01T00:00:00Z',
+                app_metadata: {
+                  provider: 'email',
+                  providers: [
+                    "email",
+                  ]        
+                },
+                user_metadata: {},
+                identities: [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": true,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "email@example.com"
+                  },
+                ],
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z',
+                is_anonymous: false,
+                factors: [
+                  "id": '<ID>',
+                  "friendly_name": 'Important Auth App',
+                  "factor_type": 'totp',
+                  "status": 'verified',
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z"
+                ]
+              }
+            }
+            error: null
+          }
           ```
   - id: mfa-unenroll
     title: 'mfa.unenroll()'
@@ -1209,12 +2379,21 @@ functions:
             factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
           })
           ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<FACTOR_ID>'
+            },
+            error: null
+          }
+          ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.getAuthenticatorAssuranceLevel()'
     $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
-      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
+      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP) or Phone factor.
       - If the user has a verified factor, the `nextLevel` field will return `aal2`, else, it will return `aal1`.
     examples:
       - id: get-aal
@@ -1224,6 +2403,22 @@ functions:
           ```js
           const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
           const { currentLevel, nextLevel, currentAuthenticationMethods } = data
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              currentLevel: 'aal1',
+              nextLevel: 'aal2',
+              currentAuthenticationMethods: [
+                {
+                  method: 'password',
+                  timestamp: 1700000000
+                }
+              ]
+            }
+            error: null
+          }
           ```
   - id: admin-api
     title: 'Overview'
@@ -1262,6 +2457,48 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.admin.getUserById(1)
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              user: {
+                id: '1',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'example@email.com',
+                email_confirmed_at: '2024-01-01T00:00:00Z',
+                phone: '',
+                confirmation_sent_at: '2024-01-01T00:00:00Z',
+                confirmed_at: '2024-01-01T00:00:00Z',
+                last_sign_in_at: '2024-01-01T00:00:00Z',
+                app_metadata: {},
+                user_metadata: {},
+                identities: [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "1",
+                    "user_id": "1",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": true,
+                      "phone_verified": false,
+                      "sub": "1"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "email@example.com"
+                  },
+                ],
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z',
+                is_anonymous: false,
+              }
+            }
+            error: null
+          }
           ```
 
   - id: list-users
@@ -1306,6 +2543,48 @@ functions:
             user_metadata: { name: 'Yoda' }
           })
           ```
+        response: |
+          ```json
+          {
+            data: {
+              user: {
+                id: '1',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'example@email.com',
+                email_confirmed_at: '2024-01-01T00:00:00Z',
+                phone: '',
+                confirmation_sent_at: '2024-01-01T00:00:00Z',
+                confirmed_at: '2024-01-01T00:00:00Z',
+                last_sign_in_at: '2024-01-01T00:00:00Z',
+                app_metadata: {},
+                user_metadata: {},
+                identities: [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "1",
+                    "user_id": "1",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": true,
+                      "phone_verified": false,
+                      "sub": "1"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "email@example.com"
+                  },
+                ],
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z',
+                is_anonymous: false,
+              }
+            }
+            error: null
+          }
+          ```
       - id: auto-confirm-the-users-email
         name: Auto-confirm the user's email
         code: |
@@ -1339,7 +2618,15 @@ functions:
             '715ed5db-f090-4b8c-a067-640ecee36aa0'
           )
           ```
-
+        response: |
+          ```json
+          {
+            "data": {
+              "user": {}
+            },
+            "error": null
+          }
+          ```
   - id: invite-user-by-email
     title: 'inviteUserByEmail()'
     $ref: '@supabase/auth-js.GoTrueAdminApi.inviteUserByEmail'
@@ -1354,6 +2641,51 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.admin.inviteUserByEmail('email@example.com')
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "email": "example@email.com",
+                "invited_at": "2024-01-01T00:00:00Z",
+                "phone": "",
+                "confirmation_sent_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
+                },
+                "user_metadata": {},
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": false,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "example@email.com"
+                  }
+                ],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+                "is_anonymous": false
+              }
+            },
+            "error": null
+          }
           ```
 
   - id: reset-password-for-email
@@ -1383,6 +2715,13 @@ functions:
           const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
             redirectTo: 'https://example.com/update-password',
           })
+          ```
+        response: |
+          ```json
+          {
+            data: {}
+            error: null
+          }
           ```
       - id: reset-password-react
         name: Reset password (React)
@@ -1421,6 +2760,35 @@ functions:
       - The following types can be passed into `generateLink()`: `signup`, `magiclink`, `invite`, `recovery`, `email_change_current`, `email_change_new`, `phone_change`.
       - `generateLink()` only generates the email link for `email_change_email` if the **Secure email change** is enabled in your project's [email auth provider settings](/dashboard/project/_/auth/providers).
       - `generateLink()` handles the creation of the user for `signup`, `invite` and `magiclink`.
+    overwriteParams:
+      - name: params
+        type: GenerateLinkParams
+        subContent:
+          - name: type
+            type: 'signup | invite | magiclink | recovery | email_change_current | email_change_new'
+          - name: email
+            type: string
+          - name: password
+            type: string
+            isOptional: true
+            description: Only required if type is `signup`.
+          - name: newEmail
+            type: string
+            isOptional: true
+            description: Only required if type is `email_change_current` or `email_change_new`.
+          - name: options
+            type: object
+            isOptional: true
+            subContent:
+              - name: data
+                type: object
+                description: >
+                  Custom JSON object containing user metadata, to be stored in the `raw_user_meta_data` column.
+                  Only accepted if type is `signup`, `invite`, or `magiclink`.
+              - name: redirectTo
+                type: string
+                description: >
+                  A redirect URL which will be appended to the generated email link.
     examples:
       - id: generate-a-signup-link
         name: Generate a signup link
@@ -1432,6 +2800,57 @@ functions:
             email: 'email@example.com',
             password: 'secret'
           })
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "properties": {
+                "action_link": "<LINK_TO_SEND_TO_USER>",
+                "email_otp": "999999",
+                "hashed_token": "<HASHED_TOKEN",
+                "redirect_to": "<REDIRECT_URL>",
+                "verification_type": "signup"
+              },
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "email": "email@example.com",
+                "phone": "",
+                "confirmation_sent_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
+                },
+                "user_metadata": {},
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "email@example.com",
+                      "email_verified": false,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "email@example.com"
+                  }
+                ],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+                "is_anonymous": false
+              }
+            },
+            "error": null
+          }
           ```
       - id: generate-an-invite-link
         name: Generate an invite link
@@ -1493,9 +2912,61 @@ functions:
         code: |
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
-            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            '11111111-1111-1111-1111-111111111111',
             { email: 'new@email.com' }
           )
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "email": "new@email.com",
+                "email_confirmed_at": "2024-01-01T00:00:00Z",
+                "phone": "",
+                "confirmed_at": "2024-01-01T00:00:00Z",
+                "recovery_sent_at": "2024-01-01T00:00:00Z",
+                "last_sign_in_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
+                },
+                "user_metadata": {
+                  "email": "example@email.com",
+                  "email_verified": false,
+                  "phone_verified": false,
+                  "sub": "11111111-1111-1111-1111-111111111111"
+                },
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": false,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "example@email.com"
+                  }
+                ],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+                "is_anonymous": false
+              }
+            },
+            "error": null
+          }
           ```
       - id: updates-a-users-password
         name: Updates a user's password
@@ -1547,7 +3018,7 @@ functions:
             { phone_confirm: true }
           )
           ```
-  - id: mfa-list-factors
+  - id: mfa-list-factors-admin
     title: 'mfa.listFactors()'
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
     examples:
@@ -1557,6 +3028,24 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.admin.mfa.listFactors()
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              factors: Factor[
+                {
+                  id: '<ID>',
+                  friendly_name: 'Auth App Factor',
+                  factor_type: 'totp',
+                  status: 'verified',
+                  created_at: '2024-01-01T00:00:00Z',
+                  updated_at: '2024-01-01T00:00:00Z'
+                }
+              ]
+            },
+            error: null
+          }
           ```
   - id: mfa-delete-factor
     title: 'mfa.deleteFactor()'
@@ -1571,6 +3060,15 @@ functions:
             id: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
             userId: 'a89baba7-b1b7-440f-b4bb-91026967f66b',
           })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '34e770dd-9ff9-416c-87fa-43b31d7ef225'
+            },
+            error: null
+          }
           ```
   - id: select
     title: 'Fetch data: select()'
@@ -2510,7 +4008,7 @@ functions:
         name: Delete a single record
         code: |
           ```ts
-          const { error } = await supabase
+          const response = await supabase
             .from('countries')
             .delete()
             .eq('id', 1)
@@ -2536,11 +4034,47 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
 
+      - id: delete-records-and-return-it
+        name: Delete a record and return it
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .eq('id', 1)
+            .select()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Spain');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Spain"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+
       - id: delete-multiple-records
         name: Delete multiple records
         code: |
           ```ts
-          const { error } = await supabase
+          const response = await supabase
             .from('countries')
             .delete()
             .in('id', [1, 2, 3])
@@ -2563,8 +4097,7 @@ functions:
             "statusText": "No Content"
           }
           ```
-        hideCodeBlock: false
-        isSpotlight: false
+        hideCodeBlock: true
 
   - id: rpc
     title: 'Postgres functions: rpc()'
@@ -3227,19 +4760,19 @@ functions:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          response: |
-            ```json
-            {
-              "data": [
-                {
-                  "id": 2,
-                  "name": "Albania"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         hideCodeBlock: true
         isSpotlight: true
   - id: is
@@ -3272,7 +4805,7 @@ functions:
           {
             "data": [
               {
-                "id": 1,
+                "id": 2,
                 "name": "null"
               }
             ],
@@ -3939,12 +5472,40 @@ functions:
         name: Text search
         code: |
           ```ts
-          const { data, error } = await supabase
-            .from('quotes')
-            .select('catchphrase')
-            .textSearch('catchphrase', `'fat' & 'cat'`, {
-              config: 'english'
-            })
+          const result = await supabase
+            .from("texts")
+            .select("content")
+            .textSearch("content", `'eggs' & 'ham'`, {
+              config: "english",
+            });
+          ```
+        data:
+          sql: |
+            ```sql
+            create table texts (
+              id      bigint
+                      primary key
+                      generated always as identity,
+              content text
+            );
+
+            insert into texts (content) values
+                ('Four score and seven years ago'),
+                ('The road goes ever on and on'),
+                ('Green eggs and ham')
+            ;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "content": "Green eggs and ham"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
       - id: basic-normalization
         name: Basic normalization
@@ -3980,7 +5541,7 @@ functions:
           with advanced operators.
 
           - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
-          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by `<->` operators, as if processed by phraseto_tsquery.
           - `OR`: the word “or” will be converted to the | operator.
           - `-`: a dash will be converted to the ! operator.
 
@@ -4632,6 +6193,8 @@ functions:
   - id: abort-signal
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.abortSignal'
     title: abortSignal()
+    notes: |
+      You can use this to set a timeout for the request.
     examples:
       - id: aborting-requests-in-flight
         name: Aborting requests in-flight
@@ -4644,16 +6207,6 @@ functions:
             .select()
             .abortSignal(ac.signal)
           ```
-        data:
-          sql: |
-            ```ts
-            const ac = new AbortController()
-            ac.abort()
-            const { data, error } = await supabase
-              .from('very_big_table')
-              .select()
-              .abortSignal(ac.signal)
-            ```
         response: |
           ```json
             {
@@ -4672,6 +6225,29 @@ functions:
           Note that `status` and `statusText` don't mean anything for aborted requests as the request wasn't fulfilled.
         hideCodeBlock: true
         isSpotlight: true
+      - id: set-a-timeout
+        name: Set a timeout
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('very_big_table')
+            .select()
+            .abortSignal(AbortSignal.timeout(1000 /* ms */))
+          ```
+        response: |
+          ```json
+            {
+              "error": {
+                "message": "FetchError: The user aborted a request.",
+                "details": "",
+                "hint": "",
+                "code": ""
+              },
+              "status": 400,
+              "statusText": "Bad Request"
+            }
+            ```
+        hideCodeBlock: true
   - id: single
     title: single()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.single'
@@ -5106,20 +6682,19 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          supabase
-            .channel('room1')
-            .on('broadcast', { event: 'cursor-pos' }, payload => {
-              console.log('Cursor position received!', payload)
-            })
-            .subscribe((status) => {
-              if (status === 'SUBSCRIBED') {
-                channel.send({
-                  type: 'broadcast',
-                  event: 'cursor-pos',
-                  payload: { x: Math.random(), y: Math.random() },
-                })
-              }
-            })
+          const channel = supabase.channel("room1")
+
+          channel.on("broadcast", { event: "cursor-pos" }, (payload) => {
+            console.log("Cursor position received!", payload);
+          }).subscribe((status) => {
+            if (status === "SUBSCRIBED") {
+              channel.send({
+                type: "broadcast",
+                event: "cursor-pos",
+                payload: { x: Math.random(), y: Math.random() },
+              });
+            }
+          });
           ```
       - id: listen-to-presence-sync
         name: Listen to presence sync
@@ -5289,6 +6864,10 @@ functions:
               }
             })
           ```
+        response: |
+          ```
+          ok | timed out | error
+          ```
       - id: send-a-message-via-rest
         name: Send a message via REST
         isSpotlight: true
@@ -5361,6 +6940,26 @@ functions:
             .storage
             .listBuckets()
           ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": "avatars",
+                "name": "avatars",
+                "owner": "",
+                "public": false,
+                "file_size_limit": 1024,
+                "allowed_mime_types": [
+                  "image/png"
+                ],
+                "created_at": "2024-05-22T22:26:05.100Z",
+                "updated_at": "2024-05-22T22:26:05.100Z"
+              }
+            ],
+            "error": null
+          }
+          ```
 
   - id: get-bucket
     title: getBucket()
@@ -5379,6 +6978,24 @@ functions:
           const { data, error } = await supabase
             .storage
             .getBucket('avatars')
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "id": "avatars",
+              "name": "avatars",
+              "owner": "",
+              "public": false,
+              "file_size_limit": 1024,
+              "allowed_mime_types": [
+                "image/png"
+              ],
+              "created_at": "2024-05-22T22:26:05.100Z",
+              "updated_at": "2024-05-22T22:26:05.100Z"
+            },
+            "error": null
+          }
           ```
 
   - id: create-bucket
@@ -5403,6 +7020,15 @@ functions:
               fileSizeLimit: 1024
             })
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "name": "avatars"
+            },
+            "error": null
+          }
+          ```
 
   - id: empty-bucket
     title: emptyBucket()
@@ -5421,6 +7047,15 @@ functions:
           const { data, error } = await supabase
             .storage
             .emptyBucket('avatars')
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "message": "Successfully emptied"
+            },
+            "error": null
+          }
           ```
   - id: update-bucket
     title: updateBucket()
@@ -5444,6 +7079,15 @@ functions:
               fileSizeLimit: 1024
             })
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "message": "Successfully updated"
+            },
+            "error": null
+          }
+          ```
 
   - id: delete-bucket
     title: deleteBucket()
@@ -5462,6 +7106,15 @@ functions:
           const { data, error } = await supabase
             .storage
             .deleteBucket('avatars')
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "message": "Successfully deleted"
+            },
+            "error": null
+          }
           ```
 
   - id: from-upload
@@ -5488,6 +7141,15 @@ functions:
               upsert: false
             })
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "path": "public/avatar1.png",
+              "fullPath": "avatars/public/avatar1.png"
+            },
+            "error": null
+          }
       - id: upload-file-using-arraybuffer-from-base64-file-data
         name: Upload file using `ArrayBuffer` from base64 file data
         code: |
@@ -5526,6 +7188,16 @@ functions:
               upsert: true
             })
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "path": "public/avatar1.png",
+              "fullPath": "avatars/public/avatar1.png"
+            },
+            "error": null
+          }
+          ```
       - id: update-file-using-arraybuffer-from-base64-file-data
         name: Update file using `ArrayBuffer` from base64 file data
         code: |
@@ -5559,6 +7231,15 @@ functions:
             .from('avatars')
             .move('public/avatar1.png', 'private/avatar2.png')
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "message": "Successfully moved"
+            },
+            "error": null
+          }
+          ```
 
   - id: from-copy
     title: from.copy()
@@ -5579,6 +7260,15 @@ functions:
             .from('avatars')
             .copy('public/avatar1.png', 'private/avatar2.png')
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "path": "avatars/private/avatar2.png"
+            },
+            "error": null
+          }
+          ```
 
   - id: from-create-signed-url
     title: from.createSignedUrl()
@@ -5598,6 +7288,15 @@ functions:
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60)
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+            },
+            "error": null
+          }
           ```
       - id: create-signed-url-with-transformations
         name: Create a signed URL for an asset with transformations
@@ -5646,6 +7345,26 @@ functions:
             .from('avatars')
             .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
           ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "error": null,
+                "path": "folder/avatar1.png",
+                "signedURL": "/object/sign/avatars/folder/avatar1.png?token=<TOKEN>",
+                "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+              },
+              {
+                "error": null,
+                "path": "folder/avatar2.png",
+                "signedURL": "/object/sign/avatars/folder/avatar2.png?token=<TOKEN>",
+                "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar2.png?token=<TOKEN>"
+              }
+            ],
+            "error": null
+          }
+          ```
 
   - id: from-create-signed-upload-url
     title: from.createSignedUploadUrl()
@@ -5665,6 +7384,17 @@ functions:
             .storage
             .from('avatars')
             .createSignedUploadUrl('folder/cat.jpg')
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "signedUrl": "https://example.supabase.co/storage/v1/object/upload/sign/avatars/folder/cat.jpg?token=<TOKEN>",
+              "path": "folder/cat.jpg",
+              "token": "<TOKEN>"
+            },
+            "error": null
+          }
           ```
 
   - id: from-upload-to-signed-url
@@ -5686,6 +7416,16 @@ functions:
             .from('avatars')
             .uploadToSignedUrl('folder/cat.jpg', 'token-from-createSignedUploadUrl', file)
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "path": "folder/cat.jpg",
+              "fullPath": "avatars/folder/cat.jpg"
+            },
+            "error": null
+          }
+          ```
 
   - id: from-get-public-url
     title: from.getPublicUrl()
@@ -5706,6 +7446,14 @@ functions:
             .storage
             .from('public-bucket')
             .getPublicUrl('folder/avatar1.png')
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "publicUrl": "https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png"
+            }
+          }
           ```
       - id: transform-asset-in-public-bucket
         name: Returns the URL for an asset in a public bucket with transformations
@@ -5754,6 +7502,13 @@ functions:
             .from('avatars')
             .download('folder/avatar1.png')
           ```
+        response: |
+          ```json
+          {
+            "data": <BLOB>,
+            "error": null
+          }
+          ```
       - id: download-file-with-transformations
         name: Download file with transformations
         isSpotlight: true
@@ -5790,6 +7545,13 @@ functions:
             .from('avatars')
             .remove(['folder/avatar1.png'])
           ```
+        response: |
+          ```json
+          {
+            "data": [],
+            "error": null
+          }
+          ```
 
   - id: from-list
     title: from.list()
@@ -5813,6 +7575,30 @@ functions:
               offset: 0,
               sortBy: { column: 'name', order: 'asc' },
             })
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "avatar1.png",
+                "id": "e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2",
+                "updated_at": "2024-05-22T23:06:05.580Z",
+                "created_at": "2024-05-22T23:04:34.443Z",
+                "last_accessed_at": "2024-05-22T23:04:34.443Z",
+                "metadata": {
+                  "eTag": "\"c5e8c553235d9af30ef4f6e280790b92\"",
+                  "size": 32175,
+                  "mimetype": "image/png",
+                  "cacheControl": "max-age=3600",
+                  "lastModified": "2024-05-22T23:06:05.574Z",
+                  "contentLength": 32175,
+                  "httpStatusCode": 200
+                }
+              }
+            ],
+            "error": null
+          }
           ```
       - id: search-files-in-a-bucket
         name: Search files in a bucket

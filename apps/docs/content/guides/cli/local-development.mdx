@@ -19,7 +19,7 @@ The Dashboard provides a wide range of features for setting up your project: cre
 
 2. **Easier Collaboration**: Developing locally can make it easier to collaborate with others on the same project.
 
-3. **Cost-Effective**: Supabase provides a generous free plan and gives you two free projects to get started. But what if you need more than two? When you develop locally, you can spin up unlimited local projects and link them with live projects when you're ready to launch.
+3. **Cost-Effective**: Supabase provides a generous Free Plan and gives you two free projects to get started. But what if you need more than two? When you develop locally, you can spin up unlimited local projects and link them with live projects when you're ready to launch.
 
 4. **Configuration in code**: If you directly change your tables via the Dashboard, none of that gets captured in code. If you follow these local development practices, you'll store all of your table schemas in code.
 
@@ -461,17 +461,7 @@ The buckets and objects themselves are rows in the storage schema so they won't 
 
 ### Local logging
 
-Local logs rely on the Supabase Analytics Server, and are not enabled by default. To enable this, edit your `supabase/config.toml` file and set `enabled` to `true`.
-
-```bash supabase/config.toml
-[analytics]
-# Set enabled to true to see logs in the Logs Explorer
-enabled = true
-port = 54327
-vector_port = 54328
-# Configure one of the supported backends: `postgres`, `bigquery`.
-backend = "postgres"
-```
+Local logs rely on the Supabase Analytics Server which accesses the docker logging driver by either volume mounting `/var/run/docker.sock` domain socket on Linux and macOS, or exposing `tcp://localhost:2375` daemon socket on Windows. These settings must be configured manually after [installing](/docs/guides/cli/getting-started#installing-the-supabase-cli) the Supabase CLI.
 
 <Admonition type="note">
 
@@ -479,7 +469,7 @@ For advanced logs analysis using the Logs Explorer, it is advised to use the Big
 
 </Admonition>
 
-Logs will be directed to the Analytics server instead of the docker logging driver. All logs will be stored in the local database under the `_analytics` schema.
+All logs will be stored in the local database under the `_analytics` schema.
 
 ## Limitations and considerations
 

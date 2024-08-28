@@ -1,22 +1,27 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import type { UpdateConnectionPayload } from './integrations.types'
 import { integrationKeys } from './keys'
 
-export async function updateVercelConnection({ id, envSyncTargets }: UpdateConnectionPayload) {
+export async function updateVercelConnection({
+  id,
+  envSyncTargets,
+  publicEnvVarPrefix,
+}: UpdateConnectionPayload) {
   const { data, error } = await patch('/platform/integrations/vercel/connections/{connection_id}', {
     params: {
       path: { connection_id: id },
     },
     body: {
       env_sync_targets: envSyncTargets,
+      public_env_var_prefix: publicEnvVarPrefix,
     },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
