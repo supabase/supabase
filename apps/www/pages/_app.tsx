@@ -2,47 +2,53 @@ import '@code-hike/mdx/styles'
 import 'config/code-hike.scss'
 import '../styles/index.css'
 
-import { useEffect } from 'react'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
+import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { DefaultSeo } from 'next-seo'
-
+import { useEffect } from 'react'
 import { PortalToast, themes } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
-import Telemetry from '~/lib/telemetry'
-import supabase from '~/lib/supabase'
-import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
+
 import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
-import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
-import { APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import { WwwCommandMenu } from '~/components/CommandMenu'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
+import { post } from '~/lib/fetchWrapper'
+import supabase from '~/lib/supabase'
+import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
-  const { consentValue } = useConsent()
+  const { consentValue, hasAcceptedConsent } = useConsent()
 
   useThemeSandbox()
 
-  function handleRouteChange(url: string) {
-    Telemetry.sendEvent(
-      {
-        category: 'www',
-        action: 'page_views',
-        label: url,
+  function handlePageTelemetry(route: string) {
+    return post(`${API_URL}/telemetry/page`, {
+      referrer: document.referrer,
+      title: document.title,
+      route,
+      ga: {
+        screen_resolution: telemetryProps?.screenResolution,
+        language: telemetryProps?.language,
       },
-      telemetryProps,
-      router
-    )
+    })
   }
 
   useEffect(() => {
+    if (!hasAcceptedConsent) return
+
+    function handleRouteChange(url: string) {
+      handlePageTelemetry(url)
+    }
+
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
     return () => {
@@ -51,11 +57,12 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.events, consentValue])
 
   useEffect(() => {
+    if (!hasAcceptedConsent) return
     /**
      * Send page telemetry on first page load
      */
     if (router.isReady) {
-      handleRouteChange(router.asPath)
+      handlePageTelemetry(router.asPath)
     }
   }, [router.isReady, consentValue])
 
