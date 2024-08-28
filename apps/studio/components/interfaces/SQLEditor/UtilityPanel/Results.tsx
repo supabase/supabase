@@ -1,4 +1,4 @@
-import { Clipboard, Expand } from 'lucide-react'
+import { ChevronDown, ChevronUp, Clipboard, Expand } from 'lucide-react'
 import { useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 
@@ -9,11 +9,17 @@ import { copyToClipboard } from 'lib/helpers'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
+  Button,
   cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
 } from 'ui'
 import { CellDetailPanel } from './CellDetailPanel'
 
@@ -142,6 +148,13 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     )
   }
 
+  const ROWS_PER_PAGE_OPTIONS = [
+    { value: -1, label: 'No limit' },
+    { value: 100, label: '100 rows' },
+    { value: 500, label: '500 rows' },
+    { value: 1000, label: '1,000 rows' },
+  ]
+
   return (
     <>
       <DataGrid
@@ -152,7 +165,33 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
         onSelectedCellChange={setCellPosition}
       />
 
-      <GridFooter className="flex items-center justify-center">
+      <GridFooter className="flex items-center gap-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="default" iconRight={<ChevronUp size={14} />}>
+              {
+                ROWS_PER_PAGE_OPTIONS.find(
+                  (opt) => opt.value === (enableFolders ? snapV2.limit : snap.limit)
+                )?.label
+              }
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-42">
+            <DropdownMenuRadioGroup
+              value={enableFolders ? snapV2.limit.toString() : snap.limit.toString()}
+              onValueChange={(val) => {
+                if (enableFolders) snapV2.setLimit(Number(val))
+                else snap.setLimit(Number(val))
+              }}
+            >
+              {ROWS_PER_PAGE_OPTIONS.map((option) => (
+                <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
+                  {option.label}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <p className="text-xs text-foreground-light">
           {rows.length} row{rows.length > 1 ? 's' : ''}
           {results.autoLimit !== undefined && ` (auto limit ${results.autoLimit} rows)`}
