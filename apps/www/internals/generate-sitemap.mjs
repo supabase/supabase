@@ -25,7 +25,7 @@ async function generate() {
     '!pages/_*.js',
     '!pages/_*.tsx',
     '!pages/api',
-    '!pages/404.js',
+    '!pages/404.tsx',
     '.next/server/pages/partners/integrations/*.html',
     '.next/server/pages/partners/experts/*.html',
   ])
