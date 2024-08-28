@@ -8,7 +8,6 @@ import { Badge, Button, IconCheck, Separator, buttonVariants, cn } from 'ui'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { useTheme } from 'next-themes'
 import career from '~/data/career.json'
 import Styles from './career.module.css'
 import { GlobeAltIcon } from '@heroicons/react/outline'
@@ -44,9 +43,9 @@ export async function getStaticProps() {
       html_url: 'https://twitter.com/XquisiteDreamer',
     },
     {
-      login: 'marijanasimag',
+      login: 'marijanapav',
       avatar_url: 'https://avatars.githubusercontent.com/u/46031252?v=4',
-      html_url: 'https://github.com/marijanasimag',
+      html_url: 'https://github.com/marijanapav',
     },
     {
       login: 'lyqht',
@@ -77,7 +76,6 @@ export async function getStaticProps() {
 }
 
 const CareerPage: NextPage = ({ jobs, contributors }: any) => {
-  const { resolvedTheme } = useTheme()
   const { basePath } = useRouter()
 
   const meta_title = 'Careers | Supabase'
@@ -141,31 +139,37 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
 
           <div className="py-[1.25px] bg-gradient-to-r from-background via-border to-background">
             <div className="bg-alternative overflow-clip">
-              <SectionContainer className="!py-0 !pb-16 lg:!pt-16">
-                <div className="lg:flex lg:h-[500px]">
-                  <div className="relative aspect-square -top-[110px] -left-[200px] w-[575px] sm:-top-[150px] sm:-left-[300px] sm:w-[850px] lg:-top-[225px] lg:-left-[330px] lg:w-[800px] lg:h-[800px] xl:-left-[200px] xl:-top-[210px] xl:w-[1000px]">
-                    <Globe />
-                  </div>
-                  <div className="relative -top-[75px] lg:top-0 lg:-left-[325px] xl:-top-[45px] xl:-left-[150px] 2xl:-left-[50px] lg:min-w-[400px] lg:h-fit xl:mt-10">
-                    <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] lg:max-w-xs tracking-[-1.5px]">
-                      We work together, wherever we are
+              <SectionContainer className="md:!pt-16 md:grid md:max-h-[500px] grid-cols-1 md:grid-cols-5 md:gap-8">
+                <div
+                  className="
+                    relative md:col-span-2 aspect-square
+                    w-[calc(100%+100px)] md:w-[calc(100%+450px)] xl:w-[calc(100%+200px)]
+                    -mb-[160px] md:mb-0
+                    -top-[160px] md:-top-[200px] xl:-top-[210px]
+                    -left-[100px] md:-left-[450px] xl:-left-[200px]
+                  "
+                >
+                  <Globe />
+                </div>
+                <div className="relative md:col-span-3">
+                  <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] md:max-w-xs tracking-[-1.5px]">
+                    We work together, wherever we are
+                  </h2>
+                  <p className="text-foreground-light mt-4 text-xs sm:text-sm md:text-base md:w-full">
+                    Working in a globally distributed team is rewarding but has its challenges. We
+                    are across many different timezones, so we use tools like Notion, Slack, and
+                    Discord to stay connected to our team, and our community.
+                  </p>
+                  <div className="max-w-[300px] sm:max-w-md md:max-w-md mt-20">
+                    <div className="border-t-2 border-brand w-4/12"></div>
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl pt-2 tracking-[-1.5px]">
+                      We deeply believe in the efficacy of collaborative open source
                     </h2>
-                    <p className="text-foreground-light mt-4 text-xs sm:text-sm lg:text-base md:w-5/6 lg:w-full">
-                      Working in a globally distributed team is rewarding but has its challenges. We
-                      are across many different timezones, so we use tools like Notion, Slack, and
-                      Discord to stay connected to our team, and our community.
-                    </p>
-                    <div className="max-w-[300px] sm:max-w-md lg:max-w-md mt-20">
-                      <div className="border-t-2 border-brand w-4/12"></div>
-                      <h2 className="text-2xl sm:text-3xl lg:text-4xl pt-2 tracking-[-1.5px]">
-                        We deeply believe in the efficacy of collaborative open source
-                      </h2>
-                    </div>
                   </div>
                 </div>
               </SectionContainer>
 
-              <SectionContainer className="-mt-16 md:mt-0">
+              <SectionContainer className="-mt-16 md:mt-16">
                 <div className="md:flex md:gap-6">
                   <div className="md:w-1/2">
                     <div>
@@ -185,11 +189,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         <Image
                           src="/images/career/1.jpg"
                           alt="team photo"
-                          layout="fill"
-                          objectFit="cover"
+                          fill
+                          sizes="(min-width: 767px) 45vw, 100vw"
                           placeholder="blur"
                           blurDataURL="/images/blur.png"
-                          className="rounded-md"
+                          className="rounded-md object-cover"
+                          draggable={false}
                         />
                       </div>
                     </div>
@@ -199,11 +204,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           <Image
                             src="/images/career/2.jpg"
                             alt="team photo"
-                            layout="fill"
-                            objectFit="cover"
+                            fill
+                            sizes="(min-width: 767px) 45vw, 100vw"
                             placeholder="blur"
                             blurDataURL="/images/blur.png"
-                            className="rounded-md"
+                            className="rounded-md object-cover"
+                            draggable={false}
                           />
                         </div>
                       </div>
@@ -215,11 +221,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         <Image
                           src="/images/career/3.jpg"
                           alt="team photo"
-                          layout="fill"
-                          objectFit="cover"
+                          fill
+                          sizes="(min-width: 767px) 45vw, 100vw"
                           placeholder="blur"
                           blurDataURL="/images/blur.png"
-                          className="rounded-md"
+                          className="rounded-md object-cover"
+                          draggable={false}
                         />
                       </div>
                     </div>
@@ -229,11 +236,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           <Image
                             src="/images/career/4.jpg"
                             alt="team photo"
-                            layout="fill"
-                            objectFit="cover"
+                            fill
+                            sizes="(min-width: 767px) 45vw, 100vw"
                             placeholder="blur"
                             blurDataURL="/images/blur.png"
-                            className="rounded-md"
+                            className="rounded-md object-cover"
+                            draggable={false}
                           />
                         </div>
                       </div>
@@ -242,11 +250,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           <Image
                             src="/images/career/5.jpg"
                             alt="team photo"
-                            layout="fill"
-                            objectFit="cover"
+                            fill
+                            sizes="(min-width: 767px) 45vw, 100vw"
                             placeholder="blur"
                             blurDataURL="/images/blur.png"
-                            className="rounded-md"
+                            className="rounded-md object-cover"
+                            draggable={false}
                           />
                         </div>
                       </div>
@@ -256,11 +265,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         <Image
                           src="/images/career/6.jpg"
                           alt="team photo"
-                          layout="fill"
-                          objectFit="cover"
+                          fill
+                          sizes="(min-width: 767px) 45vw, 100vw"
                           placeholder="blur"
                           blurDataURL="/images/blur.png"
-                          className="rounded-md"
+                          className="rounded-md object-cover"
+                          draggable={false}
                         />
                       </div>
                     </div>
@@ -320,9 +330,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                             <Image
                               src={contributor.avatar_url}
                               alt={`${contributor.login} github avatar`}
-                              className="rounded-full"
-                              layout="fill"
-                              objectFit="cover"
+                              fill
+                              sizes="(min-width: 767px) 45vw, 100vw"
+                              placeholder="blur"
+                              blurDataURL="/images/blur.png"
+                              className="rounded-full object-cover"
+                              draggable={false}
                             />
                           </div>
                         </Link>
