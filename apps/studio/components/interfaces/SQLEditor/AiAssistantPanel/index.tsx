@@ -280,6 +280,15 @@ export const AiAssistantPanel = ({
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
               )}
+              {isFirstUserMessage && includeSchemaMetadata && selectedSchemas.length === 0 && (
+                <Alert_Shadcn_>
+                  <AlertDescription_Shadcn_ className="flex flex-col gap-4">
+                    <span>
+                      We recommend including the schemas for better answers by Supabase AI.
+                    </span>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
             </Message>
           )
         })}
