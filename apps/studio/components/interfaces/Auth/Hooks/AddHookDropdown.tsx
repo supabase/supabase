@@ -53,6 +53,9 @@ export const AddHookDropdown = ({
   const nonEnterpriseHookOptions = hooks.filter((h) => !isValidHook(h) && !h.enterprise)
   const enterpriseHookOptions = hooks.filter((h) => !isValidHook(h) && h.enterprise)
 
+  const isTeamsOrEnterprisePlan =
+    subscription?.plan.id === 'team' || subscription?.plan.id === 'enterprise'
+
   if (!canUpdateConfig) {
     return (
       <ButtonTooltip
@@ -85,14 +88,14 @@ export const AddHookDropdown = ({
         {nonEnterpriseHookOptions.length > 0 && <DropdownMenuSeparator />}
 
         <div className="bg-surface-200 p-1 -mt-2">
-          {subscription?.plan.id !== 'enterprise' && (
+          {!isTeamsOrEnterprisePlan && (
             <DropdownMenuLabel className="grid gap-1 bg-surface-200">
-              <p className="text-foreground-light">Enterprise plan required</p>
+              <p className="text-foreground-light">Team or Enterprise Plan required</p>
               <p className="text-foreground-lighter text-xs">
                 The following hooks are not available on{' '}
                 <a
                   target="_href"
-                  href="https://forms.supabase.com/enterprise"
+                  href={`https://supabase.com/dashboard/org/${organization?.slug ?? '_'}/billing`}
                   className="underline"
                 >
                   your plan
@@ -101,16 +104,26 @@ export const AddHookDropdown = ({
               </p>
             </DropdownMenuLabel>
           )}
-          {enterpriseHookOptions.map((h) => (
-            <DropdownMenuItem
-              key={h.title}
-              disabled={true}
-              className="cursor-not-allowed"
-              onClick={() => onSelectHook(h.title)}
-            >
-              {h.title}
-            </DropdownMenuItem>
-          ))}
+          {enterpriseHookOptions.map((h) =>
+            isTeamsOrEnterprisePlan ? (
+              <DropdownMenuItem
+                key={h.title}
+                disabled={!isTeamsOrEnterprisePlan}
+                className=""
+                onClick={() => onSelectHook(h.title)}
+              >
+                {h.title}
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                key={h.title}
+                disabled={!isTeamsOrEnterprisePlan}
+                onClick={() => onSelectHook(h.title)}
+              >
+                {h.title}
+              </DropdownMenuItem>
+            )
+          )}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
