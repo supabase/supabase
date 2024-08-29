@@ -3,6 +3,7 @@ type PostTypes = {
   type: 'casestudy' | 'blog'
   title: string
   date?: string
+  timezone?: string
   coverImage?: string
   author?: string
   excerpt?: string
@@ -21,6 +22,7 @@ type PostTypes = {
   logo?: string
   logo_inverse?: string
   hideAuthor?: boolean
+  onDemand?: boolean
 }
 
 export default PostTypes

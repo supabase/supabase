@@ -30,6 +30,7 @@ import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import { ChevronLeft } from 'lucide-react'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -198,6 +199,18 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
         }}
       />
       <DefaultLayout>
+        <div className="flex flex-col w-full bg-alternative border-b border-muted">
+          <SectionContainer className="!py-2 flex items-start">
+            <Link
+              href="/events"
+              className="text-foreground-lighter hover:text-foreground flex !m-0 !p-0 !leading-3 gap-1 cursor-pointer items-center text-sm transition"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              All Events
+            </Link>
+          </SectionContainer>
+        </div>
+
         <div className="flex flex-col w-full">
           <header className="relative bg-alternative w-full overflow-hidden">
             <NextImage
