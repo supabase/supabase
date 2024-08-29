@@ -1,7 +1,7 @@
 import { CreditCardIcon } from 'lucide-react'
 import Link from 'next/link'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
@@ -46,8 +46,8 @@ const CurrentPaymentMethod = () => {
         <ShimmeringLoader className="flex-1" />
       ) : subscription?.payment_method_type === 'invoice' ? (
         <p className="flex-1 text-sm">
-          No payment methods You get a monthly invoice and payment link via email. To change your
-          payment method, please contact us via our support form.
+          You get a monthly invoice and payment link via email. To change your payment method,
+          please contact us via our support form.
         </p>
       ) : !defaultPaymentMethod ? (
         <div className="flex-1 flex items-center gap-2 opacity-50">
@@ -63,7 +63,15 @@ const CurrentPaymentMethod = () => {
       )}
 
       <Button type="outline" asChild>
-        <Link href={`/org/${slug}/billing#payment-methods`}>Manage payment methods</Link>
+        {subscription?.payment_method_type === 'invoice' ? (
+          <Link
+            href={`/support/new?slug=${slug}&ref=no-project&message=${encodeURIComponent('I would like to change my payment method')}&category=${SupportCategories.BILLING}`}
+          >
+            Contact support
+          </Link>
+        ) : (
+          <Link href={`/org/${slug}/billing#payment-methods`}>Manage payment methods</Link>
+        )}
       </Button>
     </div>
   )
