@@ -42,22 +42,6 @@ const EventListItem = ({ event }: Props) => {
         <h3 className="text-foreground text-lg group-hover:underline">{event.title}</h3>
       </div>
       <div className="lg:col-span-2 xl:col-span-5 flex justify-start items-center lg:grid grid-cols-2 xl:grid-cols-2 gap-2 text-sm">
-        {/* <div className="hidden lg:flex items-center -space-x-2">
-          {author.map((author: any, i: number) => {
-            return (
-              <div className="relative ring-background w-6 h-6 rounded-full ring-2" key={i}>
-                {author.author_image_url && (
-                  <Image
-                    src={author.author_image_url}
-                    className="rounded-full object-cover border border-default w-full h-full"
-                    alt={`${author.author} avatar`}
-                    fill
-                  />
-                )}
-              </div>
-            )
-          })}
-        </div> */}
         {event.categories && (
           <div className="hidden xl:flex gap-2 text-foreground-lighter flex-grow group-hover:text-foreground-light">
             {event.onDemand && (

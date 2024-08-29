@@ -66,7 +66,6 @@ function Events({ events: allEvents, onDemandEvents, categories }: Props) {
           <ol
             className={cn(
               'grid -mx-2 sm:-mx-4 py-6 lg:py-6 grid-cols-1',
-              // isList ? 'grid-cols-1' : 'grid-cols-12 lg:gap-4',
               !events?.length && 'mx-0 sm:mx-0'
             )}
           >
@@ -96,9 +95,7 @@ function Events({ events: allEvents, onDemandEvents, categories }: Props) {
           <ol
             className={cn(
               'grid -mx-2 sm:-mx-4 py-6 lg:py-6',
-              // 'grid-cols-1', // list
-              'grid-cols-12 lg:gap-4', // grid
-              // isList ? 'grid-cols-1' : 'grid-cols-12 lg:gap-4',
+              'grid-cols-12 lg:gap-4',
               !onDemandEvents?.length && 'mx-0 sm:mx-0'
             )}
           >
