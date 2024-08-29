@@ -264,44 +264,42 @@ export const AiAssistantPanel = ({
             </>
           )}
         </Message>
-        <div>
-          {messages.map((m, index) => {
-            const isFirstUserMessage =
-              m.role === 'user' && messages.slice(0, index).every((msg) => msg.role !== 'user')
+        {messages.map((m, index) => {
+          const isFirstUserMessage =
+            m.role === 'user' && messages.slice(0, index).every((msg) => msg.role !== 'user')
 
-            return (
-              <Message
-                key={`message-${m.id}`}
-                name={m.name}
-                role={m.role}
-                content={m.content}
-                createdAt={new Date(m.createdAt || new Date()).getTime()}
-                isDebug={m.isDebug}
-                isSelected={selectedMessage === m.id}
-                onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
-              >
-                {isFirstUserMessage && !includeSchemaMetadata && !shouldShowNotOptimizedAlert && (
-                  <Alert_Shadcn_>
-                    <AlertDescription_Shadcn_ className="flex flex-col gap-4">
-                      <span>
-                        Quick reminder that you're not sending project metadata with your queries.
-                        By opting into sending anonymous data, Supabase AI can improve the answers
-                        it shows you.
-                      </span>
-                      <Button
-                        type="default"
-                        className="w-fit"
-                        onClick={() => setIsConfirmOptInModalOpen(true)}
-                      >
-                        Update AI settings
-                      </Button>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
-              </Message>
-            )
-          })}
-        </div>
+          return (
+            <Message
+              key={`message-${m.id}`}
+              name={m.name}
+              role={m.role}
+              content={m.content}
+              createdAt={new Date(m.createdAt || new Date()).getTime()}
+              isDebug={m.isDebug}
+              isSelected={selectedMessage === m.id}
+              onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
+            >
+              {isFirstUserMessage && !includeSchemaMetadata && !shouldShowNotOptimizedAlert && (
+                <Alert_Shadcn_>
+                  <AlertDescription_Shadcn_ className="flex flex-col gap-4">
+                    <span>
+                      Quick reminder that you're not sending project metadata with your queries. By
+                      opting into sending anonymous data, Supabase AI can improve the answers it
+                      shows you.
+                    </span>
+                    <Button
+                      type="default"
+                      className="w-fit"
+                      onClick={() => setIsConfirmOptInModalOpen(true)}
+                    >
+                      Update AI settings
+                    </Button>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+            </Message>
+          )
+        })}
         {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
         <div ref={bottomRef} className="h-1" />
       </div>
