@@ -10,7 +10,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import RealtimeStyles from './Realtime.module.css'
+import RealtimeStyles from '~/styles/realtime.module.css'
 import ProductsNav from '~/components/Products/ProductsNav'
 
 import 'swiper/css'

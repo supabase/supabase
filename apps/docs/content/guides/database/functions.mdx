@@ -113,6 +113,15 @@ val data = supabase.postgrest.rpc("hello_world")
 Reference: [rpc()](../../reference/kotlin/rpc)
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.rpc('hello_world').execute()
+```
+
+Reference: [rpc()](../../reference/python/rpc)
+
+</TabPanel>
 </Tabs>
 
 ## Returning data sets
@@ -244,6 +253,13 @@ val data = supabase.postgrest.rpc("get_planets") {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.rpc('get_planets').eq('id', 1).execute()
+```
+
+</TabPanel>
 </Tabs>
 
 ## Passing parameters
@@ -334,6 +350,13 @@ val data = supabase.postgrest.rpc(
         put("name", "Jakku")
     }
 )
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.rpc('add_planet', params={'name': 'Jakku'}).execute()
 ```
 
 </TabPanel>

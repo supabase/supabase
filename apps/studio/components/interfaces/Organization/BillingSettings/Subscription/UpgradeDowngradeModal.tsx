@@ -3,10 +3,12 @@ import Link from 'next/link'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { PricingInformation, plans as subscriptionsPlans } from 'shared-data/plans'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
 import { ProjectInfo } from 'data/projects/projects-query'
 import { OrgSubscriptionData } from 'data/subscriptions/org-subscription-query'
@@ -226,6 +228,8 @@ export const UpgradeDowngradeModal = ({
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
 
+  const queryClient = useQueryClient()
+
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [usageFeesExpanded, setUsageFeesExpanded] = useState<string[]>([])
 
@@ -266,6 +270,20 @@ export const UpgradeDowngradeModal = ({
     if (!selectedTier) return console.error('Selected plan is required')
     if (!selectedPaymentMethod && !paymentViaInvoice) {
       return toast.error('Please select a payment method')
+    }
+
+    if (selectedPaymentMethod) {
+      queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          defaultPaymentMethodId: selectedPaymentMethod,
+          data: prev.data.map((pm: any) => ({
+            ...pm,
+            is_default: pm.id === selectedPaymentMethod,
+          })),
+        }
+      })
     }
 
     // If the user is downgrading from team, should have spend cap disabled by default
