@@ -42,10 +42,10 @@ This works with the Database REST API when called from the Supabase client libra
 
 ```sql
 create or replace function myfunc()
-return void as $$
+returns void as $$
  select pg_sleep(3); -- simulating some long-running process
 $$
-language
+language sql
 set statement_timeout TO '4s'; -- set custom timeout
 ```
 

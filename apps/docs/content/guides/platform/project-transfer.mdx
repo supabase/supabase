@@ -38,16 +38,9 @@ Target organization - the organization you want to move the project to
 
 ## Usage-billing and project addons
 
-If you’re using a [Point-In-Time-Recovery](/docs/guides/platform/backups#point-in-time-recovery) or a [Custom Domain](/docs/guides/platform/custom-domains), the source organization will get credits for the remaining unused time in your current billing cycle.
-For example, if you are in the middle of your current billing cycle and you already pre-paid $10 for a Custom domain, you’ll get $5 back in credits.
+For usage metrics such as disk size, egress or image transformations and project add-ons such as [Compute Add-On](/docs/guides/platform/compute-add-ons), [Point-In-Time-Recovery](/docs/guides/platform/backups#point-in-time-recovery), [IPv4](/docs/guides/platform/ipv4-address), [Log Drains](/docs/guides/platform/log-drains), [Advanced MFA](/docs/guides/auth/auth-mfa/phone) or a [Custom Domain](/docs/guides/platform/custom-domains), the source organization will still be charged for the usage up until the transfer. The charges will be added to the invoice when the billing cycle resets.
 
-The target organization will be charged immediately for the remaining time in the billing cycle.
-As the billing cycle from the source and target organization likely differ, the prorated charge on the target organization will also differ from the credits on the source organization.
-
-If you’re using a [Compute Add-On](/docs/guides/platform/compute-add-ons), the source organization will get credits for the remaining unused time, whereas the target organization won’t have any immediate charges.
-As we’re charging compute usage-based with [Organization-based Billing](/docs/guides/platform/org-based-billing), you’ll be charged for the usage when the next billing cycle hits based on how long the project has been in the target organization.
-
-Similarly, for other usage metrics such as database size, egress, image transformations and so on, the usage until the project transfer will be billed on the source organization and future usage will be added to the target organization once moved.
+The target organization will be charged at the end of the billing cycle for usage after the project transfer.
 
 ## Things to watch out for
 

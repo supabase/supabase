@@ -8,6 +8,7 @@ import ReactTooltip from 'react-tooltip'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import PricingPlans from '~/components/Pricing/PricingPlans'
+import { useOrganizations } from '~/data/organizations'
 
 const PricingComputeSection = dynamic(() => import('~/components/Pricing/PricingComputeSection'))
 const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons'))
@@ -51,6 +52,9 @@ export default function IndexPage() {
     }
   }, [asPath])
 
+  const { isLoading, organizations } = useOrganizations()
+  const hasExistingOrganizations = !isLoading && organizations.length > 0
+
   return (
     <DefaultLayout>
       <NextSeo
@@ -82,7 +86,10 @@ export default function IndexPage() {
         </div>
       </div>
 
-      <PricingPlans />
+      <PricingPlans
+        organizations={organizations}
+        hasExistingOrganizations={hasExistingOrganizations}
+      />
 
       <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
         <div className="flex justify-center gap-2">
@@ -115,7 +122,10 @@ export default function IndexPage() {
         <PricingAddons />
       </div>
 
-      <PricingComparisonTable />
+      <PricingComparisonTable
+        organizations={organizations}
+        hasExistingOrganizations={hasExistingOrganizations}
+      />
 
       <div id="faq" className="border-t">
         <PricingFAQs />
