@@ -87,6 +87,27 @@ async function generate() {
               route = `/${blogUrl}/` + substring
             }
 
+            /**
+             * Event based urls
+             * handle removal of dates in filename
+             */
+            if (route.includes(`/${eventsUrl}/`)) {
+              // remove finelnames with __
+              if (route.includes(`__`)) return null
+              /**
+               * remove directory from route
+               */
+              const _route = route.replace(`/${eventsUrl}/`, '')
+              /**
+               * remove the date from the file name
+               */
+              const substring = _route.substring(11)
+              /**
+               * reconsruct the route
+               */
+              route = `/${eventsUrl}/` + substring
+            }
+
             return `
               <url>
                   <loc>${`https://supabase.com${route}`}</loc>
