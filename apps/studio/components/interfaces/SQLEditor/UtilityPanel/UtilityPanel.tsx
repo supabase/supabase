@@ -51,7 +51,7 @@ const UtilityPanel = ({
   const snapV2 = useSqlEditorV2StateSnapshot()
   const enableFolders = useFlag('sqlFolderOrganization')
 
-  const snippet = snap.snippets[id]?.snippet
+  const snippet = enableFolders ? snapV2.snippets[id]?.snippet : snap.snippets[id]?.snippet
   const queryKeys = contentKeys.list(ref)
   const result = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
 

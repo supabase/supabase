@@ -76,7 +76,7 @@ export const plans: PricingInformation[] = [
         partners: [],
         features: [
           ['100,000 monthly active users', 'then $0.00325 per MAU'],
-          ['8 GB database space', 'then $0.125 per GB'],
+          ['8 GB disk size per project', 'then $0.125 per GB'],
           ['250 GB bandwidth', 'then $0.09 per GB'],
           ['100 GB file storage', 'then $0.021 per GB'],
           'Email support',
@@ -87,7 +87,7 @@ export const plans: PricingInformation[] = [
       {
         partners: ['fly'],
         features: [
-          ['8 GB database space', 'then $0.125 per GB'],
+          ['8 GB disk size per project', 'then $0.125 per GB'],
           ['250 GB bandwidth', 'then $0.09 per GB'],
           'Email support',
           'Daily backups stored for 7 days',
