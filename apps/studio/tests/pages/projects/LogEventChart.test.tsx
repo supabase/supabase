@@ -25,8 +25,8 @@ test('renders chart', async () => {
   render(
     <LogEventChart
       data={[
-        { timestamp: tsMicro.toString(), count: 1 },
-        { timestamp: (tsMicro + 1).toString(), count: 2 },
+        { timestamp: tsMicro.toString(), count: 1, has_error: false },
+        { timestamp: (tsMicro + 1).toString(), count: 2, has_error: false },
       ]}
       onBarClick={mockFn}
     />
