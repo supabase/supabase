@@ -90,7 +90,7 @@ export const AddHookDropdown = ({
         <div className="bg-surface-200 p-1 -mt-2">
           {!isTeamsOrEnterprisePlan && (
             <DropdownMenuLabel className="grid gap-1 bg-surface-200">
-              <p className="text-foreground-light">Teams or Enterprise plan required</p>
+              <p className="text-foreground-light">Team or Enterprise Plan required</p>
               <p className="text-foreground-lighter text-xs">
                 The following hooks are not available on{' '}
                 <a
