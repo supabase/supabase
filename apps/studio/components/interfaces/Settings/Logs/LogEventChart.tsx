@@ -4,22 +4,25 @@ import type { EventChartData } from './Logs.types'
 
 export interface LogEventChartProps {
   data: EventChartData[]
-  onBarClick: (isoTimestamp: string) => void
+  onBarClick: (datum: Datum) => void
 }
 
-const LogEventChart = ({ data, onBarClick }: LogEventChartProps) => (
-  <BarChart
-    minimalHeader
-    size="tiny"
-    yAxisKey="count"
-    xAxisKey="timestamp"
-    data={data}
-    title="Logs / Time"
-    onBarClick={(datum: Datum | EventChartData) => {
-      if (!datum.timestamp) return
-      onBarClick(datum.timestamp as string)
-    }}
-    customDateFormat="MMM D, HH:mm:s"
-  />
-)
+const LogEventChart = ({ data, onBarClick }: LogEventChartProps) => {
+  return (
+    <BarChart
+      minimalHeader
+      size="tiny"
+      yAxisKey="count"
+      xAxisKey="timestamp"
+      data={data}
+      title="Logs / Time"
+      onBarClick={(datum: Datum | EventChartData) => {
+        if (!datum?.timestamp) return
+        onBarClick(datum)
+      }}
+      customDateFormat="MMM D, HH:mm:s"
+      xAxisIsDate={true}
+    />
+  )
+}
 export default LogEventChart

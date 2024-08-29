@@ -229,14 +229,15 @@ export const LogsPreviewer = ({
           {!isLoading && showChart && (
             <LogEventChart
               data={eventChartData}
-              onBarClick={(isoTimestamp) => {
-                // from should be 1 hour before the bar
-                // to should be 1 hour after the bar
+              onBarClick={({ isoTimestamp }) => {
+                // from should be $RANGE minutes before the bar
+                // to should be $RANGE minutes after the bar
+                const RANGE = 5
                 const from = dayjs(isoTimestamp as string)
-                  .subtract(1, 'hour')
+                  .subtract(RANGE, 'minute')
                   .toISOString()
                 const to = dayjs(isoTimestamp as string)
-                  .add(1, 'hour')
+                  .add(RANGE, 'minute')
                   .toISOString()
                 handleSearch('event-chart-bar-click', {
                   query: filters.search_query as string,

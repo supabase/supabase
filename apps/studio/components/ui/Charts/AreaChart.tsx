@@ -68,9 +68,9 @@ const AreaChart = ({
             ? numberFormatter(resolvedHighlightedValue, valuePrecision)
             : typeof resolvedHighlightedValue === 'string'
               ? resolvedHighlightedValue
-              : undefined
+              : ''
         }
-        highlightedLabel={resolvedHighlightedLabel}
+        highlightedLabel={String(resolvedHighlightedLabel || '')}
         minimalHeader={minimalHeader}
       />
       <Container>

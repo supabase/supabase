@@ -116,9 +116,9 @@ const BarChart = ({
             ? numberFormatter(resolvedHighlightedValue, valuePrecision)
             : typeof resolvedHighlightedValue === 'string'
               ? resolvedHighlightedValue
-              : undefined
+              : ''
         }
-        highlightedLabel={String(resolvedHighlightedLabel)}
+        highlightedLabel={String(resolvedHighlightedLabel || '')}
         minimalHeader={minimalHeader}
       />
       <Container>
