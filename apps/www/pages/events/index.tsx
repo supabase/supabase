@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
+
 import { getSortedPosts } from '~/lib/posts'
 
-import type BlogPost from '~/types/post'
+import { cn } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import EventListItem from '~/components/Events/EventListItem'
 import EventsFilters from '~/components/Events/EventsFilters'
-import { cn } from 'ui'
-import SectionContainer from '../../components/Layouts/SectionContainer'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+
+import type BlogPost from '~/types/post'
 
 interface Props {
   events: BlogPost[]
@@ -69,14 +71,16 @@ function Events({ events: allEvents, onDemandEvents, categories }: Props) {
             )}
           >
             {events?.length ? (
-              events?.map((event: BlogPost, idx: number) => (
-                <div
-                  className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none opacity-0 !scale-100 animate-fade-in"
-                  key={`${event.title}-upcoming-${idx}`}
-                >
-                  <EventListItem event={event} />
-                </div>
-              ))
+              events
+                ?.sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())
+                .map((event: BlogPost, idx: number) => (
+                  <div
+                    className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none opacity-0 !scale-100 animate-fade-in"
+                    key={`${event.title}-upcoming-${idx}`}
+                  >
+                    <EventListItem event={event} />
+                  </div>
+                ))
             ) : (
               <p className="text-sm py-2 sm:py-4 text-lighter col-span-full italic opacity-0 !scale-100 animate-fade-in">
                 No results found
@@ -87,7 +91,7 @@ function Events({ events: allEvents, onDemandEvents, categories }: Props) {
         <SectionContainer>
           <div className="pt-8 border-t">
             <h2 className="h3">On Demand</h2>
-            <p className="text-foreground-lighter">Replay events on your schedule</p>
+            <p className="text-foreground-lighter">Replay selected events on your schedule</p>
           </div>
           <ol
             className={cn(

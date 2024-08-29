@@ -8,16 +8,12 @@ import { useBreakpoint } from 'common'
 import type PostTypes from '~/types/post'
 
 import {
-  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconChevronDown,
-  IconSearch,
-  IconX,
-  Input,
   cn,
 } from 'ui'
 
@@ -33,7 +29,7 @@ interface Props {
  * search via category and reset q param if present
  */
 
-function EventFilters({ allEvents, events, setEvents, categories }: Props) {
+function EventFilters({ allEvents, setEvents, categories }: Props) {
   const [category, setCategory] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [showSearchInput, setShowSearchInput] = useState<boolean>(false)
@@ -119,11 +115,6 @@ function EventFilters({ allEvents, events, setEvents, categories }: Props) {
           shallow: true,
           scroll: false,
         })
-  }
-
-  const handleSearchChange = (event: any) => {
-    activeCategory && setCategory('all')
-    handleSearchByText(event.target.value)
   }
 
   return (
