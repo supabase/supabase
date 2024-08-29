@@ -42,32 +42,25 @@ const CurrentPaymentMethod = () => {
 
   return (
     <div className="flex justify-between items-center gap-4 w-full text-sm rounded-lg p-4 text-foreground bg-alternative border">
-      <div
-        className={
-          isLoading || subscription?.payment_method_type === 'invoice' || !defaultPaymentMethod
-            ? 'flex-1'
-            : ''
-        }
-      >
-        {isLoading && <ShimmeringLoader />}
-        {subscription?.payment_method_type === 'invoice' ? (
-          <p className="text-sm">
-            No payment methods You get a monthly invoice and payment link via email. To change your
-            payment method, please contact us via our support form.
-          </p>
-        ) : !defaultPaymentMethod ? (
-          <div className="flex items-center gap-2 opacity-50">
-            <CreditCardIcon size={16} strokeWidth={1.5} />
-            <p className="text-sm">No payment methods</p>
-          </div>
-        ) : (
-          <CreditCard
-            paymentMethod={defaultPaymentMethod}
-            paymentMethodType={subscription?.payment_method_type}
-            canUpdatePaymentMethods={false}
-          />
-        )}
-      </div>
+      {isLoading ? (
+        <ShimmeringLoader className="flex-1" />
+      ) : subscription?.payment_method_type === 'invoice' ? (
+        <p className="flex-1 text-sm">
+          No payment methods You get a monthly invoice and payment link via email. To change your
+          payment method, please contact us via our support form.
+        </p>
+      ) : !defaultPaymentMethod ? (
+        <div className="flex-1 flex items-center gap-2 opacity-50">
+          <CreditCardIcon size={16} strokeWidth={1.5} />
+          <p className="text-sm">No payment methods</p>
+        </div>
+      ) : (
+        <CreditCard
+          paymentMethod={defaultPaymentMethod}
+          paymentMethodType={subscription?.payment_method_type}
+          canUpdatePaymentMethods={false}
+        />
+      )}
 
       <Button type="outline" asChild>
         <Link href={`/org/${slug}/billing#payment-methods`}>Manage payment methods</Link>
