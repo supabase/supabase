@@ -90,7 +90,7 @@ function Events({ events: allEvents, onDemandEvents, categories }: Props) {
         <SectionContainer>
           <div className="pt-8 border-t">
             <h2 className="h3">On Demand</h2>
-            <p className="text-foreground-lighter">Replay selected events on your schedule</p>
+            <p className="text-foreground-light">Replay selected events on your schedule</p>
           </div>
           <ol
             className={cn(
