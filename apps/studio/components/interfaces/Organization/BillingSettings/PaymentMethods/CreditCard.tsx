@@ -12,9 +12,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-const CURRENT_MONTH = new Date().getMonth() + 1
-const CURRENT_YEAR = new Date().getFullYear()
-
 interface CreditCardProps {
   paymentMethod: OrganizationPaymentMethod
   canUpdatePaymentMethods?: boolean
@@ -35,9 +32,12 @@ const CreditCard = ({
   const expiryYear = paymentMethod.card?.exp_year ?? 0
   const expiryMonth = paymentMethod.card?.exp_month ?? 0
 
-  const isExpiringSoon = expiryYear === CURRENT_YEAR && expiryMonth === CURRENT_MONTH
+  const currentMonth = new Date().getMonth() + 1
+  const currentYear = new Date().getFullYear()
+
+  const isExpiringSoon = expiryYear === currentYear && expiryMonth === currentMonth
   const isExpired =
-    expiryYear < CURRENT_YEAR || (expiryYear === CURRENT_YEAR && expiryMonth < CURRENT_MONTH)
+    expiryYear < currentYear || (expiryYear === currentYear && expiryMonth < currentMonth)
 
   if (!paymentMethod.card) return null
 
