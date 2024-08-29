@@ -59,13 +59,17 @@ const EventListItem = ({ event }: Props) => {
         )}
         {event.date && (
           <p className="text-foreground-lighter group-hover:text-foreground-light min-w-40 flex items-center gap-1.5 flex-1 w-full">
-            {dayjs(event.date)
-              .tz(event.timezone ?? 'America/Los_Angeles')
-              .format('DD MMM YYYY')}
+            <span className="w-[80px]">
+              {dayjs(event.date)
+                .tz(event.timezone ?? 'America/Los_Angeles')
+                .format('DD MMM YYYY')}
+            </span>
             <span className="w-px h-[16px] bg-muted" />
-            {dayjs(event.date)
-              .tz(event.timezone ?? 'America/Los_Angeles')
-              .format('hA')}
+            <span className="w-[35px]">
+              {dayjs(event.date)
+                .tz(event.timezone ?? 'America/Los_Angeles')
+                .format('hA')}
+            </span>
             <span className="w-px h-[16px] bg-muted" />
             {dayjs(event.date)
               .tz(event.timezone ?? 'America/Los_Angeles')
