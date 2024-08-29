@@ -240,23 +240,6 @@ export const AiAssistantPanel = ({
                       Dismiss
                     </Button>
                   </div>
-                  <ConfirmationModal
-                    visible={isConfirmOptInModalOpen}
-                    size="large"
-                    title="Confirm sending anonymous data to OpenAI"
-                    confirmLabel="Confirm"
-                    onCancel={() => setIsConfirmOptInModalOpen(false)}
-                    onConfirm={confirmOptInToShareSchemaData}
-                    loading={isUpdating}
-                  >
-                    <p className="text-sm text-foreground-light">
-                      By opting into sending anonymous data, Supabase AI can improve the answers it
-                      shows you. This is an organization-wide setting, and affects all projects in
-                      your organization.
-                    </p>
-
-                    <OptInToOpenAIToggle />
-                  </ConfirmationModal>
                 </Alert_Shadcn_>
               ) : (
                 <></>
@@ -337,6 +320,22 @@ export const AiAssistantPanel = ({
           }}
         />
       </div>
+      <ConfirmationModal
+        visible={isConfirmOptInModalOpen}
+        size="large"
+        title="Confirm sending anonymous data to OpenAI"
+        confirmLabel="Confirm"
+        onCancel={() => setIsConfirmOptInModalOpen(false)}
+        onConfirm={confirmOptInToShareSchemaData}
+        loading={isUpdating}
+      >
+        <p className="text-sm text-foreground-light">
+          By opting into sending anonymous data, Supabase AI can improve the answers it shows you.
+          This is an organization-wide setting, and affects all projects in your organization.
+        </p>
+
+        <OptInToOpenAIToggle />
+      </ConfirmationModal>
     </div>
   )
 }
