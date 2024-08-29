@@ -38,15 +38,15 @@ const EventListItem = ({ event }: Props) => {
       target={event.disable_page_build ? event.link?.target ?? '' : '_self'}
       className="group flex flex-col lg:grid lg:grid-cols-9 xl:grid-cols-12 w-full py-2 sm:py-4 h-full border-b"
     >
-      <div className="flex w-full lg:col-span-7 xl:col-span-7">
+      <div className="flex w-full lg:col-span-7 xl:col-span-8">
         <h3 className="text-foreground text-lg group-hover:underline">{event.title}</h3>
       </div>
-      <div className="lg:col-span-2 xl:col-span-5 flex justify-start items-center lg:grid grid-cols-2 xl:grid-cols-2 gap-2 text-sm">
+      <div className="lg:col-span-2 xl:col-span-3 flex justify-start items-center lg:grid grid-cols-2 xl:grid-cols-2 gap-2 text-sm">
         {event.categories && (
           <div className="hidden xl:flex gap-2 text-foreground-lighter flex-grow group-hover:text-foreground-light">
-            {event.onDemand && (
+            {/* {event.onDemand && (
               <Badge className="group-hover:border-foreground-muted capitalize">On Demand</Badge>
-            )}
+            )} */}
             {event.categories.map(
               (category, i) =>
                 i === 0 && (
