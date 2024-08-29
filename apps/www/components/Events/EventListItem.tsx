@@ -65,7 +65,7 @@ const EventListItem = ({ event }: Props) => {
                 .format('DD MMM YYYY')}
             </span>
             <span className="w-px h-[16px] bg-muted" />
-            <span className="w-[35px]">
+            <span className="">
               {dayjs(event.date)
                 .tz(event.timezone ?? 'America/Los_Angeles')
                 .format('hA')}
