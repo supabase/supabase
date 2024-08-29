@@ -36,9 +36,9 @@ const EventListItem = ({ event }: Props) => {
     <Link
       href={event.disable_page_build ? event.link?.href ?? '' : event.path}
       target={event.disable_page_build ? event.link?.target ?? '' : '_self'}
-      className="group flex flex-col lg:grid lg:grid-cols-10 xl:grid-cols-12 w-full py-2 sm:py-4 h-full border-b"
+      className="group flex flex-col lg:grid lg:grid-cols-9 xl:grid-cols-12 w-full py-2 sm:py-4 h-full border-b"
     >
-      <div className="flex w-full lg:col-span-8 xl:col-span-7">
+      <div className="flex w-full lg:col-span-7 xl:col-span-7">
         <h3 className="text-foreground text-lg group-hover:underline">{event.title}</h3>
       </div>
       <div className="lg:col-span-2 xl:col-span-5 flex justify-start items-center lg:grid grid-cols-2 xl:grid-cols-2 gap-2 text-sm">
@@ -58,12 +58,10 @@ const EventListItem = ({ event }: Props) => {
           </div>
         )}
         {event.date && (
-          <p className="text-foreground-lighter group-hover:text-foreground-light min-w-40 flex items-center gap-1.5 flex-1 w-full">
-            <span className="w-[80px]">
-              {dayjs(event.date)
-                .tz(event.timezone ?? 'America/Los_Angeles')
-                .format('DD MMM YYYY')}
-            </span>
+          <p className="text-foreground-lighter text-nowrap group-hover:text-foreground-light min-w-40 flex items-center gap-1.5 flex-1 w-full">
+            {dayjs(event.date)
+              .tz(event.timezone ?? 'America/Los_Angeles')
+              .format('DD MMM YYYY')}
             <span className="w-px h-[16px] bg-muted" />
             <span className="">
               {dayjs(event.date)
