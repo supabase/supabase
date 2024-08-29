@@ -1,4 +1,12 @@
-import { ChevronRight, Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
+import {
+  ArrowDownAz,
+  ChevronRight,
+  ClockArrowDown,
+  Eye,
+  EyeOffIcon,
+  Heart,
+  Unlock,
+} from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -7,17 +15,20 @@ import { useParams } from 'common'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
+import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { useContentCountQuery } from 'data/content/content-count-query'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { getContentById } from 'data/content/content-id-query'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import {
-  getSQLSnippetFolders,
   Snippet,
   SnippetDetail,
   SnippetFolder,
+  getSQLSnippetFolders,
   useSQLSnippetFoldersQuery,
 } from 'data/content/sql-folders-query'
+import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
@@ -32,19 +43,26 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  Button,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   Separator,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   TreeView,
+  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
-import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useContentCountQuery } from 'data/content/content-count-query'
 
 interface SQLEditorNavProps {
   searchText: string
@@ -339,6 +357,52 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
 
   return (
     <>
+      <div className="relative mt-4">
+        <DropdownMenu modal={false}>
+          <Tooltip_Shadcn_ delayDuration={0}>
+            <DropdownMenuTrigger
+              asChild
+              className={cn(
+                'absolute right-1 -top-4',
+                'text-foreground-muted transition-colors hover:text-foreground data-[state=open]:text-foreground'
+              )}
+            >
+              <TooltipTrigger_Shadcn_ asChild>
+                <Button
+                  type="text"
+                  className="text-light"
+                  iconRight={
+                    snapV2.order === 'name' ? (
+                      <ArrowDownAz size={18} strokeWidth={1.5} />
+                    ) : (
+                      <ClockArrowDown size={18} strokeWidth={1.5} />
+                    )
+                  }
+                >
+                  Sort
+                </Button>
+              </TooltipTrigger_Shadcn_>
+            </DropdownMenuTrigger>
+            <TooltipContent_Shadcn_ side="bottom">Sort By</TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
+          <DropdownMenuContent side="bottom" align="end" className={cn('w-48')}>
+            <DropdownMenuRadioGroup
+              value={snapV2.order}
+              onValueChange={(value: any) => snapV2.setOrder(value)}
+            >
+              <DropdownMenuRadioItem value="name" defaultChecked={snapV2.order === 'name'}>
+                Alphabetical
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem
+                value="inserted_at"
+                defaultChecked={snapV2.order === 'inserted_at'}
+              >
+                Created at
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <Separator />
 
       {((numFavoriteSnippets === 0 && searchText.length === 0) || numFavoriteSnippets > 0) && (
