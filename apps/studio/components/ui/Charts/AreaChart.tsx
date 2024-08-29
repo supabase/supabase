@@ -39,7 +39,7 @@ const AreaChart = ({
     (focusDataIndex !== null &&
       data &&
       data[focusDataIndex] !== undefined &&
-      day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
+      day(String(data[focusDataIndex][xAxisKey])).format(customDateFormat)) ||
     highlightedLabel
 
   const resolvedHighlightedValue =
@@ -66,7 +66,9 @@ const AreaChart = ({
         highlightedValue={
           typeof resolvedHighlightedValue === 'number'
             ? numberFormatter(resolvedHighlightedValue, valuePrecision)
-            : resolvedHighlightedValue
+            : typeof resolvedHighlightedValue === 'string'
+              ? resolvedHighlightedValue
+              : undefined
         }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
@@ -117,8 +119,8 @@ const AreaChart = ({
       </Container>
       {data && (
         <div className="text-foreground-lighter -mt-8 flex items-center justify-between text-xs">
-          <span>{dayjs(data[0][xAxisKey]).format(customDateFormat)}</span>
-          <span>{dayjs(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
+          <span>{dayjs(String(data[0][xAxisKey])).format(customDateFormat)}</span>
+          <span>{dayjs(String(data[data?.length - 1]?.[xAxisKey])).format(customDateFormat)}</span>
         </div>
       )}
     </div>
