@@ -82,7 +82,7 @@ const BarChart = ({
       (focusDataIndex !== null &&
         data &&
         data[focusDataIndex] !== undefined &&
-        day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
+        day(String(data[focusDataIndex][xAxisKey])).format(customDateFormat)) ||
       highlightedLabel
     )
   }
@@ -114,9 +114,11 @@ const BarChart = ({
         highlightedValue={
           typeof resolvedHighlightedValue === 'number'
             ? numberFormatter(resolvedHighlightedValue, valuePrecision)
-            : resolvedHighlightedValue
+            : typeof resolvedHighlightedValue === 'string'
+              ? resolvedHighlightedValue
+              : undefined
         }
-        highlightedLabel={resolvedHighlightedLabel}
+        highlightedLabel={String(resolvedHighlightedLabel)}
         minimalHeader={minimalHeader}
       />
       <Container>
@@ -163,9 +165,11 @@ const BarChart = ({
                 key={`cell-${index}`}
                 className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}
                 fill={
-                  focusDataIndex === index || focusDataIndex === null
-                    ? CHART_COLORS.GREEN_1
-                    : CHART_COLORS.GREEN_2
+                  _entry.has_error
+                    ? CHART_COLORS.YELLOW_1
+                    : focusDataIndex === index || focusDataIndex === null
+                      ? CHART_COLORS.GREEN_1
+                      : CHART_COLORS.GREEN_2
                 }
                 enableBackground={12}
               />
@@ -176,11 +180,13 @@ const BarChart = ({
       {data && (
         <div className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs">
           <span>
-            {xAxisIsDate ? day(data[0][xAxisKey]).format(customDateFormat) : data[0][xAxisKey]}
+            {xAxisIsDate
+              ? day(String(data[0][xAxisKey])).format(customDateFormat)
+              : data[0][xAxisKey]}
           </span>
           <span>
             {xAxisIsDate
-              ? day(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)
+              ? day(String(data[data?.length - 1]?.[xAxisKey])).format(customDateFormat)
               : data[data?.length - 1]?.[xAxisKey]}
           </span>
         </div>

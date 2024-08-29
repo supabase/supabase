@@ -38,7 +38,7 @@ export type HeaderType<D> = {
   displayDateInUtc?: boolean
 }
 
-export type Datum = Record<string, string | number>
+export type Datum = Record<string, string | number | boolean>
 
 export interface TimeseriesDatum extends Datum {
   timestamp: string

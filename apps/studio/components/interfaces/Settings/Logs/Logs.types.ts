@@ -53,6 +53,7 @@ export interface CountData {
 export interface EventChartData extends Datum {
   count: number
   timestamp: string
+  has_error: boolean
 }
 
 type LFResponse<T> = {

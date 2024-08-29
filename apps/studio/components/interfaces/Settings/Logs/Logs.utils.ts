@@ -296,6 +296,24 @@ const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] =>
   return [its.add(-extendValue, trunc), trunc]
 }
 
+function getErrorCondition(table: LogsTableName): string {
+  switch (table) {
+    case 'edge_logs':
+      return 'response.status_code >= 400'
+    case 'postgres_logs':
+      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
+    case 'function_logs':
+      return "metadata.level IN ('error', 'fatal')"
+    case 'auth_logs':
+      return "metadata.level = 'error' OR metadata.status >= 400"
+    case 'function_edge_logs':
+      return 'response.status_code >= 400'
+    // Add conditions for other log types as needed
+    default:
+      return 'false' // Default to no errors if table type is unknown
+  }
+}
+
 /**
  *
  * generates log event chart query
@@ -308,13 +326,16 @@ export const genChartQuery = (
   const [startOffset, trunc] = calcChartStart(params)
   const where = genWhereStatement(table, filters)
 
+  const errorCondition = getErrorCondition(table)
+
   let joins = genCrossJoinUnnests(table)
 
   return `
 SELECT
 -- log-event-chart
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
-  count(t.timestamp) as count
+  count(t.timestamp) as count,
+  LOGICAL_OR(${errorCondition}) as has_error
 FROM
   ${table} t
   ${joins}
