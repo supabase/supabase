@@ -11,7 +11,6 @@ const MadeForDevelopers = () => {
   return (
     <SectionContainer>
       <APISection
-        autoHeight={true}
         size="large"
         title={'Instant APIs that do the hard work for you'}
         text={[

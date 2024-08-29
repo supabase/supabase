@@ -1,8 +1,9 @@
 // Import Swiper styles if swiper used on page
 import 'swiper/css'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, IconArrowUpRight, Tabs } from 'ui'
+import SwiperCore from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import CodeBlock from '../CodeBlock/CodeBlock'
 import Link from 'next/link'
@@ -25,7 +26,7 @@ interface Props {
 
 function APISection(props: Props) {
   // store API swiper instance
-  const [apiSwiper, setApiSwiper] = useState(undefined)
+  const [apiSwiper, setApiSwiper] = useState<SwiperCore>()
   const [apiSwiperActiveIndex, setApiSwiperActiveIndex] = useState(0)
 
   function handleApiSwiperNavChange(e: number) {
@@ -63,7 +64,6 @@ function APISection(props: Props) {
         </Tabs>
         <div className="overflow-hidden">
           <Swiper
-            // @ts-ignore
             onSwiper={setApiSwiper}
             style={{ zIndex: 0, marginRight: '1px' }}
             initialSlide={apiSwiperActiveIndex}
@@ -75,8 +75,12 @@ function APISection(props: Props) {
           >
             {props.content &&
               props.content.map((content: Example, i) => (
-                <SwiperSlide key={i}>
-                  <CodeBlock key={i} lang={content.lang} size={props.size ? props.size : 'small'}>
+                <SwiperSlide key={`${content}-${i}`}>
+                  <CodeBlock
+                    key={apiSwiperActiveIndex}
+                    lang={content.lang}
+                    size={props.size ? props.size : 'small'}
+                  >
                     {content.code}
                   </CodeBlock>
                 </SwiperSlide>
