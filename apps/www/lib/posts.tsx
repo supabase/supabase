@@ -35,7 +35,7 @@ export const getSortedPosts = ({
   const allPosts = fileNames
     .map((filename) => {
       const slug =
-        directory === '_blog'
+        directory === '_blog' || directory === '_events'
           ? filename.replace('.mdx', '').substring(FILENAME_SUBSTRING)
           : filename.replace('.mdx', '')
 
@@ -119,7 +119,7 @@ export const getAllPostSlugs = (directory: Directories) => {
         ...dates,
         slug: filename
           .replace('.mdx', '')
-          .substring(directory === '_blog' ? FILENAME_SUBSTRING : 0),
+          .substring(directory === '_blog' || directory === '_events' ? FILENAME_SUBSTRING : 0),
       },
     }
   })

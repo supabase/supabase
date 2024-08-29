@@ -1,5 +1,4 @@
 import authors from 'lib/authors.json'
-import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import type Author from '~/types/author'
@@ -9,6 +8,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
+import { Badge } from 'ui'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -34,13 +34,14 @@ const EventListItem = ({ event }: Props) => {
 
   return (
     <Link
-      href={event.path}
+      href={event.disable_page_build ? event.link?.href ?? '' : event.path}
+      target={event.disable_page_build ? event.link?.target ?? '' : '_self'}
       className="group flex flex-col lg:grid lg:grid-cols-10 xl:grid-cols-12 w-full py-2 sm:py-4 h-full border-b"
     >
-      <div className="flex w-full lg:col-span-8 xl:col-span-8">
+      <div className="flex w-full lg:col-span-8 xl:col-span-7">
         <h3 className="text-foreground text-lg group-hover:underline">{event.title}</h3>
       </div>
-      <div className="lg:col-span-2 xl:col-span-4 flex justify-start items-center lg:grid grid-cols-2 xl:grid-cols-3 gap-2 text-sm">
+      <div className="lg:col-span-2 xl:col-span-5 flex justify-start items-center lg:grid grid-cols-2 xl:grid-cols-2 gap-2 text-sm">
         {/* <div className="hidden lg:flex items-center -space-x-2">
           {author.map((author: any, i: number) => {
             return (
@@ -58,25 +59,33 @@ const EventListItem = ({ event }: Props) => {
           })}
         </div> */}
         {event.categories && (
-          <div className="hidden xl:flex text-foreground-lighter group-hover:text-foreground-light">
+          <div className="hidden xl:flex gap-2 text-foreground-lighter flex-grow group-hover:text-foreground-light">
+            {event.onDemand && (
+              <Badge className="group-hover:border-foreground-muted capitalize">On Demand</Badge>
+            )}
             {event.categories.map(
               (category, i) =>
                 i === 0 && (
-                  <span
-                    key={category}
-                    className="text-sm border border-muted group-hover:border-foreground-muted py-1 px-3 rounded-full text-center w-auto capitalize"
-                  >
+                  <Badge key={category} className="group-hover:border-foreground-muted capitalize">
                     {category}
-                  </span>
+                  </Badge>
                 )
             )}
           </div>
         )}
         {event.date && (
-          <p className="text-foreground-lighter group-hover:text-foreground-light min-w-40 flex-1 lg:text-right w-full">
+          <p className="text-foreground-lighter group-hover:text-foreground-light min-w-40 flex items-center gap-1.5 flex-1 w-full">
             {dayjs(event.date)
               .tz(event.timezone ?? 'America/Los_Angeles')
-              .format('D MMM YYYY | hA z')}
+              .format('DD MMM YYYY')}
+            <span className="w-px h-[16px] bg-muted" />
+            {dayjs(event.date)
+              .tz(event.timezone ?? 'America/Los_Angeles')
+              .format('hA')}
+            <span className="w-px h-[16px] bg-muted" />
+            {dayjs(event.date)
+              .tz(event.timezone ?? 'America/Los_Angeles')
+              .format('z')}
           </p>
         )}
       </div>

@@ -7,7 +7,12 @@ import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import dayjs from 'dayjs'
 import matter from 'gray-matter'
-import { VideoCameraIcon } from '@heroicons/react/solid'
+import {
+  DesktopComputerIcon,
+  VideoCameraIcon,
+  MicrophoneIcon,
+  HandIcon,
+} from '@heroicons/react/solid'
 
 import authors from 'lib/authors.json'
 import { isNotNullOrUndefined } from '~/lib/helpers'
@@ -36,11 +41,12 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(advancedFormat)
 
-type EventType = 'webinar' | 'launch_week' | 'conference'
+type EventType = 'webinar' | 'meetup' | 'conference' | 'talk' | 'hackathon' | 'launch_week'
 
 type CTA = {
   url: string
   label?: string
+  disabled_label?: string
   target?: '_blank' | '_self'
 }
 
@@ -58,6 +64,8 @@ interface EventData {
   description: string
   type: EventType
   company?: CompanyType
+  onDemand?: boolean
+  disable_page_build?: boolean
   duration?: string
   timezone?: string
   tags?: string[]
@@ -110,6 +118,12 @@ export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({ p
   const postContent = await getPostdata(filePath, '_events')
   const { data, content } = matter(postContent) as unknown as MatterReturn
 
+  if (data.disable_page_build) {
+    return {
+      notFound: true,
+    }
+  }
+
   const mdxSource: any = await mdxSerialize(content)
 
   return {
@@ -142,9 +156,12 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
   }
 
   const eventIcons = {
-    webinar: (props: any) => <VideoCameraIcon {...props} />,
     conference: (props: any) => <VideoCameraIcon {...props} />,
+    hackathon: (props: any) => <DesktopComputerIcon {...props} />,
     launch_week: (props: any) => <VideoCameraIcon {...props} />,
+    meetup: (props: any) => <HandIcon {...props} />,
+    talk: (props: any) => <MicrophoneIcon {...props} />,
+    webinar: (props: any) => <VideoCameraIcon {...props} />,
   }
 
   const Icon = eventIcons[event.type]
@@ -266,7 +283,9 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                         ? event.main_cta?.label
                           ? event.main_cta?.label
                           : 'Register to this event'
-                        : 'Registrations are closed'}
+                        : event.main_cta?.disabled_label
+                          ? event.main_cta?.disabled_label
+                          : 'Registrations are closed'}
                     </Link>
                   </Button>
                 </div>
@@ -299,49 +318,51 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
             </SectionContainer>
           </header>
           <SectionContainer className="grid lg:grid-cols-3 gap-12 !py-10 md:!py-16">
-            <div className="order-first lg:col-span-full flex items-center gap-4 md:gap-6 lg:mb-4">
-              <figure className="h-6">
-                <NextImage
-                  src={supabaseLogoWordmarkLight}
-                  width={160}
-                  height={30}
-                  alt="Supabase Logo"
-                  className="object-contain dark:hidden"
-                  priority
-                />
-                <NextImage
-                  src={supabaseLogoWordmarkDark}
-                  width={160}
-                  height={30}
-                  alt="Supabase Logo"
-                  className="object-contain hidden dark:block"
-                  priority
-                />
-              </figure>
-              <XIcon className="w-4 h-4 text-foreground-lighter" />
-              <Link
-                href={event.company?.website_url ?? '#'}
-                target="_blank"
-                className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90"
-              >
-                <NextImage
-                  src={`/images/events/` + event.company?.logo ?? ''}
-                  alt={`${event.company?.name} Logo`}
-                  fill
-                  sizes="100%"
-                  className="!relative object-contain object-left hidden dark:block"
-                  priority
-                />
-                <NextImage
-                  src={`/images/events/` + event.company?.logo_light ?? ''}
-                  alt={`${event.company?.name} Logo`}
-                  fill
-                  sizes="100%"
-                  className="!relative object-contain object-left dark:hidden"
-                  priority
-                />
-              </Link>
-            </div>
+            {event.company && (
+              <div className="order-first lg:col-span-full flex items-center gap-4 md:gap-6 lg:mb-4">
+                <figure className="h-6">
+                  <NextImage
+                    src={supabaseLogoWordmarkLight}
+                    width={160}
+                    height={30}
+                    alt="Supabase Logo"
+                    className="object-contain dark:hidden"
+                    priority
+                  />
+                  <NextImage
+                    src={supabaseLogoWordmarkDark}
+                    width={160}
+                    height={30}
+                    alt="Supabase Logo"
+                    className="object-contain hidden dark:block"
+                    priority
+                  />
+                </figure>
+                <XIcon className="w-4 h-4 text-foreground-lighter" />
+                <Link
+                  href={event.company?.website_url ?? '#'}
+                  target="_blank"
+                  className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90"
+                >
+                  <NextImage
+                    src={`/images/events/` + event.company?.logo ?? ''}
+                    alt={`${event.company?.name} Logo`}
+                    fill
+                    sizes="100%"
+                    className="!relative object-contain object-left hidden dark:block"
+                    priority
+                  />
+                  <NextImage
+                    src={`/images/events/` + event.company?.logo_light ?? ''}
+                    alt={`${event.company?.name} Logo`}
+                    fill
+                    sizes="100%"
+                    className="!relative object-contain object-left dark:hidden"
+                    priority
+                  />
+                </Link>
+              </div>
+            )}
             <main className="lg:col-span-2">
               <div className="prose prose-docs">
                 <h2 className="text-foreground-light text-sm font-mono uppercase">
@@ -366,7 +387,9 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                       ? event.main_cta?.label
                         ? event.main_cta?.label
                         : 'Register now'
-                      : 'Registrations are closed'}
+                      : event.main_cta?.disabled_label
+                        ? event.main_cta?.disabled_label
+                        : 'Registrations are closed'}
                   </Link>
                 </Button>
               </aside>

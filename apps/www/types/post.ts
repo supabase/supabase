@@ -3,12 +3,18 @@ type PostTypes = {
   type: 'casestudy' | 'blog'
   title: string
   date?: string
+  end_date?: string
   timezone?: string
   coverImage?: string
   author?: string
   excerpt?: string
   ogImage?: {
     url: string
+  }
+  link?: {
+    href: string
+    target?: '_blank' | '_self'
+    label?: string
   }
   content?: string
   thumb: string
@@ -23,6 +29,7 @@ type PostTypes = {
   logo_inverse?: string
   hideAuthor?: boolean
   onDemand?: boolean
+  disable_page_build?: boolean
 }
 
 export default PostTypes

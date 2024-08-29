@@ -10,18 +10,15 @@ import EventsFilters from '~/components/Events/EventsFilters'
 import { cn } from 'ui'
 import SectionContainer from '../../components/Layouts/SectionContainer'
 
-export type BlogView = 'list' | 'grid'
-
 interface Props {
   events: BlogPost[]
   onDemandEvents: BlogPost[]
+  categories: { [key: string]: number }
 }
 
-function Events({ events: allEvents, onDemandEvents }: Props) {
+function Events({ events: allEvents, onDemandEvents, categories }: Props) {
   const [events, setEvents] = useState(allEvents)
   const router = useRouter()
-
-  console.log(events)
 
   const meta_title = 'Supabase Events: webinars, talks, hackathons, and meetups'
   const meta_description = 'Join Supabase and the open-source community at the upcoming events.'
@@ -57,7 +54,12 @@ function Events({ events: allEvents, onDemandEvents }: Props) {
           <p className="text-foreground-light">Join us at the following upcoming events</p>
         </SectionContainer>
         <SectionContainer className="!py-0">
-          <EventsFilters allEvents={allEvents} events={events} setEvents={setEvents} />
+          <EventsFilters
+            allEvents={allEvents}
+            events={events}
+            setEvents={setEvents}
+            categories={categories}
+          />
 
           <ol
             className={cn(
@@ -89,7 +91,9 @@ function Events({ events: allEvents, onDemandEvents }: Props) {
           </div>
           <ol
             className={cn(
-              'grid -mx-2 sm:-mx-4 py-6 lg:py-6 grid-cols-1',
+              'grid -mx-2 sm:-mx-4 py-6 lg:py-6',
+              // 'grid-cols-1', // list
+              'grid-cols-12 lg:gap-4', // grid
               // isList ? 'grid-cols-1' : 'grid-cols-12 lg:gap-4',
               !onDemandEvents?.length && 'mx-0 sm:mx-0'
             )}
@@ -125,10 +129,26 @@ export async function getStaticProps() {
     (event: BlogPost) => new Date(event.date!) < new Date() && event.onDemand === true
   )
 
+  const categories = upcomingEvents.reduce(
+    (acc: { [key: string]: number }, event: BlogPost) => {
+      // Increment the 'all' counter
+      acc.all = (acc.all || 0) + 1
+
+      // Increment the counter for each category
+      event.categories?.forEach((category) => {
+        acc[category] = (acc[category] || 0) + 1
+      })
+
+      return acc
+    },
+    { all: 0 }
+  )
+
   return {
     props: {
       events: upcomingEvents,
       onDemandEvents,
+      categories,
     },
   }
 }
