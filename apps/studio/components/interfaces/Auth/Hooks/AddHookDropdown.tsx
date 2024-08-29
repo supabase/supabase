@@ -95,7 +95,7 @@ export const AddHookDropdown = ({
                 The following hooks are not available on{' '}
                 <a
                   target="_href"
-                  href="https://supabase.com/dashboard/org/_/billing"
+                  href={`https://supabase.com/dashboard/org/${organization?.slug ?? '_'}/billing`}
                   className="underline"
                 >
                   your plan
@@ -108,7 +108,7 @@ export const AddHookDropdown = ({
             isTeamsOrEnterprisePlan ? (
               <DropdownMenuItem
                 key={h.title}
-                disabled={false}
+                disabled={!isTeamsOrEnterprisePlan}
                 className=""
                 onClick={() => onSelectHook(h.title)}
               >
@@ -117,7 +117,7 @@ export const AddHookDropdown = ({
             ) : (
               <DropdownMenuItem
                 key={h.title}
-                disabled={false}
+                disabled={!isTeamsOrEnterprisePlan}
                 onClick={() => onSelectHook(h.title)}
               >
                 {h.title}
