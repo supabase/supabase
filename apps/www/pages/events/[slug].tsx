@@ -147,7 +147,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
     })
     .filter(isNotNullOrUndefined)
 
-  const IS_REGISTRATION_OPEN = Date.parse(event.date) > Date.now()
+  const IS_REGISTRATION_OPEN = event.onDemand || Date.parse(event.date) > Date.now()
 
   const meta = {
     title: event.meta_title ?? event.title,
