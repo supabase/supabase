@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -17,33 +16,20 @@ import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection
 import NoPermission from 'components/ui/NoPermission'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import {
-  Alert,
-  Badge,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  IconCreditCard,
-  IconMoreHorizontal,
-  IconPlus,
-} from 'ui'
+import { Alert, Button, IconCreditCard, IconPlus } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
+import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
+import { CreditCardIcon } from 'lucide-react'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
   const selectedOrganization = useSelectedOrganization()
-  const queryClient = useQueryClient()
   const [selectedMethodForUse, setSelectedMethodForUse] = useState<any>()
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
@@ -151,70 +137,22 @@ const PaymentMethods = () => {
                     <FormSection>
                       <FormSectionContent fullWidth loading={false}>
                         {(paymentMethods?.data?.length ?? 0) === 0 ? (
-                          <div className="flex items-center space-x-2 opacity-50">
-                            <IconCreditCard />
+                          <div className="flex items-center gap-2 opacity-50">
+                            <CreditCardIcon size={16} strokeWidth={1.5} />
                             <p className="text-sm">No payment methods</p>
                           </div>
                         ) : (
                           <div className="space-y-3">
-                            {paymentMethods?.data?.map((paymentMethod) => {
-                              const isActive = paymentMethod.is_default
-
-                              if (!paymentMethod.card) return null
-
-                              return (
-                                <div
-                                  key={paymentMethod.id}
-                                  className="flex items-center justify-between"
-                                >
-                                  <div className="flex items-center space-x-8">
-                                    <img
-                                      alt="Credit card brand"
-                                      src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
-                                        .replace(' ', '-')
-                                        .toLowerCase()}.png`}
-                                      width="32"
-                                    />
-                                    <p className="prose text-sm font-mono">
-                                      **** **** **** {paymentMethod.card!.last4}
-                                    </p>
-                                    <p className="text-sm tabular-nums">
-                                      Expires: {paymentMethod.card.exp_month}/
-                                      {paymentMethod.card.exp_year}
-                                    </p>
-                                  </div>
-                                  {isActive && <Badge variant="brand">Active</Badge>}
-                                  {canUpdatePaymentMethods && !isActive ? (
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button type="outline" className="hover:border-muted px-1">
-                                          <IconMoreHorizontal />
-                                        </Button>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent align="end">
-                                        {subscription?.payment_method_type === 'card' && (
-                                          <>
-                                            <DropdownMenuItem
-                                              key="make-default"
-                                              onClick={() => setSelectedMethodForUse(paymentMethod)}
-                                            >
-                                              <p>Use this card</p>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                          </>
-                                        )}
-                                        <DropdownMenuItem
-                                          key="delete-method"
-                                          onClick={() => setSelectedMethodToDelete(paymentMethod)}
-                                        >
-                                          <p>Delete card</p>
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  ) : null}
-                                </div>
-                              )
-                            })}
+                            {paymentMethods?.data?.map((paymentMethod) => (
+                              <CreditCard
+                                key={paymentMethod.id}
+                                paymentMethod={paymentMethod}
+                                canUpdatePaymentMethods={canUpdatePaymentMethods}
+                                paymentMethodType={subscription?.payment_method_type}
+                                setSelectedMethodForUse={setSelectedMethodForUse}
+                                setSelectedMethodToDelete={setSelectedMethodToDelete}
+                              />
+                            ))}
                           </div>
                         )}
                       </FormSectionContent>
