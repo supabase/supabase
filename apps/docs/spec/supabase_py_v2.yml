@@ -104,6 +104,13 @@ functions:
             ))
           ```
 
+  - id: auth-api
+    title: 'Overview'
+    notes: |
+      - The auth methods can be accessed via the `supabase.auth` namespace.
+      - By default, the supabase client sets `persist_session` to true and attempts to store the session in memory.
+      - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
+      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/auth). A refresh token never expires and can only be used once.
   - id: sign-up
     title: 'sign_up()'
     params:
@@ -2308,6 +2315,349 @@ functions:
               "updated_at": "2024-01-01T00:00:00Z",
               "is_anonymous": false
             }
+          }
+          ```
+  - id: generate-link
+    title: 'generate_link()'
+    params:
+      - name: params
+        type: GenerateLinkParams
+        subContent:
+          - name: type
+            type: 'signup | invite | magiclink | recovery | email_change_current | email_change_new'
+          - name: email
+            type: string
+          - name: password
+            type: string
+            isOptional: true
+            description: Only required if type is `signup`.
+          - name: new_email
+            type: string
+            isOptional: true
+            description: Only required if type is `email_change_current` or `email_change_new`.
+          - name: options
+            type: object
+            isOptional: true
+            subContent:
+              - name: data
+                type: object
+                description: >
+                  Custom JSON object containing user metadata, to be stored in the `raw_user_meta_data` column.
+                  Only accepted if type is `signup`, `invite`, or `magiclink`.
+              - name: redirect_to
+                type: string
+                description: >
+                  A redirect URL which will be appended to the generated email link.
+    notes: |
+      - The following types can be passed into `generate_link()`: `signup`, `magiclink`, `invite`, `recovery`, `email_change_current`, `email_change_new`, `phone_change`.
+      - `generate_link()` only generates the email link for `email_change_email` if the **Secure email change** is enabled in your project's [email auth provider settings](/dashboard/project/_/auth/providers).
+      - `generate_link()` handles the creation of the user for `signup`, `invite` and `magiclink`.
+    examples:
+      - id: generate-a-signup-link
+        name: Generate a signup link
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.admin.generate_link({
+            "type": "signup",
+            "email": "email@example.com",
+            "password": "secret"
+          })
+          ```
+        response: |
+          ```json
+          {
+            "properties": {
+              "action_link": "<LINK_TO_SEND_TO_USER>",
+              "email_otp": "999999",
+              "hashed_token": "<HASHED_TOKEN",
+              "redirect_to": "<REDIRECT_URL>",
+              "verification_type": "signup"
+            },
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "aud": "authenticated",
+              "role": "authenticated",
+              "email": "email@example.com",
+              "phone": "",
+              "confirmation_sent_at": "2024-01-01T00:00:00Z",
+              "app_metadata": {
+                "provider": "email",
+                "providers": [
+                  "email"
+                ]
+              },
+              "user_metadata": {},
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "user_id": "11111111-1111-1111-1111-111111111111",
+                  "identity_data": {
+                    "email": "email@example.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "provider": "email",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "email@example.com"
+                }
+              ],
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-01T00:00:00Z",
+              "is_anonymous": false
+            }
+          }
+          ```
+      - id: generate-an-invite-link
+        name: Generate an invite link
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.generate_link({
+            "type": "invite",
+            "email": "email@example.com"
+          })
+          ```
+      - id: generate-a-magic-link
+        name: Generate a magic link
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.generate_link({
+            "type": "magiclink",
+            "email": "email@example.com"
+          })
+          ```
+      - id: generate-a-recovery-link
+        name: Generate a recovery link
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.generate_link({
+            "type": "recovery",
+            "email": "email@example.com"
+          })
+          ```
+      - id: generate-links-to-change-current-email-address
+        name: Generate links to change current email address
+        isSpotlight: false
+        code: |
+          ```python
+          # generate an email change link to be sent to the current email address
+          response = supabase.auth.admin.generate_link({
+            "type": "email_change_current",
+            "email": "current.email@example.com",
+            "new_email": "new.email@example.com"
+          })
+
+          # generate an email change link to be sent to the new email address
+          response = supabase.auth.admin.generate_link({
+            "type": "email_change_new",
+            "email": "current.email@example.com",
+            "new_email": "new.email@example.com"
+          })
+          ```
+  - id: update-user-by-id
+    title: 'update_user_by_id()'
+    params:
+      - name: uid
+        isOptional: false
+        type: string
+      - name: attributes
+        isOptional: false
+        type: AdminUserAttributes
+        description: |
+          The data you want to update.
+
+          This function should only be called on a server. Never expose your `service_role` key in the browser.
+        subContent:
+          - name: app_metadata
+            isOptional: true
+            type: object
+            description: |
+              A custom data object to store the user's application specific metadata. This maps to the `auth.users.app_metadata` column.
+          - name: ban_duration
+            isOptional: true
+            type: string
+            description: Determines how long a user is banned for.
+          - name: email
+            isOptional: true
+            type: string
+            description: The user's email.
+          - name: email_confirm
+            isOptional: true
+            type: boolean
+            description: Confirms the user's email address if set to true.
+          - name: nonce
+            isOptional: true
+            type: string
+            description: The nonce sent for reauthentication if the user's password is to be updated.
+          - name: password
+            isOptional: true
+            type: string
+            description: The user's password.
+          - name: phone
+            isOptional: true
+            type: string
+            description: The user's phone.
+          - name: phone_confirm
+            isOptional: true
+            type: boolean
+            description: Confirms the user's phone number if set to true.
+          - name: role
+            isOptional: true
+            type: string
+            description: The `role` claim set in the user's access token JWT.
+          - name: user_metadata
+            isOptional: true
+            type: string
+            description: A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.
+    examples:
+      - id: updates-a-users-email
+        name: Updates a user's email
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.update_user_by_id(
+            "11111111-1111-1111-1111-111111111111",
+            { "email": "new@email.com" }
+          )
+          ```
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "aud": "authenticated",
+              "role": "authenticated",
+              "email": "new@email.com",
+              "email_confirmed_at": "2024-01-01T00:00:00Z",
+              "phone": "",
+              "confirmed_at": "2024-01-01T00:00:00Z",
+              "recovery_sent_at": "2024-01-01T00:00:00Z",
+              "last_sign_in_at": "2024-01-01T00:00:00Z",
+              "app_metadata": {
+                "provider": "email",
+                "providers": [
+                  "email"
+                ]
+              },
+              "user_metadata": {
+                "email": "example@email.com",
+                "email_verified": false,
+                "phone_verified": false,
+                "sub": "11111111-1111-1111-1111-111111111111"
+              },
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "user_id": "11111111-1111-1111-1111-111111111111",
+                  "identity_data": {
+                    "email": "example@email.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "provider": "email",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "example@email.com"
+                }
+              ],
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-01T00:00:00Z",
+              "is_anonymous": false
+            }
+          }
+          ```
+      - id: updates-a-users-password
+        name: Updates a user's password
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.update_user_by_id(
+            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+            { "password": "new_password" }
+          )
+          ```
+      - id: updates-a-users-metadata
+        name: Updates a user's metadata
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.admin.update_user_by_id(
+            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+            { "user_metadata": { "hello": "world" } }
+          )
+          ```
+      - id: updates-a-users-app-metadata
+        name: Updates a user's app_metadata
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.update_user_by_id(
+            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+            { "app_metadata": { "plan": "trial" } }
+          )
+          ```
+      - id: confirms-a-users-email-address
+        name: Confirms a user's email address
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.update_user_by_id(
+            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+            { "email_confirm": True }
+          )
+          ```
+      - id: confirms-a-users-phone-number
+        name: Confirms a user's phone number
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.update_user_by_id(
+            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+            { "phone_confirm": True }
+          )
+          ```
+  - id: mfa-delete-factor
+    title: 'mfa.delete_factor()'
+    params:
+      - name: params
+        isOptional: false
+        type: AuthMFAAdminDeleteFactorParams
+        subContent:
+          - name: id
+            isOptional: false
+            type: string
+            description: ID of the MFA factor to delete.
+          - name: user_id
+            isOptional: false
+            type: string
+            description: ID of the user whose factor is being deleted.
+    notes: |
+      Deletes a factor on a user. This will log the user out of all active sessions if the deleted factor was verified.
+    examples:
+      - id: delete-factor
+        name: Delete a factor for a user
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.admin.mfa.delete_factor({
+            "id": "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+            "user_id": "a89baba7-b1b7-440f-b4bb-91026967f66b",
+          })
+          ```
+        response: |
+          ```json
+          {
+            "id": "34e770dd-9ff9-416c-87fa-43b31d7ef225"
           }
           ```
 
