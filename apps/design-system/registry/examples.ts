@@ -1136,6 +1136,36 @@ export const examples: Registry = [
     files: ['example/color-usage-surface-studio-frame.tsx'],
   },
   {
+    name: 'chart-bar-demo',
+    type: 'components:example',
+    files: ['example/chart-bar-demo.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-grid',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-grid.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-axis',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-axis.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-tooltip',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-tooltip.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-legend',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-legend.tsx'],
+  },
+  {
+    name: 'chart-tooltip-demo',
+    type: 'components:example',
+    files: ['example/chart-tooltip-demo.tsx'],
+  },
+  {
     name: 'expanding-textarea-demo',
     type: 'docs:example',
     files: ['example/expanding-textarea-demo.tsx'],
