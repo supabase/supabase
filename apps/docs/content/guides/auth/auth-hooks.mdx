@@ -1,10 +1,12 @@
 ---
 id: 'auth-hooks'
 title: 'Auth Hooks'
-description: 'Use Supabase Postgres Functions to customize your authentication flow'
+subtitle: 'Use HTTP or Postgres Functions to customize your authentication flow'
 ---
 
-Supabase allows you to use Postgres functions to alter the default Supabase Auth flow. Developers can use hooks to add custom behavior that's not supported natively.
+## What is a hook
+
+A hook is an endpoint that allows you to alter the default Supabase Auth flow at specific execution points. Developers can use hooks to add custom behavior that's not supported natively.
 
 Hooks help you:
 
@@ -12,33 +14,195 @@ Hooks help you:
 - Improve security by adding additional checks to password and multi-factor authentication
 - Support legacy systems by integrating with identity credentials from external authentication systems
 - Add additional custom claims to your JWT
+- Send authentication emails or SMS messages through a custom provider
 
-You can use hooks at specific points along an Auth flow to perform custom behavior via Postgres Functions. The following hooks are available:
+The following hooks are available:
 
-| Hook                          | Available on Plan    |
-| ----------------------------- | -------------------- |
-| Custom Access Token           | Free, Pro            |
-| MFA Verification Attempt      | Teams and Enterprise |
-| Password Verification Attempt | Teams and Enterprise |
+| Hook                                                                                     | Available on Plan    |
+| ---------------------------------------------------------------------------------------- | -------------------- |
+| [Custom Access Token](/docs/guides/auth/auth-hooks/custom-access-token-hook)             | Free, Pro            |
+| [Send SMS](/docs/guides/auth/auth-hooks/send-sms-hook)                                   | Free, Pro            |
+| [Send Email](/docs/guides/auth/auth-hooks/send-email-hook)                               | Free, Pro            |
+| [MFA Verification Attempt](/docs/guides/auth/auth-hooks/mfa-verification-hook)           | Teams and Enterprise |
+| [Password Verification Attempt](/docs/guides/auth/auth-hooks/password-verification-hook) | Teams and Enterprise |
 
-You can connect a hook to Supabase Auth to signal to Supabase Auth that it should make use of the hook.
+Supabase supports 2 ways to [configure a hook](/dashboard/project/_/auth/hooks) in your project:
 
-## Create a hook
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="postgres-function"
+>
+<TabPanel id="postgres-function" label="Postgres Function">
 
-### What is a hook
+A [postgres function](/docs/guides/database/functions) can be configured as a hook. The function should take in a single argument -- the event of type JSONB -- and return a JSONB object. Since the postgres function runs on your database, the request does not leave your project's instance.
 
-A hook is a [Postgres Function](https://www.postgresql.org/docs/current/sql-createfunction.html) with a single argument -- the `event` of type [JSONB]() -- and which returns a JSONB object.
+</TabPanel>
+<TabPanel id="http" label="HTTP Endpoint">
 
-This function is invoked by Supabase Auth at its point in the flow by providing an event object. The object returned by the function gives instructions on how Supabase Auth should continue processing.
+A HTTP Hook is an endpoint which takes in a JSON event payload and returns a JSON response. You can use any HTTP endpoint as a Hook, including an endpoint in your application. The easiest way to create a HTTP hook is to create a [Supabase Edge Function](/docs/guides/functions/quickstart).
 
-To access properties of the `event` argument, you can use the [JSON operators and functions](https://www.postgresql.org/docs/current/functions-json.html).
+</TabPanel>
+</Tabs>
 
-There are no restrictions as to what language can be used to write Auth Hooks. If [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html) is too difficult consider using the [plv8](/docs/guides/database/extensions/plv8) extension which lets you use JavaScript to define functions.
+## Security Model
+
+Sign the payload and grant permissions selectively in order to guard the integrity of the payload.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+
+When you configure a postgres function as a hook, Supabase will automatically apply the following grants to the function for these reasons:
+
+- Allow the `supabase_auth_admin` role to execute the function. The `supabase_auth_admin` role is the postgres role that is used by Supabase Auth to make requests to your database.
+- Revoke permissions from other roles (e.g. `anon`, `authenticated`, `public`) to ensure the function is not accessible by Supabase Data APIs.
+
+```sql
+-- Grant access to function to supabase_auth_admin
+grant execute
+  on function public.custom_access_token_hook
+  to supabase_auth_admin;
+
+-- Grant access to schema to supabase_auth_admin
+grant usage on schema public to supabase_auth_admin;
+
+-- Revoke function permissions from authenticated, anon and public
+revoke execute
+  on function public.custom_access_token_hook
+  from authenticated, anon, public;
+```
+
+<Admonition type="caution" label="Create postgres functions with security invoker">
+
+We do not recommend creating postgres functions with the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. Read more about the `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
+
+</Admonition>
+
+</TabPanel>
+<TabPanel id="http" label="HTTP">
+
+HTTP Hooks in Supabase follow the [Standard Webhooks Specification](https://www.standardwebhooks.com/), which is a set of guidelines aligning how hooks are implemented. The specification attaches three security headers to guarantee the integrity of the payload:
+
+- `webhook-id`: the unique webhook identifier described in the preceding sections.
+- `webhook-timestamp`: integer UNIX timestamp (seconds since epoch).
+- `webhook-signature`: the signatures of this webhook. This is generated from body of the hook.
+
+When the request is made to the HTTP hook, you should use the [Standard Webhooks libraries](https://github.com/standard-webhooks/standard-webhooks/tree/main/libraries) to verify these headers.
+
+When a HTTP hook is created, the secret generated should be of the following format: `v1,whsec_<standard-base64-secret>`:
+
+- `v1` denotes the version of the hook
+- `whsec_` signifies that the secret is symmetric
+- `<standard-base64-secret>` implies a Standard Base64 encoded secret which can contain the characters `+`, `/` and `=`
+
+The secret is used to verify the payload received in your hook. Create an entry in your `.env.local` file to store the secret for each hook that you have. For example:
+
+```bash
+HOOK_SECRET=<standard-base64-secret>
+```
+
+Use the secret in conjunction with the Standard Webhooks package to verify the payload before processing it:
+
+```jsx
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+
+Deno.serve(async (req) => {
+  const payload = await req.text()
+  const hookSecret = Deno.env.get('HOOK_SECRET')
+  // Extract headers and security specific fields
+  const headers = Object.fromEntries(req.headers)
+  const wh = new Webhook(hookSecret)
+  const data = wh.verify(payload, headers)
+
+  // Payload data is verified, continue with business logic here
+  // ...
+})
+```
+
+</TabPanel>
+</Tabs>
+
+## Using Hooks
+
+### Developing
+
+Let us develop a Hook locally and then deploy it to the cloud. As a recap, here’s a list of available Hooks
+
+| Hook                          | Suggested Function Name         | When it is called                                  | What it Does                                                                                              |
+| ----------------------------- | ------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Send SMS                      | `send_sms`                      | Each time an SMS is sent                           | Allows you to customize message content and SMS Provider                                                  |
+| Send Email                    | `send_email`                    | Each time an Email is sent                         | Allows you to customize message content and Email Provider                                                |
+| Custom Access Token           | `custom_access_token`           | Each time a new JWT is created                     | Returns the claims you wish to be present in the JWT.                                                     |
+| MFA Verification Attempt      | `mfa_verification_attempt`      | Each time a user tries to verify an MFA factor.    | Returns a decision on whether to reject the attempt and future ones, or to allow the user to keep trying. |
+| Password Verification Attempt | `password_verification_attempt` | Each time a user tries to sign in with a password. | Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying.   |
+
+Edit `config.toml` to set up the Auth Hook locally.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+Modify the `auth.hook.<hook_name>` field and set `uri` to a value of `pg-functions://postgres/<schema>/<function_name>`
+
+```
+[auth.hook.<hook_name>]
+enabled = true
+uri = "pg-functions://...."
+
+```
+
+You need to assign additional permissions so that Supabase Auth can access the hook as well as the tables it interacts with.
+
+The `supabase_auth_admin` role does not have permissions to the `public` schema. You need to grant the role permission to execute your hook:
+
+```sql
+grant execute
+  on function public.custom_access_token_hook
+  to supabase_auth_admin;
+
+```
+
+You also need to grant usage to `supabase_auth_admin`:
+
+```sql
+grant usage on schema public to supabase_auth_admin;
+
+```
+
+Also revoke permissions from the `authenticated` and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs.
+
+```sql
+revoke execute
+  on function public.custom_access_token_hook
+  from authenticated, anon;
+
+```
+
+For security, we recommend against the use the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
+
+We recommend that you do not use any tag and explicitly grant permissions to `supabase_auth_admin` as described above.
+
+Read more about `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
+
+There are no restrictions as to what language can be used to write a Postgres Hook. If [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html) is too difficult consider using the [plv8](/docs/guides/database/extensions/plv8) extension which lets you use JavaScript to define functions.
+
+Once done, save your Auth Hook as a migration in order to version the Auth Hook and share it with other team members. Run [`supabase migration new`](/docs/reference/cli/supabase-migration-new) to create a migration.
 
 <Admonition type="caution">
-  If you're using the Supabase SQL Editor, there's an issue when using the `?` (*Does the string
-  exist as a top-level key within the JSON value?*) operator. Use a direct connection to the
-  database if you need to use it when defining a function.
+
+If you're using the Supabase SQL Editor, there's an issue when using the `?` (_Does the string exist as a top-level key within the JSON value?_) operator. Use a direct connection to the database if you need to use it when defining a function.
+
 </Admonition>
 
 Here is an example hook signature:
@@ -55,43 +219,47 @@ begin
   return event;
 end;
 $$;
+
 ```
 
 You can visit `SQL Editor > Templates` for hook templates.
 
-### Hook grants and roles
-
-You need to assign additional permissions so that Supabase Auth can access the hook as well as the tables it interacts with.
-
-The `supabase_auth_admin` role does not have permissions to the `public` schema. You need to grant the role permission to execute your hook function:
-
-```sql
-grant execute
-  on function public.custom_access_token_hook
-  to supabase_auth_admin;
+</TabPanel>
+<TabPanel id="http" label="HTTP">
+Modify the `auth.hook.<hook_name>` field and set `uri` to a valid HTTP URI. For example, the `send_sms` hook would take the following fields:
+```
+[auth.hook.send_sms]
+enabled = true
+uri = "http://host.docker.internal:54321/functions/v1/send_sms"
+secret = "env(SEND_SMS_HOOK_SECRET)"
 ```
 
-You also need to grant usage to `supabase_auth_admin`:
+`host.docker.internal` is a special DNS name used in Docker to allow a container to access the host machine's network. This allows the Auth container to reach the Functions container
 
-```sql
-grant usage on schema public to supabase_auth_admin;
+Fill in the Hook Secret in `supabase/functions/.env`
+
+```bash
+SEND_SMS_HOOK_SECRET='v1,whsec_<base64_standard_secret>'
 ```
 
-Also revoke permissions from the `authenticated`, `public`, and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs. The `public` role has access to functions created on `public.*` by default and `anon` and `authenticated` inherit permissions from the `public` role. Permission is revoked from the`public` role in order to prevent the `anon` and `authenticated` roles from inheriting permissions to invoke the Postgres Hook.
+Start the function locally:
 
-```sql
-revoke execute
-  on function public.custom_access_token_hook
-  from authenticated, anon, public;
+```bash
+supabase functions serve send-sms --no-verify-jwt
 ```
 
-For security, we recommend against the use the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
+Disable JWT verification via the `--no-verify-jwt` to accommodate hooks which are run before a JWT is issued. Payload authenticity is instead protected via the appended security headers associated with the Standard Webhooks Standard.
 
-We recommend that you do not use any tag and explicitly grant permissions to `supabase_auth_admin` as described above.
+Note that payloads are sent uncompressed in order to accurately track Content Length. In addition, there is a 20KB payload limit to guard against payload stuffing attacks.
 
-Read more about `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
+</TabPanel>
+</Tabs>
 
-### Hook errors
+### Deploying
+
+In the dashboard, navigate to [`Authentication > Hooks`](/dashboard/project/_/auth/hooks) and select the appropriate function type (SQL or HTTP) from the dropdown menu.
+
+### Error Handling
 
 You should return an error when facing a runtime error. Runtime errors are specific to your application and arise from specific business rules rather than programmer errors.
 
@@ -100,6 +268,16 @@ Runtime errors could happen when:
 - The user does not have appropriate permissions
 - The event payload received does not have required claims.
 - The user has performed an action which violates a business rule.
+- The email or phone provider used in the webhook returned an error.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
 
 The error is a JSON object and has the following properties:
 
@@ -118,618 +296,86 @@ Here's an example:
 }
 ```
 
-When an error is returned, the error is propagated from the hook to Supabase Auth and translated into a HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
+Errors returned from a Postgres Hook are not retry-able. When an error is returned, the error is propagated from the hook to Supabase Auth and translated into a HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
 
-### Timeouts
+</TabPanel>
 
-Ensure that your hooks complete within **2 seconds** to avoid any errors.
+<TabPanel id="http" label="HTTP">
+Hooks return status codes based on the nature of the response. These status codes help determine the next steps in the processing flow:
 
-### Connect a hook
+| HTTP Status Code | Description                                                   | Example Usage                                  |
+| ---------------- | ------------------------------------------------------------- | ---------------------------------------------- |
+| 200, 202, 204    | Valid response, proceed                                       | Successful processing of the request           |
+| 429, 503         | Retry-able errors with Retry-after header supported           | Temporary server overload or maintenance       |
+| 403, 400         | Treated as Internal Server Errors and return a 500 Error Code | Malformed requests or insufficient permissions |
 
-In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate PostgreSQL function from the dropdown menu.
+Errors are responses which contain status codes 400 and above. On a retry-able error, such as an error with a `429` or `503` status code, HTTP Hooks will attempt up to three retries with a back-off of two seconds.
 
-## Hook: MFA verification attempt
+Here's a sample HTTP retry schedule:
 
-You can add additional checks to the [Supabase MFA implementation](/docs/guides/auth/auth-mfa) with hooks. For example, you can:
+| Time Since Start (HH:MM:SS) | Event                   | Notes                                             |
+| --------------------------- | ----------------------- | ------------------------------------------------- |
+| 00:00:00                    | Initial Attempt         | Initial invocation begins.                        |
+| 00:00:05                    | Initial Attempt Timeout | Initial invocation must complete.                 |
+| 00:00:07                    | Retry Start #1          | After 2 sec delay, first retry begins.            |
+| 00:00:12                    | Retry Timeout #1        | First retry timeout.                              |
+| 00:00:14                    | Retry Start #2          | After 2 sec delay, second retry begins.           |
+| 00:00:19                    | Retry Timeout #2        | Second retry timeout. Returns an error on failure |
 
-- Limit the number of verification attempts performed over a period of time.
-- Sign out users who have too many invalid verification attempts.
-- Count, rate limit, or ban sign-ins.
+Return a retry-able error by attaching a appropriate status code (`429`, `503` ) and a non-empty `retry-after` header
 
-**Inputs**
-
-Supabase Auth will supply the following fields to your hook:
-
-- `factor_id` Unique identifier for the MFA factor being verified.
-- `user_id` Unique identifier for the user.
-- `valid` Whether the verification attempt was valid. For TOTP, this means that the six digit code was correct (true) or incorrect (false).
-
-Example payload:
-
-```json
-{
-  "factor_id": "6eab6a69-7766-48bf-95d8-bd8f606894db",
-  "user_id": "3919cb6e-4215-4478-a960-6d3454326cec",
-  "valid": true
-}
+```jsx
+return new Response(
+  JSON.stringify({
+    error: `Failed to process the request: ${error}`,
+  }),
+  { status: 429, headers: { 'Content-Type': 'application/json', 'retry-after': 'true' } }
+)
 ```
 
-**Outputs**
-
-Return this if your hook processed the input without errors.
-
-- `decision` A string containing the decision on whether to allow authentication to move forward. Use `reject` to deny the verification attempt and log the user out of all active sessions. Use `continue` to use the default Supabase Auth behavior.
-- `message` The message to show the user if the decision was `reject`.
-
-Example output:
-
-```json
-{
-  "decision": "reject",
-  "message": "You have exceeded maximum number of MFA attempts."
-}
-```
-
-**Examples**
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="limit-failed-mfa-verification-attempts"
-  queryGroup="language"
->
-<TabPanel id="limit-failed-mfa-verification-attempts" label="Limit failed MFA verification attempts">
-
-Your company requires that a user can input an incorrect MFA Verification code no more than once every 2 seconds.
-
-Create a table to record the last time a user had an incorrect MFA verification attempt for a factor.
-
-```sql
-create table public.mfa_failed_verification_attempts (
-  user_id uuid not null,
-  factor_id uuid not null,
-  last_failed_at timestamp not null default now(),
-  primary key (user_id, factor_id)
-);
-```
-
-Create a hook to read and write information to this table. For example:
-
-```sql
-create function public.hook_mfa_verification_attempt(event jsonb)
-  returns jsonb
-  language plpgsql
-as $$
-  declare
-    last_failed_at timestamp;
-  begin
-    if event->'valid' is true then
-      -- code is valid, accept it
-      return jsonb_build_object('decision', 'continue');
-    end if;
-
-    select last_failed_at into last_failed_at
-      from public.mfa_failed_verification_attempts
-      where
-        user_id = event->'user_id'
-          and
-        factor_id = event->'factor_id';
-
-    if last_failed_at is not null and now() - last_failed_at < interval '2 seconds' then
-      -- last attempt was done too quickly
-      return jsonb_build_object(
-        'error', jsonb_build_object(
-          'http_code', 429,
-          'message',   'Please wait a moment before trying again.'
-        )
-      );
-    end if;
-
-    -- record this failed attempt
-    insert into public.mfa_failed_verification_attempts
-      (
-        user_id,
-        factor_id,
-        last_refreshed_at
-      )
-      values
-      (
-        event->'user_id',
-        event->'factor_id',
-        now()
-      )
-      on conflict do update
-        set last_refreshed_at = now();
-
-    -- finally let Supabase Auth do the default behavior for a failed attempt
-    return jsonb_build_object('decision', 'continue');
-  end;
-$$;
-
--- Assign appropriate permissions and revoke access
-grant execute
-  on function public.hook_mfa_verification_attempt
-  to supabase_auth_admin;
-
-grant all
-  on table public.mfa_failed_verification_attempts
-  to supabase_auth_admin;
-
-revoke execute
-  on function public.hook_mfa_verification_attempt
-  from authenticated, anon, public;
-
-revoke all
-  on table public.mfa_failed_verification_attempts
-  from authenticated, anon, public;
-```
+Note that all responses, including error responses, need a `Content-Type` of `application/json` - not specifying the appropriate `Content-Type` will result in the function returning an error response. Supabase Auth will in turn return an Internal Server Error.
 
 </TabPanel>
 </Tabs>
 
-## Hook: Password verification attempt
-
-Your company wishes to increase security beyond the requirements of the default password implementation in order to fulfill security or compliance requirements. You plan to track the status of a password sign-in attempt and take action via an email or a restriction on logins where necessary.
-
-As this hook runs on unauthenticated requests, malicious users can abuse the hook by calling it multiple times. Pay extra care when using the hook as you can unintentionally block legitimate users from accessing your application.
-
-Check if a password is valid prior to taking any additional action to ensure the user is legitimate. Where possible, send an email or notification instead of blocking the user.
-
-**Inputs**
-
-- `user_id` Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
-- `valid` Whether the password verification attempt was valid.
-
-```json
-{
-  "user_id": "3919cb6e-4215-4478-a960-6d3454326cec",
-  "valid": true
-}
-```
-
-**Outputs**
-
-Return these only if your hook processed the input without errors.
-
-- `decision` A string containing the decision whether to allow authentication to move forward. Use `reject` to completely reject the verification attempt and log the user out of all active sessions. Use `continue` to use the default Supabase Auth behavior.
-- `message` The message to show the user if the decision was `reject`.
-- `should_logout_user` Whether to logout a user if a `reject` decision is issued. Has no effect when a `continue` decision is issued.
-
-Example output:
-
-```json
-{
-  "decision": "reject",
-  "message": "You have exceeded maximum number of password sign-in attempts.",
-  "should_logout_user": "false"
-}
-```
-
-**Examples**
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="limit-failed-password-verification-attempts"
-  queryGroup="language"
->
-<TabPanel id="limit-failed-password-verification-attempts" label="Limit failed password verification attempts">
-
-As part of new security measures within the company, users can only input an incorrect password every 10 seconds and not more than that. You want to write a hook to enforce this.
-
-Create a table to record each user's last incorrect password verification attempt.
-
-```sql
-create table public.password_failed_verification_attempts (
-  user_id uuid not null,
-  last_failed_at timestamp not null default now(),
-  primary key (user_id)
-);
-```
-
-Create a hook to read and write information to this table. For example:
-
-```sql
-create function public.hook_password_verification_attempt(event jsonb)
-returns jsonb
-language plpgsql
-as $$
-  declare
-    last_failed_at timestamp;
-  begin
-    if event->'valid' is true then
-      -- password is valid, accept it
-      return jsonb_build_object('decision', 'continue');
-    end if;
-
-    select last_failed_at into last_failed_at
-      from public.password_failed_verification_attempts
-      where
-        user_id = event->'user_id';
-
-    if last_failed_at is not null and now() - last_failed_at < interval '10 seconds' then
-      -- last attempt was done too quickly
-      return jsonb_build_object(
-        'error', jsonb_build_object(
-          'http_code', 429,
-          'message',   'Please wait a moment before trying again.'
-        )
-      );
-    end if;
-
-    -- record this failed attempt
-    insert into public.password_failed_verification_attempts
-      (
-        user_id,
-        last_failed_at
-      )
-      values
-      (
-        event->'user_id',
-        now()
-      )
-      on conflict do update
-        set last_failed_at = now();
-
-    -- finally let Supabase Auth do the default behavior for a failed attempt
-    return jsonb_build_object('decision', 'continue');
-  end;
-$$;
-
--- Assign appropriate permissions
-grant execute
-  on function public.hook_password_verification_attempt
-  to supabase_auth_admin;
-
-grant all
-  on table public.password_failed_verification_attempts
-  to supabase_auth_admin;
-
-revoke execute
-  on function public.hook_password_verification_attempt
-  from authenticated, anon, public;
-
-revoke all
-  on table public.password_failed_verification_attempts
-  from authenticated, anon, public;
-```
-
-</TabPanel>
-<TabPanel id="send-email-on-failed-password-attempt" label="Send email notification on failed password attempts">
-
-You can notify a user via email instead of blocking the user. To do so, make use of [Supabase Vault](/docs/guides/database/vault) to store the API Key of our mail provider and use [`pg_net`](/docs/guides/database/extensions/pg_net) to send a HTTP request to our email provider to send the email. Ensure that you have configured a sender signature for the email account which you are sending emails from.
-
-First, create a table to track sign in attempts.
-
-```sql
-create table public.password_sign_in_attempts (
-  user_id uuid not null,
-  attempt_id uuid not null,
-  last_attempt_at timestamp not null default now(),
-  attempt_successful boolean not null,
-  primary key (user_id, attempt_id)
-);
-```
-
-Next, store the API key of our email API provider:
-
-```sql
-select vault.create_secret('my_api_key', 'my_api_key_name', 'description_of_my_api_key');
-```
-
-Create the hook:
-
-```sql
-create or replace function public.hook_notify_user_on_failed_attempts(event jsonb)
-returns jsonb
-language plpgsql
-as $$
-  declare
-    user_id uuid;
-    server_token text;
-    user_email_address text;
-    email_body jsonb;
-    response_id int; -- Variable to store the response ID
-    http_code int;
-    error_message jsonb;
-    attempt_count int;
-    max_attempts int := 5; -- Set the threshold for failed attempts
-  begin
-    user_id := (event->>'user_id')::uuid;
-
-    -- Record the attempt
-    insert into public.password_sign_in_attempts (user_id, attempt_id, last_attempt_at, attempt_successful)
-    values (user_id, (event->>'attempt_id')::uuid, now(), (event->>'valid')::boolean)
-    on conflict (user_id, attempt_id)
-    do update set last_attempt_at = now(), attempt_successful = (event->>'valid')::boolean;
-
-    -- Check failed attempts and fetch user email
-    select count(*), u.email into attempt_count, user_email_address
-    from public.password_sign_in_attempts a
-    join auth.users u on a.user_id = u.id
-    where a.user_id = user_id and attempt_successful = false and last_attempt_at > (now() - interval '1 day');
-
-    -- Notify user if the number of failed attempts exceeds the threshold
-    if attempt_count >= max_attempts then
-      -- Fetch the server token
-      select decrypted_secret into server_token from vault.decrypted_secrets where name = 'my_api_key_name';
-
-      -- Prepare the email body
-      email_body := format('{
-        "from": "yoursenderemail@example.com",
-        "to": "%s",
-        "subject": "Security Alert: Repeated Login Attempts Detected",
-        "textbody": "We have detected repeated login attempts for your account. If this was not you, please secure your account.",
-        "htmlbody": "<html><body><strong>Security Alert:</strong> We have detected repeated login attempts for your account. If this was not you, please secure your account.</body></html>",
-        "messagestream": "outbound"
-      }', user_email_address)::jsonb;
-
-      -- Perform the HTTP POST request using Postmark
-      select id into response_id from net.http_post(
-        'https://api.youremailprovider.com/email',
-        email_body,
-        'application/json',
-        array['Accept: application/json', 'X-Postmark-Server-Token: ' || server_token]
-      );
-
-      -- Fetch the response from net._http_response using the obtained id
-      select status_code, content into http_code, error_message from net._http_response where id = response_id;
-
-      -- Handle email sending errors
-      if http_code is null or (http_code < 200 or http_code >= 300) then
-        return jsonb_build_object(
-          'error', jsonb_build_object(
-            'http_code', coalesce(http_code, 0),
-            'message', coalesce(error_message ->> 'message', 'error sending email')
-          )
-        );
-      end if;
-    end if;
-
-    -- Continue with default behavior
-    return jsonb_build_object('decision', 'continue');
-  end;
-$$;
-
--- Assign appropriate permissions
-grant execute
-  on function public.hook_notify_user_on_failed_attempts
-  to supabase_auth_admin;
-
-revoke execute
-  on function public.hook_notify_user_on_failed_attempts
-  from authenticated, anon, public;
-
-grant all
-  on table public.password_sign_in_attempts
-  to supabase_auth_admin;
-
-revoke all
-  on table public.password_sign_in_attempts
-  from authenticated, anon, public;
-```
-
-</TabPanel>
-</Tabs>
-
-## Hook: Custom access token
-
-The custom access token hook runs before a token is issued and allows you to add additional claims based on the authentication method used.
-
-Claims returned must conform to our specification. Supabase Auth will check for these claims after the hook is run and return an error if they are not present.
-
-These are the fields currently available on an access token:
-
-Required Claims: `aud`, `exp`, `iat`, `sub`, `email`, `phone`, `role`, `aal`, `session_id`
-Optional Claims: `jti`, `iss`, `nbf`, `app_metadata`, `user_metadata`, `amr`
-
-**Inputs**
-
-- `user_id` Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
-- `claims` Claims which are attached to the access token.
-- `authentication_method` the authentication method used to request the access token. Possible values include:
-  `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`.
-
-**Outputs**
-
-Return these only if your hook processed the input without errors.
-
-- `claims` A json containing the updated claims after the hook has been run.
-
-**Examples**
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="add-admin-role"
-  queryGroup="language"
->
-<TabPanel id="add-admin-role" label="Add admin role">
-
-You can allow registered admin users to perform restricted actions by granting an `admin` claim to their token.
-
-Create a profiles table with an `is_admin` flag:
-
-```sql
-create table profiles (
-  user_id uuid not null primary key references auth.users (id),
-  is_admin boolean not null default false
-);
-```
-
-Create a hook:
-
-```sql
-create or replace function public.custom_access_token_hook(event jsonb)
-returns jsonb
-language plpgsql
-as $$
-  declare
-    claims jsonb;
-    is_admin boolean;
-  begin
-    -- Check if the user is marked as admin in the profiles table
-    select is_admin into is_admin from profiles where user_id = (event->>'user_id')::uuid;
-
-    -- Proceed only if the user is an admin
-    if is_admin then
-      claims := event->'claims';
-
-      -- Check if 'app_metadata' exists in claims
-      if jsonb_typeof(claims->'app_metadata') is null then
-        -- If 'app_metadata' does not exist, create an empty object
-        claims := jsonb_set(claims, '{app_metadata}', '{}');
-      end if;
-
-      -- Set a claim of 'admin'
-      claims := jsonb_set(claims, '{app_metadata, admin}', 'true');
-
-      -- Update the 'claims' object in the original event
-      event := jsonb_set(event, '{claims}', claims);
-    end if;
-
-    -- Return the modified or original event
-    return event;
-  end;
-$$;
-
-grant execute
-  on function public.custom_access_token_hook
-  to supabase_auth_admin;
-
-revoke execute
-  on function public.custom_access_token_hook
-  from authenticated, anon, public;
-
-grant all
-  on table public.profiles
-  to supabase_auth_admin;
-
-revoke all
-  on table public.profiles
-  from authenticated, anon, public;
-```
-
-</TabPanel>
-<TabPanel id="add-metadata-claim-plv8" label="Add claim via plv8">
-You can add custom claims to the access token. In this example, we fetch the level of an existing user from the `profiles` table and assign new users a default level of zero.
-
-For convenience, we enable the `plv8` extension under [`Database > Extensions`](/dashboard/project/_/database/extensions) to run JavaScript within our query.
-
-Create a `profiles` table to hold information:
-
-```sql
-create table profiles (
-  user_id uuid not null primary key references auth.users (id),
-  level integer,
-  is_admin boolean not null default false
-);
-```
-
-```javascript
-create or replace function custom_access_token_hook(event jsonb)
-returns jsonb
-language plv8
-as $$
-  var user_level;
-
-  // Fetch the current user's level from the profiles table
-  var result = plv8.execute("select level from public.profiles where user_id = $1", [event.user_id]);
-  if (result.length > 0) {
-    user_level = result[0].level;
-  } else {
-    // Assign a default level of 0 if no level is found
-    user_level = 0;
-  }
-
-  // Check if 'claims' exists in the event object; if not, initialize it
-  if (!event.claims) {
-    event.claims = {};
-  }
-
-  // Update the level in the claims
-  event.claims.level = user_level;
-
-  return event;
-$$;
-
-grant all
-  on table public.profiles
-  to supabase_auth_admin;
-
-revoke all
-  on table public.profiles
-  from authenticated, anon, public;
-```
-
-</TabPanel>
-<TabPanel id="restrict-access-to-sso-users" label="Restrict access to SSO users">
-You can restrict access to internal applications with a hook. For example, you can require that employees log in via [SAML Single Sign On (SSO)](/docs/guides/auth/sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
-
-```sql
-create or replace function public.restrict_application_access(event jsonb)
- returns jsonb
- language plpgsql
-as $function$
-declare
-    authentication_method text;
-    email_claim text;
-    allowed_emails text[] := array['myemail@company.com', 'example@company.com'];
-begin
-    -- Extract email claim and authentication method
-    email_claim = event->'claims'->>'email';
-    authentication_method = event->'authentication_method';
-    -- Authentication methods come double quoted (e.g. "otp")
-    authentication_method = replace(authentication_method, '"', '');
-
-    if email_claim ilike '%@supabase.io' or authentication_method = 'sso/saml' or email_claim = any(allowed_emails) then
-        return event;
-    end if;
-
-    -- If none of the conditions are met, return an error
-    return jsonb_build_object(
-        'error', jsonb_build_object(
-            'http_code', 403,
-            'message', 'Staging access is only allowed to team members. Please use your @company.com account instead'
-        )
-    );
-end;
-$function$
-;
--- manually added
-grant execute
-  on function public.restrict_application_access
-  to supabase_auth_admin;
-
-revoke execute
-  on function public.restrict_application_access
-  from authenticated, anon, public;
-```
-
-</TabPanel>
-</Tabs>
-
-## Local Development
-
-Unlike the hosted platform, the local development dashboard does not have a user interface for linking a Hook. Instead, edit `config.toml` to link an Auth Hook and run it with your local setup. Modify the `auth.hook.<hook_name>` field and set `uri` to a value of `pg-functions://postgres/<schema>/<function_name>`
-
-For instance, the `config.toml` for a Custom Access Token Hook which uses the function `public.custom_access_token_hook`:
-
-```
-...
-
-[auth.hook.custom_access_token]
-enabled = true
-uri = "pg-functions://postgres/public/custom_access_token_hook"
-
-...
-```
-
-Save your Auth Hook as a migration in order to version the Auth Hook and share it with other team members. Run [`supabase migration new`](https://supabase.com/docs/reference/cli/supabase-migration-new) to create a migration.
-
-### Debugging Your Hook
-
-Test the Postgres Function in isolation before enabling the hook by connecting to your database with `psql` and running `select <your_function_name>`. Where necessary, use [`RAISE` statements](https://www.postgresql.org/docs/current/plpgsql-errors-and-messages.html) to print information to the terminal.
+Outside of runtime errors, both HTTP Hooks and Postgres Hooks return timeout errors. Postgres Hooks have <SharedData data="config">auth.hook_timeouts.postgres_hooks</SharedData> seconds to complete processing while HTTP Hooks should complete in <SharedData data="config">auth.hook_timeouts.http_hooks</SharedData> seconds. Both HTTP Hooks and Postgres Hooks are run in a transaction do limit the duration of execution to avoid delays in authentication process.
+
+## Available Hooks
+
+Each Hook description contains an example JSONSchema which you can use in conjunction with [JSONSchema Faker](https://json-schema-faker.js.org/) in order to generate a mock payload. For HTTP Hooks, you can also use [the Standard Webhooks Testing Tool](https://www.standardwebhooks.com/simulate) to simulate a request.
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {[
+    {
+      name: 'Custom Access Token',
+      description: 'Customize the access token issued by Supabase Auth',
+      href: '/guides/auth/auth-hooks/custom-access-token-hook',
+    },
+    {
+      name: 'Send SMS',
+      description: 'Use a custom SMS provider to send authentication messages',
+      href: '/guides/auth/auth-hooks/send-sms-hook',
+    },
+    {
+      name: 'Send Email',
+      description: 'Use a custom email provider to send authentication messages',
+      href: '/guides/auth/auth-hooks/send-email-hook',
+    },
+    {
+      name: 'MFA Verification',
+      description: 'Add additional checks to the MFA verification flow',
+      href: '/guides/auth/auth-hooks/mfa-verification-hook',
+    },
+    {
+      name: 'Password verification',
+      description: 'Add additional checks to the password verification flow',
+      href: '/guides/auth/auth-hooks/password-verification-hook',
+    },
+  ].map((x) => (
+    <div className="col-span-4" key={x.href}>
+      <Link href={x.href} passHref>
+        <GlassPanel title={x.name}>{x.description}</GlassPanel>
+      </Link>
+    </div>
+  ))}
+</div>

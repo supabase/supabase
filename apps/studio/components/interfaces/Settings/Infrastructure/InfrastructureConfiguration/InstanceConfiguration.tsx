@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
@@ -5,6 +6,20 @@ import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
+import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import {
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from 'data/read-replicas/replicas-status-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { timeout } from 'lib/helpers'
+import { type AWS_REGIONS_KEYS } from 'shared-data'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Button,
   DropdownMenu,
@@ -12,19 +27,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  cn,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import AlertError from 'components/ui/AlertError'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import {
-  ReplicaInitializationStatus,
-  useReadReplicasStatusesQuery,
-} from 'data/read-replicas/replicas-status-query'
-import { AWS_REGIONS_KEYS } from 'lib/constants'
-import { timeout } from 'lib/helpers'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import ComputeInstanceSidePanel from '../../Addons/ComputeInstanceSidePanel'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
 import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
@@ -42,7 +46,7 @@ const InstanceConfigurationUI = () => {
   const { ref: projectRef } = useParams()
   const numTransition = useRef<number>()
   const { project, isLoading: isLoadingProject } = useProjectContext()
-  const snap = useSubscriptionPageStateSnapshot()
+  const { setPanel } = useAddonsPagePanel()
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
@@ -51,6 +55,8 @@ const InstanceConfigurationUI = () => {
   const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
   const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
+
+  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
 
   const {
     data: loadBalancers,
@@ -217,13 +223,20 @@ const InstanceConfigurationUI = () => {
           <>
             <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
               <div className="flex items-center justify-center">
-                <Button
+                <ButtonTooltip
                   type="default"
-                  className={replicas.length > 0 ? 'rounded-r-none' : ''}
+                  disabled={!canManageReplicas}
+                  className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
                   onClick={() => setShowNewReplicaPanel(true)}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: 'You need additional permissions to deploy replicas',
+                    },
+                  }}
                 >
                   Deploy a new replica
-                </Button>
+                </ButtonTooltip>
                 {replicas.length > 0 && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -234,7 +247,7 @@ const InstanceConfigurationUI = () => {
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-52 *:space-x-2">
-                      <DropdownMenuItem onClick={() => snap.setPanelKey('computeInstance')}>
+                      <DropdownMenuItem onClick={() => setPanel('computeInstance')}>
                         <div>Resize databases</div>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

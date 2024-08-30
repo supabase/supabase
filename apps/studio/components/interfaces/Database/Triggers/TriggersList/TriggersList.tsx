@@ -13,7 +13,8 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import TriggerList from './TriggerList'
@@ -30,7 +31,7 @@ const TriggersList = ({
   deleteTrigger = noop,
 }: TriggersListProps) => {
   const { project } = useProjectContext()
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [filterString, setFilterString] = useState<string>('')
 
   const { data: schemas } = useSchemasQuery({
@@ -149,6 +150,9 @@ const TriggersList = ({
                 </Table.th>
                 <Table.th key="events" className="hidden xl:table-cell">
                   Events
+                </Table.th>
+                <Table.th key="orientation" className="hidden xl:table-cell">
+                  Orientation
                 </Table.th>
                 <Table.th key="enabled" className="hidden w-20 xl:table-cell">
                   Enabled

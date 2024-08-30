@@ -34,16 +34,16 @@ Before generating types, ensure you initialize your Supabase project:
 npx supabase init
 ```
 
-Generate types for your project to produce the `types/supabase.ts` file:
+Generate types for your project to produce the `database.types.ts` file:
 
 ```bash
-npx supabase gen types typescript --project-id "$PROJECT_REF" --schema public > types/supabase.ts
+npx supabase gen types --lang=typescript --project-id "$PROJECT_REF" --schema public > database.types.ts
 ```
 
 or in case of local development:
 
 ```bash
-npx supabase gen types typescript --local > types/supabase.ts
+npx supabase gen types --lang=typescript --local > database.types.ts
 ```
 
 These types are generated from your database schema. Given a table `public.movies`, the generated types will look like:
@@ -206,10 +206,10 @@ const countriesWithCities: CountriesWithCities = data
 
 One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.
 
-Add the script above to your `package.json` to run it using `npm run update-types`
+Add the following script to your `package.json` to run it using `npm run update-types`
 
 ```json
-"update-types": "npx supabase gen types typescript --project-id \"$PROJECT_REF\" > types/supabase.ts"
+"update-types": "npx supabase gen types --lang=typescript --project-id \"$PROJECT_REF\" > database.types.ts"
 ```
 
 Create a file `.github/workflows/update-types.yml` with the following snippet to define the action along with the environment variables. This script will commit new type changes to your repo every night.
@@ -246,7 +246,7 @@ jobs:
       - name: Commit files
         if: ${{contains(steps.git_status.outputs.status, ' ')}}
         run: |
-          git add types/supabase.ts
+          git add database.types.ts
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git commit -m "Update database types" -a

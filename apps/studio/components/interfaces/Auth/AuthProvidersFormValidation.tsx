@@ -1,5 +1,6 @@
 import { boolean, number, object, string } from 'yup'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
+import { ProjectAuthConfigData } from 'data/auth/auth-config-query'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -59,6 +60,120 @@ const PROVIDER_EMAIL = {
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
+}
+
+const smsProviderValidation = (config: ProjectAuthConfigData, provider: string) => {
+  return {
+    is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+      return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === provider && !config.HOOK_SEND_SMS_ENABLED
+    },
+  }
+}
+
+// getPhoneProviderValidationSchema generate the validation schema for the SMS providers
+// based on whether the SMS hook is enabled
+export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) => {
+  return object().shape({
+    EXTERNAL_PHONE_ENABLED: boolean().required(),
+    SMS_PROVIDER: string(),
+
+    // Twilio
+    SMS_TWILIO_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'twilio'),
+      then: (schema) => schema.required('Twilio Account SID is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'twilio'),
+      then: (schema) => schema.required('Twilio Auth Token is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_MESSAGE_SERVICE_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'twilio'),
+      then: (schema) => schema.required('Twilio Message Service SID is required'),
+      otherwise: (schema) => schema,
+    }),
+
+    // Twilio Verify
+    SMS_TWILIO_VERIFY_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'twilio_verify'),
+      then: (schema) => schema.required('Twilio Verify Account SID is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_VERIFY_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'twilio_verify'),
+      then: (schema) => schema.required('Twilio Verify Auth Token is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(
+      ['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'],
+      {
+        ...smsProviderValidation(config, 'twilio_verify'),
+        then: (schema) => schema.required('Twilio Verify Service SID is required'),
+        otherwise: (schema) => schema,
+      }
+    ),
+
+    // Messagebird
+    SMS_MESSAGEBIRD_ACCESS_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'messagebird'),
+      then: (schema) => schema.required('Messagebird Access Key is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_MESSAGEBIRD_ORIGINATOR: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'messagebird'),
+      then: (schema) => schema.required('Messagebird Originator is required'),
+      otherwise: (schema) => schema,
+    }),
+
+    // Textlocal
+    SMS_TEXTLOCAL_API_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'textlocal'),
+      then: (schema) => schema.required('Textlocal API Key is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TEXTLOCAL_SENDER: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'textlocal'),
+      then: (schema) => schema.required('Textlocal Sender is required'),
+      otherwise: (schema) => schema,
+    }),
+
+    // Vonage
+    SMS_VONAGE_API_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'vonage'),
+      then: (schema) => schema.required('Vonage API is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_VONAGE_API_SECRET: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'vonage'),
+      then: (schema) => schema.required('Vonage API Secret is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_VONAGE_FROM: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'vonage'),
+      then: (schema) => schema.required('Vonage From is required'),
+      otherwise: (schema) => schema,
+    }),
+
+    // Phone SMS
+    SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
+    SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
+    SMS_TEMPLATE: string().required('SMS template is required.'),
+    SMS_TEST_OTP: string()
+      .matches(
+        /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g,
+        'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'
+      )
+      .trim()
+      .transform((value: string) => value.replace(/\s+/g, '')),
+    SMS_TEST_OTP_VALID_UNTIL: string().when(['SMS_TEST_OTP'], {
+      is: (SMS_TEST_OTP: string | null) => {
+        return !!SMS_TEST_OTP
+      },
+      then: (schema) => schema.required('You must provide a valid until date.'),
+      otherwise: (schema) => schema.transform((value: string) => ''),
+    }),
+  })
 }
 
 const PROVIDER_PHONE = {
@@ -261,133 +376,7 @@ const PROVIDER_PHONE = {
       },
     },
   },
-  validationSchema: object().shape({
-    EXTERNAL_PHONE_ENABLED: boolean().required(),
-    SMS_PROVIDER: string().required(),
-
-    // Twilio
-    SMS_TWILIO_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
-      },
-      then: (schema) => schema.required('Twilio Account SID is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TWILIO_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
-      },
-      then: (schema) => schema.required('Twilio Auth Token is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TWILIO_MESSAGE_SERVICE_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
-      },
-      then: (schema) => schema.required('Twilio Message Service SID is required'),
-      otherwise: (schema) => schema,
-    }),
-
-    // Twilio Verify
-    SMS_TWILIO_VERIFY_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
-      },
-      then: (schema) => schema.required('Twilio Verify Account SID is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TWILIO_VERIFY_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
-      },
-      then: (schema) => schema.required('Twilio Verify Auth Token is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(
-      ['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'],
-      {
-        is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-          return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
-        },
-        then: (schema) => schema.required('Twilio Verify Service SID is required'),
-        otherwise: (schema) => schema,
-      }
-    ),
-
-    // Messagebird
-    SMS_MESSAGEBIRD_ACCESS_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'messagebird'
-      },
-      then: (schema) => schema.required('Messagebird Access Key is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_MESSAGEBIRD_ORIGINATOR: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'messagebird'
-      },
-      then: (schema) => schema.required('Messagebird Originator is required'),
-      otherwise: (schema) => schema,
-    }),
-
-    // Textlocal
-    SMS_TEXTLOCAL_API_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'textlocal'
-      },
-      then: (schema) => schema.required('Textlocal API Key is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TEXTLOCAL_SENDER: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'textlocal'
-      },
-      then: (schema) => schema.required('Textlocal Sender is required'),
-      otherwise: (schema) => schema,
-    }),
-
-    // Vonage
-    SMS_VONAGE_API_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
-      },
-      then: (schema) => schema.required('Vonage API is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_VONAGE_API_SECRET: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
-      },
-      then: (schema) => schema.required('Vonage API Secret is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_VONAGE_FROM: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
-      },
-      then: (schema) => schema.required('Vonage From is required'),
-      otherwise: (schema) => schema,
-    }),
-
-    // Phone SMS
-    SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
-    SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
-    SMS_TEMPLATE: string().required('SMS template is required.'),
-    SMS_TEST_OTP: string()
-      .matches(
-        /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g,
-        'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'
-      )
-      .trim()
-      .transform((value: string) => value.replace(/\s+/g, '')),
-    SMS_TEST_OTP_VALID_UNTIL: string().when(['SMS_TEST_OTP'], {
-      is: (SMS_TEST_OTP: string | null) => {
-        return !!SMS_TEST_OTP
-      },
-      then: (schema) => schema.required('You must provide a valid until date.'),
-      otherwise: (schema) => schema.transform((value: string) => ''),
-    }),
-  }),
+  validationSchema: null,
   misc: {
     iconKey: 'phone-icon4',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
@@ -1170,7 +1159,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
 const EXTERNAL_PROVIDER_SLACK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'Slack',
+  title: 'Slack (Deprecated)',
   properties: {
     EXTERNAL_SLACK_ENABLED: {
       title: 'Slack enabled',
@@ -1194,6 +1183,44 @@ const EXTERNAL_PROVIDER_SLACK = {
       otherwise: (schema) => schema,
     }),
     EXTERNAL_SLACK_SECRET: string().when('EXTERNAL_SLACK_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client Secret is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'slack-icon',
+    requiresRedirect: true,
+  },
+}
+
+const EXTERNAL_PROVIDER_SLACK_OIDC = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Slack (OIDC)',
+  properties: {
+    EXTERNAL_SLACK_OIDC_ENABLED: {
+      title: 'Slack enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_SLACK_OIDC_CLIENT_ID: {
+      title: 'Client ID',
+      type: 'string',
+    },
+    EXTERNAL_SLACK_OIDC_SECRET: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_SLACK_OIDC_ENABLED: boolean().required(),
+    EXTERNAL_SLACK_OIDC_CLIENT_ID: string().when('EXTERNAL_SLACK_OIDC_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client ID is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_SLACK_OIDC_SECRET: string().when('EXTERNAL_SLACK_OIDC_ENABLED', {
       is: true,
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
@@ -1341,9 +1368,17 @@ const PROVIDER_SAML = {
         'You will need to use the [Supabase CLI](https://supabase.com/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it',
       type: 'boolean',
     },
+    SAML_EXTERNAL_URL: {
+      title: 'SAML metadata URL',
+      description:
+        'You may use a different SAML metadata URL from what is defined with the API External URL. Please validate that your SAML External URL can reach the Custom Domain or Project URL',
+      descriptionOptional: 'Optional',
+      type: 'string',
+    },
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
+    SAML_EXTERNAL_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'saml-icon',
@@ -1369,6 +1404,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_NOTION,
   EXTERNAL_PROVIDER_TWITCH,
   EXTERNAL_PROVIDER_TWITTER,
+  EXTERNAL_PROVIDER_SLACK_OIDC,
   EXTERNAL_PROVIDER_SLACK,
   EXTERNAL_PROVIDER_SPOTIFY,
   EXTERNAL_PROVIDER_WORKOS,

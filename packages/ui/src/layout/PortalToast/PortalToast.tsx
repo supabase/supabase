@@ -2,8 +2,8 @@
 
 import { X } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { Toaster, ToastBar, toast } from 'react-hot-toast'
-import { Button, IconX } from 'ui'
+import { ToastBar, Toaster, toast } from 'react-hot-toast'
+import { Button } from '../../components/Button/Button'
 
 const PortalRootWithNoSSR = dynamic(
   // @ts-ignore

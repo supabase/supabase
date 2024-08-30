@@ -3,6 +3,8 @@ TEAM
 Supabase is 100% remote.
 
 Alaister Young
+Aleksi Immonen
+Alex Tasioulis
 Alexander Korotkov
 Amy Q
 Angelico de los Reyes
@@ -12,17 +14,22 @@ Beng Eu
 Bo Lu
 Bobbie Soedirgo
 Bruno Andrade
+Carel de Waal
 Chandana Anumula
 Charis Lam
 Chase Granberry
 Chris Caruso
+Chris Chandler
 Chris Copplestone
 Chris Gwilliams
+Chris Stockton
+Craig Cannon
 Dave Wilson
 Deji I
 Div Arora
 Divit D
 Egor Romanov
+Etienne Stalmans
 Fabrizio Fenoglio
 Francesco Sansalvadore
 Greg Richardson
@@ -30,6 +37,7 @@ Guilherme Souza
 Haydn Maley
 Hieu Pham
 Inian P
+Jenny Kibiri
 Jess Shears
 Joel Lee
 John Pena
@@ -37,6 +45,7 @@ Jon M
 Jonny Summers-Muir
 Jordi Enric
 Joshen Lim
+Julien Goux
 Kamil Ogórek
 Kang Ming Tay
 Karan S
@@ -49,6 +58,7 @@ Long Hoang
 Margarita Sandomirskaia
 Marijana Pavlinić
 Mark Burggraf
+Michael Ridley
 Monica El Khoury
 Oli R
 Pamela Chia

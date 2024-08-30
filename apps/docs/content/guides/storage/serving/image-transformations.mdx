@@ -11,7 +11,7 @@ Supabase Storage offers the functionality to optimize and resize images on the f
 
 <Admonition type="note">
 
-Image Resizing is currently enabled for [Pro plan and above](https://supabase.com/pricing).
+Image Resizing is currently enabled for [Pro Plan and above](https://supabase.com/pricing).
 
 </Admonition>
 
@@ -68,6 +68,21 @@ let url = try await supabase.storage.from("bucket")
 val url = supabase.storage.from("bucket").publicRenderUrl("image.jpg") {
     size(width = 500, height = 600)
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+url = supabase.storage.from_('avatars').get_public_url(
+  'image.jpg',
+  {
+    'transform': {
+      'width': 500,
+      'height': 500,
+    },
+  }
+)
 ```
 
 </TabPanel>
@@ -207,6 +222,19 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket').download(
+  'image.jpg',
+  {
+    'width': 800,
+    'height': 300,
+  },
+)
+```
+
+</TabPanel>
 </Tabs>
 
 ## Automatic image optimization (WebP)
@@ -291,6 +319,22 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket').download(
+  'image.jpeg',
+  {
+    'transform': {
+      'width': 200,
+      'height': 200,
+      'format': 'origin',
+    },
+  }
+)
+```
+
+</TabPanel>
 </Tabs>
 
 ## Next.js loader
@@ -303,7 +347,7 @@ To get started, create a `supabase-image-loader.js` file in your Next.js project
 const projectId = '' // your supabase project id
 
 export default function supabaseLoader({ src, width, quality }) {
-  return `https://${projectId}.supabase.co/storage/v1/object/public/${src}?width=${width}&quality=${quality || 75}`
+  return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&quality=${quality || 75}`
 }
 ```
 
@@ -396,6 +440,20 @@ supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket').download(
+  'image.jpg',
+  {
+    'transform': {
+      'quality': 50,
+    },
+  }
+)
+```
+
+</TabPanel>
 </Tabs>
 
 ### Resizing
@@ -479,6 +537,22 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
     size(800, 300)
     resize = ImageTransformation.Resize.CONTAIN
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket').download(
+  'image.jpg',
+  {
+    'transform': {
+      'width': 800,
+      'height': 300,
+      'resize': 'contain', # 'cover' | 'fill'
+    }
+  }
+)
 ```
 
 </TabPanel>

@@ -1,6 +1,6 @@
 import { CodeBlock } from '@ui/components/CodeBlock'
 import { sample } from '@har-sdk/openapi-sampler'
-import { Tabs, TabPanel } from '~/components/Tabs'
+import { Tabs, TabPanel } from '~/features/ui/Tabs'
 
 type IParamProps = any
 

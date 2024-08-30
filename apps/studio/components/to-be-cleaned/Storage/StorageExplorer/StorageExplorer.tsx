@@ -2,14 +2,10 @@ import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
 
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { Bucket } from 'data/storage/buckets-query'
-import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
-import { copyToClipboard } from 'lib/helpers'
+import { IS_PLATFORM } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import ConfirmDeleteModal from './ConfirmDeleteModal'
@@ -57,18 +53,10 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   const storageExplorerRef = useRef(null)
 
   const { ref } = useParams()
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
-  const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
 
   // [Joshen] This is to ensure that StorageExplorerStore can get the storage file size limit
   // Will be better once we deprecate the mobx store entirely, which we will get there
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
-
-  const apiService = (projectSettings?.services ?? []).find(
-    (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
-  )
-  const apiConfig = apiService?.app_config
-  const apiUrl = `${apiConfig?.protocol ?? 'https'}://${apiConfig?.endpoint ?? '-'}`
 
   // This state exists outside of the header because FileExplorerColumn needs to listen to these as well
   // I'm keeping them outside of the mobx store as I feel that the store should contain persistent data
@@ -190,16 +178,6 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     clearSelectedItems()
   }
 
-  const onCopyUrl = (name: string, url: string) => {
-    const formattedUrl =
-      customDomainData?.customDomain?.status === 'active'
-        ? url.replace(apiUrl, `https://${customDomainData.customDomain.hostname}`)
-        : url
-    copyToClipboard(formattedUrl, () => {
-      toast.success(`Copied URL for ${name} to clipboard.`)
-    })
-  }
-
   return (
     <div
       ref={storageExplorerRef}
@@ -231,9 +209,8 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
           onColumnLoadMore={(index, column) =>
             fetchMoreFolderContents(index, column, itemSearchString)
           }
-          onCopyUrl={onCopyUrl}
         />
-        <PreviewPane onCopyUrl={onCopyUrl} />
+        <PreviewPane />
       </div>
       <ConfirmDeleteModal
         visible={selectedItemsToDelete.length > 0}
@@ -248,7 +225,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
         onSelectCancel={clearSelectedItemsToMove}
         onSelectMove={onMoveSelectedFiles}
       />
-      <CustomExpiryModal onCopyUrl={onCopyUrl} />
+      <CustomExpiryModal />
     </div>
   )
 }

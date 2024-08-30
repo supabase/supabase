@@ -3,6 +3,7 @@ import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
+
 import {
   Button,
   IconActivity,
@@ -16,10 +17,12 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
+import { useProjectContext } from '../ProjectContext'
 
 const HelpPopover = () => {
   const router = useRouter()
-  const projectRef = router.query.ref
+  const { project } = useProjectContext()
+  const projectRef = project?.parent_project_ref ?? router.query.ref
   const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
 
   return (

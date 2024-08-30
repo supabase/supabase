@@ -1,6 +1,8 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -262,24 +264,37 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
         <Panel.Content>
           <Listbox
-            label="Pricing Plan"
+            label={
+              <div className="flex flex-col gap-2">
+                <span>Plan</span>
+
+                <a
+                  href="https://supabase.com/pricing"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-sm flex items-center gap-2 opacity-75 hover:opacity-100 transition"
+                >
+                  Pricing
+                  <ExternalLink size={16} strokeWidth={1.5} />
+                </a>
+              </div>
+            }
             layout="horizontal"
             value={dbPricingTierKey}
             // @ts-ignore
             onChange={onDbPricingPlanChange}
             // @ts-ignore
             descriptionText={
-              <>
-                Select a plan that suits your needs.&nbsp;
-                <a
-                  className="underline"
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://supabase.com/pricing"
-                >
-                  More details
-                </a>
-              </>
+              dbPricingTierKey !== 'FREE' ? (
+                <p>
+                  The plan applies only to this new organization. To upgrade an existing
+                  organization,{' '}
+                  <Link className="underline" href="/org/_/billing?panel=subscriptionPlan">
+                    click here
+                  </Link>
+                  .
+                </p>
+              ) : undefined
             }
           >
             {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => {
@@ -314,10 +329,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 descriptionText={
                   <div>
                     <p>
-                      By default, Pro plan organizations have a spend cap to control costs. When
-                      enabled, usage is limited to the plan's quota, with restrictions when limits
-                      are exceeded. To scale beyond Pro limits without restrictions, disable the
-                      spend cap and pay for over-usage beyond the quota.
+                      With Spend Cap enabled, usage is limited to the plan's quota, with
+                      restrictions when limits are exceeded. To scale beyond Pro Plan limits,
+                      disable the Spend Cap to pay over-usage.
                     </p>
                   </div>
                 }

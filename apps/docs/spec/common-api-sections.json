@@ -7,7 +7,7 @@
   },
   {
     "type": "category",
-    "title": "auth",
+    "title": "Auth",
     "items": [
       {
         "id": "v1-create-a-sso-provider",
@@ -55,7 +55,7 @@
   },
   {
     "type": "category",
-    "title": "database",
+    "title": "Database",
     "items": [
       {
         "id": "v1-disable-readonly-mode-temporarily",
@@ -169,7 +169,7 @@
   },
   {
     "type": "category",
-    "title": "domains",
+    "title": "Domains",
     "items": [
       {
         "id": "v1-activate-custom-hostname",
@@ -223,7 +223,7 @@
   },
   {
     "type": "category",
-    "title": "edge functions",
+    "title": "Edge Functions",
     "items": [
       {
         "id": "v1-delete-a-function",
@@ -259,7 +259,7 @@
   },
   {
     "type": "category",
-    "title": "environments",
+    "title": "Environments",
     "items": [
       {
         "id": "v1-create-a-branch",
@@ -307,7 +307,7 @@
   },
   {
     "type": "category",
-    "title": "oauth",
+    "title": "OAuth",
     "items": [
       {
         "id": "v1-authorize-user",
@@ -325,7 +325,7 @@
   },
   {
     "type": "category",
-    "title": "organizations",
+    "title": "Organizations",
     "items": [
       {
         "id": "v1-create-an-organization",
@@ -355,12 +355,18 @@
   },
   {
     "type": "category",
-    "title": "projects",
+    "title": "Projects",
     "items": [
       {
         "id": "v1-create-a-project",
         "title": "Create a project",
         "slug": "v1-create-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-a-project",
+        "title": "Delete a project",
+        "slug": "v1-delete-a-project",
         "type": "operation"
       },
       {
@@ -421,7 +427,7 @@
   },
   {
     "type": "category",
-    "title": "rest",
+    "title": "Rest",
     "items": [
       {
         "id": "v1-get-postgrest-service-config",
@@ -439,7 +445,7 @@
   },
   {
     "type": "category",
-    "title": "secrets",
+    "title": "Secrets",
     "items": [
       {
         "id": "v1-bulk-create-secrets",
@@ -481,7 +487,7 @@
   },
   {
     "type": "category",
-    "title": "storage",
+    "title": "Storage",
     "items": [
       {
         "id": "v1-list-all-buckets",

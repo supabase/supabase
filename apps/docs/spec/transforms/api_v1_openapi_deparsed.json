@@ -2,19 +2,55 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Supabase API (v1)",
-    "description": "",
+    "description": "Supabase API generated from the OpenAPI specification.<br>Visit [https://supabase.com/docs](https://supabase.com/docs) for a complete documentation.",
     "version": "1.0.0",
     "contact": {}
   },
   "servers": [],
   "tags": [
     {
-      "name": "organizations",
-      "description": "Organization endpoints"
+      "name": "Auth",
+      "description": "Auth related endpoints"
     },
     {
-      "name": "projects",
-      "description": "Project endpoints"
+      "name": "Database",
+      "description": "Database related endpoints"
+    },
+    {
+      "name": "Domains",
+      "description": "Domains related endpoints"
+    },
+    {
+      "name": "Edge Functions",
+      "description": "Edge related endpoints"
+    },
+    {
+      "name": "Environments",
+      "description": "Environments related endpoints"
+    },
+    {
+      "name": "OAuth",
+      "description": "OAuth related endpoints"
+    },
+    {
+      "name": "Organizations",
+      "description": "Organizations related endpoints"
+    },
+    {
+      "name": "Projects",
+      "description": "Projects related endpoints"
+    },
+    {
+      "name": "Rest",
+      "description": "Rest related endpoints"
+    },
+    {
+      "name": "Secrets",
+      "description": "Secrets related endpoints"
+    },
+    {
+      "name": "Storage",
+      "description": "Storage related endpoints"
     }
   ],
   "paths": {
@@ -60,10 +96,13 @@
                         "INACTIVE",
                         "INIT_FAILED",
                         "REMOVED",
-                        "RESTORING",
+                        "RESTARTING",
                         "UNKNOWN",
                         "UPGRADING",
-                        "PAUSING"
+                        "PAUSING",
+                        "RESTORING",
+                        "RESTORE_FAILED",
+                        "PAUSE_FAILED"
                       ],
                       "type": "string"
                     },
@@ -96,7 +135,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -220,7 +259,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -267,7 +306,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -316,7 +355,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -389,10 +428,13 @@
                           "INACTIVE",
                           "INIT_FAILED",
                           "REMOVED",
-                          "RESTORING",
+                          "RESTARTING",
                           "UNKNOWN",
                           "UPGRADING",
-                          "PAUSING"
+                          "PAUSING",
+                          "RESTORING",
+                          "RESTORE_FAILED",
+                          "PAUSE_FAILED"
                         ],
                         "type": "string"
                       }
@@ -412,7 +454,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -449,7 +491,7 @@
                       "free",
                       "pro"
                     ],
-                    "description": "Subscription plan is now set on organization level and is ignored in this request",
+                    "description": "Subscription Plan is now set on organization level and is ignored in this request",
                     "example": "free",
                     "deprecated": true
                   },
@@ -567,10 +609,13 @@
                         "INACTIVE",
                         "INIT_FAILED",
                         "REMOVED",
-                        "RESTORING",
+                        "RESTARTING",
                         "UNKNOWN",
                         "UPGRADING",
-                        "PAUSING"
+                        "PAUSING",
+                        "RESTORING",
+                        "RESTORE_FAILED",
+                        "PAUSE_FAILED"
                       ],
                       "type": "string"
                     }
@@ -589,7 +634,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -635,7 +680,7 @@
           }
         },
         "tags": [
-          "organizations"
+          "Organizations"
         ],
         "security": [
           {
@@ -693,7 +738,7 @@
           }
         },
         "tags": [
-          "organizations"
+          "Organizations"
         ],
         "security": [
           {
@@ -788,7 +833,7 @@
           }
         },
         "tags": [
-          "oauth"
+          "OAuth"
         ],
         "security": [
           {
@@ -882,7 +927,7 @@
           }
         },
         "tags": [
-          "oauth"
+          "OAuth"
         ],
         "security": [
           {
@@ -1022,7 +1067,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -1169,7 +1214,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -1226,7 +1271,7 @@
           }
         },
         "tags": [
-          "secrets"
+          "Secrets"
         ],
         "security": [
           {
@@ -1333,7 +1378,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -1459,7 +1504,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -1493,7 +1538,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -1541,7 +1586,124 @@
                       "type": "string"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "messages": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "result": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "hostname": {
+                              "type": "string"
+                            },
+                            "ssl": {
+                              "type": "object",
+                              "properties": {
+                                "status": {
+                                  "type": "string"
+                                },
+                                "validation_records": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "txt_name": {
+                                        "type": "string"
+                                      },
+                                      "txt_value": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "txt_name",
+                                      "txt_value"
+                                    ]
+                                  }
+                                },
+                                "validation_errors": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "message": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "message"
+                                    ]
+                                  }
+                                }
+                              },
+                              "required": [
+                                "status",
+                                "validation_records"
+                              ]
+                            },
+                            "ownership_verification": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "value"
+                              ]
+                            },
+                            "custom_origin_server": {
+                              "type": "string"
+                            },
+                            "verification_errors": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "hostname",
+                            "ssl",
+                            "ownership_verification",
+                            "custom_origin_server",
+                            "status"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors",
+                        "messages",
+                        "result"
+                      ]
                     }
                   },
                   "required": [
@@ -1561,7 +1723,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -1597,7 +1759,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -1663,7 +1825,124 @@
                       "type": "string"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "messages": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "result": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "hostname": {
+                              "type": "string"
+                            },
+                            "ssl": {
+                              "type": "object",
+                              "properties": {
+                                "status": {
+                                  "type": "string"
+                                },
+                                "validation_records": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "txt_name": {
+                                        "type": "string"
+                                      },
+                                      "txt_value": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "txt_name",
+                                      "txt_value"
+                                    ]
+                                  }
+                                },
+                                "validation_errors": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "message": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "message"
+                                    ]
+                                  }
+                                }
+                              },
+                              "required": [
+                                "status",
+                                "validation_records"
+                              ]
+                            },
+                            "ownership_verification": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "value"
+                              ]
+                            },
+                            "custom_origin_server": {
+                              "type": "string"
+                            },
+                            "verification_errors": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "hostname",
+                            "ssl",
+                            "ownership_verification",
+                            "custom_origin_server",
+                            "status"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors",
+                        "messages",
+                        "result"
+                      ]
                     }
                   },
                   "required": [
@@ -1683,7 +1962,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -1731,7 +2010,124 @@
                       "type": "string"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "messages": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "result": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "hostname": {
+                              "type": "string"
+                            },
+                            "ssl": {
+                              "type": "object",
+                              "properties": {
+                                "status": {
+                                  "type": "string"
+                                },
+                                "validation_records": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "txt_name": {
+                                        "type": "string"
+                                      },
+                                      "txt_value": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "txt_name",
+                                      "txt_value"
+                                    ]
+                                  }
+                                },
+                                "validation_errors": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "message": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "message"
+                                    ]
+                                  }
+                                }
+                              },
+                              "required": [
+                                "status",
+                                "validation_records"
+                              ]
+                            },
+                            "ownership_verification": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "value"
+                              ]
+                            },
+                            "custom_origin_server": {
+                              "type": "string"
+                            },
+                            "verification_errors": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "hostname",
+                            "ssl",
+                            "ownership_verification",
+                            "custom_origin_server",
+                            "status"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors",
+                        "messages",
+                        "result"
+                      ]
                     }
                   },
                   "required": [
@@ -1751,7 +2147,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -1799,7 +2195,124 @@
                       "type": "string"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "messages": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "result": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "hostname": {
+                              "type": "string"
+                            },
+                            "ssl": {
+                              "type": "object",
+                              "properties": {
+                                "status": {
+                                  "type": "string"
+                                },
+                                "validation_records": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "txt_name": {
+                                        "type": "string"
+                                      },
+                                      "txt_value": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "txt_name",
+                                      "txt_value"
+                                    ]
+                                  }
+                                },
+                                "validation_errors": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "message": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "message"
+                                    ]
+                                  }
+                                }
+                              },
+                              "required": [
+                                "status",
+                                "validation_records"
+                              ]
+                            },
+                            "ownership_verification": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "value"
+                              ]
+                            },
+                            "custom_origin_server": {
+                              "type": "string"
+                            },
+                            "verification_errors": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "hostname",
+                            "ssl",
+                            "ownership_verification",
+                            "custom_origin_server",
+                            "status"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors",
+                        "messages",
+                        "result"
+                      ]
                     }
                   },
                   "required": [
@@ -1819,7 +2332,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -1875,7 +2388,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -1934,7 +2447,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -2034,7 +2547,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -2158,7 +2671,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -2211,7 +2724,7 @@
           }
         },
         "tags": [
-          "secrets"
+          "Secrets"
         ],
         "security": [
           {
@@ -2280,7 +2793,7 @@
           }
         },
         "tags": [
-          "secrets"
+          "Secrets"
         ],
         "security": [
           {
@@ -2350,7 +2863,7 @@
           }
         },
         "tags": [
-          "rest"
+          "Rest"
         ],
         "security": [
           {
@@ -2443,7 +2956,7 @@
           }
         },
         "tags": [
-          "rest"
+          "Rest"
         ],
         "security": [
           {
@@ -2454,7 +2967,7 @@
     },
     "/v1/projects/{ref}": {
       "delete": {
-        "operationId": "v1-Delete a project",
+        "operationId": "v1-delete-a-project",
         "summary": "Deletes the given project",
         "parameters": [
           {
@@ -2501,7 +3014,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -2562,7 +3075,7 @@
           }
         },
         "tags": [
-          "secrets"
+          "Secrets"
         ],
         "security": [
           {
@@ -2629,7 +3142,7 @@
           }
         },
         "tags": [
-          "secrets"
+          "Secrets"
         ],
         "security": [
           {
@@ -2686,7 +3199,7 @@
           }
         },
         "tags": [
-          "secrets"
+          "Secrets"
         ],
         "security": [
           {
@@ -2751,7 +3264,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -2840,7 +3353,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -2903,7 +3416,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -2964,7 +3477,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -3000,7 +3513,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -3071,7 +3584,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -3142,7 +3655,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -3213,7 +3726,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -3318,7 +3831,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -3361,6 +3874,9 @@
                             "initiated_at": {
                               "type": "string"
                             },
+                            "latest_status_at": {
+                              "type": "string"
+                            },
                             "target_version": {
                               "type": "number"
                             },
@@ -3374,7 +3890,8 @@
                                 "5_data_upgrade_completion_failed",
                                 "6_volume_detachchment_from_original_instance_failed",
                                 "7_volume_attachment_to_upgraded_instance_failed",
-                                "8_upgrade_completion_failed"
+                                "8_upgrade_completion_failed",
+                                "9_post_physical_backup_failed"
                               ]
                             },
                             "progress": {
@@ -3389,7 +3906,8 @@
                                 "6_completed_data_upgrade",
                                 "7_detached_volume_from_original_instance",
                                 "8_attached_volume_to_upgraded_instance",
-                                "9_completed_upgrade"
+                                "9_completed_upgrade",
+                                "10_completed_post_physical_backup"
                               ]
                             },
                             "status": {
@@ -3403,6 +3921,7 @@
                           },
                           "required": [
                             "initiated_at",
+                            "latest_status_at",
                             "target_version",
                             "status"
                           ]
@@ -3425,7 +3944,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -3483,7 +4002,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -3518,7 +4037,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -3585,12 +4104,15 @@
           "201": {
             "description": ""
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to set up read replica"
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -3638,12 +4160,15 @@
           "201": {
             "description": ""
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to remove read replica"
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -3791,7 +4316,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -3894,7 +4419,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -4066,7 +4591,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -4130,7 +4655,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ]
       }
     },
@@ -4228,7 +4753,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -4315,7 +4840,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -4534,6 +5059,18 @@
                       "nullable": true
                     },
                     "external_linkedin_oidc_secret": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_client_id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_secret": {
                       "type": "string",
                       "nullable": true
                     },
@@ -4764,6 +5301,33 @@
                       "type": "number",
                       "nullable": true
                     },
+                    "mfa_totp_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_totp_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_otp_length": {
+                      "type": "number"
+                    },
+                    "mfa_phone_template": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mfa_phone_max_frequency": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "password_hibp_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -4796,12 +5360,20 @@
                       "type": "number",
                       "nullable": true
                     },
+                    "rate_limit_otp": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "refresh_token_rotation_enabled": {
                       "type": "boolean",
                       "nullable": true
                     },
                     "saml_enabled": {
                       "type": "boolean",
+                      "nullable": true
+                    },
+                    "saml_external_url": {
+                      "type": "string",
                       "nullable": true
                     },
                     "security_captcha_enabled": {
@@ -5016,6 +5588,9 @@
                     "external_linkedin_oidc_client_id",
                     "external_linkedin_oidc_enabled",
                     "external_linkedin_oidc_secret",
+                    "external_slack_oidc_client_id",
+                    "external_slack_oidc_enabled",
+                    "external_slack_oidc_secret",
                     "external_notion_client_id",
                     "external_notion_enabled",
                     "external_notion_secret",
@@ -5073,6 +5648,13 @@
                     "mailer_templates_reauthentication_content",
                     "mailer_templates_recovery_content",
                     "mfa_max_enrolled_factors",
+                    "mfa_totp_enroll_enabled",
+                    "mfa_totp_verify_enabled",
+                    "mfa_phone_enroll_enabled",
+                    "mfa_phone_verify_enabled",
+                    "mfa_phone_otp_length",
+                    "mfa_phone_template",
+                    "mfa_phone_max_frequency",
                     "password_hibp_enabled",
                     "password_min_length",
                     "password_required_characters",
@@ -5081,8 +5663,10 @@
                     "rate_limit_sms_sent",
                     "rate_limit_token_refresh",
                     "rate_limit_verify",
+                    "rate_limit_otp",
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
+                    "saml_external_url",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -5137,7 +5721,7 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
         ],
         "security": [
           {
@@ -5265,6 +5849,10 @@
                   "saml_enabled": {
                     "type": "boolean"
                   },
+                  "saml_external_url": {
+                    "type": "string",
+                    "pattern": "/^[^,]+$/"
+                  },
                   "security_captcha_enabled": {
                     "type": "boolean"
                   },
@@ -5310,6 +5898,11 @@
                     "maximum": 2147483647
                   },
                   "rate_limit_token_refresh": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 2147483647
+                  },
+                  "rate_limit_otp": {
                     "type": "number",
                     "minimum": 1,
                     "maximum": 2147483647
@@ -5602,6 +6195,15 @@
                   "external_linkedin_oidc_secret": {
                     "type": "string"
                   },
+                  "external_slack_oidc_enabled": {
+                    "type": "boolean"
+                  },
+                  "external_slack_oidc_client_id": {
+                    "type": "string"
+                  },
+                  "external_slack_oidc_secret": {
+                    "type": "string"
+                  },
                   "external_notion_enabled": {
                     "type": "boolean"
                   },
@@ -5673,6 +6275,31 @@
                   },
                   "api_max_request_duration": {
                     "type": "number"
+                  },
+                  "mfa_totp_enroll_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_totp_verify_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_phone_enroll_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_phone_verify_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_phone_max_frequency": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 32767
+                  },
+                  "mfa_phone_otp_length": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 32767
+                  },
+                  "mfa_phone_template": {
+                    "type": "string"
                   }
                 }
               }
@@ -5872,6 +6499,18 @@
                       "nullable": true
                     },
                     "external_linkedin_oidc_secret": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_client_id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_secret": {
                       "type": "string",
                       "nullable": true
                     },
@@ -6102,6 +6741,33 @@
                       "type": "number",
                       "nullable": true
                     },
+                    "mfa_totp_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_totp_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_otp_length": {
+                      "type": "number"
+                    },
+                    "mfa_phone_template": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mfa_phone_max_frequency": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "password_hibp_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -6134,12 +6800,20 @@
                       "type": "number",
                       "nullable": true
                     },
+                    "rate_limit_otp": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "refresh_token_rotation_enabled": {
                       "type": "boolean",
                       "nullable": true
                     },
                     "saml_enabled": {
                       "type": "boolean",
+                      "nullable": true
+                    },
+                    "saml_external_url": {
+                      "type": "string",
                       "nullable": true
                     },
                     "security_captcha_enabled": {
@@ -6354,6 +7028,9 @@
                     "external_linkedin_oidc_client_id",
                     "external_linkedin_oidc_enabled",
                     "external_linkedin_oidc_secret",
+                    "external_slack_oidc_client_id",
+                    "external_slack_oidc_enabled",
+                    "external_slack_oidc_secret",
                     "external_notion_client_id",
                     "external_notion_enabled",
                     "external_notion_secret",
@@ -6411,6 +7088,13 @@
                     "mailer_templates_reauthentication_content",
                     "mailer_templates_recovery_content",
                     "mfa_max_enrolled_factors",
+                    "mfa_totp_enroll_enabled",
+                    "mfa_totp_verify_enabled",
+                    "mfa_phone_enroll_enabled",
+                    "mfa_phone_verify_enabled",
+                    "mfa_phone_otp_length",
+                    "mfa_phone_template",
+                    "mfa_phone_max_frequency",
                     "password_hibp_enabled",
                     "password_min_length",
                     "password_required_characters",
@@ -6419,8 +7103,10 @@
                     "rate_limit_sms_sent",
                     "rate_limit_token_refresh",
                     "rate_limit_verify",
+                    "rate_limit_otp",
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
+                    "saml_external_url",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -6475,7 +7161,371 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/third-party-auth": {
+      "post": {
+        "operationId": "createTPAForProject",
+        "summary": "Creates a new third-party auth integration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "oidc_issuer_url": {
+                    "type": "string"
+                  },
+                  "jwks_url": {
+                    "type": "string"
+                  },
+                  "custom_jwks": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "oidc_issuer_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "jwks_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "custom_jwks": {
+                      "type": "object",
+                      "nullable": true
+                    },
+                    "resolved_jwks": {
+                      "type": "object",
+                      "nullable": true
+                    },
+                    "inserted_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    },
+                    "resolved_at": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "inserted_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "listTPAForProject",
+        "summary": "[Alpha] Lists all third-party auth integrations",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "oidc_issuer_url": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "jwks_url": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "custom_jwks": {
+                        "type": "object",
+                        "nullable": true
+                      },
+                      "resolved_jwks": {
+                        "type": "object",
+                        "nullable": true
+                      },
+                      "inserted_at": {
+                        "type": "string"
+                      },
+                      "updated_at": {
+                        "type": "string"
+                      },
+                      "resolved_at": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type",
+                      "inserted_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}": {
+      "delete": {
+        "operationId": "deleteTPAForProject",
+        "summary": "[Alpha] Removes a third-party auth integration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "tpa_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "oidc_issuer_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "jwks_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "custom_jwks": {
+                      "type": "object",
+                      "nullable": true
+                    },
+                    "resolved_jwks": {
+                      "type": "object",
+                      "nullable": true
+                    },
+                    "inserted_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    },
+                    "resolved_at": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "inserted_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getTPAForProject",
+        "summary": "[Alpha] Get a third-party integration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "tpa_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "oidc_issuer_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "jwks_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "custom_jwks": {
+                      "type": "object",
+                      "nullable": true
+                    },
+                    "resolved_jwks": {
+                      "type": "object",
+                      "nullable": true
+                    },
+                    "inserted_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    },
+                    "resolved_at": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "inserted_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
         ],
         "security": [
           {
@@ -6538,7 +7588,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -6576,7 +7626,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -6775,7 +7825,7 @@
           }
         },
         "tags": [
-          "edge functions"
+          "Edge Functions"
         ],
         "security": [
           {
@@ -6871,7 +7921,7 @@
           }
         },
         "tags": [
-          "edge functions"
+          "Edge Functions"
         ],
         "security": [
           {
@@ -6976,7 +8026,7 @@
           }
         },
         "tags": [
-          "edge functions"
+          "Edge Functions"
         ],
         "security": [
           {
@@ -7165,7 +8215,7 @@
           }
         },
         "tags": [
-          "edge functions"
+          "Edge Functions"
         ],
         "security": [
           {
@@ -7212,7 +8262,7 @@
           }
         },
         "tags": [
-          "edge functions"
+          "Edge Functions"
         ],
         "security": [
           {
@@ -7261,7 +8311,7 @@
           }
         },
         "tags": [
-          "edge functions"
+          "Edge Functions"
         ],
         "security": [
           {
@@ -7337,7 +8387,7 @@
           }
         },
         "tags": [
-          "storage"
+          "Storage"
         ],
         "security": [
           {
@@ -7421,6 +8471,9 @@
                               "items": {
                                 "type": "string"
                               }
+                            },
+                            "array": {
+                              "type": "boolean"
                             }
                           }
                         }
@@ -7496,6 +8549,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -7556,7 +8612,7 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
         ],
         "security": [
           {
@@ -7643,6 +8699,9 @@
                                           "items": {
                                             "type": "string"
                                           }
+                                        },
+                                        "array": {
+                                          "type": "boolean"
                                         }
                                       }
                                     }
@@ -7709,7 +8768,7 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
         ],
         "security": [
           {
@@ -7801,6 +8860,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -7861,7 +8923,7 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
         ],
         "security": [
           {
@@ -7944,6 +9006,9 @@
                               "items": {
                                 "type": "string"
                               }
+                            },
+                            "array": {
+                              "type": "boolean"
                             }
                           }
                         }
@@ -8016,6 +9081,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -8076,7 +9144,7 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
         ],
         "security": [
           {
@@ -8166,6 +9234,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -8226,7 +9297,7 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
         ],
         "security": [
           {
@@ -8281,7 +9352,8 @@
                               "FAILED",
                               "PENDING",
                               "REMOVED",
-                              "ARCHIVED"
+                              "ARCHIVED",
+                              "CANCELLED"
                             ]
                           },
                           "is_physical_backup": {
@@ -8326,7 +9398,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -8376,7 +9448,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -8438,7 +9510,7 @@
           }
         },
         "tags": [
-          "organizations"
+          "Organizations"
         ],
         "security": [
           {
@@ -8505,7 +9577,7 @@
           }
         },
         "tags": [
-          "organizations"
+          "Organizations"
         ],
         "security": [
           {
@@ -8545,10 +9617,13 @@
               "INACTIVE",
               "INIT_FAILED",
               "REMOVED",
-              "RESTORING",
+              "RESTARTING",
               "UNKNOWN",
               "UPGRADING",
-              "PAUSING"
+              "PAUSING",
+              "RESTORING",
+              "RESTORE_FAILED",
+              "PAUSE_FAILED"
             ],
             "type": "string"
           },
@@ -8744,10 +9819,13 @@
               "INACTIVE",
               "INIT_FAILED",
               "REMOVED",
-              "RESTORING",
+              "RESTARTING",
               "UNKNOWN",
               "UPGRADING",
-              "PAUSING"
+              "PAUSING",
+              "RESTORING",
+              "RESTORE_FAILED",
+              "PAUSE_FAILED"
             ],
             "type": "string"
           }
@@ -8797,7 +9875,7 @@
               "free",
               "pro"
             ],
-            "description": "Subscription plan is now set on organization level and is ignored in this request",
+            "description": "Subscription Plan is now set on organization level and is ignored in this request",
             "example": "free",
             "deprecated": true
           },
@@ -9328,6 +10406,309 @@
           "branch_name"
         ]
       },
+      "ValidationRecord": {
+        "type": "object",
+        "properties": {
+          "txt_name": {
+            "type": "string"
+          },
+          "txt_value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "txt_name",
+          "txt_value"
+        ]
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "SslValidation": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "validation_records": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "txt_name": {
+                  "type": "string"
+                },
+                "txt_value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "txt_name",
+                "txt_value"
+              ]
+            }
+          },
+          "validation_errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        },
+        "required": [
+          "status",
+          "validation_records"
+        ]
+      },
+      "OwnershipVerification": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "name",
+          "value"
+        ]
+      },
+      "CustomHostnameDetails": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "ssl": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string"
+              },
+              "validation_records": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "txt_name": {
+                      "type": "string"
+                    },
+                    "txt_value": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "txt_name",
+                    "txt_value"
+                  ]
+                }
+              },
+              "validation_errors": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "status",
+              "validation_records"
+            ]
+          },
+          "ownership_verification": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "name",
+              "value"
+            ]
+          },
+          "custom_origin_server": {
+            "type": "string"
+          },
+          "verification_errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "hostname",
+          "ssl",
+          "ownership_verification",
+          "custom_origin_server",
+          "status"
+        ]
+      },
+      "CfResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "hostname": {
+                "type": "string"
+              },
+              "ssl": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "validation_records": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "txt_name": {
+                          "type": "string"
+                        },
+                        "txt_value": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "txt_name",
+                        "txt_value"
+                      ]
+                    }
+                  },
+                  "validation_errors": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "message"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "status",
+                  "validation_records"
+                ]
+              },
+              "ownership_verification": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "value"
+                ]
+              },
+              "custom_origin_server": {
+                "type": "string"
+              },
+              "verification_errors": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "hostname",
+              "ssl",
+              "ownership_verification",
+              "custom_origin_server",
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "errors",
+          "messages",
+          "result"
+        ]
+      },
       "UpdateCustomHostnameResponse": {
         "type": "object",
         "properties": {
@@ -9345,7 +10726,124 @@
             "type": "string"
           },
           "data": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "success": {
+                "type": "boolean"
+              },
+              "errors": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "messages": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "result": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "hostname": {
+                    "type": "string"
+                  },
+                  "ssl": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "validation_records": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "txt_name": {
+                              "type": "string"
+                            },
+                            "txt_value": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "txt_name",
+                            "txt_value"
+                          ]
+                        }
+                      },
+                      "validation_errors": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "message": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "message"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "validation_records"
+                    ]
+                  },
+                  "ownership_verification": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "name",
+                      "value"
+                    ]
+                  },
+                  "custom_origin_server": {
+                    "type": "string"
+                  },
+                  "verification_errors": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "hostname",
+                  "ssl",
+                  "ownership_verification",
+                  "custom_origin_server",
+                  "status"
+                ]
+              }
+            },
+            "required": [
+              "success",
+              "errors",
+              "messages",
+              "result"
+            ]
           }
         },
         "required": [
@@ -9840,6 +11338,9 @@
           "initiated_at": {
             "type": "string"
           },
+          "latest_status_at": {
+            "type": "string"
+          },
           "target_version": {
             "type": "number"
           },
@@ -9853,7 +11354,8 @@
               "5_data_upgrade_completion_failed",
               "6_volume_detachchment_from_original_instance_failed",
               "7_volume_attachment_to_upgraded_instance_failed",
-              "8_upgrade_completion_failed"
+              "8_upgrade_completion_failed",
+              "9_post_physical_backup_failed"
             ]
           },
           "progress": {
@@ -9868,7 +11370,8 @@
               "6_completed_data_upgrade",
               "7_detached_volume_from_original_instance",
               "8_attached_volume_to_upgraded_instance",
-              "9_completed_upgrade"
+              "9_completed_upgrade",
+              "10_completed_post_physical_backup"
             ]
           },
           "status": {
@@ -9882,6 +11385,7 @@
         },
         "required": [
           "initiated_at",
+          "latest_status_at",
           "target_version",
           "status"
         ]
@@ -9898,6 +11402,9 @@
                   "initiated_at": {
                     "type": "string"
                   },
+                  "latest_status_at": {
+                    "type": "string"
+                  },
                   "target_version": {
                     "type": "number"
                   },
@@ -9911,7 +11418,8 @@
                       "5_data_upgrade_completion_failed",
                       "6_volume_detachchment_from_original_instance_failed",
                       "7_volume_attachment_to_upgraded_instance_failed",
-                      "8_upgrade_completion_failed"
+                      "8_upgrade_completion_failed",
+                      "9_post_physical_backup_failed"
                     ]
                   },
                   "progress": {
@@ -9926,7 +11434,8 @@
                       "6_completed_data_upgrade",
                       "7_detached_volume_from_original_instance",
                       "8_attached_volume_to_upgraded_instance",
-                      "9_completed_upgrade"
+                      "9_completed_upgrade",
+                      "10_completed_post_physical_backup"
                     ]
                   },
                   "status": {
@@ -9940,6 +11449,7 @@
                 },
                 "required": [
                   "initiated_at",
+                  "latest_status_at",
                   "target_version",
                   "status"
                 ]
@@ -10571,6 +12081,18 @@
             "type": "string",
             "nullable": true
           },
+          "external_slack_oidc_client_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "external_slack_oidc_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "external_slack_oidc_secret": {
+            "type": "string",
+            "nullable": true
+          },
           "external_notion_client_id": {
             "type": "string",
             "nullable": true
@@ -10798,6 +12320,33 @@
             "type": "number",
             "nullable": true
           },
+          "mfa_totp_enroll_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_totp_verify_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_phone_enroll_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_phone_verify_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_phone_otp_length": {
+            "type": "number"
+          },
+          "mfa_phone_template": {
+            "type": "string",
+            "nullable": true
+          },
+          "mfa_phone_max_frequency": {
+            "type": "number",
+            "nullable": true
+          },
           "password_hibp_enabled": {
             "type": "boolean",
             "nullable": true
@@ -10830,12 +12379,20 @@
             "type": "number",
             "nullable": true
           },
+          "rate_limit_otp": {
+            "type": "number",
+            "nullable": true
+          },
           "refresh_token_rotation_enabled": {
             "type": "boolean",
             "nullable": true
           },
           "saml_enabled": {
             "type": "boolean",
+            "nullable": true
+          },
+          "saml_external_url": {
+            "type": "string",
             "nullable": true
           },
           "security_captcha_enabled": {
@@ -11050,6 +12607,9 @@
           "external_linkedin_oidc_client_id",
           "external_linkedin_oidc_enabled",
           "external_linkedin_oidc_secret",
+          "external_slack_oidc_client_id",
+          "external_slack_oidc_enabled",
+          "external_slack_oidc_secret",
           "external_notion_client_id",
           "external_notion_enabled",
           "external_notion_secret",
@@ -11107,6 +12667,13 @@
           "mailer_templates_reauthentication_content",
           "mailer_templates_recovery_content",
           "mfa_max_enrolled_factors",
+          "mfa_totp_enroll_enabled",
+          "mfa_totp_verify_enabled",
+          "mfa_phone_enroll_enabled",
+          "mfa_phone_verify_enabled",
+          "mfa_phone_otp_length",
+          "mfa_phone_template",
+          "mfa_phone_max_frequency",
           "password_hibp_enabled",
           "password_min_length",
           "password_required_characters",
@@ -11115,8 +12682,10 @@
           "rate_limit_sms_sent",
           "rate_limit_token_refresh",
           "rate_limit_verify",
+          "rate_limit_otp",
           "refresh_token_rotation_enabled",
           "saml_enabled",
+          "saml_external_url",
           "security_captcha_enabled",
           "security_captcha_provider",
           "security_captcha_secret",
@@ -11260,6 +12829,10 @@
           "saml_enabled": {
             "type": "boolean"
           },
+          "saml_external_url": {
+            "type": "string",
+            "pattern": "/^[^,]+$/"
+          },
           "security_captcha_enabled": {
             "type": "boolean"
           },
@@ -11305,6 +12878,11 @@
             "maximum": 2147483647
           },
           "rate_limit_token_refresh": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "rate_limit_otp": {
             "type": "number",
             "minimum": 1,
             "maximum": 2147483647
@@ -11597,6 +13175,15 @@
           "external_linkedin_oidc_secret": {
             "type": "string"
           },
+          "external_slack_oidc_enabled": {
+            "type": "boolean"
+          },
+          "external_slack_oidc_client_id": {
+            "type": "string"
+          },
+          "external_slack_oidc_secret": {
+            "type": "string"
+          },
           "external_notion_enabled": {
             "type": "boolean"
           },
@@ -11668,8 +13255,90 @@
           },
           "api_max_request_duration": {
             "type": "number"
+          },
+          "mfa_totp_enroll_enabled": {
+            "type": "boolean"
+          },
+          "mfa_totp_verify_enabled": {
+            "type": "boolean"
+          },
+          "mfa_phone_enroll_enabled": {
+            "type": "boolean"
+          },
+          "mfa_phone_verify_enabled": {
+            "type": "boolean"
+          },
+          "mfa_phone_max_frequency": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 32767
+          },
+          "mfa_phone_otp_length": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 32767
+          },
+          "mfa_phone_template": {
+            "type": "string"
           }
         }
+      },
+      "CreateThirdPartyAuthBody": {
+        "type": "object",
+        "properties": {
+          "oidc_issuer_url": {
+            "type": "string"
+          },
+          "jwks_url": {
+            "type": "string"
+          },
+          "custom_jwks": {
+            "type": "object"
+          }
+        }
+      },
+      "ThirdPartyAuth": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "oidc_issuer_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "jwks_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "custom_jwks": {
+            "type": "object",
+            "nullable": true
+          },
+          "resolved_jwks": {
+            "type": "object",
+            "nullable": true
+          },
+          "inserted_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "resolved_at": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "inserted_at",
+          "updated_at"
+        ]
       },
       "V1RunQueryBody": {
         "type": "object",
@@ -11881,6 +13550,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "array": {
+            "type": "boolean"
           }
         }
       },
@@ -11916,6 +13588,9 @@
                   "items": {
                     "type": "string"
                   }
+                },
+                "array": {
+                  "type": "boolean"
                 }
               }
             }
@@ -11979,6 +13654,9 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "array": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -12040,6 +13718,9 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "array": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -12128,6 +13809,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12230,6 +13914,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12337,6 +14024,9 @@
                                 "items": {
                                   "type": "string"
                                 }
+                              },
+                              "array": {
+                                "type": "boolean"
                               }
                             }
                           }
@@ -12445,6 +14135,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12541,6 +14234,9 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "array": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -12605,6 +14301,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12707,6 +14406,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12766,7 +14468,8 @@
               "FAILED",
               "PENDING",
               "REMOVED",
-              "ARCHIVED"
+              "ARCHIVED",
+              "CANCELLED"
             ]
           },
           "is_physical_backup": {
@@ -12817,7 +14520,8 @@
                     "FAILED",
                     "PENDING",
                     "REMOVED",
-                    "ARCHIVED"
+                    "ARCHIVED",
+                    "CANCELLED"
                   ]
                 },
                 "is_physical_backup": {

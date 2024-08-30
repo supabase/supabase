@@ -10,7 +10,7 @@ export function TweetCard(props: TweetCard) {
   return (
     <div
       className="
-      bg-surface-100 border-overlay
+      bg-surface-75 border
       rounded-2xl border p-6
       drop-shadow-sm
     "
@@ -43,7 +43,7 @@ export function TweetCard(props: TweetCard) {
         </div>
       </div>
 
-      <p className="text-foreground-muted mt-3 text-base">"{props.quote}"</p>
+      <p className="text-foreground-lighter mt-3 text-base">"{props.quote}"</p>
     </div>
   )
 }

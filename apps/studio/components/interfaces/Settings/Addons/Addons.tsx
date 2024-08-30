@@ -1,22 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { capitalize } from 'lodash'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconChevronRight,
-  IconExternalLink,
-  IconInfo,
-} from 'ui'
 
 import {
   getAddons,
@@ -41,11 +29,25 @@ import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
-import { useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
-import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { useAddonsPagePanel } from 'state/addons-page'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertCircle,
+  IconChevronRight,
+  IconExternalLink,
+  IconInfo,
+} from 'ui'
+import { ComputeBadge } from 'ui-patterns'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
@@ -53,8 +55,8 @@ import PITRSidePanel from './PITRSidePanel'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
-  const { ref: projectRef, panel } = useParams()
-  const snap = useSubscriptionPageStateSnapshot()
+  const { ref: projectRef } = useParams()
+  const { setPanel } = useAddonsPagePanel()
   const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
   const selectedOrg = useSelectedOrganization()
@@ -63,10 +65,6 @@ const Addons = () => {
   const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
   const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
-  const allowedPanelValues = ['computeInstance', 'pitr', 'customDomain']
-  if (panel && typeof panel === 'string' && allowedPanelValues.includes(panel)) {
-    snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
-  }
 
   const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -234,11 +232,12 @@ const Addons = () => {
                     {isLoading || (computeInstance === undefined && isLoadingProject) ? (
                       <ShimmeringLoader className="w-32" />
                     ) : (
-                      <p>
-                        {computeInstance?.variant.name ??
-                          capitalize(selectedProject?.infra_compute_size) ??
-                          'Micro'}
-                      </p>
+                      <div className="flex py-3">
+                        <ComputeBadge
+                          infraComputeSize={selectedProject?.infra_compute_size}
+                          size={'large'}
+                        />
+                      </div>
                     )}
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}
@@ -248,7 +247,7 @@ const Addons = () => {
                       <Button
                         type="default"
                         className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('computeInstance')}
+                        onClick={() => setPanel('computeInstance')}
                         disabled={
                           isBranch ||
                           !isProjectActive ||
@@ -435,7 +434,7 @@ const Addons = () => {
                           <Button
                             type="default"
                             className="mt-2 pointer-events-auto"
-                            onClick={() => snap.setPanelKey('ipv4')}
+                            onClick={() => setPanel('ipv4')}
                             disabled={
                               isBranch ||
                               !isProjectActive ||
@@ -564,7 +563,7 @@ const Addons = () => {
                         <Button
                           type="default"
                           className="mt-2 pointer-events-auto"
-                          onClick={() => snap.setPanelKey('pitr')}
+                          onClick={() => setPanel('pitr')}
                           disabled={
                             isBranch ||
                             !isProjectActive ||
@@ -641,7 +640,7 @@ const Addons = () => {
                       <Button
                         type="default"
                         className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('customDomain')}
+                        onClick={() => setPanel('customDomain')}
                         disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
                         Change custom domain

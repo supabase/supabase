@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { AuthProvidersForm } from 'components/interfaces/Auth'
-import { AuthLayout } from 'components/layouts'
-import { FormsContainer } from 'components/ui/Forms'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import { FormsContainer } from 'components/ui/Forms/FormsContainer'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {

@@ -5,10 +5,11 @@ import { useEffect } from 'react'
 
 import SignInForm from 'components/interfaces/SignIn/SignInForm'
 import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
-import { SignInLayout } from 'components/layouts'
+import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
+import { LastSignInWrapper } from 'components/interfaces/SignIn/LastSignInWrapper'
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -25,16 +26,18 @@ const SignInPage: NextPageWithLayout = () => {
     <>
       <div className="flex flex-col gap-5">
         <SignInWithGitHub />
-        <Button asChild block size="large" type="outline" icon={<Lock width={18} height={18} />}>
-          <Link
-            href={{
-              pathname: '/sign-in-sso',
-              query: searchParams,
-            }}
-          >
-            Continue with SSO
-          </Link>
-        </Button>
+        <LastSignInWrapper type="sso">
+          <Button asChild block size="large" type="outline" icon={<Lock width={18} height={18} />}>
+            <Link
+              href={{
+                pathname: '/sign-in-sso',
+                query: searchParams,
+              }}
+            >
+              Continue with SSO
+            </Link>
+          </Button>
+        </LastSignInWrapper>
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">

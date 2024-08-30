@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -8,14 +9,16 @@ import {
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { CreateCredentialModal } from './CreateCredentialModal'
 import { RevokeCredentialModal } from './RevokeCredentialModal'
@@ -31,10 +34,13 @@ export const S3Connection = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [deleteCred, setDeleteCred] = useState<{ id: string; description: string }>()
 
+  const canReadS3Credentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+
   const { data: projectAPI } = useProjectApiQuery({ projectRef: projectRef })
-  const { data: storageCreds, ...storageCredsQuery } = useStorageCredentialsQuery({
-    projectRef,
-  })
+  const { data: storageCreds, ...storageCredsQuery } = useStorageCredentialsQuery(
+    { projectRef },
+    { enabled: canReadS3Credentials }
+  )
 
   const hasStorageCreds = storageCreds?.data && storageCreds.data.length > 0
   const s3connectionUrl = getConnectionURL(projectRef ?? '', projectAPI)
@@ -85,7 +91,9 @@ export const S3Connection = () => {
           }
         />
 
-        {projectIsLoading ? (
+        {!canReadS3Credentials ? (
+          <NoPermission resourceText="view this project's S3 access keys" />
+        ) : projectIsLoading ? (
           <GenericSkeletonLoader />
         ) : !isProjectActive ? (
           <Alert_Shadcn_ variant="warning">

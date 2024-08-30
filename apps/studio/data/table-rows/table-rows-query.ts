@@ -1,7 +1,8 @@
 import type { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
-import { Filter, Query, Sort, SupaRow, SupaTable } from 'components/grid'
+import { Query } from 'components/grid/query/Query'
+import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import {
   JSON_TYPES,
   TEXT_TYPES,
@@ -21,6 +22,7 @@ import {
 } from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
 import { formatFilterValue } from './utils'
+import { THRESHOLD_COUNT } from './table-rows-count-query'
 
 type GetTableRowsArgs = {
   table?: SupaTable
@@ -34,10 +36,14 @@ type GetTableRowsArgs = {
 // [Joshen] We can probably make this reasonably high, but for now max aim to load 10kb
 export const MAX_CHARACTERS = 10 * KB
 
-// return the primary key column if exists, otherwise return the first column
-// to use as a default sort
-const getDefaultOrderByColumn = (table: SupaTable) => {
-  return table.columns.find((column) => column.isPrimaryKey)?.name || table.columns[0]?.name
+// return the primary key columns if exists, otherwise return the first column to use as a default sort
+const getDefaultOrderByColumns = (table: SupaTable) => {
+  const primaryKeyColumns = table.columns.filter((col) => col?.isPrimaryKey).map((col) => col.name)
+  if (primaryKeyColumns.length === 0) {
+    return [table.columns[0]?.name]
+  } else {
+    return primaryKeyColumns
+  }
 }
 
 // Updated fetchAllTableRows function
@@ -72,11 +78,13 @@ export const fetchAllTableRows = async ({
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
 
-  // If sorts is empty, use the primary key as the default sort
-  if (sorts.length === 0) {
-    const primaryKey = getDefaultOrderByColumn(table)
-    if (primaryKey) {
-      queryChains = queryChains.order(table.name, primaryKey, true, true)
+  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
+  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
+    const primaryKeys = getDefaultOrderByColumns(table)
+    if (primaryKeys.length > 0) {
+      primaryKeys.forEach((col) => {
+        queryChains = queryChains.order(table.name, col, true, true)
+      })
     }
   } else {
     sorts.forEach((sort) => {
@@ -125,28 +133,15 @@ export const getTableRowsSqlQuery = ({
 
   if (!table) return ``
 
-  // [Joshen] Only truncate text/json based columns as their length could go really big
-  // Note: Risk of payload being too large if the user has many many text/json based columns
-  // although possibly negligible risk.
-  const truncatedColumns = table.columns
-    .filter((column) => {
-      return (
-        ((column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array') ||
-        TEXT_TYPES.includes(column.format) ||
-        JSON_TYPES.includes(column.format)
-      )
-    })
-    .map((column) => {
-      if ((column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array') {
-        return `"${column.name}"::text[]`
-      } else {
-        return `case when length("${column.name}"::text) > ${MAX_CHARACTERS} then concat(left("${column.name}"::text, ${MAX_CHARACTERS}), '...') else "${column.name}"::text end "${column.name}"`
-      }
-    })
+  const arrayBasedColumns = table.columns
+    .filter(
+      (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+    )
+    .map((column) => `"${column.name}"::text[]`)
 
   let queryChains = query
     .from(table.name, table.schema ?? undefined)
-    .select(truncatedColumns.length > 0 ? `*,${truncatedColumns.join(',')}` : '*')
+    .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
 
   filters
     .filter((x) => x.value && x.value != '')
@@ -155,12 +150,13 @@ export const getTableRowsSqlQuery = ({
       queryChains = queryChains.filter(x.column, x.operator, value)
     })
 
-  // If sorts is empty, use the primary key as the default sort
-  if (sorts.length === 0) {
-    const primaryKey = getDefaultOrderByColumn(table)
-
-    if (primaryKey) {
-      queryChains = queryChains.order(table.name, primaryKey, true, true)
+  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
+  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
+    const defaultOrderByColumns = getDefaultOrderByColumns(table)
+    if (defaultOrderByColumns.length > 0) {
+      defaultOrderByColumns.forEach((col) => {
+        queryChains = queryChains.order(table.name, col, true, true)
+      })
     }
   } else {
     sorts.forEach((x) => {
@@ -170,14 +166,25 @@ export const getTableRowsSqlQuery = ({
 
   // getPagination is expecting to start from 0
   const { from, to } = getPagination((page ?? 1) - 1, limit)
-  const sql = queryChains.range(from, to).toSql()
+  const baseSql = queryChains.range(from, to).toSql()
 
-  return sql
+  // [Joshen] Only truncate text/json based columns as their length could go really big
+  // Note: Risk of payload being too large if the user has many many text/json based columns
+  // although possibly negligible risk.
+  const truncatedColumns = table.columns
+    .filter((column) => TEXT_TYPES.includes(column.format) || JSON_TYPES.includes(column.format))
+    .map((column) => {
+      return `case when length("${column.name}"::text) > ${MAX_CHARACTERS} then concat(left("${column.name}"::text, ${MAX_CHARACTERS}), '...') else "${column.name}"::text end "${column.name}"`
+    })
+  const outputSql =
+    truncatedColumns.length > 0
+      ? `with _temp as (${baseSql.slice(0, -1)}) select *, ${truncatedColumns.join(',')} from _temp`
+      : baseSql
+
+  return outputSql
 }
 
-export type TableRows = {
-  rows: SupaRow[]
-}
+export type TableRows = { rows: SupaRow[] }
 
 export type TableRowsVariables = GetTableRowsArgs & {
   projectRef?: string

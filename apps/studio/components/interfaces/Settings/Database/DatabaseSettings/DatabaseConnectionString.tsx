@@ -1,4 +1,5 @@
 import { useParams, useTelemetryProps } from 'common'
+import { ChevronDown, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
@@ -11,10 +12,9 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { ChevronDown, ExternalLink } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
@@ -48,7 +48,7 @@ const CONNECTION_TYPES = [
   { id: 'golang', label: 'Golang' },
   { id: 'jdbc', label: 'JDBC' },
   { id: 'dotnet', label: '.NET' },
-  { id: 'nodejs', label: 'Nodejs' },
+  { id: 'nodejs', label: 'Node.js' },
   { id: 'php', label: 'PHP' },
   { id: 'python', label: 'Python' },
 ]
@@ -225,6 +225,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                 id="connection-string"
                 checked={snap.usePoolerConnection}
                 poolingMode={poolingMode}
+                ipv4AddonAdded={!!ipv4Addon}
                 onCheckedChange={snap.setUsePoolerConnection}
                 onSelectPoolingMode={setPoolingMode}
               />
