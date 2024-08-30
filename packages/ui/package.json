@@ -81,6 +81,7 @@
     "react-tooltip": "^4.2.17",
     "react-use": "^17.5.0",
     "reactflow": "^11.10.1",
+    "recharts": "^2.12.7",
     "remark-gfm": "^3.0.1",
     "sonner": "^1.5.0",
     "sse.js": "^2.2.0",
