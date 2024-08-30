@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { CellDetailPanel } from './CellDetailPanel'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 
 function formatClipboardValue(value: any) {
   if (value === null) return ''
@@ -192,10 +193,21 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <p className="text-xs text-foreground-light">
-          {rows.length} row{rows.length > 1 ? 's' : ''}
-          {results.autoLimit !== undefined && ` (auto limit ${results.autoLimit} rows)`}
-        </p>
+        <Tooltip>
+          <TooltipTrigger>
+            <p className="text-xs text-foreground-light">
+              {rows.length} row{rows.length > 1 ? 's' : ''}
+              {results.autoLimit !== undefined && ` (auto limit ${results.autoLimit} rows)`}
+            </p>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs">
+            <p>
+              Results are limited browser performance.
+              <br />
+              You may change this, or remove the limit from the dropdown on the left
+            </p>
+          </TooltipContent>
+        </Tooltip>
       </GridFooter>
 
       <CellDetailPanel
