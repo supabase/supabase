@@ -270,7 +270,7 @@ const UtilityActions = ({
                 </div>
               )
             }
-            className="rounded-l-none"
+            className="rounded-l-none min-w-[82px]"
           >
             {hasSelection ? 'Run selected' : 'Run'}
           </Button>
