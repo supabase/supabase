@@ -21,7 +21,7 @@
     "eslint-config-supabase": "*",
     "libpg-query": "^15.1.0",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.338.0",
+    "lucide-react": "*",
     "next": "^14.2.3",
     "openai": "^4.20.1",
     "react": "^18.2.0",
