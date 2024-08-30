@@ -4,7 +4,7 @@ import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Button, Checkbox_Shadcn_, Label_Shadcn_, Modal } from 'ui'
 
 interface AddPaymentMethodFormProps {

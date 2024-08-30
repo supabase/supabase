@@ -10,17 +10,20 @@ import {
   Loader2,
   MoreVertical,
 } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { Content, ContentData } from 'data/content/content-query'
 import { contentKeys } from 'data/content/keys'
+import { Snippet } from 'data/content/sql-folders-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
   DropdownMenu,
@@ -36,9 +39,6 @@ import {
   cn,
 } from 'ui'
 import SavingIndicator from './SavingIndicator'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useFlag } from 'hooks/ui/useFlag'
-import { Snippet } from 'data/content/sql-folders-query'
 
 const ROWS_PER_PAGE_OPTIONS = [
   { value: -1, label: 'No limit' },

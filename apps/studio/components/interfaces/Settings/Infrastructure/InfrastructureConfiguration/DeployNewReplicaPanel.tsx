@@ -1,7 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
@@ -22,8 +22,8 @@ import {
   Button,
   Listbox,
   SidePanel,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
