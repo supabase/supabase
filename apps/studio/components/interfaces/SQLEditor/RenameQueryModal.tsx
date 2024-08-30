@@ -34,6 +34,7 @@ const RenameQueryModal = ({
   const snapV2 = useSqlEditorV2StateSnapshot()
   const enableFolders = useFlag('sqlFolderOrganization')
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const isSQLSnippet = snippet.type === 'sql'
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -54,11 +55,11 @@ const RenameQueryModal = ({
     },
   })
 
-  const isAiButtonVisible = enableFolders ? true : 'content' in snippet && !!snippet.content.sql
+  const isAiButtonVisible = enableFolders ? true : isSQLSnippet
 
   const generateTitle = async () => {
     if (enableFolders) {
-      if ('content' in snippet) {
+      if ('content' in snippet && isSQLSnippet) {
         titleSql({ sql: snippet.content.sql })
       } else {
         try {
@@ -69,7 +70,7 @@ const RenameQueryModal = ({
         }
       }
     } else {
-      if ('content' in snippet) titleSql({ sql: snippet.content.sql })
+      if ('content' in snippet && isSQLSnippet) titleSql({ sql: snippet.content.sql })
     }
   }
 

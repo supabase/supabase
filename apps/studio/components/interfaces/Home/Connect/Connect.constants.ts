@@ -9,13 +9,13 @@ export type ConnectionType = {
 export const FRAMEWORKS: ConnectionType[] = [
   {
     key: 'nextjs',
-    label: 'Next.JS',
+    label: 'Next.js',
     icon: 'nextjs',
     guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/nextjs',
     children: [
       {
         key: 'app',
-        label: 'App router',
+        label: 'App Router',
         icon: '',
         children: [
           {
@@ -28,7 +28,7 @@ export const FRAMEWORKS: ConnectionType[] = [
       },
       {
         key: 'pages',
-        label: 'Pages router',
+        label: 'Pages Router',
         icon: '',
         children: [
           {

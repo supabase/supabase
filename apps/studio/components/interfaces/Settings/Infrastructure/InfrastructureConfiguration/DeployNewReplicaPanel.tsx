@@ -361,7 +361,7 @@ const DeployNewReplicaPanel = ({
             <p className="text-foreground-light text-sm">
               Read more about{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
                 target="_blank"
                 rel="noreferrer"
                 className="underline hover:text-foreground transition"

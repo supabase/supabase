@@ -48,7 +48,7 @@ const CONNECTION_TYPES = [
   { id: 'golang', label: 'Golang' },
   { id: 'jdbc', label: 'JDBC' },
   { id: 'dotnet', label: '.NET' },
-  { id: 'nodejs', label: 'Nodejs' },
+  { id: 'nodejs', label: 'Node.js' },
   { id: 'php', label: 'PHP' },
   { id: 'python', label: 'Python' },
 ]

@@ -147,7 +147,7 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
         size="xlarge"
         visible={visible}
         onCancel={onClose}
-        header="We're sad that you're leaving"
+        header="Help us improve."
       >
         <Modal.Content>
           <div className="space-y-4">

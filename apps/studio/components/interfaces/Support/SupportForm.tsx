@@ -348,7 +348,6 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
   }
 
   const DocsLinkGroup = ({ page }: DocsLinkGroup) => {
-    console.log('page', page)
     const link = generateLink(page.type, page.path)
 
     return (
