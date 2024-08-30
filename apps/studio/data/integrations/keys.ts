@@ -24,4 +24,5 @@ export const integrationKeys = {
   githubBranchesList: (connectionId: number | undefined) => ['github-branches', connectionId],
   githubConnectionsList: (organizationId: number | undefined) =>
     ['organizations', organizationId, 'github-connections'] as const,
+  vercelRedirect: (installationId?: string) => ['vercel-redirect', installationId] as const,
 }

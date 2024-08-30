@@ -1,8 +1,10 @@
 import { groupBy } from 'lodash'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
+import PartnerIcon from 'components/ui/PartnerIcon'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import {
@@ -14,9 +16,8 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
-import { Plus } from 'lucide-react'
 import type { Organization, ResponseError } from 'types'
 import { Button, cn } from 'ui'
 import ProjectCard from './ProjectCard'
@@ -91,7 +92,9 @@ const ProjectList = ({
         <div className="space-y-1">
           {/* [Joshen] Just keeping it simple for now unless we decide to extend this to other statuses */}
           <p className="text-sm text-foreground">
-            No projects found with status as {filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'}
+            {filterStatus.length === 0
+              ? `No projects found`
+              : `No ${filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'} projects found`}
           </p>
           <p className="text-sm text-foreground-light">
             Your search for projects with the specified status did not return any results
@@ -180,9 +183,13 @@ const OrganizationProjects = ({
           )
         })
       : sortedProjects
+
+  // [Joshen] Just a UI thing, but we take all projects other than paused as "active"
   const filteredProjectsByStatus =
     filterStatus !== undefined
-      ? filteredProjects.filter((project) => filterStatus.includes(project.status))
+      ? filterStatus.includes(PROJECT_STATUS.ACTIVE_HEALTHY)
+        ? filteredProjects
+        : filteredProjects.filter((project) => filterStatus.includes(project.status))
       : filteredProjects
 
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
@@ -216,8 +223,10 @@ const OrganizationProjects = ({
   return (
     <div className="space-y-3" key={organization.slug}>
       <div className="flex space-x-4 items-center">
-        <h4 className="text-lg flex items-center">{organization.name}</h4>
-
+        <div className="flex items-center gap-2">
+          <h4 className="text-lg flex items-center">{organization.name}</h4>{' '}
+          <PartnerIcon organization={organization} />
+        </div>
         {!!overdueInvoices.length && (
           <div>
             <Button asChild type="danger">

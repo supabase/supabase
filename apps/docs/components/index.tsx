@@ -35,6 +35,7 @@ import { SharedData } from './SharedData'
 
 // Partials
 import HuggingFaceDeployment from './MDX/ai/quickstart_hf_deployment.mdx'
+import AuthErrorCodesTable from './MDX/auth_error_codes_table.mdx'
 import AuthRateLimits from './MDX/auth_rate_limits.mdx'
 import DatabaseSetup from './MDX/database_setup.mdx'
 import GetSessionWarning from './MDX/get_session_warning.mdx'
@@ -77,7 +78,6 @@ import { AppleSecretGenerator } from './AppleSecretGenerator'
 import { AuthSmsProviderConfig } from './AuthSmsProviderConfig'
 import { Extensions } from './Extensions'
 import { JwtGenerator } from './JwtGenerator'
-import { Mermaid } from './Mermaid'
 import { RealtimeLimitsEstimator } from './RealtimeLimitsEstimator'
 
 const components = {
@@ -91,6 +91,7 @@ const components = {
   ),
   AppleSecretGenerator,
   AuthProviders,
+  AuthErrorCodesTable,
   AuthRateLimits,
   AuthSmsProviderConfig,
   Button,
@@ -146,7 +147,6 @@ const components = {
   JwtGenerator,
   KotlinProjectSetup,
   Link,
-  Mermaid,
   MigrationWarnings,
   NavData,
   OAuthPkceFlow,

@@ -1,8 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
 import { type Metadata } from 'next'
 import Link from 'next/link'
 
-import { DocsSearchResult, type Database } from 'common'
 import { Button } from 'ui'
 
 import { SearchButton, Recommendations } from '~/features/recommendations/NotFound.client'

@@ -136,6 +136,10 @@ const footerData = [
         url: '/company',
       },
       {
+        text: 'Events',
+        url: '/events',
+      },
+      {
         text: 'General Availability',
         url: '/ga',
       },

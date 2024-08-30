@@ -31,6 +31,10 @@ DIRECT_URL="${connectionStringPooler.session}"
       <ConnectTabContent value="prisma/schema.prisma">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")

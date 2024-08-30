@@ -17,9 +17,9 @@ import {
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AWS_REGIONS_KEYS } from 'lib/constants'
 import { timeout } from 'lib/helpers'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { type AWS_REGIONS_KEYS } from 'shared-data'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Button,
   DropdownMenu,
@@ -46,7 +46,7 @@ const InstanceConfigurationUI = () => {
   const { ref: projectRef } = useParams()
   const numTransition = useRef<number>()
   const { project, isLoading: isLoadingProject } = useProjectContext()
-  const snap = useSubscriptionPageStateSnapshot()
+  const { setPanel } = useAddonsPagePanel()
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
@@ -247,7 +247,7 @@ const InstanceConfigurationUI = () => {
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-52 *:space-x-2">
-                      <DropdownMenuItem onClick={() => snap.setPanelKey('computeInstance')}>
+                      <DropdownMenuItem onClick={() => setPanel('computeInstance')}>
                         <div>Resize databases</div>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

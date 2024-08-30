@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
+import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw } from 'ui'
 
 import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import Table from 'components/to-be-cleaned/Table'
@@ -13,6 +13,7 @@ import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from 'data/profile/profile-audit-logs-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { Alert, Button } from 'ui'
 
 const AuditLogs = () => {
   const currentTime = dayjs().utc().set('millisecond', 0)
@@ -134,7 +135,7 @@ const AuditLogs = () => {
           <Button
             type="default"
             disabled={isLoading || isRefetching}
-            icon={<IconRefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+            icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
             onClick={() => refetch()}
           >
             {isRefetching ? 'Refreshing' : 'Refresh'}
@@ -181,9 +182,9 @@ const AuditLogs = () => {
                             className="px-1"
                             icon={
                               dateSortDesc ? (
-                                <IconArrowDown strokeWidth={1.5} size={14} />
+                                <ArrowDown strokeWidth={1.5} size={14} />
                               ) : (
-                                <IconArrowUp strokeWidth={1.5} size={14} />
+                                <ArrowUp strokeWidth={1.5} size={14} />
                               )
                             }
                             onClick={() => setDateSortDesc(!dateSortDesc)}

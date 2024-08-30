@@ -6,7 +6,7 @@ import Image from 'next/legacy/image'
 import { Fragment, memo } from 'react'
 import { cn } from 'ui'
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
+import type { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
 import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
 import { BASE_PATH } from '~/lib/constants'
 import MenuIconPicker from './MenuIconPicker'
@@ -185,7 +185,6 @@ const NavigationMenuRefListItems = ({
       <div className="flex items-center gap-3 my-3">
         <MenuIconPicker icon={menu.icon} width={21} height={21} />
         <HeaderLink title={menu.title} url={menu.url} id={id} />
-        <RevVersionDropdown />
       </div>
       <ul className="function-link-list flex flex-col gap-2 pb-5">
         {filteredSections.map((section) => {

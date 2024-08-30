@@ -19,7 +19,7 @@ const InputVariants = cva('aria-[]', {
 })
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, size = 'medium', ...props }, ref) => {
+  ({ className, type, size = 'small', ...props }, ref) => {
     return (
       <input
         type={type}

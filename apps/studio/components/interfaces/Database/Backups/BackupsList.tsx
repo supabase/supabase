@@ -65,7 +65,7 @@ const BackupsList = () => {
         addon="pitr"
         icon={<Clock size={20} />}
         primaryText="Free Plan does not include project backups."
-        secondaryText="Upgrade to the Pro plan for up to 7 days of scheduled backups."
+        secondaryText="Upgrade to the Pro Plan for up to 7 days of scheduled backups."
       />
     )
   }

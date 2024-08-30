@@ -5,27 +5,36 @@ description: 'Learn how billing works in Supabase.'
 subtitle: 'Learn how billing works in Supabase.'
 ---
 
-Our goal at Supabase is to provide a _predictable_ billing system that grows with your project.
+Our goal at Supabase is to provide a _predictable_ billing system that grows with you.
 
 <Admonition type="note">
 
 If you’re using Fly Postgres, see the [Fly Postgres Pricing](/docs/guides/platform/fly-postgres#pricing) section.
 
+If you’re using Vercel Marketplace, see the [Vercel Marketplace Pricing](/docs/guides/platform/vercel-marketplace#pricing) section.
+
 </Admonition>
 
 ## How billing is organized
 
-The Supabase Platform has "organizations" and "projects". An organization may contain multiple projects. Each project is a dedicated Supabase instance with all of its sub-services including Storage, Auth, Functions and Realtime. For example:
+The Supabase Platform has "organizations" and "projects". An organization may contain multiple projects. Each project is a dedicated Postgres and Supabase instance with all of its sub-services including Storage, Auth, Functions and Realtime. For example:
 
 - `Organization 1`
-  - `Project 1` (Database, Auth, Storage, Functions, Realtime)
-  - `Project 2` (Database, Auth, Storage, Functions, Realtime)
+  - `Project 1` (Postgres, Data API, Auth, Storage, Functions, Realtime)
+  - `Project 2` (Postgres, Data API, Auth, Storage, Functions, Realtime)
 - `Organization 2`
-  - `Project 3` (Database, Auth, Storage, Functions, Realtime)
+  - `Project 3` (Postgres, Data API, Auth, Storage, Functions, Realtime)
 
-Each organization only has a single subscription with a single plan (Free, Pro, Team or Enterprise). Project addons such as [Compute](/docs/guides/platform/compute-add-ons), [Custom Domains](/docs/guides/platform/custom-domains) and [PITR](/docs/guides/platform/backups#point-in-time-recovery) are still configured per project and are added to your organization subscription.
+Each organization only has a single subscription with a single Plan (Free, Pro, Team or Enterprise). Project add-ons such as [Compute](/docs/guides/platform/compute-add-ons), [IPv4](/docs/guides/platform/ipv4-address), [Log Drains](/docs/guides/platform/log-drains), [Advanced MFA](/docs/guides/auth/auth-mfa/phone), [Custom Domains](/docs/guides/platform/custom-domains) and [PITR](/docs/guides/platform/backups#point-in-time-recovery) are still configured per project and are bundled into your organization subscription.
 
-![Billing: Current](/docs/img/guides/platform/org-billing-after.png)
+<Image
+  alt="Billing Overview"
+  src={{
+    light: '/docs/img/guides/platform/billing-overview--light.png',
+    dark: '/docs/img/guides/platform/billing-overview.png',
+  }}
+  zoomable
+/>
 
 ## Quotas and features
 
@@ -33,74 +42,91 @@ Quotas and features are applied to your entire organization, independent of how 
 
 Upgrading your organization to a paid plan means that you unlock the benefits of the paid plan for **all** projects within that organization - for example, no projects in your "Pro" organization will be paused. See [pricing page](https://supabase.com/pricing) for details on all plans.
 
+It is not possible to mix different plans inside a single organization. You cannot have one Pro Plan project and one Free Plan project inside a single organization. To have projects on different plans, you'll need to create different organizations. Also see [Project Transfers](/docs/guides/platform/project-transfer) in case you're looking to transfer a project to a different organization.
+
 ### Usage items
 
-| Metric                     | Free                     | Pro/Team                                    | Enterprise |
-| -------------------------- | ------------------------ | ------------------------------------------- | ---------- |
-| Egress                     | 5GB                      | 250GB included, then $0.09 per GB           | Custom     |
-| Database Size              | 500MB                    | 8GB included, then $0.125 per GB            | Custom     |
-| Storage Size               | 1GB                      | 100GB included, then $0.021 per GB          | Custom     |
-| Monthly Active Users       | 50,000 MAU               | 100,000 MAU included, then $0.00325 per MAU | Custom     |
-| Function Invocations       | 500K                     | 2 million included, then $2 per million     | Custom     |
-| Function Count             | 10                       | 100 included, then $10 per 100              | Custom     |
-| Storage Images Transformed | Unavailable on Free plan | 100 included, then $5 per 1000              | Custom     |
-| Realtime Message Count     | 2 million                | 5 million included, then $2.5 per million   | Custom     |
-| Realtime Peak Connections  | 200                      | 500 included, then $10 per 1000             | Custom     |
+| Metric                           | Free                     | Pro/Team                                          | Enterprise |
+| -------------------------------- | ------------------------ | ------------------------------------------------- | ---------- |
+| Egress                           | 5GB                      | 250GB included, then $0.09 per GB                 | Custom     |
+| Database Size                    | 500MB                    | 8GB disk per project included, then $0.125 per GB | Custom     |
+| Storage Size                     | 1GB                      | 100GB included, then $0.021 per GB                | Custom     |
+| Monthly Active Users             | 50,000 MAU               | 100,000 MAU included, then $0.00325 per MAU       | Custom     |
+| Monthly Active Third-Party Users | 50 MAU                   | 50 MAU included, then $0.00325 per MAU            | Custom     |
+| Monthly Active SSO Users         | -                        | 50 MAU included, then $0.015 per MAU              | Custom     |
+| Function Invocations             | 500K                     | 2 million included, then $2 per million           | Custom     |
+| Function Count                   | 25                       | 500/1000                                          | Unlimited  |
+| Storage Images Transformed       | Unavailable on Free Plan | 100 included, then $5 per 1000                    | Custom     |
+| Realtime Message Count           | 2 million                | 5 million included, then $2.5 per million         | Custom     |
+| Realtime Peak Connections        | 200                      | 500 included, then $10 per 1000                   | Custom     |
+| Log Drain Events                 | -                        | - / $0.20 per Million Events                      | Custom     |
 
-## Usage-based billing for compute
+## Billing for Compute (Compute Hours)
 
-We provide a dedicated server for every Supabase project. By default, your instance runs on the Micro Compute instance. You can upgrade your compute size in your [project settings](https://supabase.com/dashboard/project/_/settings/addons).
+Supabase provides a dedicated server and database for every project. By default, your instance runs on the Micro Compute instance. You can upgrade your compute size in your [project settings](https://supabase.com/dashboard/project/_/settings/addons).
 
-You won't get an immediate charge upfront when changing compute, instead we'll bill you based on compute runtime hours when your billing cycle resets.
+Given we provide dedicated databases on paid plans that have 24/7 uptime and predictable performance, you pay the same amount for compute independent of your database usage. An active project on the Small compute size running for 30 days consumes 720 (30x24h) Small Compute Hours.
 
-If you launch a second or third instance on your paid plan, we add the additional compute hours to the final invoice.
+You won't get an immediate charge upfront when changing compute, instead we'll bill you based on compute hours when your billing cycle resets. If you launch a second or third instance on your paid plan, we add the additional compute hours to the final invoice. If you upgrade an instance for 24 hours, you'll only be billed for those 24 hours of additional compute. Compute hours are billed when you do plan up/downgrades (resets the billing cycle) or whenever your billing cycle resets once a month.
 
 <Admonition type="note" label="Paused projects">
 
-We only count compute hours for instances that are active. Paused projects do not count towards compute usage. We’re working on self-serve pausing and unpausing on paid plans to further manage costs.
+We only count compute hours for instances that are active. Paused projects do not count towards compute usage.
 
 </Admonition>
 
 ### Compute pricing
 
-| Instance Size | Hourly Price | Estimated Monthly Price |
-| ------------- | ------------ | ----------------------- |
-| Micro         | $0.01344     | ~$10                    |
-| Small         | $0.0206      | ~$15                    |
-| Medium        | $0.0822      | ~$60                    |
-| Large         | $0.1517      | ~$110                   |
-| XL            | $0.2877      | ~$210                   |
-| 2XL           | $0.562       | ~$410                   |
-| 4XL           | $1.32        | ~$960                   |
-| 8XL           | $2.562       | ~$1870                  |
-| 12XL          | $3.836       | ~$2800                  |
-| 16XL          | $5.12        | ~$3730                  |
+| Compute Size | Hourly Price | Estimated Monthly Price |
+| ------------ | ------------ | ----------------------- |
+| Micro        | $0.01344     | ~$10                    |
+| Small        | $0.0206      | ~$15                    |
+| Medium       | $0.0822      | ~$60                    |
+| Large        | $0.1517      | ~$110                   |
+| XL           | $0.2877      | ~$210                   |
+| 2XL          | $0.562       | ~$410                   |
+| 4XL          | $1.32        | ~$960                   |
+| 8XL          | $2.562       | ~$1870                  |
+| 12XL         | $3.836       | ~$2800                  |
+| 16XL         | $5.12        | ~$3730                  |
 
-### Free plan
-
-Supabase provides two "Free organizations". Each organization can run a `Nano` instance for free. This is a great way to get started with Supabase and try out the platform.
-
-### Compute credits
+### Compute Credits
 
 Paid plans come with $10 of Compute Credits to cover one Micro instance or parts of any other [Compute Add-On](/docs/guides/platform/compute-add-ons).
 
-Compute Credits are deducted from your Compute Usage. You can launch as many instances as you want on paid plans and we'll bill based on the compute hours. If you upgrade an instance for 24 hours, you'll only be billed for those 24 hours of additional compute. Compute hours are billed when you do plan up/downgrades (resets the billing cycle) or whenever your billing cycle resets once a month.
+Compute Credits are deducted from your Compute Usage. You can launch as many instances as you want on paid plans and we'll bill based on the compute hours.
 
-Compute Credits do not apply to other usage fees like egress, database size, ... They solely apply to Compute usage.
+Compute Credits do not apply to other usage fees like egress, disk size, ... They solely apply to Compute usage.
 
-Additionally, Compute Credits are given to you not only for the first month but for every month while you are on a paid plan. Notice though, that they reset every month and do not accumulate, in case you're not running any projects.
+Additionally, Compute Credits are given to you not only for the first month but for every month while you are on a paid plan. They reset every month and do not accumulate.
 
-### Replicas
+### Read Replicas
 
-In case of deploying additional [Read Replicas](/docs/guides/platform/read-replicas), each replica is a dedicated database that adds additional compute runtime hours.
+In case of deploying [Read Replicas](/docs/guides/platform/read-replicas), each replica is a dedicated database that adds additional compute hours and disk size usage.
 
-Each replica incurs one compute hour on the given instance size. An example:
+Each replica incurs one compute hour on the given compute size. An example:
 
 A primary database on XL compute and two read replicas on XL compute would incur ~2.190 XL compute hours (3x 730h) and cost ~$630/month.
 
+The disk size of a replica instance is usually 1.25x the size of the primary disk to account for WAL archives
+
+## Project Add-ons
+
+While the subscription plan (Free, Pro, Team or Enterprise) applies to your entire organization and is only charged for once, you can level up your project by opting into several add-ons:
+
+- [Compute](/docs/guides/platform/compute-add-ons) to scale your database up to 64 cores and 256 GB RAM
+- [Read Replicas](/docs/guides/platform/read-replicas) to scale read operations and provide resiliency
+- [Log Drains](/docs/guides/platform/log-drains) to sync Supabase logs to a logging system of your choice
+- [Custom Domains](/docs/guides/platform/custom-domains) to provide a branded experience
+- [PITR](/docs/guides/platform/backups#point-in-time-recovery) to roll back to any specific point in time, down to the minute
+- [IPv4](/docs/guides/platform/ipv4-address) for a dedicated IPv4 address
+- [Advanced MFA](/docs/guides/auth/auth-mfa/phone) to provide other options than TOTP
+
+Project add-ons are charged by the hour at the end of your billing cycle. I.e. if you enable a log drain for two weeks, you will pay for 336 hours (14 days \* 24 hours).
+
 ## Unified egress
 
-Each organization receives a total egress quota (eg. 250GB on the Pro plan) which can be used for anything - Storage, Realtime, Auth, Functions, Supavisor or Database.
+Each organization receives a total egress quota (eg. 250GB on the Pro Plan) which can be used for anything - Storage, Realtime, Auth, Functions, Supavisor, Log Drains or Database.
 
 ### Included egress quota
 
@@ -127,31 +153,48 @@ You can see a breakdown of the different types of egress on your [organization u
   />
 </div>
 
+## Disk Size
+
+We differentiate between database space usage and disk size. Database Space is the actual amount of space used by all your database objects, whereas disk size is the size of the underlying provisioned disk. Each database has a provisioned disk.
+Free Plan customers are limited to 500 MB of database space.
+
+For paid plan customers, we provision 8 GB of disk by default. If your database grows close to the underlying disk limit, we autoscale it by 1.5x. The first 8 GB of provisioned disk per project are free of charge. Disk size beyond the first 8 GB costs $0.125/month/GB.
+
+Disk Size is prorated down to the hour, so your bill will show "Disk Size GB-Hrs". See [Database Size](/docs/guides/platform/database-size) for further information.
+
+## Free Plan
+
+Supabase provides two "Free projects". Each project can run a `Nano` instance for free. This is a great way to get started with Supabase and try out the platform.
+
+We count your total limit of 2 free projects across all organizations you're either an Owner or Administrator of. You could have two Free Plan organizations with one project each, or one Free Plan organization with two projects. Paused projects do not count towards your free project limit.
+
 ## Billing Examples
 
 Here are some examples on how the Billing affects you.
 
-### Multiple free plan projects
+### Multiple projects in a Free Plan organization
 
-Here are the quotas for the free plan:
+Here are the quotas for the Free Plan:
 
-| Usage Item                | Free plan                               |
-| ------------------------- | --------------------------------------- |
-| Egress                    | 5GB across Database + Storage           |
-| Database Space            | 500MB                                   |
-| Storage Space             | 1GB                                     |
-| Monthly Active Users      | 50,000 MAU                              |
-| Edge Function Invocations | 500K                                    |
-| Edge Function Count       | 10                                      |
-| Realtime Message Count    | 2 million                               |
-| Realtime Peak Connections | 200                                     |
-|                           | Max of 2 free orgs - 1 database per org |
+| Usage Item                | Free Plan                     |
+| ------------------------- | ----------------------------- |
+| Egress                    | 5GB across Database + Storage |
+| Database Space            | 500MB                         |
+| Storage Space             | 1GB                           |
+| Monthly Active Users      | 50,000 MAU                    |
+| Edge Function Invocations | 500K                          |
+| Edge Function Count       | 25                            |
+| Realtime Message Count    | 2 million                     |
+| Realtime Peak Connections | 200                           |
+| Max of 2 free projects\*  |
 
-While we allow you to launch a total of two free projects, the quota applies to the entire organization, i.e. you can have a total of 4GB of database space.
+The quota applies to the entire organization, i.e. you can have a total of 5GB egress (sum of all projects egress combined).
 
-### Multiple pro plan projects
+\* All active projects in Free Plan organizations where you're either an Owner or Administrator count towards your total limit of 2 free projects. Paused projects do not count towards your limit.
 
-While you only pay for the $25 Pro plan once, launching additional projects at least incurs compute costs.
+### Multiple projects in a Pro Plan organization
+
+While you only pay for the $25 Pro Plan once, launching additional projects at least incurs compute costs.
 
 **Invoice Breakdown**
 
@@ -164,18 +207,16 @@ While you only pay for the $25 Pro plan once, launching additional projects at l
 
 Here's the quota for your entire organization:
 
-| Usage Item                 | Quota                                     |
-| -------------------------- | ----------------------------------------- |
-| Egress                     | 250GB included, then $0.09 per GB         |
-| Database Size              | 8GB included, then $0.125 per GB          |
-| Storage Size               | 100GB included, then $0.021 per GB        |
-| Monthly Active Users       | 100K MAU included, then $0.00325 per MAU  |
-| Function Invocations       | 2 million included, then $2 per million   |
-| Function Count             | 100 included, then $10 per 100            |
-| Storage Images Transformed | 100 included, then $5 per 1000            |
-| Realtime Message Count     | 5 million included, then $2.5 per million |
-| Realtime Peak Connections  | 500 included, then $10 per 1000           |
-
-If you wish to keep the same quota for each project, you can separate your projects into three organizations on the Pro plan each. You'd end up paying $25 for each project, so $75 instead of $45 in total, while getting more quota.
+| Usage Item                 | Quota                                        |
+| -------------------------- | -------------------------------------------- |
+| Egress                     | 250GB included, then $0.09 per GB            |
+| Disk Size                  | 8GB per project included, then $0.125 per GB |
+| Storage Size               | 100GB included, then $0.021 per GB           |
+| Monthly Active Users       | 100K MAU included, then $0.00325 per MAU     |
+| Function Invocations       | 2 million included, then $2 per million      |
+| Function Count             | 500 included                                 |
+| Storage Images Transformed | 100 included, then $5 per 1000               |
+| Realtime Message Count     | 5 million included, then $2.5 per million    |
+| Realtime Peak Connections  | 500 included, then $10 per 1000              |
 
 See [Project Transfers](/docs/guides/platform/project-transfer) to move projects across organizations.

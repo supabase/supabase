@@ -77,6 +77,12 @@ Deploy function to Supabase:
 supabase functions deploy resend --no-verify-jwt
 ```
 
+<Admonition type="warning">
+
+When you deploy to Supabase, make sure that your `RESEND_API_KEY` is set in [Edge Function Secrets Management](https://supabase.com/dashboard/project/_/settings/functions)
+
+</Admonition>
+
 Open the endpoint URL to send an email:
 
 ### 4. Try it yourself

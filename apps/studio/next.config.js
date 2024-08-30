@@ -469,6 +469,10 @@ const nextConfig = {
     // Typechecking is checked separately via .github/workflows/typecheck.yml
     ignoreBuildErrors: true,
   },
+  eslint: {
+    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    ignoreDuringBuilds: true,
+  },
 }
 
 // module.exports = withBundleAnalyzer(nextConfig)

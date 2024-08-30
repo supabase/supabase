@@ -10,13 +10,16 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const [search, setSearch] = useState('')
-  const [filterStatus, setFilterStatus] = useState<string[]>(['ACTIVE_HEALTHY', 'INACTIVE'])
+  const [filterStatus, setFilterStatus] = useState<string[]>([
+    PROJECT_STATUS.ACTIVE_HEALTHY,
+    PROJECT_STATUS.INACTIVE,
+  ])
   const { data: organizations, isError, isSuccess } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
 

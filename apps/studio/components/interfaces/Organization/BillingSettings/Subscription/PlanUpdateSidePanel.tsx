@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { isArray } from 'lodash'
 import { ChevronRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
@@ -13,6 +14,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
@@ -23,7 +25,6 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Button, IconCheck, IconInfo, Modal, SidePanel, cn } from 'ui'
@@ -38,6 +39,8 @@ const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
+
+  const queryClient = useQueryClient()
 
   const originalPlanRef = useRef<string>()
 
@@ -113,18 +116,6 @@ const PlanUpdateSidePanel = () => {
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Change Subscription Plan',
-            section: 'Subscription plan',
-          },
-          ...(slug && { orgSlug: slug }),
-        },
-        router
-      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
@@ -149,6 +140,20 @@ const PlanUpdateSidePanel = () => {
     if (!selectedTier) return console.error('Selected plan is required')
     if (!selectedPaymentMethod && !paymentViaInvoice) {
       return toast.error('Please select a payment method')
+    }
+
+    if (selectedPaymentMethod) {
+      queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          defaultPaymentMethodId: selectedPaymentMethod,
+          data: prev.data.map((pm: any) => ({
+            ...pm,
+            is_default: pm.id === selectedPaymentMethod,
+          })),
+        }
+      })
     }
 
     // If the user is downgrading from team, should have spend cap disabled by default
@@ -244,24 +249,13 @@ const PlanUpdateSidePanel = () => {
                       <ButtonTooltip
                         block
                         type={isDowngradeOption ? 'default' : 'primary'}
-                        disabled={subscription?.plan?.id === 'enterprise' || !canUpdateSubscription}
-                        onClick={() => {
-                          setSelectedTier(plan.id as any)
-                          Telemetry.sendActivity(
-                            {
-                              activity: 'Popup Viewed',
-                              source: 'Dashboard',
-                              data: {
-                                title: isDowngradeOption
-                                  ? 'Downgrade'
-                                  : 'Upgrade' + ' to ' + plan.name,
-                                section: 'Subscription plan',
-                              },
-                              ...(slug && { orgSlug: slug }),
-                            },
-                            router
-                          )
-                        }}
+                        disabled={
+                          subscription?.plan?.id === 'enterprise' ||
+                          !canUpdateSubscription ||
+                          (plan.id === 'tier_team' &&
+                            selectedOrganization?.managed_by === 'vercel-marketplace')
+                        }
+                        onClick={() => setSelectedTier(plan.id as any)}
                         tooltip={{
                           content: {
                             side: 'bottom',
@@ -270,7 +264,10 @@ const PlanUpdateSidePanel = () => {
                                 ? 'Reach out to us via support to update your plan from Enterprise'
                                 : !canUpdateSubscription
                                   ? 'You do not have permission to change the subscription plan'
-                                  : undefined,
+                                  : plan.id === 'tier_team' &&
+                                      selectedOrganization?.managed_by === 'vercel-marketplace'
+                                    ? 'The Team plan is currently unavailable for Vercel Marketplace managed organizations'
+                                    : undefined,
                           },
                         }}
                       >
@@ -467,7 +464,7 @@ const PlanUpdateSidePanel = () => {
                     {subscription?.plan?.id === 'free' && (
                       <p className="text-sm mt-2">
                         Mixing paid and non-paid projects in a single organization is not possible.
-                        If you want projects to be on the free plan, use self-serve project
+                        If you want projects to be on the Free Plan, use self-serve project
                         transfers.
                       </p>
                     )}
