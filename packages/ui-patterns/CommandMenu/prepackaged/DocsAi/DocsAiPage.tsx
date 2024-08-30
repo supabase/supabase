@@ -11,6 +11,7 @@ import {
   Button,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
+  CommandList_Shadcn_,
   cn,
   markdownComponents,
 } from 'ui'
@@ -39,7 +40,6 @@ const questions = [
 ]
 
 const DocsAiPage = () => {
-  const query = useQuery()
   const setQuery = useSetQuery()
 
   const isBelowSm = useBreakpoint('sm')
@@ -249,34 +249,36 @@ function EmptyState({ handleSubmit }: { handleSubmit: (message: string) => void 
   const query = useQuery()
 
   return (
-    <CommandGroup_Shadcn_
-      heading="Examples"
-      className={cn(
-        // Double padding from command group primitive and container, remove the primitive one
-        '!p-0',
-        'text-border-strong',
-        '[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5',
-        '[&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted'
-      )}
-    >
-      {questions.map((question) => {
-        const key = question.replace(/\s+/g, '_')
-        return (
-          <CommandItem_Shadcn_
-            className={generateCommandClassNames(false)}
-            onSelect={() => {
-              if (!query) {
-                handleSubmit(question)
-              }
-            }}
-            key={key}
-          >
-            <AiIconAnimation />
-            {question}
-          </CommandItem_Shadcn_>
-        )
-      })}
-    </CommandGroup_Shadcn_>
+    <CommandList_Shadcn_>
+      <CommandGroup_Shadcn_
+        heading="Examples"
+        className={cn(
+          // Double padding from command group primitive and container, remove the primitive one
+          '!p-0',
+          'text-border-strong',
+          '[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5',
+          '[&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted'
+        )}
+      >
+        {questions.map((question) => {
+          const key = question.replace(/\s+/g, '_')
+          return (
+            <CommandItem_Shadcn_
+              className={generateCommandClassNames(false)}
+              onSelect={() => {
+                if (!query) {
+                  handleSubmit(question)
+                }
+              }}
+              key={key}
+            >
+              <AiIconAnimation />
+              {question}
+            </CommandItem_Shadcn_>
+          )
+        })}
+      </CommandGroup_Shadcn_>
+    </CommandList_Shadcn_>
   )
 }
 
