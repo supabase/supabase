@@ -1771,6 +1771,7 @@ export const platform: NavMenuConstant = {
         },
         { name: 'Database Size', url: '/guides/platform/database-size' },
         { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
+        { name: 'Vercel Marketplace', url: '/guides/platform/vercel-marketplace' },
         {
           name: 'HTTP Status Codes',
           url: '/guides/platform/http-status-codes',

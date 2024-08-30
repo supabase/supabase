@@ -19,9 +19,11 @@ import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
 import MobileMenu from './MobileMenu'
 import MenuItem from './MenuItem'
-import { menu } from '~/data/nav'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import LW12CountdownBanner from 'ui/src/layout/banners/LW12CountdownBanner/LW12CountdownBanner'
+import { allBlogPosts } from 'contentlayer/generated'
+import { getMenu } from '~/data/nav'
+import { sortDates } from '~/lib/helpers'
 
 interface Props {
   hideNavbar: boolean
@@ -34,6 +36,8 @@ const Nav = (props: Props) => {
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
+  const latestBlogPosts = allBlogPosts.sort(sortDates).slice(0, 2)
+  const menu = getMenu(latestBlogPosts)
 
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('/launch-week')
