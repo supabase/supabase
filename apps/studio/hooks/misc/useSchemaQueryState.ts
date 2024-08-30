@@ -1,4 +1,5 @@
 import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo } from 'react'
 
 import { useParams } from 'common'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
@@ -20,17 +21,22 @@ export const useQuerySchemaState = () => {
   const { ref } = useParams()
 
   let defaultSchema = 'public'
-  if (typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && ref && ref.length > 0) {
     defaultSchema =
-      window.localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref ?? '')) || 'public'
+      window.localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref)) || 'public'
   }
 
-  const [schema, setSelectedSchema] = useIsomorphicUseQueryState(defaultSchema)
+  // cache the original default schema so that it's not changed by another tab and cause issues in the app (saving a
+  // table on the wrong schema)
+  const originalDefaultSchema = useMemo(() => defaultSchema, [ref])
+  const [schema, setSelectedSchema] = useIsomorphicUseQueryState(originalDefaultSchema)
 
-  // Update the schema to local storage on every change
-  if (defaultSchema !== schema && typeof window !== 'undefined') {
-    window.localStorage.setItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref ?? ''), schema)
-  }
+  useEffect(() => {
+    // Update the schema in local storage on every change
+    if (typeof window !== 'undefined' && ref && ref.length > 0) {
+      window.localStorage.setItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref), schema)
+    }
+  }, [schema, ref])
 
   return { selectedSchema: schema, setSelectedSchema }
 }
