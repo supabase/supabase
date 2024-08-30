@@ -1,7 +1,7 @@
 import type { PostgresExtension } from '@supabase/postgres-meta'
 import { ExternalLinkIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'

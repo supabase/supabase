@@ -2,14 +2,14 @@ import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supab
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
 import { find, isUndefined } from 'lodash'
+import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { SupaTable } from 'components/grid/types'
-import { Markdown } from 'components/interfaces/Markdown'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Loading } from 'components/ui/Loading'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
@@ -27,11 +27,10 @@ import type { TableLike } from 'hooks/misc/useTable'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
-import { ExternalLink } from 'lucide-react'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary, SchemaView } from 'types'
-import { Button, toast as UiToast } from 'ui'
+import { Button } from 'ui'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
@@ -236,32 +235,24 @@ const TableGridEditor = ({
 
     const configuration = { identifiers }
     if (Object.keys(identifiers).length === 0) {
-      return UiToast({
-        variant: 'default',
-        style: { flexDirection: 'column' },
-        title: (
-          <Markdown
-            className="text-foreground [&>p]:m-0"
-            content="Unable to update row as table has no primary keys"
-          />
-        ) as any,
+      return toast('Unable to update row as table has no primary keys', {
         description: (
-          <Markdown
-            className="[&>p]:m-0"
-            content="Add a primary key column to your table first to serve as a unique identifier for each row before updating or deleting the row."
-          />
-        ),
-        action: (
-          <div className="w-full flex gap-x-2 !mx-0 mt-3">
-            <Button asChild type="outline" icon={<ExternalLink />}>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href="https://supabase.com/docs/guides/database/tables#primary-keys"
-              >
-                Documentation
-              </a>
-            </Button>
+          <div>
+            <p className="text-sm text-foreground-light">
+              Add a primary key column to your table first to serve as a unique identifier for each
+              row before updating or deleting the row.
+            </p>
+            <div className="mt-3">
+              <Button asChild type="outline" icon={<ExternalLink />}>
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://supabase.com/docs/guides/database/tables#primary-keys"
+                >
+                  Documentation
+                </a>
+              </Button>
+            </div>
           </div>
         ),
       })

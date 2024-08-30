@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Book, Github, Loader2, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
@@ -111,10 +111,10 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                   extensionMeta?.link.startsWith('/guides')
                     ? siteUrl === 'http://localhost:8082'
                       ? `http://localhost:3001/docs${
-                          extensions.find((item: any) => item.name === extension.name)?.link
+                          extensions.find((item) => item.name === extension.name)?.link
                         }`
                       : `https://supabase.com/docs${
-                          extensions.find((item: any) => item.name === extension.name)?.link
+                          extensions.find((item) => item.name === extension.name)?.link
                         }`
                     : extensions.find((item: any) => item.name === extension.name)?.link ?? ''
                 }

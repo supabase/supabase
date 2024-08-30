@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { FormMessage } from '@ui/components/shadcn/ui/form'
@@ -15,7 +15,6 @@ import { useUpdateCollection } from 'data/analytics/warehouse-collections-update
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
-  Checkbox_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -23,7 +22,6 @@ import {
   DropdownMenuTrigger,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormLabel_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   Modal,

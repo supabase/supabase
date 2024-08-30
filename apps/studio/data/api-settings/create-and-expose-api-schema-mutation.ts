@@ -1,12 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import { configKeys } from 'data/config/keys'
+import { handleError, patch } from 'data/fetchers'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError } from 'types'
-import { handleError, patch } from 'data/fetchers'
-import { components } from 'api-types'
-import { configKeys } from 'data/config/keys'
 
 export type CreateAndExposeAPISchemaVariables = {
   projectRef: string
