@@ -136,7 +136,7 @@ const footerData = [
         url: '/company',
       },
       {
-        text: 'Events',
+        text: 'Events & Webinars',
         url: '/events',
       },
       {
