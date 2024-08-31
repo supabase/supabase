@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresTable } from '@supabase/postgres-meta'
 import { AlignLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'

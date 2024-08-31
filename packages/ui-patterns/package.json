@@ -20,7 +20,6 @@
     "monaco-editor": "*",
     "next-themes": "*",
     "react-error-boundary": "^4.0.12",
-    "react-hot-toast": "*",
     "react-markdown": "^9.0.1",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "*",

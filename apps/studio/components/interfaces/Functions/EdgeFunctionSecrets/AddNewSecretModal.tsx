@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
 
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
