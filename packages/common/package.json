@@ -12,7 +12,7 @@
     "config": "*",
     "dat.gui": "^0.7.9",
     "lodash": "^4.17.21",
-    "next-themes": "^0.2.1",
+    "next-themes": "^0.3.0",
     "react-hot-toast": "^2.4.1",
     "react-use": "^17.4.0"
   },

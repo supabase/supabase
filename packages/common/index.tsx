@@ -1,4 +1,5 @@
-export * from './Providers'
+export * from './providers/ThemeProvider'
+export * from './providers/TooltipProvider'
 export * from './constants'
 export * from './helpers'
 export * from './hooks'

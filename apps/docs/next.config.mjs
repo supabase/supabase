@@ -34,6 +34,9 @@ const withMDX = nextMdx({
 
 /** @type {import('next').NextConfig} nextConfig */
 const nextConfig = {
+  experimental: {
+    serverActions: true,
+  },
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // reactStrictMode: true,
@@ -83,10 +86,10 @@ const nextConfig = {
             key: 'X-Robots-Tag',
             value: 'all',
           },
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
+          // {
+          //   key: 'X-Frame-Options',
+          //   value: 'DENY',
+          // },
         ],
       },
     ]

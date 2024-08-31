@@ -26,6 +26,7 @@ export interface CodeBlockProps {
   className?: string
   value?: string
   children?: string
+  style?: React.CSSProperties
 }
 
 export const CodeBlock = ({
@@ -37,6 +38,7 @@ export const CodeBlock = ({
   children,
   hideCopy = false,
   hideLineNumbers = false,
+  style,
 }: CodeBlockProps) => {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
@@ -82,6 +84,8 @@ export const CodeBlock = ({
   if (lang === 'bash' || lang === 'sh') hideLineNumbers = true
   const showLineNumbers = !hideLineNumbers
 
+  console.log('className', className)
+
   return (
     <>
       {title && (
@@ -106,6 +110,7 @@ export const CodeBlock = ({
             customStyle={{
               fontSize: large ? 18 : 13,
               lineHeight: large ? 1.5 : 1.4,
+              ...style,
             }}
             showLineNumbers={showLineNumbers}
             lineProps={(lineNumber) => {
@@ -156,7 +161,10 @@ export const CodeBlock = ({
           ) : null}
         </div>
       ) : (
-        <code className={shortCodeBlockClasses}>{value || children}</code>
+        <>
+          {console.log('just doing code')}
+          <code className={shortCodeBlockClasses}>{value || children}</code>
+        </>
       )}
     </>
   )

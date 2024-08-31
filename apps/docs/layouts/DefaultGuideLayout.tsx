@@ -1,3 +1,5 @@
+'use client'
+
 import { FC } from 'react'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'

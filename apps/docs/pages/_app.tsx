@@ -7,7 +7,13 @@ import '../styles/prism-okaidia.scss'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { QueryClientProvider, useQueryClient } from '@tanstack/react-query'
-import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
+import {
+  AuthProvider,
+  ThemeProvider,
+  TooltipProvider,
+  useTelemetryProps,
+  useThemeSandbox,
+} from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
@@ -224,16 +230,18 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         <AuthContainer>
           <SignOutHandler>
             <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-              <CommandMenuProvider site="docs">
-                <TabsProvider>
-                  <div className="h-screen flex flex-col">
-                    <SiteLayout>
-                      <PortalToast />
-                      <Component {...pageProps} />
-                    </SiteLayout>
-                  </div>
-                </TabsProvider>
-              </CommandMenuProvider>
+              <TooltipProvider>
+                <CommandMenuProvider site="docs">
+                  <TabsProvider>
+                    <div className="h-screen flex flex-col">
+                      <SiteLayout>
+                        <PortalToast />
+                        <Component {...pageProps} />
+                      </SiteLayout>
+                    </div>
+                  </TabsProvider>
+                </CommandMenuProvider>
+              </TooltipProvider>
             </ThemeProvider>
           </SignOutHandler>
         </AuthContainer>
