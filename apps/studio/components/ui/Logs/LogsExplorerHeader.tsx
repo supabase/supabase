@@ -76,7 +76,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 >
                   unnesting joins
                   <ExternalLink
-                    size="tiny"
+                    size={14}
                     className="ml-1 inline -translate-y-[2px]"
                     strokeWidth={1.5}
                   />

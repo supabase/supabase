@@ -10,7 +10,7 @@ const ICONS = {
   PRESENCE: <IconPresence size="xlarge" />,
   BROADCAST: <IconBroadcast size="xlarge" />,
   POSTGRES: <IconDatabaseChanges size="xlarge" />,
-  SYSTEM: <AlertTriangle size="large" />,
+  SYSTEM: <AlertTriangle size="20" strokeWidth={1} />,
 }
 
 export const ColumnRenderer: Column<LogData, unknown>[] = [

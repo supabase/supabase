@@ -154,14 +154,14 @@ const UpgradingState = () => {
                   >
                     {isExpanded ? (
                       <Minimize2
-                        size="tiny"
+                        size={14}
                         strokeWidth={2}
                         className="absolute z-10 cursor-pointer top-3 right-3"
                         onClick={() => setIsExpanded(false)}
                       />
                     ) : (
                       <Maximize2
-                        size="tiny"
+                        size={14}
                         strokeWidth={2}
                         className="absolute z-10 cursor-pointer top-3 right-3"
                         onClick={() => setIsExpanded(true)}

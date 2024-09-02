@@ -23,7 +23,7 @@ export default function Loading({ children, active }: Props) {
   return (
     <div className={classNames.join(' ')}>
       <div className={contentClasses.join(' ')}>{children}</div>
-      {active && <Loader size="xlarge" className={spinnerClasses.join(' ')} />}
+      {active && <Loader size={24} className={spinnerClasses.join(' ')} />}
     </div>
   )
 }

@@ -137,9 +137,9 @@ export function SQLOutputActions({ answer, messages, className }: SQLOutputActio
           type="default"
           icon={
             showCopied ? (
-              <Check size="tiny" className="text-brand" strokeWidth={2} />
+              <Check size="14" className="text-brand" strokeWidth={2} />
             ) : (
-              <Clipboard size="tiny" />
+              <Clipboard size="14" />
             )
           }
           onClick={() => setShowCopied(true)}
@@ -154,9 +154,9 @@ export function SQLOutputActions({ answer, messages, className }: SQLOutputActio
           disabled={isSaving}
           icon={
             isSaved ? (
-              <Check size="tiny" className="text-brand" strokeWidth={2} />
+              <Check size="14" className="text-brand" strokeWidth={2} />
             ) : (
-              <Save size="tiny" />
+              <Save size="14" />
             )
           }
           onClick={() => onSelectSaveSnippet()}

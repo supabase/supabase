@@ -127,7 +127,7 @@ const InvoicesSettings = () => {
                     return (
                       <Table.tr key={x.id}>
                         <Table.td>
-                          <FileText size="xxl" />
+                          <FileText size="24" />
                         </Table.td>
                         <Table.td>
                           <p>{dayjs(x.period_end * 1000).format('MMM DD, YYYY')}</p>

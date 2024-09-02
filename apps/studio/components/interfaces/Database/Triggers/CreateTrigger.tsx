@@ -651,7 +651,7 @@ const ListboxActivation = observer(({}) => {
         label={'Before the event'}
         addOnBefore={() => (
           <div className="flex items-center justify-center rounded bg-foreground p-1 text-background">
-            <PauseCircle strokeWidth={2} size="small" />
+            <PauseCircle strokeWidth={2} size="18" />
           </div>
         )}
       >
@@ -668,7 +668,7 @@ const ListboxActivation = observer(({}) => {
         label={'After the event'}
         addOnBefore={() => (
           <div className="flex items-center justify-center rounded bg-green-1200 p-1 text-background">
-            <PlayCircle strokeWidth={2} size="small" />
+            <PlayCircle strokeWidth={2} size="18" />
           </div>
         )}
       >
@@ -741,7 +741,7 @@ const FunctionWithArguments = observer(({}) => {
       >
         <div className="flex items-center gap-2">
           <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-opacity-10">
-            <Terminal size="small" strokeWidth={2} width={14} />
+            <Terminal size="18" strokeWidth={2} width={14} />
           </div>
           <div className="flex items-center gap-2">
             <p className="text-foreground-light">{_localState!.formState.functionName.value}</p>

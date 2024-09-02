@@ -227,7 +227,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
               type="default"
               onClick={() => setShowSearchInput(true)}
             >
-              <Search size="tiny" />
+              <Search size="14" />
             </Button>
           </motion.div>
         )}
@@ -240,7 +240,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
             className="w-full h-auto flex justify-end gap-2 items-stretch lg:max-w-[240px] xl:max-w-[280px]"
           >
             <Input
-              icon={<Search size="tiny" />}
+              icon={<Search size="14" />}
               size="small"
               layout="vertical"
               autoComplete="off"
@@ -259,7 +259,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
                     }}
                     className="text-foreground-light hover:text-foreground hover:bg-selection"
                   >
-                    <X size="tiny" />
+                    <X size="14" />
                   </Button>
                 )
               }

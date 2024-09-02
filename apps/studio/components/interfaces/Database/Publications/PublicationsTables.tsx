@@ -68,7 +68,7 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
                 placeholder={'Filter'}
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
-                icon={<Search size="tiny" />}
+                icon={<Search size="14" />}
               />
             </div>
           </div>

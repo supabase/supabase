@@ -98,7 +98,7 @@ const TriggersList = ({
             <Input
               placeholder="Search for a trigger"
               size="small"
-              icon={<Search size="tiny" />}
+              icon={<Search size="14" />}
               value={filterString}
               className="w-64"
               onChange={(e) => setFilterString(e.target.value)}

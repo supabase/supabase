@@ -58,22 +58,22 @@ const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
   return (
     <Menu id={id} animation="fade">
       <Item onClick={({ props }) => onSelectCreateFolder(props.index)}>
-        <FolderPlus size="tiny" />
+        <FolderPlus size="14" strokeWidth={1} />
         <span className="ml-2 text-xs">New folder</span>
       </Item>
       <Separator />
       <Item onClick={({ props }) => onSelectAllItemsInColumn(props.index)}>
-        <Clipboard size="tiny" />
+        <Clipboard size="14" strokeWidth={1} />
         <span className="ml-2 text-xs">Select all items</span>
       </Item>
       <Submenu
         label={
           <div className="flex items-center space-x-2">
-            <Eye size="tiny" />
+            <Eye size="14" strokeWidth={1} />
             <span className="text-xs">View</span>
           </div>
         }
-        arrow={<ChevronRight size="tiny" />}
+        arrow={<ChevronRight size="14" strokeWidth={1} />}
       >
         <Item onClick={() => setView(STORAGE_VIEWS.COLUMNS)}>
           <span className="ml-2 text-xs">As columns</span>
@@ -85,11 +85,11 @@ const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
       <Submenu
         label={
           <div className="flex items-center space-x-2">
-            <ChevronsDown size="tiny" />
+            <ChevronsDown size="14" strokeWidth={1} />
             <span className="ml-2 text-xs">Sort by</span>
           </div>
         }
-        arrow={<ChevronRight size="tiny" />}
+        arrow={<ChevronRight size="14" strokeWidth={1} />}
       >
         <Item onClick={() => setSortBy(STORAGE_SORT_BY.NAME)}>
           <span className="ml-2 text-xs">Name</span>
@@ -107,11 +107,11 @@ const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
       <Submenu
         label={
           <div className="flex items-center space-x-2">
-            <ChevronsUp size="tiny" />
+            <ChevronsUp size="14" strokeWidth={1} />
             <span className="ml-2 text-xs">Sort by order</span>
           </div>
         }
-        arrow={<ChevronRight size="tiny" />}
+        arrow={<ChevronRight size="14" strokeWidth={1} />}
       >
         <Item onClick={() => setSortByOrder(STORAGE_SORT_BY_ORDER.ASC)}>
           <span className="ml-2 text-xs">Ascending</span>

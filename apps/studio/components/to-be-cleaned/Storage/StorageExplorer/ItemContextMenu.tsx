@@ -50,18 +50,18 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
     <Menu id={id} animation="fade">
       {isPublic ? (
         <Item onClick={({ props }) => onHandleClick('copy', props.item)}>
-          <Clipboard size="tiny" />
+          <Clipboard size="14" strokeWidth={1} />
           <span className="ml-2 text-xs">Get URL</span>
         </Item>
       ) : (
         <Submenu
           label={
             <div className="flex items-center space-x-2">
-              <Clipboard size="tiny" />
+              <Clipboard size="14" />
               <span className="text-xs">Get URL</span>
             </div>
           }
-          arrow={<ChevronRight size="tiny" />}
+          arrow={<ChevronRight size="14" strokeWidth={1} />}
         >
           <Item
             onClick={({ props }) => onHandleClick('copy', props.item, URL_EXPIRY_DURATION.WEEK)}
@@ -85,20 +85,20 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
       )}
       {canUpdateFiles && [
         <Item key="rename-file" onClick={({ props }) => onHandleClick('rename', props.item)}>
-          <Edit size="tiny" />
+          <Edit size="14" strokeWidth={1} />
           <span className="ml-2 text-xs">Rename</span>
         </Item>,
         <Item key="move-file" onClick={({ props }) => onHandleClick('move', props.item)}>
-          <Move size="tiny" />
+          <Move size="14" strokeWidth={1} />
           <span className="ml-2 text-xs">Move</span>
         </Item>,
         <Item key="download-file" onClick={({ props }) => onHandleClick('download', props.item)}>
-          <Download size="tiny" />
+          <Download size="14" strokeWidth={1} />
           <span className="ml-2 text-xs">Download</span>
         </Item>,
         <Separator key="file-separator" />,
         <Item key="delete-file" onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
-          <Trash2 size="tiny" stroke="red" />
+          <Trash2 size="14" strokeWidth={1} stroke="red" />
           <span className="ml-2 text-xs">Delete</span>
         </Item>,
       ]}

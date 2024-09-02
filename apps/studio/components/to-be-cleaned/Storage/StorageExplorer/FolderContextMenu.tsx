@@ -21,22 +21,22 @@ const FolderContextMenu = ({ id = '' }: FolderContextMenuProps) => {
     <Menu id={id} animation="fade">
       {canUpdateFiles && (
         <Item onClick={({ props }) => setSelectedItemToRename(props.item)}>
-          <Edit size="tiny" />
+          <Edit size="14" strokeWidth={1} />
           <span className="ml-2 text-xs">Rename</span>
         </Item>
       )}
       <Item onClick={({ props }) => downloadFolder(props.item)}>
-        <Download size="tiny" />
+        <Download size="14" strokeWidth={1} />
         <span className="ml-2 text-xs">Download</span>
       </Item>
       <Item onClick={({ props }) => copyPathToFolder(openedFolders, props.item)}>
-        <Clipboard size="tiny" />
+        <Clipboard size="14" strokeWidth={1} />
         <span className="ml-2 text-xs">Copy path to folder</span>
       </Item>
       {canUpdateFiles && [
         <Separator key="separator" />,
         <Item key="delete" onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
-          <Trash2 size="tiny" stroke="red" />
+          <Trash2 size="14" strokeWidth={1} stroke="red" />
           <span className="ml-2 text-xs">Delete</span>
         </Item>,
       ]}

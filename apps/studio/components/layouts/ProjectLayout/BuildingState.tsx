@@ -162,7 +162,7 @@ const ChecklistItem = ({ description }: any) => {
   return (
     <li className="my-3 flex flex-wrap space-x-3">
       <div className="mt-0.5">
-        <ArrowRight className="text-foreground-lighter" size="tiny" />
+        <ArrowRight className="text-foreground-lighter" size={14} />
       </div>
       <div className="flex-1">{description}</div>
     </li>

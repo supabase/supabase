@@ -70,7 +70,7 @@ const Param = ({
             <div>
               <span className="flex grow-0 bg-slate-300 px-2 py-0.5 rounded-md text-foreground-light">
                 <span className="flex items-center gap-2 text-sm">
-                  <Code size="tiny" />
+                  <Code size="14" />
                   <span>{getColumnType(type, format)}</span>
                 </span>
               </span>
@@ -83,7 +83,7 @@ const Param = ({
             <div>
               <span className="flex grow-0 bg-slate-300 px-2 py-0.5 rounded-md text-foreground-light">
                 <span className="flex items-center gap-2 text-sm">
-                  <Database size="tiny" />
+                  <Database size="14" />
                   <span>{format}</span>
                 </span>
               </span>

@@ -184,7 +184,7 @@ const AddRestrictionModal = ({
                           <p>CIDR Block Size</p>
                           <Tooltip.Root delayDuration={0}>
                             <Tooltip.Trigger>
-                              <HelpCircle size="tiny" strokeWidth={2} />
+                              <HelpCircle size="14" strokeWidth={2} />
                             </Tooltip.Trigger>
                             <Tooltip.Portal>
                               <Tooltip.Content side="bottom">

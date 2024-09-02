@@ -493,12 +493,12 @@ const FileExplorerHeader = ({
               size="tiny"
               autoFocus
               className="w-52"
-              icon={<Search size={'tiny'} strokeWidth={2} />}
+              icon={<Search size={14} strokeWidth={2} />}
               actions={[
                 <X
                   key="close"
                   className="mx-2 cursor-pointer text-foreground"
-                  size="tiny"
+                  size={14}
                   strokeWidth={2}
                   onClick={onCancelSearch}
                 />,

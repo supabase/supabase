@@ -6,7 +6,7 @@ const NotOrganizationOwnerWarning = () => {
   return (
     <div className="mt-4">
       <InformationBox
-        icon={<AlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+        icon={<AlertCircle className="text-white" size="20" strokeWidth={1.5} />}
         defaultVisibility={true}
         hideCollapse
         title="You do not have permission to create a project"

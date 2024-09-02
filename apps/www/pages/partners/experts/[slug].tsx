@@ -191,7 +191,7 @@ function Partner({
                       >
                         <span className="flex items-center space-x-1">
                           <span>Learn</span>
-                          <ExternalLink size="small" />
+                          <ExternalLink size="18" />
                         </span>
                       </a>
                     </div>

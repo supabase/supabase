@@ -131,11 +131,11 @@ const TriggerList = ({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-36">
                       <DropdownMenuItem className="space-x-2" onClick={() => editTrigger(x)}>
-                        <Edit3 size="tiny" />
+                        <Edit3 size="14" />
                         <p>Edit trigger</p>
                       </DropdownMenuItem>
                       <DropdownMenuItem className="space-x-2" onClick={() => deleteTrigger(x)}>
-                        <Trash stroke="red" size="tiny" />
+                        <Trash stroke="red" size="14" />
                         <p>Delete trigger</p>
                       </DropdownMenuItem>
                     </DropdownMenuContent>

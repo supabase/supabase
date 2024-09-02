@@ -50,7 +50,7 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
         <Input
           placeholder="Search for a webhook"
           size="small"
-          icon={<Search size="tiny" />}
+          icon={<Search size="14" />}
           value={filterString}
           className="w-64"
           onChange={(e) => setFilterString(e.target.value)}

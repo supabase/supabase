@@ -70,7 +70,7 @@ const NoticeBox = () => {
   return (
     <div className="px-6">
       <InformationBox
-        icon={<HelpCircle size="large" strokeWidth={1.5} />}
+        icon={<HelpCircle size="20" strokeWidth={1.5} />}
         title="Only functions that return a trigger will be displayed below"
         description={`You can make functions by using the Database Functions`}
         button={

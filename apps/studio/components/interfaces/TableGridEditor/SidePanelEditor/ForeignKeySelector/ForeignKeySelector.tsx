@@ -222,7 +222,7 @@ export const ForeignKeySelector = ({
       <SidePanel.Content>
         <div className="py-6 space-y-6">
           <InformationBox
-            icon={<HelpCircle size="large" strokeWidth={1.5} />}
+            icon={<HelpCircle size={20} strokeWidth={1.5} />}
             title="What are foreign keys?"
             description={`Foreign keys help maintain referential integrity of your data by ensuring that no
                 one can insert rows into the table that do not have a matching entry to another
@@ -432,7 +432,7 @@ export const ForeignKeySelector = ({
               <SidePanel.Separator />
 
               <InformationBox
-                icon={<HelpCircle size="large" strokeWidth={1.5} />}
+                icon={<HelpCircle size="20" strokeWidth={1.5} />}
                 title="Which action is most appropriate?"
                 description={
                   <>

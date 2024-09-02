@@ -125,7 +125,7 @@ export function Checkbox({
       <RadixContextMenu.ItemIndicator
       // className={ContextMenuStyles['sbui-contextmenu-input__check']}
       >
-        {ItemIndicator ? ItemIndicator : <Check size="tiny" />}
+        {ItemIndicator ? ItemIndicator : <Check size={14} />}
         <RadixContextMenu.CheckboxItem />
       </RadixContextMenu.ItemIndicator>
       <span>{children}</span>
@@ -151,7 +151,7 @@ export function Radio({ children, value, ItemIndicator }: RadioProps) {
       <RadixContextMenu.ItemIndicator
       // className={ContextMenuStyles['sbui-contextmenu-input__check']}
       >
-        {ItemIndicator ? ItemIndicator : <Check size="tiny" />}
+        {ItemIndicator ? ItemIndicator : <Check size={14} />}
       </RadixContextMenu.ItemIndicator>
       <span>{children}</span>
     </RadixContextMenu.RadioItem>

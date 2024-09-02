@@ -21,7 +21,7 @@ const columnRender = (name: string, isPrimaryKey = false) => {
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
             <div className="text-brand">
-              <Key size="tiny" strokeWidth={2} />
+              <Key size={14} strokeWidth={2} />
             </div>
           </Tooltip.Trigger>
           <Tooltip.Portal>

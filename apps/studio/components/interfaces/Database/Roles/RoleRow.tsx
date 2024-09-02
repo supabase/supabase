@@ -143,7 +143,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                             onSelectDelete(role)
                           }}
                         >
-                          <Trash className="text-red-800" size="tiny" strokeWidth={2} />
+                          <Trash className="text-red-800" size="14" strokeWidth={2} />
                           <p>Delete</p>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -173,7 +173,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                             <Tooltip.Root delayDuration={0}>
                               <Tooltip.Trigger type="button">
                                 <HelpCircle
-                                  size="tiny"
+                                  size="14"
                                   strokeWidth={2}
                                   className="ml-2 relative top-[3px]"
                                 />

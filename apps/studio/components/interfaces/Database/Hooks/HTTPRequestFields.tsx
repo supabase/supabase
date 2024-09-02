@@ -146,7 +146,7 @@ const HTTPRequestFields = ({
                 <Button
                   type="default"
                   size="medium"
-                  icon={<Trash size="tiny" />}
+                  icon={<Trash size="14" />}
                   className="px-[10px] py-[9px]"
                   onClick={() => onRemoveHeader(idx)}
                 />
@@ -237,7 +237,7 @@ const HTTPRequestFields = ({
                 <Button
                   type="default"
                   size="medium"
-                  icon={<Trash size="tiny" />}
+                  icon={<Trash size="14" />}
                   className="px-[10px] py-[9px]"
                   onClick={() => onRemoveParameter(idx)}
                 />

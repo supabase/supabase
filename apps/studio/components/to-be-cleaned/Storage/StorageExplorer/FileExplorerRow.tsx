@@ -181,19 +181,19 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
             ? [
                 {
                   name: 'Rename',
-                  icon: <Edit size="tiny" />,
+                  icon: <Edit size={14} strokeWidth={1} />,
                   onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                 },
               ]
             : []),
           {
             name: 'Download',
-            icon: <Download size="tiny" />,
+            icon: <Download size={14} strokeWidth={1} />,
             onClick: () => downloadFolder(itemWithColumnIndex),
           },
           {
             name: 'Copy path to folder',
-            icon: <Clipboard size="tiny" />,
+            icon: <Clipboard size={14} strokeWidth={1} />,
             onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
           },
           ...(canUpdateFiles
@@ -201,7 +201,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                 { name: 'Separator', icon: undefined, onClick: undefined },
                 {
                   name: 'Delete',
-                  icon: <Trash2 size="tiny" />,
+                  icon: <Trash2 size={14} strokeWidth={1} />,
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
               ]
@@ -214,7 +214,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                   ? [
                       {
                         name: 'Get URL',
-                        icon: <Clipboard size="tiny" />,
+                        icon: <Clipboard size={14} strokeWidth={1} />,
                         onClick: () =>
                           onCopyUrl(itemWithColumnIndex.name, getFileUrl(itemWithColumnIndex)),
                       },
@@ -222,7 +222,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                   : [
                       {
                         name: 'Get URL',
-                        icon: <Clipboard size="tiny" />,
+                        icon: <Clipboard size={14} strokeWidth={1} />,
                         children: [
                           {
                             name: 'Expire in 1 week',
@@ -259,17 +259,17 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                   ? [
                       {
                         name: 'Rename',
-                        icon: <Edit size="tiny" />,
+                        icon: <Edit size={14} strokeWidth={1} />,
                         onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                       },
                       {
                         name: 'Move',
-                        icon: <Move size="tiny" />,
+                        icon: <Move size={14} strokeWidth={1} />,
                         onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
                       },
                       {
                         name: 'Download',
-                        icon: <Download size="tiny" />,
+                        icon: <Download size={14} strokeWidth={1} />,
                         onClick: async () => await downloadFile(itemWithColumnIndex),
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
@@ -281,7 +281,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
             ? [
                 {
                   name: 'Delete',
-                  icon: <Trash2 size="tiny" />,
+                  icon: <Trash2 size={14} strokeWidth={1} />,
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
               ]

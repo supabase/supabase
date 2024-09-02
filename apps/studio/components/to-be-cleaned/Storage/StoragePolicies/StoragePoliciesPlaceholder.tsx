@@ -6,7 +6,7 @@ const StoragePoliciesPlaceholder = () => (
     title={[
       <div key="storagePlaceholder" className="flex w-full items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Archive size="small" />
+          <Archive size="18" />
           <h4>Bucket policies</h4>
         </div>
       </div>,

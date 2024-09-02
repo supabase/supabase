@@ -602,7 +602,7 @@ const ProjectLinkItem = observer(
             <div className="absolute top-[3px] right-[-50px]">
               <Button
                 type="text"
-                icon={<X size="small" strokeWidth={2} />}
+                icon={<X size="18" strokeWidth={2} />}
                 onClick={onRemove}
                 disabled={_store.waitingIntegration}
               />
