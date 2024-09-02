@@ -650,7 +650,7 @@ functions:
         rows visible through `SELECT` policies are deleted. Note that by default
         no rows are visible, so you need at least one `SELECT`/`ALL` policy that
         makes the rows visible.
-      - By default, `upsert` will not return the inserted data. If you want to return the inserted data, you can use the `select()` method inside the request.
+      - By default, `delete` will not return the deleted data. If you want to return the deleted data, you can use the `select()` method inside the request.
     params:
       - name: request
         isOptional: true
