@@ -1,28 +1,17 @@
-import { ChevronDown, ChevronUp, Clipboard, Expand } from 'lucide-react'
+import { Clipboard, Expand } from 'lucide-react'
 import { useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 
-import { GridFooter } from 'components/ui/GridFooter'
 import { useKeyboardShortcuts } from 'hooks/deprecated'
-import { useFlag } from 'hooks/ui/useFlag'
 import { copyToClipboard } from 'lib/helpers'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
-  Button,
   cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuTrigger_Shadcn_,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
 } from 'ui'
 import { CellDetailPanel } from './CellDetailPanel'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 
 function formatClipboardValue(value: any) {
   if (value === null) return ''
@@ -32,14 +21,9 @@ function formatClipboardValue(value: any) {
   return value
 }
 
-const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
-  const enableFolders = useFlag('sqlFolderOrganization')
+const Results = ({ rows }: { rows: readonly any[] }) => {
   const [expandCell, setExpandCell] = useState(false)
   const [cellPosition, setCellPosition] = useState<{ column: any; row: any; rowIdx: number }>()
-
-  const snap = useSqlEditorStateSnapshot()
-  const snapV2 = useSqlEditorV2StateSnapshot()
-  const results = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
 
   const onCopyCell = () => {
     if (cellPosition) {
@@ -141,85 +125,15 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     }
   })
 
-  if (rows.length <= 0) {
-    return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
-      </div>
-    )
-  }
-
-  const ROWS_PER_PAGE_OPTIONS = [
-    { value: -1, label: 'No limit' },
-    { value: 100, label: '100 rows' },
-    { value: 500, label: '500 rows' },
-    { value: 1000, label: '1,000 rows' },
-  ]
-
   return (
     <>
       <DataGrid
         columns={columns}
         rows={rows}
-        className="flex-grow border-t-0"
+        className="h-full flex-grow border-t-0"
         rowClass={() => '[&>.rdg-cell]:items-center'}
         onSelectedCellChange={setCellPosition}
       />
-
-      <GridFooter className="flex items-center justify-between gap-2">
-        <Tooltip>
-          <TooltipTrigger>
-            <p className="text-xs">
-              <span className="text-foreground">
-                {rows.length} row{rows.length > 1 ? 's' : ''}
-              </span>
-              <span className="text-foreground-lighter ml-1">
-                {results.autoLimit !== undefined && ` (Limited to only ${results.autoLimit} rows)`}
-              </span>
-            </p>
-          </TooltipTrigger>
-          <TooltipContent className="max-w-xs">
-            <p className="flex flex-col gap-y-1">
-              <span>
-                Results are automatically limited to preserve browser performance, in particular if
-                your query returns an exceptionally large number of rows.
-              </span>
-
-              <span className="text-foreground-light">
-                You may change or remove this limit from the dropdown on the right
-              </span>
-            </p>
-          </TooltipContent>
-        </Tooltip>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="default" iconRight={<ChevronUp size={14} />}>
-              Limit results to:{' '}
-              {
-                ROWS_PER_PAGE_OPTIONS.find(
-                  (opt) => opt.value === (enableFolders ? snapV2.limit : snap.limit)
-                )?.label
-              }
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-40" align="end">
-            <DropdownMenuRadioGroup
-              value={enableFolders ? snapV2.limit.toString() : snap.limit.toString()}
-              onValueChange={(val) => {
-                if (enableFolders) snapV2.setLimit(Number(val))
-                else snap.setLimit(Number(val))
-              }}
-            >
-              {ROWS_PER_PAGE_OPTIONS.map((option) => (
-                <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
-                  {option.label}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </GridFooter>
-
       <CellDetailPanel
         column={cellPosition?.column.name ?? ''}
         value={cellPosition?.row?.[cellPosition.column.name]}

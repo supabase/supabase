@@ -138,7 +138,7 @@ const UtilityPanel = ({
           executeQuery={executeQuery}
         />
       </TabsList_Shadcn_>
-      <TabsContent_Shadcn_ className="mt-0 h-full" value="results">
+      <TabsContent_Shadcn_ asChild value="results" className="mt-0 flex-grow">
         <UtilityTabResults
           id={id}
           isExecuting={isExecuting}
@@ -147,7 +147,8 @@ const UtilityPanel = ({
           isDebugging={isDebugging}
         />
       </TabsContent_Shadcn_>
-      <TabsContent_Shadcn_ className="mt-0 h-full" value="chart">
+
+      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 flex-grow">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
       </TabsContent_Shadcn_>
     </Tabs_Shadcn_>
