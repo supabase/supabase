@@ -122,7 +122,7 @@ const components = {
   HuggingFaceDeployment,
   IconCheck: Check,
   IconMenuApi,
-  ArrowDown: ArrowDown,
+  IconArrowDown: ArrowDown,
   IconMenuAuth,
   IconMenuCli,
   IconMenuCsharp,

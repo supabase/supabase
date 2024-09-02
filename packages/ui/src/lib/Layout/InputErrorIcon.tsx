@@ -1,7 +1,6 @@
 import React from 'react'
 import styleHandler from '../theme/styleHandler'
-// @ts-ignore
-import { IconAlertCircle } from './../../components/Icon/icons/IconAlertCircle'
+import { AlertCircle } from 'lucide-react'
 
 interface Props {
   style?: React.CSSProperties
@@ -13,7 +12,7 @@ export default function InputErrorIcon({ style, size }: Props) {
 
   return (
     <div className={__styles.base} style={style}>
-      <IconAlertCircle size={size} strokeWidth={2} />
+      <AlertCircle size={size} strokeWidth={2} />
     </div>
   )
 }
