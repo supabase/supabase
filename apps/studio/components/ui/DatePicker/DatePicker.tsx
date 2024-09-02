@@ -1,13 +1,12 @@
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowRight, ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 
 import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
   Button,
-  Calendar,
   Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
