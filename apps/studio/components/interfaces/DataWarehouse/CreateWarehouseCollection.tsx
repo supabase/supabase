@@ -76,7 +76,6 @@ export const CreateWarehouseCollectionModal = () => {
       >
         New collection
       </ButtonTooltip>
-      {/* <Button onClick={() => setIsOpen(!isOpen)}>Create collection</Button> */}
       <Modal
         size="medium"
         onCancel={() => setIsOpen(!isOpen)}
@@ -113,7 +112,7 @@ export const CreateWarehouseCollectionModal = () => {
                 Cancel
               </Button>
               <Button size="tiny" loading={isLoading} disabled={isLoading} htmlType="submit">
-                Create table
+                Create collection
               </Button>
             </Modal.Content>
           </form>
