@@ -23,6 +23,7 @@ import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionI
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import type { LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat, isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
+import { GenericSkeletonLoader } from 'ui-patterns'
 
 export interface LogSelectionProps {
   log: LogData | null
@@ -211,8 +212,8 @@ const LogSelection = ({
           </TabsList_Shadcn_>
           <div className="flex-grow">
             {isLoading || warehouseQueryFetching ? (
-              <div className="py-44">
-                <Loading />
+              <div className="p-4">
+                <GenericSkeletonLoader />
               </div>
             ) : (
               <>
