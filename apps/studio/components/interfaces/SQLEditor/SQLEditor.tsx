@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { format } from 'sql-formatter'
 
 import { useParams, useTelemetryProps } from 'common'

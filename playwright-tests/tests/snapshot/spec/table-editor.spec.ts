@@ -2,8 +2,8 @@ import { Page, expect, test } from '@playwright/test'
 import { kebabCase } from 'lodash'
 
 const dismissToast = async (page: Page) => {
-  await page.locator('#toast').getByRole('button').waitFor({ state: 'visible' })
-  await page.locator('#toast').getByRole('button').click()
+  await page.locator('li.toast').getByRole('button').waitFor({ state: 'visible' })
+  await page.locator('li.toast').getByRole('button').click()
 }
 
 test.describe('Table Editor page', () => {
