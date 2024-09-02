@@ -55,7 +55,7 @@ const Extensions = () => {
   return (
     <>
       <div className="mb-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 flex-wrap">
           <Input
             size="small"
             placeholder="Search for an extension"
@@ -72,7 +72,7 @@ const Extensions = () => {
               />
             </div>
           ) : (
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button className="ml-auto" asChild type="default" icon={<ExternalLink />}>
               <Link
                 href="https://supabase.com/docs/guides/database/extensions"
                 target="_blank"
