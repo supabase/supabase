@@ -1,16 +1,17 @@
+import { GlobeAltIcon } from '@heroicons/react/outline'
+import { Check } from 'lucide-react'
 import { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import ReactMarkdown from 'react-markdown'
-import { Badge, Button, IconCheck, Separator, buttonVariants, cn } from 'ui'
+import { Badge, Button, Separator, buttonVariants, cn } from 'ui'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import career from '~/data/career.json'
 import Styles from '~/styles/career.module.css'
-import { GlobeAltIcon } from '@heroicons/react/outline'
 
 export async function getStaticProps() {
   const job_res = await fetch('https://boards-api.greenhouse.io/v1/boards/supabase/jobs')
@@ -428,7 +429,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                 )
               })}
               <h3 className="bg-brand-400 border-[1px] border-brand-300 text-brand-600 text-xl w-[44px] lg:min-w-[40px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
-                <IconCheck />
+                <Check />
               </h3>
             </div>
           </SectionContainer>
