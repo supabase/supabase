@@ -2,6 +2,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components
 import CopyButton from 'components/ui/CopyButton'
 import type { WarehouseAccessTokensData } from 'data/analytics/warehouse-access-tokens-query'
 import type { WarehouseCollectionsData } from 'data/analytics/warehouse-collections-query'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
   Button,
@@ -37,6 +39,7 @@ export function TestCollectionDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
+  const router = useRouter()
   const BASE_WAREHOUSE_URL = `https://api.warehouse.tech/api/events`
   const [testAccessToken, setTestAccessToken] = useState('')
   const [selectedCollection, setSelectedCollection] = useState(collectionToken || '')
@@ -168,6 +171,13 @@ export function TestCollectionDialog({
               text={getcURL(testAccessToken)}
               className="absolute top-2 right-2"
             />
+          </div>
+
+          <p className="text-sm text-foreground-light">
+            Once you send an event, refresh the page to see it in the table.
+          </p>
+          <div className="flex justify-end">
+            <Button onClick={() => router.reload()}>Refresh events</Button>
           </div>
         </DialogSection>
       </DialogContent>
