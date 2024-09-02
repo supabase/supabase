@@ -25,9 +25,9 @@ export const CreateWarehouseCollectionModal = () => {
 
   const { mutate: createCollection, isLoading } = useCreateCollection({
     onSuccess: (data) => {
-      // todo: remove typecast once api types are fixed
       setIsOpen(false)
-      router.push(`/project/${ref}/logs/collections/${(data as any).token}`)
+      toast.success('Collection created successfully')
+      router.push(`/project/${ref}/logs/collections/${data.token}`)
     },
     onError: (error) => {
       toast.error(error.message)
