@@ -88,9 +88,9 @@ export const CreateWarehouseCollectionModal = () => {
           <form onSubmit={onSubmit}>
             <Modal.Content className="py-4">
               <p className="pb-5 text-foreground-light text-sm">
-                An event collection stores generic timeseries events and metadata in
-                Supabase-managed analytics infrastructure. Events can be then be queried using SQL,
-                without impacting transactional workloads.
+                An event collection stores time-based data and related information in Supabase's
+                analytics system. You can use SQL to analyze this data without affecting the
+                performance of your main database operations.
               </p>
 
               <FormField_Shadcn_
