@@ -10,18 +10,8 @@ import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-p
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import {
-  Alert,
-  Button,
-  IconLoader,
-  IconShield,
-  IconTool,
-  IconUsers,
-  InfoIcon,
-  Listbox,
-  Loading,
-  Modal,
-} from 'ui'
+import { Loader, Shield, Users, Wrench } from 'lucide-react'
+import { Alert, Button, InfoIcon, Listbox, Loading, Modal } from 'ui'
 
 const TransferProjectButton = () => {
   const project = useSelectedProject()
@@ -138,7 +128,7 @@ const TransferProjectButton = () => {
           <ul className="mt-4 space-y-5 text-sm">
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <IconLoader />
+                <Loader />
               </span>
               <div>
                 <p className="font-bold">Possible downtime</p>
@@ -151,7 +141,7 @@ const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <IconShield />
+                <Shield />
               </span>
               <div>
                 <p className="font-bold">Permissions</p>
@@ -164,7 +154,7 @@ const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <IconTool w={14} className="flex-shrink-0" />
+                <Wrench size={14} className="flex-shrink-0" />
               </span>
               <div>
                 <p className="font-bold">Features</p>
@@ -201,7 +191,7 @@ const TransferProjectButton = () => {
                       key={x.id}
                       label={x.name}
                       value={x.slug}
-                      addOnBefore={() => <IconUsers />}
+                      addOnBefore={() => <Users />}
                     >
                       {x.name}
                     </Listbox.Option>

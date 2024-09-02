@@ -1,6 +1,6 @@
 import { noop } from 'lodash'
-import { FlaskConical } from 'lucide-react'
-import { Button, IconChevronLeft, IconExternalLink } from 'ui'
+import { ChevronLeft, ExternalLink, FlaskConical } from 'lucide-react'
+import { Button } from 'ui'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 
 interface PolicyEditorModalTitleProps {
@@ -39,7 +39,7 @@ const PolicyEditorModalTitle = ({
             onClick={onSelectBackFromTemplates}
             className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
           >
-            <IconChevronLeft strokeWidth={2} size={14} />
+            <ChevronLeft strokeWidth={2} size={14} />
           </span>
           <h4>Select a template to use for your new policy</h4>
         </div>
@@ -61,7 +61,7 @@ const PolicyEditorModalTitle = ({
             Try Supabase Assistant
           </Button>
         )}
-        <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+        <Button asChild type="default" icon={<ExternalLink size={14} />}>
           <a
             href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
             target="_blank"

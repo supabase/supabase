@@ -1,4 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { Loader, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import SVG from 'react-inlinesvg'
@@ -9,7 +10,7 @@ import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
-import { Button, IconLoader, IconTool } from 'ui'
+import { Button } from 'ui'
 
 const SupportPage = () => {
   const [sentCategory, setSentCategory] = useState<string>()
@@ -29,7 +30,7 @@ const SupportPage = () => {
               <h1 className="m-0 text-lg">Supabase support</h1>
             </div>
             <div className="flex items-center space-x-3">
-              <Button asChild type="default" icon={<IconTool />}>
+              <Button asChild type="default" icon={<Wrench />}>
                 <Link
                   href="https://supabase.com/docs/guides/platform/troubleshooting"
                   target="_blank"
@@ -45,7 +46,7 @@ const SupportPage = () => {
                     type="default"
                     icon={
                       isLoading ? (
-                        <IconLoader className="animate-spin" />
+                        <Loader className="animate-spin" />
                       ) : isHealthy ? (
                         <div className="h-2 w-2 bg-brand rounded-full" />
                       ) : (

@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { Button, IconAlertCircle, IconExternalLink } from 'ui'
+import { Button } from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
+import { AlertCircle, ExternalLink } from 'lucide-react'
 
 interface DisabledStateForFreeTierProps {
   organizationSlug: string
@@ -17,7 +18,7 @@ const DisabledStateForFreeTier = ({
       <InformationBox
         hideCollapse
         defaultVisibility={true}
-        icon={<IconAlertCircle className="text-foreground" size="large" strokeWidth={1.5} />}
+        icon={<AlertCircle className="text-foreground" size="large" strokeWidth={1.5} />}
         title={`Support for ${category} is only available on the Pro Plan`}
         description={
           <div className="space-y-4 mb-1">
@@ -28,7 +29,7 @@ const DisabledStateForFreeTier = ({
                   Upgrade project
                 </Link>
               </Button>
-              <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+              <Button asChild type="default" icon={<ExternalLink size={14} />}>
                 <Link href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
                   About the Pro Plan
                 </Link>

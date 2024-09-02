@@ -17,8 +17,9 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from 'lib/constants'
-import { Collapsible, Form, IconChevronRight, Input, Toggle, cn } from 'ui'
+import { Collapsible, Form, Input, Toggle, cn } from 'ui'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
+import { ChevronRight } from 'lucide-react'
 
 const GeneralSettings = () => {
   const { slug } = useParams()
@@ -126,7 +127,7 @@ const GeneralSettings = () => {
                     <Collapsible open={open} onOpenChange={setOpen}>
                       <Collapsible.Trigger asChild>
                         <div className="flex items-center space-x-2 ml-16 cursor-pointer">
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={2}
                             size={16}
                             className={cn('transition-all', open ? 'rotate-90' : '')}

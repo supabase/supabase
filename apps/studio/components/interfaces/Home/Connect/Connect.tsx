@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Plug } from 'lucide-react'
+import { ExternalLink, Plug } from 'lucide-react'
 import { useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
@@ -20,7 +20,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  IconExternalLink,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
@@ -240,7 +239,7 @@ const Connect = () => {
                       <Button
                         asChild
                         type="default"
-                        icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                        icon={<ExternalLink size={14} strokeWidth={1.5} />}
                       >
                         <a
                           target="_blank"

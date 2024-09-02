@@ -1,4 +1,4 @@
-import { IconDatabase } from 'ui'
+import { Database } from 'lucide-react'
 
 export const vercelIcon = (
   <div className="flex items-center justify-center rounded bg-black p-1">
@@ -20,6 +20,6 @@ export const databaseIcon = (
       style={{ width: `12px`, height: `12px`, strokeWidth: '2px' }}
       preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-white"')}
     /> */}
-    <IconDatabase size={12} strokeWidth={2} />
+    <Database size={12} strokeWidth={2} />
   </div>
 )
