@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Mail } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useUserInviteMutation } from 'data/auth/user-invite-mutation'

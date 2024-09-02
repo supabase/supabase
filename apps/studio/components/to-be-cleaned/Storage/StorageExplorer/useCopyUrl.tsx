@@ -1,8 +1,9 @@
+import { toast } from 'sonner'
+
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants/infrastructure'
 import { copyToClipboard } from 'lib/helpers'
-import toast from 'react-hot-toast'
 
 export const useCopyUrl = (ref: string) => {
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })

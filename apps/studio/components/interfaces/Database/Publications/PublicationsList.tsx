@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Button, IconAlertCircle, IconSearch, Input, Toggle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 

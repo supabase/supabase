@@ -1,6 +1,6 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
-import { put, handleError } from 'data/fetchers'
+import { handleError, put } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 

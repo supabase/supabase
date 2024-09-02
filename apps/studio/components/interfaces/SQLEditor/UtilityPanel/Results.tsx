@@ -166,10 +166,35 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
         onSelectedCellChange={setCellPosition}
       />
 
-      <GridFooter className="flex items-center gap-2">
+      <GridFooter className="flex items-center justify-between gap-2">
+        <Tooltip>
+          <TooltipTrigger>
+            <p className="text-xs">
+              <span className="text-foreground">
+                {rows.length} row{rows.length > 1 ? 's' : ''}
+              </span>
+              <span className="text-foreground-lighter ml-1">
+                {results.autoLimit !== undefined && ` (Limited to only ${results.autoLimit} rows)`}
+              </span>
+            </p>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs">
+            <p className="flex flex-col gap-y-1">
+              <span>
+                Results are automatically limited to preserve browser performance, in particular if
+                your query returns an exceptionally large number of rows.
+              </span>
+
+              <span className="text-foreground-light">
+                You may change or remove this limit from the dropdown on the right
+              </span>
+            </p>
+          </TooltipContent>
+        </Tooltip>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="default" iconRight={<ChevronUp size={14} />}>
+              Limit results to:{' '}
               {
                 ROWS_PER_PAGE_OPTIONS.find(
                   (opt) => opt.value === (enableFolders ? snapV2.limit : snap.limit)
@@ -177,7 +202,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
               }
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-42">
+          <DropdownMenuContent className="w-40" align="end">
             <DropdownMenuRadioGroup
               value={enableFolders ? snapV2.limit.toString() : snap.limit.toString()}
               onValueChange={(val) => {
@@ -193,21 +218,6 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Tooltip>
-          <TooltipTrigger>
-            <p className="text-xs text-foreground-light">
-              {rows.length} row{rows.length > 1 ? 's' : ''}
-              {results.autoLimit !== undefined && ` (auto limit ${results.autoLimit} rows)`}
-            </p>
-          </TooltipTrigger>
-          <TooltipContent className="max-w-xs">
-            <p>
-              Results are limited browser performance.
-              <br />
-              You may change this, or remove the limit from the dropdown on the left
-            </p>
-          </TooltipContent>
-        </Tooltip>
       </GridFooter>
 
       <CellDetailPanel

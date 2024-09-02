@@ -44,7 +44,7 @@ const ProjectCard = ({
             <p className="flex-shrink truncate text-sm pr-4">{name}</p>
             <span className="text-sm lowercase text-foreground-light">{desc}</span>
             <div className="flex items-center gap-x-1.5">
-              <ComputeBadgeWrapper project={project} />
+              {project.status !== 'INACTIVE' && <ComputeBadgeWrapper project={project} />}
               {isVercelIntegrated && (
                 <div className="w-fit p-1 border rounded-md flex items-center text-black dark:text-white">
                   <InlineSVG

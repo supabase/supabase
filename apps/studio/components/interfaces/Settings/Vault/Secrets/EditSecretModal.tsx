@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'

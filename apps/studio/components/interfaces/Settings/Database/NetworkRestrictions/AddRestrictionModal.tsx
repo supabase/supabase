@@ -1,9 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Button, Form, IconHelpCircle, Input, Modal } from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
+import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 import {
   checkIfPrivate,
@@ -11,7 +12,6 @@ import {
   isValidAddress,
   normalize,
 } from './NetworkRestrictions.utils'
-import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
 
 const IPV4_MAX_CIDR_BLOCK_SIZE = 32
 const IPV6_MAX_CIDR_BLOCK_SIZE = 128
