@@ -379,7 +379,7 @@ async function upsertFolder(id: string, projectRef: string, name: string) {
 
 if (typeof window !== 'undefined') {
   devtools(sqlEditorState, {
-    name: 'sqlEditorState',
+    name: 'sqlEditorStateV2',
     // [Joshen] So that jest unit tests can ignore this
     enabled: process.env.NEXT_PUBLIC_ENVIRONMENT !== undefined,
   })
