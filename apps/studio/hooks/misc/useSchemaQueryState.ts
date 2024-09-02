@@ -20,11 +20,10 @@ const useIsomorphicUseQueryState = (defaultSchema: string) => {
 export const useQuerySchemaState = () => {
   const { ref } = useParams()
 
-  let defaultSchema = 'public'
-  if (typeof window !== 'undefined' && ref && ref.length > 0) {
-    defaultSchema =
-      window.localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref)) || 'public'
-  }
+  const defaultSchema =
+    typeof window !== 'undefined' && ref && ref.length > 0
+      ? window.localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref)) || 'public'
+      : 'public'
 
   // cache the original default schema so that it's not changed by another tab and cause issues in the app (saving a
   // table on the wrong schema)
