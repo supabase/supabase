@@ -136,7 +136,8 @@ export const WarehouseCollectionDetail = () => {
                 >
                   <>
                     <p>
-                      No data available for this collection. Send your first event to see data here.
+                      This collection is ready, but no data has been received yet. <br />
+                      Send your first event to start populating this collection.
                     </p>
                   </>
                 </ProductEmptyState>
