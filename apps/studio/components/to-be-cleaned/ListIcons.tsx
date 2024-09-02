@@ -15,11 +15,6 @@ export const vercelIcon = (
 
 export const databaseIcon = (
   <div className="flex items-center justify-center rounded bg-green-500 p-1 [[data-theme*=dark]_&]:text-typography-body-dark ">
-    {/* <SVG
-      src={'/icons/feather/database.svg'}
-      style={{ width: `12px`, height: `12px`, strokeWidth: '2px' }}
-      preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-white"')}
-    /> */}
     <Database size={12} strokeWidth={2} />
   </div>
 )
