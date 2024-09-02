@@ -25,7 +25,7 @@ const BlogListItem = ({ post }: Props) => {
     }
   }
 
-  const sanitizeCategory = (category: string) => category.replace(/-/g, ' ')
+  const sanitizeCategory = (category: string) => category.replaceAll('-', ' ')
 
   return (
     <Link
