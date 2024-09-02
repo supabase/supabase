@@ -131,7 +131,6 @@ export const WarehouseCollectionDetail = () => {
                   title="Send your first event"
                   size="large"
                   ctaButtonLabel="Send test event"
-                  infoButtonLabel="What's Warehouse?"
                   onClickCta={() => setTestDialogOpen(true)}
                 >
                   <>
