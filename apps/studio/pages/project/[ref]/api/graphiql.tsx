@@ -2,7 +2,7 @@ import '@graphiql/react/dist/style.css'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'

@@ -1,7 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import type { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
+import { entityTypeKeys } from 'data/entity-types/keys'
 import { pgSodiumKeys } from 'data/pg-sodium-keys/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
@@ -9,7 +10,6 @@ import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { vaultSecretsKeys } from 'data/vault/keys'
 import type { ResponseError } from 'types'
 import { FDW } from './fdws-query'
-import { entityTypeKeys } from 'data/entity-types/keys'
 
 export type FDWDeleteVariables = {
   projectRef: string
