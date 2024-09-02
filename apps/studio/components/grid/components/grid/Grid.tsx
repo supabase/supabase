@@ -146,10 +146,14 @@ export const Grid = memo(
 
         const fk = data?.find(
           (key: any) =>
-            key.target_schema == targetTableSchema &&
-            key.target_table == targetTableName &&
-            key.target_columns == targetColumnName
+            key.source_schema === table?.schema &&
+            key.source_table === table?.name &&
+            key.source_columns.includes(columnName) &&
+            key.target_schema === targetTableSchema &&
+            key.target_table === targetTableName &&
+            key.target_columns.includes(targetColumnName)
         )
+
         return fk !== undefined ? formatForeignKeys([fk])[0] : undefined
       }
 

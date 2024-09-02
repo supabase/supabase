@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Code, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
@@ -205,7 +205,12 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                       </div>
                     </Button>
                   </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="start">
+                  <PopoverContent_Shadcn_
+                    className="p-0"
+                    side="bottom"
+                    align="start"
+                    sameWidthAsTrigger
+                  >
                     <Command_Shadcn_>
                       <CommandInput_Shadcn_ placeholder="Find folder..." />
                       <CommandList_Shadcn_>

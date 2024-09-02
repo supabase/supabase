@@ -3,7 +3,7 @@ import { codeBlock, stripIndent } from 'common-tags'
 import { Check, Clipboard, Save } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'

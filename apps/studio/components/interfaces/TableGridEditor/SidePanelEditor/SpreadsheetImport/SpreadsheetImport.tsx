@@ -2,7 +2,7 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 import { debounce, includes, noop } from 'lodash'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { Button, IconExternalLink, SidePanel, Tabs } from 'ui'
 import ActionBar from '../ActionBar'

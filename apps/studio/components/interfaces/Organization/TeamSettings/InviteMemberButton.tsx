@@ -5,7 +5,7 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
@@ -32,6 +32,7 @@ import {
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
+  CommandList_Shadcn_,
   Command_Shadcn_,
   Dialog,
   DialogContent,
@@ -354,38 +355,40 @@ export const InviteMemberButton = () => {
                               }}
                             >
                               <CommandInput_Shadcn_ placeholder="Search project..." />
-                              <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
-                              <CommandGroup_Shadcn_>
-                                <ScrollArea
-                                  className={cn(
-                                    (orgProjects || []).length > 7 &&
-                                      'max-h-[210px] overflow-y-auto'
-                                  )}
-                                >
-                                  {orgProjects.map((project) => {
-                                    return (
-                                      <CommandItem_Shadcn_
-                                        key={project.ref}
-                                        value={project.ref}
-                                        onSelect={(value) => {
-                                          form.setValue('projectRef', value)
-                                          setProjectDropdownOpen(false)
-                                        }}
-                                      >
-                                        <Check
-                                          className={cn(
-                                            'mr-2 h-4 w-4',
-                                            field.value === project.ref
-                                              ? 'opacity-100'
-                                              : 'opacity-0'
-                                          )}
-                                        />
-                                        {project.name}
-                                      </CommandItem_Shadcn_>
-                                    )
-                                  })}
-                                </ScrollArea>
-                              </CommandGroup_Shadcn_>
+                              <CommandList_Shadcn_>
+                                <CommandEmpty_Shadcn_>No projects found...</CommandEmpty_Shadcn_>
+                                <CommandGroup_Shadcn_>
+                                  <ScrollArea
+                                    className={cn(
+                                      (orgProjects || []).length > 7 &&
+                                        'max-h-[210px] overflow-y-auto'
+                                    )}
+                                  >
+                                    {orgProjects.map((project) => {
+                                      return (
+                                        <CommandItem_Shadcn_
+                                          key={project.ref}
+                                          value={project.ref}
+                                          onSelect={(value) => {
+                                            form.setValue('projectRef', value)
+                                            setProjectDropdownOpen(false)
+                                          }}
+                                        >
+                                          <Check
+                                            className={cn(
+                                              'mr-2 h-4 w-4',
+                                              field.value === project.ref
+                                                ? 'opacity-100'
+                                                : 'opacity-0'
+                                            )}
+                                          />
+                                          {project.name}
+                                        </CommandItem_Shadcn_>
+                                      )
+                                    })}
+                                  </ScrollArea>
+                                </CommandGroup_Shadcn_>
+                              </CommandList_Shadcn_>
                             </Command_Shadcn_>
                           </PopoverContent_Shadcn_>
                         </Popover_Shadcn_>

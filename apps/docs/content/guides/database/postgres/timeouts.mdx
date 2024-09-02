@@ -42,10 +42,10 @@ This works with the Database REST API when called from the Supabase client libra
 
 ```sql
 create or replace function myfunc()
-return void as $$
+returns void as $$
  select pg_sleep(3); -- simulating some long-running process
 $$
-language
+language sql
 set statement_timeout TO '4s'; -- set custom timeout
 ```
 
@@ -68,7 +68,18 @@ Run the following query to change a role's timeout:
 alter role example_role set statement_timeout = '10min'; -- could also use seconds '10s'
 ```
 
-Unlike global settings, the result cannot be checked with `SHOW statement_timeout`. Instead, run:
+<Admonition type="tip">
+  If you are changing the timeout for the Supabase Client API calls, you will need to reload
+  postgREST to reflect the timeout changes by running the following script:
+
+```sql
+NOTIFY pgrst, 'reload config';
+```
+
+</Admonition>
+
+Unlike global settings, the result cannot be checked with `SHOW
+statement_timeout`. Instead, run:
 
 ```sql
 select

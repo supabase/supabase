@@ -4,6 +4,7 @@ Supabase is 100% remote.
 
 Alaister Young
 Aleksi Immonen
+Alex Tasioulis
 Alexander Korotkov
 Amy Q
 Angelico de los Reyes
