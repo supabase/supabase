@@ -1081,7 +1081,7 @@ export default function launchweek() {
                 className="text-brand flex items-center mt-2"
               >
                 See all the content
-                <IconExternalLink size="small" className="inline-block ml-1" />
+                <ExternalLink size="small" className="inline-block ml-1" />
               </a>
             </p>
             {activeCreator !== null && (
