@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import { IconChevronLeft } from 'ui'
 
 import { BASE_PATH } from '~/lib/constants'
 import clientLibsCommon from '~/spec/common-cli.yml' assert { type: 'yml' }
 import * as NavItems from './NavigationMenu.constants'
+import { ChevronLeft } from 'lucide-react'
 
 const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
   const menu = NavItems[id]
@@ -104,7 +104,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
         >
           <div className="relative w-2">
             <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-              <IconChevronLeft size={10} strokeWidth={3} />
+              <ChevronLeft size={10} strokeWidth={3} />
             </div>
           </div>
           <span>Back to menu</span>

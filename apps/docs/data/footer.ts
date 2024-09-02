@@ -1,9 +1,9 @@
-import { IconCheckCircle, IconLifeBuoy } from 'ui'
+import { CheckCircle, LifeBuoy } from 'lucide-react'
 import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 export const primaryLinks = [
   {
-    featherIcon: IconLifeBuoy,
+    featherIcon: LifeBuoy,
     text: 'Need some help?',
     ctaLabel: 'Contact support',
     url: 'https://supabase.com/support',
@@ -15,7 +15,7 @@ export const primaryLinks = [
     url: 'https://supabase.com/changelog',
   },
   {
-    featherIcon: IconCheckCircle,
+    featherIcon: CheckCircle,
     text: "Something's not right?",
     ctaLabel: 'Check system status',
     url: 'https://status.supabase.com/',
