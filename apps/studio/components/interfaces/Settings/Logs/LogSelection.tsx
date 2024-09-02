@@ -220,12 +220,13 @@ const LogSelection = ({
                   <Formatter />
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ value="raw">
+                  {isLoading && 'Loading...'}
                   <CodeBlock
                     hideLineNumbers
                     language="json"
                     className="prose w-full pt-0 max-w-full border-none"
                   >
-                    {JSON.stringify(fullLog || partialLog, null, 2)}
+                    {JSON.stringify(warehouseQueryData?.result[0], null, 2)}
                   </CodeBlock>
                 </TabsContent_Shadcn_>
               </>
