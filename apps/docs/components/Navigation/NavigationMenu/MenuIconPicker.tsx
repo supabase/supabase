@@ -27,6 +27,7 @@ import {
   IconMenuDevCli,
   IconSupport,
   IconTroubleshooting,
+  IconAPIDocs,
 } from './MenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, className?: string) {
@@ -87,6 +88,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <IconSupport width={width} height={height} className={className} />
     case 'contributing':
       return <IconTroubleshooting width={width} height={height} className={className} />
+    case 'api-docs':
+      return <IconAPIDocs width={width} height={height} className={className} />
     default:
       return <IconMenuPlatform width={width} height={height} className={className} />
   }

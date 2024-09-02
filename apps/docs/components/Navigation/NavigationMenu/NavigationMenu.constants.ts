@@ -140,13 +140,19 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             label: 'CLI Commands',
             icon: 'reference-cli',
             href: '/reference/cli/introduction',
-            level: 'reference_javascript',
+            level: 'api',
           },
           {
             label: 'Management API',
             icon: 'reference-api',
             href: '/reference/api/introduction',
-            level: 'reference_javascript',
+            level: 'api',
+          },
+          {
+            label: 'API Docs',
+            icon: 'api-docs',
+            href: '/reference/api/introduction',
+            level: 'api',
           },
         ],
         [

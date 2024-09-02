@@ -90,7 +90,7 @@ const GlobalNavigationMenu: FC = () => {
                   <div className="p-3 md:p-1">
                     {section[0].menuItems?.map((menuItem, menuItemIndex) => (
                       <Fragment key={`desktop-docs-menu-section-${menuItemIndex}-${menuItemIndex}`}>
-                        {menuItemIndex !== 0 && <MenubarSeparator className="bg-border-muted" />}
+                        {menuItemIndex !== 0 && <MenubarSeparator className="bg-border" />}
                         {menuItem.map((item, itemIdx) =>
                           !item.href ? (
                             <div
