@@ -1666,6 +1666,10 @@ export const ai = {
           name: 'Amazon Bedrock',
           url: '/guides/ai/integrations/amazon-bedrock',
         },
+        {
+          name: 'Mixpeek',
+          url: '/guides/ai/examples/mixpeek-video-search',
+        },
       ],
     },
   ],
