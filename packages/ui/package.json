@@ -60,7 +60,7 @@
     "highlightjs-curl": "^1.3.0",
     "input-otp": "^1.2.3",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.338.0",
+    "lucide-react": "^0.436.0",
     "next-themes": "^0.3.0",
     "openai": "^4.17.0",
     "postcss": "^8.4.31",
