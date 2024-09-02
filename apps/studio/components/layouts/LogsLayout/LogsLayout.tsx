@@ -46,7 +46,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
       enabled: showWarehouse,
     }
   )
-  const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
+  const { data: collections, isFetching: collectionsLoading } = useWarehouseCollectionsQuery(
     {
       projectRef,
     },
