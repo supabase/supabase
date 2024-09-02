@@ -87,19 +87,19 @@ const TriggerList = ({
             </p>
           </Table.td>
 
-          <Table.td className="hidden lg:table-cell break-all">
+          <Table.td className="break-all">
             <p title={x.table} className="truncate">
               {x.table}
             </p>
           </Table.td>
 
-          <Table.td className="hidden space-x-2 xl:table-cell">
+          <Table.td className="space-x-2">
             <p title={x.function_name} className="truncate">
               {x.function_name}
             </p>
           </Table.td>
 
-          <Table.td className="hidden xl:table-cell">
+          <Table.td>
             <div className="flex gap-2 flex-wrap">
               {x.events.map((event: string) => (
                 <Badge key={event}>{`${x.activation} ${event}`}</Badge>
@@ -107,13 +107,13 @@ const TriggerList = ({
             </div>
           </Table.td>
 
-          <Table.td className="hidden space-x-2 xl:table-cell">
+          <Table.td className="space-x-2">
             <p title={x.orientation} className="truncate">
               {x.orientation}
             </p>
           </Table.td>
 
-          <Table.td className="hidden xl:table-cell">
+          <Table.td>
             <div className="flex items-center justify-center">
               {x.enabled_mode !== 'DISABLED' ? (
                 <IconCheck strokeWidth={2} className="text-brand" />
