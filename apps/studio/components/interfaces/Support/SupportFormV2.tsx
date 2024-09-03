@@ -26,6 +26,7 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  ScrollArea,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -490,11 +491,13 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
               {docsResults.length > 0 && hasResults && (
                 <div className="pt-4 px-4 border rounded-md">
                   <h2 className="text-sm text-foreground-light px-2 mb-4">
-                    Suggested resources ({docsResults.length})
+                    Suggested resources ({Math.min(docsResults.length, 5)})
                   </h2>
-                  {docsResults.slice(0, 5).map((page, i) => (
-                    <DocsLinkGroup key={`${page.id}-group`} page={page} />
-                  ))}
+                  <ScrollArea className={docsResults.length > 3 ? 'h-[300px]' : ''}>
+                    {docsResults.slice(0, 5).map((page, i) => (
+                      <DocsLinkGroup key={`${page.id}-group`} page={page} />
+                    ))}
+                  </ScrollArea>
                 </div>
               )}
             </div>
