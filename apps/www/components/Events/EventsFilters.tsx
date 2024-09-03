@@ -133,9 +133,21 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
                   type="outline"
                   size="medium"
                   iconRight={<IconChevronDown />}
-                  className="w-full min-w-[200px] flex justify-between items-center py-2"
+                  className="w-full min-w-[200px] flex [&_span]:flex [&_span]:items-center [&_span]:gap-2 justify-between items-center py-2"
                 >
-                  {!activeCategory ? 'All Events' : startCase(activeCategory?.replaceAll('-', ' '))}
+                  {!activeCategory ? (
+                    <>
+                      All Events{' '}
+                      <span className="text-foreground-lighter text-xs">{categories['all']}</span>
+                    </>
+                  ) : (
+                    <>
+                      {startCase(activeCategory?.replaceAll('-', ' '))}
+                      <span className="text-foreground-lighter text-xs">
+                        {categories[activeCategory]}
+                      </span>
+                    </>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="start">
@@ -151,14 +163,7 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
                     )}
                   >
                     {category === 'all' ? 'All Posts' : startCase(category.replaceAll('-', ' '))}{' '}
-                    <span
-                      className={cn(
-                        'flex items-center justify-center rounded-full bg-border-stronger h-[16px] aspect-square',
-                        count > 9 && 'aspect-auto px-1'
-                      )}
-                    >
-                      {count}
-                    </span>
+                    <span className="text-foreground-lighter text-xs w-3">{count}</span>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -178,14 +183,9 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
               }
               onClick={() => handleSetCategory(category)}
               size={is2XL ? 'tiny' : 'small'}
-              className="rounded-full pr-1.5"
+              className="rounded-full"
               iconRight={
-                <span
-                  className={cn(
-                    'flex items-center justify-center rounded-full bg-surface-100 h-[16px] aspect-square',
-                    count > 9 && 'aspect-auto px-1'
-                  )}
-                >
+                <span className="text-foreground-lighter text-xs flex items-center h-[16px] self-center">
                   {count}
                 </span>
               }

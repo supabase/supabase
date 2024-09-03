@@ -24,6 +24,7 @@ Hashicorp
 [Gg]eospatial
 GPUs?
 Gradle
+Grafana
 GraphQL
 Groonga
 href
