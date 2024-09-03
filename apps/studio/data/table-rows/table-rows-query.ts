@@ -133,14 +133,11 @@ export const getTableRowsSqlQuery = ({
 
   if (!table) return ``
 
-  const arrayBasedColumns =
-    table.columns.length > 0
-      ? table.columns
-          .filter(
-            (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
-          )
-          .map((column) => `"${column.name}"::text[]`)
-      : []
+  const arrayBasedColumns = table.columns
+    .filter(
+      (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+    )
+    .map((column) => `"${column.name}"::text[]`)
 
   let queryChains = query
     .from(table.name, table.schema ?? undefined)
