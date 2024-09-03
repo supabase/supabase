@@ -85,30 +85,31 @@ const TriggersList = ({
           </ProductEmptyState>
         </div>
       ) : (
-        <div className="w-full space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <SchemaSelector
-                className="w-[260px]"
-                size="small"
-                showError={false}
-                selectedSchemaName={selectedSchema}
-                onSelectSchema={setSelectedSchema}
-              />
-              <Input
-                placeholder="Search for a trigger"
-                size="small"
-                icon={<IconSearch size="tiny" />}
-                value={filterString}
-                className="w-64"
-                onChange={(e) => setFilterString(e.target.value)}
-              />
-            </div>
-
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 flex-wrap">
+            <SchemaSelector
+              className="w-[260px]"
+              size="small"
+              showError={false}
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={setSelectedSchema}
+            />
+            <Input
+              placeholder="Search for a trigger"
+              size="small"
+              icon={<IconSearch size="tiny" />}
+              value={filterString}
+              className="w-64"
+              onChange={(e) => setFilterString(e.target.value)}
+            />
             {!isLocked && (
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger asChild>
-                  <Button disabled={!canCreateTriggers} onClick={() => createTrigger()}>
+                  <Button
+                    className="ml-auto"
+                    disabled={!canCreateTriggers}
+                    onClick={() => createTrigger()}
+                  >
                     Create a new trigger
                   </Button>
                 </Tooltip.Trigger>
@@ -136,25 +137,14 @@ const TriggersList = ({
           {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
           <Table
-            className="table-fixed"
             head={
               <>
-                <Table.th key="name" className="space-x-4">
-                  Name
-                </Table.th>
-                <Table.th key="table" className="hidden lg:table-cell">
-                  Table
-                </Table.th>
-                <Table.th key="function" className="hidden xl:table-cell">
-                  Function
-                </Table.th>
-                <Table.th key="events" className="hidden xl:table-cell">
-                  Events
-                </Table.th>
-                <Table.th key="orientation" className="hidden xl:table-cell">
-                  Orientation
-                </Table.th>
-                <Table.th key="enabled" className="hidden w-20 xl:table-cell">
+                <Table.th key="name">Name</Table.th>
+                <Table.th key="table">Table</Table.th>
+                <Table.th key="function">Function</Table.th>
+                <Table.th key="events">Events</Table.th>
+                <Table.th key="orientation">Orientation</Table.th>
+                <Table.th key="enabled" className="w-20">
                   Enabled
                 </Table.th>
                 <Table.th key="buttons" className="w-1/12"></Table.th>

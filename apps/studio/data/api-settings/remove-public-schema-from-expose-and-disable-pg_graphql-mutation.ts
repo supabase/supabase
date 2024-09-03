@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { configKeys } from 'data/config/keys'
 import { databaseExtensionsKeys } from 'data/database-extensions/keys'

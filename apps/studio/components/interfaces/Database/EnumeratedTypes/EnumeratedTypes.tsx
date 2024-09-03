@@ -59,26 +59,25 @@ const EnumeratedTypes = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <SchemaSelector
-            className="w-[260px]"
-            size="small"
-            showError={false}
-            selectedSchemaName={selectedSchema}
-            onSelectSchema={setSelectedSchema}
-          />
-          <Input
-            size="small"
-            value={search}
-            className="w-64"
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search for a type"
-            icon={<Search size={14} />}
-          />
-        </div>
+      <div className="flex items-center gap-2 flex-wrap">
+        <SchemaSelector
+          className="w-[260px]"
+          size="small"
+          showError={false}
+          selectedSchemaName={selectedSchema}
+          onSelectSchema={setSelectedSchema}
+        />
+        <Input
+          size="small"
+          value={search}
+          className="w-64"
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search for a type"
+          icon={<Search size={14} />}
+        />
+
         {!isLocked && (
-          <Button type="primary" onClick={() => setShowCreateTypePanel(true)}>
+          <Button className="ml-auto" type="primary" onClick={() => setShowCreateTypePanel(true)}>
             Create type
           </Button>
         )}

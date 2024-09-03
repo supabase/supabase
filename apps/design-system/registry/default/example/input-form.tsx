@@ -2,10 +2,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { Button } from 'ui'
 import {
+  Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
@@ -13,9 +14,8 @@ import {
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
+  Input,
 } from 'ui'
-import { Input } from 'ui'
-import { toast } from 'ui'
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -32,8 +32,7 @@ export default function InputForm() {
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: 'You submitted the following values:',
+    toast('You submitted the following values:', {
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>

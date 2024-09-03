@@ -1,9 +1,16 @@
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
 import CardButton from 'components/ui/CardButton'
 import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
+import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   DropdownMenu,
@@ -17,15 +24,9 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useState } from 'react'
-import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
-import AlertError from 'components/ui/AlertError'
-import toast from 'react-hot-toast'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import Link from 'next/link'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 
 export function LogDrains({
   onNewDrainClick,
