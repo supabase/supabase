@@ -145,6 +145,13 @@ const LogSelection = ({
     return JSON.stringify(fullLog || partialLog, null, 2)
   }, [fullLog, partialLog, queryType])
 
+  const rawLog = useMemo(() => {
+    if (queryType === 'warehouse') {
+      return warehouseQueryData?.result[0]
+    }
+    return fullLog || partialLog
+  }, [queryType, warehouseQueryData, fullLog, partialLog])
+
   return (
     <div
       className={cn(
@@ -227,7 +234,7 @@ const LogSelection = ({
                     language="json"
                     className="prose w-full pt-0 max-w-full border-none"
                   >
-                    {JSON.stringify(warehouseQueryData?.result[0], null, 2)}
+                    {JSON.stringify(rawLog, null, 2)}
                   </CodeBlock>
                 </TabsContent_Shadcn_>
               </>
