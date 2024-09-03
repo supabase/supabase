@@ -14,6 +14,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { Button } from 'ui'
 import LogTable from '../Settings/Logs/LogTable'
 import { TestCollectionDialog } from './TestCollectionDialog'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()
@@ -92,7 +93,22 @@ export const WarehouseCollectionDetail = () => {
       <LoadingOpacity active={isLoading}>
         <div className="flex flex-col w-full">
           <div className="flex justify-between items-center pr-3">
-            <h2 className="p-3">{collection?.name}</h2>
+            <div className="flex items-center">
+              <h2 className="p-3">{collection?.name}</h2>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button
+                    onClick={() => refetch()}
+                    icon={<RefreshCcw />}
+                    type="text"
+                    loading={isLoading}
+                    disabled={isLoading}
+                    className="px-1.5"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>Refresh</TooltipContent>
+              </Tooltip>
+            </div>
             <div className="flex items-center gap-2">
               <Button asChild type={'text'}>
                 <Link href={`/project/${projectRef}/settings/warehouse`}>Access tokens</Link>
@@ -175,15 +191,6 @@ export const WarehouseCollectionDetail = () => {
               </>
             )}
           </div>
-          <Button
-            onClick={() => refetch()}
-            icon={<RefreshCcw />}
-            type="default"
-            loading={isLoading}
-            disabled={isLoading}
-          >
-            Refresh
-          </Button>
         </div>
       )}
     </div>
