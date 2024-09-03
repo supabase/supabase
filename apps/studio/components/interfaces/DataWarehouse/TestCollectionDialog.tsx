@@ -2,7 +2,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components
 import CopyButton from 'components/ui/CopyButton'
 import type { WarehouseAccessTokensData } from 'data/analytics/warehouse-access-tokens-query'
 import type { WarehouseCollectionsData } from 'data/analytics/warehouse-collections-query'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
@@ -163,6 +162,7 @@ export function TestCollectionDialog({
               hideCopy
               className={'p-1 language-bash prose transition-colors'}
               language="bash"
+              focusable={true}
             >
               {getcURL(showAccessToken ? testAccessToken : '********************')}
             </CodeBlock>
