@@ -41,6 +41,12 @@ const navCommands = [
     icon: () => <ArrowRight />,
   },
   {
+    id: 'nav-warehouse',
+    name: 'Go to Warehouse',
+    route: '/guides/warehouse',
+    icon: () => <ArrowRight />,
+  },
+  {
     id: 'nav-ai',
     name: 'Go to AI & Vectors',
     route: '/guides/ai',

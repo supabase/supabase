@@ -45,6 +45,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'realtime',
           },
           {
+            label: 'Warehouse',
+            icon: 'warehouse',
+            href: '/guides/warehouse',
+            level: 'warehouse',
+          },
+          {
             label: 'AI & Vectors',
             icon: 'ai',
             href: '/guides/ai',
@@ -1483,6 +1489,57 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [{ name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] }],
     },
+  ],
+}
+
+
+export const warehouse: NavMenuConstant = {
+  icon: 'warehouse',
+  title: 'Warehouse',
+  url: '/guides/warehouse',
+  items: [
+    {
+      name: 'Overview & quickstart',
+      url: '/guides/warehouse',
+    },
+    {
+      name: 'Concepts',
+      url: undefined,
+      items: [
+        { name: 'Ingestion', url: '/guides/warehouse/ingestion' },
+        { name: 'Querying', url: '/guides/warehouse/querying' },
+        { name: 'Access Tokens', url: '/guides/warehouse/access-tokens' },
+      ],
+    },
+    {
+      name: 'Guides',
+      url: undefined,
+      items: [
+        {
+          name: 'JavaScript: Ingesting with Pino',
+          url: '/guides/warehouse/warehouse-js-with-pino',
+        },
+        {
+          name: 'JavaScript - Ingesting with Winston',
+          url: '/guides/warehouse/warehouse-js-with-winston',
+        },
+        {
+          name: 'Elixir - Ingesting with Logger',
+          url: '/guides/warehouse/warehouse-ex-logger',
+        },
+        {
+          name: 'Elixir - Ingesting with Telemetry.Metrics',
+          url: '/guides/warehouse/warehouse-ex-telemetry-reporter',
+        }
+      ],
+    },
+    {
+      name: 'Deep dive',
+      url: undefined,
+      items: [
+        { name: 'Architecture', url: '/guides/warehouse/architecture' },
+      ],
+    }
   ],
 }
 
