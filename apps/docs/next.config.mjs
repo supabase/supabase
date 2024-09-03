@@ -122,9 +122,17 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           {
+            key: 'Strict-Transport-Security',
+            value: '',
+          },
+          {
             key: 'X-Robots-Tag',
             value: 'noindex',
-          }
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
         ],
         has: [
           {
