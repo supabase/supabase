@@ -14,7 +14,6 @@ import { useProjectStorageConfigQuery } from 'data/config/project-storage-config
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { Alert, Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
-import { p } from 'nuqs/dist/serializer-C_l8WgvO'
 
 export interface CreateBucketModalProps {
   visible: boolean
