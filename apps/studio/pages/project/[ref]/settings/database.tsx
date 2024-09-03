@@ -6,10 +6,10 @@ import {
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import type { NextPageWithLayout } from 'types'
 
+import { DiskMangementPanelForm } from 'components/interfaces/DiskManagement/DiskMangementPanelForm'
 import BannedIPs from 'components/interfaces/Settings/Database/BannedIPs'
 import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
-import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfiguration'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
@@ -32,7 +32,8 @@ const ProjectSettings: NextPageWithLayout = () => {
           </div>
 
           <SSLConfiguration />
-          <DiskSizeConfiguration />
+          <DiskMangementPanelForm />
+          {/* <DiskSizeConfiguration /> */}
           <NetworkRestrictions />
           <BannedIPs />
         </div>

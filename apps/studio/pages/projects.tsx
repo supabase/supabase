@@ -12,6 +12,8 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { DiskManagementForm } from 'components/interfaces/DiskManagement/DiskManagementForm'
+import { DiskCountdown } from 'components/interfaces/DiskManagement/DiskCountdown'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -43,6 +45,8 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <>
+      {/* <DiskManagementForm /> */}
+      {/* <DiskCountdown /> */}
       {isError && (
         <div
           className={`py-4 px-5 ${navLayoutV2 ? 'h-full flex items-center justify-center' : ''}`}

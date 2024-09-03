@@ -19,7 +19,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { formatBytes } from 'lib/helpers'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, InfoIcon } from 'ui'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
@@ -154,7 +154,7 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
         </div>
       ) : (
         <Alert_Shadcn_>
-          <Info size={16} />
+          <InfoIcon />
           <AlertTitle_Shadcn_>
             {projectSubscriptionData?.plan?.id === 'free'
               ? 'Disk size configuration is not available for projects on the Free Plan'
