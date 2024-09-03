@@ -61,7 +61,7 @@ export function TestCollectionDialog({
   function getcURL(accessToken: string) {
     return `curl -X "POST" "${BASE_WAREHOUSE_URL}?source=${selectedCollection}" \\
   -H 'Content-Type: application/json' \\
-  -H 'X-API-KEY: ${accessToken}' \\
+  -H 'Authorization: Bearer ${accessToken}' \\
   -d $'{
     "event_message": "Test event message",
     "metadata": {
