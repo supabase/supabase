@@ -69,7 +69,7 @@ export interface CodeBlockProps {
  * @param {boolean} [props.hideCopy=false] - Whether to hide the copy button.
  * @param {boolean} [props.hideLineNumbers=false] - Whether to hide line numbers.
  * @param {SyntaxHighlighterProps['renderer']} [props.renderer] - Custom renderer for syntax highlighting.
- * @param {boolean} [props.focusable=false] - Whether the code block is focusable. When true, users can focus the code block to select text or use ⌘A (Cmd+A) to select all. This is so we don't need to load Monaco Editor.
+ * @param {boolean} [props.focusable=true] - Whether the code block is focusable. When true, users can focus the code block to select text or use ⌘A (Cmd+A) to select all. This is so we don't need to load Monaco Editor.
  */
 export const CodeBlock = ({
   title,
@@ -85,7 +85,7 @@ export const CodeBlock = ({
   hideCopy = false,
   hideLineNumbers = false,
   renderer,
-  focusable = false,
+  focusable = true,
 }: CodeBlockProps) => {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
