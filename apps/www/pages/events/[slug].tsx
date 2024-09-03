@@ -13,6 +13,7 @@ import {
   MicrophoneIcon,
   HandIcon,
 } from '@heroicons/react/solid'
+import { capitalize } from 'lodash'
 
 import authors from 'lib/authors.json'
 import { isNotNullOrUndefined } from '~/lib/helpers'
@@ -150,7 +151,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
   const IS_REGISTRATION_OPEN = event.onDemand || Date.parse(event.date) > Date.now()
 
   const meta = {
-    title: event.meta_title ?? event.title,
+    title: `${event.meta_title ?? event.title} | ${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)} | ${capitalize(event.type)}}`,
     description: event.meta_description ?? event.description,
     url: `https://supabase.com/events/${event.slug}`,
   }
