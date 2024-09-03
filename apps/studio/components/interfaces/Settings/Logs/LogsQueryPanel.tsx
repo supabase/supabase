@@ -240,97 +240,93 @@ const LogsQueryPanel = ({
               </div>
             </div>
           </div>
-          <div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <SidePanel
-                  size="large"
-                  header={
-                    <div className="flex flex-row justify-between items-center">
-                      <h3>Field Reference</h3>
-                      <Button
-                        type="text"
-                        className="px-1"
-                        onClick={() => setShowReference(false)}
-                        icon={<IconX size={18} strokeWidth={1.5} />}
-                      />
-                    </div>
-                  }
-                  visible={showReference}
-                  cancelText="Close"
-                  onCancel={() => setShowReference(false)}
-                  hideFooter
-                  triggerElement={
-                    <Button
-                      asChild // ?: we don't want a button inside a button
-                      type="default"
-                      onClick={() => setShowReference(true)}
-                      icon={<BookOpen />}
-                      className="px-2"
-                    >
-                      <span>Field Reference</span>
-                    </Button>
-                  }
+          {dataSource === 'logs' && (
+            <SidePanel
+              size="large"
+              header={
+                <div className="flex flex-row justify-between items-center">
+                  <h3>Field Reference</h3>
+                  <Button
+                    type="text"
+                    className="px-1"
+                    onClick={() => setShowReference(false)}
+                    icon={<IconX size={18} strokeWidth={1.5} />}
+                  />
+                </div>
+              }
+              visible={showReference}
+              cancelText="Close"
+              onCancel={() => setShowReference(false)}
+              hideFooter
+              triggerElement={
+                <Button
+                  asChild // ?: we don't want a button inside a button
+                  type="text"
+                  onClick={() => setShowReference(true)}
+                  icon={<BookOpen />}
+                  className="px-2"
                 >
-                  <SidePanel.Content>
-                    <div className="pt-4 pb-2 space-y-1">
-                      <p className="text-sm">
-                        The following table shows all the available paths that can be queried from
-                        each respective source. Do note that to access nested keys, you would need
-                        to perform the necessary{' '}
-                        <Link
-                          href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-brand"
-                        >
-                          unnesting joins
-                          <IconExternalLink
-                            size="tiny"
-                            className="ml-1 inline -translate-y-[2px]"
-                            strokeWidth={1.5}
-                          />
-                        </Link>
-                      </p>
-                    </div>
-                  </SidePanel.Content>
-                  <SidePanel.Separator />
-                  <Tabs
-                    scrollable
-                    size="small"
-                    type="underlined"
-                    defaultActiveId="edge_logs"
-                    listClassNames="px-2"
+                  <span>Field Reference</span>
+                </Button>
+              }
+            >
+              <SidePanel.Content>
+                <div className="pt-4 pb-2 space-y-1">
+                  <p className="text-sm">
+                    The following table shows all the available paths that can be queried from each
+                    respective source. Do note that to access nested keys, you would need to perform
+                    the necessary{' '}
+                    <Link
+                      href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand"
+                    >
+                      unnesting joins
+                      <IconExternalLink
+                        size="tiny"
+                        className="ml-1 inline -translate-y-[2px]"
+                        strokeWidth={1.5}
+                      />
+                    </Link>
+                  </p>
+                </div>
+              </SidePanel.Content>
+              <SidePanel.Separator />
+              <Tabs
+                scrollable
+                size="small"
+                type="underlined"
+                defaultActiveId="edge_logs"
+                listClassNames="px-2"
+              >
+                {logConstants.schemas.map((schema) => (
+                  <Tabs.Panel
+                    key={schema.reference}
+                    id={schema.reference}
+                    label={schema.name}
+                    className="px-4 pb-4"
                   >
-                    {logConstants.schemas.map((schema) => (
-                      <Tabs.Panel
-                        key={schema.reference}
-                        id={schema.reference}
-                        label={schema.name}
-                        className="px-4 pb-4"
-                      >
-                        <Table
-                          head={[
-                            <Table.th className="text-xs !p-2" key="path">
-                              Path
-                            </Table.th>,
-                            <Table.th key="type" className="text-xs !p-2">
-                              Type
-                            </Table.th>,
-                          ]}
-                          body={schema.fields
-                            .sort((a: any, b: any) => a.path - b.path)
-                            .map((field) => (
-                              <Field key={field.path} field={field} />
-                            ))}
-                        />
-                      </Tabs.Panel>
-                    ))}
-                  </Tabs>
-                </SidePanel>
-              </div>
-            </div>
-          </div>
+                    <Table
+                      head={[
+                        <Table.th className="text-xs !p-2" key="path">
+                          Path
+                        </Table.th>,
+                        <Table.th key="type" className="text-xs !p-2">
+                          Type
+                        </Table.th>,
+                      ]}
+                      body={schema.fields
+                        .sort((a: any, b: any) => a.path - b.path)
+                        .map((field) => (
+                          <Field key={field.path} field={field} />
+                        ))}
+                    />
+                  </Tabs.Panel>
+                ))}
+              </Tabs>
+            </SidePanel>
+          )}
         </div>
       </div>
     </div>
