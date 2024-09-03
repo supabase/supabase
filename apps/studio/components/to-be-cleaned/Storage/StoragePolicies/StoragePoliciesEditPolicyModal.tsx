@@ -183,7 +183,7 @@ const StoragePoliciesEditPolicyModal = ({
     return (
       <div className="w-full flex items-center justify-between gap-x-2">
         <h4 className="m-0 truncate">{getTitle()}</h4>
-        <Button asChild type="default" icon={<ExternalLink size={14} />}>
+        <Button asChild type="default" icon={<ExternalLink />}>
           <a
             href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
             target="_blank"

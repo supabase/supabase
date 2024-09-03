@@ -664,7 +664,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                               Upgrade project
                             </Link>
                           </Button>
-                          <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                          <Button asChild type="default" icon={<ExternalLink />}>
                             <Link
                               href="https://supabase.com/contact/enterprise"
                               target="_blank"
@@ -839,7 +839,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                                   <Button
                                     asChild
                                     type="default"
-                                    icon={<ExternalLink size={14} strokeWidth={1.5} />}
+                                    icon={<ExternalLink strokeWidth={1.5} />}
                                   >
                                     <Link href={library.url} target="_blank" rel="noreferrer">
                                       View Github issues
@@ -865,7 +865,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                               <Button
                                 asChild
                                 type="default"
-                                icon={<ExternalLink size={14} strokeWidth={1.5} />}
+                                icon={<ExternalLink strokeWidth={1.5} />}
                               >
                                 <Link
                                   href="https://github.com/supabase/supabase"

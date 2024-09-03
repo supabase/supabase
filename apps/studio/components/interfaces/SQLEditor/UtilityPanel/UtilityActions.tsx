@@ -148,7 +148,7 @@ const UtilityActions = ({
           <Button
             type="default"
             className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
-            icon={<MoreVertical size={14} className="text-foreground-light" />}
+            icon={<MoreVertical className="text-foreground-light" />}
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-48">
@@ -189,7 +189,7 @@ const UtilityActions = ({
             <Button
               type="text"
               className="px-1"
-              icon={<Keyboard size={14} className="text-foreground-light" />}
+              icon={<Keyboard className="text-foreground-light" />}
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-48">

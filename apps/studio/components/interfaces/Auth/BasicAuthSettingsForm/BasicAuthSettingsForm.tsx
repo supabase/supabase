@@ -252,7 +252,7 @@ const BasicAuthSettingsForm = () => {
                               asChild
                               type="default"
                               className="w-min"
-                              icon={<ExternalLink size={14} />}
+                              icon={<ExternalLink />}
                             >
                               <Link href="/docs/guides/auth/auth-anonymous#access-control">
                                 View access control docs

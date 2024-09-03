@@ -31,7 +31,7 @@ const FormHeader = ({
       </div>
       <div className="flex items-center gap-x-2">
         {docsUrl !== undefined && (
-          <Button asChild type="default" icon={<ExternalLink size={14} />}>
+          <Button asChild type="default" icon={<ExternalLink />}>
             <Link href={docsUrl} target="_blank" rel="noreferrer">
               Documentation
             </Link>

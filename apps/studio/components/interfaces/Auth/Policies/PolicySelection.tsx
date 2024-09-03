@@ -77,7 +77,7 @@ const PolicySelection = ({
             <Button type="default" onClick={onToggleFeaturePreviewModal}>
               Toggle feature preview
             </Button>
-            <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <a
                 href="https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant"
                 target="_blank"

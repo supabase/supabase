@@ -236,11 +236,7 @@ const Connect = () => {
                       )}
                     </div>
                     {connectionObject.find((item) => item.key === selectedParent)?.guideLink && (
-                      <Button
-                        asChild
-                        type="default"
-                        icon={<ExternalLink size={14} strokeWidth={1.5} />}
-                      >
+                      <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                         <a
                           target="_blank"
                           rel="noreferrer"

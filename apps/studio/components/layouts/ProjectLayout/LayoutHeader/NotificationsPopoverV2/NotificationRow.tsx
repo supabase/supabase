@@ -142,7 +142,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
                   <Button
                     key={key}
                     type="default"
-                    icon={<ExternalLink strokeWidth={1.5} size={14} />}
+                    icon={<ExternalLink strokeWidth={1.5} />}
                     asChild
                   >
                     <Link href={url} target="_blank" rel="noreferrer">

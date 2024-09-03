@@ -65,7 +65,7 @@ export const CreateWarehouseCollectionModal = () => {
         type="default"
         disabled={!canCreateCollection}
         className="justify-start flex-grow w-full"
-        icon={<PlusIcon size="14" />}
+        icon={<PlusIcon />}
         onClick={() => setIsOpen(!isOpen)}
         tooltip={{
           content: {

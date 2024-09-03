@@ -53,15 +53,11 @@ const PolicyEditorModalTitle = ({
       </h4>
       <div className="flex items-center gap-x-2">
         {showAssistantPreview && view === POLICY_MODAL_VIEWS.EDITOR && (
-          <Button
-            type="default"
-            icon={<FlaskConical size={14} />}
-            onClick={onToggleFeaturePreviewModal}
-          >
+          <Button type="default" icon={<FlaskConical />} onClick={onToggleFeaturePreviewModal}>
             Try Supabase Assistant
           </Button>
         )}
-        <Button asChild type="default" icon={<ExternalLink size={14} />}>
+        <Button asChild type="default" icon={<ExternalLink />}>
           <a
             href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
             target="_blank"

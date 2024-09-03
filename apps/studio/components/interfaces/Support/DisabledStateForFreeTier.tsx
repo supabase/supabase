@@ -29,7 +29,7 @@ const DisabledStateForFreeTier = ({
                   Upgrade project
                 </Link>
               </Button>
-              <Button asChild type="default" icon={<ExternalLink size={14} />}>
+              <Button asChild type="default" icon={<ExternalLink />}>
                 <Link href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
                   About the Pro Plan
                 </Link>

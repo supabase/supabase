@@ -193,7 +193,7 @@ const BranchManagement = () => {
                 <div className="flex items-center justify-between space-x-2">
                   <Button
                     type={'text'}
-                    icon={<MessageCircle className="text-muted" size={14} strokeWidth={1} />}
+                    icon={<MessageCircle className="text-muted" strokeWidth={1} />}
                     asChild
                   >
                     <a href="https://github.com/orgs/supabase/discussions/18937" target="_blank">
