@@ -55,6 +55,7 @@ import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
+const CONTAINER_CLASSES = 'px-6'
 
 interface SupportFormV2Props {
   setSentCategory: (value: string) => void
@@ -77,8 +78,8 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
 
   const FormSchema = z
     .object({
-      organizationSlug: z.string(),
-      projectRef: z.string(),
+      organizationSlug: z.string().min(1, 'Please select an organization'),
+      projectRef: z.string().min(1, 'Please select a project'),
       category: z.string(),
       severity: z.string(),
       library: z.string(),
@@ -97,25 +98,26 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
       }
     )
 
+  const defaultValues = {
+    organizationSlug: '',
+    projectRef: 'no-project',
+    category: CATEGORY_OPTIONS[0].value,
+    severity: 'Low',
+    library: '',
+    subject: '',
+    message: '',
+    affectedServices: '',
+    allowSupportAccess: false,
+  }
+
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      organizationSlug: '',
-      projectRef: 'no-project',
-      category: CATEGORY_OPTIONS[0].value,
-      severity: 'Low',
-      library: '',
-      subject: '',
-      message: '',
-      affectedServices: '',
-      allowSupportAccess: false,
-    },
+    defaultValues,
   })
 
-  const { organizationSlug, projectRef, category, severity, subject, message, library } =
-    form.watch()
+  const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
 
   const {
     handleDocsSearchDebounced,
@@ -123,7 +125,11 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     searchState: state,
   } = useDocsSearch(supabaseClient)
 
-  const { data: organizations, isSuccess: isSuccessOrganizations } = useOrganizationsQuery()
+  const {
+    data: organizations,
+    isLoading: isLoadingOrganizations,
+    isSuccess: isSuccessOrganizations,
+  } = useOrganizationsQuery()
 
   const {
     data: subscription,
@@ -133,7 +139,11 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     orgSlug: organizationSlug,
   })
 
-  const { data: allProjects, isSuccess: isSuccessProjects } = useProjectsQuery()
+  const {
+    data: allProjects,
+    isLoading: isLoadingProjects,
+    isSuccess: isSuccessProjects,
+  } = useProjectsQuery()
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
     onSuccess: (res, variables) => {
@@ -286,23 +296,24 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     <Form_Shadcn_ {...form}>
       <form
         id="support-form"
-        className={cn('flex flex-col gap-y-8 max-w-[620px]')}
+        className={cn('flex flex-col gap-y-8')}
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <h3 className="text-xl px-6">How can we help?</h3>
+        <h3 className={cn(CONTAINER_CLASSES, 'text-xl')}>How can we help?</h3>
 
         <FormField_Shadcn_
           name="organizationSlug"
           control={form.control}
           render={({ field }) => (
             <FormItemLayout
-              className="px-6"
+              className={cn(CONTAINER_CLASSES)}
               layout="vertical"
               label="Which organization is affected?"
             >
               <FormControl_Shadcn_>
                 <Select_Shadcn_
                   {...field}
+                  disabled={isLoadingOrganizations}
                   defaultValue={field.value}
                   onValueChange={field.onChange}
                 >
@@ -332,7 +343,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
           )}
         />
 
-        <div className="flex flex-col gap-y-2 px-6">
+        <div className={cn(CONTAINER_CLASSES, 'flex flex-col gap-y-2')}>
           <FormField_Shadcn_
             name="projectRef"
             control={form.control}
@@ -341,8 +352,11 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 <FormControl_Shadcn_>
                   <Select_Shadcn_
                     {...field}
+                    disabled={isLoadingProjects}
                     defaultValue={field.value}
-                    onValueChange={field.onChange}
+                    onValueChange={(val) => {
+                      if (val.length > 0) field.onChange(val)
+                    }}
                   >
                     <SelectTrigger_Shadcn_ className="w-full">
                       <SelectValue_Shadcn_ placeholder="Select a project" />
@@ -372,7 +386,12 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
             )}
         </div>
 
-        <div className="px-6 grid sm:grid-cols-2 sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2">
+        <div
+          className={cn(
+            CONTAINER_CLASSES,
+            'grid sm:grid-cols-2 sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2'
+          )}
+        >
           <FormField_Shadcn_
             name="category"
             control={form.control}
@@ -394,7 +413,9 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                         {CATEGORY_OPTIONS.map((option) => (
                           <SelectItem_Shadcn_ value={option.value}>
                             {option.label}
-                            <span className="block text-xs opacity-50">{option.description}</span>
+                            <span className="block text-xs text-foreground-lighter">
+                              {option.description}
+                            </span>
                           </SelectItem_Shadcn_>
                         ))}
                       </SelectGroup_Shadcn_>
@@ -425,7 +446,9 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                         {SEVERITY_OPTIONS.map((option) => (
                           <SelectItem_Shadcn_ value={option.value}>
                             {option.label}
-                            <span className="block text-xs opacity-50">{option.description}</span>
+                            <span className="block text-xs text-foreground-lighter">
+                              {option.description}
+                            </span>
                           </SelectItem_Shadcn_>
                         ))}
                       </SelectGroup_Shadcn_>
@@ -453,7 +476,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
           />
         ) : (
           <>
-            <div className="flex flex-col gap-y-2 px-6">
+            <div className={cn(CONTAINER_CLASSES, 'flex flex-col gap-y-2')}>
               <FormField_Shadcn_
                 name="subject"
                 control={form.control}
@@ -464,17 +487,17 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                     description={
                       field.value.length > 0 &&
                       INCLUDE_DISCUSSIONS.includes(category) && (
-                        <p className="flex items-center space-x-1">
+                        <p className="flex items-center gap-x-1">
                           <span>Check our </span>
                           <Link
                             key="gh-discussions"
                             href={`https://github.com/orgs/supabase/discussions?discussions_q=${field.value}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex items-center space-x-2 text-foreground-light underline hover:text-foreground transition"
+                            className="flex items-center gap-x-1 text-foreground-light underline hover:text-foreground transition"
                           >
                             Github discussions
-                            <ExternalLink size={14} strokeWidth={2} className="ml-1" />
+                            <ExternalLink size={14} strokeWidth={2} />
                           </Link>
                           <span> for a quick answer</span>
                         </p>
@@ -508,7 +531,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout
-                    className="px-6"
+                    className={cn(CONTAINER_CLASSES)}
                     layout="vertical"
                     label="Which library are you having issues with"
                   >
@@ -545,7 +568,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout
-                    className="px-6"
+                    className={cn(CONTAINER_CLASSES)}
                     layout="vertical"
                     label="Which services are affected?"
                   >
@@ -570,7 +593,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
               control={form.control}
               render={({ field }) => (
                 <FormItemLayout
-                  className="px-6"
+                  className={cn(CONTAINER_CLASSES)}
                   layout="vertical"
                   label="Message"
                   labelOptional="5000 character limit"
@@ -599,7 +622,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 render={({ field }) => (
                   <FormItemLayout
                     layout="flex"
-                    className="px-6"
+                    className={cn(CONTAINER_CLASSES)}
                     label="Allow Supabase Support to access your project temporarily"
                     description="In some cases, we may require temporary access to your project to complete troubleshooting, or to answer questions related specifically to your project"
                   >
@@ -616,7 +639,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
               />
             )}
 
-            <div className="px-6">
+            <div className={cn(CONTAINER_CLASSES)}>
               <div className="flex flex-col gap-y-1">
                 <p className="text-sm text-foreground-light">Attachments</p>
                 <p className="text-sm text-foreground-lighter">
@@ -666,7 +689,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
               </div>
             </div>
 
-            <div className="px-6">
+            <div className={cn(CONTAINER_CLASSES)}>
               <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
                 <p className="text-foreground-light">We will contact you at</p>
                 <p className="text-foreground font-medium">{respondToEmail}</p>
