@@ -162,7 +162,6 @@ export function TestCollectionDialog({
               hideCopy
               className={'p-1 language-bash prose transition-colors'}
               language="bash"
-              focusable={true}
             >
               {getcURL(showAccessToken ? testAccessToken : '********************')}
             </CodeBlock>
