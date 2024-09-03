@@ -1,0 +1,155 @@
+---
+id: 'customizing-postgres-configs'
+title: 'Customizing Postgres Configs'
+description: 'Configuring Postgres for your Supabase project.'
+---
+
+Each Supabase project is a pre-configured Postgres cluster. You can override some configuration settings to suit your needs. This is an advanced topic, and we don't recommend touching these settings unless it is necessary.
+
+<Admonition type="note">
+
+Customizing Postgres configurations provides _advanced_ control over your database, but inappropriate settings can lead to severe performance degradation or project instability.
+
+</Admonition>
+
+### Viewing settings
+
+To list all Postgres settings and their descriptions, run:
+
+```sql
+select * from pg_settings;
+```
+
+## Configurable settings
+
+### User-context settings
+
+The [`pg_settings`](https://www.postgresql.org/docs/current/view-pg-settings.html) table's `context` column specifies the requirements for changing a setting. By default, those with a `user` context can be changed at the `role` or `database` level with [SQL](https://supabase.com/dashboard/project/_/sql/).
+
+To list all user-context settings, run:
+
+```sql
+select * from pg_settings where context = 'user';
+```
+
+As an example, the `statement_timeout` setting for the can be altered:
+
+```sql
+alter database "postgres" set "statement_timeout" TO '60s';
+```
+
+To verify the change, execute:
+
+```sql
+show "statement_timeout";
+```
+
+### Superuser settings
+
+Some settings can only be modified by a superuser. Supabase pre-enables the [`supautils` extension](https://supabase.com/blog/roles-postgres-hooks#setting-up-the-supautils-extension), which allows the `postgres` role to retain certain superuser privileges. It enables modification of the below reserved configurations at the `role` level:
+
+| Setting                              | Description                                                                                                                                                  |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `auto_explain.log_min_duration`      | Logs query plans taking longer than this duration.                                                                                                           |
+| `auto_explain.log_nested_statements` | Log nested statements' plans.                                                                                                                                |
+| `log_min_messages`                   | Minimum severity level of messages to log.                                                                                                                   |
+| `pgaudit.*`                          | Configures the [PGAudit extension](https://supabase.com/docs/guides/database/extensions/pgaudit). The `log_parameter` is still restricted to protect secrets |
+| `pgrst.*`                            | [`PostgREST` settings](https://docs.postgrest.org/en/stable/references/configuration.html#db-aggregates-enabled)                                             |
+| `plan_filter.*`                      | Configures the [pg_plan_filter extension](https://supabase.com/docs/guides/database/extensions/pg_plan_filter)                                               |
+| `session_replication_role`           | Sets the session's behavior for triggers and rewrite rules.                                                                                                  |
+| `track_io_timing`                    | Collects timing statistics for database I/O activity.                                                                                                        |
+
+For example, to enable `log_nested_statements` for the postgres role, execute:
+
+```sql
+alter role "postgres" set "auto_explain.log_nested_statements" to 'on';
+```
+
+To view the change:
+
+```sql
+select
+  rolname,
+  rolconfig
+from pg_roles
+where rolname = 'postgres';
+```
+
+### CLI configurable settings
+
+While many Postgres parameters are configurable directly, some configurations can be changed with the Supabase CLI at the [`system`](https://www.postgresql.org/docs/current/config-setting.html#CONFIG-SETTING-SQL) level.
+
+<Admonition type="caution">
+
+CLI changes permanently overwrite default settings, so `reset all` and `set to default` commands won't revert to the original values.
+
+</Admonition>
+
+#### CLI supported parameters
+
+<Admonition type="tip">
+
+If a setting you need is not yet configurable, [share your use case with us](https://supabase.com/dashboard/support/new)! Let us know what setting you'd like to control, and we'll consider adding support in future updates.
+
+</Admonition>
+
+The following parameters are available for overrides:
+
+1. [effective_cache_size](https://postgresqlco.nf/doc/en/param/effective_cache_size/)
+1. [maintenance_work_mem](https://postgresqlco.nf/doc/en/param/maintenance_work_mem/)
+1. [max_connections](https://postgresqlco.nf/doc/en/param/max_connections/) (CLI only)
+1. [max_locks_per_transaction](https://postgresqlco.nf/doc/en/param/max_locks_per_transaction/) (CLI only)
+1. [max_parallel_maintenance_workers](https://postgresqlco.nf/doc/en/param/max_parallel_maintenance_workers/)
+1. [max_parallel_workers_per_gather](https://postgresqlco.nf/doc/en/param/max_parallel_workers_per_gather/)
+1. [max_parallel_workers](https://postgresqlco.nf/doc/en/param/max_parallel_workers/)
+1. [max_worker_processes](https://postgresqlco.nf/doc/en/param/max_worker_processes/) (CLI only)
+1. [session_replication_role](https://postgresqlco.nf/doc/en/param/session_replication_role/)
+1. [shared_buffers](https://postgresqlco.nf/doc/en/param/shared_buffers/) (CLI only)
+1. [work_mem](https://postgresqlco.nf/doc/en/param/work_mem/)
+
+#### Managing Postgres configuration with the CLI
+
+To start:
+
+1. [Install](/docs/guides/resources/supabase-cli) Supabase CLI 1.69.0+.
+1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+
+To update Postgres configurations, use the [`postgres config`](/docs/reference/cli/supabase-postgres-config) command:
+
+```bash
+supabase --experimental \
+--project-ref <project-ref> \
+postgres-config update --config shared_buffers=250MB
+```
+
+By default, the CLI will merge any provided config overrides with any existing ones. The `--replace-existing-overrides` flag can be used to instead force all existing overrides to be replaced with the ones being provided:
+
+```bash
+supabase --experimental \
+--project-ref <project-ref> \
+postgres-config update --config max_parallel_workers=3 \
+--replace-existing-overrides
+```
+
+### Resetting to default config
+
+To reset a setting to its default value at the database level:
+
+```sql
+-- reset a single setting at the database level
+alter database "postgres" set "<setting_name>" to default;
+
+-- reset all settings at the database level
+alter database "postgres" reset all;
+```
+
+For `role` level configurations, you can run:
+
+```sql
+alter role "<role_name>" set "<setting_name>" to default;
+```
+
+### Considerations
+
+1. Changes through the CLI must restart the database and will cause momentary disruption to existing database connections; in most cases this should not take more than a few seconds.
+1. Custom Postgres Config will always override the default optimizations generated by Supabase. When changing compute add-ons, you should also review and update your custom Postgres Config to ensure they remain compatible and effective with the updated compute.
