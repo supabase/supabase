@@ -98,7 +98,7 @@ const FunctionsList = ({
         </div>
       ) : (
         <div className="w-full space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             <div className="flex items-center space-x-4">
               <SchemaSelector
                 className="w-[260px]"
@@ -141,17 +141,17 @@ const FunctionsList = ({
           {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
 
           <Table
-            className="table-fixed"
+            className="table-fixed overflow-x-auto"
             head={
               <>
                 <Table.th key="name">Name</Table.th>
-                <Table.th key="arguments" className="hidden md:table-cell">
+                <Table.th key="arguments" className="table-cell">
                   Arguments
                 </Table.th>
-                <Table.th key="return_type" className="hidden lg:table-cell">
+                <Table.th key="return_type" className="table-cell">
                   Return type
                 </Table.th>
-                <Table.th key="security" className="hidden lg:table-cell w-[100px]">
+                <Table.th key="security" className="table-cell w-[100px]">
                   Security
                 </Table.th>
                 <Table.th key="buttons" className="w-1/6"></Table.th>

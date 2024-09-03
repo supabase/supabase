@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Alert, IconLock, Modal } from 'ui'
 
 import { useAuthorizedAppRevokeMutation } from 'data/oauth/authorized-app-revoke-mutation'
