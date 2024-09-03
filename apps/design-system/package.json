@@ -19,7 +19,7 @@
     "fs": "^0.0.1-security",
     "jotai": "^2.8.0",
     "lodash.template": "4.5.0",
-    "lucide-react": "^0.338.0",
+    "lucide-react": "*",
     "markdown-wasm": "^1.2.0",
     "next": "^14.2.3",
     "next-contentlayer2": "0.4.6",

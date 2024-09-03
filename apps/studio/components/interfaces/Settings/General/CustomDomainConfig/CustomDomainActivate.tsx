@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import Panel from 'components/ui/Panel'
 import { useProjectApiQuery } from 'data/config/project-api-query'
@@ -15,7 +15,6 @@ import {
   Button,
   IconAlertCircle,
   IconExternalLink,
-  Modal,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 

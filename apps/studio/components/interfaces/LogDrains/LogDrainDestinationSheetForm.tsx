@@ -3,10 +3,9 @@ import { ExternalLink, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
 import { useParams } from 'common'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import {
@@ -20,13 +19,6 @@ import {
   Input_Shadcn_,
   RadioGroupCard,
   RadioGroupCardItem,
-  Switch,
-  Sheet,
-  SheetContent,
-  SheetSection,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -34,6 +26,13 @@ import {
   SelectLabel_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+  Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -251,27 +250,27 @@ export function LogDrainDestinationSheetForm({
                     label="Type"
                     description={LOG_DRAIN_TYPES.find((t) => t.value === type)?.description || ''}
                   >
-                    <Select
+                    <Select_Shadcn_
                       defaultValue={defaultType}
                       value={form.getValues('type')}
                       onValueChange={(v: LogDrainType) => form.setValue('type', v)}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger_Shadcn_>
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
-                      </SelectTrigger>
-                      <SelectContent>
+                      </SelectTrigger_Shadcn_>
+                      <SelectContent_Shadcn_>
                         {LOG_DRAIN_TYPES.map((type) => (
-                          <SelectItem
+                          <SelectItem_Shadcn_
                             value={type.value}
                             key={type.value}
                             id={type.value}
                             className="text-left"
                           >
                             {type.name}
-                          </SelectItem>
+                          </SelectItem_Shadcn_>
                         ))}
-                      </SelectContent>
-                    </Select>
+                      </SelectContent_Shadcn_>
+                    </Select_Shadcn_>
                   </FormItemLayout>
                 )}
               </div>

@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 27 Aug 2024 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Wed, 28 Aug 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/in-browser-semantic-search-pglite</guid>
+  <title>In-Browser Semantic AI Search with PGlite and Transformers.js</title>
+  <link>https://supabase.com/blog/in-browser-semantic-search-pglite</link>
+  <description>Use pgvector in PGlite and combine it with Huggingface Transformers.js for a fully local, in-browser semantic search functionality!</description>
+  <pubDate>Wed, 28 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-vercel-partnership</guid>
   <title>Supabase + Vercel Partnership</title>
   <link>https://supabase.com/blog/supabase-vercel-partnership</link>

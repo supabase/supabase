@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'

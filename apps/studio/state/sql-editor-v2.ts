@@ -1,15 +1,15 @@
 import { debounce, memoize } from 'lodash'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxySet } from 'valtio/utils'
 
 import { UpsertContentPayloadV2, upsertContent } from 'data/content/content-upsert-v2-mutation'
+import { contentKeys } from 'data/content/keys'
 import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder, SnippetFolderResponse } from 'data/content/sql-folders-query'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { getQueryClient } from 'data/query-client'
-import { contentKeys } from 'data/content/keys'
 
 export type StateSnippetFolder = {
   projectRef: string
@@ -379,7 +379,7 @@ async function upsertFolder(id: string, projectRef: string, name: string) {
 
 if (typeof window !== 'undefined') {
   devtools(sqlEditorState, {
-    name: 'sqlEditorState',
+    name: 'sqlEditorStateV2',
     // [Joshen] So that jest unit tests can ignore this
     enabled: process.env.NEXT_PUBLIC_ENVIRONMENT !== undefined,
   })
