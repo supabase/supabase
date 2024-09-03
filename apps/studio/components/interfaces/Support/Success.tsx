@@ -36,7 +36,7 @@ const Success = ({
           <Check strokeWidth={4} size={18} />
         </div>
       </div>
-      <div className="flex items-center flex-col space-y-2 text-center">
+      <div className="flex items-center flex-col space-y-2 text-center p-4">
         <h3 className="text-xl">Support request successfully sent!</h3>
         <p className="text-sm text-foreground-light">
           We will reach out to you at <span className="text-foreground">{respondToEmail}</span>.
