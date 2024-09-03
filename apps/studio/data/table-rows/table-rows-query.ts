@@ -133,11 +133,14 @@ export const getTableRowsSqlQuery = ({
 
   if (!table) return ``
 
-  const arrayBasedColumns = table.columns
-    .filter(
-      (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
-    )
-    .map((column) => `"${column.name}"::text[]`)
+  const arrayBasedColumns =
+    table.columns.length > 0
+      ? table.columns
+          .filter(
+            (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+          )
+          .map((column) => `"${column.name}"::text[]`)
+      : []
 
   let queryChains = query
     .from(table.name, table.schema ?? undefined)
@@ -151,7 +154,7 @@ export const getTableRowsSqlQuery = ({
     })
 
   // If sorts is empty and table row count is within threshold, use the primary key as the default sort
-  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
+  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT && table.columns.length > 0) {
     const defaultOrderByColumns = getDefaultOrderByColumns(table)
     if (defaultOrderByColumns.length > 0) {
       defaultOrderByColumns.forEach((col) => {
