@@ -88,17 +88,15 @@ const FunctionList = ({
             <Table.td className="truncate">
               <p title={x.name}>{x.name}</p>
             </Table.td>
-            <Table.td className="hidden md:table-cell md:overflow-auto">
+            <Table.td className="table-cell overflow-auto">
               <p title={x.argument_types} className="truncate">
                 {x.argument_types || '-'}
               </p>
             </Table.td>
-            <Table.td className="hidden lg:table-cell">
+            <Table.td className="table-cell">
               <p title={x.return_type}>{x.return_type}</p>
             </Table.td>
-            <Table.td className="hidden lg:table-cell">
-              {x.security_definer ? 'Definer' : 'Invoker'}
-            </Table.td>
+            <Table.td className="table-cell">{x.security_definer ? 'Definer' : 'Invoker'}</Table.td>
             <Table.td className="text-right">
               {!isLocked && (
                 <div className="flex items-center justify-end">

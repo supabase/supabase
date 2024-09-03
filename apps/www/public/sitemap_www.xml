@@ -169,6 +169,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/events</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/launch-week</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -211,6 +217,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/partners/integrations</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/launch-week/x</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -218,12 +230,6 @@
 
   <url>
     <loc>https://supabase.com/partners/experts</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/partners/integrations</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -1983,6 +1989,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/blog/supabase-vercel-partnership</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/customers/berriai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -2086,6 +2098,12 @@
 
   <url>
     <loc>https://supabase.com/events/scale-to-billions-generative-ai-humata</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/events/launch-week-12-hackathon</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

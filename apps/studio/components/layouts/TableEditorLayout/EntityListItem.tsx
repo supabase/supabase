@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { IS_PLATFORM } from 'common'
 import {
@@ -279,7 +279,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   return (
     <Link
       title={entity.name}
-      href={`/project/${projectRef}/editor/${entity.id}`}
+      href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
       role="button"
       aria-label={`View ${entity.name}`}
       className={cn(

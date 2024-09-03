@@ -792,36 +792,6 @@ export const examples: Registry = [
     files: ['example/textarea-with-text.tsx'],
   },
   {
-    name: 'toast-demo',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-demo.tsx'],
-  },
-  {
-    name: 'toast-destructive',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-destructive.tsx'],
-  },
-  {
-    name: 'toast-simple',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-simple.tsx'],
-  },
-  {
-    name: 'toast-with-action',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-with-action.tsx'],
-  },
-  {
-    name: 'toast-with-title',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-with-title.tsx'],
-  },
-  {
     name: 'toggle-group-demo',
     type: 'components:example',
     registryDependencies: ['toggle-group'],
@@ -1134,6 +1104,36 @@ export const examples: Registry = [
     name: 'color-usage-surface-studio-frame',
     type: 'docs:example',
     files: ['example/color-usage-surface-studio-frame.tsx'],
+  },
+  {
+    name: 'chart-bar-demo',
+    type: 'components:example',
+    files: ['example/chart-bar-demo.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-grid',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-grid.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-axis',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-axis.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-tooltip',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-tooltip.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-legend',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-legend.tsx'],
+  },
+  {
+    name: 'chart-tooltip-demo',
+    type: 'components:example',
+    files: ['example/chart-tooltip-demo.tsx'],
   },
   {
     name: 'expanding-textarea-demo',
