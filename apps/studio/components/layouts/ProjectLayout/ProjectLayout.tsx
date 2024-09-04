@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode, useEffect, useLayoutEffect, useState } from 'react'
+import { Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -94,7 +94,7 @@ const ProjectLayout = ({
   const MIN_SIZE_IN_PIXELS = 256 // min-w-64
   const MAX_SIZE_IN_PIXELS = 512 // 32rem
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const panelGroup: HTMLDivElement = document.querySelector('[data-panel-group-id]')!
     const resizeHandles: NodeListOf<HTMLDivElement> = document.querySelectorAll(
       '[data-panel-resize-handle-id]'
