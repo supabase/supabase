@@ -1,4 +1,4 @@
-import { ArrowUpRight, RefreshCcw, Rewind } from 'lucide-react'
+import { RefreshCcw, Rewind } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -15,6 +15,34 @@ import LogTable from '../Settings/Logs/LogTable'
 import { TestCollectionDialog } from './TestCollectionDialog'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 import { Input } from '@ui/components/shadcn/ui/input'
+import DatePickers from '../Settings/Logs/Logs.DatePickers'
+import { DatetimeHelper } from '../Settings/Logs/Logs.types'
+import dayjs from 'dayjs'
+
+const dayjsBase = dayjs()
+const INTERVALS: DatetimeHelper[] = [
+  {
+    text: 'Last 1 hour',
+    calcFrom: () => dayjsBase.subtract(1, 'hour').toISOString(),
+    calcTo: () => dayjsBase.toISOString(),
+    default: true,
+  },
+  {
+    text: 'Last 12 hours',
+    calcFrom: () => dayjsBase.subtract(12, 'hour').toISOString(),
+    calcTo: () => dayjsBase.toISOString(),
+  },
+  {
+    text: 'Last 1 day',
+    calcFrom: () => dayjsBase.subtract(1, 'day').toISOString(),
+    calcTo: () => dayjsBase.toISOString(),
+  },
+  {
+    text: 'Last 7 days',
+    calcFrom: () => dayjsBase.subtract(7, 'day').toISOString(),
+    calcTo: () => dayjsBase.toISOString(),
+  },
+]
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()
@@ -30,7 +58,7 @@ export const WarehouseCollectionDetail = () => {
   )
   const collection = (collections || []).find((c) => c.token === collectionToken)
   const [params, setParams] = useState({
-    sql: `select current_timestamp() as 'time'`,
+    sql: ``,
   })
   const [search, setSearch] = useState('')
 
@@ -38,18 +66,29 @@ export const WarehouseCollectionDetail = () => {
     limit: 100,
     offset: 0,
     search: '',
+    interval: {
+      to: INTERVALS[0].calcTo(),
+      from: INTERVALS[0].calcFrom(),
+    },
   })
 
   useEffect(() => {
     if (collection) {
+      const from = filters.interval?.from
+      const to = filters.interval?.to
+      console.log({ from, to })
+
+      const sql = `
+      select id, timestamp, event_message from \`${collection.name}\`
+      where timestamp >= TIMESTAMP('${from}')
+      ${to ? `and timestamp <= TIMESTAMP('${to}')` : ''}
+      and event_message like '%${filters.search}%'
+      order by timestamp desc limit ${filters.limit} offset ${filters.offset}
+      `
+
       setParams((prevParams) => ({
         ...prevParams,
-        sql: `
-        select id, timestamp, event_message from \`${collection.name}\`
-        where event_message like '%${filters.search}%'
-        and timestamp > timestamp_sub(current_timestamp(), interval 7 day)
-        order by timestamp desc limit ${filters.limit} offset ${filters.offset}
-        `,
+        sql,
       }))
     }
   }, [collection, filters])
@@ -104,14 +143,8 @@ export const WarehouseCollectionDetail = () => {
           <div className="flex justify-between items-center h-12 px-5">
             <form onSubmit={handleSubmit} className="flex items-center gap-2">
               <h2 className="text-foreground-light">{collection?.name}</h2>
-              <Input
-                size="tiny"
-                placeholder="Search by event message"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
               <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger asChild>
                   <Button
                     htmlType="submit"
                     icon={<RefreshCcw />}
@@ -123,6 +156,27 @@ export const WarehouseCollectionDetail = () => {
                 </TooltipTrigger>
                 <TooltipContent>Refresh</TooltipContent>
               </Tooltip>
+              <Input
+                className="w-40"
+                size="tiny"
+                placeholder="Search by event message"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <DatePickers
+                to={filters.interval?.to}
+                from={filters.interval?.from}
+                helpers={INTERVALS}
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    interval: {
+                      to: e.to || '',
+                      from: e.from || '',
+                    },
+                  })
+                }
+              />
             </form>
             <div className="flex items-center gap-2">
               <Button asChild type={'text'}>
