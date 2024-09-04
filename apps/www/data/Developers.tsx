@@ -1,5 +1,6 @@
 import {
   IconBriefcase2,
+  IconCalendar,
   IconChangelog,
   IconDiscussions,
   IconDocumentation,
@@ -61,6 +62,11 @@ export const data = {
           text: 'Careers',
           url: '/careers',
           icon: IconBriefcase2,
+        },
+        {
+          text: 'Events & Webinars',
+          url: '/events',
+          icon: IconCalendar,
         },
       ],
     },

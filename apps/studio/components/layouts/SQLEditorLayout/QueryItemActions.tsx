@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { Copy, Download, Edit, MoreHorizontal, Share, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,
@@ -46,7 +46,8 @@ export const QueryItemActions = ({
   const snap = useSqlEditorStateSnapshot()
   const project = useSelectedProject()
 
-  const { id, name, visibility, content } = tabInfo || {}
+  const { id, name, visibility, content, type } = tabInfo || {}
+  const isSQLSnippet = type === 'sql'
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -77,6 +78,7 @@ export const QueryItemActions = ({
   }
 
   const createPersonalCopy = async () => {
+    if (!isSQLSnippet) return console.error('Snippet is not SQL')
     if (!ref) return console.error('Project ref is required')
     if (!id) return console.error('Snippet ID is required')
     try {

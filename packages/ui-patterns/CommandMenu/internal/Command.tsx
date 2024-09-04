@@ -64,14 +64,14 @@ aria-selected:border-overlay
 aria-selected:bg-selection/90
 aria-selected:shadow-sm
 aria-selected:scale-[100.3%]
-data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
+data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50`
       : `
 px-2
 aria-selected:bg-selection/80
 aria-selected:backdrop-filter
 aria-selected:backdrop-blur-md
-data-[disabled]:pointer-events-none
-data-[disabled]:opacity-50
+data-[disabled=true]:pointer-events-none
+data-[disabled=true]:opacity-50
 `
   )
 

@@ -13,7 +13,7 @@ export * from './src/components/Image'
 
 // DISPLAYS
 
-export * from './src/components/Card'
+export { Card as Card_legacy_ } from './src/components/Card'
 export * from './src/components/Tabs'
 export * from './src/components/Alert'
 export * from './src/components/Accordion'
@@ -32,7 +32,6 @@ export * from './src/components/Modal'
 export * from './src/components/SidePanel'
 export * from './src/components/ContextMenu'
 export * from './src/components/Popover'
-export * from './src/layout/PortalToast'
 
 // HTML
 
@@ -72,10 +71,8 @@ export * from './src/components/ThemeProvider/prefixedThemes'
 
 // shadcn
 export * from './src/components/shadcn/ui/dropdown-menu'
-export * from './src/components/shadcn/ui/use-toast'
-export * from './src/components/shadcn/ui/toast'
-export * from './src/components/shadcn/ui/toaster'
 export * from './src/components/shadcn/ui/sonner'
+export * from './src/components/shadcn/ui/sonner-progress'
 export * from './src/components/shadcn/ui/separator'
 export * from './src/components/shadcn/ui/sheet'
 export * from './src/components/shadcn/ui/badge'
@@ -93,14 +90,7 @@ export * from './src/components/shadcn/ui/toggle-group'
 
 export { Toggle as Toggle_Shadcn_ } from './src/components/shadcn/ui/toggle'
 
-export {
-  Card as Card_Shadcn_,
-  CardContent as CardContent_Shadcn_,
-  CardDescription as CardDescription_Shadcn_,
-  CardFooter as CardFooter_Shadcn_,
-  CardHeader as CardHeader_Shadcn_,
-  CardTitle as CardTitle_Shadcn_,
-} from './src/components/shadcn/ui/card'
+export * from './src/components/shadcn/ui/card'
 
 export {
   Command as Command_Shadcn_,
@@ -258,6 +248,8 @@ export * from './src/components/radio-group-stacked'
 export * from './src/components/radio-group-card'
 
 export * from './src/components/TreeView'
+
+export * from './src/components/shadcn/ui/chart'
 
 // links
 

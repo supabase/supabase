@@ -2,7 +2,7 @@ import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-d
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { Trash } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import Table from 'components/to-be-cleaned/Table'
 import { Button } from 'ui'

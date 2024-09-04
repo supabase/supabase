@@ -2,7 +2,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
   AlignLeft,
   Check,
-  ChevronDown,
   Command,
   CornerDownLeft,
   Heart,
@@ -10,24 +9,25 @@ import {
   Loader2,
   MoreVertical,
 } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { Content, ContentData } from 'data/content/content-query'
 import { contentKeys } from 'data/content/keys'
+import { Snippet } from 'data/content/sql-folders-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   TooltipContent_Shadcn_,
@@ -36,16 +36,6 @@ import {
   cn,
 } from 'ui'
 import SavingIndicator from './SavingIndicator'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useFlag } from 'hooks/ui/useFlag'
-import { Snippet } from 'data/content/sql-folders-query'
-
-const ROWS_PER_PAGE_OPTIONS = [
-  { value: -1, label: 'No limit' },
-  { value: 100, label: '100 rows' },
-  { value: 500, label: '500 rows' },
-  { value: 1000, label: '1,000 rows' },
-]
 
 export type UtilityActionsProps = {
   id: string
@@ -250,33 +240,6 @@ const UtilityActions = ({
         </Tooltip_Shadcn_>
       </div>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown size={14} />}>
-            {
-              ROWS_PER_PAGE_OPTIONS.find(
-                (opt) => opt.value === (enableFolders ? snapV2.limit : snap.limit)
-              )?.label
-            }
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-42">
-          <DropdownMenuRadioGroup
-            value={enableFolders ? snapV2.limit.toString() : snap.limit.toString()}
-            onValueChange={(val) => {
-              if (enableFolders) snapV2.setLimit(Number(val))
-              else snap.setLimit(Number(val))
-            }}
-          >
-            {ROWS_PER_PAGE_OPTIONS.map((option) => (
-              <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
-                {option.label}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
       <div className="flex items-center justify-between gap-x-2">
         <div className="flex items-center">
           <DatabaseSelector
@@ -306,7 +269,7 @@ const UtilityActions = ({
                 </div>
               )
             }
-            className="rounded-l-none"
+            className="rounded-l-none min-w-[82px]"
           >
             {hasSelection ? 'Run selected' : 'Run'}
           </Button>

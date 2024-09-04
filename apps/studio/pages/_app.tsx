@@ -33,15 +33,12 @@ import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { ErrorInfo, useEffect, useMemo, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import toast from 'react-hot-toast'
-import { PortalToast, Toaster } from 'ui'
-import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { ConsentToast } from 'ui-patterns/ConsentToast'
+import { toast } from 'sonner'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { AppBannerWrapper, RouteValidationWrapper } from 'components/interfaces/App'
-import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
+import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
@@ -55,6 +52,9 @@ import { ProfileProvider } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
+import { SonnerToaster } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { ConsentToast } from 'ui-patterns/ConsentToast'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -82,7 +82,7 @@ loader.config({
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const snap = useAppStateSnapshot()
   const queryClient = useRootQueryClient()
-  const consentToastId = useRef<string>()
+  const consentToastId = useRef<string | number>()
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
   const [supabase] = useState(() =>
@@ -184,6 +184,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                 <FeaturePreviewModal />
                               </FeaturePreviewContextProvider>
                             </AppBannerWrapper>
+                            <SonnerToaster position="top-right" />
                           </CommandProvider>
                         </AppBannerContextProvider>
                       </ThemeProvider>
@@ -192,8 +193,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 </PageTelemetry>
 
                 {!isTestEnv && <HCaptchaLoadedStore />}
-                {!isTestEnv && <Toaster />}
-                <PortalToast />
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </FlagProvider>
             </ProfileProvider>

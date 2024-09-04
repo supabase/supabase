@@ -4,8 +4,10 @@ Supabase is 100% remote.
 
 Alaister Young
 Aleksi Immonen
+Alex Tasioulis
 Alexander Korotkov
 Amy Q
+Andrew Valleteau
 Angelico de los Reyes
 Ant Wilson
 Ariuna K
@@ -21,6 +23,7 @@ Chris Caruso
 Chris Chandler
 Chris Copplestone
 Chris Gwilliams
+Chris Stockton
 Craig Cannon
 Dave Wilson
 Deji I

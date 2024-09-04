@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
@@ -21,6 +21,7 @@ import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSele
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
@@ -243,7 +244,9 @@ const Wizard: NextPageWithLayout = () => {
   const freePlanWithExceedingLimits =
     orgSubscription?.plan?.id === 'free' && hasMembersExceedingFreeTierLimit
 
-  const canCreateProject = isAdmin && !freePlanWithExceedingLimits
+  const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
+
+  const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !isManagedByVercel
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
@@ -458,7 +461,7 @@ const Wizard: NextPageWithLayout = () => {
                 <Button
                   htmlType="submit"
                   loading={isCreatingNewProject || isSuccessNewProject}
-                  disabled={isCreatingNewProject || isSuccessNewProject}
+                  disabled={isCreatingNewProject || isSuccessNewProject || isManagedByVercel}
                 >
                   Create new project
                 </Button>
@@ -691,7 +694,7 @@ const Wizard: NextPageWithLayout = () => {
                               <span>Compute Billing</span>
                               <div className="flex flex-col space-y-2">
                                 <Link
-                                  href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                                  href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
                                   target="_blank"
                                 >
                                   <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
@@ -1045,6 +1048,19 @@ const Wizard: NextPageWithLayout = () => {
                     <FreeProjectLimitWarning
                       membersExceededLimit={membersExceededLimit || []}
                       orgSlug={slug}
+                    />
+                  </Panel.Content>
+                )}
+
+                {!freePlanWithExceedingLimits && isManagedByVercel && (
+                  <Panel.Content>
+                    <PartnerManagedResource
+                      partner="vercel-marketplace"
+                      resource="Projects"
+                      cta={{
+                        installationId: currentOrg?.partner_id,
+                        message: 'Visit Vercel to create a project',
+                      }}
                     />
                   </Panel.Content>
                 )}

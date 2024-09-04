@@ -2,7 +2,9 @@ import { useRouter } from 'next/router'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
+import { useFlag } from 'hooks/ui/useFlag'
 import { PROVIDERS } from 'lib/constants'
+import type { CloudProvider } from 'shared-data'
 import {
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -12,7 +14,6 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import type { CloudProvider } from 'shared-data'
 import { getAvailableRegions } from './ProjectCreation.utils'
 
 interface RegionSelectorProps {
@@ -21,13 +22,23 @@ interface RegionSelectorProps {
   form: UseFormReturn<any>
 }
 
+// [Joshen] Let's use a library to maintain the flag SVGs in the future
+// I tried using https://flagpack.xyz/docs/development/react/ but couldn't get it to render
+// ^ can try again next time
+
 export const RegionSelector = ({ cloudProvider, field }: RegionSelectorProps) => {
   const router = useRouter()
+  const newRegions = ['EAST_US_2', 'WEST_EU_3', 'CENTRAL_EU_2', 'NORTH_EU']
+  const enableNewRegions = useFlag('enableNewRegions')
+
   const showNonProdFields =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
+  const regionsArray = enableNewRegions
+    ? Object.entries(availableRegions)
+    : Object.entries(availableRegions).filter(([key]) => !newRegions.includes(key))
 
   const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery({
     cloudProvider,
@@ -56,15 +67,15 @@ export const RegionSelector = ({ cloudProvider, field }: RegionSelectorProps) =>
         </SelectTrigger_Shadcn_>
         <SelectContent_Shadcn_>
           <SelectGroup_Shadcn_>
-            {Object.keys(availableRegions).map((option: string, i) => {
-              const label = Object.values(availableRegions)[i].displayName as string
+            {regionsArray.map(([key, value]) => {
+              const label = value.displayName as string
               return (
-                <SelectItem_Shadcn_ key={option} value={label}>
+                <SelectItem_Shadcn_ key={key} value={label}>
                   <div className="flex items-center gap-3">
                     <img
                       alt="region icon"
                       className="w-5 rounded-sm"
-                      src={`${router.basePath}/img/regions/${Object.keys(availableRegions)[i]}.svg`}
+                      src={`${router.basePath}/img/regions/${key}.svg`}
                     />
                     <span className="text-foreground">{label}</span>
                   </div>
