@@ -1,10 +1,10 @@
+import { Check, ExternalLink, Mail, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, Input, Separator } from 'ui'
 
 import { useProfile } from 'lib/profile'
+import { Button, Input, Separator } from 'ui'
 import { CATEGORY_OPTIONS } from './Support.constants'
-import { Mail, Check, Search, ExternalLink } from 'lucide-react'
 
 interface SuccessProps {
   sentCategory?: string
@@ -36,7 +36,7 @@ const Success = ({
           <Check strokeWidth={4} size={18} />
         </div>
       </div>
-      <div className="flex items-center flex-col space-y-2 text-center">
+      <div className="flex items-center flex-col space-y-2 text-center p-4">
         <h3 className="text-xl">Support request successfully sent!</h3>
         <p className="text-sm text-foreground-light">
           We will reach out to you at <span className="text-foreground">{respondToEmail}</span>.
@@ -68,11 +68,11 @@ const Success = ({
               icon={<Search size={16} strokeWidth={1.5} />}
               actions={[
                 <Button
-                  key="search"
                   asChild
+                  key="search"
                   className="mr-1"
                   type="default"
-                  icon={<ExternalLink size={16} strokeWidth={1.5} />}
+                  icon={<ExternalLink />}
                 >
                   <Link
                     href={`https://github.com/supabase/supabase/discussions?discussions_q=${searchValue}`}
