@@ -46,7 +46,7 @@ This will start up the Supabase stack locally and print out a bunch of environme
 
 ## Install the dependencies
 
-We will need to add the following dependencies to our project:
+Add the following dependencies to your project:
 
 - [`supabase`](https://github.com/supabase-community/supabase-py): Supabase Python Client
 - [`mixpeek`](https://github.com/mixpeek/python-client): Mixpeek Python Client for embedding generation
@@ -134,7 +134,7 @@ After activating the virtual environment with `poetry shell`, you can now run yo
 
 ## Perform a video search from a text query
 
-With Supabase Vector, we can easily query our embeddings. We can use either a video clip as search input or alternatively, we can generate an embedding from a string input and use that as the query input:
+With Supabase Vector, you can query your embeddings. You can use either a video clip as search input or alternatively, you can generate an embedding from a string input and use that as the query input:
 
 ```python
 def search():
@@ -171,10 +171,10 @@ def search():
         print("No matching video chunks found")
 ```
 
-This query will return the top 5 most similar video chunks from our database.
+This query will return the top 5 most similar video chunks from your database.
 
-That's it! You can now test it out by running `poetry run search`, and you will be presented with the most relevant video chunks to the query "a car chase scene".
+You can now test it out by running `poetry run search`, and you will be presented with the most relevant video chunks to the query "a car chase scene".
 
 ## Conclusion
 
-With just a couple of Python scripts, you are able to implement video search as well as reverse video search using Mixpeek Embed and Supabase Vector. This approach allows for powerful semantic search capabilities that can be easily integrated into various applications, enabling you to search through video content using both text and video queries.
+With just a couple of Python scripts, you are able to implement video search as well as reverse video search using Mixpeek Embed and Supabase Vector. This approach allows for powerful semantic search capabilities that can be integrated into various applications, enabling you to search through video content using both text and video queries.
