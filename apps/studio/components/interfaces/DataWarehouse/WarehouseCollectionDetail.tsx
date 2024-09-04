@@ -1,7 +1,7 @@
-import { RefreshCcw, Rewind } from 'lucide-react'
+import { ArrowUpRight, RefreshCcw, Rewind } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
@@ -15,6 +15,8 @@ import { Button } from 'ui'
 import LogTable from '../Settings/Logs/LogTable'
 import { TestCollectionDialog } from './TestCollectionDialog'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
+import { Input } from '@ui/components/shadcn/ui/input'
+import { debounce } from 'lodash'
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()
@@ -32,10 +34,12 @@ export const WarehouseCollectionDetail = () => {
   const [params, setParams] = useState({
     sql: `select current_timestamp() as 'time'`,
   })
+  const [search, setSearch] = useState('')
 
-  const [pagination, setPagination] = useState({
+  const [filters, setFilters] = useState({
     limit: 100,
     offset: 0,
+    search: '',
   })
 
   useEffect(() => {
@@ -44,12 +48,13 @@ export const WarehouseCollectionDetail = () => {
         ...prevParams,
         sql: `
         select id, timestamp, event_message from \`${collection.name}\`
-        where timestamp > timestamp_sub(current_timestamp(), interval 7 day)
-        order by timestamp desc limit ${pagination.limit} offset ${pagination.offset}
+        where event_message like '%${filters.search}%'
+        and timestamp > timestamp_sub(current_timestamp(), interval 7 day)
+        order by timestamp desc limit ${filters.limit} offset ${filters.offset}
         `,
       }))
     }
-  }, [collection, pagination])
+  }, [collection, filters])
 
   const {
     isLoading: queryLoading,
@@ -82,23 +87,35 @@ export const WarehouseCollectionDetail = () => {
   const results = formatResults(queryData?.result)
 
   function loadMore() {
-    setPagination({ ...pagination, offset: pagination.offset + pagination.limit })
+    setFilters({ ...filters, offset: filters.offset + filters.limit })
   }
 
   const isLoading = queryLoading || collectionsLoading || isRefetching
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setFilters({ ...filters, search })
+    refetch()
+  }
 
   return (
     <div className="relative flex flex-col flex-grow h-full">
       <ShimmerLine active={isLoading} />
       <LoadingOpacity active={isLoading}>
         <div className="flex flex-col w-full">
-          <div className="flex justify-between items-center pr-3">
-            <div className="flex items-center">
-              <h2 className="p-3">{collection?.name}</h2>
+          <div className="flex justify-between items-center h-12 px-5">
+            <form onSubmit={handleSubmit} className="flex items-center gap-2">
+              <h2 className="text-foreground-light">{collection?.name}</h2>
+              <Input
+                size="tiny"
+                placeholder="Filter by event name"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
               <Tooltip>
                 <TooltipTrigger>
                   <Button
-                    onClick={() => refetch()}
+                    htmlType="submit"
                     icon={<RefreshCcw />}
                     type="text"
                     loading={isLoading}
@@ -108,7 +125,7 @@ export const WarehouseCollectionDetail = () => {
                 </TooltipTrigger>
                 <TooltipContent>Refresh</TooltipContent>
               </Tooltip>
-            </div>
+            </form>
             <div className="flex items-center gap-2">
               <Button asChild type={'text'}>
                 <Link href={`/project/${projectRef}/settings/warehouse`}>Access tokens</Link>
@@ -178,10 +195,10 @@ export const WarehouseCollectionDetail = () => {
                 </Button>
               </>
             )}
-            {pagination.offset !== 0 && (
+            {filters.offset !== 0 && (
               <>
                 <Button
-                  onClick={() => setPagination({ ...pagination, offset: 0 })}
+                  onClick={() => setFilters({ ...filters, offset: 0 })}
                   type="default"
                   loading={isLoading}
                   disabled={isLoading}
