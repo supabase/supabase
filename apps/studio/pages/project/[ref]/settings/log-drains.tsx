@@ -1,3 +1,13 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import { toast } from 'sonner'
+
+import { useParams } from 'common'
+import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
+import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
+import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
@@ -5,23 +15,13 @@ import {
   ScaffoldHeader,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
-import type { NextPageWithLayout } from 'types'
-import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
-import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
-import { Button } from 'ui'
-import { useState } from 'react'
-import { LOG_DRAIN_TYPES, LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
-import toast from 'react-hot-toast'
+import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
-import { useParams } from 'common'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import Link from 'next/link'
-import { ExternalLink } from 'lucide-react'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Alert } from '@ui/components/shadcn/ui/alert'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import type { NextPageWithLayout } from 'types'
+import { Alert_Shadcn_, Button } from 'ui'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const canManageLogDrains = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
@@ -154,7 +154,9 @@ const LogDrainsSettings: NextPageWithLayout = () => {
         {canManageLogDrains ? (
           <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
         ) : (
-          <Alert variant="default">You do not have permission to manage log drains</Alert>
+          <Alert_Shadcn_ variant="default">
+            You do not have permission to manage log drains
+          </Alert_Shadcn_>
         )}
       </ScaffoldContainer>
     </>

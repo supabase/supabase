@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { object, string } from 'yup'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'

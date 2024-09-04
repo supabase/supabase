@@ -36,10 +36,14 @@ type GetTableRowsArgs = {
 // [Joshen] We can probably make this reasonably high, but for now max aim to load 10kb
 export const MAX_CHARACTERS = 10 * KB
 
-// return the primary key column if exists, otherwise return the first column
-// to use as a default sort
-const getDefaultOrderByColumn = (table: SupaTable) => {
-  return table.columns.find((column) => column.isPrimaryKey)?.name || table.columns[0]?.name
+// return the primary key columns if exists, otherwise return the first column to use as a default sort
+const getDefaultOrderByColumns = (table: SupaTable) => {
+  const primaryKeyColumns = table.columns.filter((col) => col?.isPrimaryKey).map((col) => col.name)
+  if (primaryKeyColumns.length === 0) {
+    return [table.columns[0]?.name]
+  } else {
+    return primaryKeyColumns
+  }
 }
 
 // Updated fetchAllTableRows function
@@ -76,9 +80,11 @@ export const fetchAllTableRows = async ({
 
   // If sorts is empty and table row count is within threshold, use the primary key as the default sort
   if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
-    const primaryKey = getDefaultOrderByColumn(table)
-    if (primaryKey) {
-      queryChains = queryChains.order(table.name, primaryKey, true, true)
+    const primaryKeys = getDefaultOrderByColumns(table)
+    if (primaryKeys.length > 0) {
+      primaryKeys.forEach((col) => {
+        queryChains = queryChains.order(table.name, col, true, true)
+      })
     }
   } else {
     sorts.forEach((sort) => {
@@ -145,10 +151,12 @@ export const getTableRowsSqlQuery = ({
     })
 
   // If sorts is empty and table row count is within threshold, use the primary key as the default sort
-  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
-    const defaultOrderByColumn = getDefaultOrderByColumn(table)
-    if (defaultOrderByColumn) {
-      queryChains = queryChains.order(table.name, defaultOrderByColumn, true, true)
+  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT && table.columns.length > 0) {
+    const defaultOrderByColumns = getDefaultOrderByColumns(table)
+    if (defaultOrderByColumns.length > 0) {
+      defaultOrderByColumns.forEach((col) => {
+        queryChains = queryChains.order(table.name, col, true, true)
+      })
     }
   } else {
     sorts.forEach((x) => {

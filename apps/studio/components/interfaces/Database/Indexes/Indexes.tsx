@@ -1,6 +1,6 @@
 import { partition, sortBy } from 'lodash'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -98,35 +98,35 @@ const Indexes = () => {
     <>
       <div className="pb-8">
         <div className="flex flex-col gap-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
-              {isErrorSchemas && (
-                <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
-                  <IconAlertCircle strokeWidth={2} size={16} />
-                  <p>Failed to load schemas</p>
-                </div>
-              )}
-              {isSuccessSchemas && (
-                <SchemaSelector
-                  className="w-[260px]"
-                  size="small"
-                  showError={false}
-                  selectedSchemaName={selectedSchema}
-                  onSelectSchema={setSelectedSchema}
-                />
-              )}
-              <Input
+          <div className="flex items-center gap-2 flex-wrap">
+            {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
+            {isErrorSchemas && (
+              <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
+                <IconAlertCircle strokeWidth={2} size={16} />
+                <p>Failed to load schemas</p>
+              </div>
+            )}
+            {isSuccessSchemas && (
+              <SchemaSelector
+                className="w-[260px]"
                 size="small"
-                value={search}
-                className="w-64"
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search for an index"
-                icon={<IconSearch size={14} />}
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
               />
-            </div>
+            )}
+            <Input
+              size="small"
+              value={search}
+              className="w-64"
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search for an index"
+              icon={<IconSearch size={14} />}
+            />
+
             {!isLocked && (
               <Button
+                className="ml-auto"
                 type="primary"
                 onClick={() => setShowCreateIndex(true)}
                 disabled={!isSuccessSchemas}
