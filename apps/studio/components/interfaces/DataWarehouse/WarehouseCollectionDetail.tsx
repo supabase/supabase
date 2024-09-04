@@ -1,8 +1,7 @@
 import { ArrowUpRight, RefreshCcw, Rewind } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
-
+import { useEffect, useState } from 'react'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
@@ -16,7 +15,6 @@ import LogTable from '../Settings/Logs/LogTable'
 import { TestCollectionDialog } from './TestCollectionDialog'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 import { Input } from '@ui/components/shadcn/ui/input'
-import { debounce } from 'lodash'
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()
@@ -108,7 +106,7 @@ export const WarehouseCollectionDetail = () => {
               <h2 className="text-foreground-light">{collection?.name}</h2>
               <Input
                 size="tiny"
-                placeholder="Filter by event name"
+                placeholder="Search by event message"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
