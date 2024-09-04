@@ -137,7 +137,7 @@ const nextConfig = {
         has: [
           {
             type: 'host',
-            value: '*.vercel.app',
+            value: '(?:.+\\.vercel\\.app)',
           },
         ],
       },
