@@ -176,16 +176,17 @@ for select using (
     id: 'policy-9',
     preview: false,
     templateName: 'Enable users to view their own data only',
-    description:
-      'This policy grants read access (SELECT) to users so they can only view rows where the "user_id" or "created_by" column matches their own user ID.',
-    statement: 
+    description: 'Restrict users to reading only their own data.',
+    statement: `
 create policy "Enable users to view their own data only"
 on "${schema}"."${table}"
 for select
 to authenticated
-using (auth.uid() = user_id OR auth.uid() = created_by);.trim(),
+using (
+  (select auth.uid()) = user_id
+);`.trim(),
     name: 'Enable users to view their own data only',
-    definition: 'auth.uid() = user_id OR auth.uid() = created_by',
+    definition: '(select auth.uid()) = user_id',
     check: '',
     command: 'SELECT',
     roles: ['authenticated'],
