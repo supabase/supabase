@@ -22,7 +22,8 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function DiskCountdownRadial(props: any) {
-  const [remainingTime, setRemainingTime] = useState(6 * 60 * 60) // 6 hours in seconds
+  const TOTAL_TIME = 20 // 6 hours in seconds
+  const [remainingTime, setRemainingTime] = useState(TOTAL_TIME)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -42,6 +43,8 @@ export function DiskCountdownRadial(props: any) {
   const minutes = Math.floor((remainingTime % 3600) / 60)
   const seconds = remainingTime % 60
 
+  const progressPercentage = (remainingTime / TOTAL_TIME) * 100
+
   return (
     <Card className="" {...props}>
       <CardContent className="py-3 flex gap-3 px-3 items-center">
@@ -49,10 +52,10 @@ export function DiskCountdownRadial(props: any) {
           {/* timer ring */}
           <ChartContainer config={chartConfig} className="absolute w-12 h-12">
             <RadialBarChart
-              data={chartData}
+              data={[{ timeRemaining: 100, fill: 'var(--color-timeRemaining)' }]}
               startAngle={90}
-              endAngle={-240} // end position
-              innerRadius={21} // Correctly placed on RadialBarChart
+              endAngle={90 - (progressPercentage * 360) / 100}
+              innerRadius={21}
               outerRadius={14}
             >
               <PolarGrid
@@ -68,10 +71,11 @@ export function DiskCountdownRadial(props: any) {
 
           <ChartContainer config={chartConfig} className="absolute top-1 left-1 w-10 h-10">
             <RadialBarChart
-              data={handData}
-              startAngle={-240}
-              endAngle={-200} // end position
-              innerRadius={14} // Correctly placed on RadialBarChart
+              data={[{ hand: 100, fill: 'var(--color-hand)' }]}
+              // Adjust the angles to create a small hand
+              startAngle={80 - (progressPercentage * 360) / 100}
+              endAngle={140 - (progressPercentage * 360) / 100}
+              innerRadius={14}
               outerRadius={5}
             >
               <RadialBar dataKey="hand" cornerRadius={2} isAnimationActive={true} />
