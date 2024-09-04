@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
 import { useState } from 'react'
-import { Button, IconSearch, Input } from 'ui'
+import { Button, Input } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
@@ -16,6 +16,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { Search } from 'lucide-react'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import TriggerList from './TriggerList'
 
@@ -97,7 +98,7 @@ const TriggersList = ({
             <Input
               placeholder="Search for a trigger"
               size="small"
-              icon={<IconSearch size="tiny" />}
+              icon={<Search size="14" />}
               value={filterString}
               className="w-64"
               onChange={(e) => setFilterString(e.target.value)}

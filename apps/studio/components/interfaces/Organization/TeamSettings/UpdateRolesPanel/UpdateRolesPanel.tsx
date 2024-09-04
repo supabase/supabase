@@ -301,7 +301,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                   type="text"
                                   disabled={!canRemoveRole}
                                   className="px-1"
-                                  icon={<X size={14} />}
+                                  icon={<X />}
                                   onClick={() => onRemoveProject(project?.ref)}
                                 />
                               </TooltipTrigger_Shadcn_>

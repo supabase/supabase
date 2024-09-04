@@ -4,14 +4,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
+import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'lucide-react'
 import {
   Button,
-  IconActivity,
-  IconBookOpen,
-  IconHelpCircle,
-  IconMail,
-  IconMessageCircle,
-  IconTool,
   Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -35,9 +30,7 @@ const HelpPopover = () => {
                 id="help-popover-button"
                 type="text"
                 className="px-1"
-                icon={
-                  <IconHelpCircle size={16} strokeWidth={1.5} className="text-foreground-light" />
-                }
+                icon={<HelpCircle size={16} strokeWidth={1.5} className="text-foreground-light" />}
               />
             </div>
           </Tooltip.Trigger>
@@ -64,7 +57,7 @@ const HelpPopover = () => {
             services.
           </p>
           <div className="space-x-1">
-            <Button asChild type="default" icon={<IconTool />}>
+            <Button asChild type="default" icon={<Wrench />}>
               <Link
                 href="https://supabase.com/docs/guides/platform/troubleshooting"
                 target="_blank"
@@ -73,12 +66,12 @@ const HelpPopover = () => {
                 Troubleshooting
               </Link>
             </Button>
-            <Button asChild type="text" size="tiny" icon={<IconBookOpen />}>
+            <Button asChild type="text" size="tiny" icon={<BookOpen />}>
               <Link href="https://supabase.com/docs/" target="_blank" rel="noreferrer">
                 Docs
               </Link>
             </Button>
-            <Button asChild type="text" size="tiny" icon={<IconActivity />}>
+            <Button asChild type="text" size="tiny" icon={<Activity />}>
               <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
                 Supabase Status
               </Link>
@@ -89,7 +82,7 @@ const HelpPopover = () => {
             prioritized.
           </p>
           <div>
-            <Button asChild type="default" icon={<IconMail />}>
+            <Button asChild type="default" icon={<Mail />}>
               <Link href={supportUrl}>Contact Support</Link>
             </Button>
           </div>
@@ -146,7 +139,7 @@ const HelpPopover = () => {
                   objectFit="cover"
                   alt="discord illustration header"
                 />
-                <Button type="secondary" icon={<IconMessageCircle />}>
+                <Button type="secondary" icon={<MessageCircle />}>
                   GitHub Discussions
                 </Button>
               </a>

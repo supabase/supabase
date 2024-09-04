@@ -3,8 +3,8 @@
 import * as RadixAccordion from '@radix-ui/react-accordion'
 import React, { createContext, useContext, useState } from 'react'
 
+import { ChevronDown } from 'lucide-react'
 import styleHandler from '../../lib/theme/styleHandler'
-import { IconChevronDown } from '../Icon/icons/IconChevronDown'
 
 type Type = 'default' | 'bordered'
 type Size = 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
@@ -134,7 +134,7 @@ export function Item({ children, className, header, id, disabled }: ItemProps) {
       <RadixAccordion.Trigger className={triggerClasses.join(' ')}>
         {header}
         {!disabled && (
-          <IconChevronDown aria-hidden className={chevronClasses.join(' ')} strokeWidth={2} />
+          <ChevronDown aria-hidden className={chevronClasses.join(' ')} strokeWidth={2} />
         )}
       </RadixAccordion.Trigger>
       {/* @ts-ignore TODO: investigate why this is making TS angry */}

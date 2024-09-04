@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronDown, GitBranch, RotateCcw, Shield } from 'lucide-react'
+import { Check, ChevronDown, GitBranch, RotateCcw, Shield } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -31,7 +31,6 @@ import {
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   Form_Shadcn_,
-  IconCheck,
   Input_Shadcn_,
   Label_Shadcn_,
   PopoverContent_Shadcn_,
@@ -209,7 +208,7 @@ const GitHubIntegrationConnectionForm = ({
                             )}
                             {branch.name}
                           </div>
-                          {branch.name === productionPreviewBranch?.git_branch && <IconCheck />}
+                          {branch.name === productionPreviewBranch?.git_branch && <Check />}
                         </CommandItem_Shadcn_>
                       )
                     })}

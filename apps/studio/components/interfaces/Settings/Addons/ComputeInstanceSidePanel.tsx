@@ -32,13 +32,12 @@ import {
   Badge,
   Button,
   CriticalIcon,
-  IconExternalLink,
-  IconInfo,
   Modal,
   Radio,
   SidePanel,
   WarningIcon,
 } from 'ui'
+import { ExternalLink, Info } from 'lucide-react'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()
@@ -234,7 +233,7 @@ const ComputeInstanceSidePanel = () => {
         header={
           <div className="flex items-center justify-between">
             <h4>Change project compute size</h4>
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
                 href="https://supabase.com/docs/guides/platform/compute-add-ons"
                 target="_blank"
@@ -250,7 +249,7 @@ const ComputeInstanceSidePanel = () => {
           <div className="py-6 space-y-4">
             {selectedProject?.infra_compute_size === 'nano' && subscription?.plan.id !== 'free' && (
               <Alert_Shadcn_ variant="default">
-                <IconInfo strokeWidth={2} />
+                <Info strokeWidth={2} />
                 <AlertTitle_Shadcn_>Free compute upgrade to Micro</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   Paid Plans include a free upgrade to Micro compute. Your project is ready to
@@ -335,7 +334,7 @@ const ComputeInstanceSidePanel = () => {
                             <Tooltip.Root delayDuration={0}>
                               <Tooltip.Trigger>
                                 <div className="flex items-center">
-                                  <IconInfo
+                                  <Info
                                     size={14}
                                     strokeWidth={2}
                                     className="hover:text-foreground-light"

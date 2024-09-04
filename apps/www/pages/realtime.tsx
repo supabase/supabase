@@ -1,20 +1,21 @@
-import { Button, IconGrid, IconLayers, IconMenu, Image } from 'ui'
 import ApiExamples from 'data/products/realtime/api-examples'
 import AppExamples from 'data/products/realtime/app-examples'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { Button, Image } from 'ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import ProductsNav from '~/components/Products/ProductsNav'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import RealtimeStyles from '~/styles/realtime.module.css'
-import ProductsNav from '~/components/Products/ProductsNav'
 
-import 'swiper/css'
+import { Grid, Layers, Menu } from 'lucide-react'
 import { PRODUCT_NAMES } from 'shared-data/products'
+import 'swiper/css'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -111,9 +112,9 @@ function RealtimePage() {
               </div>
               <div className="bg-background border-default absolute top-0 flex h-9 w-full items-center justify-between border-b">
                 <div className="flex items-center">
-                  <IconMenu className="text-foreground mx-3" strokeWidth={1} size={16} />
-                  <IconGrid className="text-foreground mx-3" strokeWidth={1} size={15} />
-                  <IconLayers className="text-foreground mx-3" strokeWidth={1} size={15} />
+                  <Menu className="text-foreground mx-3" strokeWidth={1} size={16} />
+                  <Grid className="text-foreground mx-3" strokeWidth={1} size={15} />
+                  <Layers className="text-foreground mx-3" strokeWidth={1} size={15} />
                 </div>
                 <div className="mx-3 flex items-center">
                   <div className="border-foreground bg-tomato-900 relative -right-4 h-5 w-5 rounded-full border" />

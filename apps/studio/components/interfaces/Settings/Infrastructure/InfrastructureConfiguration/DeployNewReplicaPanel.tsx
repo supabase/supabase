@@ -187,7 +187,7 @@ const DeployNewReplicaPanel = ({
                 replicas
               </span>
               <div className="mt-3">
-                <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                <Button asChild type="default" icon={<ExternalLink />}>
                   <a
                     href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
                     target="_blank"
@@ -245,7 +245,7 @@ const DeployNewReplicaPanel = ({
                         {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
                       </Link>
                     </Button>
-                    <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                    <Button asChild type="default" icon={<ExternalLink />}>
                       <a
                         href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
                         target="_blank"
@@ -294,7 +294,7 @@ const DeployNewReplicaPanel = ({
                     >
                       Enable physical backups
                     </Button>
-                    <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                    <Button asChild type="default" icon={<ExternalLink />}>
                       <a
                         href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
                         target="_blank"

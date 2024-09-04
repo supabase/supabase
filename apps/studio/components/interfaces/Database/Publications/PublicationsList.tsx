@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button, IconAlertCircle, IconSearch, Input, Toggle } from 'ui'
+import { Button, Input, Toggle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -13,6 +13,7 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import PublicationSkeleton from './PublicationSkeleton'
+import { Search, AlertCircle } from 'lucide-react'
 
 interface PublicationEvent {
   event: string
@@ -81,7 +82,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
           <div className="flex items-center">
             <Input
               size="small"
-              icon={<IconSearch size="tiny" />}
+              icon={<Search size="14" />}
               placeholder={'Filter'}
               value={filterString}
               onChange={(e) => setFilterString(e.target.value)}
@@ -90,7 +91,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
           {isPermissionsLoaded && !canUpdatePublications && (
             <div className="w-[500px]">
               <InformationBox
-                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
+                icon={<AlertCircle className="text-foreground-light" strokeWidth={2} />}
                 title="You need additional permissions to update database publications"
               />
             </div>

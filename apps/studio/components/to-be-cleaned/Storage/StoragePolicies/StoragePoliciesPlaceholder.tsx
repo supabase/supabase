@@ -1,12 +1,12 @@
 import Panel from 'components/ui/Panel'
-import { IconArchive } from 'ui'
+import { Archive } from 'lucide-react'
 
 const StoragePoliciesPlaceholder = () => (
   <Panel
     title={[
       <div key="storagePlaceholder" className="flex w-full items-center justify-between">
         <div className="flex items-center space-x-4">
-          <IconArchive size="small" />
+          <Archive size="18" />
           <h4>Bucket policies</h4>
         </div>
       </div>,

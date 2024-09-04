@@ -10,8 +10,8 @@ import NoPermission from 'components/ui/NoPermission'
 import { authKeys } from 'data/auth/keys'
 import { useUsersQuery } from 'data/auth/users-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { Search, X } from 'lucide-react'
-import { Button, IconRefreshCw, Input, Listbox } from 'ui'
+import { RefreshCw, Search, X } from 'lucide-react'
+import { Button, Input, Listbox } from 'ui'
 import AddUserDropdown from './AddUserDropdown'
 import UsersList from './UsersList'
 
@@ -118,7 +118,7 @@ const Users = () => {
           {isNewAPIDocsEnabled && <APIDocsButton section={['user-management']} />}
           <Button
             size="tiny"
-            icon={<IconRefreshCw />}
+            icon={<RefreshCw />}
             type="default"
             loading={isRefetching && !isFetchingNextPage}
             onClick={() => refetch()}

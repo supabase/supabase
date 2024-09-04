@@ -1,6 +1,7 @@
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
+import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, IconAlertCircle } from 'ui'
+import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 interface CPUWarningsProps {
   isFreePlan: boolean
@@ -12,7 +13,7 @@ const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => 
   if (severity === 'warning') {
     return (
       <Alert_Shadcn_ variant="warning">
-        <IconAlertCircle />
+        <AlertCircle />
         <AlertTitle>Your max CPU usage has exceeded 80%</AlertTitle>
         <AlertDescription_Shadcn_>
           High CPU usage could result in slower queries, disruption of daily back up routines, and
@@ -36,7 +37,7 @@ const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => 
   if (severity === 'critical') {
     return (
       <Alert_Shadcn_ variant="destructive">
-        <IconAlertCircle />
+        <AlertCircle />
         <AlertTitle>Your max CPU usage has reached 100%</AlertTitle>
         <AlertDescription_Shadcn_>
           High CPU usage could result in slower queries, disruption of daily back up routines, and
