@@ -31,6 +31,11 @@ import {
   WarningIcon,
   AlertTitle_Shadcn_,
   AlertDescription_Shadcn_,
+  RadioGroupStacked,
+  FormItem_Shadcn_,
+  RadioGroupStackedItem,
+  RadioGroupCard,
+  RadioGroupCardItem,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
@@ -117,6 +122,81 @@ export function DiskMangementPanelForm() {
                   name="storageType"
                   control={form.control}
                   render={({ field }) => (
+                    <>
+                      <FormItemLayout layout="horizontal" label="Storage type">
+                        <FormControl_Shadcn_>
+                          <RadioGroupCard
+                            className="flex flex-wrap gap-3"
+                            {...field}
+                            onValueChange={(value) => field.onChange(value)}
+                          >
+                            <FormItem_Shadcn_ asChild>
+                              <FormControl_Shadcn_>
+                                <RadioGroupCardItem
+                                  className="grow p-3 px-5"
+                                  value="gp3"
+                                  showIndicator={false}
+                                  // @ts-ignore
+                                  label={
+                                    <div className="flex flex-col gap-1">
+                                      <div className="flex gap-3 items-center">
+                                        <span className="text-sm">General Purpose SSD</span>{' '}
+                                        <div>
+                                          <Badge
+                                            variant={'outline'}
+                                            className="font-mono bg-alternative bg-opacity-100"
+                                          >
+                                            gp3
+                                          </Badge>
+                                        </div>
+                                      </div>
+                                      <p className="text-foreground-light">
+                                        gp3 provides a balance between price and performance
+                                      </p>
+                                    </div>
+                                  }
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItem_Shadcn_>
+                            <FormItem_Shadcn_ asChild>
+                              <FormControl_Shadcn_>
+                                <RadioGroupCardItem
+                                  className="grow p-3 px-5"
+                                  value="io2"
+                                  showIndicator={false}
+                                  // @ts-ignore
+                                  label={
+                                    <div className="flex flex-col gap-1">
+                                      <div className="flex gap-3 items-center">
+                                        <span className="text-sm">Provisioned IOPS SSD</span>{' '}
+                                        <div>
+                                          <Badge
+                                            variant={'outline'}
+                                            className="font-mono bg-alternative bg-opacity-100"
+                                          >
+                                            io2
+                                          </Badge>
+                                        </div>
+                                      </div>
+                                      <p className="text-foreground-light">
+                                        `io2` offers high IOPS for mission-critical applications.
+                                      </p>
+                                    </div>
+                                  }
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItem_Shadcn_>
+                          </RadioGroupCard>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    </>
+                  )}
+                />
+
+                {/* <FormField_Shadcn_
+                  name="storageType"
+                  control={form.control}
+                  render={({ field }) => (
                     <FormItemLayout
                       label="Storage type"
                       description="Select the type of storage you want to use. `gp3` provides a balance between price and performance, while `io2` offers high IOPS for mission-critical applications."
@@ -149,7 +229,7 @@ export function DiskMangementPanelForm() {
                       </Select>
                     </FormItemLayout>
                   )}
-                />
+                /> */}
                 <FormField_Shadcn_
                   control={form.control}
                   name="provisionedIOPS"
