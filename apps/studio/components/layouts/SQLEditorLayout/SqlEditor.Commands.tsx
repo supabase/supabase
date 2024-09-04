@@ -321,14 +321,14 @@ function TableSelector() {
                 <CommandItem_Shadcn_
                   key={table.id}
                   className={generateCommandClassNames(false)}
-                  value={escapeAttributeSelector(formatTableIdentifier(table))}
+                  value={escapeAttributeSelector(`${table.schema}.${table.name}`)}
                   onSelect={() => {
                     router.push(
                       `/project/${project?.ref ?? '_'}/sql/new?content=${encodeURIComponent(generateSelectStatement(table))}`
                     )
                   }}
                 >
-                  {formatTableIdentifier(table)}
+                  {`${table.schema}.${table.name}`}
                 </CommandItem_Shadcn_>
               ))}
             </CommandGroup_Shadcn_>
