@@ -36,17 +36,14 @@ const EventListItem = ({ event }: Props) => {
     <Link
       href={event.disable_page_build ? event.link?.href ?? '' : event.path}
       target={event.disable_page_build ? event.link?.target ?? '' : '_self'}
-      className="group flex flex-col lg:grid lg:grid-cols-9 xl:grid-cols-12 w-full py-2 sm:py-4 h-full border-b"
+      className="group flex flex-col lg:grid lg:grid-cols-10 2xl:grid-cols-12 w-full py-2 sm:py-4 h-full border-b"
     >
-      <div className="flex w-full lg:col-span-7 xl:col-span-8">
+      <div className="flex w-full lg:col-span-7 2xl:col-span-9">
         <h3 className="text-foreground text-lg group-hover:underline">{event.title}</h3>
       </div>
-      <div className="lg:col-span-2 xl:col-span-3 flex justify-start items-center lg:grid grid-cols-2 xl:grid-cols-2 gap-2 text-sm">
+      <div className="lg:col-span-3 xl:col-span-3 flex justify-between items-center grid-cols-2 gap-2 text-sm">
         {event.categories && (
-          <div className="hidden xl:flex gap-2 text-foreground-lighter flex-grow group-hover:text-foreground-light">
-            {/* {event.onDemand && (
-              <Badge className="group-hover:border-foreground-muted capitalize">On Demand</Badge>
-            )} */}
+          <div className="hidden xl:flex gap-2 text-foreground-lighter group-hover:text-foreground-light">
             {event.categories.map(
               (category, i) =>
                 i === 0 && (
@@ -58,17 +55,17 @@ const EventListItem = ({ event }: Props) => {
           </div>
         )}
         {event.date && (
-          <p className="text-foreground-lighter text-nowrap group-hover:text-foreground-light min-w-40 flex items-center gap-1.5 flex-1 w-full">
+          <p className="text-foreground-lighter lg:text-right flex-grow lg:w-full text-nowrap group-hover:text-foreground-light min-w-40 inline-flex items-center lg:justify-end gap-1.5 flex-1 w-full">
             {dayjs(event.date)
               .tz(event.timezone ?? 'America/Los_Angeles')
               .format('DD MMM YYYY')}
-            <span className="w-px h-[16px] bg-muted" />
+            <span className="min-w-px h-[16px] bg-muted" />
             <span className="">
               {dayjs(event.date)
                 .tz(event.timezone ?? 'America/Los_Angeles')
                 .format('hA')}
             </span>
-            <span className="w-px h-[16px] bg-muted" />
+            <span className="min-w-px h-[16px] bg-muted" />
             {dayjs(event.date)
               .tz(event.timezone ?? 'America/Los_Angeles')
               .format('z')}

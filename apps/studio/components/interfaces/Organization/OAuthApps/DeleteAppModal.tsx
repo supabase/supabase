@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useOAuthAppDeleteMutation } from 'data/oauth/oauth-app-delete-mutation'

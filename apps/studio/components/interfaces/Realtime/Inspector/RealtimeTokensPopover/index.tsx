@@ -1,7 +1,7 @@
 import { useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectApiQuery } from 'data/config/project-api-query'
