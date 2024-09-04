@@ -1,6 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronRight, RotateCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -10,39 +12,32 @@ import {
   CardContent,
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogSection,
-  DialogTitle,
   DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Input_Shadcn_ as Input,
-  Select_Shadcn_ as Select,
-  SelectContent_Shadcn_ as SelectContent,
-  SelectItem_Shadcn_ as SelectItem,
-  SelectTrigger_Shadcn_ as SelectTrigger,
-  SelectValue_Shadcn_ as SelectValue,
-  Separator,
-  DialogFooter,
-  DialogDescription,
-  DialogTrigger,
-  Alert_Shadcn_,
-  WarningIcon,
-  AlertTitle_Shadcn_,
-  AlertDescription_Shadcn_,
-  RadioGroupStacked,
   FormItem_Shadcn_,
-  RadioGroupStackedItem,
+  Input_Shadcn_ as Input,
   RadioGroupCard,
   RadioGroupCardItem,
+  Separator,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
-import { AnimatePresence, motion } from 'framer-motion'
-import { RotateCcw, ArrowRight, ChevronRight } from 'lucide-react'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { DiskCountdownRadial } from './DiskCountdownRadial'
+import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
 
 export function DiskMangementPanelForm() {
   const [usedSize, setUsedSize] = useState<number>(4)
