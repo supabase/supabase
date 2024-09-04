@@ -85,19 +85,6 @@ export function DiskMangementPanelForm() {
     }
   }, [storageType, allocatedStorage, setValue, form])
 
-  // Dynamic adjustment based on storageType and allocatedStorage
-  //   useEffect(() => {
-  //     // if (storageType === 'Provisioned IOPS SSD (io2)') {
-  //     //   setValue('allocatedStorage', Math.max(20, Math.min(allocatedStorage, 6144))) // Ensure min/max for 'io2'
-  //     //   setValue('throughput', undefined) // Throughput is not applicable for 'io2'
-  //     // } else {
-  //     //   setValue('allocatedStorage', Math.max(20, Math.min(allocatedStorage, 6144))) // Ensure min/max for 'gp3'
-  //     //   if (allocatedStorage < 400) {
-  //     //     setValue('throughput', 125) // Fixed throughput for allocatedStorage < 400 GiB
-  //     //   }
-  //     // }
-  //   }, [storageType, allocatedStorage, setValue])
-
   const onSubmit = (data) => {
     console.log('Form submitted:', data)
   }
@@ -109,6 +96,21 @@ export function DiskMangementPanelForm() {
 
   // Check if 'allocatedStorage' is dirty
   const isAllocatedStorageDirty = !!dirtyFields.allocatedStorage
+
+  const calculateDiskSizePrice = () => {
+    const newSize = form.getValues('allocatedStorage')
+    const oldSize = form.formState.defaultValues?.allocatedStorage || 0
+    const pricePerGiB = form.getValues('storageType') === 'io2' ? 0.125 : 0.08
+    return ((newSize - Math.max(oldSize, 8)) * pricePerGiB).toFixed(2)
+  }
+
+  const calculateIOPSPrice = () => {
+    return (form.getValues('provisionedIOPS') * 0.065).toFixed(2)
+  }
+
+  const calculateThroughputPrice = () => {
+    return (form.getValues('throughput') * 0.04).toFixed(2)
+  }
 
   return (
     <div>
@@ -128,7 +130,11 @@ export function DiskMangementPanelForm() {
                           <RadioGroupCard
                             className="flex flex-wrap gap-3"
                             {...field}
-                            onValueChange={(value) => field.onChange(value)}
+                            onValueChange={async (e) => {
+                              field.onChange(e)
+                              await form.trigger('provisionedIOPS') // only trigger provisionedIOPS due to other input being hidden
+                            }}
+                            defaultValue={field.value}
                           >
                             <FormItem_Shadcn_ asChild>
                               <FormControl_Shadcn_>
@@ -192,44 +198,6 @@ export function DiskMangementPanelForm() {
                     </>
                   )}
                 />
-
-                {/* <FormField_Shadcn_
-                  name="storageType"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Storage type"
-                      description="Select the type of storage you want to use. `gp3` provides a balance between price and performance, while `io2` offers high IOPS for mission-critical applications."
-                      layout="horizontal"
-                    >
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <SelectTrigger id="storageType" className="w-full max-w-96">
-                          <FormControl_Shadcn_>
-                            <SelectValue placeholder="Select storage type" />
-                          </FormControl_Shadcn_>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="gp3">
-                            <div className="flex gap-2 items-center">
-                              <span>General Purpose SSD (gp3)</span>{' '}
-                              <Badge variant={'outline'} className="font-mono">
-                                gp3
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="io2" className="flex flex-row gap-3">
-                            <div className="flex gap-2 items-center">
-                              <span>Provisioned IOPS SSD</span>{' '}
-                              <Badge variant={'outline'} className="font-mono">
-                                io2
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItemLayout>
-                  )}
-                /> */}
                 <FormField_Shadcn_
                   control={form.control}
                   name="provisionedIOPS"
@@ -245,29 +213,58 @@ export function DiskMangementPanelForm() {
                       //   labelOptional="GiB ratio must be between 0.5 and 1,000"
                       labelOptional="Input/output operations per second. Higher IOPS is suitable for applications requiring high throughput."
                     >
-                      <div className="flex -space-x-px max-w-48">
-                        <FormControl_Shadcn_>
-                          <Input
-                            id="provisionedIOPS"
-                            type="number"
-                            className="flex-grow font-mono rounded-r-none"
-                            {...field}
-                            onChange={(e) => {
-                              setValue('provisionedIOPS', e.target.valueAsNumber, {
-                                shouldDirty: true,
-                                shouldValidate: true,
-                              })
-                            }}
-                          />
-                        </FormControl_Shadcn_>
-                        <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
-                          <span className="text-foreground-lighter text-xs font-mono">IOPS</span>
+                      <div className="flex gap-3 items-center">
+                        <div className="flex -space-x-px">
+                          <FormControl_Shadcn_>
+                            <Input
+                              id="provisionedIOPS"
+                              type="number"
+                              className="flex-grow font-mono rounded-r-none max-w-32"
+                              {...field}
+                              onChange={(e) => {
+                                setValue('provisionedIOPS', e.target.valueAsNumber, {
+                                  shouldDirty: true,
+                                  shouldValidate: true,
+                                })
+                              }}
+                            />
+                          </FormControl_Shadcn_>
+                          <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
+                            <span className="text-foreground-lighter text-xs font-mono">IOPS</span>
+                          </div>
                         </div>
+                        <AnimatePresence>
+                          {(storageType === 'io2' ||
+                            (storageType === 'gp3' && field.value > 3000)) &&
+                            !formState.errors.provisionedIOPS && (
+                              <motion.div
+                                initial={{ opacity: 0, x: -4 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -4 }}
+                                transition={{ duration: 0.15 }}
+                              >
+                                <Badge variant="default" className="bg-alternative bg-opacity-100">
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-xs font-mono text-foreground-muted">
+                                      ${calculateIOPSPrice()}
+                                    </span>
+                                    <ChevronRight
+                                      size={12}
+                                      strokeWidth={2}
+                                      className="text-foreground-muted"
+                                    />
+                                    <span className="text-xs font-mono text-foreground">
+                                      ${calculateIOPSPrice()}
+                                    </span>
+                                  </div>
+                                </Badge>
+                              </motion.div>
+                            )}
+                        </AnimatePresence>
                       </div>
                     </FormItemLayout>
                   )}
                 />
-
                 <AnimatePresence initial={false}>
                   {form.getValues('storageType') === 'gp3' && (
                     <motion.div
@@ -289,26 +286,59 @@ export function DiskMangementPanelForm() {
                               'Throughput can only be configured when Disk size is greater than 400 GiB.'
                             }
                           >
-                            <div className="flex -space-x-px max-w-48">
-                              <FormControl_Shadcn_>
-                                <Input
-                                  type="number"
-                                  {...field}
-                                  onChange={(e) => {
-                                    setValue('throughput', e.target.valueAsNumber, {
-                                      shouldDirty: true,
-                                      shouldValidate: true,
-                                    })
-                                  }}
-                                  className="flex-grow font-mono rounded-r-none"
-                                  disabled={storageType === 'io2' || allocatedStorage < 400} // Disable if storageType is 'io2' or allocatedStorage < 400
-                                />
-                              </FormControl_Shadcn_>
-                              <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
-                                <span className="text-foreground-lighter text-xs font-mono">
-                                  MiBps
-                                </span>
+                            <div className="flex gap-3 items-center">
+                              <div className="flex -space-x-px">
+                                <FormControl_Shadcn_>
+                                  <Input
+                                    type="number"
+                                    {...field}
+                                    onChange={(e) => {
+                                      setValue('throughput', e.target.valueAsNumber, {
+                                        shouldDirty: true,
+                                        shouldValidate: true,
+                                      })
+                                    }}
+                                    className="flex-grow font-mono rounded-r-none max-w-32"
+                                    disabled={storageType === 'io2' || allocatedStorage < 400} // Disable if storageType is 'io2' or allocatedStorage < 400
+                                  />
+                                </FormControl_Shadcn_>
+                                <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
+                                  <span className="text-foreground-lighter text-xs font-mono">
+                                    MiBps
+                                  </span>
+                                </div>
                               </div>
+                              <AnimatePresence>
+                                {formState.isDirty &&
+                                formState.dirtyFields.throughput &&
+                                !formState.errors.throughput ? (
+                                  <motion.div
+                                    initial={{ opacity: 0, x: -4 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -4 }}
+                                    transition={{ duration: 0.15 }}
+                                  >
+                                    <Badge
+                                      variant="default"
+                                      className="bg-alternative bg-opacity-100"
+                                    >
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-xs font-mono text-foreground-muted">
+                                          ${calculateThroughputPrice()}
+                                        </span>
+                                        <ChevronRight
+                                          size={12}
+                                          strokeWidth={2}
+                                          className="text-foreground-muted"
+                                        />
+                                        <span className="text-xs font-mono text-foreground">
+                                          ${calculateThroughputPrice()}
+                                        </span>
+                                      </div>
+                                    </Badge>
+                                  </motion.div>
+                                ) : null}
+                              </AnimatePresence>
                             </div>
                           </FormItemLayout>
                         )}
@@ -389,6 +419,35 @@ export function DiskMangementPanelForm() {
                             </motion.div>
                           )}
                         </AnimatePresence>
+
+                        <AnimatePresence>
+                          {formState.isDirty &&
+                          formState.dirtyFields.allocatedStorage &&
+                          !formState.errors.allocatedStorage ? (
+                            <motion.div
+                              initial={{ opacity: 0, x: -4 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: -4 }}
+                              transition={{ duration: 0.15 }}
+                            >
+                              <Badge variant="default" className="bg-alternative bg-opacity-100">
+                                <div className="flex items-center gap-1">
+                                  <span className="text-xs font-mono text-foreground-muted">
+                                    ${calculateDiskSizePrice()}
+                                  </span>
+                                  <ChevronRight
+                                    size={12}
+                                    strokeWidth={2}
+                                    className="text-foreground-muted"
+                                  />
+                                  <span className="text-xs font-mono text-foreground">
+                                    ${calculateDiskSizePrice()}
+                                  </span>
+                                </div>
+                              </Badge>
+                            </motion.div>
+                          ) : null}
+                        </AnimatePresence>
                       </div>
                     </FormItemLayout>
                   )}
@@ -425,13 +484,15 @@ export function DiskMangementPanelForm() {
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <DiskCountdownRadial className="px-2 rounded-none" />
+                  <DiskCountdownRadial
+                    className="px-2 rounded-none"
+                    setShowTimer={setStateShowTimer}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <AnimatePresence>
-              {/* if form is dirty then show this*/}
+            {/* <AnimatePresence>
               {Object.keys(formState.dirtyFields).length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
@@ -453,7 +514,7 @@ export function DiskMangementPanelForm() {
                   </Alert_Shadcn_>
                 </motion.div>
               )}
-            </AnimatePresence>
+            </AnimatePresence> */}
 
             <Card className="bg-surface-100 rounded-t-none">
               <CardContent className="flex items-center pb-0 py-3 px-8 gap-3 justify-end">
@@ -562,11 +623,7 @@ export function DiskMangementPanelForm() {
                                   <span className="font-mono text-foreground-muted">$0.00</span>
                                   <ChevronRight size={12} className="text-foreground-muted" />
                                   <span className="font-mono text-foreground">
-                                    $
-                                    {(
-                                      (form.getValues('allocatedStorage') - 8) *
-                                      (form.getValues('storageType') === 'io2' ? 0.125 : 0.08)
-                                    ).toFixed(2)}
+                                    ${calculateDiskSizePrice()}
                                   </span>
                                 </Badge>
                               </div>
@@ -599,7 +656,7 @@ export function DiskMangementPanelForm() {
                                   <span className="font-mono text-foreground-muted">$0.00</span>
                                   <ChevronRight size={12} className="text-foreground-muted" />
                                   <span className="font-mono text-foreground">
-                                    ${(form.getValues('provisionedIOPS') * 0.065).toFixed(2)}
+                                    ${calculateIOPSPrice()}
                                   </span>
                                 </Badge>
                               </div>
@@ -632,7 +689,7 @@ export function DiskMangementPanelForm() {
                                   <span className="font-mono text-foreground-muted">$0.00</span>
                                   <ChevronRight size={12} className="text-foreground-muted" />
                                   <span className="font-mono text-foreground">
-                                    ${(form.getValues('throughput') * 0.04).toFixed(2)}
+                                    ${calculateThroughputPrice()}
                                   </span>
                                 </Badge>
                               </div>
@@ -644,6 +701,7 @@ export function DiskMangementPanelForm() {
                       <DialogSection>Warning here about the 6 hour thing</DialogSection>
 
                       <DialogSectionSeparator />
+
                       <DialogSection className="bg-surface-100 text-sm text-foreground-light">
                         <p>Disk configuration changes will take effect after the next restart.</p>
                       </DialogSection>

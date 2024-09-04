@@ -21,15 +21,18 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function DiskCountdownRadial(props: any) {
-  const TOTAL_TIME = 20 // 6 hours in seconds
+export function DiskCountdownRadial({ setShowTimer, ...props }: any) {
+  const TOTAL_TIME = 5 // 6 hours in seconds
   const [remainingTime, setRemainingTime] = useState(TOTAL_TIME)
-
   useEffect(() => {
     const timer = setInterval(() => {
       setRemainingTime((prevTime) => {
-        if (prevTime <= 0) {
+        if (prevTime <= 1) {
           clearInterval(timer)
+          // Wait for 3 seconds before hiding the timer
+          setTimeout(() => {
+            setShowTimer(false)
+          }, 3000)
           return 0
         }
         return prevTime - 1
@@ -37,7 +40,7 @@ export function DiskCountdownRadial(props: any) {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [])
+  }, [setShowTimer])
 
   const hours = Math.floor(remainingTime / 3600)
   const minutes = Math.floor((remainingTime % 3600) / 60)

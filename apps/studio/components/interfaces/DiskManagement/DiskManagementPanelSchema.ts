@@ -4,20 +4,11 @@ const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
   allocatedStorage: z
     .number()
-    .min(8, { message: 'Allocated storage must be at least 8 GiB for gp3' })
-    .max(16384, { message: 'Allocated storage must not exceed 16 TiB for gp3' })
+    .min(8, { message: 'Allocated storage must be at least 8 GiB.' })
+    .max(16384, { message: 'Allocated storage must not exceed 16 TiB.' })
     .describe('Allocated storage size in GiB'),
-  provisionedIOPS: z
-    .number()
-    .min(3000, { message: 'Provisioned IOPS must be at least 3000 for gp3' })
-    .max(16000, { message: 'Provisioned IOPS must not exceed 16000 for gp3' })
-    .describe('Provisioned IOPS for gp3'),
-  throughput: z
-    .number()
-    .min(125, { message: 'Throughput must be at least 125 MiBps for gp3' })
-    .max(1000, { message: 'Throughput must not exceed 1000 MiBps for gp3' })
-    .optional()
-    .describe('Throughput in MiBps for gp3'),
+  provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
+  throughput: z.number().optional().describe('Throughput in MiBps for gp3'),
 })
 
 export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
@@ -25,13 +16,6 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
 
   if (storageType === 'io2') {
     // Validation rules for io2
-    if (allocatedStorage < 8 || allocatedStorage > 16384) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Allocated storage must be between 8 GiB and 16 TiB for io2.',
-        path: ['allocatedStorage'],
-      })
-    }
     if (provisionedIOPS < 100 || provisionedIOPS > 256000) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -48,13 +32,6 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
     }
   } else if (storageType === 'gp3') {
     // Validation rules for gp3
-    if (allocatedStorage < 8 || allocatedStorage > 16384) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Allocated storage must be between 8 GiB and 16 TiB for gp3.',
-        path: ['allocatedStorage'],
-      })
-    }
     if (provisionedIOPS < 3000 || provisionedIOPS > 16000) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -75,8 +52,7 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message:
-          'Throughput must be between 125 and 1000 MiBps for allocated storage >= 400 GiB for gp3.',
+        message: 'Throughput must be set between 125 and 1000 MiBps.',
         path: ['throughput'],
       })
     }
