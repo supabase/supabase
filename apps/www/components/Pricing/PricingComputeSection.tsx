@@ -82,7 +82,7 @@ const PricingComputeSection = () => {
                 <p className="text-[13px] text-foreground-lighter">
                   Read more on{' '}
                   <Link
-                    href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                    href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
                     target="_blank"
                     className="transition text-brand hover:text-brand-600"
                   >

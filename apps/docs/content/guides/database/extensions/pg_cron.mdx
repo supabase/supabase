@@ -129,8 +129,9 @@ select
     select
       net.http_post(
           url:='https://project-ref.supabase.co/functions/v1/function-name',
-          headers:='{"Content-Type": "application/json", "Authorization": "Bearer YOUR_ANON_KEY"}'::jsonb,
-          body:=concat('{"time": "', now(), '"}')::jsonb
+          headers:=jsonb_build_object('Content-Type','application/json', 'Authorization', 'Bearer ' || 'YOUR_ANON_KEY'),
+          body:=jsonb_build_object('time', now() ),
+          timeout_milliseconds:=5000
       ) as request_id;
     $$
   );

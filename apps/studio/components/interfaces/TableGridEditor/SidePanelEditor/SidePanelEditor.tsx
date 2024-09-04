@@ -2,10 +2,9 @@ import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ToastLoader } from 'components/ui/ToastLoader'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -21,6 +20,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary } from 'types'
+import { SonnerProgress } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ColumnEditor from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
@@ -513,7 +513,7 @@ const SidePanelEditor = ({
         selectedHeaders,
         (progress: number) => {
           toast.loading(
-            <ToastLoader
+            <SonnerProgress
               progress={progress}
               message={`Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`}
             />,
@@ -535,7 +535,7 @@ const SidePanelEditor = ({
         selectedHeaders,
         (progress: number) => {
           toast.loading(
-            <ToastLoader
+            <SonnerProgress
               progress={progress}
               message={`Adding ${importContent.rows.length.toLocaleString()} rows to ${
                 selectedTable.name

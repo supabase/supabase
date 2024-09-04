@@ -77,7 +77,7 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
             },
             {
               name: 'Usage-billing for Compute',
-              url: 'https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute',
+              url: 'https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
             },
           ],
         }}

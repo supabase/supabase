@@ -3,7 +3,7 @@ import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } fr
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
@@ -125,6 +125,12 @@ export const SQLEditorTreeViewItem = ({
                   router.push(`/project/${ref}/sql/${element.id}`)
                 }
               } else {
+                // Prevent expanding folder while editing text
+                // as the user may double click to select etc
+                if (isEditing) {
+                  return
+                }
+
                 onClick(e)
                 if (!isExpanded) onOpenFolder(element.id)
               }

@@ -2579,4 +2579,17 @@ module.exports = [
     source: '/launchweek',
     destination: '/launch-week',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/enterprise-billing',
+    destination: '/docs/guides/platform/org-based-billing',
+  },
+
+  // marketing
+
+  {
+    permanent: true,
+    source: '/changelogpod',
+    destination: 'https://forms.supabase.com/changelog-podcast-sponsorship',
+  },
 ]

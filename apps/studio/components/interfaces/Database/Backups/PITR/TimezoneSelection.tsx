@@ -5,6 +5,7 @@ import {
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
+  CommandList_Shadcn_,
   Command_Shadcn_,
   IconGlobe,
   PopoverContent_Shadcn_,
@@ -51,34 +52,36 @@ export const TimezoneSelection = ({
         <PopoverContent_Shadcn_ className="w-[350px] p-0">
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Search timezone..." className="h-9" />
-            <CommandEmpty_Shadcn_> No timezones found</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
-              <ScrollArea className="h-72">
-                {timezoneOptions.map((option) => (
-                  <CommandItem_Shadcn_
-                    key={option}
-                    value={option}
-                    onSelect={(text) => {
-                      const selectedTimezone = ALL_TIMEZONES.find(
-                        (option) => option.text.toLocaleLowerCase() === text
-                      )
-                      if (selectedTimezone) {
-                        onSelectTimezone(selectedTimezone)
-                        setOpen(false)
-                      }
-                    }}
-                  >
-                    {option}
-                    <CheckIcon
-                      className={cn(
-                        'ml-auto h-4 w-4',
-                        selectedTimezone.text === option ? 'opacity-100' : 'opacity-0'
-                      )}
-                    />
-                  </CommandItem_Shadcn_>
-                ))}
-              </ScrollArea>
-            </CommandGroup_Shadcn_>
+            <CommandList_Shadcn_>
+              <CommandEmpty_Shadcn_>No timezones found...</CommandEmpty_Shadcn_>
+              <CommandGroup_Shadcn_>
+                <ScrollArea className="h-72">
+                  {timezoneOptions.map((option) => (
+                    <CommandItem_Shadcn_
+                      key={option}
+                      value={option}
+                      onSelect={(text) => {
+                        const selectedTimezone = ALL_TIMEZONES.find(
+                          (option) => option.text.toLocaleLowerCase() === text
+                        )
+                        if (selectedTimezone) {
+                          onSelectTimezone(selectedTimezone)
+                          setOpen(false)
+                        }
+                      }}
+                    >
+                      {option}
+                      <CheckIcon
+                        className={cn(
+                          'ml-auto h-4 w-4',
+                          selectedTimezone.text === option ? 'opacity-100' : 'opacity-0'
+                        )}
+                      />
+                    </CommandItem_Shadcn_>
+                  ))}
+                </ScrollArea>
+              </CommandGroup_Shadcn_>
+            </CommandList_Shadcn_>
           </Command_Shadcn_>
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>

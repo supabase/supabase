@@ -11,6 +11,8 @@ export interface Organization {
   subscription_id?: string | null
   restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
   restriction_data: Record<string, never>
+  managed_by: 'supabase' | 'vercel-marketplace' | 'aws-marketplace'
+  partner_id?: string
 }
 
 /**

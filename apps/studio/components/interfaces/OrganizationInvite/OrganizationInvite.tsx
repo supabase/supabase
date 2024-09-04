@@ -1,7 +1,7 @@
 import { CheckSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useOrganizationAcceptInvitationMutation } from 'data/organization-members/organization-invitation-accept-mutation'
