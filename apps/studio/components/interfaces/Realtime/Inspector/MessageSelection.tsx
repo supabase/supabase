@@ -1,12 +1,13 @@
 import { useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
-import { Button, IconX, cn } from 'ui'
+import { Button, cn } from 'ui'
 
 import CopyButton from 'components/ui/CopyButton'
 import Telemetry from 'lib/telemetry'
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
+import { X } from 'lucide-react'
 
 export interface MessageSelectionProps {
   log: LogData | null
@@ -92,7 +93,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
               className="cursor-pointer transition hover:text-scale-1200 h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
-              <IconX size={14} strokeWidth={2} className="text-scale-900" />
+              <X size={14} strokeWidth={2} className="text-scale-900" />
             </Button>
           </div>
           <div className="h-px w-full bg-scale-600 rounded" />

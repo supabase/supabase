@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { IconStar } from 'ui'
+import { Star } from 'lucide-react'
+import Link from 'next/link'
 
 import Panel from '~/components/Panel'
 
@@ -59,7 +59,7 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
             </div>
             <div className="flex items-center gap-1">
               <span>{repo.stargazers_count.toLocaleString()}</span>
-              <IconStar className="w-4 fill-foreground-lighter stroke-none" />
+              <Star className="w-4 fill-foreground-lighter stroke-none" />
             </div>
           </div>
         </div>

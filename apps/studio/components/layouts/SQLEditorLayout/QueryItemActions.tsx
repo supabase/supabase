@@ -109,7 +109,7 @@ export const QueryItemActions = ({
             <Button
               type="text"
               className="px-1 text-lighter data-[state=open]:text-foreground"
-              icon={<MoreHorizontal size={14} strokeWidth={2} />}
+              icon={<MoreHorizontal strokeWidth={2} />}
               onClick={(e) => e.preventDefault()}
             />
           </DropdownMenuTrigger>

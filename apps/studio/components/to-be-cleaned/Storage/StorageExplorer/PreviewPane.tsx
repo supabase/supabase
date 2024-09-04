@@ -2,25 +2,19 @@ import { Transition } from '@headlessui/react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isEmpty } from 'lodash'
+import { AlertCircle, ChevronDown, Clipboard, Download, Loader, Trash2, X } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { Trash2 } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconAlertCircle,
-  IconChevronDown,
-  IconClipboard,
-  IconDownload,
-  IconLoader,
-  IconX,
 } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useCopyUrl } from './useCopyUrl'
@@ -39,7 +33,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType?: string; previewUrl?:
   if (previewUrl === 'loading') {
     return (
       <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
-        <IconLoader size={14} strokeWidth={2} className="animate-spin" />
+        <Loader size={14} strokeWidth={2} className="animate-spin" />
       </div>
     )
   }
@@ -145,7 +139,7 @@ const PreviewPane = () => {
         >
           {/* Preview Header */}
           <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
-            <IconX
+            <X
               className="cursor-pointer"
               size={14}
               strokeWidth={2}
@@ -166,7 +160,7 @@ const PreviewPane = () => {
               <h5 className="break-words text-base text-foreground">{file.name}</h5>
               {file.isCorrupted && (
                 <div className="flex items-center space-x-2">
-                  <IconAlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
+                  <AlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
                   <p className="text-sm text-foreground-light">
                     File is corrupted, please delete and reupload this file again
                   </p>
@@ -196,7 +190,7 @@ const PreviewPane = () => {
             <div className="flex space-x-2 border-b border-overlay pb-4">
               <Button
                 type="default"
-                icon={<IconDownload size={16} strokeWidth={2} />}
+                icon={<Download size={16} strokeWidth={2} />}
                 disabled={file.isCorrupted}
                 onClick={async () => await downloadFile(file)}
               >
@@ -205,7 +199,7 @@ const PreviewPane = () => {
               {selectedBucket.public ? (
                 <Button
                   type="outline"
-                  icon={<IconClipboard size={16} strokeWidth={2} />}
+                  icon={<Clipboard size={16} strokeWidth={2} />}
                   onClick={() => onCopyUrl(file.name, getFileUrl(file))}
                   disabled={file.isCorrupted}
                 >
@@ -216,8 +210,8 @@ const PreviewPane = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       type="outline"
-                      icon={<IconClipboard size={16} strokeWidth={2} />}
-                      iconRight={<IconChevronDown />}
+                      icon={<Clipboard size={16} strokeWidth={2} />}
+                      iconRight={<ChevronDown />}
                       disabled={file.isCorrupted}
                     >
                       Get URL

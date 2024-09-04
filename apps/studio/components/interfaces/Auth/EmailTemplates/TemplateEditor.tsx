@@ -11,16 +11,8 @@ import InformationBox from 'components/ui/InformationBox'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { FormSchema } from 'types'
-import {
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Form,
-  IconCode,
-  IconInfo,
-  IconMonitor,
-  Input,
-  Tabs,
-} from 'ui'
+import { AlertTitle_Shadcn_, Alert_Shadcn_, Form, Input, Tabs } from 'ui'
+import { Code, Monitor, Info } from 'lucide-react'
 
 interface TemplateEditorProps {
   template: FormSchema
@@ -136,7 +128,7 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                       />
                     </div>
                     <Tabs defaultActiveId="source" type="underlined" size="tiny">
-                      <Tabs.Panel id={'source'} icon={<IconCode />} label="Source">
+                      <Tabs.Panel id={'source'} icon={<Code />} label="Source">
                         <div className="relative h-96">
                           <CodeEditor
                             id="code-id"
@@ -149,9 +141,9 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                           />
                         </div>
                       </Tabs.Panel>
-                      <Tabs.Panel id={'preview'} icon={<IconMonitor />} label="Preview">
+                      <Tabs.Panel id={'preview'} icon={<Monitor />} label="Preview">
                         <Alert_Shadcn_ className="mb-2" variant="default">
-                          <IconInfo strokeWidth={1.5} />
+                          <Info strokeWidth={1.5} />
                           <AlertTitle_Shadcn_>
                             The preview may differ slightly from the actual rendering in the email
                             client.
