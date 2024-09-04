@@ -177,6 +177,10 @@ const Products = (props: any) => {
         onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.VECTOR)}
         image={<VectorVisual />}
       />
+      <p className="text-xl sm:text-2xl text-foreground-lighter col-span-full">
+        <span className="text-foreground">Use one or all.</span> Best of breed products. Integrated
+        as a platform.
+      </p>
     </SectionContainer>
   )
 }
