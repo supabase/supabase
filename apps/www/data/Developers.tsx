@@ -1,5 +1,5 @@
+import { Calendar } from 'lucide-react'
 import {
-  Calendar,
   IconBriefcase2,
   IconChangelog,
   IconDiscussions,
