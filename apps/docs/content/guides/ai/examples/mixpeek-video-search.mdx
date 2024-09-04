@@ -98,7 +98,7 @@ def seed():
 
     for chunk in processed_chunks:
         print(f"Processing video chunk: {chunk['start_time']}")
-        
+
         # Generate embedding using Mixpeek
         embed_response = mixpeek.embed.video(
             model_id="vuse-generic-v1",
