@@ -42,6 +42,7 @@ import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelS
 import { AnimatePresence, motion } from 'framer-motion'
 import { RotateCcw, ArrowRight, ChevronRight } from 'lucide-react'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { DiskCountdownRadial } from './DiskCountdownRadial'
 
 export function DiskMangementPanelForm() {
   const [usedSize, setUsedSize] = useState<number>(4)
@@ -461,36 +462,32 @@ export function DiskMangementPanelForm() {
                   <div className="col-span-4">
                     {/* Additional content or information can go here */}
                   </div>
-                  <div className="col-span-8">
-                    <div className="col-span-8">
-                      <div className="space-y-6 mt-6">
-                        <div>
-                          <h3 className="text-sm">Main Disk Space</h3>
-                          <DiskSpaceBar
-                            showNewBar={showNewBar}
-                            totalSize={mainDiskTotal}
-                            usedSize={mainDiskUsed}
-                            newTotalSize={
-                              form.getValues('allocatedStorage') <= totalSize
-                                ? mainDiskTotal
-                                : form.getValues('allocatedStorage')
-                            }
-                          />
-                        </div>
-                        <div>
-                          <h3 className="text-sm">Read Replica Disk Space</h3>
-                          <DiskSpaceBar
-                            showNewBar={showNewBar}
-                            totalSize={mainDiskTotal * 1.25}
-                            usedSize={mainDiskUsed}
-                            newTotalSize={
-                              form.getValues('allocatedStorage') <= totalSize
-                                ? replicaDiskTotal
-                                : form.getValues('allocatedStorage') * 1.25
-                            }
-                          />
-                        </div>
-                      </div>
+                  <div className="col-span-8 space-y-6 mt-6">
+                    <div>
+                      <h3 className="text-sm">Main Disk Space</h3>
+                      <DiskSpaceBar
+                        showNewBar={showNewBar}
+                        totalSize={mainDiskTotal}
+                        usedSize={mainDiskUsed}
+                        newTotalSize={
+                          form.getValues('allocatedStorage') <= totalSize
+                            ? mainDiskTotal
+                            : form.getValues('allocatedStorage')
+                        }
+                      />
+                    </div>
+                    <div>
+                      <h3 className="text-sm">Read Replica Disk Space</h3>
+                      <DiskSpaceBar
+                        showNewBar={showNewBar}
+                        totalSize={mainDiskTotal * 1.25}
+                        usedSize={mainDiskUsed}
+                        newTotalSize={
+                          form.getValues('allocatedStorage') <= totalSize
+                            ? replicaDiskTotal
+                            : form.getValues('allocatedStorage') * 1.25
+                        }
+                      />
                     </div>
                   </div>
                 </div>
@@ -513,30 +510,6 @@ export function DiskMangementPanelForm() {
                 </motion.div>
               )}
             </AnimatePresence>
-
-            {/* <AnimatePresence>
-              {Object.keys(formState.dirtyFields).length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.12, delay: 0.1 }}
-                >
-                  <Alert_Shadcn_
-                    variant="default"
-                    className="bg-studio rounded-none pl-10 [&_svg]:left-8"
-                  >
-                    <WarningIcon />
-                    <AlertTitle_Shadcn_>
-                      Disk configuration changes will cause billing changes
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      You can review the changes and accept them to apply them.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                </motion.div>
-              )}
-            </AnimatePresence> */}
 
             <Card className="bg-surface-100 rounded-t-none">
               <CardContent className="flex items-center pb-0 py-3 px-8 gap-3 justify-end">
