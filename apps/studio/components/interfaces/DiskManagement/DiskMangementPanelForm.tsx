@@ -39,7 +39,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
-import { DiskCountdownRadial } from './DiskCountdownRadial'
 import { AnimatePresence, motion } from 'framer-motion'
 import { RotateCcw, ArrowRight, ChevronRight } from 'lucide-react'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from 'ui'
@@ -67,6 +66,11 @@ export function DiskMangementPanelForm() {
   const { watch, setValue, control, formState } = form
   const storageType = watch('storageType')
   const allocatedStorage = watch('allocatedStorage')
+
+  const [mainDiskUsed, setMainDiskUsed] = useState(4) // GB
+  const [replicaDiskUsed, setReplicaDiskUsed] = useState(1) // GB
+  const mainDiskTotal = totalSize // 75% of total for main disk
+  const replicaDiskTotal = totalSize * 1.25 // 25% of total for read replica
 
   // Watch storageType and allocatedStorage to adjust constraints dynamically
   useEffect(() => {
@@ -348,7 +352,7 @@ export function DiskMangementPanelForm() {
                 </AnimatePresence>
               </CardContent>
               <Separator />
-              <CardContent className="py-10 flex flex-col gap-5 px-8">
+              <CardContent className="py-10 px-8">
                 <FormField_Shadcn_
                   name="allocatedStorage"
                   control={control}
@@ -452,22 +456,40 @@ export function DiskMangementPanelForm() {
                     </FormItemLayout>
                   )}
                 />
-
-                <div className="w-full">
-                  <div className="flex flex-col gap-6 w-full">
-                    <div className="relative gap-2 text-sm grid grid-cols-12">
-                      <div className="col-span-4"></div>
-                      <div className="col-span-8 flex flex-col gap-2">
-                        <DiskSpaceBar
-                          showNewBar={showNewBar}
-                          totalSize={totalSize}
-                          usedSize={usedSize}
-                          newTotalSize={
-                            form.getValues('allocatedStorage') <= totalSize
-                              ? totalSize
-                              : form.getValues('allocatedStorage')
-                          }
-                        />
+                <div className="grid grid-cols-12 gap-3">
+                  {/* You can add additional content in the remaining 4 columns if needed */}
+                  <div className="col-span-4">
+                    {/* Additional content or information can go here */}
+                  </div>
+                  <div className="col-span-8">
+                    <div className="col-span-8">
+                      <div className="space-y-6 mt-6">
+                        <div>
+                          <h3 className="text-sm">Main Disk Space</h3>
+                          <DiskSpaceBar
+                            showNewBar={showNewBar}
+                            totalSize={mainDiskTotal}
+                            usedSize={mainDiskUsed}
+                            newTotalSize={
+                              form.getValues('allocatedStorage') <= totalSize
+                                ? mainDiskTotal
+                                : form.getValues('allocatedStorage')
+                            }
+                          />
+                        </div>
+                        <div>
+                          <h3 className="text-sm">Read Replica Disk Space</h3>
+                          <DiskSpaceBar
+                            showNewBar={showNewBar}
+                            totalSize={mainDiskTotal * 1.25}
+                            usedSize={mainDiskUsed}
+                            newTotalSize={
+                              form.getValues('allocatedStorage') <= totalSize
+                                ? replicaDiskTotal
+                                : form.getValues('allocatedStorage') * 1.25
+                            }
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
