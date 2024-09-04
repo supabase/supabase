@@ -1,7 +1,8 @@
 import type { ProjectInfo } from 'data/projects/projects-query'
 import type { OrgSubscription, ProjectAddon } from 'data/subscriptions/types'
+import { AlertOctagon, MinusCircle, PauseCircle } from 'lucide-react'
 import { PricingInformation } from 'shared-data'
-import { Alert, IconAlertOctagon, IconMinusCircle, IconPauseCircle, Modal } from 'ui'
+import { Alert, Modal } from 'ui'
 
 export interface DowngradeModalProps {
   visible: boolean
@@ -107,7 +108,7 @@ const DowngradeModal = ({
         <ul className="mt-4 space-y-5 text-sm">
           <li className="flex gap-3">
             <div>
-              <IconPauseCircle />
+              <PauseCircle />
             </div>
             <span>Projects will be paused after a week of inactivity</span>
           </li>
@@ -115,14 +116,14 @@ const DowngradeModal = ({
           <li>
             <div className="flex gap-3 mb-2">
               <div>
-                <IconMinusCircle />
+                <MinusCircle />
               </div>
               <span>Add ons from all projects under this organization will be removed.</span>
             </div>
           </li>
 
           <li className="flex gap-3">
-            <IconAlertOctagon w={14} className="flex-shrink-0" />
+            <AlertOctagon size={14} className="flex-shrink-0" />
             <div>
               <strong>Before you downgrade to the {selectedPlan?.name} plan, consider:</strong>
               <ul className="space-y-2 mt-2">

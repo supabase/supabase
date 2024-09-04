@@ -135,13 +135,7 @@ export function SQLOutputActions({ answer, messages, className }: SQLOutputActio
       <CopyToClipboard text={answer?.replace(/```.*/g, '').trim()}>
         <Button
           type="default"
-          icon={
-            showCopied ? (
-              <Check size="tiny" className="text-brand" strokeWidth={2} />
-            ) : (
-              <Clipboard size="tiny" />
-            )
-          }
+          icon={showCopied ? <Check className="text-brand" strokeWidth={2} /> : <Clipboard />}
           onClick={() => setShowCopied(true)}
         >
           {showCopied ? 'Copied' : 'Copy SQL'}
@@ -152,13 +146,7 @@ export function SQLOutputActions({ answer, messages, className }: SQLOutputActio
           type="default"
           loading={isSaving}
           disabled={isSaving}
-          icon={
-            isSaved ? (
-              <Check size="tiny" className="text-brand" strokeWidth={2} />
-            ) : (
-              <Save size="tiny" />
-            )
-          }
+          icon={isSaved ? <Check className="text-brand" strokeWidth={2} /> : <Save />}
           onClick={() => onSelectSaveSnippet()}
         >
           {isSaved ? 'Snippet saved!' : 'Save into new snippet'}

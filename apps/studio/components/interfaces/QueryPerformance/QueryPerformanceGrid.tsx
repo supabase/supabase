@@ -193,7 +193,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
             <Button
               type="text"
               className="absolute top-3 right-3 px-1"
-              icon={<X size={14} />}
+              icon={<X />}
               onClick={() => setSelectedRow(undefined)}
             />
             <Tabs_Shadcn_

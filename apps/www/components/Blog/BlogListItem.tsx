@@ -5,6 +5,7 @@ import React from 'react'
 import type Author from '~/types/author'
 import type PostTypes from '~/types/post'
 import dayjs from 'dayjs'
+import { Badge } from 'ui'
 
 interface Props {
   post: PostTypes
@@ -23,6 +24,8 @@ const BlogListItem = ({ post }: Props) => {
       )
     }
   }
+
+  const sanitizeCategory = (category: string) => category.replaceAll('-', ' ')
 
   return (
     <Link
@@ -54,12 +57,9 @@ const BlogListItem = ({ post }: Props) => {
             {post.categories.map(
               (category, i) =>
                 i === 0 && (
-                  <span
-                    key={category}
-                    className="text-sm border border-muted group-hover:border-foreground-muted py-1 px-3 rounded-full text-center w-auto capitalize"
-                  >
-                    {category}
-                  </span>
+                  <Badge key={category} className="group-hover:border-foreground-muted capitalize">
+                    {sanitizeCategory(category)}
+                  </Badge>
                 )
             )}
           </div>

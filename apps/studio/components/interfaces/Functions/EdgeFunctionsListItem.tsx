@@ -1,8 +1,8 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
+import { Check, Clipboard } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { IconCheck, IconClipboard } from 'ui'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -64,12 +64,12 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
           >
             {isCopied ? (
               <div className="text-brand">
-                <IconCheck size={14} strokeWidth={3} />
+                <Check size={14} strokeWidth={3} />
               </div>
             ) : (
               <div className="relative">
                 <div className="block">
-                  <IconClipboard size={14} strokeWidth={1.5} />
+                  <Clipboard size={14} strokeWidth={1.5} />
                 </div>
               </div>
             )}

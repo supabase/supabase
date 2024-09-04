@@ -1,7 +1,7 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
-import { ExternalLink } from 'lucide-react'
+import { Edit2, ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -14,7 +14,7 @@ import { useOrganizationCreateMutation } from 'data/organizations/organization-c
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import { Button, IconEdit2, IconHelpCircle, Input, Listbox, Toggle } from 'ui'
+import { Button, Input, Listbox, Toggle } from 'ui'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -316,7 +316,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 label={
                   <div className="flex space-x-4">
                     <span>Spend Cap</span>
-                    <IconHelpCircle
+                    <HelpCircle
                       size={16}
                       strokeWidth={1.5}
                       className="transition opacity-50 cursor-pointer hover:opacity-100"
@@ -370,7 +370,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 <div>
                   <Button
                     type="outline"
-                    icon={<IconEdit2 />}
+                    icon={<Edit2 />}
                     onClick={() => resetPaymentMethod()}
                     disabled={newOrgLoading}
                     className="hover:border-muted"

@@ -11,6 +11,8 @@ import CSVButton from 'components/ui/CSVButton'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { Item, Menu, useContextMenu } from 'react-contexify'
+import { createPortal } from 'react-dom'
 import {
   Alert,
   Button,
@@ -18,9 +20,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconEye,
-  IconEyeOff,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -37,8 +36,6 @@ import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
-import { createPortal } from 'react-dom'
-import { Item, Menu, useContextMenu } from 'react-contexify'
 
 interface Props {
   data?: Array<LogData | Object>

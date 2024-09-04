@@ -5,15 +5,9 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useState } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ConfirmDisableReadOnlyModeModal from './DatabaseSettings/ConfirmDisableReadOnlyModal'
+import { AlertTriangle, ExternalLink } from 'lucide-react'
 
 export const DatabaseReadOnlyAlert = () => {
   const { ref: projectRef } = useParams()
@@ -31,7 +25,7 @@ export const DatabaseReadOnlyAlert = () => {
     <>
       {isReadOnlyMode && (
         <Alert_Shadcn_ variant="destructive">
-          <IconAlertTriangle />
+          <AlertTriangle />
           <AlertTitle_Shadcn_>
             Project is in read-only mode and database is no longer accepting write requests
           </AlertTitle_Shadcn_>
@@ -64,7 +58,7 @@ export const DatabaseReadOnlyAlert = () => {
             <Button type="default" onClick={() => setShowConfirmationModal(true)}>
               Disable read-only mode
             </Button>
-            <Button asChild type="default" icon={<IconExternalLink />}>
+            <Button asChild type="default" icon={<ExternalLink />}>
               <a
                 href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
                 target="_blank"

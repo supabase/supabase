@@ -1,5 +1,6 @@
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { Button, IconDownload, IconTrash2, IconMove, IconX } from 'ui'
+import { X, Download, Trash2, Move } from 'lucide-react'
+import { Button } from 'ui'
 
 const FileExplorerHeaderSelection = () => {
   const storageExplorerStore = useStorageStore()
@@ -15,7 +16,7 @@ const FileExplorerHeaderSelection = () => {
   return (
     <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow [[data-theme*=dark]_&]:bg-brand-500">
       <Button
-        icon={<IconX size={16} strokeWidth={2} />}
+        icon={<X size={16} strokeWidth={2} />}
         type="text"
         onClick={() => clearSelectedItems()}
       />
@@ -25,7 +26,7 @@ const FileExplorerHeaderSelection = () => {
           selected
         </p>
         <Button
-          icon={<IconDownload size={16} strokeWidth={2} />}
+          icon={<Download size={16} strokeWidth={2} />}
           type="primary"
           onClick={async () => {
             if (selectedItems.length === 1) {
@@ -39,14 +40,14 @@ const FileExplorerHeaderSelection = () => {
         </Button>
         <div className="border-r border-green-900 py-3 opacity-50" />
         <Button
-          icon={<IconTrash2 size={16} strokeWidth={2} />}
+          icon={<Trash2 size={16} strokeWidth={2} />}
           type="primary"
           onClick={() => setSelectedItemsToDelete(selectedItems)}
         >
           Delete
         </Button>
         <Button
-          icon={<IconMove size={16} strokeWidth={2} />}
+          icon={<Move size={16} strokeWidth={2} />}
           type="primary"
           onClick={() => setSelectedItemsToMove(selectedItems)}
         >
