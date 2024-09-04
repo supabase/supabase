@@ -249,12 +249,7 @@ const PlanUpdateSidePanel = () => {
                       <ButtonTooltip
                         block
                         type={isDowngradeOption ? 'default' : 'primary'}
-                        disabled={
-                          subscription?.plan?.id === 'enterprise' ||
-                          !canUpdateSubscription ||
-                          (plan.id === 'tier_team' &&
-                            selectedOrganization?.managed_by === 'vercel-marketplace')
-                        }
+                        disabled={subscription?.plan?.id === 'enterprise' || !canUpdateSubscription}
                         onClick={() => setSelectedTier(plan.id as any)}
                         tooltip={{
                           content: {
@@ -264,10 +259,7 @@ const PlanUpdateSidePanel = () => {
                                 ? 'Reach out to us via support to update your plan from Enterprise'
                                 : !canUpdateSubscription
                                   ? 'You do not have permission to change the subscription plan'
-                                  : plan.id === 'tier_team' &&
-                                      selectedOrganization?.managed_by === 'vercel-marketplace'
-                                    ? 'The Team plan is currently unavailable for Vercel Marketplace managed organizations'
-                                    : undefined,
+                                  : undefined,
                           },
                         }}
                       >
