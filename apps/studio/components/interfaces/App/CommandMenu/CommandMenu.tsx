@@ -11,7 +11,7 @@ import { useDocsSearchCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsS
 import { useThemeSwitcherCommands } from 'ui-patterns/CommandMenu/prepackaged/ThemeSwitcher'
 import { useApiKeysCommands } from './ApiKeys'
 import { useApiUrlCommand } from './ApiUrl'
-import { useProjectSwitchCommand } from './ProjectSwitcher'
+import { useCommandMenuSwitchers } from './OrgProjectSwitcher'
 import { useSupportCommands } from './Support'
 import { orderCommandSectionsByPriority } from './ordering'
 
@@ -20,7 +20,7 @@ export default function StudioCommandMenu() {
   useApiKeysCommands()
   useApiUrlCommand()
   useProjectLevelTableEditorCommands()
-  useProjectSwitchCommand()
+  useCommandMenuSwitchers()
   useBranchCommands()
   useSnippetCommands()
   useLayoutNavCommands()
