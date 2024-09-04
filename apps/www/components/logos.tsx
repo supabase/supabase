@@ -1,7 +1,38 @@
-import Image from 'next/image'
 import { useRouter } from 'next/router'
+import { cn } from 'ui'
+import { range } from 'lodash'
 
 export default function Logos() {
+  return (
+    <div className="pb-14 lg:pb-24">
+      <div className="max-w-xl md:max-w-3xl lg:max-w-5xl mx-auto px-5 lg:px-12">
+        <div
+          className={cn(
+            'relative w-full mx-auto max-w-4xl opacity-60',
+            'overflow-hidden',
+            'flex flex-nowrap justify-center gap-8 lg:gap-12',
+            "before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,hsl(var(--background-default))_0%,transparent_10%,transparent_90%,hsl(var(--background-default))_100%)] before:z-10"
+          )}
+        >
+          {range(0, 3).map((_, i) => (
+            <LogosRow
+              key={`logos-group-${i}`}
+              className={cn(
+                'flex flex-nowrap w-fit gap-8 lg:gap-12',
+                'animate-marquee will-change-transform'
+              )}
+            />
+          ))}
+        </div>
+      </div>
+      <p className="w-full text-center text-sm text-foreground-lighter mt-4 lg:mt-8">
+        Trusted by fast-growing companies worldwide
+      </p>
+    </div>
+  )
+}
+
+const LogosRow: React.FC<{ className?: string }> = ({ className }) => {
   const { basePath } = useRouter()
 
   const logos = [
@@ -78,23 +109,17 @@ export default function Logos() {
   ]
 
   return (
-    <div className="py-12 pb:14 lg:pb-24">
-      <div className="max-w-xl md:max-w-3xl lg:max-w-5xl mx-auto px-5 lg:px-12">
-        <div className="flex flex-wrap justify-center gap-x-5 gap-y-5 lg:gap-x-8 lg:gap-y-7 overflow-hidden">
-          {logos.map((logo) => (
-            <div>
-              <Image
-                src={logo.image}
-                alt={logo.alt}
-                priority
-                width={32}
-                height={32}
-                className={'w-16 lg:w-24 max-h-4 lg:max-h-5'}
-              />
-            </div>
-          ))}
+    <div className={cn(className)}>
+      {logos.map((logo) => (
+        <div key={`logos-group-${logo.name}`} className="h-4 lg:h-5 w-max !inline-block">
+          <img
+            src={logo.image}
+            alt={logo.alt}
+            className={'h-4 lg:h-5 !min-h-4 lg:!min-h-5 w-auto block'}
+            draggable={false}
+          />
         </div>
-      </div>
+      ))}
     </div>
   )
 }
