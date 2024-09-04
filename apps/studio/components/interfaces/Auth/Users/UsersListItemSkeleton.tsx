@@ -1,6 +1,7 @@
 import Table from 'components/to-be-cleaned/Table'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { Button, IconMoreHorizontal } from 'ui'
+import { MoreHorizontal } from 'lucide-react'
+import { Button } from 'ui'
 
 const UsersListItemSkeleton = () => {
   return (
@@ -28,7 +29,7 @@ const UsersListItemSkeleton = () => {
       </Table.td>
       <Table.td className="table-cell">
         <Button type="text" disabled={true} className="hover:border-muted flex">
-          <IconMoreHorizontal />
+          <MoreHorizontal />
         </Button>
       </Table.td>
     </Table.tr>

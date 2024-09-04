@@ -1,5 +1,5 @@
+import { XCircle } from 'lucide-react'
 import { FC, PropsWithChildren, useState } from 'react'
-import { IconXCircle } from '~/../../packages/ui'
 
 interface IOptions {
   name?: string
@@ -28,7 +28,7 @@ const Options: FC<PropsWithChildren<IOptions>> & OptionsSubComponents = (props) 
       >
         <div>
           <div className={[!open ? 'rotate-45' : 'rotate-0'].join(' ')}>
-            <IconXCircle size={14} />
+            <XCircle size={14} />
           </div>
         </div>
         {`${!open ? `Open` : `Close`} ${props.name ?? 'accepted values'}`}

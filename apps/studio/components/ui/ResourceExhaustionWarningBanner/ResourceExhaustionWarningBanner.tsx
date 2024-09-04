@@ -1,18 +1,12 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
+import { AlertTriangle, ExternalLink } from 'lucide-react'
 
 const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
@@ -111,12 +105,12 @@ const ResourceExhaustionWarningBanner = () => {
       className="border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px]
 [&>svg]:h-[26px]"
     >
-      <IconAlertTriangle />
+      <AlertTriangle />
       <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
       <div className="absolute top-5 right-5 flex items-center space-x-2">
         {learnMoreUrl !== undefined && (
-          <Button asChild type="default" icon={<IconExternalLink />}>
+          <Button asChild type="default" icon={<ExternalLink />}>
             <a href={learnMoreUrl} target="_blank" rel="noreferrer">
               Learn more
             </a>

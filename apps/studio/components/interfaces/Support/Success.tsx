@@ -68,8 +68,8 @@ const Success = ({
               icon={<Search size={16} strokeWidth={1.5} />}
               actions={[
                 <Button
-                  key="search"
                   asChild
+                  key="search"
                   className="mr-1"
                   type="default"
                   icon={<ExternalLink />}

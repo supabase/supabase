@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { isArray } from 'lodash'
-import { ChevronRight, ExternalLink } from 'lucide-react'
+import { Check, ChevronRight, ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -27,7 +27,7 @@ import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Button, IconCheck, IconInfo, Modal, SidePanel, cn } from 'ui'
+import { Button, Modal, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
@@ -276,7 +276,7 @@ const PlanUpdateSidePanel = () => {
                           className="flex py-2"
                         >
                           <div className="w-[12px]">
-                            <IconCheck
+                            <Check
                               className="h-3 w-3 text-brand translate-y-[2.5px]"
                               aria-hidden="true"
                               strokeWidth={3}
@@ -441,7 +441,7 @@ const PlanUpdateSidePanel = () => {
               <InformationBox
                 className="mt-4"
                 title="Usage-billing for Compute"
-                icon={<IconInfo />}
+                icon={<Info />}
                 defaultVisibility={true}
                 hideCollapse={true}
                 description={

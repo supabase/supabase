@@ -7,7 +7,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import { copyToClipboard } from 'lib/helpers'
-import { BookOpen, Check, ChevronDown, Clipboard } from 'lucide-react'
+import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
 import { logConstants } from 'shared-data'
 import {
   Alert,
@@ -17,8 +17,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconExternalLink,
-  IconX,
   Popover,
   SidePanel,
   Tabs,
@@ -252,7 +250,7 @@ const LogsQueryPanel = ({
                         type="text"
                         className="px-1"
                         onClick={() => setShowReference(false)}
-                        icon={<IconX size={18} strokeWidth={1.5} />}
+                        icon={<X size={18} strokeWidth={1.5} />}
                       />
                     </div>
                   }
@@ -285,8 +283,8 @@ const LogsQueryPanel = ({
                           className="text-brand"
                         >
                           unnesting joins
-                          <IconExternalLink
-                            size="tiny"
+                          <ExternalLink
+                            size="14"
                             className="ml-1 inline -translate-y-[2px]"
                             strokeWidth={1.5}
                           />

@@ -1,7 +1,7 @@
 import { BASE_PATH } from 'lib/constants'
+import { ChevronRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { IconChevronRight } from 'ui'
 
 interface ExampleProjectProps {
   framework: string
@@ -54,7 +54,7 @@ const ExampleProject = ({ framework, title, description, url }: ExampleProjectPr
           group-hover:text-foreground
         "
         >
-          <IconChevronRight />
+          <ChevronRight />
         </div>
       </div>
     </Link>

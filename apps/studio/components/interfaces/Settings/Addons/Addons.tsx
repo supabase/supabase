@@ -36,22 +36,13 @@ import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconChevronRight,
-  IconExternalLink,
-  IconInfo,
-} from 'ui'
+import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { ComputeBadge } from 'ui-patterns'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
+import { AlertCircle, Info, ExternalLink, ChevronRight } from 'lucide-react'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -123,7 +114,7 @@ const Addons = () => {
       {isBranch && (
         <ScaffoldContainer>
           <Alert_Shadcn_ variant="default" className="mt-6">
-            <IconAlertCircle strokeWidth={2} />
+            <AlertCircle strokeWidth={2} />
             <AlertTitle_Shadcn_>
               You are currently on a preview branch of your project
             </AlertTitle_Shadcn_>
@@ -164,7 +155,7 @@ const Addons = () => {
           {selectedProject?.infra_compute_size === 'nano' && subscription?.plan.id !== 'free' && (
             <ScaffoldContainer className="mt-4">
               <Alert_Shadcn_ variant="default">
-                <IconInfo strokeWidth={2} />
+                <Info strokeWidth={2} />
                 <AlertTitle_Shadcn_>Free compute upgrade to Micro</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   Paid Plans include a free upgrade to Micro compute. Your project is ready to
@@ -188,7 +179,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About compute add-ons</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -200,7 +191,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">Connection Pooler</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -302,7 +293,7 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Memory
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -317,7 +308,7 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             CPU
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -343,7 +334,7 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Max Disk Throughput
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -360,7 +351,7 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Baseline Disk Throughput
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -394,7 +385,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About IPv4 deprecation</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -489,7 +480,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About PITR backups</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -599,7 +590,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About custom domains</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
