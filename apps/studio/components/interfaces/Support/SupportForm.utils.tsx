@@ -45,6 +45,8 @@ export const uploadAttachments = async (ref: string, files: File[]) => {
   )
   const keys = compact(uploadedFiles).map((file) => file.path)
 
+  if (keys.length === 0) return []
+
   const { data, error } = await supportSupabaseClient.storage
     .from('support-attachments')
     .createSignedUrls(keys, 10 * 365 * 24 * 60 * 60)
