@@ -28,15 +28,16 @@ functions:
 
       ### OAuth and OTP link verification
 
-      [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification. \
-      **On Desktop platforms (JVM, MacOS\*, Linux)**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login. The success page can be customized via `AuthConfig#httpCallbackConfig`
+      [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification. 
+      
+      **On Desktop platforms (JVM, MacOS\*, Linux)**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login. The success page can be customized via `AuthConfig#httpCallbackConfig` \
       \* If no deeplinks are being used.
 
-      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
-
-      **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use Native Google Auth. Refer to the [Supabase Auth documentation](/docs/guides/auth/social-login/auth-google?platform=android) to learn more.
-      **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
-      **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR.
+      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`* 
+      
+      **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use [Native Google Auth](/docs/guides/auth/social-login/auth-google?platform=android). \
+      **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically. \
+      **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR. 
 
       You always make your own implementation and use `auth.parseSessionFromFragment(fragment)` or `auth.parseSessionFromUrl(url)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing after receiving a callback.
       Then you can simply use `auth.importSession(session)`.
@@ -420,9 +421,9 @@ functions:
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
     notes: |
+      Perform an INSERT into the table or view.
       - When calling an `insert` method, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization).
-      - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-      This is convenient, but it can also cause problems if your policies are not configured to allow the `select` operation.
+      - By default, `insert` will not return the inserted data. If you want to return the inserted data, you can use the `select()` method inside the request.
     params:
       - name: value # This function has two signatures: "value: T" and "values: List<T>"
         isOptional: false
@@ -467,8 +468,10 @@ functions:
   - id: update
     title: 'Modify data: update()'
     notes: |
+      Perform an UPDATE on the table or view.
       - `update()` should always be combined with a [filter](/docs/reference/kotlin/using-filters) block to avoid updating all records.
       - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
+      - By default, `update` will not return the inserted data. If you want to return the inserted data, you can use the `select()` method inside the request.
     params:
       - name: value
         type: T or PostgrestUpdate.() -> Unit = {}
@@ -567,10 +570,12 @@ functions:
     title: 'Upsert data: upsert()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.upsert'
     notes: |
+      Perform an UPSERT on the table or view. Depending on the column(s) passed to `onConflict`, `.upsert()` allows you to perform the equivalent of `.insert()` if a row with the corresponding `onConflict` columns doesn't exist, or if it does exist, perform an alternative action depending on `ignoreDuplicates`.
       - Primary keys should be included in the data payload in order for an update to work correctly.
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
       - If you need to insert new data and update existing data at the same time, use [Postgres triggers](https://github.com/supabase/postgrest-js/issues/173#issuecomment-825124550).
       - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
+      - By default, `upsert` will not return the inserted data. If you want to return the inserted data, you can use the `select()` method inside the request.
     params:
       - name: value # This function has two signatures: "value: T" and "values: List<T>"
         isOptional: false
@@ -601,6 +606,16 @@ functions:
           val toUpsert = Message(id = 3, message = "foo", username = "supabot")
           supabase.from("messages").upsert(toUpsert)
           ```
+      - id: upsert-your-data-and-return
+        name: Upsert your data and return it
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val toUpsert = Message(id = 3, message = "foo", username = "supabot")
+          val message = supabase.from("messages").upsert(toUpsert) {
+              select()
+          }.decodeSingle<Message>()
+          ```
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
         description: |
@@ -628,12 +643,14 @@ functions:
     title: 'Delete data: delete()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.delete'
     notes: |
+      Perform a DELETE on the table or view.
       - `delete()` should always be combined with a [filter](/docs/reference/kotlin/using-filters) block to target the item(s) you wish to delete.
       - If you use `delete()` with filters and you have
         [RLS](/docs/learn/auth-deep-dive/auth-row-level-security) enabled, only
         rows visible through `SELECT` policies are deleted. Note that by default
         no rows are visible, so you need at least one `SELECT`/`ALL` policy that
         makes the rows visible.
+      - By default, `delete` will not return the deleted data. If you want to return the deleted data, you can use the `select()` method inside the request.
     params:
       - name: request
         isOptional: true
@@ -3874,6 +3891,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
       Creates and verifies a challenge for a factor.
+      - Creating and verifying a challenge in a single step is not supported by the `Phone` factor type.
       - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before invoking `createChallengeAndVerify()`.
       - Executes [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge) and [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify) in a single step.
     params:
@@ -3939,18 +3957,18 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val enabled = supabase.auth.mfa.isMfaEnabled
+          val (enabled, _) = supabase.auth.mfa.status
           //flow variant, automatically emitting new values on session changes
-          val enabledFlow = supabase.auth.mfa.isMfaEnabledFlow
+          val statusFlow = supabase.auth.mfa.statusFlow
           ```
       - id: aal-enabled-for-current-session
         name: Check whether the user is logged in using AAL2
         isSpotlight: true
         code: |
           ```kotlin
-          val loggedInUsingMfa = supabase.auth.mfa.loggedInUsingMfa
+          val (_, active) = supabase.auth.mfa.status
           //flow variant, automatically emitting new values on session changes
-          val loggedInUsingMfaFlow = supabase.auth.mfa.loggedInUsingMfaFlow
+          val statusFlow = supabase.auth.mfa.statusFlow
           ```
   - id: admin-api
     title: 'Overview'

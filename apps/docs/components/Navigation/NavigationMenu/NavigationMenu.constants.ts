@@ -797,6 +797,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/database-advisors',
         },
         { name: 'Testing your database', url: '/guides/database/testing' },
+        {
+          name: 'Customizing Postgres config',
+          url: '/guides/database/custom-postgres-config',
+        },
       ],
     },
     {
@@ -1769,10 +1773,6 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Regions', url: '/guides/platform/regions' },
-        {
-          name: 'Custom Postgres Config',
-          url: '/guides/platform/custom-postgres-config',
-        },
         { name: 'Database Size', url: '/guides/platform/database-size' },
         { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
         { name: 'Vercel Marketplace', url: '/guides/platform/vercel-marketplace' },
