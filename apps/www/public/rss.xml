@@ -1422,25 +1422,25 @@
   <pubDate>Thu, 14 Apr 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/hackathon-bring-the-func</guid>
-  <title>Hackathon: Bring the Func(🕺)</title>
-  <link>https://supabase.com/blog/hackathon-bring-the-func</link>
-  <description>Build open-source projects with our latest features, win limited edition swag and plant a tree!</description>
-  <pubDate>Thu, 31 Mar 2022 22:00:00 GMT</pubDate>
-</item>
-<item>
   <guid>https://supabase.com/blog/supabase-realtime-with-multiplayer-features</guid>
   <title>Supabase Realtime, with Multiplayer Features</title>
   <link>https://supabase.com/blog/supabase-realtime-with-multiplayer-features</link>
   <description>Today we&apos;re announced Realtime, with multiplayer features. Realtime enables broadcast, presence, and listening to database changes delivered over WebSockets.</description>
-  <pubDate>Thu, 31 Mar 2022 22:00:00 GMT</pubDate>
+  <pubDate>Fri, 01 Apr 2022 20:30:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/hackathon-bring-the-func</guid>
+  <title>Hackathon: Bring the Func(🕺)</title>
+  <link>https://supabase.com/blog/hackathon-bring-the-func</link>
+  <description>Build open-source projects with our latest features, win limited edition swag and plant a tree!</description>
+  <pubDate>Fri, 01 Apr 2022 14:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabrew</guid>
   <title>Supabrew - Never Code Thirsty</title>
   <link>https://supabase.com/blog/supabrew</link>
   <description>A light and refreshing non-alcoholic beer for devs.</description>
-  <pubDate>Thu, 31 Mar 2022 22:00:00 GMT</pubDate>
+  <pubDate>Fri, 01 Apr 2022 09:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-edge-functions</guid>

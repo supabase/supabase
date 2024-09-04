@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import { Badge } from 'ui'
+import dayjs from 'dayjs'
 
 import authors from 'lib/authors.json'
 import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
@@ -152,7 +153,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               </div>
               <div>
                 <h4 className="text-foreground text-lg">{post.title}</h4>
-                <p className="small">{post.date}</p>
+                <p className="small">{post.formattedDate}</p>
               </div>
             </div>
           </div>
@@ -262,7 +263,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   </Link>
                   <h1 className="text-2xl sm:text-4xl">{props.blog.title}</h1>
                   <div className="text-light flex space-x-3 text-sm">
-                    <p>{props.blog.date}</p>
+                    <p>{dayjs(props.blog.date).format('DD MMM YYYY')}</p>
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.source)}</p>
                   </div>
