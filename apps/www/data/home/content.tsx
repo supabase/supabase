@@ -109,11 +109,11 @@ export default {
         ),
       },
       {
-        label: 'Auth Rules',
+        label: 'RLS Policies',
         panel: () => (
           <VideoWithHighlights
             video={{
-              title: 'Supabase dashboard auth rules',
+              title: 'Supabase dashboard Row Level Security',
               sources: [
                 {
                   src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-rls.mp4',
