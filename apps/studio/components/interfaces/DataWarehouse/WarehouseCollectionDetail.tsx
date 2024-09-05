@@ -213,15 +213,15 @@ export const WarehouseCollectionDetail = () => {
               showHeader={false}
               emptyState={
                 <ProductEmptyState
-                  title="Send your first event"
+                  title="No events found"
                   size="large"
                   ctaButtonLabel="Send test event"
                   onClickCta={() => setTestDialogOpen(true)}
                 >
                   <>
                     <p>
-                      This collection is ready, but no data has been received yet. <br />
-                      Send your first event to start populating this collection.
+                      No events match your current search criteria. <br />
+                      Try adjusting your filters or send a test event to populate this collection.
                     </p>
                   </>
                 </ProductEmptyState>
