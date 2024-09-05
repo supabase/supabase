@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
 import { useWindowSize } from 'react-use'
 
-import { Announcement, Button, buttonVariants, cn } from 'ui'
+import { Button, buttonVariants, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -20,7 +20,6 @@ import HamburgerButton from './HamburgerMenu'
 import MobileMenu from './MobileMenu'
 import MenuItem from './MenuItem'
 import RightClickBrandLogo from './RightClickBrandLogo'
-import LW12CountdownBanner from 'ui/src/layout/banners/LW12CountdownBanner/LW12CountdownBanner'
 import { allBlogPosts } from 'contentlayer/generated'
 import { getMenu } from '~/data/nav'
 import { sortDates } from '~/lib/helpers'
@@ -68,9 +67,9 @@ const Nav = (props: Props) => {
 
   return (
     <>
-      <Announcement>
-        <LW12CountdownBanner />
-      </Announcement>
+      {/* <Announcement>
+        Uncomment to show announcement banner
+      </Announcement> */}
       <div
         className={cn('sticky top-0 z-40 transform', hasStickySubnav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
