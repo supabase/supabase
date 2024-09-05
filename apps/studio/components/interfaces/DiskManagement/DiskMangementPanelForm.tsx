@@ -39,41 +39,44 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskCountdownRadial } from './DiskCountdownRadial'
 import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
 
-export function DiskMangementPanelForm() {
-  const [usedSize, setUsedSize] = useState<number>(4)
-  const [totalSize, setTotalSize] = useState<number>(8) // 8 GB total disk size
-  const [showTimer, setStateShowTimer] = useState<boolean>(false)
-  const [loading, setLoading] = useState(false)
+import { useDiskManagement } from './useDiskManagement'
 
+export function DiskMangementPanelForm() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+  const [loading, setLoading] = useState(false)
+  const [showTimer, setStateShowTimer] = useState<boolean>(false)
+
+  const {
+    storageType,
+    provisionedIOPS,
+    throughput,
+    totalSize,
+    mainDiskUsed,
+    updateDiskConfiguration,
+  } = useDiskManagement()
 
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(DiskStorageSchema),
     defaultValues: {
-      storageType: 'gp3', // Set default values as needed
-      allocatedStorage: 8, // Example default
-      provisionedIOPS: 3000,
-      throughput: 125,
+      storageType,
+      provisionedIOPS,
+      throughput,
+      totalSize,
     },
-    mode: 'onBlur', // Validation mode
-    reValidateMode: 'onChange', // Revalidation mode
+    mode: 'onBlur',
+    reValidateMode: 'onChange',
   })
 
   const { watch, setValue, control, formState } = form
-  const storageType = watch('storageType')
-  const allocatedStorage = watch('allocatedStorage')
-
-  const [mainDiskUsed, setMainDiskUsed] = useState(4) // GB
-  const [replicaDiskUsed, setReplicaDiskUsed] = useState(1) // GB
-  const mainDiskTotal = totalSize // 75% of total for main disk
-  const replicaDiskTotal = totalSize * 1.25 // 25% of total for read replica
+  const watchedStorageType = watch('storageType')
+  const watchedTotalSize = watch('totalSize')
 
   // Watch storageType and allocatedStorage to adjust constraints dynamically
   useEffect(() => {
-    if (storageType === 'io2') {
+    if (watchedStorageType === 'io2') {
       setValue('throughput', undefined) // Throughput is not configurable for 'io2'
-    } else if (storageType === 'gp3') {
-      if (allocatedStorage < 400) {
+    } else if (watchedStorageType === 'gp3') {
+      if (watchedTotalSize < 400) {
         setValue('throughput', 125) // Fixed throughput for allocated storage < 400 GiB
       } else {
         // Ensure throughput is within the allowed range if it's greater than 400 GiB
@@ -83,23 +86,30 @@ export function DiskMangementPanelForm() {
         }
       }
     }
-  }, [storageType, allocatedStorage, setValue, form])
+  }, [watchedStorageType, watchedTotalSize, setValue, form])
 
-  const onSubmit = (data) => {
-    console.log('Form submitted:', data)
+  const onSubmit = async (data: DiskStorageSchemaType) => {
+    console.log('data', data)
+    setLoading(true)
+    await updateDiskConfiguration(data)
+    form.reset(data)
+    await new Promise((resolve) => setTimeout(resolve, 3000))
+    setLoading(false)
+    setStateShowTimer(true)
+    setIsDialogOpen(false)
   }
 
-  const showNewBar = allocatedStorage !== totalSize && allocatedStorage > totalSize
+  const showNewBar = watchedTotalSize !== totalSize && watchedTotalSize > totalSize
 
   // Destructure dirtyFields from formState
   const { dirtyFields } = formState
 
   // Check if 'allocatedStorage' is dirty
-  const isAllocatedStorageDirty = !!dirtyFields.allocatedStorage
+  const isAllocatedStorageDirty = !!dirtyFields.totalSize
 
   const calculateDiskSizePrice = () => {
-    const newSize = form.getValues('allocatedStorage')
-    const oldSize = form.formState.defaultValues?.allocatedStorage || 0
+    const newSize = form.getValues('totalSize')
+    const oldSize = form.formState.defaultValues?.totalSize || 0
     const pricePerGiB = form.getValues('storageType') === 'io2' ? 0.125 : 0.08
     return ((newSize - Math.max(oldSize, 8)) * pricePerGiB).toFixed(2)
   }
@@ -109,7 +119,7 @@ export function DiskMangementPanelForm() {
   }
 
   const calculateThroughputPrice = () => {
-    return (form.getValues('throughput') * 0.04).toFixed(2)
+    return null //(form.getValues('throughput') * 0.04).toFixed(2)
   }
 
   return (
@@ -206,7 +216,7 @@ export function DiskMangementPanelForm() {
                       layout="horizontal"
                       label="IOPS"
                       description={
-                        storageType === 'io2'
+                        watchedStorageType === 'io2'
                           ? 'For `io2` storage type, 3000 IOPS and the maximum value is 16,000 IOPS.'
                           : 'For `gp3` storage type, 100 IOPS and the maximum value is 256,000 IOPS.'
                       }
@@ -234,8 +244,8 @@ export function DiskMangementPanelForm() {
                           </div>
                         </div>
                         <AnimatePresence>
-                          {(storageType === 'io2' ||
-                            (storageType === 'gp3' && field.value > 3000)) &&
+                          {(watchedStorageType === 'io2' ||
+                            (watchedStorageType === 'gp3' && field.value > 3000)) &&
                             !formState.errors.provisionedIOPS && (
                               <motion.div
                                 initial={{ opacity: 0, x: -4 }}
@@ -299,7 +309,9 @@ export function DiskMangementPanelForm() {
                                       })
                                     }}
                                     className="flex-grow font-mono rounded-r-none max-w-32"
-                                    disabled={storageType === 'io2' || allocatedStorage < 400} // Disable if storageType is 'io2' or allocatedStorage < 400
+                                    disabled={
+                                      watchedStorageType === 'io2' || watchedTotalSize < 400
+                                    }
                                   />
                                 </FormControl_Shadcn_>
                                 <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
@@ -350,31 +362,10 @@ export function DiskMangementPanelForm() {
               <Separator />
               <CardContent className="py-10 px-8">
                 <FormField_Shadcn_
-                  name="allocatedStorage"
+                  name="totalSize"
                   control={control}
                   render={({ field }) => (
-                    <FormItemLayout
-                      label="Disk Size"
-                      layout="horizontal"
-                      description={
-                        <>
-                          <>
-                            Additional GiB: ${storageType === 'io2' ? '0.125' : '0.08'}
-                            /month after 8 GB
-                          </>
-                          {form.getValues('allocatedStorage') > totalSize && (
-                            <>
-                              . Total additional cost: $
-                              {(
-                                (form.getValues('allocatedStorage') - totalSize) *
-                                (storageType === 'io2' ? 0.125 : 0.08)
-                              ).toFixed(2)}{' '}
-                              per month
-                            </>
-                          )}
-                        </>
-                      }
-                    >
+                    <FormItemLayout label="Disk Size" layout="horizontal">
                       <div className="mt-1 relative flex gap-2 items-center">
                         <div className="flex -space-x-px max-w-48">
                           <FormControl_Shadcn_>
@@ -385,7 +376,7 @@ export function DiskMangementPanelForm() {
                               className="flex-grow font-mono rounded-r-none"
                               onWheel={(e) => e.currentTarget.blur()}
                               onChange={(e) => {
-                                setValue('allocatedStorage', e.target.valueAsNumber, {
+                                setValue('totalSize', e.target.valueAsNumber, {
                                   shouldDirty: true,
                                   shouldValidate: true,
                                 })
@@ -399,7 +390,7 @@ export function DiskMangementPanelForm() {
                         <AnimatePresence initial={false}>
                           {isAllocatedStorageDirty && (
                             <motion.div
-                              key="throughPutContainer"
+                              key="throughPut"
                               initial={{ opacity: 0, scale: 0.95, x: -2 }}
                               animate={{ opacity: 1, scale: 1, x: 0 }}
                               exit={{ opacity: 0, scale: 0.95, x: -2 }}
@@ -411,7 +402,7 @@ export function DiskMangementPanelForm() {
                                 type="default"
                                 size="small"
                                 onClick={() => {
-                                  form.resetField('allocatedStorage')
+                                  form.resetField('totalSize')
                                 }}
                               >
                                 <RotateCcw className="h-4 w-4" aria-hidden="true" />
@@ -422,8 +413,8 @@ export function DiskMangementPanelForm() {
 
                         <AnimatePresence>
                           {formState.isDirty &&
-                          formState.dirtyFields.allocatedStorage &&
-                          !formState.errors.allocatedStorage ? (
+                          formState.dirtyFields.totalSize &&
+                          !formState.errors.totalSize ? (
                             <motion.div
                               initial={{ opacity: 0, x: -4 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -462,12 +453,12 @@ export function DiskMangementPanelForm() {
                       <h3 className="text-sm">Main Disk Space</h3>
                       <DiskSpaceBar
                         showNewBar={showNewBar}
-                        totalSize={mainDiskTotal}
+                        totalSize={totalSize}
                         usedSize={mainDiskUsed}
                         newTotalSize={
-                          form.getValues('allocatedStorage') <= totalSize
-                            ? mainDiskTotal
-                            : form.getValues('allocatedStorage')
+                          form.getValues('totalSize') <= totalSize
+                            ? totalSize
+                            : form.getValues('totalSize')
                         }
                       />
                     </div>
@@ -475,12 +466,12 @@ export function DiskMangementPanelForm() {
                       <h3 className="text-sm">Read Replica Disk Space</h3>
                       <DiskSpaceBar
                         showNewBar={showNewBar}
-                        totalSize={mainDiskTotal * 1.25}
+                        totalSize={totalSize * 1.25}
                         usedSize={mainDiskUsed}
                         newTotalSize={
-                          form.getValues('allocatedStorage') <= totalSize
-                            ? replicaDiskTotal
-                            : form.getValues('allocatedStorage') * 1.25
+                          form.getValues('totalSize') <= totalSize
+                            ? totalSize * 1.25
+                            : form.getValues('totalSize') * 1.25
                         }
                       />
                     </div>
@@ -595,11 +586,11 @@ export function DiskMangementPanelForm() {
                                   className="!bg-alternative border bg-opacity-100 inline-flex items-center gap-1 text-xs"
                                 >
                                   <span className="font-mono text-foreground-muted">
-                                    {form.formState.defaultValues?.allocatedStorage}GiB
+                                    {form.formState.defaultValues?.totalSize}GiB
                                   </span>
                                   <ChevronRight size={12} className="text-foreground-muted" />
                                   <span className="font-mono text-foreground">
-                                    {form.getValues('allocatedStorage')}GiB
+                                    {form.getValues('totalSize')}GiB
                                   </span>
                                 </Badge>
                               </div>
@@ -713,14 +704,7 @@ export function DiskMangementPanelForm() {
                           onClick={async () => {
                             // Simulating a 5 second delay
 
-                            setLoading(true)
-                            await new Promise((resolve) => setTimeout(resolve, 3000))
-                            setLoading(false)
-
-                            form.reset()
-                            // Close the dialog after the delay
-                            setIsDialogOpen(false)
-                            setStateShowTimer(true)
+                            await onSubmit(form.getValues())
                           }}
                         >
                           Accept changes

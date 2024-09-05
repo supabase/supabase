@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
-  allocatedStorage: z
+  totalSize: z
     .number()
     .min(8, { message: 'Allocated storage must be at least 8 GiB.' })
     .max(16384, { message: 'Allocated storage must not exceed 16 TiB.' })
@@ -12,7 +12,7 @@ const baseSchema = z.object({
 })
 
 export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
-  const { storageType, allocatedStorage, provisionedIOPS, throughput } = data
+  const { storageType, totalSize, provisionedIOPS, throughput } = data
 
   if (storageType === 'io2') {
     // Validation rules for io2
@@ -39,14 +39,14 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
         path: ['provisionedIOPS'],
       })
     }
-    if (allocatedStorage < 400 && throughput !== 125) {
+    if (totalSize < 400 && throughput !== 125) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Throughput must be 125 MiBps for allocated storage less than 400 GiB for gp3.',
         path: ['throughput'],
       })
     } else if (
-      allocatedStorage >= 400 &&
+      totalSize >= 400 &&
       throughput !== undefined &&
       (throughput < 125 || throughput > 1000)
     ) {
