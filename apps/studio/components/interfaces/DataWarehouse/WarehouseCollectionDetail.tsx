@@ -1,4 +1,4 @@
-import { RefreshCcw, Rewind } from 'lucide-react'
+import { RefreshCcw, Rewind, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -135,6 +135,10 @@ export const WarehouseCollectionDetail = () => {
     refetch()
   }
 
+  const queryUrl = `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
+    params.sql || ''
+  )}&source=warehouse`
+
   return (
     <div className="relative flex flex-col flex-grow h-full">
       <ShimmerLine active={isLoading} />
@@ -182,6 +186,17 @@ export const WarehouseCollectionDetail = () => {
               <Button asChild type={'text'}>
                 <Link href={`/project/${projectRef}/settings/warehouse`}>Access tokens</Link>
               </Button>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button asChild className="px-1.5" type="outline" icon={<Terminal />}>
+                    <Link href={queryUrl} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-xs">
+                  Open query in Warehouse Explorer
+                </TooltipContent>
+              </Tooltip>
 
               <TestCollectionDialog
                 accessTokens={accessTokens.data?.data || []}

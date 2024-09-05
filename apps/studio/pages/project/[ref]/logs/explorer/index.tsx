@@ -141,8 +141,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     if (q) {
       onSelectTemplate({
         mode: 'custom',
-        searchString: q as string,
+        searchString: q,
       })
+      setWarehouseEditorValue(q)
     }
   }, [])
 
