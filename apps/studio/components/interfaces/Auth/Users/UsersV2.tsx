@@ -80,7 +80,6 @@ export const UsersV2 = () => {
   const gridRef = useRef<DataGridHandle>(null)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
-  const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [filterKeywords, setFilterKeywords] = useState('')
