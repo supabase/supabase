@@ -66,6 +66,7 @@ import { PolicyDetailsV2 } from './PolicyDetailsV2'
 import { PolicyTemplates } from './PolicyTemplates'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
+import { useQueryState } from 'nuqs'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -104,6 +105,8 @@ export const AIPolicyEditorPanel = memo(function ({
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
+  const [editView, setEditView] = useQueryState('view', { defaultValue: 'templates' as const })
+
   // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
   const [using, setUsing] = useState('')
   const [check, setCheck] = useState('')
@@ -122,8 +125,10 @@ export const AIPolicyEditorPanel = memo(function ({
 
   // Use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
-  const [tabId, setTabId] = useState<'templates' | 'conversation'>('templates')
-
+  const [tabId, setTabId] = useState<'templates' | 'conversation'>(
+    editView as 'templates' | 'conversation'
+  )
+  console.log({ editView }, { tabId })
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const placeholder = generatePlaceholder(selectedPolicy)
   const isOptedInToAI = useOrgOptedIntoAi()
@@ -166,6 +171,8 @@ export const AIPolicyEditorPanel = memo(function ({
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const [selectedSchemas] = useSchemasForAi(selectedProject?.ref!)
+
+  // get entitiy (tables/views/materialized views/etc) definitions  to pass to AI Assistant
   const { data: entities } = useEntityDefinitionsQuery(
     {
       schemas: selectedSchemas,
@@ -175,7 +182,7 @@ export const AIPolicyEditorPanel = memo(function ({
     { enabled: true, refetchOnWindowFocus: false }
   )
   const entityDefinitions = entities?.map((def) => def.sql.trim())
-
+  console.log({ entityDefinitions })
   const { name, table, behavior, command, roles } = form.watch()
   const supportWithCheck = ['update', 'all'].includes(command)
   const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
@@ -259,6 +266,8 @@ export const AIPolicyEditorPanel = memo(function ({
             check: command === 'INSERT' ? editorOneFormattedValue : editorTwoFormattedValue,
           })
         : false
+
+    setEditView(null)
 
     if (policyCreateUnsaved || policyUpdateUnsaved || messages.length > 0) {
       setIsClosingPolicyEditorPanel(true)
@@ -437,6 +446,11 @@ export const AIPolicyEditorPanel = memo(function ({
     })
   }, [showDetails, error, errorPanelOpen])
 
+  // update tabId when the editView changes
+  useEffect(() => {
+    editView === 'conversation' ? setTabId('conversation') : setTabId('templates')
+  }, [editView])
+
   return (
     <>
       <Form_Shadcn_ {...form}>
@@ -530,7 +544,8 @@ export const AIPolicyEditorPanel = memo(function ({
                     />
                   ) : null}
 
-                  {isAiAssistantEnabled ? (
+                  {/* which left side editor to show in the sheet  */}
+                  {editView === 'conversation' ? (
                     <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
                       <RLSCodeEditor
                         id="rls-sql-policy"
@@ -792,85 +807,95 @@ export const AIPolicyEditorPanel = memo(function ({
                     className="flex flex-col h-full w-full"
                   >
                     <TabsList_Shadcn_ className="flex gap-4 px-content pt-2">
-                      <TabsTrigger_Shadcn_
-                        key="templates"
-                        value="templates"
-                        onClick={() => setTabId('templates')}
-                        className="px-0 data-[state=active]:bg-transparent"
-                      >
-                        Templates
-                      </TabsTrigger_Shadcn_>
-                      {isAiAssistantEnabled && !hasHipaaAddon && (
+                      {editView === 'templates' && (
+                        <TabsTrigger_Shadcn_
+                          key="templates"
+                          value="templates"
+                          onClick={() => setTabId('templates')}
+                          className="px-0 data-[state=active]:bg-transparent"
+                        >
+                          Templates
+                        </TabsTrigger_Shadcn_>
+                      )}
+
+                      {editView === 'conversation' && !hasHipaaAddon && (
                         <TabsTrigger_Shadcn_
                           key="conversation"
                           value="conversation"
                           onClick={() => setTabId('conversation')}
                           className="px-0 data-[state=active]:bg-transparent"
                         >
-                          Assistant
+                          Assistantzans
                         </TabsTrigger_Shadcn_>
                       )}
                     </TabsList_Shadcn_>
-                    <TabsContent_Shadcn_
-                      value="templates"
-                      className={cn(
-                        '!mt-0 overflow-y-auto',
-                        'data-[state=active]:flex data-[state=active]:grow'
-                      )}
-                    >
-                      <ScrollArea className="h-full w-full">
-                        <PolicyTemplates
-                          schema={schema}
-                          table={table}
-                          selectedPolicy={selectedPolicy}
-                          selectedTemplate={selectedDiff}
-                          onSelectTemplate={(value) => {
-                            if (isAiAssistantEnabled) {
-                              updateEditorWithCheckForDiff({
-                                id: value.id,
-                                content: value.statement,
-                              })
-                            } else {
-                              form.setValue('name', value.name)
-                              form.setValue('behavior', 'permissive')
-                              form.setValue('command', value.command.toLowerCase())
-                              form.setValue('roles', value.roles.join(', ') ?? '')
 
-                              setUsing(`  ${value.definition}`)
-                              setCheck(`  ${value.check}`)
-                              setExpOneLineCount(1)
-                              setExpTwoLineCount(1)
-                              setFieldError(undefined)
-
-                              if (!['update', 'all'].includes(value.command.toLowerCase())) {
-                                setShowCheckBlock(false)
-                              } else if (value.check.length > 0) {
-                                setShowCheckBlock(true)
+                    {editView === 'templates' && (
+                      <TabsContent_Shadcn_
+                        value="templates"
+                        className={cn(
+                          '!mt-0 overflow-y-auto',
+                          'data-[state=active]:flex data-[state=active]:grow'
+                        )}
+                      >
+                        <ScrollArea className="h-full w-full">
+                          <PolicyTemplates
+                            schema={schema}
+                            table={table}
+                            selectedPolicy={selectedPolicy}
+                            selectedTemplate={selectedDiff}
+                            onSelectTemplate={(value) => {
+                              if (isAiAssistantEnabled) {
+                                updateEditorWithCheckForDiff({
+                                  id: value.id,
+                                  content: value.statement,
+                                })
                               } else {
-                                setShowCheckBlock(false)
+                                form.setValue('name', value.name)
+                                form.setValue('behavior', 'permissive')
+                                form.setValue('command', value.command.toLowerCase())
+                                form.setValue('roles', value.roles.join(', ') ?? '')
+
+                                setUsing(`  ${value.definition}`)
+                                setCheck(`  ${value.check}`)
+                                setExpOneLineCount(1)
+                                setExpTwoLineCount(1)
+                                setFieldError(undefined)
+
+                                if (!['update', 'all'].includes(value.command.toLowerCase())) {
+                                  setShowCheckBlock(false)
+                                } else if (value.check.length > 0) {
+                                  setShowCheckBlock(true)
+                                } else {
+                                  setShowCheckBlock(false)
+                                }
                               }
-                            }
-                          }}
-                        />
-                      </ScrollArea>
-                    </TabsContent_Shadcn_>
+                            }}
+                          />
+                        </ScrollArea>
+                      </TabsContent_Shadcn_>
+                    )}
+
                     <TabsContent_Shadcn_
                       value="conversation"
                       className="flex grow !mt-0 overflow-y-auto"
                     >
-                      <AIPolicyChat
-                        messages={messages}
-                        selectedMessage={selectedDiff}
-                        onSubmit={(message) =>
-                          append({
-                            content: message,
-                            role: 'user',
-                            createdAt: new Date(),
-                          })
-                        }
-                        onDiff={updateEditorWithCheckForDiff}
-                        loading={isLoading || isDebugSqlLoading}
-                      />
+                      {' '}
+                      <div className="border bg-red-500">
+                        <AIPolicyChat
+                          messages={messages}
+                          selectedMessage={selectedDiff}
+                          onSubmit={(message) =>
+                            append({
+                              content: message,
+                              role: 'user',
+                              createdAt: new Date(),
+                            })
+                          }
+                          onDiff={updateEditorWithCheckForDiff}
+                          loading={isLoading || isDebugSqlLoading}
+                        />
+                      </div>
                     </TabsContent_Shadcn_>
                   </Tabs_Shadcn_>
                 </div>

@@ -130,7 +130,7 @@ export const AIPolicyChat = ({
             </ButtonTooltip>
           )}
         </Message>
-
+        <Button type="default">Generate templates</Button>
         {messages.map((m) => (
           <Message
             key={`message-${m.id}`}
@@ -143,9 +143,7 @@ export const AIPolicyChat = ({
             onDiff={(content) => onDiff({ id: m.id, content })}
           />
         ))}
-
         {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
-
         <div ref={bottomRef} className="h-1" />
       </div>
 
