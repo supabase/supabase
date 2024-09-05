@@ -404,7 +404,7 @@ export const UsersV2 = () => {
               loading={isRefetching && !isFetchingNextPage}
               onClick={() => refetch()}
             >
-              Reload
+              Refresh
             </Button>
             <AddUserDropdown projectKpsVersion={project?.kpsVersion} />
           </div>
