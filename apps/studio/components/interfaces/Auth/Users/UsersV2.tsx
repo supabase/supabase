@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import {
+  Copy,
   Mail,
   RefreshCw,
   Search,
@@ -28,7 +29,7 @@ import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import type { User } from 'data/auth/users-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { timeout } from 'lib/helpers'
+import { copyToClipboard, timeout } from 'lib/helpers'
 import {
   Button,
   cn,
@@ -50,6 +51,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AddUserDropdown from './AddUserDropdown'
 import { formatUsersData, isAtBottom } from './Users.utils'
 import UsersSidePanel from './UserSidePanel'
+import { formatClipboardValue } from 'components/grid/utils/common'
 
 type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 const USERS_TABLE_COLUMNS = [
@@ -74,6 +76,8 @@ const USERS_TABLE_COLUMNS = [
   },
 ]
 
+// [Joshen] Just naming it as V2 as its a rewrite of the old one, to make it easier for reviews
+// Can change it to remove V2 thereafter
 export const UsersV2 = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
@@ -217,6 +221,17 @@ export const UsersV2 = () => {
               </div>
             </ContextMenuTrigger_Shadcn_>
             <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
+              <ContextMenuItem_Shadcn_
+                className="gap-x-2"
+                onSelect={() => {
+                  const valueToCopy = formatClipboardValue(value)
+                  copyToClipboard(valueToCopy)
+                }}
+                onFocusCapture={(e) => e.stopPropagation()}
+              >
+                <Copy size={14} />
+                Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}
+              </ContextMenuItem_Shadcn_>
               <ContextMenuItem_Shadcn_
                 className="gap-x-2"
                 onSelect={() => {
