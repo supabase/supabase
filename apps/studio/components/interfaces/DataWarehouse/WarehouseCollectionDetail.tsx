@@ -33,7 +33,7 @@ const INTERVALS: DatetimeHelper[] = [
     calcTo: () => dayjsBase.toISOString(),
   },
   {
-    text: 'Last 1 day',
+    text: 'Last day',
     calcFrom: () => dayjsBase.subtract(1, 'day').toISOString(),
     calcTo: () => dayjsBase.toISOString(),
   },
