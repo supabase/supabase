@@ -76,7 +76,6 @@ export const WarehouseCollectionDetail = () => {
     if (collection) {
       const from = filters.interval?.from
       const to = filters.interval?.to
-      console.log({ from, to })
 
       const sql = `
       select id, timestamp, event_message from \`${collection.name}\`
