@@ -94,3 +94,17 @@ export const getAllTroubleshootingEntries = cache_fullProcess_withDevCacheBust(
   TROUBLESHOOTING_DIRECTORY,
   () => JSON.stringify([])
 )
+
+export async function getAllTroubleshootingKeywords() {
+  const entries = await getAllTroubleshootingEntries()
+  const keywords = new Set<string>()
+  for (const entry of entries) {
+    for (const topic of entry.data.topics) {
+      keywords.add(topic)
+    }
+    for (const keyword of entry.data.keywords ?? []) {
+      keywords.add(keyword)
+    }
+  }
+  return Array.from(keywords)
+}
