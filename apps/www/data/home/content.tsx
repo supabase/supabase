@@ -84,11 +84,11 @@ export default {
               title: 'Supabase dashboard SQL editor',
               sources: [
                 {
-                  src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor.mp4',
+                  src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-sql-editor.mp4',
                   type: 'video/mp4',
                 },
               ],
-              poster: '/images/index/dashboard/supabase-table-editor.png',
+              poster: '/images/index/dashboard/supabase-sql-editor.png',
             }}
             highlights={[
               { label: 'AI SQL Editor', link: '/docs/guides/database/overview#the-sql-editor' },
@@ -116,11 +116,11 @@ export default {
               title: 'Supabase dashboard auth rules',
               sources: [
                 {
-                  src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor.mp4',
+                  src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-rls.mp4',
                   type: 'video/mp4',
                 },
               ],
-              poster: '/images/index/dashboard/supabase-table-editor.png',
+              poster: '/images/index/dashboard/supabase-rls.png',
             }}
             highlights={[
               { label: 'Email Logins', link: '/docs/guides/auth/auth-email-passwordless' },
