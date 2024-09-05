@@ -1,10 +1,9 @@
-import { useRouter } from 'next/router'
 import { cn } from 'ui'
 import { range } from 'lodash'
 
-export default function Logos() {
+const Logos: React.FC = () => {
   return (
-    <div className="pb-14 lg:pb-24">
+    <div className="pb-14 md:pb-24">
       <div className="max-w-xl md:max-w-3xl lg:max-w-5xl mx-auto px-5 lg:px-12">
         <div
           className={cn(
@@ -25,101 +24,99 @@ export default function Logos() {
           ))}
         </div>
       </div>
-      <p className="w-full text-center text-sm text-foreground-lighter mt-4 lg:mt-8">
+      <p className="w-full text-center text-sm text-foreground-lighter mt-6 lg:mt-8">
         Trusted by fast-growing companies worldwide
       </p>
     </div>
   )
 }
 
-const LogosRow: React.FC<{ className?: string }> = ({ className }) => {
-  const { basePath } = useRouter()
+const logos = [
+  {
+    image: `/images/logos/publicity/mozilla.svg`,
+    alt: 'mozilla',
+    name: 'mozilla',
+  },
+  {
+    image: `/images/logos/publicity/1password.svg`,
+    alt: '1password',
+    name: '1password',
+  },
+  {
+    image: `/images/logos/publicity/pwc.svg`,
+    alt: 'pwc',
+    name: 'pwc',
+  },
+  {
+    image: `/images/logos/publicity/pika.svg`,
+    alt: 'pika',
+    name: 'pika',
+  },
+  {
+    image: `/images/logos/publicity/humata.svg`,
+    alt: 'humata',
+    name: 'humata',
+  },
+  {
+    image: `/images/logos/publicity/krea.svg`,
+    alt: 'krea',
+    name: 'krea',
+  },
+  {
+    image: `/images/logos/publicity/udio.svg`,
+    alt: 'udio',
+    name: 'udio',
+  },
+  {
+    image: `/images/logos/publicity/langchain.svg`,
+    alt: 'langchain',
+    name: 'langchain',
+  },
+  {
+    image: `/images/logos/publicity/resend.svg`,
+    alt: 'resend',
+    name: 'resend',
+  },
+  {
+    image: `/images/logos/publicity/loops.svg`,
+    alt: 'loops',
+    name: 'loops',
+  },
+  {
+    image: `/images/logos/publicity/mobbin.svg`,
+    alt: 'mobbin',
+    name: 'mobbin',
+  },
+  {
+    image: `/images/logos/publicity/gopuff.svg`,
+    alt: 'gopuff',
+    name: 'gopuff',
+  },
+  {
+    image: `/images/logos/publicity/chatbase.svg`,
+    alt: 'chatbase',
+    name: 'chatbase',
+  },
+  {
+    image: `/images/logos/publicity/betashares.svg`,
+    alt: 'betashares',
+    name: 'betashares',
+  },
+]
 
-  const logos = [
-    {
-      image: `${basePath}/images/logos/publicity/mozilla.svg`,
-      alt: 'mozilla',
-      name: 'mozilla',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/1password.svg`,
-      alt: '1password',
-      name: '1password',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/pwc.svg`,
-      alt: 'pwc',
-      name: 'pwc',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/pika.svg`,
-      alt: 'pika',
-      name: 'pika',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/humata.svg`,
-      alt: 'humata',
-      name: 'humata',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/krea.svg`,
-      alt: 'krea',
-      name: 'krea',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/udio.svg`,
-      alt: 'udio',
-      name: 'udio',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/langchain.svg`,
-      alt: 'langchain',
-      name: 'langchain',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/resend.svg`,
-      alt: 'resend',
-      name: 'resend',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/loops.svg`,
-      alt: 'loops',
-      name: 'loops',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/mobbin.svg`,
-      alt: 'mobbin',
-      name: 'mobbin',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/gopuff.svg`,
-      alt: 'gopuff',
-      name: 'gopuff',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/chatbase.svg`,
-      alt: 'chatbase',
-      name: 'chatbase',
-    },
-    {
-      image: `${basePath}/images/logos/publicity/betashares.svg`,
-      alt: 'betashares',
-      name: 'betashares',
-    },
-  ]
+const LogosRow: React.FC<{ className?: string }> = ({ className }) => (
+  <div className={cn(className)}>
+    {logos.map((logo) => (
+      <div key={`logos-group-${logo.name}`} className="h-4 lg:h-5 w-max !inline-block">
+        <img
+          src={logo.image}
+          alt={logo.alt}
+          className={'h-4 lg:h-5 !min-h-4 lg:!min-h-5 w-auto block'}
+          draggable={false}
+        />
+      </div>
+    ))}
+  </div>
+)
 
-  return (
-    <div className={cn(className)}>
-      {logos.map((logo) => (
-        <div key={`logos-group-${logo.name}`} className="h-4 lg:h-5 w-max !inline-block">
-          <img
-            src={logo.image}
-            alt={logo.alt}
-            className={'h-4 lg:h-5 !min-h-4 lg:!min-h-5 w-auto block'}
-            draggable={false}
-          />
-        </div>
-      ))}
-    </div>
-  )
-}
+export default Logos
