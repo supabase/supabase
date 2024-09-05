@@ -1,5 +1,6 @@
-import solutions from '../Solutions'
+import solutions from '~/data/Solutions'
 // import { frameworks } from '../frameworks'
+import VideoWithHighlights from '~/components/VideoWithHighlights'
 
 export default {
   heroSection: {
@@ -32,5 +33,99 @@ export default {
   },
   productsSection: {
     products: { ...solutions },
+  },
+  dashboardFeatures: {
+    title: (
+      <>
+        <span className="text-foreground">Stay productive and manage your app</span>
+        <br className="hidden md:block" />
+        without leaving the dashboard
+      </>
+    ),
+    tabs: [
+      {
+        label: 'Table Editor',
+        panel: () => (
+          <VideoWithHighlights
+            video={{
+              src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor.mp4',
+              poster: '/images/index/dashboard/supabase-table-editor.png',
+            }}
+            highlights={[
+              {
+                label: 'Full CRUD',
+                link: '/docs/guides/database/tables?queryGroups=database-method&database-method=sql&queryGroups=language&language=js',
+              },
+              {
+                label: 'Materialized Views',
+                link: '/docs/guides/database/tables?queryGroups=database-method&database-method=sql&queryGroups=language&language=js#materialized-views',
+              },
+              {
+                label: 'Foreign Tables',
+                link: '/docs/guides/database/tables?queryGroups=database-method&database-method=sql&queryGroups=language&language=js#joining-tables-with-foreign-keys',
+              },
+              { label: 'Partitioned Tables', link: '/docs/guides/database/partitions' },
+              { label: 'Easy as a spreadsheet', link: '/docs/guides/database/overview#table-view' },
+            ]}
+          />
+        ),
+      },
+      {
+        label: 'SQL Editor',
+        panel: () => (
+          <VideoWithHighlights
+            video={{
+              src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor.mp4',
+              poster: '/images/index/dashboard/supabase-table-editor.png',
+            }}
+            highlights={[
+              { label: 'AI SQL Editor', link: '/docs/guides/database/overview#the-sql-editor' },
+              {
+                label: 'Row Level Security',
+                link: '/docs/guides/database/postgres/row-level-security',
+              },
+              {
+                label: 'Save time using Templates',
+                link: '/docs/guides/database/overview#the-sql-editor',
+              },
+              {
+                label: 'Save and reuse Queries',
+                link: '/docs/guides/database/overview#the-sql-editor',
+              },
+            ]}
+          />
+        ),
+      },
+      {
+        label: 'Auth Rules',
+        panel: () => (
+          <VideoWithHighlights
+            video={{
+              src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor.mp4',
+              poster: '/images/index/dashboard/supabase-table-editor.png',
+            }}
+            highlights={[
+              { label: 'Email Logins', link: '/docs/guides/auth/auth-email-passwordless' },
+              {
+                label: 'Magic Links',
+                link: '/docs/guides/auth/auth-email-passwordless?queryGroups=language&language=js#with-magic-link',
+              },
+              {
+                label: '20+ Third-party Logins',
+                link: '/docs/guides/auth/social-login#set-up-a-social-provider-with-supabase-auth',
+              },
+              {
+                label: 'Custom Access Policies via RLS',
+                link: '/docs/guides/database/postgres/row-level-security',
+              },
+              {
+                label: 'Password Recovery',
+                link: '/docs/guides/auth/passwords?queryGroups=language&language=js#resetting-a-password',
+              },
+            ]}
+          />
+        ),
+      },
+    ],
   },
 }

@@ -5,6 +5,7 @@ import Hero from '~/components/Hero/Hero'
 import HeroFrameworks from '~/components/Hero/HeroFrameworks'
 
 const Products = dynamic(() => import('~/components/Products/index'))
+const DashboardFeatures = dynamic(() => import('~/components/DashboardFeatures'))
 const Logos = dynamic(() => import('~/components/logos'))
 const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
 const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
@@ -23,8 +24,9 @@ const Index = () => {
       <HeroFrameworks className="mt-4 lg:mt-6" />
       <TwitterSocialSection />
       <BuiltExamples />
-      <MadeForDevelopers />
-      <AdminAccess />
+      {/* <MadeForDevelopers /> */}
+      <DashboardFeatures {...content.dashboardFeatures} />
+      {/* <AdminAccess /> */}
       <CustomerStories />
       <CTABanner />
       <ReactTooltip

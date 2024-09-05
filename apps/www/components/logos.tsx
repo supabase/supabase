@@ -1,24 +1,26 @@
 import { cn } from 'ui'
 import { range } from 'lodash'
+import { isBrowser } from 'common'
 
 const Logos: React.FC = () => {
   return (
-    <div className="pb-14 md:pb-24">
-      <div className="max-w-xl md:max-w-3xl lg:max-w-5xl mx-auto px-5 lg:px-12">
+    <div className="pb-14 md:pb-24" suppressHydrationWarning>
+      <div className="max-w-xl md:max-w-3xl lg:max-w-5xl mx-auto animadura px-5 lg:px-12">
         <div
           className={cn(
-            'relative w-full mx-auto max-w-4xl opacity-60',
+            'relative w-full mx-auto max-w-4xl dark:opacity-60',
             'overflow-hidden',
             'flex flex-nowrap justify-center gap-8 lg:gap-12',
             "before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,hsl(var(--background-default))_0%,transparent_10%,transparent_90%,hsl(var(--background-default))_100%)] before:z-10"
           )}
         >
-          {range(0, 3).map((_, i) => (
+          {range(0, 4).map((_, i) => (
             <LogosRow
               key={`logos-group-${i}`}
               className={cn(
                 'flex flex-nowrap w-fit gap-8 lg:gap-12',
-                'animate-marquee will-change-transform'
+                'animate-[marquee_90000ms_linear_both_infinite] will-change-transform',
+                'motion-reduce:animate-none motion-reduce:will-change-none'
               )}
             />
           ))}
