@@ -173,6 +173,11 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       menuItems: [
         [
           {
+            label: 'Troubleshooting',
+            icon: 'contributing',
+            href: '/guides/troubleshooting',
+          },
+          {
             label: 'Migration guides',
             icon: 'resources',
             href: '/guides/resources',
