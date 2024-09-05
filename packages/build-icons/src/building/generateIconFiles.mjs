@@ -25,9 +25,10 @@ export default async ({
   const icons = Object.keys(iconNodes)
   const iconsDistDirectory = path.join(outputDirectory, `icons`)
 
-  if (!fs.existsSync(iconsDistDirectory)) {
-    fs.mkdirSync(iconsDistDirectory)
-  }
+  // delete the existing folder so that it can be recreated from scratch. This helps with removing
+  // accidentally misnamed files.
+  fs.rmdirSync(iconsDistDirectory, { recursive: true })
+  fs.mkdirSync(iconsDistDirectory)
 
   // TO DO -- START
   //
@@ -100,7 +101,7 @@ export const Index: Record<string, any> = [`
   // with all the other build scripts
   // @mildtomato
   async function writeRegistry() {
-    console.log(registryIndex)
+    // console.log(registryIndex)
 
     registryIndex += `\n}`
     // close index
