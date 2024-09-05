@@ -5,8 +5,17 @@ import Link from 'next/link'
 import BrowserFrame from './BrowserFrame'
 import Image from 'next/image'
 
+type VideoType = {
+  sources: {
+    src: string
+    type?: string
+  }[]
+  poster?: string
+  title?: string
+}
+
 interface Props {
-  video: { src: string; poster?: string }
+  video: VideoType
   highlights: { label: string; link?: string }[]
 }
 
@@ -58,7 +67,9 @@ const VideoWithHighlights = (props: Props) => {
               autoPlay
               poster={props.video.poster ?? '/images/index/dashboard/supabase-table-editor.png'}
             >
-              <source src={props.video.src} type="video/mp4" />
+              {props.video.sources.map((source) => (
+                <source key={source.src} src={source.src} type={source.type ?? 'video/mp4'} />
+              ))}
             </video>
             <Image
               src="/images/index/dashboard/supabase-table-editor.png"

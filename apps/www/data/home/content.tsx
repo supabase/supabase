@@ -48,7 +48,13 @@ export default {
         panel: () => (
           <VideoWithHighlights
             video={{
-              src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor.mp4',
+              title: 'Supabase dashboard table editor',
+              sources: [
+                {
+                  src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor.mp4',
+                  type: 'video/mp4',
+                },
+              ],
               poster: '/images/index/dashboard/supabase-table-editor.png',
             }}
             highlights={[
@@ -75,7 +81,13 @@ export default {
         panel: () => (
           <VideoWithHighlights
             video={{
-              src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor.mp4',
+              title: 'Supabase dashboard SQL editor',
+              sources: [
+                {
+                  src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor.mp4',
+                  type: 'video/mp4',
+                },
+              ],
               poster: '/images/index/dashboard/supabase-table-editor.png',
             }}
             highlights={[
@@ -101,7 +113,13 @@ export default {
         panel: () => (
           <VideoWithHighlights
             video={{
-              src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor.mp4',
+              title: 'Supabase dashboard auth rules',
+              sources: [
+                {
+                  src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor.mp4',
+                  type: 'video/mp4',
+                },
+              ],
               poster: '/images/index/dashboard/supabase-table-editor.png',
             }}
             highlights={[
