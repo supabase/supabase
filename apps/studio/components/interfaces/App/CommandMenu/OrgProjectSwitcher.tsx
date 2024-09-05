@@ -8,9 +8,9 @@ import { IS_PLATFORM } from 'common'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 
 const PROJECT_SWITCHER_PAGE_NAME = 'Switch project'
-const ORGANIZATION_SWITCHER_PAGE_NAME = 'Switch organization'
+const ORGANIZATION_SWITCHER_PAGE_NAME = 'Configure organization'
 
-function useProjectSwitchCommand() {
+export function useProjectSwitchCommand() {
   const setPage = useSetPage()
 
   const { data: _projects } = useProjectsQuery({ enabled: IS_PLATFORM })
@@ -55,7 +55,7 @@ function useProjectSwitchCommand() {
   )
 }
 
-function useOrganizationSwitchCommand() {
+export function useConfigureOrganizationCommand() {
   const setPage = useSetPage()
 
   const { data: organizations } = useOrganizationsQuery({ enabled: IS_PLATFORM })
@@ -66,8 +66,8 @@ function useOrganizationSwitchCommand() {
       type: PageType.Commands,
       sections: [
         {
-          id: 'switch-organization',
-          name: 'Switch organization',
+          id: 'configure-organization',
+          name: 'Configure organization',
           commands:
             organizations?.map(({ name, slug }) => ({
               id: `organization-${slug}`,
@@ -86,18 +86,13 @@ function useOrganizationSwitchCommand() {
     COMMAND_MENU_SECTIONS.ACTIONS,
     [
       {
-        id: 'switch-organization',
-        name: 'Switch organization',
-        value: 'Switch organization, Change organization, Select organization',
+        id: 'configure-organization',
+        name: 'Configure organization',
+        value: 'Configure organization, Change organization, Select organization',
         action: () => setPage(ORGANIZATION_SWITCHER_PAGE_NAME),
         icon: () => <Building />,
       },
     ],
     { enabled: !!organizations && organizations.length > 0 }
   )
-}
-
-export function useCommandMenuSwitchers() {
-  useProjectSwitchCommand()
-  useOrganizationSwitchCommand()
 }
