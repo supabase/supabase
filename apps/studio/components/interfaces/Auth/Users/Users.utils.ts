@@ -89,7 +89,7 @@ const phoneProviders = providers.phone.map((x) => {
   return key
 })
 
-function getDisplayName(user: User, fallback = '-'): string {
+export function getDisplayName(user: User, fallback = '-'): string {
   const {
     displayName,
     display_name,
@@ -119,7 +119,7 @@ function getDisplayName(user: User, fallback = '-'): string {
   )
 }
 
-function getAvatarUrl(user: User): string | undefined {
+export function getAvatarUrl(user: User): string | undefined {
   const {
     avatarUrl,
     avatarURL,
