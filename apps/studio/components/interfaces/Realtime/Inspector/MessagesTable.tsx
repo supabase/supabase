@@ -10,7 +10,8 @@ import { DocsButton } from 'components/ui/DocsButton'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { Button, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
+import { Broadcast, DatabaseChanges, Presence } from 'icons'
+import { Button, cn } from 'ui'
 import MessageSelection from './MessageSelection'
 import type { LogData } from './Messages.types'
 import NoChannelEmptyState from './NoChannelEmptyState'
@@ -42,7 +43,7 @@ const NoResultAlert = ({
 
           <div className="mt-4 border bg-surface-100 border-border rounded-md justify-start items-center flex flex-col w-full">
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-              <IconBroadcast size="xlarge" className="text-background bg-foreground rounded w-6" />
+              <Broadcast size="xlarge" className="text-background bg-foreground rounded w-6" />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Create a Broadcast message</p>
                 <p className="text-foreground-lighter text-xs">Send a message in the channel</p>
@@ -52,7 +53,7 @@ const NoResultAlert = ({
               </Button>
             </div>
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-              <IconPresence size="xlarge" className="text-background bg-foreground rounded w-6" />
+              <Presence size="xlarge" className="text-background bg-foreground rounded w-6" />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Join from another browser tab</p>
                 <p className="text-foreground-lighter text-xs">
@@ -67,7 +68,7 @@ const NoResultAlert = ({
             </div>
 
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-              <IconDatabaseChanges
+              <DatabaseChanges
                 size="xlarge"
                 className="text-background bg-foreground rounded w-6"
               />

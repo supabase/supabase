@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
-import { IconDocumentation, IconMicSolid, IconProductHunt, IconYoutubeSolid, cn } from 'ui'
 import { Music } from 'lucide-react'
-
 import Link from 'next/link'
-import { StepLink } from '../data/lw12_data'
+import { useEffect, useState } from 'react'
+
+import { Documentation, Mic, ProductHunt, Youtube } from 'icons'
+import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import { StepLink } from '../data/lw12_data'
 
 interface DayLink extends StepLink {
   className?: string
@@ -21,19 +22,19 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
 
   const linkTypes = {
     blog: {
-      icon: IconDocumentation,
+      icon: Documentation,
       text: 'Blog Post',
     },
     docs: {
-      icon: IconDocumentation,
+      icon: Documentation,
       text: 'Docs',
     },
     productHunt: {
-      icon: IconProductHunt,
+      icon: ProductHunt,
       text: 'Product Hunt',
     },
     video: {
-      icon: IconYoutubeSolid,
+      icon: Youtube,
       text: 'Watch video',
     },
     podcast: {
@@ -41,7 +42,7 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
       text: 'Podcast',
     },
     xSpace: {
-      icon: IconMicSolid,
+      icon: Mic,
       text: 'X Space',
     },
   }
