@@ -248,7 +248,7 @@ const LogsQueryPanel = ({
                     type="text"
                     className="px-1"
                     onClick={() => setShowReference(false)}
-                    icon={<X size={18} strokeWidth={1.5} />}
+                    icon={<X />}
                   />
                 </div>
               }
