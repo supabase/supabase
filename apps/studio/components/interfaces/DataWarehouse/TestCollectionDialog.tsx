@@ -184,7 +184,7 @@ export function TestCollectionDialog({
         </SheetSection>
         <SheetFooter className="mt-auto">
           <p className="text-sm text-foreground-light mr-auto">
-            Once you send an event, refresh the page to see it in the table.
+            Once you send an event, refresh the page to see it in the collection.
           </p>
           <div className="flex justify-end">
             <Button onClick={() => router.reload()}>Refresh events</Button>

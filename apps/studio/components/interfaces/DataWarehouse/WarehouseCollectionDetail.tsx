@@ -22,7 +22,7 @@ import dayjs from 'dayjs'
 const dayjsBase = dayjs()
 const INTERVALS: DatetimeHelper[] = [
   {
-    text: 'Last 1 hour',
+    text: 'Last hour',
     calcFrom: () => dayjsBase.subtract(1, 'hour').toISOString(),
     calcTo: () => dayjsBase.toISOString(),
     default: true,
@@ -33,7 +33,7 @@ const INTERVALS: DatetimeHelper[] = [
     calcTo: () => dayjsBase.toISOString(),
   },
   {
-    text: 'Last 1 day',
+    text: 'Last day',
     calcFrom: () => dayjsBase.subtract(1, 'day').toISOString(),
     calcTo: () => dayjsBase.toISOString(),
   },
