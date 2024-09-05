@@ -34,7 +34,7 @@ export const useUserDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(authKeys.users(projectRef))
+        await queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
