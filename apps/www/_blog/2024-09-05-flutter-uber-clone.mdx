@@ -21,13 +21,13 @@ toc_depth: 3
 
 </Admonition>
 
-Postgres can handle geography data efficiently thanks to the PostGIS extension. Combining it with Supabase realtime and you can create a real-time location tracking app. 
+Postgres can handle geography data efficiently thanks to the PostGIS extension. Combining it with Supabase realtime and you can create a real-time location tracking app.
 
-In this tutorial, we will guide you through the process of creating an Uber-like application using Flutter and Supabase. This project demonstrates the capabilities of Supabase for building complex, real-time applications with minimal backend code. 
+In this tutorial, we will guide you through the process of creating an Uber-like application using Flutter and Supabase. This project demonstrates the capabilities of Supabase for building complex, real-time applications with minimal backend code.
 
 ## App Overview
 
-An actual Uber app has two apps, the consumer facing app and the driver facing app. This article only covers the consumer facing app. The app works by first choosing a destination, and then waiting for the driver to come pick them up. Once they are picked up, they head to the destination and the journey is complete once they arrive at the destination. Throughout the lifecycle of the app, the driver’s position is shared on screen in real-time. 
+An actual Uber app has two apps, the consumer facing app and the driver facing app. This article only covers the consumer facing app. The app works by first choosing a destination, and then waiting for the driver to come pick them up. Once they are picked up, they head to the destination and the journey is complete once they arrive at the destination. Throughout the lifecycle of the app, the driver’s position is shared on screen in real-time.
 
 The focus of the app is to showcase how to use Supabase realtime with geographical data, so handling payments will not be covered in this article.
 
@@ -62,10 +62,9 @@ google_maps_flutter: ^2.7.0
 geolocator: ^12.0.0
 duration: ^3.0.13
 intl: ^0.19.0
-
 ```
 
-`google_maps_flutter` is used to display the map on our app. We will also draw and move icons on the map. `geolocator` is used to access the GPS information. `duration` is used to parse duration value returned from Google’s routes API, and `intl` is used to display currencies nicely. 
+`google_maps_flutter` is used to display the map on our app. We will also draw and move icons on the map. `geolocator` is used to access the GPS information. `duration` is used to parse duration value returned from Google’s routes API, and `intl` is used to display currencies nicely.
 
 In addition to adding it to `pubspec.yaml` file, `google_maps_flutter` requires additional setup to get started. Follow the [readme.md](https://pub.dev/packages/google_maps_flutter) file to configure Google Maps for the platform you want to support.
 
@@ -95,7 +94,7 @@ Replace `YOUR_SUPABASE_URL` and `YOUR_SUPABASE_ANON_KEY` with your actual Supaba
 
 We need to create two tables for this application. The `drivers` table holds the vehicle information as well as the position. Notice that we have a `latitude` and `longitude` generated column. These columns are generated from the `location` column, and will be used to display the real-time location on the map later on.
 
-The `rides` table holds information about customer’s request to get a ride. 
+The `rides` table holds information about customer’s request to get a ride.
 
 ```sql
 -- Enable the "postgis" extension
@@ -136,7 +135,7 @@ create policy "The driver or the passenger can select the ride." on public.rides
 create policy "The driver can update the status. " on public.rides for update to authenticated using (auth.uid() = driver_id);
 ```
 
-Lastly, we will create a few database functions and triggers. The first function and trigger updates the driver status depending on the status of the ride. This ensures that the driver status is always in sync with the status of the ride. 
+Lastly, we will create a few database functions and triggers. The first function and trigger updates the driver status depending on the status of the ride. This ensures that the driver status is always in sync with the status of the ride.
 
 The second function is for the customer to find available drivers. This function will be called from the Flutter app, which automatically find available drivers within 3,000m radius and returns the driver ID and a newly created ride ID if a driver was found.
 
@@ -173,11 +172,11 @@ create function public.find_driver(origin geography(POINT), destination geograph
             v_driver_id uuid;
             v_ride_id uuid;
         begin
-            select 
+            select
                 drivers.id into v_driver_id
             from public.drivers
             where is_available = true
-                and st_dwithin(origin, location, 3000) 
+                and st_dwithin(origin, location, 3000)
             order by drivers.location <-> origin
             limit 1;
 
@@ -304,7 +303,7 @@ class UberCloneMainScreenState extends State<UberCloneMainScreen> {
 
   /// The current location of the user.
   LatLng? _currentLocation;
-  
+
   final Set<Polyline> _polylines = {};
   final Set<Marker> _markers = {};
 
@@ -317,7 +316,7 @@ class UberCloneMainScreenState extends State<UberCloneMainScreen> {
   LatLng? _previousDriverLocation;
   BitmapDescriptor? _pinIcon;
   BitmapDescriptor? _carIcon;
-  
+
   @override
   void initState() {
     super.initState();
@@ -331,9 +330,9 @@ class UberCloneMainScreenState extends State<UberCloneMainScreen> {
     _cancelSubscriptions();
     super.dispose();
   }
-  
-  // TODO: Add missing methods 
-  
+
+  // TODO: Add missing methods
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -437,7 +436,7 @@ class UberCloneMainScreenState extends State<UberCloneMainScreen> {
 
 ```
 
-The code above still has many missing methods, so do not worry if you see many errors. 
+The code above still has many missing methods, so do not worry if you see many errors.
 
 ## Step 6: Location Selection Implementation
 
@@ -533,59 +532,58 @@ npx supabase functions new route
 
 ```tsx
 type Coordinates = {
-  latitude: number;
-  longitude: number;
-};
+  latitude: number
+  longitude: number
+}
 
 Deno.serve(async (req) => {
-  const { origin, destination }: {
-    origin: Coordinates;
-    destination: Coordinates;
-  } = await req.json();
+  const {
+    origin,
+    destination,
+  }: {
+    origin: Coordinates
+    destination: Coordinates
+  } = await req.json()
 
   const response = await fetch(
-    `https://routes.googleapis.com/directions/v2:computeRoutes?key=${
-      Deno.env.get("GOOGLE_MAPS_API_KEY")
-    }`,
+    `https://routes.googleapis.com/directions/v2:computeRoutes?key=${Deno.env.get(
+      'GOOGLE_MAPS_API_KEY'
+    )}`,
     {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "X-Goog-FieldMask":
-          "routes.duration,routes.distanceMeters,routes.polyline,routes.legs.polyline",
+        'Content-Type': 'application/json',
+        'X-Goog-FieldMask':
+          'routes.duration,routes.distanceMeters,routes.polyline,routes.legs.polyline',
       },
       body: JSON.stringify({
         origin: { location: { latLng: origin } },
         destination: { location: { latLng: destination } },
-        travelMode: "DRIVE",
-        polylineEncoding: "GEO_JSON_LINESTRING",
+        travelMode: 'DRIVE',
+        polylineEncoding: 'GEO_JSON_LINESTRING',
       }),
-    },
-  );
+    }
+  )
 
   if (!response.ok) {
-    const error = await response.json();
-    console.error({ error });
-    throw new Error(`HTTP error! status: ${response.status}`);
+    const error = await response.json()
+    console.error({ error })
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  const data = await response.json();
+  const data = await response.json()
 
-  const res = data.routes[0];
+  const res = data.routes[0]
 
-  return new Response(
-    JSON.stringify(res),
-    { headers: { "Content-Type": "application/json" } },
-  );
-});
-
+  return new Response(JSON.stringify(res), { headers: { 'Content-Type': 'application/json' } })
+})
 ```
 
 Once the function is ready, you can [run it locally](https://supabase.com/docs/guides/functions/quickstart) or [deploy it to a remote Supabase instance](https://supabase.com/docs/guides/functions/deploy).
 
 ## Step 7: Driver Assignment
 
-Now, once a route is displayed on the map and the customer agrees on the fare, a driver needs to be found. We created a convenient method for this earlier, so we can just call the method to find a driver and create a new ride. 
+Now, once a route is displayed on the map and the customer agrees on the fare, a driver needs to be found. We created a convenient method for this earlier, so we can just call the method to find a driver and create a new ride.
 
 If a driver was successfully found, we listen to real-time changes on both the driver and the ride to keep track of the driver’s position and the ride’s current status. For this, we use the [.stream()](https://supabase.com/docs/reference/dart/stream) method.
 
@@ -667,9 +665,9 @@ If a driver was successfully found, we listen to real-time changes on both the d
 
 ## Step 8: Updating the car icon on the map
 
-We will not make an app for the driver in this article, but let’s imagine we had one. As the driver’s car moves, it could update it’s position on the `drivers` table. In the previous step, we are listening to the driver’s position being updated, and using those information, we could move the car in the UI as well. 
+We will not make an app for the driver in this article, but let’s imagine we had one. As the driver’s car moves, it could update it’s position on the `drivers` table. In the previous step, we are listening to the driver’s position being updated, and using those information, we could move the car in the UI as well.
 
-Implement `_updateDriverMarker` method, which updates the driver’s icon on the map as the position changes. We can also calculate the angle at which the driver is headed to using the previous position and the current position. 
+Implement `_updateDriverMarker` method, which updates the driver’s icon on the map as the position changes. We can also calculate the angle at which the driver is headed to using the previous position and the current position.
 
 ```dart
   void _updateDriverMarker(Driver driver) {
@@ -720,9 +718,9 @@ Implement `_updateDriverMarker` method, which updates the driver’s icon on the
 
 ## Step 9: Ride Completion
 
-Finally when the car arrives at the destination (when the driver updates the status to `completed`), a modal thanking the user for using the app shows up. Implement `_showCompletionModal` to greet our valuable customers. 
+Finally when the car arrives at the destination (when the driver updates the status to `completed`), a modal thanking the user for using the app shows up. Implement `_showCompletionModal` to greet our valuable customers.
 
-Upon closing the modal, we reset the app’s state so that the user can take another ride. 
+Upon closing the modal, we reset the app’s state so that the user can take another ride.
 
 ```dart
   /// Shows a modal to indicate that the ride has been completed.
