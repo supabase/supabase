@@ -22,9 +22,15 @@ interface Props {
   viewBox?: string
 }
 
-interface StringMap {
-  [key: string]: number
-}
+export const ICON_SIZES = {
+  tiny: 14,
+  small: 18,
+  medium: 20,
+  large: 20,
+  xlarge: 24,
+  xxlarge: 30,
+  xxxlarge: 42,
+} as const
 
 function IconBase({
   className,
@@ -44,17 +50,7 @@ function IconBase({
   return (
     <IconContext.Consumer>
       {({ contextSize, className: contextClassName }) => {
-        const defaultSizes: StringMap = {
-          tiny: 14,
-          small: 18,
-          medium: 20,
-          large: 20,
-          xlarge: 24,
-          xxlarge: 30,
-          xxxlarge: 42,
-        }
-
-        const defaultSize = defaultSizes['large']
+        const defaultSize = ICON_SIZES['large']
         // @ts-ignore
 
         const FeatherIcon = icon
@@ -66,14 +62,14 @@ function IconBase({
         if (contextSize) {
           iconSize = contextSize
             ? typeof contextSize === 'string'
-              ? defaultSizes[contextSize]
+              ? ICON_SIZES[contextSize]
               : contextSize
             : defaultSize
         }
 
         // use size prop of this component if one exists
         if (size) {
-          iconSize = size ? (typeof size === 'string' ? defaultSizes[size] : size) : defaultSize
+          iconSize = size ? (typeof size === 'string' ? ICON_SIZES[size] : size) : defaultSize
         }
 
         // confitional used for Icons with no color settings
