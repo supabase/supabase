@@ -5,7 +5,7 @@ export * from './src/lib/Markdown'
 // GENERAL
 
 export * from './src/components/Button'
-export * from './src/components/Icon/IconBackground'
+export * from './src/components/IconBackground'
 export * from './src/components/Image'
 
 // DISPLAYS
