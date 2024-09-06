@@ -388,9 +388,9 @@ export const UsersV2 = () => {
               <SelectContent_Shadcn_>
                 <SelectGroup_Shadcn_>
                   <SelectItem_Shadcn_ value="all">All users</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="verified">Verfified users</SelectItem_Shadcn_>
+                  <SelectItem_Shadcn_ value="verified">Verified users</SelectItem_Shadcn_>
                   <SelectItem_Shadcn_ value="unverified">Unverified users</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="anonymous">Anonymous Users</SelectItem_Shadcn_>
+                  <SelectItem_Shadcn_ value="anonymous">Anonymous users</SelectItem_Shadcn_>
                 </SelectGroup_Shadcn_>
               </SelectContent_Shadcn_>
             </Select_Shadcn_>
