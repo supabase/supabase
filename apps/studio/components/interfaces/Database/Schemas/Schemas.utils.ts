@@ -201,10 +201,23 @@ const getLayoutedElementsViaLocalStorage = (
   edges: Edge[],
   positions: { [key: string]: { x: number; y: number } }
 ) => {
+  // [Joshen] Potentially look into auto fitting new nodes?
+  // https://github.com/xyflow/xyflow/issues/1113
+
+  let newNodeCount = 0
+
   nodes.forEach((node) => {
+    const existingPosition = positions?.[node.id]
+
     node.targetPosition = Position.Left
     node.sourcePosition = Position.Right
-    node.position = positions?.[node.id] ?? { x: 0, y: 0 }
+
+    if (existingPosition) {
+      node.position = existingPosition
+    } else {
+      node.position = { x: newNodeCount * 10, y: newNodeCount * 10 }
+      newNodeCount += 1
+    }
   })
   return { nodes, edges }
 }
