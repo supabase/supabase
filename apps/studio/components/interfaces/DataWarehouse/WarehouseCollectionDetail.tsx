@@ -18,6 +18,7 @@ import { Input } from '@ui/components/shadcn/ui/input'
 import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import dayjs from 'dayjs'
+import { useKeyboardShortcuts } from 'components/grid/components/common/Hooks'
 
 const dayjsBase = dayjs()
 const INTERVALS: DatetimeHelper[] = [
@@ -77,12 +78,11 @@ export const WarehouseCollectionDetail = () => {
       const from = filters.interval?.from
       const to = filters.interval?.to
 
-      const sql = `
-      select id, timestamp, event_message from \`${collection.name}\`
-      where timestamp >= TIMESTAMP('${from}')
-      ${to ? `and timestamp <= TIMESTAMP('${to}')` : ''}
-      and event_message like '%${filters.search}%'
-      order by timestamp desc limit ${filters.limit} offset ${filters.offset}
+      const sql = `select id, timestamp, event_message from \`${collection.name}\`
+where timestamp >= TIMESTAMP('${from}')
+${to ? `and timestamp <= TIMESTAMP('${to}')` : ''}
+and event_message like '%${filters.search}%'
+order by timestamp desc limit ${filters.limit} offset ${filters.offset}
       `
 
       setParams((prevParams) => ({
@@ -138,6 +138,25 @@ export const WarehouseCollectionDetail = () => {
     params.sql || ''
   )}&source=warehouse`
 
+  useKeyboardShortcuts(
+    {
+      r: () => {
+        document.getElementById('refresh-button')?.focus()
+      },
+      s: () => {
+        document.getElementById('search-input')?.focus()
+      },
+    },
+    ['INPUT', 'BUTTON', 'TEXTAREA']
+  )
+
+  function KeyboardShortcut({ children }: { children: React.ReactNode }) {
+    return (
+      <span className="flex items-center gap-2 font-medium text-xs font-mono text-foreground-light border rounded-md px-1.5 py-0.5 border-b-2">
+        {children}
+      </span>
+    )
+  }
   return (
     <div className="relative flex flex-col flex-grow h-full">
       <ShimmerLine active={isLoading} />
@@ -149,6 +168,7 @@ export const WarehouseCollectionDetail = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
+                    id="refresh-button"
                     htmlType="submit"
                     icon={<RefreshCcw />}
                     type="text"
@@ -157,9 +177,12 @@ export const WarehouseCollectionDetail = () => {
                     className="px-1.5"
                   />
                 </TooltipTrigger>
-                <TooltipContent>Refresh</TooltipContent>
+                <TooltipContent className="flex items-center gap-2">
+                  Refresh <KeyboardShortcut>R</KeyboardShortcut>
+                </TooltipContent>
               </Tooltip>
               <Input
+                id="search-input"
                 className="w-40"
                 size="tiny"
                 placeholder="Search by event message"
@@ -204,6 +227,10 @@ export const WarehouseCollectionDetail = () => {
                 collections={collections || []}
                 open={testDialogOpen}
                 onOpenChange={setTestDialogOpen}
+                onSubmit={() => {
+                  refetch()
+                  setTestDialogOpen(false)
+                }}
               />
             </div>
           </div>
