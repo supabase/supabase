@@ -50,10 +50,11 @@ const LogSelection = ({
   )
   const [sql, setSql] = useState('')
 
+  const warehouseQueryEnabled = queryType === 'warehouse'
   const {
     refetch: refetchWarehouseData,
     data: warehouseQueryData,
-    isFetching: warehouseQueryFetching,
+    isLoading: warehouseQueryLoading,
   } = useWarehouseQueryQuery(
     {
       ref: projectRef,
@@ -218,7 +219,7 @@ const LogSelection = ({
             </Button>
           </TabsList_Shadcn_>
           <div className="flex-grow">
-            {isLoading || warehouseQueryFetching ? (
+            {isLoading || (warehouseQueryEnabled && warehouseQueryLoading) ? (
               <div className="p-4">
                 <GenericSkeletonLoader />
               </div>
