@@ -367,8 +367,9 @@ export const UsersV2 = () => {
         <div className="bg-surface-200 py-3 px-6 flex items-center justify-between border-t">
           <div className="flex items-center gap-x-2">
             <Input
-              className="w-72"
-              icon={<Search size={16} className="text-foreground-lighter" />}
+              size="tiny"
+              className="w-64"
+              icon={<Search size={14} className="text-foreground-lighter" />}
               placeholder="Search by email or phone number"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -382,7 +383,7 @@ export const UsersV2 = () => {
               ]}
             />
             <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
-              <SelectTrigger_Shadcn_ className="w-[180px]">
+              <SelectTrigger_Shadcn_ size="tiny" className="w-[150px]">
                 <SelectValue_Shadcn_ />
               </SelectTrigger_Shadcn_>
               <SelectContent_Shadcn_>
