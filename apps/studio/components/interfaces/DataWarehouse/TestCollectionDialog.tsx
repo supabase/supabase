@@ -2,6 +2,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components
 import CopyButton from 'components/ui/CopyButton'
 import type { WarehouseAccessTokensData } from 'data/analytics/warehouse-access-tokens-query'
 import type { WarehouseCollectionsData } from 'data/analytics/warehouse-collections-query'
+import { Code } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
@@ -32,6 +33,7 @@ export function TestCollectionDialog({
   collections,
   open,
   onOpenChange,
+  onSubmit,
 }: {
   accessTokens: WarehouseAccessTokensData['data']
   collections: WarehouseCollectionsData
@@ -39,6 +41,7 @@ export function TestCollectionDialog({
   projectRef: string
   open: boolean
   onOpenChange: (open: boolean) => void
+  onSubmit: () => void
 }) {
   const router = useRouter()
   const BASE_WAREHOUSE_URL = `https://api.warehouse.tech/api/events`
@@ -98,14 +101,14 @@ export function TestCollectionDialog({
         )}
       </Tooltip_Shadcn_>
 
-      <SheetContent size="lg">
+      <SheetContent size="lg" className="h-screen overflow-auto flex flex-col">
         <SheetHeader>
           <SheetTitle>Send events to this collection</SheetTitle>
           <SheetDescription>
             Use the following cURL command to send events to this collection
           </SheetDescription>
         </SheetHeader>
-        <Separator />
+
         <SheetSection className="flex flex-col gap-4 overflow-auto">
           <FormItemLayout label="Collection" isReactForm={false} layout="horizontal">
             <Select value={selectedCollection} onValueChange={setSelectedCollection}>
@@ -139,26 +142,16 @@ export function TestCollectionDialog({
           </FormItemLayout>
 
           <FormItemLayout layout="horizontal" label="Ingest API URL" isReactForm={false}>
-            <Input_Shadcn_
-              size="tiny"
-              className="font-mono tracking-tighter"
-              value={BASE_WAREHOUSE_URL}
-              readOnly
-            />
+            <Input_Shadcn_ size="tiny" className="font-mono" value={BASE_WAREHOUSE_URL} readOnly />
           </FormItemLayout>
           <FormItemLayout layout="horizontal" label="Collection ID" isReactForm={false}>
-            <Input_Shadcn_
-              size="tiny"
-              className="font-mono tracking-tighter"
-              value={selectedCollection}
-              readOnly
-            />
+            <Input_Shadcn_ size="tiny" className="font-mono" value={selectedCollection} readOnly />
           </FormItemLayout>
         </SheetSection>
 
         <Separator />
 
-        <SheetSection>
+        <SheetSection className="flex-1">
           <div className="flex justify-between items-center">
             <div className="flex gap-2 items-center">
               <Checkbox_Shadcn_
@@ -182,12 +175,13 @@ export function TestCollectionDialog({
             </CodeBlock>
           </div>
         </SheetSection>
+
         <SheetFooter className="mt-auto">
           <p className="text-sm text-foreground-light mr-auto">
             Once you send an event, refresh the page to see it in the collection.
           </p>
           <div className="flex justify-end">
-            <Button onClick={() => router.reload()}>Refresh events</Button>
+            <Button onClick={onSubmit}>Refresh results</Button>
           </div>
         </SheetFooter>
       </SheetContent>
