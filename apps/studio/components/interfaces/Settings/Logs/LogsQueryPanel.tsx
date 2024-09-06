@@ -102,7 +102,10 @@ const LogsQueryPanel = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" iconRight={<ChevronDown />}>
-                    Data source <span className="ml-2 font-mono opacity-50">{dataSource}</span>
+                    Data source{' '}
+                    <span className="ml-2 font-mono opacity-50">
+                      {dataSource === 'warehouse' ? 'collections' : 'logs'}
+                    </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="start">
@@ -113,10 +116,10 @@ const LogsQueryPanel = ({
                     <DropdownMenuItemContent
                       name={
                         <span>
-                          Warehouse <Badge variant="warning">NEW</Badge>
+                          Collections <Badge variant="warning">NEW</Badge>
                         </span>
                       }
-                      desc="Query your data warehouse collections"
+                      desc="Query your collections"
                     />
                   </DropdownMenuItem>
                 </DropdownMenuContent>

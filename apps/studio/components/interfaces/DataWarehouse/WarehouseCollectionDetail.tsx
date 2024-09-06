@@ -219,7 +219,7 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="text-xs">
-                  Open query in Warehouse Explorer
+                  Open query in Collections Explorer
                 </TooltipContent>
               </Tooltip>
 
