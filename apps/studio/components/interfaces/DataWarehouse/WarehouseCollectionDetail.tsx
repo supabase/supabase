@@ -19,6 +19,7 @@ import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import dayjs from 'dayjs'
 import { useKeyboardShortcuts } from 'components/grid/components/common/Hooks'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 const dayjsBase = dayjs()
 const INTERVALS: DatetimeHelper[] = [
@@ -182,8 +183,9 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
                 </TooltipContent>
               </Tooltip>
               <Input
+                type="search"
                 id="search-input"
-                className="w-40"
+                className="w-52"
                 size="tiny"
                 placeholder="Search by event message"
                 value={search}
