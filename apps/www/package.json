@@ -20,6 +20,7 @@
     "@mdx-js/react": "^2.3.0",
     "@next/bundle-analyzer": "^14.2.3",
     "@next/mdx": "^14.2.3",
+    "@notion-stuff/blocks-markdown-parser": "^6.0.0",
     "@notionhq/client": "^2.2.15",
     "@octokit/auth-app": "^6.0.3",
     "@octokit/core": "^5.0.2",

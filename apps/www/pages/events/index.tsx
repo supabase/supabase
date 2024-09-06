@@ -60,13 +60,46 @@ function Events({ events: allEvents, onDemandEvents, categories, eventsWithBlock
           <p className="text-foreground-light">Join us at the following upcoming events</p>
         </SectionContainer>
         <SectionContainer className="!py-0">
-          <EventsFilters
+          {/* <EventsFilters
             allEvents={allEvents}
             events={events}
             setEvents={setEvents}
             categories={categories}
-          />
+          /> */}
 
+          <h2 className="text-foreground-lighter mt-12">📒 Events from Notion</h2>
+          <ol
+            className={cn(
+              'grid -mx-2 sm:-mx-4 py-6 lg:py-6 grid-cols-1',
+              !eventsWithBlocks?.length && 'mx-0 sm:mx-0'
+            )}
+          >
+            {eventsWithBlocks?.length ? (
+              eventsWithBlocks
+                // ?.sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())
+                .map((event: any, idx: number) => (
+                  <div
+                    className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none opacity-0 !scale-100 animate-fade-in"
+                    key={`${event.title}-upcoming-${idx}`}
+                  >
+                    <EventListItem event={{
+                      type: "event",
+                      title: event.properties.Name.title[0].plain_text,
+                      date: event.properties.Date.date.start,
+                      thumb: "",
+                      description: "",
+                      url: "",
+                      path: "",
+                      }} />
+                  </div>
+                ))
+            ) : (
+              <p className="text-sm py-2 sm:py-4 text-lighter col-span-full italic opacity-0 !scale-100 animate-fade-in">
+                No results found
+              </p>
+            )}
+          </ol>
+          <h2 className="text-foreground-lighter mt-8">📄 Static Events</h2>
           <ol
             className={cn(
               'grid -mx-2 sm:-mx-4 py-6 lg:py-6 grid-cols-1',
