@@ -165,7 +165,9 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
         <div className="flex flex-col w-full">
           <div className="flex justify-between items-center h-12 px-5">
             <form onSubmit={handleSubmit} className="flex items-center gap-2">
-              <h2 className="text-foreground-light">{collection?.name}</h2>
+              <h2 className="text-foreground-light max-w-60 truncate" title={collection?.name}>
+                {collection?.name}
+              </h2>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
