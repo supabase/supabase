@@ -2,18 +2,21 @@ import { ChevronRight } from 'lucide-react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { MDXRemoteBase } from './MdxBase'
-import { getAllTroubleshootingEntries, getArticleSlug } from './Troubleshooting.utils'
+import { type ITroubleshootingEntry, getArticleSlug } from './Troubleshooting.utils'
 import { TroubleshootingEntryAssociatedErrors } from './Troubleshooting.ui.client'
 import {
   TROUBLESHOOTING_DATA_ATTRIBUTE,
   TROUBLESHOOTING_DATA_ATTRIBUTE_ENTRY,
   TROUBLESHOOTING_DATA_ATTRIBUTE_PREVIEW,
 } from './Troubleshooting.utils.shared'
+import Link from 'next/link'
 
 export function TroubleshootingPreview({
   entry,
+  parentPage = '/guides/troubleshooting',
 }: {
-  entry: Awaited<ReturnType<typeof getAllTroubleshootingEntries>>[number]
+  entry: ITroubleshootingEntry
+  parentPage?: string
 }) {
   const keywords = [...entry.data.topics, ...(entry.data.keywords ?? [])]
 
@@ -32,15 +35,15 @@ export function TroubleshootingPreview({
       data-keywords={keywords.join(',')}
       {...articleAttributes}
     >
-      <a
-        href={getArticleSlug(entry.data)}
+      <Link
+        href={`/guides/troubleshooting/${getArticleSlug(entry.data)}?returnTo=${parentPage}`}
         className="group p-[var(--local-padding)] block no-underline w-full flex items-center justify-between gap-2"
       >
         <h2 id={`troubleshooting-entry-title-${entry.data.database_id}`} className="m-0 truncate">
           {entry.data.title}
         </h2>
         <ChevronRight className="text-foreground-lighter group-hover:translate-x-1 transition-transform" />
-      </a>
+      </Link>
       <hr className="m-0" aria-hidden />
       <h3 className="sr-only">Keywords</h3>
       <ul className="not-prose p-[var(--local-padding)] flex flex-wrap items-center gap-2">

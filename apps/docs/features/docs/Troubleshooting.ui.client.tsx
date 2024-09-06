@@ -1,5 +1,6 @@
 'use client'
 
+import { X } from 'lucide-react'
 import { Fragment, useEffect, useMemo, useRef, useState, createContext, useContext } from 'react'
 
 import {
@@ -10,14 +11,14 @@ import {
   cn,
 } from 'ui'
 
-import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
+import { type ITroubleshootingEntry, type ITroubleshootingMetadata } from './Troubleshooting.utils'
 import {
   TROUBLESHOOTING_DATA_ATTRIBUTE,
   TROUBLESHOOTING_DATA_ATTRIBUTE_ENTRY,
   TROUBLESHOOTING_DATA_ATTRIBUTE_PREVIEW,
   TROUBLESHOOTING_ENTRIES_ID,
 } from './Troubleshooting.utils.shared'
-import { X } from 'lucide-react'
+import Link from 'next/link'
 
 // Create a context for filter and search state
 const TroubleshootingContext = createContext<
@@ -261,5 +262,90 @@ export function TroubleshootingEntryAssociatedErrors({
         </Wrapper>
       </ul>
     </div>
+  )
+}
+
+export function TroubleshootingErrorListDetailed({
+  errors,
+  className,
+}: {
+  errors: ITroubleshootingEntry['data']['errors']
+  className?: string
+}) {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  const longErrorsList = errors.length > 2
+  const expandedContentId = 'troubleshooting-error-list-detailed-expanded-content'
+
+  return (
+    <aside className={cn('not-prose', className)}>
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <h2 className="uppercase tracking-wider text-xs text-foreground-light">Related errors</h2>
+        <button
+          className="text-sm text-foreground-lighter hover:text-foreground transition-colors"
+          onClick={() => setIsExpanded(!isExpanded)}
+          aria-controls={expandedContentId}
+          aria-expanded={isExpanded}
+        >
+          {isExpanded ? 'Show less' : 'Show more'}
+        </button>
+      </div>
+      <table className="[&_td]:pr-2 [&_td]:text-foreground-light [&_td]:text-sm">
+        <thead className="sr-only">
+          <tr>
+            <th>HTTP Status Code</th>
+            <th>Error Code</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          {errors.slice(0, 2).map((error, index) => (
+            <tr key={index}>
+              <td className="font-mono">{error.http_status_code}</td>
+              <td className="font-mono">{error.code}</td>
+              <td>{error.message}</td>
+            </tr>
+          ))}
+        </tbody>
+        {longErrorsList && isExpanded && (
+          <tbody id={expandedContentId}>
+            {errors.slice(2).map((error, index) => (
+              <tr key={index}>
+                <td className="font-mono">{error.http_status_code}</td>
+                <td className="font-mono">{error.code}</td>
+                <td>{error.message}</td>
+              </tr>
+            ))}
+          </tbody>
+        )}
+      </table>
+    </aside>
+  )
+}
+
+export function TroubleshootingBackLink({
+  className,
+  direction = 'left',
+}: {
+  className?: string
+  direction?: 'left' | 'right'
+}) {
+  const [href, setHref] = useState('/guides/troubleshooting')
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    const returnTo = searchParams.get('returnTo')
+    if (returnTo) {
+      setHref(returnTo)
+    }
+  }, [])
+
+  return (
+    <Link
+      href={href}
+      className={cn('group flex items-center gap-1 text-sm text-foreground-lighter', className)}
+    >
+      {direction === 'left' ? '‹ More troubleshooting' : 'More troubleshooting ›'}
+    </Link>
   )
 }

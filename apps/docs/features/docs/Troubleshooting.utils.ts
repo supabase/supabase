@@ -130,6 +130,7 @@ export const getAllTroubleshootingEntries = cache_fullProcess_withDevCacheBust(
   TROUBLESHOOTING_DIRECTORY,
   () => JSON.stringify([])
 )
+export type ITroubleshootingEntry = Awaited<ReturnType<typeof getAllTroubleshootingEntries>>[number]
 
 export async function getAllTroubleshootingKeywords() {
   const entries = await getAllTroubleshootingEntries()
@@ -148,5 +149,5 @@ export async function getAllTroubleshootingKeywords() {
 export function getArticleSlug(entry: ITroubleshootingMetadata) {
   const slugifiedTitle = entry.title.toLowerCase().replace(/\s+/g, '-')
   const escapedTitle = encodeURIComponent(slugifiedTitle)
-  return `troubleshooting/${escapedTitle}-${entry.database_id}`
+  return escapedTitle
 }
