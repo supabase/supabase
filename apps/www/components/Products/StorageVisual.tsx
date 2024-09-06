@@ -1,12 +1,11 @@
-import React from 'react'
 import { range } from 'lodash'
-import { IconFile, IconImage, IconVideo } from 'ui'
+import { File, Image, Video } from 'lucide-react'
 
 const StorageVisual = () => {
   const cols = [
-    <IconImage className="w-6 h-6 md:w-6 md:h-6 text-muted" />,
-    <IconFile className="w-6 h-6 md:w-6 md:h-6 text-muted" />,
-    <IconVideo className="w-6 h-6 md:w-6 md:h-6 text-muted" />,
+    <Image className="w-6 h-6 md:w-6 md:h-6 text-muted" />,
+    <File className="w-6 h-6 md:w-6 md:h-6 text-muted" />,
+    <Video className="w-6 h-6 md:w-6 md:h-6 text-muted" />,
   ]
 
   return (

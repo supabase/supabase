@@ -1,8 +1,9 @@
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
-import { Badge, IconExternalLink } from 'ui'
+import { Badge } from 'ui'
 import { CategoryAttribute } from './Usage.constants'
+import { ExternalLink } from 'lucide-react'
 
 export interface SectionContent {
   section: Pick<CategoryAttribute, 'name' | 'description' | 'links'>
@@ -44,7 +45,7 @@ const SectionContent = ({
                         <Link href={link.url} target="_blank" rel="noreferrer">
                           <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                             <p className="text-sm">{link.name}</p>
-                            <IconExternalLink size={16} strokeWidth={1.5} />
+                            <ExternalLink size={16} strokeWidth={1.5} />
                           </div>
                         </Link>
                       </div>

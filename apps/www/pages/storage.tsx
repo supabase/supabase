@@ -1,11 +1,13 @@
-import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, Image } from 'ui'
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
 import Solutions from 'data/Solutions'
+import { ArrowUpRight, Shuffle, Wifi, X } from 'lucide-react'
 import { NextSeo } from 'next-seo'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { PRODUCT_NAMES } from 'shared-data/products'
+import { Button, Image } from 'ui'
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
@@ -14,10 +16,9 @@ import FeatureColumn from '~/components/FeatureColumn'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductIcon from '~/components/ProductIcon'
+import ProductsNav from '~/components/Products/ProductsNav'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import ProductsNav from '~/components/Products/ProductsNav'
-import { PRODUCT_NAMES } from 'shared-data/products'
 
 function StoragePage() {
   // base path for images
@@ -81,9 +82,9 @@ function StoragePage() {
             <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
               <div className="p mb-4 flex items-center space-x-2">
                 <ProductIcon icon={Solutions['storage'].icon} />
-                <IconX />
+                <X />
                 <ProductIcon icon={Solutions['authentication'].icon} />
-                <IconX />
+                <X />
                 <ProductIcon icon={Solutions['database'].icon} />
               </div>
 
@@ -179,7 +180,7 @@ function StoragePage() {
               <div className="my-8 grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16" key={0}>
                 <div className="col-span-6 lg:col-span-12 lg:mb-8 xl:col-span-4 xl:mb-0">
                   <FeatureColumn
-                    icon={<IconWifi />}
+                    icon={<Wifi />}
                     title="CDN"
                     text="Serve from over 285 cities globally to reduce latency."
                   />
@@ -188,14 +189,14 @@ function StoragePage() {
                     size="small"
                     type="default"
                     className="mt-4"
-                    icon={<IconArrowUpRight />}
+                    icon={<ArrowUpRight />}
                   >
                     <Link href="/docs/guides/storage/cdn/fundamentals">Explore docs</Link>
                   </Button>
                 </div>
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
-                    icon={<IconShuffle />}
+                    icon={<Shuffle />}
                     title="Image Optimizations and Transformations"
                     text="Resize and compress your media files on the fly."
                   />
@@ -204,7 +205,7 @@ function StoragePage() {
                     size="small"
                     type="default"
                     className="mt-4"
-                    icon={<IconArrowUpRight />}
+                    icon={<ArrowUpRight />}
                   >
                     <Link href="/docs/guides/storage/serving/image-transformations">
                       Explore docs
@@ -245,7 +246,7 @@ function StoragePage() {
                         size="small"
                         type="default"
                         className="mt-4"
-                        icon={<IconArrowUpRight />}
+                        icon={<ArrowUpRight />}
                       >
                         <Link href="/docs/reference/javascript/storage-createbucket">
                           Explore documentation

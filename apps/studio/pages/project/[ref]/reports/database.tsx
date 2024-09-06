@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, IconExternalLink } from 'ui'
+import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
@@ -278,7 +278,7 @@ const DatabaseUsage = () => {
                       inactive.
                     </p>
 
-                    <Button asChild type="default" icon={<IconExternalLink />}>
+                    <Button asChild type="default" icon={<ExternalLink />}>
                       <Link
                         href="https://supabase.com/docs/guides/platform/database-size#database-space-management"
                         target="_blank"

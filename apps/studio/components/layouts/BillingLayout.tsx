@@ -5,7 +5,7 @@ import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { IconX } from 'ui'
+import { X } from 'lucide-react'
 
 export interface BillingLayoutProps {}
 
@@ -22,7 +22,7 @@ const BillingLayout = ({ children }: PropsWithChildren<BillingLayoutProps>) => {
             href={`/org/${selectedOrganization?.slug}/billing`}
             className="text-foreground-lighter transition-colors hover:text-foreground"
           >
-            <IconX size={16} strokeWidth={1.5} />
+            <X size={16} strokeWidth={1.5} />
           </Link>
           <div className="flex items-center space-x-6">
             <h1 className="text-sm text-foreground">Customize your plan</h1>

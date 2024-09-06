@@ -1,20 +1,17 @@
-import React, { useEffect, useState } from 'react'
 import { InformationCircleIcon } from '@heroicons/react/outline'
+import { ChevronDown, Plus, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import {
-  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconPlus,
-  IconTrash2,
   Slider_Shadcn_,
   cn,
 } from 'ui'
-import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { ComputeBadge } from 'ui-patterns'
+import pricingAddOn from '~/data/PricingAddOnTable.json'
 
 const plans = [
   {
@@ -129,7 +126,7 @@ const ComputePricingCalculator = () => {
                 <Button
                   size="tiny"
                   type="outline"
-                  iconRight={<IconChevronDown />}
+                  iconRight={<ChevronDown />}
                   icon={
                     activePlan.name === 'Pro' ? (
                       <svg
@@ -274,7 +271,7 @@ const ComputePricingCalculator = () => {
                       className="p-1 text-lighter hover:text-foreground rounded opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={() => removeInstance(activeInstance.position)}
                     >
-                      <IconTrash2 className="w-3 h-3" />
+                      <Trash2 className="w-3 h-3" />
                     </button>
                   )}
                 </div>
@@ -287,7 +284,7 @@ const ComputePricingCalculator = () => {
             size="tiny"
             type="outline"
             block
-            icon={<IconPlus />}
+            icon={<Plus />}
             onClick={() =>
               setActiveInstances([
                 ...activeInstances,
