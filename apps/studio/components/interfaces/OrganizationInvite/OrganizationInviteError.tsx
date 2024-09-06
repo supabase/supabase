@@ -18,16 +18,8 @@ export const OrganizationInviteError = ({ data, error, isError }: OrganizationIn
   const signOut = useSignOut()
   const { profile } = useProfile()
 
-  const hasError =
-    isError || data?.token_does_not_exist || data?.expired_token || !data?.email_match
-
   return (
-    <div
-      className={cn(
-        'flex flex-col items-center justify-center gap-y-1 text-sm',
-        hasError ? 'text-foreground-light' : 'text-foreground'
-      )}
-    >
+    <div className={cn('flex flex-col items-center justify-center gap-y-1 text-sm')}>
       {isError ? (
         <AlertError
           error={error}
@@ -43,7 +35,7 @@ export const OrganizationInviteError = ({ data, error, isError }: OrganizationIn
           </p>
         </>
       ) : !data?.email_match ? (
-        <>
+        <div className="p-4 flex flex-col gap-y-1">
           <p>
             Your email address {profile?.primary_email} does not match the email address this
             invitation was sent to.
@@ -62,14 +54,14 @@ export const OrganizationInviteError = ({ data, error, isError }: OrganizationIn
             and then sign in or create a new account using the same email address used in the
             invitation.
           </p>
-        </>
+        </div>
       ) : data.expired_token ? (
-        <>
+        <div className="p-4 flex flex-col gap-y-1">
           <p>The invite token has expired.</p>
           <p className="text-foreground-lighter">
             Please request a new one from the organization owner.
           </p>
-        </>
+        </div>
       ) : null}
     </div>
   )
