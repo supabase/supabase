@@ -94,7 +94,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
         key={item.token + '-collection-item'}
         href={`/project/${projectRef}/logs/collections/${item.token}`}
       >
-        <div>{item.name}</div>
+        <div className="truncate">{item.name}</div>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
