@@ -11,12 +11,12 @@ import { getFlattenedSections } from '~/features/docs/Reference.generated.single
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
 
-export interface AbbrevCommonClientLibSection {
+export interface AbbrevApiReferenceSection {
   id: string
   type: string
   title?: string
   slug?: string
-  items?: Array<AbbrevCommonClientLibSection>
+  items?: Array<AbbrevApiReferenceSection>
   excludes?: Array<string>
   meta?: {
     shared?: boolean
@@ -25,6 +25,7 @@ export interface AbbrevCommonClientLibSection {
 
 export function parseReferencePath(slug: Array<string>) {
   const isClientSdkReference = clientSdkIds.includes(slug[0])
+  const isCliReference = slug[0] === 'cli'
 
   if (isClientSdkReference) {
     let [sdkId, maybeVersion, maybeCrawlers, ...path] = slug
@@ -44,6 +45,11 @@ export function parseReferencePath(slug: Array<string>) {
       maybeVersion,
       maybeCrawlers,
       path,
+    }
+  } else if (isCliReference) {
+    return {
+      __type: 'cli' as const,
+      path: slug.slice(1),
     }
   } else {
     return {
@@ -68,7 +74,7 @@ async function generateStaticParamsForSdkVersion(sdkId: string, version: string)
 }
 
 export async function generateReferenceStaticParams() {
-  const nonCrawlerPages = clientSdkIds
+  const sdkPages = clientSdkIds
     .flatMap((sdkId) =>
       REFERENCES[sdkId].versions.map((version) => ({
         sdkId,
@@ -79,7 +85,13 @@ export async function generateReferenceStaticParams() {
       slug: [sdkId, version === REFERENCES[sdkId].versions[0] ? null : version].filter(Boolean),
     }))
 
-  return nonCrawlerPages
+  const cliPages = [
+    {
+      slug: ['cli'],
+    },
+  ]
+
+  return [...sdkPages, ...cliPages]
 }
 
 export async function generateReferenceMetadata(
@@ -90,6 +102,7 @@ export async function generateReferenceMetadata(
 
   const parsedPath = parseReferencePath(slug)
   const isClientSdkReference = parsedPath.__type === 'clientSdk'
+  const isCliReference = parsedPath.__type === 'cli'
 
   if (isClientSdkReference) {
     const { sdkId, maybeVersion } = parsedPath
@@ -125,6 +138,11 @@ export async function generateReferenceMetadata(
         url,
         images,
       },
+    }
+  } else if (isCliReference) {
+    return {
+      title: 'CLI Reference | Supabase Docs',
+      description: 'CLI reference for the Supabase CLI',
     }
   } else {
     return {}

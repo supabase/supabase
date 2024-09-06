@@ -107,6 +107,7 @@ export const REFERENCES = {
   cli: {
     type: 'cli',
     name: 'CLI',
+    libPath: 'cli',
     versions: [],
     icon: 'reference-cli',
   },
