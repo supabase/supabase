@@ -46,11 +46,12 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
       enabled: showWarehouse,
     }
   )
-  const { data: collections, isFetching: collectionsLoading } = useWarehouseCollectionsQuery(
+  const collectionQueryEnabled = !!tenant
+  const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
     {
       projectRef,
     },
-    { enabled: !!tenant }
+    { enabled: collectionQueryEnabled }
   )
 
   const canUseLogsExplorer = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
@@ -99,7 +100,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
                   <div className="space-y-1">
                     <CreateWarehouseCollectionModal />
                     <div className="pt-3">
-                      {collectionsLoading ? (
+                      {collectionQueryEnabled && collectionsLoading ? (
                         <GenericSkeletonLoader />
                       ) : (
                         collections?.map((item) => (
