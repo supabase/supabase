@@ -21,7 +21,7 @@ const Index = () => {
       <Hero />
       <Logos />
       <Products {...content.productsSection} />
-      <HeroFrameworks className="mt-4 lg:mt-6" />
+      <HeroFrameworks />
       <TwitterSocialSection />
       <BuiltExamples />
       {/* <MadeForDevelopers /> */}
