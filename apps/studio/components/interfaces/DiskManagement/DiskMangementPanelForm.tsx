@@ -10,15 +10,6 @@ import {
   Button,
   Card,
   CardContent,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogSection,
-  DialogSectionSeparator,
-  DialogTitle,
-  DialogTrigger,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -27,24 +18,21 @@ import {
   RadioGroupCard,
   RadioGroupCardItem,
   Separator,
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { DiskCountdownRadial } from './DiskCountdownRadial'
 import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
-
+import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
+import { DiskManagementReviewAndSubmitDialog } from './DiskMangementReviewAndSubmitDialog'
 import { useDiskManagement } from './useDiskManagement'
+import { DiskManagementDiskSizeReadReplicas } from './DiskManagementDiskSizeReadReplicas'
+import BillingChangeBadge from './BillingChangeBadge'
 
 export function DiskMangementPanelForm() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [loading, setLoading] = useState(false)
-  const [showTimer, setStateShowTimer] = useState<boolean>(false)
+  const [showTimer, setStateShowTimer] = useState<boolean>(true)
 
   const {
     storageType,
@@ -52,6 +40,7 @@ export function DiskMangementPanelForm() {
     throughput,
     totalSize,
     mainDiskUsed,
+    totalWaitTime,
     updateDiskConfiguration,
   } = useDiskManagement()
 
@@ -91,12 +80,13 @@ export function DiskMangementPanelForm() {
   const onSubmit = async (data: DiskStorageSchemaType) => {
     console.log('data', data)
     setLoading(true)
-    await updateDiskConfiguration(data)
-    form.reset(data)
     await new Promise((resolve) => setTimeout(resolve, 3000))
+    await updateDiskConfiguration(data)
+    await updateDiskConfiguration({ remainingTime: totalWaitTime })
+    form.reset(data)
     setLoading(false)
-    setStateShowTimer(true)
     setIsDialogOpen(false)
+    setStateShowTimer(true)
   }
 
   const showNewBar = watchedTotalSize !== totalSize && watchedTotalSize > totalSize
@@ -119,7 +109,7 @@ export function DiskMangementPanelForm() {
   }
 
   const calculateThroughputPrice = () => {
-    return null //(form.getValues('throughput') * 0.04).toFixed(2)
+    return undefined //(form.getValues('throughput') * 0.04).toFixed(2)
   }
 
   return (
@@ -330,24 +320,15 @@ export function DiskMangementPanelForm() {
                                     exit={{ opacity: 0, x: -4 }}
                                     transition={{ duration: 0.15 }}
                                   >
-                                    <Badge
-                                      variant="default"
-                                      className="bg-alternative bg-opacity-100"
-                                    >
-                                      <div className="flex items-center gap-1">
-                                        <span className="text-xs font-mono text-foreground-muted">
-                                          ${calculateThroughputPrice()}
-                                        </span>
-                                        <ChevronRight
-                                          size={12}
-                                          strokeWidth={2}
-                                          className="text-foreground-muted"
-                                        />
-                                        <span className="text-xs font-mono text-foreground">
-                                          ${calculateThroughputPrice()}
-                                        </span>
-                                      </div>
-                                    </Badge>
+                                    <BillingChangeBadge
+                                      show={
+                                        formState.isDirty &&
+                                        formState.dirtyFields.throughput &&
+                                        !formState.errors.throughput
+                                      }
+                                      beforePrice={calculateThroughputPrice()}
+                                      afterPrice={calculateThroughputPrice()}
+                                    />
                                   </motion.div>
                                 ) : null}
                               </AnimatePresence>
@@ -450,7 +431,7 @@ export function DiskMangementPanelForm() {
                   </div>
                   <div className="col-span-8 space-y-6 mt-6">
                     <div>
-                      <h3 className="text-sm">Main Disk Space</h3>
+                      {/* <h3 className="text-sm">Main Disk Space</h3> */}
                       <DiskSpaceBar
                         showNewBar={showNewBar}
                         totalSize={totalSize}
@@ -462,75 +443,27 @@ export function DiskMangementPanelForm() {
                         }
                       />
                     </div>
-                    <div>
-                      <h3 className="text-sm">Read Replica Disk Space</h3>
-                      <DiskSpaceBar
-                        showNewBar={showNewBar}
-                        totalSize={totalSize * 1.25}
-                        usedSize={mainDiskUsed}
-                        newTotalSize={
-                          form.getValues('totalSize') <= totalSize
-                            ? totalSize * 1.25
-                            : form.getValues('totalSize') * 1.25
-                        }
-                      />
-                    </div>
+                    <DiskManagementDiskSizeReadReplicas
+                      isDirty={form.formState.dirtyFields.totalSize !== undefined}
+                      totalSize={totalSize * 1.25}
+                      usedSize={mainDiskUsed}
+                      newTotalSize={
+                        form.getValues('totalSize') <= totalSize
+                          ? totalSize * 1.25
+                          : form.getValues('totalSize') * 1.25
+                      }
+                    />
                   </div>
                 </div>
               </CardContent>
             </Card>
-            {/* <div className="bg-surface-100 rounded-none border flex gap-8"></div> */}
 
-            <AnimatePresence>
-              {showTimer && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <DiskCountdownRadial
-                    className="px-2 rounded-none"
-                    setShowTimer={setStateShowTimer}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <DiskCountdownRadial />
+            <DiskManagementPlanUpgradeRequired />
 
             <Card className="bg-surface-100 rounded-t-none">
               <CardContent className="flex items-center pb-0 py-3 px-8 gap-3 justify-end">
-                <AnimatePresence mode="wait">
-                  {Object.keys(formState.dirtyFields).length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <motion.div
-                        animate={{
-                          scale: [1, 1.05, 1],
-                          transition: { duration: 0.3 },
-                        }}
-                      >
-                        <Badge variant={'default'}>
-                          <motion.span
-                            key={Object.keys(formState.dirtyFields).length}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ duration: 0.1 }}
-                          >
-                            {Object.keys(formState.dirtyFields).length === 1
-                              ? '1 change to review'
-                              : `${Object.keys(formState.dirtyFields).length} changes to review`}
-                          </motion.span>
-                        </Badge>
-                      </motion.div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
+                <FormFooterChangeBadge formState={formState} />
                 <div className="flex gap-2">
                   <Button
                     type="default"
@@ -539,179 +472,16 @@ export function DiskMangementPanelForm() {
                   >
                     Cancel
                   </Button>
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button
-                        htmlType="submit"
-                        type={'primary'}
-                        onClick={async (e) => {
-                          e.preventDefault()
-                          const isValid = await form.trigger() // Triggers validation for all fields
-                          if (isValid) {
-                            setIsDialogOpen(true) // Open the dialog only if the form is valid
-                          } else {
-                            console.log('Form validation failed. Please check the fields.')
-                          }
-                        }}
-                        disabled={!form.formState.isDirty}
-                      >
-                        Review changes
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent size="large">
-                      <DialogHeader>
-                        <DialogTitle>Review changes</DialogTitle>
-                        <DialogDescription>
-                          Disk configuration changes will take effect after the next restart.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <DialogSectionSeparator />
-
-                      <Table>
-                        <TableCaption>Please take note of the above billing changes</TableCaption>
-                        <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:pb-2 [&_th]:pt-4">
-                          <TableRow>
-                            <TableHead className="w-[200px] pl-5">Disk attribute</TableHead>
-                            <TableHead>Unit</TableHead>
-                            <TableHead className="text-right pr-5">Price</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
-                          <TableRow>
-                            <TableCell className="font-medium pl-5">Disk Size</TableCell>
-                            <TableCell>
-                              <div className="flex justify-start">
-                                <Badge
-                                  size="large"
-                                  className="!bg-alternative border bg-opacity-100 inline-flex items-center gap-1 text-xs"
-                                >
-                                  <span className="font-mono text-foreground-muted">
-                                    {form.formState.defaultValues?.totalSize}GiB
-                                  </span>
-                                  <ChevronRight size={12} className="text-foreground-muted" />
-                                  <span className="font-mono text-foreground">
-                                    {form.getValues('totalSize')}GiB
-                                  </span>
-                                </Badge>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right pr-5">
-                              <div className="flex justify-end">
-                                <Badge
-                                  size="large"
-                                  className="!bg-alternative border bg-opacity-100 inline-flex items-center gap-1 text-xs"
-                                >
-                                  <span className="font-mono text-foreground-muted">$0.00</span>
-                                  <ChevronRight size={12} className="text-foreground-muted" />
-                                  <span className="font-mono text-foreground">
-                                    ${calculateDiskSizePrice()}
-                                  </span>
-                                </Badge>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell className="font-medium pl-5">IOPS</TableCell>
-                            <TableCell>
-                              <div className="flex justify-start">
-                                <Badge
-                                  size="large"
-                                  className="!bg-alternative border bg-opacity-100 inline-flex items-center gap-1 text-xs"
-                                >
-                                  <span className="font-mono text-foreground-muted">
-                                    {form.formState.defaultValues?.provisionedIOPS}IOPS
-                                  </span>
-                                  <ChevronRight size={12} className="text-foreground-muted" />
-                                  <span className="font-mono text-foreground">
-                                    {form.getValues('provisionedIOPS')}IOPS
-                                  </span>
-                                </Badge>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right pr-5">
-                              <div className="flex justify-end">
-                                <Badge
-                                  size="large"
-                                  className="!bg-alternative border bg-opacity-100 inline-flex items-center gap-1 text-xs"
-                                >
-                                  <span className="font-mono text-foreground-muted">$0.00</span>
-                                  <ChevronRight size={12} className="text-foreground-muted" />
-                                  <span className="font-mono text-foreground">
-                                    ${calculateIOPSPrice()}
-                                  </span>
-                                </Badge>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell className="font-medium pl-5">Throughput</TableCell>
-                            <TableCell>
-                              <div className="flex justify-start">
-                                <Badge
-                                  size="large"
-                                  className="!bg-alternative border bg-opacity-100 inline-flex items-center gap-1 text-xs"
-                                >
-                                  <span className="font-mono text-foreground-muted">
-                                    {form.formState.defaultValues?.throughput}MiBps
-                                  </span>
-                                  <ChevronRight size={12} className="text-foreground-muted" />
-                                  <span className="font-mono text-foreground">
-                                    {form.getValues('throughput')}MiBps
-                                  </span>
-                                </Badge>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right pr-5">
-                              <div className="flex justify-end">
-                                <Badge
-                                  size="large"
-                                  className="!bg-alternative border bg-opacity-100 inline-flex items-center gap-1 text-xs"
-                                >
-                                  <span className="font-mono text-foreground-muted">$0.00</span>
-                                  <ChevronRight size={12} className="text-foreground-muted" />
-                                  <span className="font-mono text-foreground">
-                                    ${calculateThroughputPrice()}
-                                  </span>
-                                </Badge>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-
-                      <DialogSection>Warning here about the 6 hour thing</DialogSection>
-
-                      <DialogSectionSeparator />
-
-                      <DialogSection className="bg-surface-100 text-sm text-foreground-light">
-                        <p>Disk configuration changes will take effect after the next restart.</p>
-                      </DialogSection>
-
-                      <DialogFooter>
-                        <Button
-                          block
-                          size="small"
-                          type="default"
-                          onClick={() => setIsDialogOpen(false)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          block
-                          size="small"
-                          htmlType="submit"
-                          loading={loading}
-                          onClick={async () => {
-                            // Simulating a 5 second delay
-
-                            await onSubmit(form.getValues())
-                          }}
-                        >
-                          Accept changes
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                  <DiskManagementReviewAndSubmitDialog
+                    onSubmit={onSubmit}
+                    isDialogOpen={isDialogOpen}
+                    setIsDialogOpen={setIsDialogOpen}
+                    form={form}
+                    loading={loading}
+                    calculateDiskSizePrice={calculateDiskSizePrice()}
+                    calculateIOPSPrice={calculateIOPSPrice()}
+                    calculateThroughputPrice={calculateThroughputPrice()}
+                  />
                 </div>
               </CardContent>
             </Card>

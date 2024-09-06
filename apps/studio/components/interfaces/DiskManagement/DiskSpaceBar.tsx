@@ -86,7 +86,7 @@ export default function DiskSpaceBar({
                     />
                   </div>
                   <div
-                    className="bg-border transition-all duration-500 ease-in-out"
+                    className="bg-transparent border-r transition-all duration-500 ease-in-out"
                     style={{ width: `${resizePercentage - usedPercentage}%` }}
                   />
                 </div>
@@ -158,7 +158,8 @@ export default function DiskSpaceBar({
                 style={{ left: `${showNewBar ? newResizePercentage : resizePercentage}%` }}
               >
                 <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded text-xs text-foreground-light whitespace-nowrap">
-                  Resize point: {(showNewBar ? newResizePoint : resizePoint).toFixed(2)} GB
+                  {/* Resize point: {(showNewBar ? newResizePoint : resizePoint).toFixed(2)} GB */}
+                  Autoscaling
                 </div>
                 <div className="w-px h-full bg-border"></div>
               </div>
@@ -173,7 +174,7 @@ export default function DiskSpaceBar({
         </div>
         <div className="flex items-center">
           <div className="w-2 h-2 rounded-full bg-border border border-strong mr-2"></div>
-          <span>Available Until Resize</span>
+          <span>Available space</span>
         </div>
       </div>
     </div>
