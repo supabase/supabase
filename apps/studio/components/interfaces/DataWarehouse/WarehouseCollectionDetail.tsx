@@ -19,30 +19,29 @@ import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import dayjs from 'dayjs'
 import { useKeyboardShortcuts } from 'components/grid/components/common/Hooks'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
-const dayjsBase = dayjs()
+const djs = dayjs()
 const INTERVALS: DatetimeHelper[] = [
   {
     text: 'Last hour',
-    calcFrom: () => dayjsBase.subtract(1, 'hour').toISOString(),
-    calcTo: () => dayjsBase.toISOString(),
+    calcFrom: () => djs.subtract(1, 'hour').toISOString(),
+    calcTo: () => djs.toISOString(),
     default: true,
   },
   {
     text: 'Last 12 hours',
-    calcFrom: () => dayjsBase.subtract(12, 'hour').toISOString(),
-    calcTo: () => dayjsBase.toISOString(),
+    calcFrom: () => djs.subtract(12, 'hour').toISOString(),
+    calcTo: () => djs.toISOString(),
   },
   {
     text: 'Last day',
-    calcFrom: () => dayjsBase.subtract(1, 'day').toISOString(),
-    calcTo: () => dayjsBase.toISOString(),
+    calcFrom: () => djs.subtract(1, 'day').toISOString(),
+    calcTo: () => djs.toISOString(),
   },
   {
     text: 'Last 7 days',
-    calcFrom: () => dayjsBase.subtract(7, 'day').toISOString(),
-    calcTo: () => dayjsBase.toISOString(),
+    calcFrom: () => djs.subtract(7, 'day').toISOString(),
+    calcTo: () => djs.toISOString(),
   },
 ]
 
