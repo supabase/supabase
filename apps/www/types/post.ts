@@ -1,6 +1,6 @@
 type PostTypes = {
   slug?: string
-  type: 'casestudy' | 'blog'
+  type: 'casestudy' | 'blog' | 'event'
   title: string
   date?: string
   formattedDate?: string

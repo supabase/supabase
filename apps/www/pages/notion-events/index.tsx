@@ -88,8 +88,8 @@ function Events({ events: allEvents, onDemandEvents, categories, eventsWithBlock
                       date: event.properties.Date.date?.start,
                       thumb: "",
                       description: "",
-                      url: `/notion-events/${event.slug}`,
-                      path: `/notion-events/${event.slug}`,
+                      url: event.slug,
+                      path: event.slug,
                       categories: event.properties.Category.multi_select?.map((category: any) => category.name),
                       }} />
                   </div>

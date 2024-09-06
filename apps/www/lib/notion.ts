@@ -4,14 +4,34 @@ import { Client, iteratePaginatedAPI } from '@notionhq/client';
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
-export async function getNotionDatabase() {
+export async function getNotionDatabase(limit?: number) {
   const databaseId = process.env.NOTION_DATABASE_ID!;
   const response = await notion.databases.query({
     database_id: databaseId,
   }).catch((error) => {console.log((error.message))});
 
-  return response?.results?.slice(0,2);
+  return response?.results?.slice(0,limit ?? 3);
 }
+
+export async function getNotionPageContent(page_id: string) {
+  const response = await notion.pages.retrieve({
+    page_id: page_id,
+  }).catch((error) => {console.log((error.message))});
+
+  return response;
+}
+
+export function addSlugToEvent(event: any) {
+  // const slug = "notion-" + event.properties.Name.title[0].plain_text.toLowerCase().replace(/\s/g, "-")
+  const slug = event.id.replaceAll('-', '')
+
+  return {
+    ...event,
+    slug
+  };
+}
+
+export const addSlugToEvents = (events: any) => events.map(addSlugToEvent)
 
 export async function getDatabaseBlocks(parentBlockId: string) {
   let blocks = []
@@ -31,7 +51,7 @@ export const getDatabaseWithBlocks = async (event: any) => {
 
 export const getDatabaseWithParsedBlocks = (event: any) => {
   const parser = NotionBlocksMarkdownParser.getInstance()
-  const parsedBlocks = parser.parse(event.blocks)
+  const parsedBlocks = event.blocks ? parser.parse(event.blocks) : []
   console.log("parsedBlocks", parsedBlocks)
 
   return {...event, parsedBlocks }
