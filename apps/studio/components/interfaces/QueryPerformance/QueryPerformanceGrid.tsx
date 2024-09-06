@@ -16,7 +16,7 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { QueryPerformanceSort } from '../Reports/Reports.queries'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'

@@ -30,8 +30,8 @@ import {
   Tooltip_Shadcn_,
   WarningIcon,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useProjectContext } from './ProjectContext'
 import { RestorePaidPlanProjectNotice } from './RestorePaidPlanProjectNotice'
 

@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { AlertCircle, ChevronRight, ExternalLink, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -36,13 +37,19 @@ import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
-import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { ComputeBadge } from 'ui-patterns'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+} from 'ui'
+import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
-import { AlertCircle, Info, ExternalLink, ChevronRight } from 'lucide-react'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()

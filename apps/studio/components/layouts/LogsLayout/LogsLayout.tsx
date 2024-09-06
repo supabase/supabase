@@ -1,4 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
@@ -15,11 +17,10 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Badge, Menu } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateLogsMenu } from './LogsMenu.utils'
-import Link from 'next/link'
-import { ArrowUpRight } from 'lucide-react'
+
 interface LogsLayoutProps {
   title?: string
 }

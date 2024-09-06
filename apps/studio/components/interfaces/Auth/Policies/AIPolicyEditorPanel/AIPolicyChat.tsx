@@ -1,9 +1,12 @@
 import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
+import { ChevronsUpDown } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
 import { useTelemetryProps } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { SchemaComboBox } from 'components/ui/SchemaComboBox'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
@@ -11,19 +14,10 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { ChevronsUpDown } from 'lucide-react'
-import Link from 'next/link'
-import {
-  AiIconAnimation,
-  Button,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
-import { AssistantChatForm } from 'ui-patterns'
+import { AiIconAnimation } from 'ui'
+import { AssistantChatForm } from 'ui-patterns/AssistantChat'
 import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface AIPolicyChatProps {
   messages: MessageWithDebug[]
