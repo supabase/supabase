@@ -1,18 +1,21 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import React, { useState } from 'react'
+
 import {
+  Alert_Shadcn_ as Alert,
+  AlertDescription_Shadcn_ as AlertDescription,
+  AlertTitle_Shadcn_ as AlertTitle,
   Collapsible_Shadcn_ as Collapsible,
   CollapsibleContent_Shadcn_ as CollapsibleContent,
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
   InfoIcon,
-  Alert_Shadcn_ as Alert,
-  AlertTitle_Shadcn_ as AlertTitle,
-  AlertDescription_Shadcn_ as AlertDescription,
 } from 'ui'
+import BillingChangeBadge from './BillingChangeBadge'
 import DiskSpaceBar from './DiskSpaceBar'
 import { useDiskManagement } from './useDiskManagement'
-import BillingChangeBadge from './BillingChangeBadge'
-import { AnimatePresence, motion } from 'framer-motion'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useParams } from 'common'
 
 interface DiskManagementDiskSizeReadReplicasProps {
   isDirty: boolean
@@ -24,9 +27,14 @@ interface DiskManagementDiskSizeReadReplicasProps {
 export const DiskManagementDiskSizeReadReplicas: React.FC<
   DiskManagementDiskSizeReadReplicasProps
 > = ({ isDirty, totalSize, usedSize, newTotalSize }) => {
+  const { ref: projectRef } = useParams()
   const [isOpen, setIsOpen] = useState(false)
-  const { replicaDiskUsed, readReplicas } = useDiskManagement()
 
+  // [Joshen] To hook up properly at the end
+  const { data: databases } = useReadReplicasQuery({ projectRef })
+  const readReplicass = (databases ?? []).filter((db) => db.identifier !== projectRef)
+
+  const { replicaDiskUsed, readReplicas } = useDiskManagement()
   if (!replicaDiskUsed) return null
 
   return (

@@ -1,8 +1,7 @@
-'use client'
-
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
-import { Card, CardContent, ChartConfig } from 'ui'
+
+import { Card, CardContent } from 'ui'
 import CountdownTimerRadial from './CountdownTimerRadial'
 import CountdownTimerSpan from './CountdownTimerSpan'
 import { useDiskManagement } from './useDiskManagement'

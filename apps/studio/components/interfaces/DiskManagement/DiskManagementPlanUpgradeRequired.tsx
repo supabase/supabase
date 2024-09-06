@@ -1,19 +1,21 @@
+import { AnimatePresence, motion } from 'framer-motion'
+import Link from 'next/link'
+
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Alert_Shadcn_ as Alert,
   AlertDescription_Shadcn_ as AlertDescription,
   AlertTitle_Shadcn_ as AlertTitle,
-  cn,
   buttonVariants,
+  cn,
   InfoIcon,
 } from 'ui'
 
-import Link from 'next/link'
-import { useDiskManagement } from './useDiskManagement'
-import { AnimatePresence, motion } from 'framer-motion'
-
 export function DiskManagementPlanUpgradeRequired() {
-  const { plan } = useDiskManagement()
-  const isPlanUpgradeRequired = plan === 'tier_free'
+  const org = useSelectedOrganization()
+  const { data } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const isPlanUpgradeRequired = data?.plan.id === 'free'
 
   return (
     <AnimatePresence>

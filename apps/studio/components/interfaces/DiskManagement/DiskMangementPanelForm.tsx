@@ -28,29 +28,43 @@ import { DiskManagementReviewAndSubmitDialog } from './DiskMangementReviewAndSub
 import { useDiskManagement } from './useDiskManagement'
 import { DiskManagementDiskSizeReadReplicas } from './DiskManagementDiskSizeReadReplicas'
 import BillingChangeBadge from './BillingChangeBadge'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseSizeQuery } from 'data/database/database-size-query'
+import { GB } from 'lib/constants'
 
 export function DiskMangementPanelForm() {
+  const { project } = useProjectContext()
+  const { ref: projectRef } = useParams()
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [loading, setLoading] = useState(false)
   const [showTimer, setStateShowTimer] = useState<boolean>(true)
 
-  const {
-    storageType,
-    provisionedIOPS,
-    throughput,
-    totalSize,
-    mainDiskUsed,
-    totalWaitTime,
-    updateDiskConfiguration,
-  } = useDiskManagement()
+  // [Joshen] Once everything is ready, use actual data from the API
+  // const { data } = useDiskAttributesQuery({ projectRef })
+  // [Joshen] Just FYI eventually we'll need to show the DISK size, although this is okay for now
+  const { data: dbSize } = useDatabaseSizeQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+  })
+  const mainDiskUsed = Math.round(((dbSize?.result[0].db_size ?? 0) / GB) * 100) / 100
+
+  // [Joshen] To figure out how to get this number and deprecate these variables
+  // const totalWaitTime = 180
+  const { type, iops, throughput_mbps, size_gb, totalWaitTime, updateDiskConfiguration } =
+    useDiskManagement()
+
+  // @ts-ignore [Joshen TODO] check whats happening here
+  // const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
 
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(DiskStorageSchema),
     defaultValues: {
-      storageType,
-      provisionedIOPS,
-      throughput,
-      totalSize,
+      storageType: type,
+      provisionedIOPS: iops,
+      throughput: throughput_mbps,
+      totalSize: size_gb,
     },
     mode: 'onBlur',
     reValidateMode: 'onChange',
@@ -60,28 +74,11 @@ export function DiskMangementPanelForm() {
   const watchedStorageType = watch('storageType')
   const watchedTotalSize = watch('totalSize')
 
-  // Watch storageType and allocatedStorage to adjust constraints dynamically
-  useEffect(() => {
-    if (watchedStorageType === 'io2') {
-      setValue('throughput', undefined) // Throughput is not configurable for 'io2'
-    } else if (watchedStorageType === 'gp3') {
-      if (watchedTotalSize < 400) {
-        setValue('throughput', 125) // Fixed throughput for allocated storage < 400 GiB
-      } else {
-        // Ensure throughput is within the allowed range if it's greater than 400 GiB
-        const currentThroughput = form.getValues('throughput')
-        if (currentThroughput && (currentThroughput < 125 || currentThroughput > 1000)) {
-          setValue('throughput', 125) // Reset to default if out of bounds
-        }
-      }
-    }
-  }, [watchedStorageType, watchedTotalSize, setValue, form])
-
   const onSubmit = async (data: DiskStorageSchemaType) => {
     console.log('data', data)
     setLoading(true)
     await new Promise((resolve) => setTimeout(resolve, 3000))
-    await updateDiskConfiguration(data)
+    await updateDiskConfiguration(data as any)
     await updateDiskConfiguration({ remainingTime: totalWaitTime })
     form.reset(data)
     setLoading(false)
@@ -89,7 +86,7 @@ export function DiskMangementPanelForm() {
     setStateShowTimer(true)
   }
 
-  const showNewBar = watchedTotalSize !== totalSize && watchedTotalSize > totalSize
+  const showNewBar = watchedTotalSize !== size_gb && watchedTotalSize > size_gb
 
   // Destructure dirtyFields from formState
   const { dirtyFields } = formState
@@ -111,6 +108,23 @@ export function DiskMangementPanelForm() {
   const calculateThroughputPrice = () => {
     return undefined //(form.getValues('throughput') * 0.04).toFixed(2)
   }
+
+  // Watch storageType and allocatedStorage to adjust constraints dynamically
+  useEffect(() => {
+    if (watchedStorageType === 'io2') {
+      setValue('throughput', undefined) // Throughput is not configurable for 'io2'
+    } else if (watchedStorageType === 'gp3') {
+      if (watchedTotalSize < 400) {
+        setValue('throughput', 125) // Fixed throughput for allocated storage < 400 GiB
+      } else {
+        // Ensure throughput is within the allowed range if it's greater than 400 GiB
+        const currentThroughput = form.getValues('throughput')
+        if (currentThroughput && (currentThroughput < 125 || currentThroughput > 1000)) {
+          setValue('throughput', 125) // Reset to default if out of bounds
+        }
+      }
+    }
+  }, [watchedStorageType, watchedTotalSize, setValue, form])
 
   return (
     <div>
@@ -434,22 +448,22 @@ export function DiskMangementPanelForm() {
                       {/* <h3 className="text-sm">Main Disk Space</h3> */}
                       <DiskSpaceBar
                         showNewBar={showNewBar}
-                        totalSize={totalSize}
+                        totalSize={size_gb}
                         usedSize={mainDiskUsed}
                         newTotalSize={
-                          form.getValues('totalSize') <= totalSize
-                            ? totalSize
+                          form.getValues('totalSize') <= size_gb
+                            ? size_gb
                             : form.getValues('totalSize')
                         }
                       />
                     </div>
                     <DiskManagementDiskSizeReadReplicas
                       isDirty={form.formState.dirtyFields.totalSize !== undefined}
-                      totalSize={totalSize * 1.25}
+                      totalSize={size_gb * 1.25}
                       usedSize={mainDiskUsed}
                       newTotalSize={
-                        form.getValues('totalSize') <= totalSize
-                          ? totalSize * 1.25
+                        form.getValues('totalSize') <= size_gb
+                          ? size_gb * 1.25
                           : form.getValues('totalSize') * 1.25
                       }
                     />

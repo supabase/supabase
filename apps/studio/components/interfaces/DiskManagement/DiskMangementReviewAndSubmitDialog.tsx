@@ -21,7 +21,6 @@ import {
 } from 'ui'
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskMangementCoolDownSection } from './DiskMangementCoolDownSection'
-import { useDiskManagement } from './useDiskManagement'
 
 interface DiskSizeMeterProps {
   isDialogOpen: boolean
@@ -95,9 +94,6 @@ export const DiskManagementReviewAndSubmitDialog: React.FC<DiskSizeMeterProps> =
   calculateIOPSPrice,
   calculateThroughputPrice,
 }) => {
-  const { totalSize, mainDiskUsed, storageType, provisionedIOPS, throughput, readReplicas } =
-    useDiskManagement()
-
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>

@@ -2,8 +2,12 @@ import { atom, useAtom } from 'jotai'
 import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { components } from 'api-types'
 
-interface ExtendedDiskStorageSchemaType extends DiskStorageSchemaType {
-  totalSize: number
+interface ExtendedDiskStorageSchemaType {
+  type: 'gp3' | 'io2'
+  size_gb: number
+  iops: number
+  throughput_mbps: number
+
   mainDiskUsed: number
   replicaDiskUsed: number
   plan: 'tier_free' | 'tier_pro' | 'tier_team' | 'tier_enterprise'
@@ -15,11 +19,13 @@ interface ExtendedDiskStorageSchemaType extends DiskStorageSchemaType {
   readReplicas: string[]
 }
 
+// Rename according to API
 const diskConfigAtom = atom<ExtendedDiskStorageSchemaType>({
-  storageType: 'gp3',
-  totalSize: 8,
-  provisionedIOPS: 3000,
-  throughput: 125,
+  type: 'gp3',
+  size_gb: 8,
+  iops: 3000,
+  throughput_mbps: 125,
+
   mainDiskUsed: 4,
   replicaDiskUsed: 4,
   plan: 'tier_pro',
