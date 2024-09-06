@@ -38,3 +38,17 @@ export const DISK_TYPE_LABELS = {
   [DiskType.GP3]: 'General Purpose SSD (gp3)',
   [DiskType.IO2]: 'Provisioned IOPS SSD (io2)',
 }
+
+type PlanType = 'tier_free' | 'tier_pro' | 'tier_team' | 'tier_enterprise'
+
+interface PlanDetails {
+  includedDiskGB: number
+  includedDiskPricePerMonth: number
+}
+
+export const PLAN_DETAILS: Record<PlanType, PlanDetails> = {
+  tier_free: { includedDiskGB: 1, includedDiskPricePerMonth: 0 },
+  tier_pro: { includedDiskGB: 8, includedDiskPricePerMonth: 5 },
+  tier_team: { includedDiskGB: 16, includedDiskPricePerMonth: 10 },
+  tier_enterprise: { includedDiskGB: 32, includedDiskPricePerMonth: 20 },
+}

@@ -1,27 +1,36 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
+import { useParams } from 'common'
+import { useRemainingDurationForDiskAttributeUpdate } from 'data/config/disk-attributes-query'
+import { COOLDOWN_DURATION } from 'data/config/disk-attributes-update-mutation'
 import { Card, CardContent } from 'ui'
 import CountdownTimerRadial from './CountdownTimerRadial'
 import CountdownTimerSpan from './CountdownTimerSpan'
-import { useDiskManagement } from './useDiskManagement'
 
-export function DiskCountdownRadial({}: any) {
-  const { remainingTime, totalWaitTime: TOTAL_TIME, updateDiskConfiguration } = useDiskManagement()
+export function DiskCountdownRadial() {
+  const { ref: projectRef } = useParams()
+  const [remainingTime, setRemainingTime] = useState(0)
+
+  const { remainingDuration: initialRemainingTime } = useRemainingDurationForDiskAttributeUpdate({
+    projectRef,
+  })
+
+  useEffect(() => {
+    if (initialRemainingTime > 0) setRemainingTime(initialRemainingTime)
+  }, [initialRemainingTime])
 
   useEffect(() => {
     if (remainingTime <= 0) return
 
     const timer = setInterval(() => {
-      updateDiskConfiguration({
-        remainingTime: Math.max(0, remainingTime - 1),
-      })
+      setRemainingTime(Math.max(0, remainingTime - 1))
     }, 1000)
 
     return () => clearInterval(timer)
   }, [remainingTime])
 
-  const progressPercentage = (remainingTime / TOTAL_TIME) * 100
+  const progressPercentage = (remainingTime / COOLDOWN_DURATION) * 100
 
   return (
     <AnimatePresence>

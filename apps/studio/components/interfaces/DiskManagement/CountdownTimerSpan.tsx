@@ -1,11 +1,10 @@
-import React from 'react'
 import MotionNumber from 'motion-number'
 
 interface CountdownTimerSpanProps {
   seconds: number
 }
 
-const CountdownTimerSpan: React.FC<CountdownTimerSpanProps> = ({ seconds }) => {
+const CountdownTimerSpan = ({ seconds }: CountdownTimerSpanProps) => {
   const transitionConfig = {
     y: { type: 'spring', duration: 0.35, bounce: 0 },
   }

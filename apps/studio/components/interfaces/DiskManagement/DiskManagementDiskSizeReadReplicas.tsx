@@ -2,6 +2,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import React, { useState } from 'react'
 
+import { useParams } from 'common'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import {
   Alert_Shadcn_ as Alert,
   AlertDescription_Shadcn_ as AlertDescription,
@@ -13,9 +16,6 @@ import {
 } from 'ui'
 import BillingChangeBadge from './BillingChangeBadge'
 import DiskSpaceBar from './DiskSpaceBar'
-import { useDiskManagement } from './useDiskManagement'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useParams } from 'common'
 
 interface DiskManagementDiskSizeReadReplicasProps {
   isDirty: boolean
@@ -30,12 +30,10 @@ export const DiskManagementDiskSizeReadReplicas: React.FC<
   const { ref: projectRef } = useParams()
   const [isOpen, setIsOpen] = useState(false)
 
-  // [Joshen] To hook up properly at the end
   const { data: databases } = useReadReplicasQuery({ projectRef })
-  const readReplicass = (databases ?? []).filter((db) => db.identifier !== projectRef)
+  const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
 
-  const { replicaDiskUsed, readReplicas } = useDiskManagement()
-  if (!replicaDiskUsed) return null
+  if (readReplicas.length === 0) return null
 
   return (
     <>
@@ -56,7 +54,9 @@ export const DiskManagementDiskSizeReadReplicas: React.FC<
                   {readReplicas.map((replica, index) => (
                     <li key={index} className="marker:text-foreground-light">
                       <div className="flex items-center gap-2">
-                        <span>{replica}:</span>
+                        <span>
+                          ID: {formatDatabaseID(replica.identifier)} ({replica.region}):
+                        </span>
                         <BillingChangeBadge
                           beforePrice={(totalSize * 0.25) / readReplicas.length}
                           afterPrice={(newTotalSize * 0.25) / readReplicas.length}

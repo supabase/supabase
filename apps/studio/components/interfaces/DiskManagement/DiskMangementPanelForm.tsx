@@ -1,10 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronRight, RotateCcw } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+
+import { useParams } from 'common'
+import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-update-mutation'
+import { useDatabaseSizeQuery } from 'data/database/database-size-query'
+import { GB } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -21,29 +28,30 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
+import BillingChangeBadge from './BillingChangeBadge'
 import { DiskCountdownRadial } from './DiskCountdownRadial'
+import { DiskManagementDiskSizeReadReplicas } from './DiskManagementDiskSizeReadReplicas'
 import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
+import { DISK_LIMITS, DISK_PRICING, DiskType, PLAN_DETAILS } from './DiskMangement.constants'
 import { DiskManagementReviewAndSubmitDialog } from './DiskMangementReviewAndSubmitDialog'
-import { useDiskManagement, PLAN_DETAILS } from './useDiskManagement'
-import { DiskManagementDiskSizeReadReplicas } from './DiskManagementDiskSizeReadReplicas'
-import BillingChangeBadge from './BillingChangeBadge'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { GB } from 'lib/constants'
-import { DISK_PRICING, DISK_LIMITS, DiskType } from './DiskMangement.constants'
+import { useDiskManagement } from './useDiskManagement'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export function DiskMangementPanelForm() {
+  const org = useSelectedOrganization()
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [loading, setLoading] = useState(false)
-  const [showTimer, setStateShowTimer] = useState<boolean>(true)
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
 
-  // [Joshen] Once everything is ready, use actual data from the API
-  // const { data } = useDiskAttributesQuery({ projectRef })
+  const { data } = useDiskAttributesQuery({ projectRef })
+  // @ts-ignore [Joshen TODO] check whats happening here
+  const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const planId = subscription?.plan.id ?? ''
+
   // [Joshen] Just FYI eventually we'll need to show the DISK size, although this is okay for now
   const { data: dbSize } = useDatabaseSizeQuery({
     projectRef,
@@ -52,21 +60,18 @@ export function DiskMangementPanelForm() {
   const mainDiskUsed = Math.round(((dbSize?.result[0].db_size ?? 0) / GB) * 100) / 100
 
   // [Joshen] To figure out how to get this number and deprecate these variables
-  // const totalWaitTime = 180
-  const {
-    type,
-    iops,
-    throughput_mbps,
-    size_gb,
-    totalWaitTime,
-    updateDiskConfiguration,
-    plan,
-    getPlanDetails,
-  } = useDiskManagement()
-  const { includedDiskGB } = getPlanDetails()
+  const totalWaitTime = 180
+  const { updateDiskConfiguration } = useDiskManagement()
+  const { includedDiskGB } = PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
 
-  // @ts-ignore [Joshen TODO] check whats happening here
-  // const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
+  const { mutate: updateDiskConfigurationRQ, isLoading: isUpdatingDiskConfiguration } =
+    useUpdateDiskAttributesMutation({
+      onSuccess: (_, vars) => {
+        const { ref, ...formData } = vars
+        setIsDialogOpen(false)
+        form.reset(formData as DiskStorageSchemaType)
+      },
+    })
 
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(DiskStorageSchema),
@@ -86,6 +91,9 @@ export function DiskMangementPanelForm() {
 
   const onSubmit = async (data: DiskStorageSchemaType) => {
     console.log('data', data)
+    // if (projectRef === undefined) return console.error('Project ref is required')
+    // updateDiskConfigurationRQ({ ref: projectRef, ...data })
+
     setLoading(true)
     await new Promise((resolve) => setTimeout(resolve, 3000))
     await updateDiskConfiguration(data as any)
@@ -93,7 +101,6 @@ export function DiskMangementPanelForm() {
     form.reset(data)
     setLoading(false)
     setIsDialogOpen(false)
-    setStateShowTimer(true)
   }
 
   const showNewBar = watchedTotalSize > size_gb
@@ -113,8 +120,6 @@ export function DiskMangementPanelForm() {
     const newPrice = (Math.max(newSize - includedDiskGB, 0) * pricePerGiB).toFixed(2)
     return { oldPrice, newPrice }
   }
-
-  console.log(calculateDiskSizePrice())
 
   const calculateIOPSPrice = () => {
     const storageType = form.getValues('storageType') as DiskType
