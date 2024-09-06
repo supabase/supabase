@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 
 import { getSortedPosts } from '~/lib/posts'
+import { fetchEventsWithBlocks, getNotionDatabase } from '~/lib/notion'
 
 import { cn } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -16,11 +17,14 @@ interface Props {
   events: BlogPost[]
   onDemandEvents: BlogPost[]
   categories: { [key: string]: number }
+  eventsWithBlocks: any
 }
 
-function Events({ events: allEvents, onDemandEvents, categories }: Props) {
+function Events({ events: allEvents, onDemandEvents, categories, eventsWithBlocks }: Props) {
   const [events, setEvents] = useState(allEvents)
   const router = useRouter()
+
+  console.log("eventsWithBlocks", eventsWithBlocks)
 
   const meta_title = 'Supabase Events: webinars, talks, hackathons, and meetups'
   const meta_description = 'Join Supabase and the open-source community at the upcoming events.'
@@ -145,11 +149,15 @@ export async function getStaticProps() {
     { all: 0 }
   )
 
+  const notionEvents = await getNotionDatabase()
+  const eventsWithBlocks = notionEvents?.length ? await fetchEventsWithBlocks(notionEvents) : []
+
   return {
     props: {
       events: upcomingEvents,
       onDemandEvents,
       categories,
+      eventsWithBlocks
     },
   }
 }
