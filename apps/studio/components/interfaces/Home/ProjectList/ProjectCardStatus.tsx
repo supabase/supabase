@@ -2,8 +2,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { AlertTriangle, Info, RefreshCcw } from 'lucide-react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, cn, IconPauseCircle } from 'ui'
+import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
 import { InferredProjectStatus } from './ProjectCard.utils'
 
 export interface ProjectCardWarningsProps {
@@ -100,7 +100,7 @@ export const ProjectCardStatus = ({
       )}
     >
       {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
-        <IconPauseCircle strokeWidth={1.5} size={12} />
+        <PauseCircle strokeWidth={1.5} size={12} />
       ) : projectStatus === 'isRestoring' ||
         projectStatus === 'isComingUp' ||
         projectStatus === 'isRestarting' ? (

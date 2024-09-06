@@ -8,7 +8,8 @@ import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { timeout } from 'lib/helpers'
-import { Button, IconLoader } from 'ui'
+import { Button } from 'ui'
+import { Loader } from 'lucide-react'
 
 // Removes some auto-generated Postgrest text
 // Ideally PostgREST wouldn't add this if there is already a comment
@@ -104,7 +105,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
         </Button>
         <Button disabled={!hasChanged} onClick={updateDescription}>
           {isUpdating ? (
-            <IconLoader className="mx-auto animate-spin" size={14} strokeWidth={2} />
+            <Loader className="mx-auto animate-spin" size={14} strokeWidth={2} />
           ) : (
             <span>Save</span>
           )}

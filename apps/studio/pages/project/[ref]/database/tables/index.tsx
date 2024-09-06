@@ -20,7 +20,7 @@ const DatabaseTables: NextPageWithLayout = () => {
     <>
       <ScaffoldContainer>
         <ScaffoldSection>
-          <div className="col-span-12">
+          <div className="col-span-12 space-x-2">
             <FormHeader title="Database Tables" />
             <TableList
               onAddTable={snap.onAddTable}

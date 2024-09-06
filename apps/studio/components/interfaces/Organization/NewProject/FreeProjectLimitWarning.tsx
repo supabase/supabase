@@ -1,8 +1,7 @@
 import Link from 'next/link'
-import { Button, IconAlertCircle } from 'ui'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-import InformationBox from 'components/ui/InformationBox'
 import type { MemberWithFreeProjectLimit } from 'data/organizations/free-project-limit-check-query'
 
 interface FreeProjectLimitWarningProps {
@@ -47,7 +46,7 @@ const FreeProjectLimitWarning = ({
         }
       ></Admonition>
       {/* <InformationBox
-        icon={<IconAlertCircle className="text-foreground" size="large" strokeWidth={1.5} />}
+        icon={<AlertCircle className="text-foreground" size="large" strokeWidth={1.5} />}
         defaultVisibility={true}
         hideCollapse
         title="The organization has members who have exceeded their free project limits"

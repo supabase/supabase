@@ -14,7 +14,8 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { Button, IconAlertCircle, IconSearch, IconTrash, Input, SidePanel } from 'ui'
+import { AlertCircle, Search, Trash } from 'lucide-react'
+import { Button, Input, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
@@ -98,35 +99,35 @@ const Indexes = () => {
     <>
       <div className="pb-8">
         <div className="flex flex-col gap-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
-              {isErrorSchemas && (
-                <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
-                  <IconAlertCircle strokeWidth={2} size={16} />
-                  <p>Failed to load schemas</p>
-                </div>
-              )}
-              {isSuccessSchemas && (
-                <SchemaSelector
-                  className="w-[260px]"
-                  size="small"
-                  showError={false}
-                  selectedSchemaName={selectedSchema}
-                  onSelectSchema={setSelectedSchema}
-                />
-              )}
-              <Input
+          <div className="flex items-center gap-2 flex-wrap">
+            {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
+            {isErrorSchemas && (
+              <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
+                <AlertCircle strokeWidth={2} size={16} />
+                <p>Failed to load schemas</p>
+              </div>
+            )}
+            {isSuccessSchemas && (
+              <SchemaSelector
+                className="w-[260px]"
                 size="small"
-                value={search}
-                className="w-64"
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search for an index"
-                icon={<IconSearch size={14} />}
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
               />
-            </div>
+            )}
+            <Input
+              size="small"
+              value={search}
+              className="w-64"
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search for an index"
+              icon={<Search size={14} />}
+            />
+
             {!isLocked && (
               <Button
+                className="ml-auto"
                 type="primary"
                 onClick={() => setShowCreateIndex(true)}
                 disabled={!isSuccessSchemas}
@@ -195,7 +196,7 @@ const Indexes = () => {
                               <Button
                                 type="text"
                                 className="px-1"
-                                icon={<IconTrash />}
+                                icon={<Trash />}
                                 onClick={() => setSelectedIndexToDelete(index)}
                               />
                             )}

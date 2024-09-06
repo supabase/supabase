@@ -119,7 +119,7 @@ const UtilityPanel = ({
 
   return (
     <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
-      <TabsList_Shadcn_ className="flex justify-between gap-2 pl-6 pr-2">
+      <TabsList_Shadcn_ className="flex justify-between gap-2 px-2 overflow-x-auto min-h-[42px]">
         <div className="flex items-center gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             <span className="translate-y-[1px]">Results</span>
@@ -138,7 +138,7 @@ const UtilityPanel = ({
           executeQuery={executeQuery}
         />
       </TabsList_Shadcn_>
-      <TabsContent_Shadcn_ className="mt-0 h-full" value="results">
+      <TabsContent_Shadcn_ asChild value="results" className="mt-0 flex-grow">
         <UtilityTabResults
           id={id}
           isExecuting={isExecuting}
@@ -147,7 +147,8 @@ const UtilityPanel = ({
           isDebugging={isDebugging}
         />
       </TabsContent_Shadcn_>
-      <TabsContent_Shadcn_ className="mt-0 h-full" value="chart">
+
+      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 flex-grow">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
       </TabsContent_Shadcn_>
     </Tabs_Shadcn_>

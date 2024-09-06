@@ -1,12 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Badge, IconCircle, IconLoader } from 'ui'
+import { Badge } from 'ui'
 
 import { Project, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useEffect, useState } from 'react'
+import { Loader, Circle } from 'lucide-react'
 
 export interface PausingStateProps {
   project: Project
@@ -45,7 +46,7 @@ const PausingState = ({ project }: PausingStateProps) => {
           <div>
             <Badge>
               <div className="flex items-center gap-2">
-                <IconLoader className="animate-spin" size={12} />
+                <Loader className="animate-spin" size={12} />
                 <span>Pausing project</span>
               </div>
             </Badge>
@@ -56,9 +57,9 @@ const PausingState = ({ project }: PausingStateProps) => {
             <div className="grid w-[380px] gap-4">
               <div className="relative mx-auto max-w-[300px]">
                 <div className="absolute flex h-full w-full items-center justify-center">
-                  <IconLoader className="animate-spin" size={20} strokeWidth={2} />
+                  <Loader className="animate-spin" size={20} strokeWidth={2} />
                 </div>
-                <IconCircle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
+                <Circle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
               </div>
               <p className="text-center">Pausing {project.name}</p>
               <p className="mt-4 text-center text-sm text-foreground-light">

@@ -58,7 +58,7 @@ export const getSortedPosts = ({
 
       const frontmatter = {
         ...data,
-        date: formattedDate,
+        formattedDate,
         readingTime,
         url: url,
         path: contentPath,

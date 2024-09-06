@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { Button, IconExternalLink, SidePanel, Tabs } from 'ui'
+import { Button, SidePanel, Tabs } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
@@ -18,6 +18,7 @@ import {
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
+import { ExternalLink } from 'lucide-react'
 
 const MAX_CSV_SIZE = 1024 * 1024 * 100 // 100 MB
 
@@ -82,7 +83,7 @@ const SpreadsheetImport = ({
         <div className="space-y-1">
           <p>The dashboard currently only supports importing of CSVs below 100MB.</p>
           <p>For bulk data loading, we recommend doing so directly through the database.</p>
-          <Button asChild type="default" icon={<IconExternalLink />} className="!mt-2">
+          <Button asChild type="default" icon={<ExternalLink />} className="!mt-2">
             <Link
               href="https://supabase.com/docs/guides/database/tables#bulk-data-loading"
               target="_blank"

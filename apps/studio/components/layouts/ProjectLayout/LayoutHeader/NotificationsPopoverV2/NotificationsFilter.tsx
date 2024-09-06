@@ -36,7 +36,7 @@ export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archi
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           type={snap.numFiltersApplied > 0 ? 'default' : 'text'}
-          icon={<Settings2Icon size={14} strokeWidth={1} />}
+          icon={<Settings2Icon strokeWidth={1} />}
           className="px-1 h-[26px]"
         >
           {snap.numFiltersApplied > 0 &&
