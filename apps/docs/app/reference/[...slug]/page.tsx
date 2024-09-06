@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 
 import { REFERENCES } from '~/content/navigation.references'
+import { CliReferencePage } from '~/features/docs/Reference.cliPage'
 import { ClientSdkReferencePage } from '~/features/docs/Reference.sdkPage'
 import {
   generateReferenceMetadata,
@@ -21,7 +22,7 @@ export default async function ReferencePage({
 
   const parsedPath = parseReferencePath(slug)
   const isClientSdkReference = parsedPath.__type === 'clientSdk'
-
+  const isCliReference = parsedPath.__type === 'cli'
   if (isClientSdkReference) {
     const { sdkId, maybeVersion, path } = parsedPath
 
@@ -32,8 +33,10 @@ export default async function ReferencePage({
     await redirectNonexistentReferenceSection(sdkId, version, path, version === latestVersion)
 
     return <ClientSdkReferencePage sdkId={sdkId} libVersion={version} />
+  } else if (isCliReference) {
+    return <CliReferencePage />
   } else {
-    // Unimplemented -- eventually API and CLI
+    // Unimplemented -- eventually API
     redirect(notFoundLink(slug.join('/')))
   }
 }
