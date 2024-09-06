@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
 import { useTelemetryProps } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { SchemaComboBox } from 'components/ui/SchemaComboBox'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
@@ -11,7 +12,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { ChevronsUpDown } from 'lucide-react'
+import { ChevronsUpDown, Lightbulb } from 'lucide-react'
 import Link from 'next/link'
 import {
   AiIconAnimation,
@@ -23,9 +24,9 @@ import {
 import { AssistantChatForm } from 'ui-patterns'
 import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface AIPolicyChatProps {
+  selectedTable: string
   messages: MessageWithDebug[]
   selectedMessage?: string
   loading: boolean
@@ -34,6 +35,7 @@ interface AIPolicyChatProps {
 }
 
 export const AIPolicyChat = ({
+  selectedTable,
   messages,
   selectedMessage,
   loading,
@@ -49,6 +51,7 @@ export const AIPolicyChat = ({
 
   const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
   const [value, setValue] = useState<string>('')
+  const [hasSuggested, setHasSuggested] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const isOptedInToAI = useOrgOptedIntoAi()
@@ -87,19 +90,24 @@ export const AIPolicyChat = ({
         learn and improve.`}
         >
           {includeSchemaMetadata ? (
-            <SchemaComboBox
-              className="w-fit"
-              disabled={!includeSchemaMetadata}
-              selectedSchemas={selectedSchemas}
-              onSelectSchemas={setSelectedSchemas}
-              label={
-                includeSchemaMetadata && selectedSchemas.length > 0
-                  ? `${selectedSchemas.length} schema${
-                      selectedSchemas.length > 1 ? 's' : ''
-                    } selected`
-                  : 'No schemas selected'
-              }
-            />
+            <div className="grid gap-2 mt-2">
+              <span className="inline-block text-lighter">
+                Include these schemas in your prompts:
+              </span>
+              <SchemaComboBox
+                className="w-fit"
+                disabled={!includeSchemaMetadata}
+                selectedSchemas={selectedSchemas}
+                onSelectSchemas={setSelectedSchemas}
+                label={
+                  includeSchemaMetadata && selectedSchemas.length > 0
+                    ? `${selectedSchemas.length} schema${
+                        selectedSchemas.length > 1 ? 's' : ''
+                      } selected`
+                    : 'No schemas selected'
+                }
+              />
+            </div>
           ) : (
             <ButtonTooltip
               disabled
@@ -130,7 +138,7 @@ export const AIPolicyChat = ({
             </ButtonTooltip>
           )}
         </Message>
-        <Button type="default">Generate templates</Button>
+
         {messages.map((m) => (
           <Message
             key={`message-${m.id}`}
@@ -146,6 +154,31 @@ export const AIPolicyChat = ({
         {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
         <div ref={bottomRef} className="h-1" />
       </div>
+
+      {!hasSuggested && (
+        <div className="flex flex-row justify-between m-4">
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
+              <Button
+                type="outline"
+                className="rounded-full"
+                icon={<Lightbulb size={14} />}
+                onClick={() => {
+                  onSubmit(
+                    `Suggest policies for ${selectedTable} table. Don't duplicate any of my existing policies.`
+                  )
+                  setHasSuggested(true)
+                }}
+              >
+                <span>Suggest</span>
+              </Button>
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="right">
+              Suggest policies for this table
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
+        </div>
+      )}
 
       <div className="sticky p-5 flex-0 border-t">
         <AssistantChatForm

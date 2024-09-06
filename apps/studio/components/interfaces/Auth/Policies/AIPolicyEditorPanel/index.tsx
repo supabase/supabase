@@ -67,6 +67,8 @@ import { PolicyTemplates } from './PolicyTemplates'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
 import { useQueryState } from 'nuqs'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -182,10 +184,20 @@ export const AIPolicyEditorPanel = memo(function ({
     { enabled: true, refetchOnWindowFocus: false }
   )
   const entityDefinitions = entities?.map((def) => def.sql.trim())
-  console.log({ entityDefinitions })
+
   const { name, table, behavior, command, roles } = form.watch()
   const supportWithCheck = ['update', 'all'].includes(command)
   const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
+
+  const { project } = useProjectContext()
+  const { data } = useDatabasePoliciesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const existingPolicies = (data ?? [])
+    .filter((policy) => policy.schema === schema && policy.table === selectedTable)
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   const {
     messages: chatMessages,
@@ -196,6 +208,7 @@ export const AIPolicyEditorPanel = memo(function ({
     api: `${BASE_PATH}/api/ai/sql/suggest`,
     body: {
       entityDefinitions: isOptedInToAI || !IS_PLATFORM ? entityDefinitions : undefined,
+      existingPolicies,
       policyDefinition:
         selectedPolicy !== undefined ? generatePolicyDefinition(selectedPolicy) : undefined,
     },
@@ -267,12 +280,11 @@ export const AIPolicyEditorPanel = memo(function ({
           })
         : false
 
-    setEditView(null)
-
     if (policyCreateUnsaved || policyUpdateUnsaved || messages.length > 0) {
       setIsClosingPolicyEditorPanel(true)
     } else {
       onSelectCancel()
+      setEditView(null)
     }
   }
 
@@ -767,18 +779,16 @@ export const AIPolicyEditorPanel = memo(function ({
                           incomingChange !== undefined
                         }
                         onClick={() => {
-                          if (isAiAssistantEnabled) {
-                            const sql = editorOneRef.current?.getValue().trim()
-                            if (!sql) return onSelectCancel()
-                            executeMutation({
-                              sql: sql,
-                              projectRef: selectedProject?.ref,
-                              connectionString: selectedProject?.connectionString,
-                              handleError: (error) => {
-                                throw error
-                              },
-                            })
-                          }
+                          const sql = editorOneRef.current?.getValue().trim()
+                          if (!sql) return onSelectCancel()
+                          executeMutation({
+                            sql: sql,
+                            projectRef: selectedProject?.ref,
+                            connectionString: selectedProject?.connectionString,
+                            handleError: (error) => {
+                              throw error
+                            },
+                          })
                         }}
                         tooltip={{
                           content: {
@@ -825,7 +835,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           onClick={() => setTabId('conversation')}
                           className="px-0 data-[state=active]:bg-transparent"
                         >
-                          Assistantzans
+                          Assistant
                         </TabsTrigger_Shadcn_>
                       )}
                     </TabsList_Shadcn_>
@@ -880,22 +890,20 @@ export const AIPolicyEditorPanel = memo(function ({
                       value="conversation"
                       className="flex grow !mt-0 overflow-y-auto"
                     >
-                      {' '}
-                      <div className="border bg-red-500">
-                        <AIPolicyChat
-                          messages={messages}
-                          selectedMessage={selectedDiff}
-                          onSubmit={(message) =>
-                            append({
-                              content: message,
-                              role: 'user',
-                              createdAt: new Date(),
-                            })
-                          }
-                          onDiff={updateEditorWithCheckForDiff}
-                          loading={isLoading || isDebugSqlLoading}
-                        />
-                      </div>
+                      <AIPolicyChat
+                        selectedTable={selectedTable!}
+                        messages={messages}
+                        selectedMessage={selectedDiff}
+                        onSubmit={(message) =>
+                          append({
+                            content: message,
+                            role: 'user',
+                            createdAt: new Date(),
+                          })
+                        }
+                        onDiff={updateEditorWithCheckForDiff}
+                        loading={isLoading || isDebugSqlLoading}
+                      />
                     </TabsContent_Shadcn_>
                   </Tabs_Shadcn_>
                 </div>
@@ -915,6 +923,7 @@ export const AIPolicyEditorPanel = memo(function ({
         onConfirm={() => {
           onSelectCancel()
           setIsClosingPolicyEditorPanel(false)
+          setEditView(null)
         }}
       >
         <p className="text-sm text-foreground-light">
