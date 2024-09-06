@@ -1,11 +1,12 @@
 import dagre from '@dagrejs/dagre'
 import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uniqBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
 import 'reactflow/dist/style.css'
 
-import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode } from 'ui-patterns/SchemaTableNode'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { tryParseJson } from 'lib/helpers'
+import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH } from 'ui-patterns/SchemaTableNode'
 
 type TableNodeData = {
   name: string
@@ -23,6 +24,7 @@ type TableNodeData = {
 }
 
 export async function getGraphDataFromTables(
+  ref: string,
   schema: PostgresSchema,
   tables: PostgresTable[]
 ): Promise<{
@@ -127,12 +129,12 @@ export async function getGraphDataFromTables(
     }
   }
 
-  // [Joshen] If there's data (either local storage or user-content), load it, otherwise default to dagreGraph
-  const savedPositions = localStorage.getItem(
-    LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(schema.id)
+  const savedPositionsLocalStorage = localStorage.getItem(
+    LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref, schema.id)
   )
+  const savedPositions = tryParseJson(savedPositionsLocalStorage)
   return !!savedPositions
-    ? getLayoutedElementsViaLocalStorage(nodes, edges)
+    ? getLayoutedElementsViaLocalStorage(nodes, edges, savedPositions)
     : getLayoutedElementsViaDagre(nodes, edges)
 }
 
@@ -194,18 +196,15 @@ export const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
   return { nodes, edges }
 }
 
-const getLayoutedElementsViaLocalStorage = (nodes: Node[], edges: Edge[]) => {
-  console.log('getLayout', { nodes, edges })
-
-  // TODO WHEN WE ARE BACK JOSHEN
-  // [Joshen] For nodes that are not saved in local storage - will need to default them to 0;0
-  // Users can either shift them manually or hit "reset layout" to let the algorithm automatically adjust
-
+const getLayoutedElementsViaLocalStorage = (
+  nodes: Node[],
+  edges: Edge[],
+  positions: { [key: string]: { x: number; y: number } }
+) => {
   nodes.forEach((node) => {
     node.targetPosition = Position.Left
     node.sourcePosition = Position.Right
-    node.position = { x: 0, y: 0 }
+    node.position = positions?.[node.id] ?? { x: 0, y: 0 }
   })
-
   return { nodes, edges }
 }

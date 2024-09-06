@@ -65,7 +65,8 @@ export const LOCAL_STORAGE_KEYS = {
   // Key to show a warning on the SQL Editor AI Assistant that the org hasn't opted-in to sending anon data
   SHOW_AI_NOT_OPTIMIZED_WARNING: (ref: string) => `supabase-show-ai-not-optimized-${ref}`,
   // Track position of nodes for schema visualizer
-  SCHEMA_VISUALIZER_POSITIONS: (schemaId: number) => `schema-visualizer-positions-${schemaId}`,
+  SCHEMA_VISUALIZER_POSITIONS: (ref: string, schemaId: number) =>
+    `schema-visualizer-positions-${ref}-${schemaId}`,
 }
 
 export const OPT_IN_TAGS = {

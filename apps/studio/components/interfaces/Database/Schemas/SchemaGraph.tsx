@@ -2,7 +2,7 @@ import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
-import ReactFlow, { Background, BackgroundVariant, MiniMap, Node, useReactFlow } from 'reactflow'
+import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -10,14 +10,18 @@ import AlertError from 'components/ui/AlertError'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 import { TableNode } from 'ui-patterns/SchemaTableNode'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
-import { Button } from 'ui'
+import { useParams } from 'common'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
 export const SchemaGraph = () => {
+  const { ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
   const [selectedSchema, setSelectedSchema] = useState<string>('public')
@@ -59,6 +63,12 @@ export const SchemaGraph = () => {
     includeColumns: true,
   })
 
+  const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
+  const [_, setStoredPositions] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref as string, schema?.id ?? 0),
+    {}
+  )
+
   const resetLayout = () => {
     const nodes = reactFlowInstance.getNodes()
     const edges = reactFlowInstance.getEdges()
@@ -67,21 +77,29 @@ export const SchemaGraph = () => {
     reactFlowInstance.setNodes(nodes)
     reactFlowInstance.setEdges(edges)
     setTimeout(() => reactFlowInstance.fitView({}))
+    saveNodePositions()
   }
 
-  const onNodeDragStop = (node: Node) => {
-    // TODO WHEN WE ARE BACK JOSHEN
-    console.log(node)
+  const saveNodePositions = () => {
+    if (schema === undefined) return console.error('Schema is required')
+
+    const nodes = reactFlowInstance.getNodes()
+    const nodesPositionData = nodes.reduce((a, b) => {
+      return { ...a, [b.id]: b.position }
+    }, {})
+    setStoredPositions(nodesPositionData)
   }
 
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
       const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
-      getGraphDataFromTables(schema, tables as PostgresTable[]).then(({ nodes, edges }) => {
-        reactFlowInstance.setNodes(nodes)
-        reactFlowInstance.setEdges(edges)
-        setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
-      })
+      getGraphDataFromTables(ref as string, schema, tables as PostgresTable[]).then(
+        ({ nodes, edges }) => {
+          reactFlowInstance.setNodes(nodes)
+          reactFlowInstance.setEdges(edges)
+          setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
+        }
+      )
     }
   }, [isSuccessTables, isSuccessSchemas, tables, resolvedTheme])
 
@@ -105,9 +123,16 @@ export const SchemaGraph = () => {
               selectedSchemaName={selectedSchema}
               onSelectSchema={setSelectedSchema}
             />
-            <Button type="default" onClick={resetLayout}>
-              Reset layout
-            </Button>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <Button type="default" onClick={resetLayout}>
+                  Auto layout
+                </Button>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom">
+                Automatically arrange the layout of all nodes
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           </>
         )}
       </div>
@@ -141,7 +166,7 @@ export const SchemaGraph = () => {
             minZoom={0.8}
             maxZoom={1.8}
             proOptions={{ hideAttribution: true }}
-            onNodeDragStop={(_, node) => onNodeDragStop(node)}
+            onNodeDragStop={() => saveNodePositions()}
           >
             <Background
               gap={16}
