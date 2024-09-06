@@ -386,7 +386,7 @@ const { data, error } = await supabase.from('shifts').select(
       user_id,
       badge_scan_time
     ),
-   start_scan:scans!scan_id_end (
+   end_scan:scans!scan_id_end (
      id, 
      user_id,
      badge_scan_time
@@ -406,7 +406,7 @@ final data = await supabase.from('shifts').select('''
     user_id,
     badge_scan_time
   ),
-start_scan:scans!scan_id_end (
+end_scan:scans!scan_id_end (
     id,
     user_id,
     badge_scan_time
@@ -477,7 +477,7 @@ val data = supabase.from("shifts").select(Columns.raw('''
     user_id,
     badge_scan_time
   ),
-start_scan:scans!scan_id_end (
+end_scan:scans!scan_id_end (
     id,
     user_id,
     badge_scan_time
@@ -496,7 +496,7 @@ data = supabase.from_('shifts').select("""
     user_id,
     badge_scan_time
   ),
-  start_scan:scans!scan_id_end (
+  end_scan:scans!scan_id_end (
     id,
     user_id,
     badge_scan_time
