@@ -648,7 +648,7 @@ export const WRAPPERS: WrapperMeta[] = [
       {
         label: 'Payouts',
         description:
-          'Created when you receive funds rfom Stripe, or when you initiate a payout to either a bank account or debit card',
+          'Created when you receive funds from Stripe, or when you initiate a payout to either a bank account or debit card',
         availableColumns: [
           {
             name: 'id',
