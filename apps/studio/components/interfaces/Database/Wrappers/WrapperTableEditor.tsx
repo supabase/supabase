@@ -4,10 +4,11 @@ import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/Act
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { Form, IconDatabase, IconPlus, Input, Listbox, Modal, SidePanel } from 'ui'
+import { Form, Input, Listbox, Modal, SidePanel } from 'ui'
 import WrapperDynamicColumns from './WrapperDynamicColumns'
 import type { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
+import { Plus, Database } from 'lucide-react'
 
 export type WrapperTableEditorProps = {
   visible: boolean
@@ -217,7 +218,7 @@ const TableForm = ({
                   id="custom"
                   label={`Create a new schema`}
                   value="custom"
-                  addOnBefore={() => <IconPlus size={16} strokeWidth={1.5} />}
+                  addOnBefore={() => <Plus size={16} strokeWidth={1.5} />}
                 >
                   Create a new schema
                 </Listbox.Option>
@@ -230,7 +231,7 @@ const TableForm = ({
                       id={schema.name}
                       label={schema.name}
                       value={schema.name}
-                      addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
+                      addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
                     >
                       {schema.name}
                     </Listbox.Option>

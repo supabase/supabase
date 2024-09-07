@@ -11,13 +11,10 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconAlertCircle,
-  IconExternalLink,
-  IconHelpCircle,
-  IconRefreshCw,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 import DNSRecord from './DNSRecord'
+import { AlertCircle, HelpCircle, ExternalLink, RefreshCw } from 'lucide-react'
 
 export type CustomDomainVerifyProps = {
   projectRef?: string
@@ -69,9 +66,9 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           <div className="mt-4 mb-2">
             <Alert_Shadcn_ variant="default">
               {isNotVerifiedYet ? (
-                <IconAlertCircle className="text-foreground-light" strokeWidth={1.5} />
+                <AlertCircle className="text-foreground-light" strokeWidth={1.5} />
               ) : (
-                <IconHelpCircle className="text-foreground-light" strokeWidth={1.5} />
+                <HelpCircle className="text-foreground-light" strokeWidth={1.5} />
               )}
               <AlertTitle_Shadcn_>
                 {isNotVerifiedYet
@@ -186,7 +183,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
 
             {customDomain.ssl.status === 'pending_deployment' && (
               <div className="flex items-center justify-center space-x-2 py-8">
-                <IconAlertCircle size={16} strokeWidth={1.5} />
+                <AlertCircle size={16} strokeWidth={1.5} />
                 <p className="text-sm text-foreground-light">
                   SSL certificate is being deployed. Please wait a few minutes and try again.
                 </p>
@@ -212,7 +209,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
 
       <Panel.Content>
         <div className="flex items-center justify-between">
-          <Button asChild type="default" icon={<IconExternalLink />}>
+          <Button asChild type="default" icon={<ExternalLink />}>
             <Link
               href="https://supabase.com/docs/guides/platform/custom-domains"
               target="_blank"
@@ -232,7 +229,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
               Cancel
             </Button>
             <Button
-              icon={<IconRefreshCw />}
+              icon={<RefreshCw />}
               onClick={onReverifyCustomDomain}
               loading={isReverifyLoading}
               disabled={isDeleting || isReverifyLoading}

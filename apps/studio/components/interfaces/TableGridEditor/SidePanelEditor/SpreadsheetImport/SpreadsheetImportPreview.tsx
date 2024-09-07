@@ -1,19 +1,11 @@
 import clsx from 'clsx'
 import { useEffect, useState } from 'react'
-import {
-  Badge,
-  Button,
-  Collapsible,
-  IconAlertCircle,
-  IconArrowRight,
-  IconChevronDown,
-  IconChevronRight,
-  SidePanel,
-} from 'ui'
+import { Badge, Button, Collapsible, SidePanel } from 'ui'
 
 import type { PostgresTable } from '@supabase/postgres-meta'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import SpreadsheetPreviewGrid from './SpreadsheetPreviewGrid'
+import { ChevronDown, AlertCircle, ChevronRight, ArrowRight } from 'lucide-react'
 
 const MAX_ROWS = 20
 const MAX_HEADERS = 20
@@ -69,7 +61,7 @@ const SpreadsheetImportPreview = ({
             <Button
               type="text"
               icon={
-                <IconChevronDown
+                <ChevronDown
                   size={18}
                   strokeWidth={2}
                   className={clsx('text-foreground-light', expandPreview && 'rotate-180')}
@@ -102,7 +94,7 @@ const SpreadsheetImportPreview = ({
               <SpreadsheetPreviewGrid height={350} headers={previewHeaders} rows={previewRows} />
             ) : (
               <div className="flex items-center justify-center py-4 border border-control rounded-md space-x-2">
-                <IconAlertCircle size={16} strokeWidth={1.5} className="text-foreground-light" />
+                <AlertCircle size={16} strokeWidth={1.5} className="text-foreground-light" />
                 <p className="text-sm text-foreground-light">
                   {previewHeaders.length === 0
                     ? 'No headers have been selected'
@@ -154,7 +146,7 @@ const SpreadsheetImportPreview = ({
                         onClick={() => onSelectExpandError(key)}
                       >
                         {error.data !== undefined ? (
-                          <IconChevronRight
+                          <ChevronRight
                             size={14}
                             className={`transform ${isExpanded ? 'rotate-90' : ''}`}
                           />
@@ -169,7 +161,7 @@ const SpreadsheetImportPreview = ({
                         <p className="text-sm">{error.message}</p>
                         {error.data?.__parsed_extra && (
                           <>
-                            <IconArrowRight size={14} />
+                            <ArrowRight size={14} />
                             <p className="text-sm">Extra field(s):</p>
                             {error.data?.__parsed_extra.map((value: any, i: number) => (
                               <code key={i} className="text-xs">

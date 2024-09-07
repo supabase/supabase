@@ -6,6 +6,7 @@ import {
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
+  CommandList_Shadcn_,
   Command_Shadcn_,
   FormControl_Shadcn_,
   PopoverContent_Shadcn_,
@@ -76,26 +77,28 @@ export const AwsRegionSelector = ({
       <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search AWS regions..." />
-          <CommandEmpty_Shadcn_>No regions found.</CommandEmpty_Shadcn_>
-          <CommandGroup_Shadcn_>
-            <ScrollArea className="h-72">
-              {AWS_IDP_REGIONS.map((option) => (
-                <CommandItem_Shadcn_
-                  value={option}
-                  key={option}
-                  onSelect={(currentValue) => {
-                    onChange(currentValue === value ? '' : currentValue)
-                    setOpen(false)
-                  }}
-                >
-                  <Check
-                    className={cn('mr-2 h-4 w-4', option === value ? 'opacity-100' : 'opacity-0')}
-                  />
-                  {option}
-                </CommandItem_Shadcn_>
-              ))}
-            </ScrollArea>
-          </CommandGroup_Shadcn_>
+          <CommandList_Shadcn_>
+            <CommandEmpty_Shadcn_>No regions found.</CommandEmpty_Shadcn_>
+            <CommandGroup_Shadcn_>
+              <ScrollArea className="h-72">
+                {AWS_IDP_REGIONS.map((option) => (
+                  <CommandItem_Shadcn_
+                    value={option}
+                    key={option}
+                    onSelect={(currentValue) => {
+                      onChange(currentValue === value ? '' : currentValue)
+                      setOpen(false)
+                    }}
+                  >
+                    <Check
+                      className={cn('mr-2 h-4 w-4', option === value ? 'opacity-100' : 'opacity-0')}
+                    />
+                    {option}
+                  </CommandItem_Shadcn_>
+                ))}
+              </ScrollArea>
+            </CommandGroup_Shadcn_>
+          </CommandList_Shadcn_>
         </Command_Shadcn_>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

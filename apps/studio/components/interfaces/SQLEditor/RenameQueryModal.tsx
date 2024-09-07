@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { getContentById } from 'data/content/content-id-query'
+import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import { Snippet } from 'data/content/sql-folders-query'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useFlag } from 'hooks/ui/useFlag'
-import { getContentById } from 'data/content/content-id-query'
 
 export interface RenameQueryModalProps {
   snippet?: SqlSnippet | Snippet
@@ -34,6 +34,7 @@ const RenameQueryModal = ({
   const snapV2 = useSqlEditorV2StateSnapshot()
   const enableFolders = useFlag('sqlFolderOrganization')
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const isSQLSnippet = snippet.type === 'sql'
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -54,11 +55,11 @@ const RenameQueryModal = ({
     },
   })
 
-  const isAiButtonVisible = enableFolders ? true : 'content' in snippet && !!snippet.content.sql
+  const isAiButtonVisible = enableFolders ? true : isSQLSnippet
 
   const generateTitle = async () => {
     if (enableFolders) {
-      if ('content' in snippet) {
+      if ('content' in snippet && isSQLSnippet) {
         titleSql({ sql: snippet.content.sql })
       } else {
         try {
@@ -69,7 +70,7 @@ const RenameQueryModal = ({
         }
       }
     } else {
-      if ('content' in snippet) titleSql({ sql: snippet.content.sql })
+      if ('content' in snippet && isSQLSnippet) titleSql({ sql: snippet.content.sql })
     }
   }
 

@@ -567,6 +567,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/platform/custom-postgres-config',
+    destination: '/docs/guides/database/custom-postgres-config',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/hosting/platform/access-control',
     destination: '/docs/guides/platform/access-control',
   },
@@ -2578,6 +2583,11 @@ module.exports = [
     permanent: true,
     source: '/launchweek',
     destination: '/launch-week',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/enterprise-billing',
+    destination: '/docs/guides/platform/org-based-billing',
   },
 
   // marketing

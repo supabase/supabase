@@ -1,7 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
@@ -22,8 +22,8 @@ import {
   Button,
   Listbox,
   SidePanel,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
@@ -187,7 +187,7 @@ const DeployNewReplicaPanel = ({
                 replicas
               </span>
               <div className="mt-3">
-                <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                <Button asChild type="default" icon={<ExternalLink />}>
                   <a
                     href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
                     target="_blank"
@@ -245,7 +245,7 @@ const DeployNewReplicaPanel = ({
                         {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
                       </Link>
                     </Button>
-                    <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                    <Button asChild type="default" icon={<ExternalLink />}>
                       <a
                         href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
                         target="_blank"
@@ -294,7 +294,7 @@ const DeployNewReplicaPanel = ({
                     >
                       Enable physical backups
                     </Button>
-                    <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                    <Button asChild type="default" icon={<ExternalLink />}>
                       <a
                         href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
                         target="_blank"
@@ -361,7 +361,7 @@ const DeployNewReplicaPanel = ({
             <p className="text-foreground-light text-sm">
               Read more about{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
                 target="_blank"
                 rel="noreferrer"
                 className="underline hover:text-foreground transition"

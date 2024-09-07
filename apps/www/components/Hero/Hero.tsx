@@ -1,10 +1,11 @@
+import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
+import { BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
-import gaEvents from '~/lib/gaEvents'
-import { Button, IconBookOpen } from 'ui'
+import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import gaEvents from '~/lib/gaEvents'
+import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 
 const Hero = () => {
   const router = useRouter()
@@ -46,7 +47,7 @@ const Hero = () => {
                       Start your project
                     </Link>
                   </Button>
-                  <Button asChild size="medium" type="default" icon={<IconBookOpen />}>
+                  <Button asChild size="medium" type="default" icon={<BookOpen />}>
                     <Link
                       href="/docs"
                       as="/docs"

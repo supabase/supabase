@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { SetStateAction } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { number, object } from 'yup'
 
 import { useParams } from 'common'

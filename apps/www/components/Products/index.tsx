@@ -1,19 +1,19 @@
-import { useRouter } from 'next/router'
-import Image from 'next/image'
-import Telemetry from '~/lib/telemetry'
-import gaEvents from '~/lib/gaEvents'
-import { IconCheck } from 'ui'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import gaEvents from '~/lib/gaEvents'
+import Telemetry from '~/lib/telemetry'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductCard from './ProductCard'
 import AuthVisual from './AuthVisual'
 import DatabaseVisual from './DatabaseVisual'
 import FunctionsVisual from './FunctionsVisual'
+import ProductCard from './ProductCard'
 import RealtimeVisual from './RealtimeVisual'
 import StorageVisual from './StorageVisual'
 import VectorVisual from './VectorVisual'
+import { Check } from 'lucide-react'
 
 const Products = (props: any) => {
   const router = useRouter()
@@ -72,13 +72,13 @@ const Products = (props: any) => {
         highlights={
           <ul className="flex flex-col gap-1 text-sm">
             <li>
-              <IconCheck className="inline h-4 w-4" /> 100% portable
+              <Check className="inline h-4 w-4" /> 100% portable
             </li>
             <li>
-              <IconCheck className="inline h-4 w-4" /> Built-in Auth with RLS
+              <Check className="inline h-4 w-4" /> Built-in Auth with RLS
             </li>
             <li>
-              <IconCheck className="inline h-4 w-4" /> Easy to extend
+              <Check className="inline h-4 w-4" /> Easy to extend
             </li>
           </ul>
         }

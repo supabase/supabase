@@ -4,7 +4,7 @@ import { ReactNode } from 'react'
 
 import { useFlag } from 'hooks/ui/useFlag'
 import { ArrowUpRight, LogOut } from 'lucide-react'
-import { Badge, cn, IconArrowUpRight, Menu } from 'ui'
+import { Badge, cn, Menu } from 'ui'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
 import type { SidebarLink, SidebarSection } from './AccountLayout.types'
 
@@ -198,8 +198,6 @@ const SidebarLinkItem = ({
       </Menu.Item>
     )
   }
-
-  console.log(label, isActive)
 
   return (
     <Link href={href || ''} className="block" target={isExternal ? '_blank' : '_self'}>

@@ -1,12 +1,13 @@
 import { useParams } from 'common'
-import { Button, IconCopy, Input } from 'ui'
+import { Button, Input } from 'ui'
 
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { copyToClipboard } from 'lib/helpers'
+import { useEffect, useState } from 'react'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
-import { copyToClipboard } from 'lib/helpers'
-import { useEffect, useState } from 'react'
+import { Copy } from 'lucide-react'
 
 const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
@@ -48,7 +49,7 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
                 <Button
                   key="copy"
                   type="default"
-                  icon={<IconCopy />}
+                  icon={<Copy />}
                   onClick={() => {
                     setCopied('anon')
                     copyToClipboard(
@@ -79,7 +80,7 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
                 <Button
                   key="copy"
                   type="default"
-                  icon={<IconCopy />}
+                  icon={<Copy />}
                   onClick={() => {
                     setCopied('service')
                     copyToClipboard(
