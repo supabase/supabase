@@ -261,11 +261,11 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <UpgradingState />
   }
 
-  if (isProjectPausing && !isBackupsPage) {
+  if (isProjectPausing) {
     return <PausingState project={selectedProject} />
   }
 
-  if (isProjectPauseFailed && !isBackupsPage) {
+  if (isProjectPauseFailed) {
     return <PauseFailedState />
   }
 
