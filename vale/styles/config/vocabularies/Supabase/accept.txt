@@ -1,5 +1,6 @@
 APIs
 [Aa]uth
+[Bb]aselining
 Berri
 [Cc]hatbots?
 ChatGPT
@@ -70,6 +71,7 @@ RESTful
 Roboflow
 [Ss]crollable
 [Ss]erializ(e|ed|es|ing)
+[Ss]erverless
 [Ss]erverside
 [Ss]igncryption
 [Ss]ignins?
