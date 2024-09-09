@@ -176,7 +176,7 @@ export const UsersV2 = () => {
       renderHeaderCell: () => {
         if (col.id === 'img') return undefined
         return (
-          <div className="flex items-center justify-between font-mono font-normal text-xs w-full">
+          <div className="flex items-center justify-between font-normal text-xs w-full">
             <div className="flex items-center gap-x-2">
               <p className="!text-foreground">{col.name}</p>
             </div>
@@ -210,7 +210,7 @@ export const UsersV2 = () => {
             <ContextMenuTrigger_Shadcn_ asChild>
               <div
                 className={cn(
-                  'w-full flex items-center font-mono text-xs gap-x-2',
+                  'w-full flex items-center text-xs gap-x-2',
                   col.id.includes('provider') ? 'capitalize' : ''
                 )}
               >
