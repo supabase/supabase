@@ -10,8 +10,9 @@ export function TweetCard(props: TweetCard) {
   return (
     <div
       className="
-      bg-surface-75 border
-      rounded-2xl border p-6
+      bg-surface-75
+      border group-hover:border-foreground-muted transition-colors
+      rounded-2xl p-6
       drop-shadow-sm
     "
     >
