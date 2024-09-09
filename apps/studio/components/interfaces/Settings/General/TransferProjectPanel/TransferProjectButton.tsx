@@ -204,60 +204,63 @@ const TransferProjectButton = () => {
 
         <Loading active={selectedOrg !== undefined && transferPreviewIsLoading}>
           <Modal.Content>
-            {transferPreviewData && transferPreviewData.warnings.length > 0 && (
-              <Alert
-                withIcon
-                variant="warning"
-                title="Warnings for project transfer"
-                className="mt-3"
-              >
-                <div className="space-y-1">
-                  {transferPreviewData.warnings.map((warning) => (
-                    <p key={warning.key}>{warning.message}</p>
-                  ))}
-                </div>
-              </Alert>
-            )}
-            {transferPreviewData && transferPreviewData.errors.length > 0 && (
-              <Alert withIcon variant="danger" title="Project cannot be transferred">
-                <div className="space-y-1">
-                  {transferPreviewData.errors.map((error) => (
-                    <p key={error.key}>{error.message}</p>
-                  ))}
-                </div>
-                {transferPreviewData.members_exceeding_free_project_limit.length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-foreground-light">
-                      These members have reached their maximum limits for the number of active Free
-                      plan projects within organizations where they are an administrator or owner:
-                    </p>
-                    <ul className="pl-5 text-sm list-disc text-foreground-light">
-                      {(transferPreviewData.members_exceeding_free_project_limit || []).map(
-                        (member, idx: number) => (
-                          <li key={`member-${idx}`}>
-                            {member.name} (Limit: {member.limit} free projects)
-                          </li>
-                        )
-                      )}
-                    </ul>
-                    <p className="text-sm text-foreground-light">
-                      These members will need to either delete, pause, or upgrade one or more of
-                      their projects before you can downgrade this project.
-                    </p>
+            <div className="space-y-2">
+              {transferPreviewData && transferPreviewData.warnings.length > 0 && (
+                <Alert
+                  withIcon
+                  variant="warning"
+                  title="Warnings for project transfer"
+                  className="mt-3"
+                >
+                  <div className="space-y-1">
+                    {transferPreviewData.warnings.map((warning) => (
+                      <p key={warning.key}>{warning.message}</p>
+                    ))}
                   </div>
-                )}
-              </Alert>
-            )}
-            {transferPreviewError && !transferError && (
-              <Alert withIcon variant="danger" title="Project cannot be transferred">
-                <p>{transferPreviewError.message}</p>
-              </Alert>
-            )}
-            {transferError && (
-              <Alert withIcon variant="danger" title="Project cannot be transferred">
-                <p>{transferError.message}</p>
-              </Alert>
-            )}
+                </Alert>
+              )}
+              {transferPreviewData && transferPreviewData.errors.length > 0 && (
+                <Alert withIcon variant="danger" title="Project cannot be transferred">
+                  <div className="space-y-1">
+                    {transferPreviewData.errors.map((error) => (
+                      <p key={error.key}>{error.message}</p>
+                    ))}
+                  </div>
+                  {transferPreviewData.members_exceeding_free_project_limit.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm text-foreground-light">
+                        These members have reached their maximum limits for the number of active
+                        Free plan projects within organizations where they are an administrator or
+                        owner:
+                      </p>
+                      <ul className="pl-5 text-sm list-disc text-foreground-light">
+                        {(transferPreviewData.members_exceeding_free_project_limit || []).map(
+                          (member, idx: number) => (
+                            <li key={`member-${idx}`}>
+                              {member.name} (Limit: {member.limit} free projects)
+                            </li>
+                          )
+                        )}
+                      </ul>
+                      <p className="text-sm text-foreground-light">
+                        These members will need to either delete, pause, or upgrade one or more of
+                        their projects before you can downgrade this project.
+                      </p>
+                    </div>
+                  )}
+                </Alert>
+              )}
+              {transferPreviewError && !transferError && (
+                <Alert withIcon variant="danger" title="Project cannot be transferred">
+                  <p>{transferPreviewError.message}</p>
+                </Alert>
+              )}
+              {transferError && (
+                <Alert withIcon variant="danger" title="Project cannot be transferred">
+                  <p>{transferError.message}</p>
+                </Alert>
+              )}
+            </div>
           </Modal.Content>
         </Loading>
       </Modal>

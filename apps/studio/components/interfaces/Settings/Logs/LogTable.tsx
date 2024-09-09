@@ -130,7 +130,6 @@ const LogTable = ({
         return <div className="flex items-center">{v}</div>
       },
       minWidth: 128,
-      maxWidth: v === 'timestamp' ? 240 : 2400, // Without this, the column flickers on first render
     }
 
     return result
@@ -402,7 +401,7 @@ const LogTable = ({
               renderers={{
                 renderRow: RowRenderer,
                 noRowsFallback: !isLoading ? (
-                  <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
+                  <div className="mx-auto flex h-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
                     {!error && renderNoResultAlert()}
                     {error && renderErrorAlert()}
                   </div>

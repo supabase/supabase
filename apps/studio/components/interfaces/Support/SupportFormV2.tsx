@@ -268,7 +268,10 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
           form.setValue('organizationSlug', selectedOrganization.slug)
         }
       } else if (ref === undefined && slug === undefined) {
-        form.setValue('organizationSlug', organizations[0].slug)
+        const firstOrganization = organizations?.[0]
+        if (firstOrganization !== undefined) {
+          form.setValue('organizationSlug', firstOrganization.slug)
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
