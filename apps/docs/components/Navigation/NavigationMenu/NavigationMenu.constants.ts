@@ -749,6 +749,10 @@ export const database: NavMenuConstant = {
           name: 'Partitioning your tables',
           url: '/guides/database/partitions',
         },
+        {
+          name: 'Managing Connections',
+          url: '/guides/database/connection-management',
+        },
       ],
     },
     {
