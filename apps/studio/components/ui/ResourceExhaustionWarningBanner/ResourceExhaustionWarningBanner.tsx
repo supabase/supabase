@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
@@ -12,9 +12,10 @@ const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { data: resourceWarnings } = useResourceWarningsQuery()
-  const projectResourceWarnings = (resourceWarnings ?? [])?.find(
-    (warning) => warning.project === ref
-  )
+  // const projectResourceWarnings = (resourceWarnings ?? [])?.find(
+  //   (warning) => warning.project === ref
+  // )
+  const projectResourceWarnings = { cpu_exhaustion: 'critical' }
 
   // [Joshen] Read only takes higher precedence over multiple resource warnings
   const activeWarnings =
@@ -96,19 +97,24 @@ const ResourceExhaustionWarningBanner = () => {
       !activeWarnings.includes('is_readonly_mode_enabled')) ||
     (activeWarnings.includes('is_readonly_mode_enabled') &&
       router.pathname.endsWith('settings/database'))
-  )
+  ) {
     return null
+  }
 
   return (
     <Alert_Shadcn_
       variant={isCritical ? 'destructive' : 'warning'}
-      className="border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px]
-[&>svg]:h-[26px]"
+      className={cn(
+        'flex items-center justify-between',
+        'border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px] [&>svg]:h-[26px]'
+      )}
     >
       <AlertTriangle />
-      <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
-      <div className="absolute top-5 right-5 flex items-center space-x-2">
+      <div className="">
+        <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
+      </div>
+      <div className="flex items-center gap-x-2">
         {learnMoreUrl !== undefined && (
           <Button asChild type="default" icon={<ExternalLink />}>
             <a href={learnMoreUrl} target="_blank" rel="noreferrer">
