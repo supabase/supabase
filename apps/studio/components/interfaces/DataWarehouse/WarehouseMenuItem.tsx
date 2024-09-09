@@ -221,8 +221,9 @@ export const WarehouseMenuItem = ({ item }: Props) => {
           >
             <div className="p-3 px-6 space-y-4">
               <p className="text-sm text-foreground-light">
-                Are you sure you want to delete the selected collection?
-                <br /> This action cannot be undone.
+                All data in this collection will be deleted.
+                <br />
+                <div className="mt-2">This action cannot be undone.</div>
               </p>
             </div>
 
