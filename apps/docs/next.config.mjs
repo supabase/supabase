@@ -111,6 +111,35 @@ const nextConfig = {
             value: 'DENY',
           },
         ],
+        has: [
+          {
+            type: 'host',
+            value: 'supabase.com',
+          },
+        ],
+      },
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: '',
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+        ],
+        has: [
+          {
+            type: 'host',
+            value: '(?:.+\\.vercel\\.app)',
+          },
+        ],
       },
     ]
   },

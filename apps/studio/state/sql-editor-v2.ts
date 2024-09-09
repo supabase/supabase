@@ -10,6 +10,7 @@ import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder, SnippetFolderResponse } from 'data/content/sql-folders-query'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { getQueryClient } from 'data/query-client'
+import { getContentById } from 'data/content/content-id-query'
 
 export type StateSnippetFolder = {
   projectRef: string
@@ -263,16 +264,31 @@ export const sqlEditorState = proxy({
     }
   },
 
-  shareSnippet: (id: string, visibility: 'user' | 'project' | 'org' | 'public') => {
-    if (sqlEditorState.snippets[id]) {
+  shareSnippet: async (id: string, visibility: 'user' | 'project' | 'org' | 'public') => {
+    const storeSnippet = sqlEditorState.snippets[id]
+
+    if (storeSnippet) {
+      let snippetContent = storeSnippet.snippet.content
+      if (snippetContent === undefined) {
+        const { content } = await getContentById({ projectRef: storeSnippet.projectRef, id })
+        snippetContent = content
+      }
+
+      if (snippetContent === undefined) {
+        // [Joshen] Just as a final check - to ensure that the content is minimally there (empty string is fine)
+        return toast.error('Unable to share snippet: Content is missing')
+      }
+
       sqlEditorState.snippets[id] = {
-        ...sqlEditorState.snippets[id],
+        ...storeSnippet,
         snippet: {
-          ...sqlEditorState.snippets[id].snippet,
+          ...storeSnippet.snippet,
+          content: snippetContent,
           visibility,
           folder_id: null as any,
         },
       }
+
       sqlEditorState.needsSaving.add(id)
     }
   },

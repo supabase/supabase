@@ -6,9 +6,10 @@ import { parse } from 'yaml'
 
 import { REFERENCES, clientSdkIds } from '~/content/navigation.references'
 import { parseTypeSpec } from '~/features/docs/Reference.typeSpec'
-import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
+import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { deepFilterRec } from '~/features/helpers.fn'
 import type { Json } from '~/features/helpers.types'
+import cliCommonSections from '~/spec/common-cli-sections.json' assert { type: 'json' }
 import commonClientLibSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
 
 const DOCS_DIRECTORY = join(dirname(fileURLToPath(import.meta.url)), '../..')
@@ -18,7 +19,7 @@ const GENERATED_DIRECTORY = join(dirname(fileURLToPath(import.meta.url)), 'gener
 async function getSpec(specFile: string, { ext = 'yml' }: { ext?: string } = {}) {
   const specFullPath = join(SPEC_DIRECTORY, `${specFile}.${ext}`)
   const rawSpec = await readFile(specFullPath, 'utf-8')
-  return ext === 'yml' ? parse(rawSpec) : rawSpec
+  return ext === 'yml' || ext === 'yaml' ? parse(rawSpec) : rawSpec
 }
 
 async function parseFnsList(rawSpec: Json): Promise<Array<{ id: unknown }>> {
@@ -34,7 +35,7 @@ async function parseFnsList(rawSpec: Json): Promise<Array<{ id: unknown }>> {
 
 function genClientSdkSectionTree(fns: Array<{ id: unknown }>, excludeName: string) {
   const validSections = deepFilterRec(
-    commonClientLibSections as Array<AbbrevCommonClientLibSection>,
+    commonClientLibSections as Array<AbbrevApiReferenceSection>,
     'items',
     (section) =>
       section.type === 'markdown' || section.type === 'category'
@@ -46,7 +47,19 @@ function genClientSdkSectionTree(fns: Array<{ id: unknown }>, excludeName: strin
   return validSections
 }
 
-export function flattenCommonClientLibSections(tree: Array<AbbrevCommonClientLibSection>) {
+async function genCliSectionTree() {
+  const cliSpec = await getSpec('cli_v1_commands', { ext: 'yaml' })
+
+  const validSections = deepFilterRec(
+    cliCommonSections as Array<AbbrevApiReferenceSection>,
+    'items',
+    (section) =>
+      section.type === 'cli-command' ? cliSpec.commands.some(({ id }) => id === section.id) : true
+  )
+  return validSections
+}
+
+export function flattenCommonClientLibSections(tree: Array<AbbrevApiReferenceSection>) {
   return tree.reduce((acc, elem) => {
     if ('items' in elem) {
       const prunedElem = { ...elem }
@@ -58,7 +71,7 @@ export function flattenCommonClientLibSections(tree: Array<AbbrevCommonClientLib
     }
 
     return acc
-  }, [] as Array<AbbrevCommonClientLibSection>)
+  }, [] as Array<AbbrevApiReferenceSection>)
 }
 
 async function writeTypes() {
@@ -95,29 +108,56 @@ async function writeReferenceSections() {
           JSON.stringify(fnsList)
         )
 
-        const sectionTree = genClientSdkSectionTree(fnsList, REFERENCES[sdkId].meta[version].libId)
-        const pendingSectionTreeWrite = writeFile(
+        const sdkSectionTree = genClientSdkSectionTree(
+          fnsList,
+          REFERENCES[sdkId].meta[version].libId
+        )
+        const pendingSdkSectionTreeWrite = writeFile(
           join(GENERATED_DIRECTORY, `${sdkId}.${version}.sections.json`),
-          JSON.stringify(sectionTree)
+          JSON.stringify(sdkSectionTree)
         )
 
-        const flattened = flattenCommonClientLibSections(sectionTree)
-        const pendingFlattenedWrite = writeFile(
+        const cliSectionTree = await genCliSectionTree()
+        const pendingCliSectionTreeWrite = writeFile(
+          join(GENERATED_DIRECTORY, 'cli.latest.sections.json'),
+          JSON.stringify(cliSectionTree)
+        )
+
+        const flattenedSdkSections = flattenCommonClientLibSections(sdkSectionTree)
+        const pendingFlattenedSdkSectionsWrite = writeFile(
           join(GENERATED_DIRECTORY, `${sdkId}.${version}.flat.json`),
-          JSON.stringify(flattened)
+          JSON.stringify(flattenedSdkSections)
         )
 
-        const sectionsBySlug = keyBy(flattened, (section) => section.slug)
-        const pendingSlugDictionaryWrite = writeFile(
+        const flattenedCliSections = flattenCommonClientLibSections(cliSectionTree)
+        const pendingFlattenedCliSectionsWrite = writeFile(
+          join(GENERATED_DIRECTORY, 'cli.latest.flat.json'),
+          JSON.stringify(flattenedCliSections)
+        )
+
+        const sdkSectionsBySlug = keyBy(flattenedSdkSections, (section) => section.slug)
+        const pendingSdkSlugDictionaryWrite = writeFile(
           join(GENERATED_DIRECTORY, `${sdkId}.${version}.bySlug.json`),
-          JSON.stringify(sectionsBySlug)
+          JSON.stringify(sdkSectionsBySlug)
+        )
+
+        const cliSectionsBySlug = keyBy(
+          flattenedCliSections.filter(({ slug }) => !!slug),
+          (section) => section.slug
+        )
+        const pendingCliSlugDictionaryWrite = writeFile(
+          join(GENERATED_DIRECTORY, 'cli.latest.bySlug.json'),
+          JSON.stringify(cliSectionsBySlug)
         )
 
         return [
           pendingFnListWrite,
-          pendingSectionTreeWrite,
-          pendingFlattenedWrite,
-          pendingSlugDictionaryWrite,
+          pendingSdkSectionTreeWrite,
+          pendingCliSectionTreeWrite,
+          pendingFlattenedSdkSectionsWrite,
+          pendingFlattenedCliSectionsWrite,
+          pendingSdkSlugDictionaryWrite,
+          pendingCliSlugDictionaryWrite,
         ]
       })
   )
