@@ -833,6 +833,10 @@ export const database: NavMenuConstant = {
           name: 'Debugging performance issues',
           url: '/guides/database/debugging-performance',
         },
+        {
+          name: 'Supavisor',
+          url: '/guides/database/supavisor',
+        },
       ],
     },
     {
