@@ -226,6 +226,18 @@ response = supabase.storage.from_('bucket_name').upload('file_path', file, {
 </TabPanel>
 </Tabs>
 
+## Metadata
+
+You can also add custom metadata to your file by passing the `metadata` option during upload.
+
+```javascript
+await supabase.storage.from('bucket_name').upload('file_path', file, {
+  metadata: {
+    custom_key: 'custom_value',
+  },
+})
+```
+
 ## Concurrency
 
 When two or more clients upload a file to the same path, the first client to complete the upload will succeed and the other clients will receive a `400 Asset Already Exists` error.
