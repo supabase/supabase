@@ -9,14 +9,14 @@ export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean 
 
 export const formatUsersData = (users: User[]) => {
   return users.map((user) => {
-    const provider = user.raw_app_meta_data?.provider ?? ''
+    const provider: string = user.raw_app_meta_data?.provider ?? ''
 
     return {
       id: user.id,
       email: user.email,
       phone: user.phone,
       created_at: user.created_at,
-
+      last_sign_in_at: user.last_sign_in_at,
       provider: user.is_anonymous ? '-' : provider,
       provider_type: user.is_anonymous
         ? 'Anonymous'
@@ -24,11 +24,13 @@ export const formatUsersData = (users: User[]) => {
           ? 'Social'
           : phoneProviders.includes(provider)
             ? 'Phone'
+            : '-',
+      provider_icon:
+        provider === 'email'
+          ? `${BASE_PATH}/img/icons/email-icon2.svg`
+          : providerIconMap[provider]
+            ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
             : undefined,
-      provider_icon: providerIconMap[provider]
-        ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
-        : undefined,
-
       img: getAvatarUrl(user), // [Joshen] Note that the images might not load due to CSP issues
       name: getDisplayName(user),
     }
@@ -37,7 +39,7 @@ export const formatUsersData = (users: User[]) => {
 
 const providers = {
   social: [
-    { email: 'email-icon2' },
+    // { email: 'email-icon2' },
     { apple: 'apple-icon' },
     { azure: 'microsoft-icon' },
     { bitbucket: 'bitbucket-icon' },

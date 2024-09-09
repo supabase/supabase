@@ -56,7 +56,8 @@ import { formatClipboardValue } from 'components/grid/utils/common'
 type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 const USERS_TABLE_COLUMNS = [
   { id: 'img', name: '', minWidth: 65, width: 65, resizable: false },
-  { id: 'id', name: 'UID', minWidth: undefined, width: 300, resizable: true },
+  { id: 'id', name: 'UID', minWidth: undefined, width: 280, resizable: true },
+  { id: 'name', name: 'Display name', minWidth: 0, width: 150, resizable: false },
   {
     id: 'email',
     name: 'Email',
@@ -71,7 +72,14 @@ const USERS_TABLE_COLUMNS = [
     id: 'created_at',
     name: 'Created at',
     minWidth: undefined,
-    width: 300,
+    width: 260,
+    resizable: true,
+  },
+  {
+    id: 'last_sign_in_at',
+    name: 'Last sign in at',
+    minWidth: undefined,
+    width: 260,
     resizable: true,
   },
 ]
@@ -187,7 +195,10 @@ export const UsersV2 = () => {
         const value = row?.[col.id]
         const user = users?.find((u) => u.id === row.id)
         const formattedValue =
-          col.id === 'created_at' ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ') : value
+          value !== null && ['created_at', 'last_sign_in_at'].includes(col.id)
+            ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
+            : value
+        const isConfirmed = user?.email_confirmed_at || user?.phone_confirmed_at
 
         if (col.id === 'img') {
           return (
@@ -217,7 +228,11 @@ export const UsersV2 = () => {
                 {col.id === 'provider' && row.provider_icon && (
                   <img width={16} src={row.provider_icon} alt={`${row.provider} auth icon`} />
                 )}
-                <p>{formattedValue === null ? '-' : formattedValue}</p>
+                {col.id === 'last_sign_in_at' && !isConfirmed ? (
+                  <p className="text-foreground-lighter">Waiting for verification</p>
+                ) : (
+                  <p>{formattedValue === null ? '-' : formattedValue}</p>
+                )}
               </div>
             </ContextMenuTrigger_Shadcn_>
             <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
