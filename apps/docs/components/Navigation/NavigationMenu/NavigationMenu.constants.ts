@@ -836,6 +836,14 @@ export const database: NavMenuConstant = {
       url: undefined,
       items: [
         {
+          name: 'pgAdmin',
+          url: '/guides/database/pgadmin',
+        },
+        {
+          name: 'PSQL',
+          url: '/guides/database/psql',
+        },
+        {
           name: 'DBeaver',
           url: '/guides/database/dbeaver',
         },
