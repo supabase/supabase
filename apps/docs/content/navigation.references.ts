@@ -114,6 +114,7 @@ export const REFERENCES = {
   api: {
     type: 'api',
     name: 'API',
+    libPath: 'api',
     versions: [],
     icon: 'reference-api',
   },

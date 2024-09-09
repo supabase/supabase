@@ -26,6 +26,7 @@ export interface AbbrevApiReferenceSection {
 export function parseReferencePath(slug: Array<string>) {
   const isClientSdkReference = clientSdkIds.includes(slug[0])
   const isCliReference = slug[0] === 'cli'
+  const isApiReference = slug[0] === 'api'
 
   if (isClientSdkReference) {
     let [sdkId, maybeVersion, maybeCrawlers, ...path] = slug
@@ -49,6 +50,11 @@ export function parseReferencePath(slug: Array<string>) {
   } else if (isCliReference) {
     return {
       __type: 'cli' as const,
+      path: slug.slice(1),
+    }
+  } else if (isApiReference) {
+    return {
+      __type: 'api' as const,
       path: slug.slice(1),
     }
   } else {
