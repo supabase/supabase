@@ -15,14 +15,24 @@ export interface DowngradeModalProps {
 
 const ProjectDowngradeListItem = ({ projectAddon }: { projectAddon: ProjectAddon }) => {
   const needsRestart = projectAddon.addons.find((addon) => addon.type === 'compute_instance')
-  const addons = projectAddon.addons.map((addon) => {
+
+  /**
+   * We do not include Log Drains and Advanced MFA Phone for the following reasons:
+   * 1. These addons are not removed automatically. Instead, users have to remove the respective configuration themselves
+   * 2. It's not obvious to users that Log Drains and MFA Phone are addons
+   */
+  const relevantAddonsToList = projectAddon.addons.filter(
+    (addon) => !['log_drain', 'auth_mfa_phone'].includes(addon.type)
+  )
+
+  const addonNames = relevantAddonsToList.map((addon) => {
     if (addon.type === 'compute_instance') return `${addon.variant.name} Compute Instance`
     return addon.variant.name
   })
 
   return (
     <li className="list-disc ml-6">
-      {projectAddon.name}: {addons.join(', ')} will be removed.
+      {projectAddon.name}: {addonNames.join(', ')} will be removed.
       {needsRestart ? (
         <>
           {' '}
