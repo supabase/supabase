@@ -1,58 +1,69 @@
 import { z } from 'zod'
+import { DISK_LIMITS, DiskType, DISK_TYPE_LABELS } from './DiskMangement.constants'
 
 const baseSchema = z.object({
-  storageType: z.enum(['Provisioned IOPS SSD (io2)', 'General Purpose SSD (gp3)']),
+  storageType: z.enum([DiskType.IO2, DiskType.GP3]),
   allocatedStorage: z.number(),
   provisionedIOPS: z.number(),
+  throughput: z.number().optional(),
   storageAutoscaling: z.boolean(),
   maxStorageThreshold: z.number(),
   enableDedicatedLogVolume: z.boolean(),
 })
 
-// Refine the schema dynamically based on storageType and allocatedStorage
 export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
-  const { storageType, allocatedStorage } = data
+  const limits = DISK_LIMITS[data.storageType]
 
-  // Dynamic rules for 'Provisioned IOPS SSD (io2)'
-  if (storageType === 'Provisioned IOPS SSD (io2)') {
-    if (allocatedStorage < 100 || allocatedStorage > 6144) {
+  if (data.allocatedStorage < limits.minStorage || data.allocatedStorage > limits.maxStorage) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Allocated storage must be between ${limits.minStorage} and ${limits.maxStorage} for ${DISK_TYPE_LABELS[data.storageType]}.`,
+      path: ['allocatedStorage'],
+    })
+  }
+
+  if (data.provisionedIOPS < limits.minIops || data.provisionedIOPS > limits.maxIops) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Provisioned IOPS must be between ${limits.minIops} and ${limits.maxIops} for ${DISK_TYPE_LABELS[data.storageType]}.`,
+      path: ['provisionedIOPS'],
+    })
+  }
+
+  if (data.storageType === DiskType.IO2) {
+    if (data.throughput !== undefined) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Allocated storage must be between 100 and 6144 for Provisioned IOPS SSD (io2).',
-        path: ['allocatedStorage'],
+        message: 'Throughput is not configurable for io2.',
+        path: ['throughput'],
       })
     }
-    if (data.provisionedIOPS < 1000 || data.provisionedIOPS > 80000) {
+  } else if (data.storageType === DiskType.GP3) {
+    if (data.allocatedStorage < 400 && data.throughput !== limits.includedThroughput) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Provisioned IOPS must be between 1000 and 80000 for Provisioned IOPS SSD (io2).',
-        path: ['provisionedIOPS'],
+        message: `Throughput must be ${limits.includedThroughput} MiBps for allocated storage less than 400 GiB for gp3.`,
+        path: ['throughput'],
       })
-    }
-  } else {
-    // Dynamic rules for 'General Purpose SSD (gp3)'
-    if (allocatedStorage < 20 || allocatedStorage > 6144) {
+    } else if (
+      data.allocatedStorage >= 400 &&
+      data.throughput !== undefined &&
+      (data.throughput < limits.minThroughput || data.throughput > limits.maxThroughput)
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Allocated storage must be between 20 and 6144 for General Purpose SSD (gp3).',
-        path: ['allocatedStorage'],
-      })
-    }
-    if (data.provisionedIOPS < 3000 || data.provisionedIOPS > 16000) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Provisioned IOPS must be between 3000 and 16000 for General Purpose SSD (gp3).',
-        path: ['provisionedIOPS'],
+        message: `Throughput must be set between ${limits.minThroughput} and ${limits.maxThroughput} MiBps.`,
+        path: ['throughput'],
       })
     }
   }
 
   // Dynamic validation for maxStorageThreshold based on allocatedStorage
-  const minThreshold = Math.max(allocatedStorage + 2, 22)
-  if (data.maxStorageThreshold < minThreshold || data.maxStorageThreshold > 6144) {
+  const minThreshold = Math.max(data.allocatedStorage + 2, 22)
+  if (data.maxStorageThreshold < minThreshold || data.maxStorageThreshold > limits.maxStorage) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Max storage threshold must be between ${minThreshold} and 6144.`,
+      message: `Max storage threshold must be between ${minThreshold} and ${limits.maxStorage}.`,
       path: ['maxStorageThreshold'],
     })
   }

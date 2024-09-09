@@ -53,7 +53,7 @@ export default function DiskSpaceBar({
         <div
           className={cn(
             'h-[34px] relative border rounded-sm w-full',
-            showNewBar ? 'bg-[hsl(var(--chart-1))]' : 'bg-surface-200'
+            showNewBar ? 'bg-[hsl(var(--chart-1))]' : 'bg-surface-300'
           )}
         >
           <AnimatePresence>
