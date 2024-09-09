@@ -39,20 +39,22 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
       })
     }
   } else if (data.storageType === DiskType.GP3) {
-    if (data.allocatedStorage < 400 && data.throughput !== limits.includedThroughput) {
+    const gp3Limits = DISK_LIMITS['gp3']
+
+    if (data.allocatedStorage < 400 && data.throughput !== gp3Limits.includedThroughput) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Throughput must be ${limits.includedThroughput} MiBps for allocated storage less than 400 GiB for gp3.`,
+        message: `Throughput must be ${gp3Limits.includedThroughput ?? 'default'} MiBps for allocated storage less than 400 GiB for gp3.`,
         path: ['throughput'],
       })
     } else if (
       data.allocatedStorage >= 400 &&
       data.throughput !== undefined &&
-      (data.throughput < limits.minThroughput || data.throughput > limits.maxThroughput)
+      (data.throughput < gp3Limits.minThroughput || data.throughput > gp3Limits.maxThroughput)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Throughput must be set between ${limits.minThroughput} and ${limits.maxThroughput} MiBps.`,
+        message: `Throughput must be set between ${gp3Limits.minThroughput} and ${gp3Limits.maxThroughput} MiBps.`,
         path: ['throughput'],
       })
     }

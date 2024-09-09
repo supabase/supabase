@@ -1,7 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import React from 'react'
 import {
-  Badge,
   Button,
   Dialog,
   DialogContent,
@@ -28,16 +27,16 @@ interface DiskSizeMeterProps {
   form: any // Replace 'any' with the actual type of your form
   loading: boolean
   onSubmit: (values: any) => Promise<void> // Replace 'any' with the actual type of form values
-  calculateDiskSizePrice: string
-  calculateIOPSPrice: string
-  calculateThroughputPrice: string | undefined
+  calculateDiskSizePrice: { oldPrice: string; newPrice: string }
+  calculateIOPSPrice: { oldPrice: string; newPrice: string }
+  calculateThroughputPrice: { oldPrice: string; newPrice: string }
 }
 
 const TableHeaderRow: React.FC = () => (
   <TableRow>
     <TableHead className="w-[200px] pl-5">Disk attribute</TableHead>
     <TableHead>Unit</TableHead>
-    <TableHead className="text-right pr-5">Price</TableHead>
+    <TableHead className="text-right pr-5">Price Change</TableHead>
   </TableRow>
 )
 
@@ -46,7 +45,8 @@ interface TableDataRowProps {
   defaultValue: string | number
   newValue: string | number
   unit: string
-  price: number
+  oldPrice: string
+  newPrice: string
 }
 
 const TableDataRow: React.FC<TableDataRowProps> = ({
@@ -54,32 +54,23 @@ const TableDataRow: React.FC<TableDataRowProps> = ({
   defaultValue,
   newValue,
   unit,
-  price,
+  oldPrice,
+  newPrice,
 }) => (
   <TableRow>
-    <TableCell className="font-medium pl-5">{attribute}</TableCell>
-    <TableCell>
-      <div className="flex justify-start">
-        <Badge
-          size="large"
-          className="!bg-alternative border bg-opacity-100 inline-flex items-center gap-1 text-xs"
-        >
-          <span className="font-mono text-foreground-muted">
-            {defaultValue}
-            {unit}
-          </span>
-          <ChevronRight size={12} className="text-foreground-muted" />
-          <span className="font-mono text-foreground">
-            {newValue}
-            {unit}
-          </span>
-        </Badge>
+    <TableCell className="pl-5">
+      <div className="flex flex-col">
+        <span>{attribute}</span>
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-foreground-muted">{defaultValue}</span>
+          <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
+          <span className="text-xs">{newValue}</span>
+        </div>
       </div>
     </TableCell>
+    <TableCell>{unit}</TableCell>
     <TableCell className="text-right pr-5">
-      <div className="flex justify-end">
-        <BillingChangeBadge beforePrice={0} afterPrice={price} show={true} />
-      </div>
+      <BillingChangeBadge oldPrice={oldPrice} newPrice={newPrice} />
     </TableCell>
   </TableRow>
 )
@@ -102,9 +93,9 @@ export const DiskManagementReviewAndSubmitDialog: React.FC<DiskSizeMeterProps> =
           type="primary"
           onClick={async (e) => {
             e.preventDefault()
-            const isValid = await form.trigger() // Triggers validation for all fields
+            const isValid = await form.trigger()
             if (isValid) {
-              setIsDialogOpen(true) // Open the dialog only if the form is valid
+              setIsDialogOpen(true)
             }
           }}
           disabled={!form.formState.isDirty}
@@ -132,21 +123,24 @@ export const DiskManagementReviewAndSubmitDialog: React.FC<DiskSizeMeterProps> =
               defaultValue={form.formState.defaultValues?.totalSize}
               newValue={form.getValues('totalSize')}
               unit="GiB"
-              price={parseFloat(calculateDiskSizePrice)}
+              oldPrice={calculateDiskSizePrice.oldPrice}
+              newPrice={calculateDiskSizePrice.newPrice}
             />
             <TableDataRow
               attribute="IOPS"
               defaultValue={form.formState.defaultValues?.provisionedIOPS}
               newValue={form.getValues('provisionedIOPS')}
               unit="IOPS"
-              price={parseFloat(calculateIOPSPrice)}
+              oldPrice={calculateIOPSPrice.oldPrice}
+              newPrice={calculateIOPSPrice.newPrice}
             />
             <TableDataRow
               attribute="Throughput"
               defaultValue={form.formState.defaultValues?.throughput}
               newValue={form.getValues('throughput')}
               unit="MiBps"
-              price={calculateThroughputPrice ? parseFloat(calculateThroughputPrice) : 0}
+              oldPrice={calculateThroughputPrice.oldPrice}
+              newPrice={calculateThroughputPrice.newPrice}
             />
           </TableBody>
         </Table>
@@ -165,7 +159,6 @@ export const DiskManagementReviewAndSubmitDialog: React.FC<DiskSizeMeterProps> =
             htmlType="submit"
             loading={loading}
             onClick={async () => {
-              // Simulating a 5 second delay
               await onSubmit(form.getValues())
             }}
           >

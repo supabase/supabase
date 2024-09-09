@@ -33,6 +33,7 @@ import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { GB } from 'lib/constants'
+import { DISK_PRICING, DISK_LIMITS, DiskType } from './DiskMangement.constants'
 
 export function DiskMangementPanelForm() {
   const { project } = useProjectContext()
@@ -97,16 +98,56 @@ export function DiskMangementPanelForm() {
   const calculateDiskSizePrice = () => {
     const newSize = form.getValues('totalSize')
     const oldSize = form.formState.defaultValues?.totalSize || 0
-    const pricePerGiB = form.getValues('storageType') === 'io2' ? 0.125 : 0.08
-    return ((newSize - Math.max(oldSize, 8)) * pricePerGiB).toFixed(2)
+    const storageType = form.getValues('storageType') as DiskType
+    const pricePerGiB = DISK_PRICING[storageType].storage
+    const oldPrice = (Math.max(oldSize, 8) * pricePerGiB).toFixed(2)
+    const newPrice = (Math.max(newSize, 8) * pricePerGiB).toFixed(2)
+    return { oldPrice, newPrice }
   }
 
   const calculateIOPSPrice = () => {
-    return (form.getValues('provisionedIOPS') * 0.065).toFixed(2)
+    const storageType = form.getValues('storageType') as DiskType
+    const newProvisionedIOPS = form.getValues('provisionedIOPS')
+    const oldProvisionedIOPS = form.formState.defaultValues?.provisionedIOPS || 0
+
+    if (storageType === DiskType.GP3) {
+      const oldChargeableIOPS = Math.max(
+        0,
+        oldProvisionedIOPS - DISK_LIMITS[DiskType.GP3].includedIops
+      )
+      const newChargeableIOPS = Math.max(
+        0,
+        newProvisionedIOPS - DISK_LIMITS[DiskType.GP3].includedIops
+      )
+      const oldPrice = (oldChargeableIOPS * DISK_PRICING[DiskType.GP3].iops).toFixed(2)
+      const newPrice = (newChargeableIOPS * DISK_PRICING[DiskType.GP3].iops).toFixed(2)
+      return { oldPrice, newPrice }
+    } else {
+      const oldPrice = (oldProvisionedIOPS * DISK_PRICING[DiskType.IO2].iops).toFixed(2)
+      const newPrice = (newProvisionedIOPS * DISK_PRICING[DiskType.IO2].iops).toFixed(2)
+      return { oldPrice, newPrice }
+    }
   }
 
   const calculateThroughputPrice = () => {
-    return undefined //(form.getValues('throughput') * 0.04).toFixed(2)
+    const storageType = form.getValues('storageType') as DiskType
+    const newThroughput = form.getValues('throughput')
+    const oldThroughput = form.formState.defaultValues?.throughput || 0
+
+    if (storageType === DiskType.GP3 && newThroughput) {
+      const oldChargeableThroughput = Math.max(
+        0,
+        oldThroughput - DISK_LIMITS[DiskType.GP3].includedThroughput
+      )
+      const newChargeableThroughput = Math.max(
+        0,
+        newThroughput - DISK_LIMITS[DiskType.GP3].includedThroughput
+      )
+      const oldPrice = (oldChargeableThroughput * DISK_PRICING[DiskType.GP3].throughput).toFixed(2)
+      const newPrice = (newChargeableThroughput * DISK_PRICING[DiskType.GP3].throughput).toFixed(2)
+      return { oldPrice, newPrice }
+    }
+    return { oldPrice: '0.00', newPrice: '0.00' }
   }
 
   // Watch storageType and allocatedStorage to adjust constraints dynamically
@@ -117,10 +158,10 @@ export function DiskMangementPanelForm() {
       if (watchedTotalSize < 400) {
         setValue('throughput', 125) // Fixed throughput for allocated storage < 400 GiB
       } else {
-        // Ensure throughput is within the allowed range if it's greater than 400 GiB
+        // Ensure throughput is within the allowed range if it's greater than or equal to 400 GiB
         const currentThroughput = form.getValues('throughput')
-        if (currentThroughput && (currentThroughput < 125 || currentThroughput > 1000)) {
-          setValue('throughput', 125) // Reset to default if out of bounds
+        if (!currentThroughput || currentThroughput < 125 || currentThroughput > 1000) {
+          setValue('throughput', 125) // Reset to default if undefined or out of bounds
         }
       }
     }
@@ -247,34 +288,16 @@ export function DiskMangementPanelForm() {
                             <span className="text-foreground-lighter text-xs font-mono">IOPS</span>
                           </div>
                         </div>
-                        <AnimatePresence>
-                          {(watchedStorageType === 'io2' ||
-                            (watchedStorageType === 'gp3' && field.value > 3000)) &&
-                            !formState.errors.provisionedIOPS && (
-                              <motion.div
-                                initial={{ opacity: 0, x: -4 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -4 }}
-                                transition={{ duration: 0.15 }}
-                              >
-                                <Badge variant="default" className="bg-alternative bg-opacity-100">
-                                  <div className="flex items-center gap-1">
-                                    <span className="text-xs font-mono text-foreground-muted">
-                                      ${calculateIOPSPrice()}
-                                    </span>
-                                    <ChevronRight
-                                      size={12}
-                                      strokeWidth={2}
-                                      className="text-foreground-muted"
-                                    />
-                                    <span className="text-xs font-mono text-foreground">
-                                      ${calculateIOPSPrice()}
-                                    </span>
-                                  </div>
-                                </Badge>
-                              </motion.div>
-                            )}
-                        </AnimatePresence>
+
+                        <BillingChangeBadge
+                          show={
+                            (watchedStorageType === 'io2' ||
+                              (watchedStorageType === 'gp3' && field.value > 3000)) &&
+                            !formState.errors.provisionedIOPS
+                          }
+                          beforePrice={Number(calculateIOPSPrice().oldPrice)}
+                          afterPrice={Number(calculateIOPSPrice().newPrice)}
+                        />
                       </div>
                     </FormItemLayout>
                   )}
@@ -324,28 +347,15 @@ export function DiskMangementPanelForm() {
                                   </span>
                                 </div>
                               </div>
-                              <AnimatePresence>
-                                {formState.isDirty &&
-                                formState.dirtyFields.throughput &&
-                                !formState.errors.throughput ? (
-                                  <motion.div
-                                    initial={{ opacity: 0, x: -4 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -4 }}
-                                    transition={{ duration: 0.15 }}
-                                  >
-                                    <BillingChangeBadge
-                                      show={
-                                        formState.isDirty &&
-                                        formState.dirtyFields.throughput &&
-                                        !formState.errors.throughput
-                                      }
-                                      beforePrice={calculateThroughputPrice()}
-                                      afterPrice={calculateThroughputPrice()}
-                                    />
-                                  </motion.div>
-                                ) : null}
-                              </AnimatePresence>
+                              <BillingChangeBadge
+                                show={
+                                  formState.isDirty &&
+                                  formState.dirtyFields.throughput &&
+                                  !formState.errors.throughput
+                                }
+                                beforePrice={Number(calculateThroughputPrice().oldPrice)}
+                                afterPrice={Number(calculateThroughputPrice().newPrice)}
+                              />
                             </div>
                           </FormItemLayout>
                         )}
@@ -405,35 +415,16 @@ export function DiskMangementPanelForm() {
                             </motion.div>
                           )}
                         </AnimatePresence>
-
-                        <AnimatePresence>
-                          {formState.isDirty &&
-                          formState.dirtyFields.totalSize &&
-                          !formState.errors.totalSize ? (
-                            <motion.div
-                              initial={{ opacity: 0, x: -4 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0, x: -4 }}
-                              transition={{ duration: 0.15 }}
-                            >
-                              <Badge variant="default" className="bg-alternative bg-opacity-100">
-                                <div className="flex items-center gap-1">
-                                  <span className="text-xs font-mono text-foreground-muted">
-                                    ${calculateDiskSizePrice()}
-                                  </span>
-                                  <ChevronRight
-                                    size={12}
-                                    strokeWidth={2}
-                                    className="text-foreground-muted"
-                                  />
-                                  <span className="text-xs font-mono text-foreground">
-                                    ${calculateDiskSizePrice()}
-                                  </span>
-                                </div>
-                              </Badge>
-                            </motion.div>
-                          ) : null}
-                        </AnimatePresence>
+                        <BillingChangeBadge
+                          beforePrice={Number(calculateDiskSizePrice().oldPrice)}
+                          afterPrice={Number(calculateDiskSizePrice().newPrice)}
+                          show={
+                            formState.isDirty &&
+                            formState.dirtyFields.totalSize &&
+                            !formState.errors.totalSize &&
+                            calculateDiskSizePrice().oldPrice !== calculateDiskSizePrice().newPrice
+                          }
+                        />
                       </div>
                     </FormItemLayout>
                   )}

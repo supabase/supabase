@@ -5,13 +5,13 @@ export enum DiskType {
 
 export const DISK_PRICING = {
   [DiskType.GP3]: {
-    storage: 0.08, // per GB per month
-    iops: 0.005, // per IOPS per month, charged after 3000 IOPS
-    throughput: 0.04, // per MB/s per month, charged after 125 MB/s
+    storage: 0.125, // per GB per month
+    iops: 0.024, // per IOPS per month, charged after 3000 IOPS
+    throughput: 0.095, // per MB/s per month, charged after 125 MB/s
   },
   [DiskType.IO2]: {
-    storage: 0.125, // per GB per month
-    iops: 0.065, // per IOPS per month
+    storage: 0.195, // per GB per month
+    iops: 0.119, // per IOPS per month
   },
 }
 
