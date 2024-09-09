@@ -1,21 +1,20 @@
-import { useParams } from 'common'
+import { AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 
+import { useParams } from 'common'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
-import { AlertTriangle, ExternalLink } from 'lucide-react'
 
 const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { data: resourceWarnings } = useResourceWarningsQuery()
-  // const projectResourceWarnings = (resourceWarnings ?? [])?.find(
-  //   (warning) => warning.project === ref
-  // )
-  const projectResourceWarnings = { cpu_exhaustion: 'critical' }
+  const projectResourceWarnings = (resourceWarnings ?? [])?.find(
+    (warning) => warning.project === ref
+  )
 
   // [Joshen] Read only takes higher precedence over multiple resource warnings
   const activeWarnings =
