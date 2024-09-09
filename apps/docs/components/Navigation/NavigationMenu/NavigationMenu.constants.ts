@@ -832,6 +832,30 @@ export const database: NavMenuConstant = {
       ],
     },
     {
+      name: 'ORM Quickstarts',
+      url: undefined,
+      items: [
+        {
+          name: 'Prisma',
+          url: '/guides/database/prisma',
+          items: [
+            {
+              name: 'Prisma troubleshooting',
+              url: '/guides/database/prisma-troubleshooting',
+            },
+          ],
+        },
+        {
+          name: 'Drizzle',
+          url: '/guides/database/drizzle',
+        },
+        {
+          name: 'Postgres.js',
+          url: '/guides/database/postgres-js',
+        },
+      ],
+    },
+    {
       name: 'GUI quickstarts',
       url: undefined,
       items: [
