@@ -750,7 +750,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/partitions',
         },
         {
-          name: 'Managing Connections',
+          name: 'Managing connections',
           url: '/guides/database/connection-management',
         },
       ],
