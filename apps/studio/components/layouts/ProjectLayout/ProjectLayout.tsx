@@ -89,8 +89,16 @@ const ProjectLayout = ({
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
+  const showProductMenu =
+    selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+    (selectedProject?.status !== PROJECT_STATUS.ACTIVE_HEALTHY &&
+      router.pathname.includes('/project/[ref]/settings')) ||
+    (selectedProject?.status !== PROJECT_STATUS.ACTIVE_HEALTHY &&
+      router.pathname.includes('/project/[ref]/database'))
   const ignorePausedState =
-    router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
+    router.pathname === '/project/[ref]' ||
+    router.pathname.includes('/project/[ref]/settings') ||
+    router.pathname.includes('project/[ref]/database/backups')
   const showPausedState = isPaused && !ignorePausedState
 
   return (
@@ -119,7 +127,7 @@ const ProjectLayout = ({
             direction="horizontal"
             autoSaveId="project-layout"
           >
-            {!showPausedState && productMenu && (
+            {showProductMenu && productMenu && (
               <>
                 <ResizablePanel
                   className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64')}
@@ -221,6 +229,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
+  const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
 
   const requiresDbConnection: boolean =
     (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
@@ -248,19 +257,19 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Loading />
   }
 
-  if (isRestarting) {
+  if (isRestarting && !isBackupsPage) {
     return <RestartingState />
   }
 
-  if (isProjectUpgrading) {
+  if (isProjectUpgrading && !isBackupsPage) {
     return <UpgradingState />
   }
 
-  if (isProjectPausing) {
+  if (isProjectPausing && !isBackupsPage) {
     return <PausingState project={selectedProject} />
   }
 
-  if (isProjectPauseFailed) {
+  if (isProjectPauseFailed && !isBackupsPage) {
     return <PauseFailedState />
   }
 
@@ -272,7 +281,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoringState />
   }
 
-  if (isProjectRestoreFailed) {
+  if (isProjectRestoreFailed && !isBackupsPage) {
     return <RestoreFailedState />
   }
 
