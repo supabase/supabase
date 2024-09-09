@@ -30,7 +30,7 @@ If you plan to solely use Prisma instead of the Supabase Postgres API, turn it o
       -- Create custom user
       create user "prisma" with password 'custom_password' bypassrls createdb;
 
-      -- extend prisma's priveleges to postgres (necessary to view changes in Dashboard)
+      -- extend prisma's privileges to postgres (necessary to view changes in Dashboard)
       grant "prisma" to "postgres";
 
       -- Grant it necessary permissions over the relevant schemas (public)
