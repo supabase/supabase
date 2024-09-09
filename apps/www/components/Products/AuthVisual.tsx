@@ -15,7 +15,7 @@ const AuthVisual = () => {
         sizes="100%"
         priority
         quality={100}
-        className="absolute inset-0 object-cover object-center xl:object-bottom"
+        className="hidden dark:block absolute inset-0 object-cover object-center xl:object-bottom"
       />
       <Image
         src="/images/index/products/auth-active.svg"
@@ -23,7 +23,25 @@ const AuthVisual = () => {
         fill
         sizes="100%"
         quality={100}
-        className="absolute inset-0 object-cover object-center xl:object-bottom opacity-0 group-hover:opacity-100 transition-opacity"
+        className="hidden dark:block absolute inset-0 object-cover object-center xl:object-bottom opacity-0 group-hover:opacity-100 transition-opacity"
+        aria-hidden
+      />
+      <Image
+        src="/images/index/products/auth-light.svg"
+        alt="Supabase Authentication user db rows"
+        fill
+        sizes="100%"
+        priority
+        quality={100}
+        className="dark:hidden absolute inset-0 object-cover object-center xl:object-bottom"
+      />
+      <Image
+        src="/images/index/products/auth-active-light.svg"
+        alt="Supabase Authentication user db rows"
+        fill
+        sizes="100%"
+        quality={100}
+        className="dark:hidden absolute inset-0 object-cover object-center xl:object-bottom opacity-0 group-hover:opacity-100 transition-opacity"
         aria-hidden
       />
     </figure>

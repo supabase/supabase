@@ -3,9 +3,9 @@ import { File, Image, Video } from 'lucide-react'
 
 const StorageVisual = () => {
   const cols = [
-    <Image className="w-6 h-6 md:w-6 md:h-6 text-muted" />,
-    <File className="w-6 h-6 md:w-6 md:h-6 text-muted" />,
-    <Video className="w-6 h-6 md:w-6 md:h-6 text-muted" />,
+    <Image className="w-6 h-6 md:w-6 md:h-6" />,
+    <File className="w-6 h-6 md:w-6 md:h-6" />,
+    <Video className="w-6 h-6 md:w-6 md:h-6" />,
   ]
 
   return (
@@ -24,7 +24,7 @@ const StorageVisual = () => {
               {cols.map((col: any, idx3: number) => (
                 <div
                   key={`icon-${idx3}`}
-                  className="w-[60px] h-[60px] md:min-w-[62px] md:w-[62px] md:h-[62px] flex items-center justify-center rounded-lg border bg hover:border-brand"
+                  className="w-[60px] h-[60px] md:min-w-[62px] md:w-[62px] md:h-[62px] flex items-center justify-center rounded-lg border bg hover:border-foreground-lighter text-muted hover:text-foreground-light hover:bg-surface-200"
                 >
                   {col}
                 </div>

@@ -26,9 +26,7 @@ const Hero = () => {
                     <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-foreground to-foreground-light">
                       Build in a weekend
                     </span>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#3ECF8E] via-[#3ECF8E] to-[#3ecfb2] block md:ml-0">
-                      Scale to billions
-                    </span>
+                    <span className="text-brand block md:ml-0">Scale to billions</span>
                   </h1>
                   <p className="pt-2 text-foreground my-3 text-sm sm:mt-5 lg:mb-0 sm:text-base lg:text-lg">
                     Supabase is an open source Firebase alternative.{' '}
@@ -38,7 +36,7 @@ const Hero = () => {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button asChild size="medium" className="text-white">
+                  <Button asChild size="medium">
                     <Link
                       href="https://supabase.com/dashboard"
                       as="https://supabase.com/dashboard"

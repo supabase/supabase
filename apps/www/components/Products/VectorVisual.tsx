@@ -54,7 +54,7 @@ const VectorVisual = () => {
       role="img"
       aria-label="Supabase Vector uses pgvector to store, index, and access embeddings"
     >
-      <span className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 left-0 lg:left-auto top-24 md:top-24 lg:top-0 lg:bottom-0 my-auto lg:scale-110">
+      <span className="absolute w-full h-full lg:aspect-square flex items-end justify-center right-0 left-0 top-24 md:top-24 lg:top-4 mx-auto">
         <Image
           src={`/images/index/products/vector.svg`}
           alt="Supabase Vector graph"
