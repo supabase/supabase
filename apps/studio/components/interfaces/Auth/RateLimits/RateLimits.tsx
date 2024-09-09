@@ -426,11 +426,6 @@ const RateLimits = () => {
                         <FormControl_Shadcn_>
                           <Input_Shadcn_ type="number" {...field} disabled={!canUpdateConfig} />
                         </FormControl_Shadcn_>
-                        {field.value > 0 && (
-                          <FormDescription_Shadcn_ className="text-foreground-lighter">
-                            This is equivalent to {field.value * 12} requests per hour
-                          </FormDescription_Shadcn_>
-                        )}
                       </FormItem_Shadcn_>
                     )}
                   />
