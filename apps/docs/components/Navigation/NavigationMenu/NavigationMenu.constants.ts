@@ -832,6 +832,16 @@ export const database: NavMenuConstant = {
       ],
     },
     {
+      name: 'GUI quickstarts',
+      url: undefined,
+      items: [
+        {
+          name: 'DBeaver',
+          url: '/guides/database/dbeaver',
+        },
+      ],
+    },
+    {
       name: 'Extensions',
       url: undefined,
       items: [
