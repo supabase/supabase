@@ -141,8 +141,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     if (q) {
       onSelectTemplate({
         mode: 'custom',
-        searchString: q as string,
+        searchString: q,
       })
+      setWarehouseEditorValue(q)
     }
   }, [])
 
@@ -193,7 +194,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       const whQuery = warehouseEditorValue
 
       if (!warehouseCollections?.length) {
-        toast.error('You do not have any collections in your warehouse yet.')
+        toast.error('You do not have any collections yet.')
         return
       }
 
@@ -213,9 +214,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       const logsSourceExists = logsSources.find((source) => whQuery.includes(source))
 
       if (logsSourceExists) {
-        toast.error(
-          'Cannot query logs tables from a warehouse query. Please remove the logs table from the query.'
-        )
+        toast.error('Cannot query logs tables from current query.')
         return
       }
 
