@@ -92,13 +92,9 @@ const ProjectLayout = ({
   const showProductMenu =
     selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
     (selectedProject?.status !== PROJECT_STATUS.ACTIVE_HEALTHY &&
-      router.pathname.includes('/project/[ref]/settings')) ||
-    (selectedProject?.status !== PROJECT_STATUS.ACTIVE_HEALTHY &&
-      router.pathname.includes('/project/[ref]/database'))
+      router.pathname.includes('/project/[ref]/settings'))
   const ignorePausedState =
-    router.pathname === '/project/[ref]' ||
-    router.pathname.includes('/project/[ref]/settings') ||
-    router.pathname.includes('project/[ref]/database/backups')
+    router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
 
   return (
