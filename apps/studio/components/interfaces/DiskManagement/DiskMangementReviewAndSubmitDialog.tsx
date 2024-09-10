@@ -45,8 +45,8 @@ interface TableDataRowProps {
   defaultValue: string | number
   newValue: string | number
   unit: string
-  oldPrice: string
-  newPrice: string
+  beforePrice: number
+  afterPrice: number
 }
 
 const TableDataRow: React.FC<TableDataRowProps> = ({
@@ -54,15 +54,15 @@ const TableDataRow: React.FC<TableDataRowProps> = ({
   defaultValue,
   newValue,
   unit,
-  oldPrice,
-  newPrice,
+  beforePrice,
+  afterPrice,
 }) => (
   <TableRow>
     <TableCell className="pl-5">
-      <div className="flex flex-col">
+      <div className="flex flex-row gap-2 items-center">
         <span>{attribute}</span>
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-foreground-muted">{defaultValue}</span>
+        <div className="flex flex-row items-center gap-1">
+          <span className="text-foreground-muted">{defaultValue}</span>
           <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
           <span className="text-xs">{newValue}</span>
         </div>
@@ -70,7 +70,13 @@ const TableDataRow: React.FC<TableDataRowProps> = ({
     </TableCell>
     <TableCell>{unit}</TableCell>
     <TableCell className="text-right pr-5">
-      <BillingChangeBadge oldPrice={oldPrice} newPrice={newPrice} />
+      {beforePrice !== afterPrice ? (
+        <BillingChangeBadge show={true} beforePrice={beforePrice} afterPrice={afterPrice} />
+      ) : (
+        <span className="text-xs font-mono">
+          <span className="text-foreground-muted">no change - </span>${beforePrice}
+        </span>
+      )}
     </TableCell>
   </TableRow>
 )
@@ -119,28 +125,28 @@ export const DiskManagementReviewAndSubmitDialog: React.FC<DiskSizeMeterProps> =
           </TableHeader>
           <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
             <TableDataRow
-              attribute="Disk Size"
+              attribute="Disk size"
               defaultValue={form.formState.defaultValues?.totalSize}
               newValue={form.getValues('totalSize')}
               unit="GiB"
-              oldPrice={calculateDiskSizePrice.oldPrice}
-              newPrice={calculateDiskSizePrice.newPrice}
+              beforePrice={Number(calculateDiskSizePrice.oldPrice)}
+              afterPrice={Number(calculateDiskSizePrice.newPrice)}
             />
             <TableDataRow
               attribute="IOPS"
               defaultValue={form.formState.defaultValues?.provisionedIOPS}
               newValue={form.getValues('provisionedIOPS')}
               unit="IOPS"
-              oldPrice={calculateIOPSPrice.oldPrice}
-              newPrice={calculateIOPSPrice.newPrice}
+              beforePrice={Number(calculateIOPSPrice.oldPrice)}
+              afterPrice={Number(calculateIOPSPrice.newPrice)}
             />
             <TableDataRow
               attribute="Throughput"
               defaultValue={form.formState.defaultValues?.throughput}
               newValue={form.getValues('throughput')}
               unit="MiBps"
-              oldPrice={calculateThroughputPrice.oldPrice}
-              newPrice={calculateThroughputPrice.newPrice}
+              beforePrice={Number(calculateThroughputPrice.oldPrice)}
+              afterPrice={Number(calculateThroughputPrice.newPrice)}
             />
           </TableBody>
         </Table>
