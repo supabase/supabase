@@ -74,6 +74,10 @@ export const sqlEditorState = proxy({
   limit: 100,
   order: 'inserted_at' as 'name' | 'inserted_at',
 
+  get allFolderNames() {
+    return Object.values(sqlEditorState.folders).map((x) => x.folder.name)
+  },
+
   // ========================================================================
   // ## Methods to interact the store with
   // ========================================================================
@@ -203,8 +207,7 @@ export const sqlEditorState = proxy({
   },
 
   saveFolder: ({ id, name }: { id: string; name: string }) => {
-    const folderNames = Object.values(sqlEditorState.folders).map((x) => x.folder.name)
-    if (id === 'new-folder' && folderNames.includes(name)) {
+    if (id === 'new-folder' && sqlEditorState.allFolderNames.includes(name)) {
       sqlEditorState.removeFolder(id)
       return toast.error('This folder name already exists')
     }
