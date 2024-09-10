@@ -9,24 +9,6 @@ subtitle: 'Using your connections resourcefully'
 
 Every [Compute Add-On](/docs/guides/platform/compute-add-ons) has a pre-configured direct connection count and Supavisor pool size. This guide discusses ways to observe and manage them resourcefully.
 
-## What is a pool
-
-When clients (backend servers) connect to PostgreSQL or Supavisor, they use the PostgreSQL Wire Protocol. Unlike HTTP requests, these connections are stateful and persistent, involving a costly startup but becoming efficient once established.
-
-Clients may create several active connections with Postgres, reducing the overhead of establishing connections between queries.
-
-## The pools in Supabase
-
-Supabase servers only create connections when needed, closing idle ones to conserve resources. If you're not using a service, no connections will be made. They are configured to not over-consume the database connections.
-
-## Understanding Supavisor
-
-Supavisor is used to connect with external libraries, especially for serverless deployments. In transaction mode, it acts as a database connection load balancer between your application and Postgres. This setup allows your clients (application servers) to share database connections more efficiently.
-
-In serverless or auto-scaling environments, Supavisor helps manage a large number of client connections by optimizing their use of available database connections.
-
-While Supavisor can handle an impressive amount of client connections, they are ultimately routed through a smaller pool of actual database connections, based on the capacity of your Postgres database.
-
 ### Configuring Supavisor's pool size
 
 You can change how many database connections Supavisor can manage by altering the pool size in the [Database Settings](/dashboard/project/_/settings/database):
