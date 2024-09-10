@@ -54,7 +54,7 @@ const Home: NextPageWithLayout = () => {
           />
         </div>
         <div className="flex items-center gap-x-3">
-          <SecurityStatus />
+          {project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <SecurityStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
         </div>
