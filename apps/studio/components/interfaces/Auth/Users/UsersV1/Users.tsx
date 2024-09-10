@@ -1,7 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-
+import { RefreshCw, Search, X } from 'lucide-react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -10,12 +11,11 @@ import NoPermission from 'components/ui/NoPermission'
 import { authKeys } from 'data/auth/keys'
 import { useUsersQuery } from 'data/auth/users-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { RefreshCw, Search, X } from 'lucide-react'
 import { Button, Input, Listbox } from 'ui'
-import AddUserDropdown from './AddUserDropdown'
-import UsersList from './UsersList'
+import AddUserDropdown from '../AddUserDropdown'
+import { UsersList } from './UsersList'
 
-const Users = () => {
+export const Users = () => {
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
@@ -154,5 +154,3 @@ const Users = () => {
     </div>
   )
 }
-
-export default Users
