@@ -10,7 +10,12 @@ interface UsersPaginationProps {
   isFetchingNextPage: boolean
 }
 
-const UsersPagination = ({ total, page, setPage, isFetchingNextPage }: UsersPaginationProps) => {
+export const UsersPagination = ({
+  total,
+  page,
+  setPage,
+  isFetchingNextPage,
+}: UsersPaginationProps) => {
   const startRowFromPage = USERS_PAGE_LIMIT * (page - 1) + 1
   const fromRow = startRowFromPage > total ? total : startRowFromPage
 
@@ -54,5 +59,3 @@ const UsersPagination = ({ total, page, setPage, isFetchingNextPage }: UsersPagi
     </nav>
   )
 }
-
-export default UsersPagination

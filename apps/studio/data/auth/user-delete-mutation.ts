@@ -6,6 +6,7 @@ import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 import type { User } from './users-query'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export type UserDeleteVariables = {
   projectRef: string
@@ -29,12 +30,20 @@ export const useUserDeleteMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const userManagementV2 = useFlag('userManagementV2')
+
   return useMutation<UserDeleteData, ResponseError, UserDeleteVariables>(
     (vars) => deleteUser(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(authKeys.users(projectRef))
+
+        if (userManagementV2) {
+          await queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))
+        } else {
+          await queryClient.invalidateQueries(authKeys.users(projectRef))
+        }
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
