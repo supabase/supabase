@@ -12,7 +12,7 @@ const SectionHeader = (props: any) => {
           )}
         </h3>
       </div>
-      {props.paragraph && <p className="p max-w-3xl text-lg sm:mt-4">{props.paragraph}</p>}
+      {props.paragraph && <p className="max-w-3xl text-lg sm:mt-4">{props.paragraph}</p>}
     </div>
   )
 }
