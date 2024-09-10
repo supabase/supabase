@@ -1,6 +1,7 @@
 import { ChevronRight } from 'lucide-react'
 import React from 'react'
 import {
+  Badge,
   Button,
   Dialog,
   DialogContent,
@@ -34,7 +35,8 @@ interface DiskSizeMeterProps {
 
 const TableHeaderRow: React.FC = () => (
   <TableRow>
-    <TableHead className="w-[200px] pl-5">Disk attribute</TableHead>
+    <TableHead className="w-[128px] pl-5">Disk attribute</TableHead>
+    <TableHead className="text-right">-</TableHead>
     <TableHead>Unit</TableHead>
     <TableHead className="text-right pr-5">Price Change</TableHead>
   </TableRow>
@@ -61,21 +63,30 @@ const TableDataRow: React.FC<TableDataRowProps> = ({
     <TableCell className="pl-5">
       <div className="flex flex-row gap-2 items-center">
         <span>{attribute}</span>
-        <div className="flex flex-row items-center gap-1">
-          <span className="text-foreground-muted">{defaultValue}</span>
-          <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
-          <span className="text-xs">{newValue}</span>
-        </div>
       </div>
     </TableCell>
-    <TableCell>{unit}</TableCell>
+    <TableCell className="text-right font-mono">
+      {defaultValue !== newValue ? (
+        <Badge variant="default" className="bg-alternative bg-opacity-100">
+          <div className="flex items-center gap-1">
+            <span className="text-xs font-mono text-foreground-muted">{defaultValue}</span>
+            <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
+            <span className="text-xs font-mono text-foreground">{newValue}</span>
+          </div>
+        </Badge>
+      ) : (
+        <span className="text-xs font-mono">
+          <span className="text-foreground-muted"></span>
+          {defaultValue}
+        </span>
+      )}
+    </TableCell>
+    <TableCell className="text-xs font-mono">{unit}</TableCell>
     <TableCell className="text-right pr-5">
       {beforePrice !== afterPrice ? (
         <BillingChangeBadge show={true} beforePrice={beforePrice} afterPrice={afterPrice} />
       ) : (
-        <span className="text-xs font-mono">
-          <span className="text-foreground-muted">no change - </span>${beforePrice}
-        </span>
+        <span className="text-xs font-mono">${beforePrice}</span>
       )}
     </TableCell>
   </TableRow>
