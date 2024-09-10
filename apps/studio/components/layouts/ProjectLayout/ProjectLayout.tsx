@@ -90,10 +90,11 @@ const ProjectLayout = ({
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
-  const showProductMenu =
-    selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
-    (selectedProject?.status !== PROJECT_STATUS.ACTIVE_HEALTHY &&
-      router.pathname.includes('/project/[ref]/settings'))
+  const showProductMenu = selectedProject
+    ? selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+      (selectedProject?.status === PROJECT_STATUS.COMING_UP &&
+        router.pathname.includes('/project/[ref]/settings'))
+    : true
   const ignorePausedState =
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
@@ -128,7 +129,7 @@ const ProjectLayout = ({
               <>
                 <ResizablePanel
                   className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64')}
-                  defaultSize={1} // forces panel to smallest width possible, at w-64
+                  defaultSize={0} // forces panel to smallest width possible, at w-64
                 >
                   <MenuBarWrapper
                     isLoading={isLoading}
