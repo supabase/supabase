@@ -20,28 +20,27 @@ import { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import dayjs from 'dayjs'
 import { useKeyboardShortcuts } from 'components/grid/components/common/Hooks'
 
-const djs = dayjs()
 const INTERVALS: DatetimeHelper[] = [
   {
     text: 'Last hour',
-    calcFrom: () => djs.subtract(1, 'hour').toISOString(),
-    calcTo: () => djs.toISOString(),
+    calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
+    calcTo: () => dayjs().toISOString(),
     default: true,
   },
   {
     text: 'Last 12 hours',
-    calcFrom: () => djs.subtract(12, 'hour').toISOString(),
-    calcTo: () => djs.toISOString(),
+    calcFrom: () => dayjs().subtract(12, 'hour').toISOString(),
+    calcTo: () => dayjs().toISOString(),
   },
   {
     text: 'Last day',
-    calcFrom: () => djs.subtract(1, 'day').toISOString(),
-    calcTo: () => djs.toISOString(),
+    calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
+    calcTo: () => dayjs().toISOString(),
   },
   {
     text: 'Last 7 days',
-    calcFrom: () => djs.subtract(7, 'day').toISOString(),
-    calcTo: () => djs.toISOString(),
+    calcFrom: () => dayjs().subtract(7, 'day').toISOString(),
+    calcTo: () => dayjs().toISOString(),
   },
 ]
 
@@ -68,15 +67,16 @@ export const WarehouseCollectionDetail = () => {
     offset: 0,
     search: '',
     interval: {
-      to: INTERVALS[0].calcTo(),
-      from: INTERVALS[0].calcFrom(),
+      to: () => INTERVALS[0].calcTo(),
+      from: () => INTERVALS[0].calcFrom(),
     },
   })
 
   useEffect(() => {
     if (collection) {
-      const from = filters.interval?.from
-      const to = filters.interval?.to
+      const from = filters.interval.from()
+      const to = filters.interval.to()
+      console.log(to)
 
       const sql = `select id, timestamp, event_message from \`${collection.name}\`
 where timestamp >= TIMESTAMP('${from}')
@@ -85,8 +85,7 @@ and event_message like '%${filters.search}%'
 order by timestamp desc limit ${filters.limit} offset ${filters.offset}
       `
 
-      setParams((prevParams) => ({
-        ...prevParams,
+      setParams(() => ({
         sql,
       }))
     }
@@ -95,7 +94,6 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
   const {
     isLoading: queryLoading,
     data: queryData,
-    refetch,
     isError,
     isRefetching,
   } = useWarehouseQueryQuery(
@@ -134,11 +132,10 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
       ...filters,
       search,
       interval: {
-        to: dayjs().toISOString(),
-        from: filters.interval?.from || dayjs().subtract(1, 'hour').toISOString(),
+        to: () => dayjs().toISOString(),
+        from: () => filters.interval.from() || dayjs().subtract(1, 'hour').toISOString(),
       },
     })
-    refetch()
   }
 
   const queryUrl = `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
@@ -200,15 +197,15 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
                 onChange={(e) => setSearch(e.target.value)}
               />
               <DatePickers
-                to={filters.interval?.to}
-                from={filters.interval?.from}
+                to={filters.interval?.to()}
+                from={filters.interval?.from()}
                 helpers={INTERVALS}
                 onChange={(e) =>
                   setFilters({
                     ...filters,
                     interval: {
-                      to: e.to || '',
-                      from: e.from || '',
+                      to: () => e.to || '',
+                      from: () => e.from || '',
                     },
                   })
                 }
@@ -263,18 +260,25 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
               maxHeight="calc(100vh - 139px)"
               showHeader={false}
               emptyState={
-                <ProductEmptyState
-                  title="No events found"
-                  size="large"
-                  ctaButtonLabel="Send test event"
-                  onClickCta={() => setTestDialogOpen(true)}
-                >
-                  <>
+                <ProductEmptyState title="No events found" size="large">
+                  <div className="space-y-4">
                     <p>
                       No events match your current search criteria. <br />
                       Try adjusting your filters or send a test event to populate this collection.
                     </p>
-                  </>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={() => {
+                          setTestDialogOpen(true)
+                        }}
+                      >
+                        Send test event
+                      </Button>
+                      <Button type="outline" onClick={() => refreshResults()}>
+                        Refresh
+                      </Button>
+                    </div>
+                  </div>
                 </ProductEmptyState>
               }
             />
