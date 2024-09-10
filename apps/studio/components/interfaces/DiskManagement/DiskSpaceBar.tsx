@@ -1,8 +1,7 @@
-'use client'
-
 import { AnimatePresence, motion } from 'framer-motion'
 import MotionNumber from 'motion-number'
 import { useState } from 'react'
+
 import { badgeVariants, cn } from 'ui'
 
 export default function DiskSpaceBar({
@@ -28,8 +27,6 @@ export default function DiskSpaceBar({
   const newUsedPercentage = (usedSize / newTotalSize) * 100
   const newResizePoint = newTotalSize - resizeThreshold
   const newResizePercentage = (newResizePoint / newTotalSize) * 100
-
-  //   const showNewBar = newTotalSize !== totalSize && newTotalSize > totalSize
 
   return (
     <div className="flex flex-col gap-2">
@@ -180,40 +177,3 @@ export default function DiskSpaceBar({
     </div>
   )
 }
-
-// ;<span className="text-foreground-light text-sm font-mono">
-//   {usedSize.toFixed(2)} GB used of{' '}
-//   <AnimatePresence mode="wait">
-//     {!showNewBar ? (
-//       <motion.span
-//         key="currentSize"
-//         initial={{ opacity: 0 }}
-//         animate={{ opacity: 1 }}
-//         exit={{ opacity: 0 }}
-//         transition={{ duration: 0.2 }}
-//       >
-//         {totalSize.toFixed(2)}
-//       </motion.span>
-//     ) : (
-//       <motion.span
-//         key="newSize"
-//         initial={{ opacity: 0 }}
-//         animate={{ opacity: 1 }}
-//         exit={{ opacity: 0 }}
-//         transition={{ duration: 0.2 }}
-//         className="text-foreground font-semibold"
-//       >
-//         <MotionNumber
-//           value={newTotalSize.toFixed(2)}
-//           style={{ lineHeight: 0.8 }}
-//           transition={{
-//             y: { type: 'spring', duration: 0.35, bounce: 0 },
-//           }}
-//           //   format={{ notation: 'compact' }} // Intl.NumberFormat() options
-//           locales="en-US" // Intl.NumberFormat() locales
-//         />
-//       </motion.span>
-//     )}
-//   </AnimatePresence>{' '}
-//   GB
-// </span>

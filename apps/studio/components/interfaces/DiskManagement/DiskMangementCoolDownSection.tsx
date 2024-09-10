@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { DialogSection, Button } from 'ui'
 import { X } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+
+import { DialogSection } from 'ui'
 import CountdownTimerRadial from './CountdownTimerRadial'
 
 export const DiskMangementCoolDownSection: React.FC = () => {

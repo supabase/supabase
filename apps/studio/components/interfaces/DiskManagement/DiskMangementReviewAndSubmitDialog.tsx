@@ -1,5 +1,5 @@
 import { ChevronRight } from 'lucide-react'
-import React from 'react'
+
 import {
   Badge,
   Button,
@@ -21,19 +21,9 @@ import {
 } from 'ui'
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskMangementCoolDownSection } from './DiskMangementCoolDownSection'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
-interface DiskSizeMeterProps {
-  isDialogOpen: boolean
-  setIsDialogOpen: (isOpen: boolean) => void
-  form: any // Replace 'any' with the actual type of your form
-  loading: boolean
-  onSubmit: (values: any) => Promise<void> // Replace 'any' with the actual type of form values
-  calculateDiskSizePrice: { oldPrice: string; newPrice: string }
-  calculateIOPSPrice: { oldPrice: string; newPrice: string }
-  calculateThroughputPrice: { oldPrice: string; newPrice: string }
-}
-
-const TableHeaderRow: React.FC = () => (
+const TableHeaderRow = () => (
   <TableRow>
     <TableHead className="w-[128px] pl-5">Disk attribute</TableHead>
     <TableHead className="text-right">-</TableHead>
@@ -51,14 +41,14 @@ interface TableDataRowProps {
   afterPrice: number
 }
 
-const TableDataRow: React.FC<TableDataRowProps> = ({
+const TableDataRow = ({
   attribute,
   defaultValue,
   newValue,
   unit,
   beforePrice,
   afterPrice,
-}) => (
+}: TableDataRowProps) => (
   <TableRow>
     <TableCell className="pl-5">
       <div className="flex flex-row gap-2 items-center">
@@ -92,33 +82,52 @@ const TableDataRow: React.FC<TableDataRowProps> = ({
   </TableRow>
 )
 
-export const DiskManagementReviewAndSubmitDialog: React.FC<DiskSizeMeterProps> = ({
+interface DiskSizeMeterProps {
+  isDialogOpen: boolean
+  setIsDialogOpen: (isOpen: boolean) => void
+  isWithinCooldown: boolean
+  form: any // Replace 'any' with the actual type of your form
+  loading: boolean
+  onSubmit: (values: any) => Promise<void> // Replace 'any' with the actual type of form values
+  iopsPrice: { oldPrice: string; newPrice: string }
+  throughputPrice: { oldPrice: string; newPrice: string }
+  diskSizePrice: { oldPrice: string; newPrice: string }
+}
+
+export const DiskManagementReviewAndSubmitDialog = ({
   isDialogOpen,
   setIsDialogOpen,
+  isWithinCooldown,
   form,
   loading,
   onSubmit,
-  calculateDiskSizePrice,
-  calculateIOPSPrice,
-  calculateThroughputPrice,
-}) => {
+  iopsPrice,
+  throughputPrice,
+  diskSizePrice,
+}: DiskSizeMeterProps) => {
+  const isDirty = Object.keys(form.formState.dirtyFields)
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button
+        <ButtonTooltip
           htmlType="submit"
           type="primary"
           onClick={async (e) => {
             e.preventDefault()
             const isValid = await form.trigger()
-            if (isValid) {
-              setIsDialogOpen(true)
-            }
+            if (isValid) setIsDialogOpen(true)
           }}
-          disabled={!form.formState.isDirty}
+          disabled={isWithinCooldown || !isDirty}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: 'Currently within cooldown period from previous disk change',
+            },
+          }}
         >
           Review changes
-        </Button>
+        </ButtonTooltip>
       </DialogTrigger>
       <DialogContent size="large">
         <DialogHeader>
@@ -140,24 +149,24 @@ export const DiskManagementReviewAndSubmitDialog: React.FC<DiskSizeMeterProps> =
               defaultValue={form.formState.defaultValues?.totalSize}
               newValue={form.getValues('totalSize')}
               unit="GiB"
-              beforePrice={Number(calculateDiskSizePrice.oldPrice)}
-              afterPrice={Number(calculateDiskSizePrice.newPrice)}
+              beforePrice={Number(diskSizePrice.oldPrice)}
+              afterPrice={Number(diskSizePrice.newPrice)}
             />
             <TableDataRow
               attribute="IOPS"
               defaultValue={form.formState.defaultValues?.provisionedIOPS}
               newValue={form.getValues('provisionedIOPS')}
               unit="IOPS"
-              beforePrice={Number(calculateIOPSPrice.oldPrice)}
-              afterPrice={Number(calculateIOPSPrice.newPrice)}
+              beforePrice={Number(iopsPrice.oldPrice)}
+              afterPrice={Number(iopsPrice.newPrice)}
             />
             <TableDataRow
               attribute="Throughput"
               defaultValue={form.formState.defaultValues?.throughput}
               newValue={form.getValues('throughput')}
               unit="MiBps"
-              beforePrice={Number(calculateThroughputPrice.oldPrice)}
-              afterPrice={Number(calculateThroughputPrice.newPrice)}
+              beforePrice={Number(throughputPrice.oldPrice)}
+              afterPrice={Number(throughputPrice.newPrice)}
             />
           </TableBody>
         </Table>
@@ -170,6 +179,7 @@ export const DiskManagementReviewAndSubmitDialog: React.FC<DiskSizeMeterProps> =
           <Button block size="small" type="default" onClick={() => setIsDialogOpen(false)}>
             Cancel
           </Button>
+
           <Button
             block
             size="small"
@@ -179,7 +189,7 @@ export const DiskManagementReviewAndSubmitDialog: React.FC<DiskSizeMeterProps> =
               await onSubmit(form.getValues())
             }}
           >
-            Accept changes
+            Review changes
           </Button>
         </DialogFooter>
       </DialogContent>

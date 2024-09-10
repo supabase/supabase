@@ -39,7 +39,7 @@ export const DISK_TYPE_LABELS = {
   [DiskType.IO2]: 'Provisioned IOPS SSD (io2)',
 }
 
-type PlanType = 'tier_free' | 'tier_pro' | 'tier_team' | 'tier_enterprise'
+type PlanType = 'free' | 'pro' | 'team' | 'enterprise'
 
 interface PlanDetails {
   includedDiskGB: number
@@ -47,8 +47,8 @@ interface PlanDetails {
 }
 
 export const PLAN_DETAILS: Record<PlanType, PlanDetails> = {
-  tier_free: { includedDiskGB: 1, includedDiskPricePerMonth: 0 },
-  tier_pro: { includedDiskGB: 8, includedDiskPricePerMonth: 5 },
-  tier_team: { includedDiskGB: 16, includedDiskPricePerMonth: 10 },
-  tier_enterprise: { includedDiskGB: 32, includedDiskPricePerMonth: 20 },
+  free: { includedDiskGB: 1, includedDiskPricePerMonth: 0 },
+  pro: { includedDiskGB: 8, includedDiskPricePerMonth: 5 },
+  team: { includedDiskGB: 16, includedDiskPricePerMonth: 10 },
+  enterprise: { includedDiskGB: 32, includedDiskPricePerMonth: 20 },
 }

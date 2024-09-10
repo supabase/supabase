@@ -1,6 +1,5 @@
-import React from 'react'
-import { RadialBarChart, PolarGrid, RadialBar } from 'recharts'
-import { ChartContainer, ChartConfig } from 'ui'
+import { PolarGrid, RadialBar, RadialBarChart } from 'recharts'
+import { ChartConfig, ChartContainer } from 'ui'
 
 interface CountdownTimerRadialProps {
   progress: number
@@ -17,7 +16,9 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-const CountdownTimerRadial: React.FC<CountdownTimerRadialProps> = ({ progress }) => {
+// [Joshen TODO] This should be under UI instead, as its not DiskManagement specific
+
+const CountdownTimerRadial = ({ progress }: CountdownTimerRadialProps) => {
   return (
     <div className="relative w-12 h-12">
       {/* timer ring */}

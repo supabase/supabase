@@ -1,4 +1,3 @@
-import React from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Badge } from 'ui'
 
@@ -7,7 +6,7 @@ interface FormFooterChangeBadgeProps {
     dirtyFields: Record<string, boolean>
   }
 }
-export const FormFooterChangeBadge: React.FC<FormFooterChangeBadgeProps> = ({ formState }) => {
+export const FormFooterChangeBadge = ({ formState }: FormFooterChangeBadgeProps) => {
   return (
     <AnimatePresence mode="wait">
       {Object.keys(formState.dirtyFields).length > 0 && (

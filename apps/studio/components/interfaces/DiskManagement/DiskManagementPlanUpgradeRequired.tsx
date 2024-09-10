@@ -36,7 +36,7 @@ export function DiskManagementPlanUpgradeRequired() {
             </AlertDescription>
             <div className="mt-4">
               <Link
-                href="/project/[ref]/settings/billing"
+                href={`/org/${org?.slug}/billing`}
                 className={cn(buttonVariants({ type: 'default', size: 'small' }))}
               >
                 Upgrade your plan

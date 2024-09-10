@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -24,9 +24,12 @@ interface DiskManagementDiskSizeReadReplicasProps {
   newTotalSize: number
 }
 
-export const DiskManagementDiskSizeReadReplicas: React.FC<
-  DiskManagementDiskSizeReadReplicasProps
-> = ({ isDirty, totalSize, usedSize, newTotalSize }) => {
+export const DiskManagementDiskSizeReadReplicas = ({
+  isDirty,
+  totalSize,
+  usedSize,
+  newTotalSize,
+}: DiskManagementDiskSizeReadReplicasProps) => {
   const { ref: projectRef } = useParams()
   const [isOpen, setIsOpen] = useState(false)
 

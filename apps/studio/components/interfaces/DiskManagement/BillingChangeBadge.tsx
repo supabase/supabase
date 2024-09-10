@@ -1,7 +1,6 @@
-import React from 'react'
-import { Badge } from 'ui'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { Badge } from 'ui'
 
 interface BillingChangeBadgeProps {
   beforePrice?: number
@@ -9,11 +8,7 @@ interface BillingChangeBadgeProps {
   show: boolean | undefined
 }
 
-const BillingChangeBadge: React.FC<BillingChangeBadgeProps> = ({
-  beforePrice,
-  afterPrice,
-  show,
-}) => {
+const BillingChangeBadge = ({ beforePrice, afterPrice, show }: BillingChangeBadgeProps) => {
   return (
     <AnimatePresence>
       {beforePrice !== undefined && afterPrice !== undefined && show && (

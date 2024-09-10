@@ -51,7 +51,7 @@ export const useRemainingDurationForDiskAttributeUpdate = ({
   projectRef?: string
 }) => {
   const { data } = useDiskAttributesQuery({ projectRef })
-  const lastModifiedAtString = '2024-09-06 11:35:00.030161' // data?.last_modified_at !== undefined ? dayjs(data.last_modified_at).utc() : undefined
+  const lastModifiedAtString = '2024-09-10 10:00:00.030161' // data?.last_modified_at !== undefined ? dayjs(data.last_modified_at).utc() : undefined
   const secondsFromNow = Math.max(
     0,
     dayjs().utc().diff(dayjs(lastModifiedAtString).utc(), 'second')

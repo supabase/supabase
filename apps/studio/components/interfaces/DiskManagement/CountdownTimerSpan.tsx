@@ -4,6 +4,8 @@ interface CountdownTimerSpanProps {
   seconds: number
 }
 
+// [Joshen TODO] This should be under UI instead, as its not DiskManagement specific
+
 const CountdownTimerSpan = ({ seconds }: CountdownTimerSpanProps) => {
   const transitionConfig = {
     y: { type: 'spring', duration: 0.35, bounce: 0 },
