@@ -113,7 +113,7 @@ export const SQLEditorTreeViewItem = ({
             isEditing={isEditing}
             isLoading={isFetching || isSaving}
             onEditSubmit={(value) => {
-              if (onEditSave !== undefined && value) onEditSave(value)
+              if (onEditSave !== undefined) onEditSave(value)
             }}
             onClick={(e) => {
               if (!isBranch) {

@@ -209,12 +209,16 @@ export const sqlEditorState = proxy({
   },
 
   saveFolder: ({ id, name }: { id: string; name: string }) => {
+    const hasChanges = sqlEditorState.folders[id].folder.name !== name
+
     if (id === 'new-folder' && sqlEditorState.allFolderNames.includes(name)) {
       sqlEditorState.removeFolder(id)
       return toast.error('This folder name already exists')
+    } else if (hasChanges && sqlEditorState.allFolderNames.includes(name)) {
+      sqlEditorState.folders[id] = { ...sqlEditorState.folders[id], status: 'idle' }
+      return toast.error('This folder name already exists')
     }
 
-    const hasChanges = sqlEditorState.folders[id].folder.name !== name
     const originalFolderName = sqlEditorState.folders[id].folder.name.slice()
 
     sqlEditorState.folders[id] = {
@@ -393,7 +397,6 @@ const debouncedUpdateSnippet = (id: string, projectRef: string, payload: UpsertC
   memoizedUpdateSnippet(id)(id, projectRef, payload)
 
 async function upsertFolder(id: string, projectRef: string, name: string) {
-  const originalFolder = sqlEditorState.folders[id]
   try {
     if (id === NEW_FOLDER_ID) {
       const res = await createSQLSnippetFolder({ projectRef, name })
