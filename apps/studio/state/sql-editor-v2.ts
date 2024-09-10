@@ -203,6 +203,12 @@ export const sqlEditorState = proxy({
   },
 
   saveFolder: ({ id, name }: { id: string; name: string }) => {
+    const folderNames = Object.values(sqlEditorState.folders).map((x) => x.folder.name)
+    if (id === 'new-folder' && folderNames.includes(name)) {
+      sqlEditorState.removeFolder(id)
+      return toast.error('This folder name already exists')
+    }
+
     const hasChanges = sqlEditorState.folders[id].folder.name !== name
     sqlEditorState.folders[id] = {
       projectRef: sqlEditorState.folders[id].projectRef,
@@ -390,6 +396,7 @@ async function upsertFolder(id: string, projectRef: string, name: string) {
     }
   } catch (error: any) {
     toast.error(`Failed to save folder: ${error.message}`)
+    if (error.message.includes('create')) sqlEditorState.removeFolder(id)
   }
 }
 
