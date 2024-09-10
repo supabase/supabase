@@ -23,12 +23,20 @@ const RealtimeVisual = () => {
         className="absolute w-6 h-6 z-10 right-[40%] bottom-3 xl:bottom-10 2xl:bottom-3 transition translate-x-80 group-hover:translate-x-0 !duration-700 will-change-transform"
       />
       <Image
-        src="/images/index/products/realtime-bg.svg"
+        src="/images/index/products/realtime-dark.svg"
         alt="Supabase Realtime"
         fill
         sizes="100%"
         quality={100}
-        className="absolute object-cover xl:object-center inset-0"
+        className="hidden dark:block absolute object-cover xl:object-center inset-0"
+      />
+      <Image
+        src="/images/index/products/realtime-light.svg"
+        alt="Supabase Realtime"
+        fill
+        sizes="100%"
+        quality={100}
+        className="dark:hidden absolute object-cover xl:object-center inset-0"
       />
     </figure>
   )
