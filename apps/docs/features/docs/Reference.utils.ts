@@ -97,7 +97,13 @@ export async function generateReferenceStaticParams() {
     },
   ]
 
-  return [...sdkPages, ...cliPages]
+  const apiPages = [
+    {
+      slug: ['api'],
+    },
+  ]
+
+  return [...sdkPages, ...cliPages, ...apiPages]
 }
 
 export async function generateReferenceMetadata(
@@ -109,6 +115,7 @@ export async function generateReferenceMetadata(
   const parsedPath = parseReferencePath(slug)
   const isClientSdkReference = parsedPath.__type === 'clientSdk'
   const isCliReference = parsedPath.__type === 'cli'
+  const isApiReference = parsedPath.__type === 'api'
 
   if (isClientSdkReference) {
     const { sdkId, maybeVersion } = parsedPath
@@ -149,6 +156,11 @@ export async function generateReferenceMetadata(
     return {
       title: 'CLI Reference | Supabase Docs',
       description: 'CLI reference for the Supabase CLI',
+    }
+  } else if (isApiReference) {
+    return {
+      title: 'Management API Reference | Supabase Docs',
+      description: 'Management API reference for the Supabase API',
     }
   } else {
     return {}
