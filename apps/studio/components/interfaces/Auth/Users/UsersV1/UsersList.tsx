@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { AlertCircle } from 'lucide-react'
+import { useState } from 'react'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import type { User } from 'data/auth/users-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AlertCircle } from 'lucide-react'
-import { useState } from 'react'
 import type { ResponseError } from 'types'
-import UsersSidePanel from './UserSidePanel'
-import UserListItem from './UsersListItem'
-import UsersListItemSkeleton from './UsersListItemSkeleton'
-import UsersPagination from './UsersPagination'
+import { UserListItem } from './UsersListItem'
+import { UsersListItemSkeleton } from './UsersListItemSkeleton'
+import { UsersPagination } from './UsersPagination'
+import UsersSidePanel from '../UserSidePanel'
 
 interface UsersListProps {
   page: number
@@ -24,7 +24,7 @@ interface UsersListProps {
   error: ResponseError | null
 }
 
-const UsersList = ({
+export const UsersList = ({
   page,
   setPage,
   keywords,
@@ -128,5 +128,3 @@ const UsersList = ({
     />
   )
 }
-
-export default UsersList
