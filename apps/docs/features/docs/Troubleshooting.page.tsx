@@ -18,7 +18,10 @@ export default function TroubleshootingPage({ entry }: { entry: ITroubleshooting
               <h1 className="w-fit text-foreground-light text-sm border rounded-lg px-2 py-0.5 mb-2">
                 Troubleshooting topic
               </h1>
-              <TroubleshootingBackLink className="@5xl/troubleshooting-entry-layout:hidden" />
+              <TroubleshootingBackLink
+                className="@5xl/troubleshooting-entry-layout:hidden"
+                direction="right"
+              />
             </div>
             <article className="prose max-w-none">
               <h1>{entry.data.title}</h1>
