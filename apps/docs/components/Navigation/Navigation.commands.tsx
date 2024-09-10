@@ -42,7 +42,7 @@ const navCommands = [
   },
   {
     id: 'nav-warehouse',
-    name: 'Go to Warehouse',
+    name: 'Go to Analytics',
     route: '/guides/warehouse',
     icon: () => <ArrowRight />,
   },

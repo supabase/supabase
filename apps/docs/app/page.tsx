@@ -69,11 +69,11 @@ const products = [
       'Globally distributed, server-side functions to execute your code closest to your users for the lowest latency.',
   },
   {
-    title: 'Warehouse',
+    title: 'Analytics',
     icon: 'database',
     hasLightIcon: true,
     href: '/guides/warehouse',
-    description: 'Data warehousing for ingesting and querying timeseries events.',
+    description: 'Data analytics for ingesting and querying timeseries events.',
   },
 ]
 

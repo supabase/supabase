@@ -45,7 +45,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'realtime',
           },
           {
-            label: 'Warehouse',
+            label: 'Analytics',
             icon: 'warehouse',
             href: '/guides/warehouse',
             level: 'warehouse',
@@ -1495,7 +1495,7 @@ export const realtime: NavMenuConstant = {
 
 export const warehouse: NavMenuConstant = {
   icon: 'warehouse',
-  title: 'Warehouse',
+  title: 'Analytics',
   url: '/guides/warehouse',
   items: [
     {
@@ -1507,39 +1507,9 @@ export const warehouse: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Ingestion', url: '/guides/warehouse/ingestion' },
-        { name: 'Querying', url: '/guides/warehouse/querying' },
-        { name: 'Access Tokens', url: '/guides/warehouse/access-tokens' },
+        { name: 'BigQuery Backend', url: '/guides/warehouse/backends/bigquery' },
       ],
     },
-    {
-      name: 'Guides',
-      url: undefined,
-      items: [
-        {
-          name: 'JavaScript: Ingesting with Pino',
-          url: '/guides/warehouse/warehouse-js-with-pino',
-        },
-        {
-          name: 'JavaScript - Ingesting with Winston',
-          url: '/guides/warehouse/warehouse-js-with-winston',
-        },
-        {
-          name: 'Elixir - Ingesting with Logger',
-          url: '/guides/warehouse/warehouse-ex-logger',
-        },
-        {
-          name: 'Elixir - Ingesting with Telemetry.Metrics',
-          url: '/guides/warehouse/warehouse-ex-telemetry-reporter',
-        }
-      ],
-    },
-    {
-      name: 'Deep dive',
-      url: undefined,
-      items: [
-        { name: 'Architecture', url: '/guides/warehouse/architecture' },
-      ],
-    }
   ],
 }
 
