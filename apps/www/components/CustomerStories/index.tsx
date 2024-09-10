@@ -85,7 +85,12 @@ const CustomerStories = () => {
           </Button>
         </div>
       </SectionContainer>
-      <div className={cn('group w-full flex items-stretch h-[300px] nowrap', compositionGap)}>
+      <div
+        className={cn(
+          'group w-full flex items-stretch h-[300px] min-w-[300px] nowrap mb-16 md:mb-24 lg:mb-24',
+          compositionGap
+        )}
+      >
         {range(0, 2).map((_, idx1: number) => (
           <div
             key={`row-${idx1}`}
