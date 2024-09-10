@@ -91,8 +91,8 @@ const ProjectLayout = ({
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const showProductMenu = selectedProject
-    ? selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
-      (selectedProject?.status === PROJECT_STATUS.COMING_UP &&
+    ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+      (selectedProject.status === PROJECT_STATUS.COMING_UP &&
         router.pathname.includes('/project/[ref]/settings'))
     : true
   const ignorePausedState =
