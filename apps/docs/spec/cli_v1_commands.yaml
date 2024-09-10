@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.190.0
+  version: 1.192.5
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1133,6 +1133,41 @@ commands:
             type: string
           - id: us-west-2
             name: us-west-2
+            type: string
+      - id: size
+        name: --size <string>
+        description: Select a desired instance size for your project.
+        default_value: ''
+        accepted_values:
+          - id: micro
+            name: micro
+            type: string
+          - id: small
+            name: small
+            type: string
+          - id: medium
+            name: medium
+            type: string
+          - id: large
+            name: large
+            type: string
+          - id: xlarge
+            name: xlarge
+            type: string
+          - id: 2xlarge
+            name: 2xlarge
+            type: string
+          - id: 4xlarge
+            name: 4xlarge
+            type: string
+          - id: 8xlarge
+            name: 8xlarge
+            type: string
+          - id: 12xlarge
+            name: 12xlarge
+            type: string
+          - id: 16xlarge
+            name: 16xlarge
             type: string
   - id: supabase-projects-api-keys
     title: supabase projects api-keys
@@ -3503,10 +3538,34 @@ commands:
         name: --name <string>
         description: Rename the preview branch.
         default_value: ''
+      - id: persistent
+        name: --persistent
+        description: Switch between ephemeral and persistent branch.
+        default_value: 'false'
       - id: reset-on-push
         name: --reset-on-push
         description: Reset the preview branch on git push.
         default_value: 'false'
+      - id: status
+        name: --status <string>
+        description: Override the current branch status.
+        default_value: ''
+        accepted_values:
+          - id: RUNNING_MIGRATIONS
+            name: RUNNING_MIGRATIONS
+            type: string
+          - id: MIGRATIONS_PASSED
+            name: MIGRATIONS_PASSED
+            type: string
+          - id: MIGRATIONS_FAILED
+            name: MIGRATIONS_FAILED
+            type: string
+          - id: FUNCTIONS_DEPLOYED
+            name: FUNCTIONS_DEPLOYED
+            type: string
+          - id: FUNCTIONS_FAILED
+            name: FUNCTIONS_FAILED
+            type: string
       - id: experimental
         name: --experimental
         description: enable experimental features
@@ -3597,6 +3656,10 @@ commands:
     usage: supabase branches create [name] [flags]
     subcommands: []
     flags:
+      - id: persistent
+        name: --persistent
+        description: Whether to create a persistent branch.
+        default_value: 'false'
       - id: region
         name: --region <string>
         description: Select a region to deploy the branch database.
@@ -3697,6 +3760,41 @@ commands:
             type: string
           - id: yyz
             name: yyz
+            type: string
+      - id: size
+        name: --size <string>
+        description: Select a desired instance size for the branch database.
+        default_value: ''
+        accepted_values:
+          - id: micro
+            name: micro
+            type: string
+          - id: small
+            name: small
+            type: string
+          - id: medium
+            name: medium
+            type: string
+          - id: large
+            name: large
+            type: string
+          - id: xlarge
+            name: xlarge
+            type: string
+          - id: 2xlarge
+            name: 2xlarge
+            type: string
+          - id: 4xlarge
+            name: 4xlarge
+            type: string
+          - id: 8xlarge
+            name: 8xlarge
+            type: string
+          - id: 12xlarge
+            name: 12xlarge
+            type: string
+          - id: 16xlarge
+            name: 16xlarge
             type: string
       - id: experimental
         name: --experimental
