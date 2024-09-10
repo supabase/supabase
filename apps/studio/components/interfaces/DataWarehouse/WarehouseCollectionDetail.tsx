@@ -231,6 +231,14 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
                 open={testDialogOpen}
                 onOpenChange={setTestDialogOpen}
                 onSubmit={() => {
+                  setFilters({
+                    ...filters,
+                    offset: 0,
+                    interval: {
+                      to: dayjs().toISOString(),
+                      from: dayjs().subtract(15, 'minute').toISOString(),
+                    },
+                  })
                   refetch()
                   setTestDialogOpen(false)
                 }}
