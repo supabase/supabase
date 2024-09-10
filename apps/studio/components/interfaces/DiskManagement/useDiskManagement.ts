@@ -2,6 +2,20 @@ import { atom, useAtom } from 'jotai'
 import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { components } from 'api-types'
 
+type PlanType = 'tier_free' | 'tier_pro' | 'tier_team' | 'tier_enterprise'
+
+interface PlanDetails {
+  includedDiskGB: number
+  includedDiskPricePerMonth: number
+}
+
+const PLAN_DETAILS: Record<PlanType, PlanDetails> = {
+  tier_free: { includedDiskGB: 1, includedDiskPricePerMonth: 0 },
+  tier_pro: { includedDiskGB: 8, includedDiskPricePerMonth: 5 },
+  tier_team: { includedDiskGB: 16, includedDiskPricePerMonth: 10 },
+  tier_enterprise: { includedDiskGB: 32, includedDiskPricePerMonth: 20 },
+}
+
 interface ExtendedDiskStorageSchemaType {
   type: 'gp3' | 'io2'
   size_gb: number
@@ -10,16 +24,14 @@ interface ExtendedDiskStorageSchemaType {
 
   mainDiskUsed: number
   replicaDiskUsed: number
-  plan: 'tier_free' | 'tier_pro' | 'tier_team' | 'tier_enterprise'
+  plan: PlanType
   compute: components['schemas']['AddonVariantId']
   hasReadReplica: boolean
   remainingTime: number
   totalWaitTime: number
-  // regions used in read replicas
   readReplicas: string[]
 }
 
-// Rename according to API
 const diskConfigAtom = atom<ExtendedDiskStorageSchemaType>({
   type: 'gp3',
   size_gb: 8,
@@ -42,10 +54,15 @@ export function useDiskManagement() {
   const updateDiskConfiguration = (newConfig: Partial<ExtendedDiskStorageSchemaType>) => {
     setDiskConfig((prev) => ({ ...prev, ...newConfig }))
   }
+
+  const getPlanDetails = () => PLAN_DETAILS[diskConfig.plan]
+
   return {
     ...diskConfig,
     updateDiskConfiguration,
+    getPlanDetails,
   }
 }
 
-export type { DiskStorageSchemaType }
+export type { DiskStorageSchemaType, PlanType, PlanDetails }
+export { PLAN_DETAILS }

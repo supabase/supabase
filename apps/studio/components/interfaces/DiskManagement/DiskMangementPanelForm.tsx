@@ -25,7 +25,7 @@ import { DiskCountdownRadial } from './DiskCountdownRadial'
 import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import { DiskManagementReviewAndSubmitDialog } from './DiskMangementReviewAndSubmitDialog'
-import { useDiskManagement } from './useDiskManagement'
+import { useDiskManagement, PLAN_DETAILS } from './useDiskManagement'
 import { DiskManagementDiskSizeReadReplicas } from './DiskManagementDiskSizeReadReplicas'
 import BillingChangeBadge from './BillingChangeBadge'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
@@ -53,8 +53,17 @@ export function DiskMangementPanelForm() {
 
   // [Joshen] To figure out how to get this number and deprecate these variables
   // const totalWaitTime = 180
-  const { type, iops, throughput_mbps, size_gb, totalWaitTime, updateDiskConfiguration } =
-    useDiskManagement()
+  const {
+    type,
+    iops,
+    throughput_mbps,
+    size_gb,
+    totalWaitTime,
+    updateDiskConfiguration,
+    plan,
+    getPlanDetails,
+  } = useDiskManagement()
+  const { includedDiskGB } = getPlanDetails()
 
   // @ts-ignore [Joshen TODO] check whats happening here
   // const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
@@ -87,7 +96,7 @@ export function DiskMangementPanelForm() {
     setStateShowTimer(true)
   }
 
-  const showNewBar = watchedTotalSize !== size_gb && watchedTotalSize > size_gb
+  const showNewBar = watchedTotalSize > size_gb
 
   // Destructure dirtyFields from formState
   const { dirtyFields } = formState
@@ -100,10 +109,12 @@ export function DiskMangementPanelForm() {
     const oldSize = form.formState.defaultValues?.totalSize || 0
     const storageType = form.getValues('storageType') as DiskType
     const pricePerGiB = DISK_PRICING[storageType].storage
-    const oldPrice = (Math.max(oldSize, 8) * pricePerGiB).toFixed(2)
-    const newPrice = (Math.max(newSize, 8) * pricePerGiB).toFixed(2)
+    const oldPrice = (Math.max(oldSize - includedDiskGB, 0) * pricePerGiB).toFixed(2)
+    const newPrice = (Math.max(newSize - includedDiskGB, 0) * pricePerGiB).toFixed(2)
     return { oldPrice, newPrice }
   }
+
+  console.log(calculateDiskSizePrice())
 
   const calculateIOPSPrice = () => {
     const storageType = form.getValues('storageType') as DiskType
@@ -385,7 +396,9 @@ export function DiskMangementPanelForm() {
                                   shouldDirty: true,
                                   shouldValidate: true,
                                 })
+                                updateDiskConfiguration({ size_gb: Number(e.target.value) })
                               }}
+                              min={includedDiskGB}
                             />
                           </FormControl_Shadcn_>
                           <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
@@ -425,6 +438,9 @@ export function DiskMangementPanelForm() {
                             calculateDiskSizePrice().oldPrice !== calculateDiskSizePrice().newPrice
                           }
                         />
+                        <div className="text-xs text-foreground-light mt-2">
+                          Your plan includes {includedDiskGB}GB of storage.
+                        </div>
                       </div>
                     </FormItemLayout>
                   )}
@@ -438,7 +454,7 @@ export function DiskMangementPanelForm() {
                     <div>
                       {/* <h3 className="text-sm">Main Disk Space</h3> */}
                       <DiskSpaceBar
-                        showNewBar={showNewBar}
+                        showNewBar={form.formState.dirtyFields.totalSize !== undefined}
                         totalSize={size_gb}
                         usedSize={mainDiskUsed}
                         newTotalSize={
