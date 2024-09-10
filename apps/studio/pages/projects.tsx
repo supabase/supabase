@@ -43,9 +43,9 @@ const ProjectsPage: NextPageWithLayout = () => {
 
     if (orgCreationExperimentGroup === 'group-b' && !navLayoutV2 && isSuccess && hasWindowLoaded) {
       // navigate to new page exactly once
-      const hasShownNewPage = localStorage.getItem('newPageShown')
+      const hasShownNewPage = localStorage.getItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN)
       if (!hasShownNewPage && organizations.length === 0) {
-        localStorage.setItem('newPageShown', 'true')
+        localStorage.setItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN, 'true')
         router.push('/new')
       }
     }
