@@ -99,7 +99,7 @@ export function ApiOperationBodySchemeSelector({
           setSelectedScheme(value as 'application/json' | 'application/x-www-form-urlencoded')
         }
       >
-        <SelectTrigger_Shadcn_ className="w-48">
+        <SelectTrigger_Shadcn_ className="w-48 [&>span]:w-full [&>span]:truncate">
           <SelectValue_Shadcn_ />
         </SelectTrigger_Shadcn_>
         <SelectContent_Shadcn_>

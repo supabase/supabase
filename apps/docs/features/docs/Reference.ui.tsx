@@ -340,7 +340,9 @@ export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['paramete
   return (
     <li className="border-t last-of-type:border-b py-5 flex flex-col gap-3">
       <div className="flex flex-wrap items-baseline gap-3">
-        <span className="font-mono text-sm font-medium text-foreground">{param.name}</span>
+        <span className="font-mono text-sm font-medium text-foreground break-all">
+          {param.name}
+        </span>
         <RequiredBadge isOptional={!param.required} />
         {param.schema.deprecated && <span className="text-xs text-warning-600">Deprecated</span>}
         <span className="text-xs text-foreground-muted">
