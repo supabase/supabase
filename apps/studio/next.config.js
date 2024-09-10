@@ -413,6 +413,10 @@ const nextConfig = {
             value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? csp : "frame-ancestors 'none';",
           },
           {
+            key: 'X-Studio-Version',
+            value: process.env.VERCEL_GIT_COMMIT_SHA || 'Unknown git sha',
+          },
+          {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
