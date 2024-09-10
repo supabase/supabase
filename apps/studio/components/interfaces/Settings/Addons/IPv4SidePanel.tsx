@@ -172,11 +172,12 @@ const IPv4SidePanel = () => {
                       <p className="text-foreground-light">
                         Allow direct database connections via IPv4 address
                       </p>
-                      <div className="flex items-center space-x-1 mt-2">
+                      <div className="grid grid-cols-[max-content,1fr] space-x-1 mt-2">
                         <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
-                        <p className="text-foreground-light translate-y-[1px]">
+                        <p className="text-foreground-light translate-y-[2px]">
                           / month / database
                         </p>
+                        <span className="col-start-2 text-foreground-light">(billed hourly)</span>
                       </div>
                     </div>
                   </div>
