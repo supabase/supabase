@@ -3,7 +3,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { MoreHorizontal } from 'lucide-react'
 import { Button } from 'ui'
 
-const UsersListItemSkeleton = () => {
+export const UsersListItemSkeleton = () => {
   return (
     <Table.tr className="relative">
       <Table.td className="whitespace-nowrap">
@@ -35,5 +35,3 @@ const UsersListItemSkeleton = () => {
     </Table.tr>
   )
 }
-
-export default UsersListItemSkeleton

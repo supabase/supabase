@@ -4,8 +4,8 @@ import { Badge } from 'ui'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Table from 'components/to-be-cleaned/Table'
 import type { User } from 'data/auth/users-query'
-import UserDropdown from './UserDropdown'
-import { getDisplayName } from './UserListItem.utils'
+import UserDropdown from '../UserDropdown'
+import { getDisplayName } from '../Users.utils'
 
 interface UserListItemProps {
   user: User
@@ -20,7 +20,7 @@ interface UserListItemProps {
   setUserSidePanelOpen: (open: boolean) => void
 }
 
-const UserListItem = ({
+export const UserListItem = ({
   user,
   permissions,
   setSelectedUser,
@@ -77,5 +77,3 @@ const UserListItem = ({
     </Table.tr>
   )
 }
-
-export default UserListItem
