@@ -9,7 +9,7 @@ export function EmailRateLimitsAlert() {
   return (
     <Alert_Shadcn_ variant="warning">
       <WarningIcon />
-      <AlertTitle_Shadcn_>Email rate-limits and template changes!</AlertTitle_Shadcn_>
+      <AlertTitle_Shadcn_>Email rate-limits and template changes</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
         You're using the built-in email service. The service has rate limits and it's not meant to
         be used for production apps. Check the{' '}
@@ -31,7 +31,8 @@ export function EmailRateLimitsAlert() {
         .<br />
         <strong>
           You will not be able to modify the email templates unless you've set up a custom SMTP
-          server, except if you had changed it before this restriction went into effect.
+          server or Send Email Hook server, except if you had changed it before this restriction
+          went into effect.
         </strong>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
