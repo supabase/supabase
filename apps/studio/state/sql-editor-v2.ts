@@ -73,6 +73,8 @@ export const sqlEditorState = proxy({
   },
   limit: 100,
   order: 'inserted_at' as 'name' | 'inserted_at',
+  // For handling renaming folder failed
+  lastUpdatedFolderName: '',
 
   get allFolderNames() {
     return Object.values(sqlEditorState.folders).map((x) => x.folder.name)
@@ -213,6 +215,8 @@ export const sqlEditorState = proxy({
     }
 
     const hasChanges = sqlEditorState.folders[id].folder.name !== name
+    const originalFolderName = sqlEditorState.folders[id].folder.name.slice()
+
     sqlEditorState.folders[id] = {
       projectRef: sqlEditorState.folders[id].projectRef,
       status: hasChanges ? 'saving' : 'idle',
@@ -222,7 +226,10 @@ export const sqlEditorState = proxy({
         name,
       },
     }
-    if (hasChanges) sqlEditorState.needsSaving.add(id)
+    if (hasChanges) {
+      sqlEditorState.lastUpdatedFolderName = originalFolderName
+      sqlEditorState.needsSaving.add(id)
+    }
   },
 
   removeFolder: (id: string) => {
@@ -386,6 +393,7 @@ const debouncedUpdateSnippet = (id: string, projectRef: string, payload: UpsertC
   memoizedUpdateSnippet(id)(id, projectRef, payload)
 
 async function upsertFolder(id: string, projectRef: string, name: string) {
+  const originalFolder = sqlEditorState.folders[id]
   try {
     if (id === NEW_FOLDER_ID) {
       const res = await createSQLSnippetFolder({ projectRef, name })
@@ -399,7 +407,23 @@ async function upsertFolder(id: string, projectRef: string, name: string) {
     }
   } catch (error: any) {
     toast.error(`Failed to save folder: ${error.message}`)
-    if (error.message.includes('create')) sqlEditorState.removeFolder(id)
+    if (error.message.includes('create')) {
+      sqlEditorState.removeFolder(id)
+    } else if (
+      error.message.includes('update') &&
+      sqlEditorState.lastUpdatedFolderName.length > 0
+    ) {
+      sqlEditorState.folders[id] = {
+        ...sqlEditorState.folders[id],
+        status: 'idle',
+        folder: {
+          ...sqlEditorState.folders[id].folder,
+          name: sqlEditorState.lastUpdatedFolderName,
+        },
+      }
+    }
+  } finally {
+    sqlEditorState.lastUpdatedFolderName = ''
   }
 }
 
