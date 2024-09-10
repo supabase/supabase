@@ -44,6 +44,7 @@ const routesToIgnoreProjectDetailsRequest = [
 const routesToIgnoreDBConnection = [
   '/project/[ref]/branches',
   '/project/[ref]/database/backups/scheduled',
+  '/project/[ref]/database/backups/pitr',
   '/project/[ref]/settings/addons',
 ]
 
