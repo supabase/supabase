@@ -128,9 +128,16 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
 
   const isLoading = queryLoading || collectionsLoading || isRefetching
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setFilters({ ...filters, search })
+  function refreshResults(e?: React.FormEvent<HTMLFormElement>) {
+    e?.preventDefault()
+    setFilters({
+      ...filters,
+      search,
+      interval: {
+        to: dayjs().toISOString(),
+        from: filters.interval?.from || dayjs().subtract(1, 'hour').toISOString(),
+      },
+    })
     refetch()
   }
 
@@ -163,7 +170,7 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
       <LoadingOpacity active={isLoading}>
         <div className="flex flex-col w-full">
           <div className="flex justify-between items-center h-12 px-5">
-            <form onSubmit={handleSubmit} className="flex items-center gap-2">
+            <form onSubmit={refreshResults} className="flex items-center gap-2">
               <h2 className="text-foreground-light max-w-60 truncate" title={collection?.name}>
                 {collection?.name}
               </h2>
@@ -231,15 +238,7 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
                 open={testDialogOpen}
                 onOpenChange={setTestDialogOpen}
                 onSubmit={() => {
-                  setFilters({
-                    ...filters,
-                    offset: 0,
-                    interval: {
-                      to: dayjs().toISOString(),
-                      from: dayjs().subtract(15, 'minute').toISOString(),
-                    },
-                  })
-                  refetch()
+                  refreshResults()
                   setTestDialogOpen(false)
                 }}
               />
