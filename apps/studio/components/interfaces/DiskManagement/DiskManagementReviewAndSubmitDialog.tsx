@@ -23,7 +23,7 @@ import {
 } from 'ui'
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
-import { DiskMangementCoolDownSection } from './DiskMangementCoolDownSection'
+import { DiskMangementCoolDownSection } from './DiskManagementCoolDownSection'
 
 const TableHeaderRow = () => (
   <TableRow>

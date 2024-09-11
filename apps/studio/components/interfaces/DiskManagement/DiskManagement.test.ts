@@ -3,7 +3,7 @@ import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
-import { DiskType } from './DiskMangement.constants'
+import { DiskType } from './DiskManagement.constants'
 
 describe('DiskManagement.utils.ts:calculateDiskSizePrice', () => {
   test('GP3 with 8GB to GP3 with 10GB for pro plan', () => {

@@ -47,11 +47,11 @@ import {
 import { DiskManagementDiskSizeReadReplicas } from './DiskManagementDiskSizeReadReplicas'
 import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
-import { DiskType, PLAN_DETAILS } from './DiskMangement.constants'
-import { DiskManagementReviewAndSubmitDialog } from './DiskMangementReviewAndSubmitDialog'
+import { DiskType, PLAN_DETAILS } from './DiskManagement.constants'
+import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 import Link from 'next/link'
 
-export function DiskMangementPanelForm() {
+export function DiskManagementPanelForm() {
   const org = useSelectedOrganization()
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()

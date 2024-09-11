@@ -1,4 +1,4 @@
-import { DISK_LIMITS, DISK_PRICING, DiskType, PLAN_DETAILS } from './DiskMangement.constants'
+import { DISK_LIMITS, DISK_PRICING, DiskType, PLAN_DETAILS } from './DiskManagement.constants'
 
 export const calculateDiskSizePrice = ({
   planId,

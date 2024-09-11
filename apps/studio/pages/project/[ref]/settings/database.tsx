@@ -6,7 +6,7 @@ import {
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import type { NextPageWithLayout } from 'types'
 
-import { DiskMangementPanelForm } from 'components/interfaces/DiskManagement/DiskMangementPanelForm'
+import { DiskManagementPanelForm } from 'components/interfaces/DiskManagement/DiskManagementPanelForm'
 import BannedIPs from 'components/interfaces/Settings/Database/BannedIPs'
 import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
@@ -43,7 +43,7 @@ const ProjectSettings: NextPageWithLayout = () => {
           </div>
 
           <SSLConfiguration />
-          {showNewDiskManagementUI ? <DiskMangementPanelForm /> : <DiskSizeConfiguration />}
+          {showNewDiskManagementUI ? <DiskManagementPanelForm /> : <DiskSizeConfiguration />}
           <NetworkRestrictions />
           <BannedIPs />
         </div>
