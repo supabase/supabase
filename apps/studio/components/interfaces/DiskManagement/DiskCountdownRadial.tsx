@@ -2,8 +2,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 
 import { COOLDOWN_DURATION } from 'data/config/disk-attributes-update-mutation'
 import { Card, CardContent } from 'ui'
-import CountdownTimerRadial from './CountdownTimerRadial'
-import CountdownTimerSpan from './CountdownTimerSpan'
+import CountdownTimerRadial from '../../ui/CountdownTimer/CountdownTimerRadial'
+import CountdownTimerSpan from '../../ui/CountdownTimer/CountdownTimerSpan'
 
 export function DiskCountdownRadial({ remainingTime }: { remainingTime: number }) {
   const progressPercentage = (remainingTime / COOLDOWN_DURATION) * 100

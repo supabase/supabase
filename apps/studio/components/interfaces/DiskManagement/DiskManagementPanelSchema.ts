@@ -4,9 +4,9 @@ const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
   totalSize: z
     .number()
-    .min(8, { message: 'Allocated storage must be at least 8 GiB.' })
-    .max(16384, { message: 'Allocated storage must not exceed 16 TiB.' })
-    .describe('Allocated storage size in GiB'),
+    .min(8, { message: 'Allocated disk size must be at least 8 GiB.' })
+    .max(16384, { message: 'Allocated disk size must not exceed 16 TiB.' })
+    .describe('Allocated disk size in GiB'),
   provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
   throughput: z.number().optional().describe('Throughput in MiBps for gp3'),
 })
@@ -16,12 +16,27 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
 
   if (storageType === 'io2') {
     // Validation rules for io2
-    if (provisionedIOPS < 100 || provisionedIOPS > 256000) {
+    const maxIOPS = Math.min(1000 * totalSize, 256000)
+    if (provisionedIOPS < 100) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Provisioned IOPS must be between 100 and 256,000 for io2.',
+        message: 'Provisioned IOPS must be at least 100 for io2.',
         path: ['provisionedIOPS'],
       })
+    } else if (provisionedIOPS > maxIOPS) {
+      if (totalSize >= 8) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Provisioned IOPS must be at most ${maxIOPS} for io2.`,
+          path: ['provisionedIOPS'],
+        })
+      } else {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Invalid IOPS value due to invalid disk size`,
+          path: ['provisionedIOPS'],
+        })
+      }
     }
     if (throughput !== undefined) {
       ctx.addIssue({
@@ -32,27 +47,35 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
     }
   } else if (storageType === 'gp3') {
     // Validation rules for gp3
-    if (provisionedIOPS < 3000 || provisionedIOPS > 16000) {
+    const maxIOPS = Math.min(500 * totalSize, 16000)
+    const maxThroughput = Math.min(0.25 * provisionedIOPS, 1000)
+
+    if (provisionedIOPS < 3000) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Provisioned IOPS must be between 3000 and 16000 for gp3.',
+        message: `Provisioned IOPS must be at least 3000 for gp3.`,
         path: ['provisionedIOPS'],
       })
+    } else if (provisionedIOPS > maxIOPS) {
+      if (totalSize >= 8) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Provisioned IOPS must be at most ${maxIOPS} for gp3.`,
+          path: ['provisionedIOPS'],
+        })
+      } else {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Invalid IOPS value due to invalid disk size`,
+          path: ['provisionedIOPS'],
+        })
+      }
     }
-    if (totalSize < 400 && throughput !== 125) {
+
+    if (throughput !== undefined && (throughput < 125 || throughput > maxThroughput)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Throughput must be 125 MiBps for allocated storage less than 400 GiB for gp3.',
-        path: ['throughput'],
-      })
-    } else if (
-      totalSize >= 400 &&
-      throughput !== undefined &&
-      (throughput < 125 || throughput > 1000)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Throughput must be set between 125 and 1000 MiBps.',
+        message: `Throughput must be set between 125 and ${maxThroughput} MiBps.`,
         path: ['throughput'],
       })
     }

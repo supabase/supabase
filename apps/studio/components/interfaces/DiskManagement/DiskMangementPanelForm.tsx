@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { RotateCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
@@ -51,18 +52,42 @@ export function DiskMangementPanelForm() {
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
 
-  const [loading, setLoading] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [remainingTime, setRemainingTime] = useState(0)
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
-  const { data } = useDiskAttributesQuery({ projectRef })
+  const { data, isSuccess } = useDiskAttributesQuery(
+    { projectRef },
+    {
+      refetchInterval,
+      refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        if (!('requested_modification' in data)) {
+          if (refetchInterval !== false) {
+            toast.success('Disk configuration changes have been successfully applied!')
+          }
+          // @ts-ignore
+          const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
+          setRefetchInterval(false)
+          form.reset({
+            storageType: type,
+            provisionedIOPS: iops,
+            throughput: throughput_mbps,
+            totalSize: size_gb,
+          })
+        }
+      },
+    }
+  )
   // @ts-ignore [Joshen TODO] check whats happening here
   const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
+  const isRequestingChanges = data?.requested_modification !== undefined
 
-  const { remainingDuration: initialRemainingTime } = useRemainingDurationForDiskAttributeUpdate({
-    projectRef,
-  })
-  const isWithinCooldown = remainingTime > 0
+  const { remainingDuration: initialRemainingTime, isWithinCooldownWindow } =
+    useRemainingDurationForDiskAttributeUpdate({
+      projectRef,
+    })
+  const disableInput = isRequestingChanges || isWithinCooldownWindow
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const planId = subscription?.plan.id ?? ''
@@ -78,20 +103,25 @@ export function DiskMangementPanelForm() {
   const { mutate: updateDiskConfigurationRQ, isLoading: isUpdatingDiskConfiguration } =
     useUpdateDiskAttributesMutation({
       onSuccess: (_, vars) => {
+        toast.success(
+          'Successfully requested disk configuration changes! Your changes will be applied shortly'
+        )
         const { ref, ...formData } = vars
         setIsDialogOpen(false)
+        setRefetchInterval(3000)
         form.reset(formData as DiskStorageSchemaType)
       },
     })
 
+  const defaultValues = {
+    storageType: type,
+    provisionedIOPS: iops,
+    throughput: throughput_mbps,
+    totalSize: size_gb,
+  }
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(DiskStorageSchema),
-    defaultValues: {
-      storageType: type,
-      provisionedIOPS: iops,
-      throughput: throughput_mbps,
-      totalSize: size_gb,
-    },
+    defaultValues,
     mode: 'onBlur',
     reValidateMode: 'onChange',
   })
@@ -99,21 +129,20 @@ export function DiskMangementPanelForm() {
   const { watch, setValue, control, formState } = form
   const watchedStorageType = watch('storageType')
   const watchedTotalSize = watch('totalSize')
-  // Destructure dirtyFields from formState
-  const { dirtyFields } = formState
-  // Check if 'allocatedStorage' is dirty
-  const isAllocatedStorageDirty = !!dirtyFields.totalSize
+  const watchedIOPS = watch('provisionedIOPS')
+  const { dirtyFields } = formState // Destructure dirtyFields from formState
+  const isAllocatedStorageDirty = !!dirtyFields.totalSize // Check if 'allocatedStorage' is dirty
+
+  const maxIOPS =
+    watchedStorageType === 'gp3'
+      ? Math.min(500 * watchedTotalSize, 16000)
+      : Math.min(1000 * watchedTotalSize, 256000)
+  const maxThroughput =
+    watchedStorageType === 'gp3' ? Math.min(0.25 * watchedIOPS, 1000) : undefined
 
   const onSubmit = async (data: DiskStorageSchemaType) => {
-    console.log('data', data)
     if (projectRef === undefined) return console.error('Project ref is required')
-
-    setLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-    // updateDiskConfigurationRQ({ ref: projectRef, ...data })
-    form.reset(data)
-    setLoading(false)
-    setIsDialogOpen(false)
+    updateDiskConfigurationRQ({ ref: projectRef, ...data })
   }
 
   const diskSizePrice = calculateDiskSizePrice({
@@ -137,19 +166,20 @@ export function DiskMangementPanelForm() {
     oldThroughput: form.formState.defaultValues?.throughput || 0,
   })
 
+  useEffect(() => {
+    // Initialize field values properly when data has been loaded
+    if (isSuccess) form.reset(defaultValues)
+  }, [isSuccess])
+
   // Watch storageType and allocatedStorage to adjust constraints dynamically
   useEffect(() => {
     if (watchedStorageType === 'io2') {
       setValue('throughput', undefined) // Throughput is not configurable for 'io2'
     } else if (watchedStorageType === 'gp3') {
-      if (watchedTotalSize < 400) {
-        setValue('throughput', 125) // Fixed throughput for allocated storage < 400 GiB
-      } else {
-        // Ensure throughput is within the allowed range if it's greater than or equal to 400 GiB
-        const currentThroughput = form.getValues('throughput')
-        if (!currentThroughput || currentThroughput < 125 || currentThroughput > 1000) {
-          setValue('throughput', 125) // Reset to default if undefined or out of bounds
-        }
+      // Ensure throughput is within the allowed range if it's greater than or equal to 400 GiB
+      const currentThroughput = form.getValues('throughput')
+      if (!currentThroughput || currentThroughput < 125 || currentThroughput > 1000) {
+        setValue('throughput', 125) // Reset to default if undefined or out of bounds
       }
     }
   }, [watchedStorageType, watchedTotalSize, setValue, form])
@@ -191,13 +221,13 @@ export function DiskMangementPanelForm() {
                             await form.trigger('provisionedIOPS')
                           }}
                           defaultValue={field.value}
-                          disabled={isWithinCooldown}
+                          disabled={disableInput}
                         >
                           <FormItem_Shadcn_ asChild>
                             <FormControl_Shadcn_>
                               <RadioGroupCardItem
                                 className="grow p-3 px-5"
-                                disabled={isWithinCooldown}
+                                disabled={disableInput}
                                 value="gp3"
                                 showIndicator={false}
                                 // @ts-ignore
@@ -226,7 +256,7 @@ export function DiskMangementPanelForm() {
                             <FormControl_Shadcn_>
                               <RadioGroupCardItem
                                 className="grow p-3 px-5"
-                                disabled={isWithinCooldown}
+                                disabled={disableInput}
                                 value="io2"
                                 showIndicator={false}
                                 // @ts-ignore
@@ -266,13 +296,15 @@ export function DiskMangementPanelForm() {
                       description={
                         watchedStorageType === 'io2' ? (
                           <>
-                            For <code className="text-xs">io2</code> storage type, 3000 IOPS and the
-                            maximum value is 16,000 IOPS.
+                            For <code className="text-xs">io2</code> storage type, IOPS must be{' '}
+                            {watchedTotalSize >= 8 ? `between 100 and ${maxIOPS}.` : `at least 100`}
                           </>
                         ) : (
                           <>
-                            For <code className="text-xs">gp3</code> storage type, 100 IOPS and the
-                            maximum value is 256,000 IOPS.
+                            For <code className="text-xs">gp3</code> storage type, IOPS must be{' '}
+                            {watchedTotalSize >= 8
+                              ? `between 3,000 and ${maxIOPS.toLocaleString()}.`
+                              : `at least 3,000`}
                           </>
                         )
                       }
@@ -286,7 +318,7 @@ export function DiskMangementPanelForm() {
                               type="number"
                               className="flex-grow font-mono rounded-r-none max-w-32"
                               {...field}
-                              disabled={isWithinCooldown}
+                              disabled={disableInput}
                               onChange={(e) => {
                                 setValue('provisionedIOPS', e.target.valueAsNumber, {
                                   shouldDirty: true,
@@ -330,7 +362,10 @@ export function DiskMangementPanelForm() {
                             label="Throughput (MiBps)"
                             layout="horizontal"
                             description={
-                              'Throughput can only be configured when Disk size is greater than 400 GiB.'
+                              <>
+                                For <code className="text-xs">gp3</code> storage type, throughput
+                                must be between 125 and {maxThroughput} MiBps
+                              </>
                             }
                           >
                             <div className="flex gap-3 items-center">
@@ -346,11 +381,7 @@ export function DiskMangementPanelForm() {
                                       })
                                     }}
                                     className="flex-grow font-mono rounded-r-none max-w-32"
-                                    disabled={
-                                      isWithinCooldown ||
-                                      watchedStorageType === 'io2' ||
-                                      watchedTotalSize < 400
-                                    }
+                                    disabled={disableInput || watchedStorageType === 'io2'}
                                   />
                                 </FormControl_Shadcn_>
                                 <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
@@ -390,6 +421,7 @@ export function DiskMangementPanelForm() {
                               type="number"
                               step="1"
                               {...field}
+                              disabled={disableInput}
                               className="flex-grow font-mono rounded-r-none"
                               onWheel={(e) => e.currentTarget.blur()}
                               onChange={(e) => {
@@ -408,7 +440,7 @@ export function DiskMangementPanelForm() {
                         <AnimatePresence initial={false}>
                           {isAllocatedStorageDirty && (
                             <motion.div
-                              key="throughPut"
+                              key="reset-disksize"
                               initial={{ opacity: 0, scale: 0.95, x: -2 }}
                               animate={{ opacity: 1, scale: 1, x: 0 }}
                               exit={{ opacity: 0, scale: 0.95, x: -2 }}
@@ -419,9 +451,8 @@ export function DiskMangementPanelForm() {
                                 htmlType="button"
                                 type="default"
                                 size="small"
-                                onClick={() => {
-                                  form.resetField('totalSize')
-                                }}
+                                className="px-2"
+                                onClick={() => form.resetField('totalSize')}
                               >
                                 <RotateCcw className="h-4 w-4" aria-hidden="true" />
                               </Button>
@@ -438,8 +469,8 @@ export function DiskMangementPanelForm() {
                             diskSizePrice.oldPrice !== diskSizePrice.newPrice
                           }
                         />
-                        <div className="text-xs text-foreground-light mt-2">
-                          Your plan includes {includedDiskGB}GB of storage.
+                        <div className="text-xs text-foreground-light">
+                          Your plan includes {includedDiskGB}GB of disk size.
                         </div>
                       </div>
                     </FormItemLayout>
@@ -476,7 +507,22 @@ export function DiskMangementPanelForm() {
               </CardContent>
             </Card>
 
-            <DiskCountdownRadial remainingTime={remainingTime} />
+            {isRequestingChanges ? (
+              <Card className="px-2 rounded-none">
+                <CardContent className="py-3 flex gap-3 px-3 items-center">
+                  <div className="flex flex-col">
+                    <p className="text-foreground-lighter text-sm p-0">
+                      Disk configuration changes have been requested
+                    </p>
+                    <p className="text-sm">
+                      The requested changes will be applied to your disk shortly
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <DiskCountdownRadial remainingTime={remainingTime} />
+            )}
             <DiskManagementPlanUpgradeRequired />
 
             <Card className="bg-surface-100 rounded-t-none">
@@ -494,9 +540,9 @@ export function DiskMangementPanelForm() {
                     onSubmit={onSubmit}
                     isDialogOpen={isDialogOpen}
                     setIsDialogOpen={setIsDialogOpen}
-                    isWithinCooldown={isWithinCooldown}
+                    isWithinCooldown={disableInput}
                     form={form}
-                    loading={loading}
+                    loading={isUpdatingDiskConfiguration}
                     diskSizePrice={diskSizePrice}
                     iopsPrice={iopsPrice}
                     throughputPrice={throughputPrice}

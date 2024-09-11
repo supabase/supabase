@@ -8,15 +8,13 @@ interface CountdownTimerRadialProps {
 const chartConfig = {
   timeRemaining: {
     label: 'timeRemaining',
-    color: 'hsl(var(--chart-1))',
+    color: 'hsl(var(--warning-default))',
   },
   hand: {
     label: 'hand',
-    color: 'hsl(var(--chart-1))',
+    color: 'hsl(var(--warning-default))',
   },
 } satisfies ChartConfig
-
-// [Joshen TODO] This should be under UI instead, as its not DiskManagement specific
 
 const CountdownTimerRadial = ({ progress }: CountdownTimerRadialProps) => {
   return (

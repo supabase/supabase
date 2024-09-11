@@ -13,8 +13,12 @@ import { DatabaseConnectionString } from 'components/interfaces/Settings/Databas
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfiguration'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
+import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const ProjectSettings: NextPageWithLayout = () => {
+  const diskManagementV2 = useFlag('diskManagementV2')
+
   return (
     <>
       <ScaffoldContainer>
@@ -32,8 +36,7 @@ const ProjectSettings: NextPageWithLayout = () => {
           </div>
 
           <SSLConfiguration />
-          <DiskMangementPanelForm />
-          {/* <DiskSizeConfiguration /> */}
+          {diskManagementV2 ? <DiskMangementPanelForm /> : <DiskSizeConfiguration />}
           <NetworkRestrictions />
           <BannedIPs />
         </div>

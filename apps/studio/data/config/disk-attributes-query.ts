@@ -51,7 +51,8 @@ export const useRemainingDurationForDiskAttributeUpdate = ({
   projectRef?: string
 }) => {
   const { data } = useDiskAttributesQuery({ projectRef })
-  const lastModifiedAtString = '2024-09-10 10:00:00.030161' // data?.last_modified_at !== undefined ? dayjs(data.last_modified_at).utc() : undefined
+
+  const lastModifiedAtString = dayjs(data?.last_modified_at ?? '').utc()
   const secondsFromNow = Math.max(
     0,
     dayjs().utc().diff(dayjs(lastModifiedAtString).utc(), 'second')
@@ -62,6 +63,9 @@ export const useRemainingDurationForDiskAttributeUpdate = ({
       ? 0
       : COOLDOWN_DURATION - secondsFromNow
   }, [lastModifiedAtString])
+
+  if (data?.last_modified_at === undefined)
+    return { remainingDuration: 0, isWithinCooldownWindow: false }
 
   return { remainingDuration, isWithinCooldownWindow: remainingDuration > 0 }
 }

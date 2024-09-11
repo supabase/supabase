@@ -2,24 +2,34 @@ import { AnimatePresence, motion } from 'framer-motion'
 import MotionNumber from 'motion-number'
 import { useState } from 'react'
 
-import { badgeVariants, cn } from 'ui'
+import {
+  badgeVariants,
+  cn,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
+
+interface DiskSpaceBarProps {
+  showNewBar: boolean
+  totalSize: number
+  usedSize: number
+  newTotalSize: number
+}
 
 export default function DiskSpaceBar({
   showNewBar,
   totalSize,
   usedSize,
   newTotalSize,
-}: {
-  showNewBar: boolean
-  totalSize: number
-  usedSize: number
-  newTotalSize: number
-}) {
+}: DiskSpaceBarProps) {
   //   const [totalSize, setTotalSize] = useState<number>(8) // 8 GB total disk size
   //   const [usedSize, setUsedSize] = useState<number>(4) // Starting with 4 GB used (50% usage)
   const [resizeThreshold, setResizeThreshold] = useState<number>(0.5) // 500 MB threshold for resize
 
-  const freeSize = totalSize - usedSize
   const usedPercentage = (usedSize / totalSize) * 100
   const resizePoint = totalSize - resizeThreshold
   const resizePercentage = (resizePoint / totalSize) * 100
@@ -49,8 +59,8 @@ export default function DiskSpaceBar({
       <div className="relative">
         <div
           className={cn(
-            'h-[34px] relative border rounded-sm w-full',
-            showNewBar ? 'bg-[hsl(var(--chart-1))]' : 'bg-surface-300'
+            'h-[34px] relative border rounded-sm w-full transition',
+            showNewBar ? 'bg-selection border border-brand-button' : 'bg-surface-300'
           )}
         >
           <AnimatePresence>
@@ -130,10 +140,7 @@ export default function DiskSpaceBar({
                   duration: 0.12,
                   delay: 0.12,
                 }}
-                className={cn(
-                  badgeVariants({ variant: 'default' }),
-                  'absolute right-2 top-1 bg-alternative bg-opacity-100 text-background bg-[hsl(var(--chart-1))]'
-                )}
+                className={cn(badgeVariants({ variant: 'success' }), 'absolute right-1 top-[5px]')}
               >
                 New disk size
               </motion.span>
@@ -154,11 +161,25 @@ export default function DiskSpaceBar({
                 className="absolute top-0 -left-0 h-full flex items-center transition-all duration-500 ease-in-out"
                 style={{ left: `${showNewBar ? newResizePercentage : resizePercentage}%` }}
               >
-                <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded text-xs text-foreground-light whitespace-nowrap">
-                  {/* Resize point: {(showNewBar ? newResizePoint : resizePoint).toFixed(2)} GB */}
-                  Autoscaling
-                </div>
-                <div className="w-px h-full bg-border"></div>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded text-xs text-foreground-light whitespace-nowrap">
+                      Autoscaling
+                    </div>
+                  </TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ side="bottom" className="w-[310px] flex flex-col gap-y-1">
+                    <p>
+                      Supabase expands your disk storage automatically when the database reached 90%
+                      of the disk size. However, auto-scaling can only take place once every 6
+                      hours.
+                    </p>
+                    <p>
+                      If within those 6 hours you reach 95% of the disk space, your project{' '}
+                      <span className="text-destructive-600">will enter read-only mode.</span>
+                    </p>
+                  </TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
+                <div className="w-px h-full bg-border" />
               </div>
             </motion.div>
           )}
@@ -166,11 +187,11 @@ export default function DiskSpaceBar({
       </div>
       <div className="flex items-center space-x-4 text-xs text-foreground-lighter">
         <div className="flex items-center">
-          <div className="w-2 h-2 rounded-full bg-foreground mr-2"></div>
+          <div className="w-2 h-2 rounded-full bg-foreground mr-2" />
           <span>Used Space</span>
         </div>
         <div className="flex items-center">
-          <div className="w-2 h-2 rounded-full bg-border border border-strong mr-2"></div>
+          <div className="w-2 h-2 rounded-full bg-border border border-strong mr-2" />
           <span>Available space</span>
         </div>
       </div>

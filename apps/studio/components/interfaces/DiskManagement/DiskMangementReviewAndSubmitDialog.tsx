@@ -1,5 +1,7 @@
 import { ChevronRight } from 'lucide-react'
+import { UseFormReturn } from 'react-hook-form'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Badge,
   Button,
@@ -20,14 +22,14 @@ import {
   TableRow,
 } from 'ui'
 import BillingChangeBadge from './BillingChangeBadge'
+import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskMangementCoolDownSection } from './DiskMangementCoolDownSection'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 const TableHeaderRow = () => (
   <TableRow>
-    <TableHead className="w-[128px] pl-5">Disk attribute</TableHead>
+    <TableHead className="w-[140px] pl-5">Disk attribute</TableHead>
     <TableHead className="text-right">-</TableHead>
-    <TableHead>Unit</TableHead>
+    <TableHead className="w-[100px]">Unit</TableHead>
     <TableHead className="text-right pr-5">Price Change</TableHead>
   </TableRow>
 )
@@ -39,6 +41,7 @@ interface TableDataRowProps {
   unit: string
   beforePrice: number
   afterPrice: number
+  hidePrice?: boolean
 }
 
 const TableDataRow = ({
@@ -48,6 +51,7 @@ const TableDataRow = ({
   unit,
   beforePrice,
   afterPrice,
+  hidePrice = false,
 }: TableDataRowProps) => (
   <TableRow>
     <TableCell className="pl-5">
@@ -73,7 +77,9 @@ const TableDataRow = ({
     </TableCell>
     <TableCell className="text-xs font-mono">{unit}</TableCell>
     <TableCell className="text-right pr-5">
-      {beforePrice !== afterPrice ? (
+      {hidePrice ? (
+        <span className="text-xs font-mono">-</span>
+      ) : beforePrice !== afterPrice ? (
         <BillingChangeBadge show={true} beforePrice={beforePrice} afterPrice={afterPrice} />
       ) : (
         <span className="text-xs font-mono">${beforePrice}</span>
@@ -83,15 +89,15 @@ const TableDataRow = ({
 )
 
 interface DiskSizeMeterProps {
-  isDialogOpen: boolean
-  setIsDialogOpen: (isOpen: boolean) => void
-  isWithinCooldown: boolean
-  form: any // Replace 'any' with the actual type of your form
   loading: boolean
-  onSubmit: (values: any) => Promise<void> // Replace 'any' with the actual type of form values
+  form: UseFormReturn<DiskStorageSchemaType>
   iopsPrice: { oldPrice: string; newPrice: string }
   throughputPrice: { oldPrice: string; newPrice: string }
   diskSizePrice: { oldPrice: string; newPrice: string }
+  isDialogOpen: boolean
+  isWithinCooldown: boolean
+  setIsDialogOpen: (isOpen: boolean) => void
+  onSubmit: (values: DiskStorageSchemaType) => Promise<void>
 }
 
 export const DiskManagementReviewAndSubmitDialog = ({
@@ -105,7 +111,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
   throughputPrice,
   diskSizePrice,
 }: DiskSizeMeterProps) => {
-  const isDirty = Object.keys(form.formState.dirtyFields)
+  const isDirty = Object.keys(form.formState.dirtyFields).length > 0
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -122,7 +128,9 @@ export const DiskManagementReviewAndSubmitDialog = ({
           tooltip={{
             content: {
               side: 'bottom',
-              text: 'Currently within cooldown period from previous disk change',
+              text: isWithinCooldown
+                ? 'Currently within cooldown period from previous disk change'
+                : undefined,
             },
           }}
         >
@@ -139,14 +147,22 @@ export const DiskManagementReviewAndSubmitDialog = ({
         <DialogSectionSeparator />
 
         <Table>
-          <TableCaption>Please take note of the above billing changes</TableCaption>
           <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:pb-2 [&_th]:pt-4">
             <TableHeaderRow />
           </TableHeader>
           <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
             <TableDataRow
+              hidePrice
+              attribute="Storage Type"
+              defaultValue={form.formState.defaultValues?.storageType ?? ''}
+              newValue={form.getValues('storageType')}
+              unit="-"
+              beforePrice={0}
+              afterPrice={0}
+            />
+            <TableDataRow
               attribute="Disk size"
-              defaultValue={form.formState.defaultValues?.totalSize}
+              defaultValue={form.formState.defaultValues?.totalSize ?? 0}
               newValue={form.getValues('totalSize')}
               unit="GiB"
               beforePrice={Number(diskSizePrice.oldPrice)}
@@ -154,21 +170,37 @@ export const DiskManagementReviewAndSubmitDialog = ({
             />
             <TableDataRow
               attribute="IOPS"
-              defaultValue={form.formState.defaultValues?.provisionedIOPS}
+              defaultValue={form.formState.defaultValues?.provisionedIOPS ?? 0}
               newValue={form.getValues('provisionedIOPS')}
               unit="IOPS"
               beforePrice={Number(iopsPrice.oldPrice)}
               afterPrice={Number(iopsPrice.newPrice)}
             />
-            <TableDataRow
-              attribute="Throughput"
-              defaultValue={form.formState.defaultValues?.throughput}
-              newValue={form.getValues('throughput')}
-              unit="MiBps"
-              beforePrice={Number(throughputPrice.oldPrice)}
-              afterPrice={Number(throughputPrice.newPrice)}
-            />
+            {form.getValues('storageType') === 'gp3' ? (
+              <TableDataRow
+                attribute="Throughput"
+                defaultValue={form.formState.defaultValues?.throughput ?? 0}
+                newValue={form.getValues('throughput') ?? 0}
+                unit="MiBps"
+                beforePrice={Number(throughputPrice.oldPrice)}
+                afterPrice={Number(throughputPrice.newPrice)}
+              />
+            ) : (
+              <TableRow>
+                <TableCell className="pl-5">
+                  <div className="flex flex-row gap-2 items-center">
+                    <span>Throughput</span>
+                  </div>
+                </TableCell>
+                <TableCell colSpan={3}>
+                  <p className="text-foreground-lighter text-xs text-center">
+                    Throughput is not configurable for io2 storage type
+                  </p>
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
+          <TableCaption>Please take note of the above billing changes</TableCaption>
         </Table>
 
         <DialogSectionSeparator />
@@ -189,7 +221,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
               await onSubmit(form.getValues())
             }}
           >
-            Review changes
+            Confirm changes
           </Button>
         </DialogFooter>
       </DialogContent>

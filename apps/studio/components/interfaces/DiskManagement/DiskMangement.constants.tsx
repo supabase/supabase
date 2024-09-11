@@ -43,12 +43,11 @@ type PlanType = 'free' | 'pro' | 'team' | 'enterprise'
 
 interface PlanDetails {
   includedDiskGB: number
-  includedDiskPricePerMonth: number
 }
 
 export const PLAN_DETAILS: Record<PlanType, PlanDetails> = {
-  free: { includedDiskGB: 1, includedDiskPricePerMonth: 0 },
-  pro: { includedDiskGB: 8, includedDiskPricePerMonth: 5 },
-  team: { includedDiskGB: 16, includedDiskPricePerMonth: 10 },
-  enterprise: { includedDiskGB: 32, includedDiskPricePerMonth: 20 },
+  free: { includedDiskGB: 1 },
+  pro: { includedDiskGB: 8 },
+  team: { includedDiskGB: 8 },
+  enterprise: { includedDiskGB: 8 },
 }
