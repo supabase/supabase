@@ -169,7 +169,7 @@ const CustomerCard: React.FC<CustomerCardProps> = ({
   const showLogo = !showLogoInverse && customer.logo
 
   const LogoComponent = ({ logoImage, className }: { logoImage: string; className?: string }) => (
-    <div className="relative box-content">
+    <div className="relative box-content opacity-50 group-hover:opacity-75 transition-opacity">
       <div className="relative h-[33px] w-auto max-w-[145px]">
         <Image
           src={logoImage}
@@ -196,7 +196,7 @@ const CustomerCard: React.FC<CustomerCardProps> = ({
             alt={customer.organization}
             width={300}
             height={150}
-            className="w-full opacity-60 max-w-[140px] filter dark:invert"
+            className="w-full opacity-50 group-hover/panel:opacity-75 transition-opacity max-w-[140px] filter dark:invert"
           />
         </Panel>
       )
@@ -217,13 +217,10 @@ const CustomerCard: React.FC<CustomerCardProps> = ({
           innerClassName="h-full p-8 flex flex-col gap-6 justify-between"
           {...rest}
         >
-          <div className="not-sr-only absolute top-8 right-8">
-            <ArrowRight className="-rotate-45 stroke-1 -translate-x-1 translate-y-1 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0" />
-          </div>
-          {showLogoInverse && (
-            <LogoComponent logoImage={customer.logo_inverse!} className="opacity-50" />
-          )}
-          {showLogo && <LogoComponent logoImage={customer.logo} className="opacity-75" />}
+          <ArrowRight className="not-sr-only absolute top-8 right-8 -rotate-45 stroke-1 -translate-x-1 translate-y-1 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0" />
+
+          {showLogoInverse && <LogoComponent logoImage={customer.logo_inverse!} />}
+          {showLogo && <LogoComponent logoImage={customer.logo} />}
 
           <p className="text-base text-foreground-lighter">{customer.title}</p>
           {children && <span className="text-sm text-foreground-light flex-grow">{children}</span>}
