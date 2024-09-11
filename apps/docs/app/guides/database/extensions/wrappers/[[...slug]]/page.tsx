@@ -1,5 +1,7 @@
 import matter from 'gray-matter'
-import { type Heading } from 'mdast'
+import { type Heading, type Node } from 'mdast'
+import { gfm } from 'micromark-extension-gfm'
+import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
@@ -7,6 +9,7 @@ import { readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
+import { visit } from 'unist-util-visit'
 
 import { genGuideMeta, genGuidesStaticParams } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
@@ -16,7 +19,6 @@ import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLin
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-import remarkGfm from 'remark-gfm'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -185,21 +187,36 @@ const getContent = async (params: Params) => {
 
     const { content: contentWithoutFrontmatter } = matter(rawContent)
 
-    // This is the more robust way of doing it, but problems with the rewritten
-    // Markdown and handling of tables this way, so saving it for later.
-    //
-    // const mdxTree = fromMarkdown(contentWithoutFrontmatter)
-    // const maybeH1 = mdxTree.children[0]
-    // if (maybeH1 && maybeH1.type === 'heading' && (maybeH1 as Heading).depth === 1) {
-    //   mdxTree.children.shift()
-    // }
-    // content = toMarkdown(mdxTree)
+    const mdxTree = fromMarkdown(contentWithoutFrontmatter, 'utf-8', {
+      extensions: [gfm()],
+      mdastExtensions: [gfmFromMarkdown()],
+    })
 
-    content = contentWithoutFrontmatter
-    if (meta.title) {
-      const h1Regex = new RegExp(`(?:^|\n)# ${meta.title}\n+`)
-      content = content.replace(h1Regex, '')
+    // Remove redundant headings
+    const maybeH1 = mdxTree.children[0]
+    if (maybeH1 && maybeH1.type === 'heading' && (maybeH1 as Heading).depth === 1) {
+      mdxTree.children.shift()
     }
+
+    // MDX should not be used in any of these files (they also need to be
+    // mkdocs-compatible) to literally display any angle brackets surrounding
+    // capitalized words.
+    visit(
+      mdxTree,
+      (node: Node) =>
+        node.children?.some((child) => child.type === 'html' && child.value.match(/^<[A-Z]/)),
+      (node: Node) => {
+        node.children.forEach((child: Node) => {
+          if (child.type === 'html' && child.value.match(/^<[A-Z]/)) {
+            child.type = 'text'
+          }
+        })
+      }
+    )
+
+    content = toMarkdown(mdxTree, {
+      extensions: [gfmToMarkdown()],
+    })
   }
 
   return {

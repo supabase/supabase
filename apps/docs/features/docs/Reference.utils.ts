@@ -1,3 +1,4 @@
+import { type Text } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
@@ -175,7 +176,7 @@ export function normalizeMarkdown(markdownUnescaped: string): string {
     mdastExtensions: [mdxFromMarkdown()],
   })
 
-  visit(mdxTree, 'text', (node) => {
+  visit(mdxTree, 'text', (node: Text) => {
     node.value = node.value.replace(/\n/g, ' ')
   })
 
