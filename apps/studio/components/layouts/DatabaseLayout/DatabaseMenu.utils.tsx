@@ -119,6 +119,12 @@ export const generateDatabaseMenu = (
               },
             ]
           : []),
+        {
+          name: 'Crons',
+          key: 'crons',
+          url: `/project/${ref}/database/crons`,
+          items: [],
+        },
       ],
     },
     {
