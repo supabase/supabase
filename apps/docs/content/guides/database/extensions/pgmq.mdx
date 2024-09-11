@@ -6,7 +6,6 @@ description: 'pgmq: Managed queues in Postgres'
 
 pgmq is a lightweight message queue built on Postgres.
 
-
 ## Features
 
 - Lightweight - No background worker or external dependencies, just Postgres functions packaged in an extension
@@ -14,7 +13,6 @@ pgmq is a lightweight message queue built on Postgres.
 - API parity with AWS SQS and RSMQ
 - Messages stay in the queue until explicitly removed
 - Messages can be archived, instead of deleted, for long-term retention and replayability
-
 
 ## Enable the extension
 
@@ -43,11 +41,11 @@ returns setof bigint
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
-| msg   | jsonb        | The message to send to the queue      |
-| delay   | integer        | Time in seconds before the message becomes visible. Defaults to 0.      |
+| Parameter  | Type    | Description                                                        |
+| :--------- | :------ | :----------------------------------------------------------------- |
+| queue_name | text    | The name of the queue                                              |
+| msg        | jsonb   | The message to send to the queue                                   |
+| delay      | integer | Time in seconds before the message becomes visible. Defaults to 0. |
 
 Example:
 
@@ -74,13 +72,14 @@ pgmq.send_batch(
 )
 returns setof bigint
 ```
+
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
-| msgs   | jsonb[]       | Array of messages to send to the queue      |
-| delay   | integer        | Time in seconds before the messages becomes visible. Defaults to 0.      |
+| Parameter  | Type    | Description                                                         |
+| :--------- | :------ | :------------------------------------------------------------------ |
+| queue_name | text    | The name of the queue                                               |
+| msgs       | jsonb[] | Array of messages to send to the queue                              |
+| delay      | integer | Time in seconds before the messages becomes visible. Defaults to 0. |
 
 {/* prettier-ignore */}
 ```sql
@@ -118,11 +117,11 @@ returns setof pgmq.message_record
 
 **Parameters:**
 
-| Parameter   | Type     | Description |
-| :---        |  :----   |  :--- |
-| queue_name  | text     | The name of the queue   |
-| vt          | integer  | Time in seconds that the message become invisible after reading |
-| qty         | integer  | The number of messages to read from the queue. Defaults to 1 |
+| Parameter  | Type    | Description                                                     |
+| :--------- | :------ | :-------------------------------------------------------------- |
+| queue_name | text    | The name of the queue                                           |
+| vt         | integer | Time in seconds that the message become invisible after reading |
+| qty        | integer | The number of messages to read from the queue. Defaults to 1    |
 
 Example:
 
@@ -141,8 +140,8 @@ select * from pgmq.read('my_queue', 10, 2);
 #### read_with_poll
 
 Same as read(). Also provides convenient long-poll functionality.
- When there are no messages in the queue, the function call will wait for `max_poll_seconds` in duration before returning.
- If messages reach the queue during that duration, they will be read and returned immediately.
+When there are no messages in the queue, the function call will wait for `max_poll_seconds` in duration before returning.
+If messages reach the queue during that duration, they will be read and returned immediately.
 
 {/* prettier-ignore */}
 ```sql
@@ -158,13 +157,13 @@ returns setof pgmq.message_record
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
-| vt   | integer       | Time in seconds that the message become invisible after reading.      |
-| qty   | integer        | The number of messages to read from the queue. Defaults to 1.      |
-| max_poll_seconds   | integer        | Time in seconds to wait for new messages to reach the queue. Defaults to 5.      |
-| poll_interval_ms   | integer        | Milliseconds between the internal poll operations. Defaults to 100.      |
+| Parameter        | Type    | Description                                                                 |
+| :--------------- | :------ | :-------------------------------------------------------------------------- |
+| queue_name       | text    | The name of the queue                                                       |
+| vt               | integer | Time in seconds that the message become invisible after reading.            |
+| qty              | integer | The number of messages to read from the queue. Defaults to 1.               |
+| max_poll_seconds | integer | Time in seconds to wait for new messages to reach the queue. Defaults to 5. |
+| poll_interval_ms | integer | Milliseconds between the internal poll operations. Defaults to 100.         |
 
 Example:
 
@@ -192,9 +191,9 @@ returns setof pgmq.message_record
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
 
 Example:
 
@@ -222,10 +221,10 @@ returns boolean
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
-| msg_id      | bigint       | Message ID of the message to delete   |
+| Parameter  | Type   | Description                         |
+| :--------- | :----- | :---------------------------------- |
+| queue_name | text   | The name of the queue               |
+| msg_id     | bigint | Message ID of the message to delete |
 
 Example:
 
@@ -251,10 +250,10 @@ returns setof bigint
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
-| msg_ids      | bigint[]       | Array of message IDs to delete   |
+| Parameter  | Type     | Description                    |
+| :--------- | :------- | :----------------------------- |
+| queue_name | text     | The name of the queue          |
+| msg_ids    | bigint[] | Array of message IDs to delete |
 
 Examples:
 
@@ -273,7 +272,7 @@ Delete two messages, one that exists and one that does not. Message `999` does n
 
 ```sql
 select * from pgmq.delete('my_queue', array[6, 999]);
- delete 
+ delete
 --------
       6
 ```
@@ -291,9 +290,9 @@ returns bigint
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
 
 Example:
 
@@ -321,16 +320,16 @@ returns boolean
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
-| msg_id      | bigint       | Message ID of the message to archive   |
+| Parameter  | Type   | Description                          |
+| :--------- | :----- | :----------------------------------- |
+| queue_name | text   | The name of the queue                |
+| msg_id     | bigint | Message ID of the message to archive |
 
 Returns
 Boolean value indicating success or failure of the operation.
 
 Example; remove message with ID 1 from queue `my_queue` and archive it:
- 
+
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.archive('my_queue', 1);
@@ -344,7 +343,7 @@ select * from pgmq.archive('my_queue', 1);
 #### archive (batch)
 
 Deletes a batch of requested messages from the specified queue and inserts them into the queue's archive.
- Returns an array of message ids that were successfully archived.
+Returns an array of message ids that were successfully archived.
 
 ```text
 pgmq.archive(queue_name text, msg_ids bigint[])
@@ -353,10 +352,10 @@ RETURNS SETOF bigint
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
-| msg_ids      | bigint[]       | Array of message IDs to archive   |
+| Parameter  | Type     | Description                     |
+| :--------- | :------- | :------------------------------ |
+| queue_name | text     | The name of the queue           |
+| msg_ids    | bigint[] | Array of message IDs to archive |
 
 Examples:
 
@@ -397,9 +396,9 @@ returns void
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
 
 Example:
 
@@ -428,11 +427,11 @@ returns void
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
-| partition_interval      | text       | The name of the queue   |
-| retention_interval      | text       | The name of the queue   |
+| Parameter          | Type | Description           |
+| :----------------- | :--- | :-------------------- |
+| queue_name         | text | The name of the queue |
+| partition_interval | text | The name of the queue |
+| retention_interval | text | The name of the queue |
 
 Example:
 
@@ -453,7 +452,7 @@ select * from pgmq.create_partitioned(
 
 #### create_unlogged
 
-Creates an unlogged table. This is useful when write throughput is more important that durability. 
+Creates an unlogged table. This is useful when write throughput is more important that durability.
 See Postgres documentation for [unlogged tables](https://www.postgresql.org/docs/current/sql-createtable.html#SQL-CREATETABLE-UNLOGGED) for more information.
 
 {/* prettier-ignore */}
@@ -464,9 +463,9 @@ returns void
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
 
 Example:
 
@@ -482,7 +481,7 @@ select pgmq.create_unlogged('my_unlogged');
 #### detach_archive
 
 Drop the queue's archive table as a member of the PGMQ extension. Useful for preventing the queue's archive table from being drop when `drop extension pgmq` is executed.
- This does not prevent the further archives() from appending to the archive table.
+This does not prevent the further archives() from appending to the archive table.
 
 {/* prettier-ignore */}
 ```sql
@@ -491,9 +490,9 @@ pgmq.detach_archive(queue_name text)
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
 
 Example:
 
@@ -518,9 +517,9 @@ returns boolean
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name      | text       | The name of the queue   |
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
 
 Example:
 
@@ -550,11 +549,11 @@ returns pgmq.message_record
 
 **Parameters:**
 
-| Parameter      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name  | text         | The name of the queue   |
-| msg_id      | bigint       | ID of the message to set visibility time  |
-| vt_offset   | integer      | Duration from now, in seconds, that the message's VT should be set to   |
+| Parameter  | Type    | Description                                                           |
+| :--------- | :------ | :-------------------------------------------------------------------- |
+| queue_name | text    | The name of the queue                                                 |
+| msg_id     | bigint  | ID of the message to set visibility time                              |
+| vt_offset  | integer | Duration from now, in seconds, that the message's VT should be set to |
 
 Example:
 
@@ -562,7 +561,7 @@ Set the visibility timeout of message 1 to 30 seconds from now.
 
 ```sql
 select * from pgmq.set_vt('my_queue', 11, 30);
- msg_id | read_ct |          enqueued_at          |              vt               |       message        
+ msg_id | read_ct |          enqueued_at          |              vt               |       message
 --------+---------+-------------------------------+-------------------------------+----------------------
      1 |       0 | 2023-10-28 19:42:21.778741-05 | 2023-10-28 19:59:34.286462-05 | {"hello": "world_0"}
 ```
@@ -617,20 +616,20 @@ returns table(
 
 **Parameters:**
 
-| Parameter   | Type  | Description             |
-| :---        | :---- |                    :--- |
-| queue_name  | text  | The name of the queue   |
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
 
 **Returns:**
 
-| Attribute      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name  | text         | The name of the queue   |
-| queue_length      | bigint       | Number of messages currently in the queue  |
-| newest_msg_age_sec   | integer \| null     | Age of the newest message in the queue, in seconds   |
-| oldest_msg_age_sec   | integer \| null    | Age of the oldest message in the queue, in seconds   |
-| total_messages   | bigint      | Total number of messages that have passed through the queue over all time   |
-| scrape_time   | timestamp with time zone      | The current timestamp   |
+| Attribute          | Type                     | Description                                                               |
+| :----------------- | :----------------------- | :------------------------------------------------------------------------ |
+| queue_name         | text                     | The name of the queue                                                     |
+| queue_length       | bigint                   | Number of messages currently in the queue                                 |
+| newest_msg_age_sec | integer \| null          | Age of the newest message in the queue, in seconds                        |
+| oldest_msg_age_sec | integer \| null          | Age of the oldest message in the queue, in seconds                        |
+| total_messages     | bigint                   | Total number of messages that have passed through the queue over all time |
+| scrape_time        | timestamp with time zone | The current timestamp                                                     |
 
 Example:
 
@@ -662,14 +661,14 @@ RETURNS TABLE(
 
 **Returns:**
 
-| Attribute      | Type | Description     |
-| :---        |    :----   |          :--- |
-| queue_name  | text         | The name of the queue   |
-| queue_length      | bigint       | Number of messages currently in the queue  |
-| newest_msg_age_sec   | integer \| null     | Age of the newest message in the queue, in seconds   |
-| oldest_msg_age_sec   | integer \| null    | Age of the oldest message in the queue, in seconds   |
-| total_messages   | bigint      | Total number of messages that have passed through the queue over all time   |
-| scrape_time   | timestamp with time zone      | The current timestamp   |
+| Attribute          | Type                     | Description                                                               |
+| :----------------- | :----------------------- | :------------------------------------------------------------------------ |
+| queue_name         | text                     | The name of the queue                                                     |
+| queue_length       | bigint                   | Number of messages currently in the queue                                 |
+| newest_msg_age_sec | integer \| null          | Age of the newest message in the queue, in seconds                        |
+| oldest_msg_age_sec | integer \| null          | Age of the oldest message in the queue, in seconds                        |
+| total_messages     | bigint                   | Total number of messages that have passed through the queue over all time |
+| scrape_time        | timestamp with time zone | The current timestamp                                                     |
 
 {/* prettier-ignore */}
 ```sql
@@ -681,21 +680,19 @@ select * from pgmq.metrics_all();
  my_unlogged          |            1 |                  3 |                  3 |              1 | 2023-10-28 20:25:07.016413-05
 ```
 
-
 ### Types
 
 #### message_record
 
 The complete representation of a message in a queue.
 
-| Attribute Name   | Type       | Description                |
-| :---             |    :----   |                       :--- |
-| msg_id           | bigint     | Unique ID of the message   |
-| read_ct          | bigint     | Number of times the message has been read. Increments on read().   |
-| enqueued_at           |  timestamp with time zone     | time that the message was inserted into the queue   |
-| vt           | timestamp with time zone      | Timestamp when the message will become available for consumers to read   |
-| message           | jsonb      | The message payload   |
-
+| Attribute Name | Type                     | Description                                                            |
+| :------------- | :----------------------- | :--------------------------------------------------------------------- |
+| msg_id         | bigint                   | Unique ID of the message                                               |
+| read_ct        | bigint                   | Number of times the message has been read. Increments on read().       |
+| enqueued_at    | timestamp with time zone | time that the message was inserted into the queue                      |
+| vt             | timestamp with time zone | Timestamp when the message will become available for consumers to read |
+| message        | jsonb                    | The message payload                                                    |
 
 Example:
 
@@ -705,7 +702,6 @@ Example:
 --------+---------+-------------------------------+-------------------------------+--------------------
       1 |       1 | 2023-10-28 19:06:19.941509-05 | 2023-10-28 19:06:27.419392-05 | {"hello": "world"}
 ```
-
 
 ## Resources
 
