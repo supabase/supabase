@@ -15,9 +15,16 @@ import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfigu
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const diskManagementV2 = useFlag('diskManagementV2')
+  const selectedOrg = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
+
+  const showNewDiskManagementUI =
+    subscription?.usage_based_billing_project_addons && diskManagementV2
 
   return (
     <>
@@ -36,7 +43,7 @@ const ProjectSettings: NextPageWithLayout = () => {
           </div>
 
           <SSLConfiguration />
-          {diskManagementV2 ? <DiskMangementPanelForm /> : <DiskSizeConfiguration />}
+          {showNewDiskManagementUI ? <DiskMangementPanelForm /> : <DiskSizeConfiguration />}
           <NetworkRestrictions />
           <BannedIPs />
         </div>
