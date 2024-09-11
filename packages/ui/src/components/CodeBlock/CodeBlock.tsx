@@ -201,6 +201,7 @@ export const CodeBlock = ({
               e.preventDefault()
               return false
             }}
+            suppressContentEditableWarning={true}
           >
             {codeValue}
           </SyntaxHighlighter>
