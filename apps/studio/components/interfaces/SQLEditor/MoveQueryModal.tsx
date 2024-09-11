@@ -65,17 +65,23 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
   const { mutateAsync: createFolder, isLoading: isCreatingFolder } =
     useSQLSnippetFolderCreateMutation()
-  const {
-    mutate: moveSnippet,
-    mutateAsync: moveSnippetAsync,
-    isLoading: isMovingSnippet,
-  } = useContentUpsertV2Mutation({
+  const { mutateAsync: moveSnippetAsync, isLoading: isMovingSnippet } = useContentUpsertV2Mutation({
     onError: (error) => {
       toast.error(`Failed to move query: ${error.message}`)
     },
   })
 
-  const FormSchema = z.object({ name: z.string() })
+  const FormSchema = z
+    .object({ name: z.string().min(1, 'Please provide a name for the folder') })
+    .refine(
+      (data) => {
+        return !snapV2.allFolderNames.includes(data.name)
+      },
+      {
+        message: 'This folder name already exists',
+        path: ['name'],
+      }
+    )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
