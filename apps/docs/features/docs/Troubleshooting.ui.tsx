@@ -1,15 +1,18 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Wrench } from 'lucide-react'
+import Link from 'next/link'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { MDXRemoteBase } from './MdxBase'
 import { type ITroubleshootingEntry, getArticleSlug } from './Troubleshooting.utils'
-import { TroubleshootingEntryAssociatedErrors } from './Troubleshooting.ui.client'
+import {
+  TroubleshootingEntryAssociatedErrors,
+  TroubleshootingFilter,
+} from './Troubleshooting.ui.client'
 import {
   TROUBLESHOOTING_DATA_ATTRIBUTE,
   TROUBLESHOOTING_DATA_ATTRIBUTE_ENTRY,
   TROUBLESHOOTING_DATA_ATTRIBUTE_PREVIEW,
 } from './Troubleshooting.utils.shared'
-import Link from 'next/link'
 
 export function TroubleshootingPreview({
   entry,
@@ -76,5 +79,17 @@ export function TroubleshootingPreview({
         </div>
       </ErrorBoundary>
     </article>
+  )
+}
+
+export function TroubleshootingSidebar({ keywords }: { keywords: string[] }) {
+  return (
+    <div className="w-full flex flex-col gap-3">
+      <h1 className="flex items-center gap-3 my-3 text-brand-link">
+        <Wrench size={16} />
+        Troubleshooting
+      </h1>
+      <TroubleshootingFilter keywords={keywords} />
+    </div>
   )
 }

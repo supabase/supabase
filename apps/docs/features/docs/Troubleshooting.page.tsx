@@ -9,7 +9,7 @@ export default function TroubleshootingPage({ entry }: { entry: ITroubleshooting
   return (
     <SidebarSkeleton>
       <LayoutMainContent className="@container/troubleshooting-entry-layout w-full max-w-[80ch]">
-        <Breadcrumbs minLength={1} />
+        <Breadcrumbs minLength={1} forceDisplayOnMobile />
         <article className="prose max-w-none mt-4">
           <h1>{entry.data.title}</h1>
           {entry.data.errors?.length > 0 && (

@@ -29,7 +29,15 @@ import {
 import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 
-const Breadcrumbs = ({ className, minLength = 2 }: { className?: string; minLength?: number }) => {
+const Breadcrumbs = ({
+  className,
+  minLength = 2,
+  forceDisplayOnMobile = false,
+}: {
+  className?: string
+  minLength?: number
+  forceDisplayOnMobile?: boolean
+}) => {
   const breadcrumbs = useBreadcrumbs()
   const [open, setOpen] = React.useState(false)
   const isMobile = useBreakpoint('md')
@@ -38,7 +46,10 @@ const Breadcrumbs = ({ className, minLength = 2 }: { className?: string; minLeng
 
   if (!breadcrumbs?.length || breadcrumbs?.length < minLength) return null
 
-  const appendedBreadcrumbs = breadcrumbs?.slice(-ITEMS_TO_DISPLAY + 1, isMobile ? -1 : undefined)
+  const appendedBreadcrumbs = breadcrumbs?.slice(
+    -ITEMS_TO_DISPLAY + 1,
+    isMobile && !forceDisplayOnMobile ? -1 : undefined
+  )
 
   return (
     <Breadcrumb className={cn(className)}>
