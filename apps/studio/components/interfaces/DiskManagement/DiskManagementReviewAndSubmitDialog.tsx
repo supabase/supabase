@@ -200,7 +200,9 @@ export const DiskManagementReviewAndSubmitDialog = ({
               </TableRow>
             )}
           </TableBody>
-          <TableCaption>Please take note of the above billing changes</TableCaption>
+          <TableCaption className="mt-2 mb-2">
+            Please take note of the above billing changes
+          </TableCaption>
         </Table>
 
         <DialogSectionSeparator />

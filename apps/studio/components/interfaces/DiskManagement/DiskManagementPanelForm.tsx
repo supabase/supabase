@@ -207,7 +207,10 @@ export function DiskManagementPanelForm() {
   if (planId === 'free') {
     return (
       <div id="disk-management">
-        <FormHeader title="Disk Management" />
+        <FormHeader
+          title="Disk Management"
+          docsUrl="https://supabase.com/docs/guides/platform/database-size#disk-management"
+        />
         <Alert_Shadcn_>
           <InfoIcon />
           <AlertTitle_Shadcn_>
@@ -235,7 +238,10 @@ export function DiskManagementPanelForm() {
 
   return (
     <div id="disk-management">
-      <FormHeader title="Disk Management" />
+      <FormHeader
+        title="Disk Management"
+        docsUrl="https://supabase.com/docs/guides/platform/database-size#disk-management"
+      />
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="-space-y-px">
