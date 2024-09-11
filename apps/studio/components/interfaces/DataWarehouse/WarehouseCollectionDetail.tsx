@@ -56,12 +56,8 @@ export const WarehouseCollectionDetail = () => {
     { projectRef },
     { enabled: hasWarehouse }
   )
-  const collection = (collections || []).find((c) => c.token === collectionToken)
-  const [params, setParams] = useState({
-    sql: ``,
-  })
+  const collection = collections?.find((c) => c.token === collectionToken)
   const [search, setSearch] = useState('')
-
   const [filters, setFilters] = useState({
     limit: 100,
     offset: 0,
@@ -71,24 +67,22 @@ export const WarehouseCollectionDetail = () => {
       from: () => INTERVALS[0].calcFrom(),
     },
   })
+  const [sql, setSQL] = useState('')
 
   useEffect(() => {
     if (collection) {
       const from = filters.interval.from()
       const to = filters.interval.to()
 
-      const sql = `select id, timestamp, event_message from \`${collection.name}\`
+      const sql = `select id, timestamp from \`${collection.name}\`
 where timestamp >= TIMESTAMP('${from}')
-${to ? `and timestamp <= TIMESTAMP('${to}')` : ''}
-and event_message like '%${filters.search}%'
+and timestamp <= TIMESTAMP('${to}')
 order by timestamp desc limit ${filters.limit} offset ${filters.offset}
       `
 
-      setParams(() => ({
-        sql,
-      }))
+      setSQL(sql)
     }
-  }, [collection, filters])
+  }, [filters.interval, filters.limit, filters.offset, collection])
 
   const {
     isLoading: queryLoading,
@@ -96,9 +90,9 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
     isError,
     isRefetching,
   } = useWarehouseQueryQuery(
-    { ref: projectRef, sql: params.sql },
+    { ref: projectRef, sql },
     {
-      enabled: !!params.sql && hasWarehouse,
+      enabled: !!sql && hasWarehouse,
     }
   )
 
@@ -138,7 +132,7 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
   }
 
   const queryUrl = `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
-    params.sql || ''
+    sql || ''
   )}&source=warehouse`
 
   useKeyboardShortcuts(
@@ -186,7 +180,7 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
                   Refresh <KeyboardShortcut>R</KeyboardShortcut>
                 </TooltipContent>
               </Tooltip>
-              <Input
+              {/* <Input
                 type="search"
                 id="search-input"
                 className="w-52"
@@ -194,7 +188,7 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
                 placeholder="Search by event message"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-              />
+              /> */}
               <DatePickers
                 to={filters.interval?.to()}
                 from={filters.interval?.from()}
@@ -255,16 +249,13 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
               projectRef={projectRef}
               isLoading={isLoading}
               data={results}
-              params={params}
+              params={{ sql }}
               maxHeight="calc(100vh - 139px)"
               showHeader={false}
               emptyState={
                 <ProductEmptyState title="No events found" size="large">
                   <div className="space-y-4">
-                    <p>
-                      No events match your current search criteria. <br />
-                      Try adjusting your filters or send a test event to populate this collection.
-                    </p>
+                    <p>Try adjusting your filters, send a test event or refresh the results.</p>
                     <div className="flex items-center gap-2">
                       <Button
                         onClick={() => {
