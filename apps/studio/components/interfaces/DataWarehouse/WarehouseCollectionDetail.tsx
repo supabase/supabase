@@ -63,8 +63,8 @@ export const WarehouseCollectionDetail = () => {
     offset: 0,
     search: '',
     interval: {
-      to: () => INTERVALS[0].calcTo(),
-      from: () => INTERVALS[0].calcFrom(),
+      to: INTERVALS[0].calcTo,
+      from: INTERVALS[0].calcFrom,
     },
   })
   const [sql, setSQL] = useState('')
