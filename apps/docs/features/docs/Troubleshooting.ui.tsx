@@ -82,7 +82,42 @@ export function TroubleshootingPreview({
   )
 }
 
-export function TroubleshootingSidebar({ keywords }: { keywords: string[] }) {
+export function TroubleshootingSidebar({
+  mode = 'filter',
+  keywords,
+}: {
+  mode?: 'filter' | 'moreInfo'
+  keywords: string[]
+}) {
+  if (mode === 'moreInfo') {
+    return (
+      <div className="w-full flex flex-col gap-3">
+        <h1>
+          <Link
+            className="flex items-center gap-3 my-3 text-brand-link"
+            href="/guides/troubleshooting"
+          >
+            <Wrench size={16} />
+            Troubleshooting
+          </Link>
+        </h1>
+        <h2 className="text-foreground-lighter">Related keywords</h2>
+        <ul className="text-foreground-lighter">
+          {keywords.map((keyword) => (
+            <li key={keyword} className="list-['–'] ml-2 pl-2 leading-7">
+              <Link
+                className="underline underline-offset-4 decoration-foreground-muted hover:text-foreground transition-colors"
+                href={`/guides/troubleshooting?keywords=${keyword}`}
+              >
+                {keyword}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full flex flex-col gap-3">
       <h1 className="flex items-center gap-3 my-3 text-brand-link">

@@ -9,6 +9,7 @@ import {
   CollapsibleTrigger_Shadcn_,
   Input_Shadcn_,
   cn,
+  Admonition,
 } from 'ui'
 
 import { type ITroubleshootingEntry, type ITroubleshootingMetadata } from './Troubleshooting.utils'
@@ -18,7 +19,8 @@ import {
   TROUBLESHOOTING_DATA_ATTRIBUTE_PREVIEW,
   TROUBLESHOOTING_ENTRIES_ID,
 } from './Troubleshooting.utils.shared'
-import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 
 // Create a context for filter and search state
 const TroubleshootingContext = createContext<
@@ -33,7 +35,10 @@ const TroubleshootingContext = createContext<
 
 // Create a provider component
 export function TroubleshootingFilterStateProvider({ children }: { children: React.ReactNode }) {
-  const [filterState, setFilterState] = useState<Array<string>>([])
+  const [filterState, setFilterState] = useQueryState(
+    'keywords',
+    parseAsArrayOf(parseAsString).withDefault([])
+  )
   const [searchState, setSearchState] = useState('')
 
   return (
@@ -84,14 +89,19 @@ export function TroubleshootingFilter({
       )
     )
     allTroubleshootingEntries.current.forEach((entry) => {
-      entry
-        .querySelector(
-          `[${TROUBLESHOOTING_DATA_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTE_PREVIEW}"]`
-        )
+      const preview = entry.querySelector(
+        `[${TROUBLESHOOTING_DATA_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTE_PREVIEW}"]`
+      )
+
+      ;(preview as HTMLElement).style.pointerEvents = 'none'
+
+      preview
         ?.querySelectorAll(
           'a,area,input,button,select,textarea,form,details,iframe,audio,video,[contenteditable]'
         )
-        .forEach((element) => ((element as HTMLElement).inert = true))
+        .forEach((element) => {
+          ;(element as HTMLElement).inert = true
+        })
     })
   }, [])
 
@@ -136,7 +146,10 @@ export function TroubleshootingFilter({
             <li key={keyword}>
               <button
                 className="group border rounded px-2 py-1.5 text-foreground-lighter hover:text-foreground text-sm flex items-center gap-1 transition-colors"
-                onClick={() => setFilterState(filterState.filter((k) => k !== keyword))}
+                onClick={() => {
+                  const newFilterState = filterState.filter((k) => k !== keyword)
+                  setFilterState(newFilterState.length === 0 ? null : newFilterState)
+                }}
               >
                 {keyword}
                 <X
@@ -162,7 +175,8 @@ export function TroubleshootingFilter({
                 if (e.target.checked) {
                   setFilterState([...filterState, keyword])
                 } else {
-                  setFilterState(filterState.filter((k) => k !== keyword))
+                  const newFilterState = filterState.filter((k) => k !== keyword)
+                  setFilterState(newFilterState.length === 0 ? null : newFilterState)
                 }
               }}
             />
@@ -196,7 +210,7 @@ export function TroubleshootingFilterEmptyState() {
   }, [filterState, searchState])
 
   return numberResults === 0 ? (
-    <span>No results found</span>
+    <Admonition type="note">No results found</Admonition>
   ) : numberResults > 0 ? (
     <span className="sr-only">
       {numberResults} {numberResults === 1 ? 'result' : 'results'}

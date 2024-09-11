@@ -24,7 +24,7 @@ export default async function GlobalTroubleshootingPage() {
         NavigationMenu={<TroubleshootingSidebar keywords={keywords} />}
         menuName="Troubleshooting"
       >
-        <LayoutMainContent>
+        <LayoutMainContent className="w-full max-w-[80ch]">
           <div id={TROUBLESHOOTING_ENTRIES_ID} className="flex flex-col gap-8 max-w-[80ch]">
             <h2 className="sr-only">Matching topics</h2>
             <TroubleshootingFilterEmptyState />
