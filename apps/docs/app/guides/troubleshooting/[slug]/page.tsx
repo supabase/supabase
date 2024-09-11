@@ -24,6 +24,9 @@ export const generateMetadata = async ({ params: { slug } }: { params: { slug: s
 
   return {
     title: 'Supabase Docs | Troubleshooting' + (entry ? ` | ${entry.data.title}` : ''),
+    alternates: {
+      canonical: `/guides/troubleshooting/${slug}`,
+    },
   }
 }
 

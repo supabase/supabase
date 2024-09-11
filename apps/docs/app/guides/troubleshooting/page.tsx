@@ -1,3 +1,4 @@
+import { type Metadata } from 'next'
 import { TroubleshootingPreview, TroubleshootingSidebar } from '~/features/docs/Troubleshooting.ui'
 import { TroubleshootingFilterEmptyState } from '~/features/docs/Troubleshooting.ui.client'
 import {
@@ -28,4 +29,11 @@ export default async function GlobalTroubleshootingPage() {
       </LayoutMainContent>
     </SidebarSkeleton>
   )
+}
+
+export const metadata: Metadata = {
+  title: 'Supabase Docs | Troubleshooting',
+  alternates: {
+    canonical: '/guides/troubleshooting',
+  },
 }
