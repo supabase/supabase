@@ -6,7 +6,6 @@ import type { RenderCellProps } from 'react-data-grid'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableQuery } from 'data/tables/table-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 import type { SupaRow } from '../../types'
 import { NullValue } from '../common/NullValue'
@@ -18,7 +17,6 @@ interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
 
 export const ForeignKeyFormatter = (props: Props) => {
   const { project } = useProjectContext()
-  const { selectedSchema } = useQuerySchemaState()
 
   const { projectRef, tableId, row, column } = props
   const id = tableId ? Number(tableId) : undefined
@@ -63,7 +61,7 @@ export const ForeignKeyFormatter = (props: Props) => {
               style={{ padding: '3px' }}
             >
               <Link
-                href={`/project/${projectRef}/editor/${targetTable?.id}?schema=${selectedSchema}&filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
+                href={`/project/${projectRef}/editor/${targetTable?.id}?schema=${targetTable.schema}&filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
               >
                 <ArrowRight size={14} />
               </Link>

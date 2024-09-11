@@ -21,6 +21,7 @@ import {
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { Markdown } from 'components/interfaces/Markdown'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
@@ -45,7 +46,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { Markdown } from 'components/interfaces/Markdown'
 
 export interface EntityListItemProps {
   id: number
@@ -279,7 +279,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   return (
     <Link
       title={entity.name}
-      href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
+      href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}`}
       role="button"
       aria-label={`View ${entity.name}`}
       className={cn(

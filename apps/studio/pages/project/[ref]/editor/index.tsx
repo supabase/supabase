@@ -14,7 +14,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
 
   const onTableCreated = (table: Table) => {
-    router.push(`/project/${projectRef}/editor/${table.id}`)
+    router.push(`/project/${projectRef}/editor/${table.id}?schema=${table.schema}`)
   }
 
   return (

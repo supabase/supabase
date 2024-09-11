@@ -2,6 +2,17 @@ import { PostgresMaterializedView, PostgresTable, PostgresView } from '@supabase
 import { PostgresForeignTable } from '@supabase/postgres-meta/dist/lib/types'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 
+type Entity = {
+  type: ENTITY_TYPE
+  id: number
+  name: string
+  comment: string | null
+  rows: number | undefined
+  size: string | undefined
+  columns: unknown[]
+  schema: string
+}
+
 // [Joshen] We just need name, description, rows, size, and the number of columns
 // Just missing partitioned tables as missing pg-meta support
 export const formatAllEntities = ({
@@ -14,17 +25,18 @@ export const formatAllEntities = ({
   views?: PostgresView[]
   materializedViews?: PostgresMaterializedView[]
   foreignTables?: PostgresForeignTable[]
-}) => {
-  const formattedTables = tables.map((x) => {
+}): Entity[] => {
+  const formattedTables: Entity[] = tables.map((x) => {
     return {
       ...x,
       type: ENTITY_TYPE.TABLE,
       rows: x.live_rows_estimate,
       columns: x.columns ?? [],
+      schema: x.schema,
     }
   })
 
-  const formattedViews = views.map((x) => {
+  const formattedViews: Entity[] = views.map((x) => {
     return {
       type: ENTITY_TYPE.VIEW,
       id: x.id,
@@ -33,10 +45,11 @@ export const formatAllEntities = ({
       rows: undefined,
       size: undefined,
       columns: x.columns ?? [],
+      schema: x.schema,
     }
   })
 
-  const formattedMaterializedViews = materializedViews.map((x) => {
+  const formattedMaterializedViews: Entity[] = materializedViews.map((x) => {
     return {
       type: ENTITY_TYPE.MATERIALIZED_VIEW,
       id: x.id,
@@ -45,10 +58,11 @@ export const formatAllEntities = ({
       rows: undefined,
       size: undefined,
       columns: x.columns ?? [],
+      schema: x.schema,
     }
   })
 
-  const formattedForeignTables = foreignTables.map((x) => {
+  const formattedForeignTables: Entity[] = foreignTables.map((x) => {
     return {
       type: ENTITY_TYPE.FOREIGN_TABLE,
       id: x.id,
@@ -57,6 +71,7 @@ export const formatAllEntities = ({
       rows: undefined,
       size: undefined,
       columns: x.columns ?? [],
+      schema: x.schema,
     }
   })
 

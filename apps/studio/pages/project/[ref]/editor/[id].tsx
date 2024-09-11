@@ -29,7 +29,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         onAfterDeleteTable={(tables) => {
           // For simplicity for now, we just open the first table within the same schema
           if (tables.length > 0) {
-            router.push(`/project/${projectRef}/editor/${tables[0].id}`)
+            router.push(`/project/${projectRef}/editor/${tables[0].id}?schema=${tables[0].schema}`)
           } else {
             router.push(`/project/${projectRef}/editor/`)
           }

@@ -1,11 +1,11 @@
 import clsx from 'clsx'
 import { useParams } from 'common'
+import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import SVG from 'react-inlinesvg'
-import { Badge, Button, cn } from 'ui'
-import { ArrowRight } from 'lucide-react'
 
 import { BASE_PATH } from 'lib/constants'
+import { Badge, Button, cn } from 'ui'
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 
 interface ForeignKeyProps {
@@ -78,7 +78,7 @@ export const ForeignKeyRow = ({
               }
             >
               <Link
-                href={`/project/${ref}/editor/${foreignKey.tableId}`}
+                href={`/project/${ref}/editor/${foreignKey.tableId}?schema=${foreignKey.schema}`}
                 onClick={() => closePanel()}
               >
                 {foreignKey.schema}.{foreignKey.table}

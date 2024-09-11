@@ -188,7 +188,7 @@ const TableGridEditor = ({
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`
 
   const onTableCreated = (table: PostgresTable) => {
-    router.push(`/project/${projectRef}/editor/${table.id}`)
+    router.push(`/project/${projectRef}/editor/${table.id}?schema=${table.schema}`)
   }
 
   // columns must be accessed via columnsRef.current as these two functions immediately become

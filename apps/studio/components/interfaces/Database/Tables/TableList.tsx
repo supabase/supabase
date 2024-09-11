@@ -471,7 +471,9 @@ const TableList = ({
                                 <DropdownMenuItem
                                   className="flex items-center space-x-2"
                                   onClick={() =>
-                                    router.push(`/project/${project?.ref}/editor/${x.id}`)
+                                    router.push(
+                                      `/project/${project?.ref}/editor/${x.id}?schema=${x.schema}`
+                                    )
                                   }
                                 >
                                   <Eye size={12} />
