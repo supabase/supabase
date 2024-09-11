@@ -1371,14 +1371,22 @@ const PROVIDER_SAML = {
     SAML_EXTERNAL_URL: {
       title: 'SAML metadata URL',
       description:
-        'You may use a different SAML metadata URL from what is defined with the API External URL. Please validate that your SAML External URL can reach the Custom Domain or Project URL',
+        'You may use a different SAML metadata URL from what is defined with the API External URL. Please validate that your SAML External URL can reach the Custom Domain or Project URL.',
       descriptionOptional: 'Optional',
       type: 'string',
+    },
+    SAML_ALLOW_ENCRYPTED_ASSERTIONS: {
+      title: 'Allow encrypted SAML Assertions',
+      description:
+        'Some SAML Identity Providers require support for encrypted assertions. Usually this is not necessary.',
+      descriptionOptional: 'Optional',
+      type: 'boolean',
     },
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
     SAML_EXTERNAL_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
+    SAML_ALLOW_ENCRYPTED_ASSERTIONS: boolean().optional(),
   }),
   misc: {
     iconKey: 'saml-icon',

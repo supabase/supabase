@@ -73,6 +73,12 @@ export const sqlEditorState = proxy({
   },
   limit: 100,
   order: 'inserted_at' as 'name' | 'inserted_at',
+  // For handling renaming folder failed
+  lastUpdatedFolderName: '',
+
+  get allFolderNames() {
+    return Object.values(sqlEditorState.folders).map((x) => x.folder.name)
+  },
 
   // ========================================================================
   // ## Methods to interact the store with
@@ -204,6 +210,17 @@ export const sqlEditorState = proxy({
 
   saveFolder: ({ id, name }: { id: string; name: string }) => {
     const hasChanges = sqlEditorState.folders[id].folder.name !== name
+
+    if (id === 'new-folder' && sqlEditorState.allFolderNames.includes(name)) {
+      sqlEditorState.removeFolder(id)
+      return toast.error('This folder name already exists')
+    } else if (hasChanges && sqlEditorState.allFolderNames.includes(name)) {
+      sqlEditorState.folders[id] = { ...sqlEditorState.folders[id], status: 'idle' }
+      return toast.error('This folder name already exists')
+    }
+
+    const originalFolderName = sqlEditorState.folders[id].folder.name.slice()
+
     sqlEditorState.folders[id] = {
       projectRef: sqlEditorState.folders[id].projectRef,
       status: hasChanges ? 'saving' : 'idle',
@@ -213,7 +230,10 @@ export const sqlEditorState = proxy({
         name,
       },
     }
-    if (hasChanges) sqlEditorState.needsSaving.add(id)
+    if (hasChanges) {
+      sqlEditorState.lastUpdatedFolderName = originalFolderName
+      sqlEditorState.needsSaving.add(id)
+    }
   },
 
   removeFolder: (id: string) => {
@@ -390,6 +410,23 @@ async function upsertFolder(id: string, projectRef: string, name: string) {
     }
   } catch (error: any) {
     toast.error(`Failed to save folder: ${error.message}`)
+    if (error.message.includes('create')) {
+      sqlEditorState.removeFolder(id)
+    } else if (
+      error.message.includes('update') &&
+      sqlEditorState.lastUpdatedFolderName.length > 0
+    ) {
+      sqlEditorState.folders[id] = {
+        ...sqlEditorState.folders[id],
+        status: 'idle',
+        folder: {
+          ...sqlEditorState.folders[id].folder,
+          name: sqlEditorState.lastUpdatedFolderName,
+        },
+      }
+    }
+  } finally {
+    sqlEditorState.lastUpdatedFolderName = ''
   }
 }
 
