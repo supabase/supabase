@@ -20,7 +20,7 @@ Analytics connects to databases such as BigQuery to store massive volumes of dat
 
 ### Bring Your Own Backends
 
-Analytics can integrate with your very own backends, with Analytics managing the ingestion pipeline and maximising throughput of events. This ensures maximum flexibility for storing sensitive data.
+Analytics can integrate with your very own backends, with Analytics managing the ingestion pipeline and maximizing throughput of events. This ensures maximum flexibility for storing sensitive data.
 
 Bringing-your-own-backend gives Supabase customers complete control over storage and querying costs.
 
@@ -50,7 +50,7 @@ When new fields are sent to Analytics, the data type is detected automatically a
 
 ```bash
 # By collection name
-curl -X "POST" "https://api.analytics.tech/api/events/json?collection_name=YOUR-COLLLECTION-NAME-HERE" \
+curl -X "POST" "https://api.warehouse.tech/api/events/json?collection_name=YOUR-COLLLECTION-NAME-HERE" \
     -H 'Content-Type: application/json; charset=utf-8' \
     -H 'Authorization: Bearer YOUR-ACCESS-TOKEN-HERE' \
     -d $'[{
@@ -60,7 +60,7 @@ curl -X "POST" "https://api.analytics.tech/api/events/json?collection_name=YOUR-
 
 
 # By collection UUID
-curl -X "POST" "https://api.Analytics.tech/api/events/json?collection=YOUR-COLLECTION-UUID-HERE" \
+curl -X "POST" "https://api.warehouse.tech/api/events/json?collection=YOUR-COLLECTION-UUID-HERE" \
     -H 'Content-Type: application/json; charset=utf-8' \
     -H 'Authorization: Bearer YOUR-ACCESS-TOKEN-HERE' \
     -d $'[{

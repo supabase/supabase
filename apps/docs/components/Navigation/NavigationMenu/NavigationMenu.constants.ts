@@ -1492,7 +1492,6 @@ export const realtime: NavMenuConstant = {
   ],
 }
 
-
 export const warehouse: NavMenuConstant = {
   icon: 'warehouse',
   title: 'Analytics',
