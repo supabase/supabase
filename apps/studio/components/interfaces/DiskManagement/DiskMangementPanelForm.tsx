@@ -206,7 +206,7 @@ export function DiskMangementPanelForm() {
 
   if (planId === 'free') {
     return (
-      <div>
+      <div id="disk-management">
         <FormHeader title="Disk Management" />
         <Alert_Shadcn_>
           <InfoIcon />
@@ -234,7 +234,7 @@ export function DiskMangementPanelForm() {
   }
 
   return (
-    <div>
+    <div id="disk-management">
       <FormHeader title="Disk Management" />
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
