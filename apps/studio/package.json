@@ -74,7 +74,7 @@
     "openai": "^4.20.1",
     "openapi-fetch": "^0.6.2",
     "papaparse": "^5.3.1",
-    "path-to-regexp": "^6.2.0",
+    "path-to-regexp": "^8.0.0",
     "pg-minify": "^1.6.3",
     "prism-react-renderer": "^2.3.1",
     "randombytes": "^2.1.0",
