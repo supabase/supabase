@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import React, { Fragment } from 'react'
 
 import { useBreakpoint } from 'common'
@@ -29,17 +29,14 @@ import {
 import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 
-const Breadcrumbs = ({ className }: { className?: string }) => {
-  const pathname = usePathname()
-  const menuId = getMenuId(pathname)
-  const menu = NavItems[menuId]
-  const breadcrumbs = findMenuItemByUrl(menu, pathname, [])
+const Breadcrumbs = ({ className, minLength = 2 }: { className?: string; minLength?: number }) => {
+  const breadcrumbs = useBreadcrumbs()
   const [open, setOpen] = React.useState(false)
   const isMobile = useBreakpoint('md')
 
   const ITEMS_TO_DISPLAY = isMobile ? 4 : 3
 
-  if (!breadcrumbs?.length || breadcrumbs?.length === 1) return null
+  if (!breadcrumbs?.length || breadcrumbs?.length < minLength) return null
 
   const appendedBreadcrumbs = breadcrumbs?.slice(-ITEMS_TO_DISPLAY + 1, isMobile ? -1 : undefined)
 
@@ -136,6 +133,32 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
       </BreadcrumbList>
     </Breadcrumb>
   )
+}
+
+function useBreadcrumbs() {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const isTroubleshootingPage = pathname.startsWith('/guides/troubleshooting')
+
+  if (isTroubleshootingPage) {
+    const returnTo = searchParams?.get('returnTo')
+      ? decodeURIComponent(searchParams.get('returnTo')!)
+      : '/guides/troubleshooting'
+
+    const breadcrumbs = [{ name: 'Troubleshooting topics', url: returnTo }]
+
+    const [, , section] = pathname.split('/')
+    if (section !== 'troubleshooting') {
+      breadcrumbs.push({ name: section, url: `/guides/${section}/troubleshooting` })
+    }
+
+    return breadcrumbs
+  }
+
+  const menuId = getMenuId(pathname)
+  const menu = NavItems[menuId]
+  return findMenuItemByUrl(menu, pathname, [])
 }
 
 function findMenuItemByUrl(menu, targetUrl, parents = []) {

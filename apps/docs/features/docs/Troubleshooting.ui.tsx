@@ -36,7 +36,7 @@ export function TroubleshootingPreview({
       {...articleAttributes}
     >
       <Link
-        href={`/guides/troubleshooting/${getArticleSlug(entry.data)}?returnTo=${parentPage}`}
+        href={`/guides/troubleshooting/${getArticleSlug(entry.data)}?returnTo=${encodeURIComponent(parentPage)}`}
         className="group p-[var(--local-padding)] block no-underline w-full flex items-center justify-between gap-2"
       >
         <h2 id={`troubleshooting-entry-title-${entry.data.database_id}`} className="m-0 truncate">

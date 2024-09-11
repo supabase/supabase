@@ -322,30 +322,3 @@ export function TroubleshootingErrorListDetailed({
     </aside>
   )
 }
-
-export function TroubleshootingBackLink({
-  className,
-  direction = 'left',
-}: {
-  className?: string
-  direction?: 'left' | 'right'
-}) {
-  const [href, setHref] = useState('/guides/troubleshooting')
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search)
-    const returnTo = searchParams.get('returnTo')
-    if (returnTo) {
-      setHref(returnTo)
-    }
-  }, [])
-
-  return (
-    <Link
-      href={href}
-      className={cn('group flex items-center gap-1 text-sm text-foreground-lighter', className)}
-    >
-      {direction === 'left' ? '‹ More troubleshooting' : 'More troubleshooting ›'}
-    </Link>
-  )
-}
