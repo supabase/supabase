@@ -175,7 +175,7 @@ for select using (
   {
     id: 'policy-9',
     preview: false,
-    templateName: 'Enable users to view their own data only',
+    templateName: 'Allow users to only view their own data',
     description: 'Restrict users to reading only their own data.',
     statement: `
 create policy "Enable users to view their own data only"
