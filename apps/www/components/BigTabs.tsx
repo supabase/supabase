@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 
 export type Tab = {
   label: string
@@ -65,16 +65,19 @@ interface TabProps {
 }
 
 const Tab = ({ label, isActive, onClick }: TabProps) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      `text-left py-1.5 px-3 lg:py-2 lg:px-8 border rounded-md bg-alternative hover:border-foreground text-lg opacity-80 transition-all`,
-      isActive ? 'opacity-100 border-brand' : ''
-    )}
-    aria-selected={isActive}
-    role="tab"
-  >
-    {label}
+  <button onClick={onClick} aria-selected={isActive} role="tab">
+    <Badge
+      size="large"
+      className={cn(
+        // `text-left py-1.5 px-3 lg:py-2 lg:px-8 border rounded-md bg-alternative hover:border-foreground text-lg opacity-80 transition-all`,
+        'py-1.5 px-3 lg:py-2 lg:px-8',
+        'hover:border-foreground-lighter hover:text-foreground',
+        `opacity-80`,
+        isActive ? 'opacity-100 !border-foreground' : ''
+      )}
+    >
+      {label}
+    </Badge>
   </button>
 )
 

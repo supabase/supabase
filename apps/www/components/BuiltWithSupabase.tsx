@@ -1,12 +1,12 @@
 import { Button, IconGitHubSolid } from 'ui'
 import Link from 'next/link'
 
-import SectionContainer from '../Layouts/SectionContainer'
-import ExampleCard from '../ExampleCard'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import ExampleCard from './ExampleCard'
 
 import Examples from 'data/Examples'
 
-const BuiltExamples = () => {
+const BuiltWithSupabase = () => {
   return (
     <SectionContainer id="examples" className="xl:pt-32">
       <div className="text-center">
@@ -41,4 +41,4 @@ const BuiltExamples = () => {
   )
 }
 
-export default BuiltExamples
+export default BuiltWithSupabase

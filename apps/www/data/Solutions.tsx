@@ -87,18 +87,6 @@ const solutions: SolutionsType = {
     label: '',
     url: '/vector',
   },
-  'data-api': {
-    name: 'Data APIs',
-    icon: products.vector.icon[24],
-    description: (
-      <>
-        Instant ready-to-use <strong>Restful APIs</strong>.
-      </>
-    ),
-    description_short: 'Instant ready-to-use Restful APIs.',
-    label: '',
-    url: 'https://supabase.com/docs/guides/api',
-  },
 }
 
 export default solutions

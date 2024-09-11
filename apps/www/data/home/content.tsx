@@ -1,6 +1,7 @@
 import solutions from '~/data/Solutions'
 // import { frameworks } from '../frameworks'
 import VideoWithHighlights from '~/components/VideoWithHighlights'
+import { products } from 'shared-data'
 
 export default {
   heroSection: {
@@ -32,7 +33,21 @@ export default {
     },
   },
   productsSection: {
-    products: { ...solutions },
+    products: {
+      ...solutions,
+      'data-api': {
+        name: 'Data APIs',
+        icon: products.vector.icon[24],
+        description: (
+          <>
+            Instant ready-to-use <strong>Restful APIs</strong>.
+          </>
+        ),
+        description_short: 'Instant ready-to-use Restful APIs.',
+        label: '',
+        url: 'https://supabase.com/docs/guides/api',
+      },
+    },
   },
   dashboardFeatures: {
     title: (

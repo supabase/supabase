@@ -9,7 +9,7 @@ interface Props {
 }
 
 const DashboardFeatures: React.FC<Props> = ({ title, tabs }) => (
-  <SectionContainer className="text-center !pb-0" id="dashboard">
+  <SectionContainer className="text-center" id="dashboard">
     <div className="relative mb-8 lg:mb-0">
       <h3 className="mb-8 text-2xl lg:text-4xl text-foreground-lighter">{title}</h3>
     </div>

@@ -1,14 +1,17 @@
+import { PropsWithChildren } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useTheme } from 'next-themes'
 import { range } from 'lodash'
+import { ArrowRight } from 'lucide-react'
 import { Button, cn } from 'ui'
 
-import { GlassPanel } from 'ui-patterns/GlassPanel'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import TextLink from '~/components/TextLink'
 import SectionHeader from 'components/UI/SectionHeader'
-import customerStories from '~/data/CustomerStories'
 import Panel from '~/components/Panel'
+
+import customerStories from '~/data/CustomerStories'
+import type { CustomerStoryType } from '~/data/CustomerStories'
 
 const getCustomer = (customer: string, linked: boolean) => ({
   ...customerStories.find((story: any) => customer.includes(story.organization)),
@@ -87,7 +90,7 @@ const CustomerStories = () => {
       </SectionContainer>
       <div
         className={cn(
-          'group w-full flex items-stretch h-[300px] min-w-[300px] nowrap mb-16 md:mb-24 lg:mb-24',
+          'group/tw-marquee w-full flex items-stretch h-[300px] min-w-[300px] nowrap mb-16 md:mb-24 lg:mb-24',
           compositionGap
         )}
       >
@@ -99,7 +102,7 @@ const CustomerStories = () => {
               'left-0 z-10',
               'w-auto h-full',
               'flex gap-4 items-end',
-              'run animate-marquee group-hover:pause',
+              'run animate-marquee group-hover/tw-marquee:pause',
               'will-change-transform transition-transform',
               compositionGap
             )}
@@ -120,17 +123,7 @@ const CustomerStories = () => {
                       key={customer.organization}
                       className="col-span-12 md:col-span-4 w-[450px] h-full"
                     >
-                      <Panel hasActiveOnHover outerClassName="h-full">
-                        <GlassPanel
-                          {...customer}
-                          background={false}
-                          className="border-none dark:filter dark:[&_img]:!invert"
-                          showIconBg={true}
-                          showLink={true}
-                        >
-                          {customer.description}
-                        </GlassPanel>
-                      </Panel>
+                      <CustomerCard size="expanded" customer={customer} />
                     </Link>
                   ) : customer.linked ? (
                     <Link
@@ -138,10 +131,11 @@ const CustomerStories = () => {
                       key={customer.organization}
                       className="col-span-12 md:col-span-4 h-full flex-grow"
                     >
-                      <CustomerCard customer={customer} />
+                      <CustomerCard size="narrow" customer={customer} />
                     </Link>
                   ) : (
                     <CustomerCard
+                      size="narrow"
                       key={customer.organization}
                       customer={customer}
                       className="pointer-events-none"
@@ -157,26 +151,85 @@ const CustomerStories = () => {
   )
 }
 
-interface CustomerCardProps {
-  customer: any
+interface CustomerCardProps extends PropsWithChildren {
+  customer: CustomerStoryType
   className?: string
+  size?: 'narrow' | 'expanded'
 }
 
-const CustomerCard: React.FC<CustomerCardProps> = ({ customer, className }) => (
-  <Panel
-    hasActiveOnHover
-    outerClassName={cn('h-full w-[250px] h-full flex-grow', className)}
-    innerClassName="flex items-center justify-center"
-  >
-    <Image
-      key={customer.organization}
-      src={customer.logo}
-      alt={customer.organization}
-      width={300}
-      height={150}
-      className="w-full opacity-60 max-w-[140px]"
-    />
-  </Panel>
-)
+const CustomerCard: React.FC<CustomerCardProps> = ({
+  customer,
+  className,
+  size,
+  children,
+  ...rest
+}) => {
+  const { resolvedTheme } = useTheme()
+  const showLogoInverse = customer.logo_inverse && resolvedTheme?.includes('dark')
+  const showLogo = !showLogoInverse && customer.logo
+
+  const LogoComponent = ({ logoImage, className }: { logoImage: string; className?: string }) => (
+    <div className="relative box-content">
+      <div className="relative h-[33px] w-auto max-w-[145px]">
+        <Image
+          src={logoImage}
+          alt={customer.title}
+          fill
+          sizes="100%"
+          className={cn('object-contain object-left', className)}
+        />
+      </div>
+    </div>
+  )
+
+  switch (size) {
+    case 'narrow':
+      return (
+        <Panel
+          hasActiveOnHover
+          outerClassName={cn('h-full w-[250px] h-full flex-grow', className)}
+          innerClassName="flex items-center justify-center"
+        >
+          <Image
+            key={customer.organization}
+            src={customer.logo}
+            alt={customer.organization}
+            width={300}
+            height={150}
+            className="w-full opacity-60 max-w-[140px] filter dark:invert"
+          />
+        </Panel>
+      )
+    case 'expanded':
+      return (
+        <Panel
+          hasActiveOnHover
+          outerClassName={cn(
+            'relative',
+            'h-full',
+            'group',
+            'cursor-pointer',
+            'overflow-hidden',
+            'text-left',
+            'transition',
+            className
+          )}
+          innerClassName="h-full p-8 flex flex-col gap-6 justify-between"
+          {...rest}
+        >
+          <div className="not-sr-only absolute top-8 right-8">
+            <ArrowRight className="-rotate-45 stroke-1 -translate-x-1 translate-y-1 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0" />
+          </div>
+          {showLogoInverse && (
+            <LogoComponent logoImage={customer.logo_inverse!} className="opacity-50" />
+          )}
+          {showLogo && <LogoComponent logoImage={customer.logo} className="opacity-75" />}
+
+          <p className="text-base text-foreground-lighter">{customer.title}</p>
+          {children && <span className="text-sm text-foreground-light flex-grow">{children}</span>}
+        </Panel>
+      )
+  }
+}
 
 export default CustomerStories

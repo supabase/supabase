@@ -1,20 +1,26 @@
+import { hover } from '@testing-library/user-event/dist/hover'
+import { drop } from 'lodash'
 import Image from 'next/image'
+import xl from 'react-syntax-highlighter/dist/esm/languages/hljs/xl'
+import { cn } from 'ui/src/lib/utils'
 
 interface TweetCard {
   handle: string
   quote: string | React.ReactNode
   img_url: string
+  className?: string
 }
 
 export function TweetCard(props: TweetCard) {
   return (
     <div
-      className="
-      bg-surface-75
-      border group-hover:border-foreground-muted transition-colors
-      rounded-2xl p-6
-      drop-shadow-sm
-    "
+      className={cn(
+        'bg-surface-75',
+        'border group-hover/tweet-card:border-foreground-muted transition-colors',
+        'rounded-2xl p-6',
+        'drop-shadow-sm',
+        props.className
+      )}
     >
       <div className="relative">
         <div className="flex items-center gap-2">

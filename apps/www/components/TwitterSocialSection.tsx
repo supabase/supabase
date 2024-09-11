@@ -14,7 +14,7 @@ const TwitterSocialSection = () => {
     <>
       <SectionContainer className="w-full text-center !pb-0">
         <h3 className="h2">Join the community</h3>
-        <p className="p">Supported by a network of early advocates, contributors, and champions.</p>
+        <p className="p">Discover what our community has to say about their Supabase experience.</p>
         <div className="my-8 flex justify-center gap-2">
           <Button asChild size="small" iconRight={<MessageCircle size={14} />} type="default">
             <Link
@@ -32,9 +32,9 @@ const TwitterSocialSection = () => {
           </Button>
         </div>
       </SectionContainer>
-      <SectionContainer className="relative w-full !px-0 lg:!px-16 xl:!px-0 !pb-0 -mb-14 lg:-mb-52 xl:-mb-24 !pt-6 max-w-[1400px]">
+      <SectionContainer className="relative w-full !px-0 lg:!px-16 xl:!px-0 !pb-0 mb-16 md:mb-24 lg:mb-24 !pt-6 max-w-[1400px]">
         <TwitterSocialProofMobile className="lg:hidden" tweets={tweets} />
-        <TwitterSocialProof className="hidden lg:block" />
+        <TwitterSocialProof className="hidden lg:flex" />
       </SectionContainer>
     </>
   )
