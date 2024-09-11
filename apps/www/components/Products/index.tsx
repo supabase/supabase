@@ -161,7 +161,7 @@ const Products = (props: Props) => {
         }
         onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.REALTIME)}
         image={<RealtimeVisual />}
-        className="col-span-6 xl:col-span-3 hover:!cursor-[url('/images/index/products/realtime-cursor.svg'),_auto]"
+        className="col-span-6 xl:col-span-3 hover:!cursor-[url('/images/index/products/realtime-cursor-light.svg'),_auto] dark:hover:!cursor-[url('/images/index/products/realtime-cursor-dark.svg'),_auto]"
       />
       <ProductCard
         alignLeft

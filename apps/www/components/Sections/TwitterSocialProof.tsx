@@ -65,7 +65,7 @@ const TwitterSocialProof: React.FC<Props> = ({ className }) => {
             absolute pointer-events-none
             w-full h-full max-h-[400px] lg:max-h-none
             inset-0 top-auto
-            lg:bg-[radial-gradient(50%_100%_at_50%_0,transparent_0%,transparent_40%,hsl(var(--background-default))_100%)]
+            lg:bg-[radial-gradient(50%_100%_at_50%_0,transparent_0%,transparent_50%,hsl(var(--background-default))_100%)]
           "
       />
     </>

@@ -64,7 +64,7 @@ const FunctionsVisual = () => {
 
   return (
     <figure
-      className="absolute inset-0 z-20"
+      className="absolute inset-0 z-20 pointer-events-auto"
       role="img"
       aria-label="Supabase Edge Functions visual composition"
       onMouseOver={handleMouseEnter}

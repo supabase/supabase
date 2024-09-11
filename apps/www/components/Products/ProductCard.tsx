@@ -39,7 +39,7 @@ const ProductCard = ({
       hasShimmer={isBrowser && detectBrowser() !== 'Safari'}
       hasActiveOnHover
       hasMotion={title.includes('Edge Functions')}
-      outerClassName="relative w-full h-full"
+      outerClassName="relative w-full h-full pointer-events-none"
       innerClassName={cn(
         'relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between',
         'bg-surface-75 w-full h-full text-foreground-lighter [&_strong]:!font-normal [&_strong]:!text-foreground'
@@ -48,9 +48,7 @@ const ProductCard = ({
       <div
         className={cn(
           'relative z-10 flex flex-col lg:h-full gap-4 mx-auto items-center text-center h-full px-4 py-6',
-          alignLeft &&
-            !isDatabase &&
-            'lg:mx-0 lg:pl-6 lg:items-start lg:text-left lg:max-w-[260px]',
+          alignLeft && !isDatabase && 'lg:mx-0 lg:pl-6 lg:items-start lg:text-left',
           alignLeft &&
             isDatabase &&
             'md:ml-4 md:mt-2 md:justify-start md:max-w-[260px] md:text-left md:items-start'
