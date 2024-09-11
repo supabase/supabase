@@ -6,11 +6,25 @@ import { useBreakpoint } from 'common'
 
 const FunctionsVisual = () => {
   const typerRef = useRef<HTMLSpanElement>(null)
+  const isMobile = useBreakpoint('md')
   const [typed, setTyped] = useState<Typed | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const firstString = 'deploy'
   const strings = [firstString, 'serve']
-  const isMobile = useBreakpoint('md')
+  const disableAnimation = isPlaying || isMobile
+
+  let hoverTimeoutRef: any
+
+  const handleMouseEnter = () => {
+    // Delay the animation to trigger animation only if hover is intentional
+    hoverTimeoutRef = setTimeout(() => {
+      triggerAnimation()
+    }, 200)
+  }
+
+  const handleMouseLeave = () => {
+    clearTimeout(hoverTimeoutRef)
+  }
 
   const onComplete = () => {
     setIsPlaying(false)
@@ -31,20 +45,22 @@ const FunctionsVisual = () => {
     onComplete,
   }
 
+  const triggerAnimation = () => {
+    // Disable triggering the animation on mobile and if it's already playing
+    if (disableAnimation) return
+
+    typed?.destroy()
+    setTyped(new Typed(typerRef.current, options))
+    typed?.reset()
+    typed?.start()
+  }
+
   useEffect(() => {
     return () => {
       typed?.destroy()
+      hoverTimeoutRef && clearTimeout(hoverTimeoutRef)
     }
   }, [])
-
-  const handleMouseEnter = () => {
-    if (!isPlaying && !isMobile) {
-      typed?.destroy()
-      setTyped(new Typed(typerRef.current, options))
-      typed?.reset()
-      typed?.start()
-    }
-  }
 
   return (
     <figure
@@ -52,6 +68,7 @@ const FunctionsVisual = () => {
       role="img"
       aria-label="Supabase Edge Functions visual composition"
       onMouseOver={handleMouseEnter}
+      onMouseOut={handleMouseLeave}
     >
       <Image
         src="/images/index/products/edge-functions-dark.svg"
