@@ -32,6 +32,11 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
 
   const X_PADDING = 'px-5'
   const extensionMeta = extensions.find((item: any) => item.name === extension.name)
+  const docsUrl = extensionMeta?.link.startsWith('/guides')
+    ? siteUrl === 'http://localhost:8082'
+      ? `http://localhost:3001/docs${extensions.find((item) => item.name === extension.name)?.link}`
+      : `https://supabase.com/docs${extensions.find((item) => item.name === extension.name)?.link}`
+    : extensions.find((item: any) => item.name === extension.name)?.link ?? undefined
 
   const { mutate: disableExtension, isLoading: isDisabling } = useDatabaseExtensionDisableMutation({
     onSuccess: () => {
@@ -102,26 +107,18 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                 </a>
               </Button>
             )}
-            <Button asChild type="default" icon={<Book />} className="rounded-full">
-              <a
-                target="_blank"
-                rel="noreferrer"
-                className="font-mono tracking-tighter"
-                href={
-                  extensionMeta?.link.startsWith('/guides')
-                    ? siteUrl === 'http://localhost:8082'
-                      ? `http://localhost:3001/docs${
-                          extensions.find((item) => item.name === extension.name)?.link
-                        }`
-                      : `https://supabase.com/docs${
-                          extensions.find((item) => item.name === extension.name)?.link
-                        }`
-                    : extensions.find((item: any) => item.name === extension.name)?.link ?? ''
-                }
-              >
-                Docs
-              </a>
-            </Button>
+            {docsUrl !== undefined && (
+              <Button asChild type="default" icon={<Book />} className="rounded-full">
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono tracking-tighter"
+                  href={docsUrl}
+                >
+                  Docs
+                </a>
+              </Button>
+            )}
           </div>
         </div>
 

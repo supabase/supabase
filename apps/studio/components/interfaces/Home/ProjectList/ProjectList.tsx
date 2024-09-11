@@ -187,7 +187,7 @@ const OrganizationProjects = ({
   // [Joshen] Just a UI thing, but we take all projects other than paused as "active"
   const filteredProjectsByStatus =
     filterStatus !== undefined
-      ? filterStatus.includes(PROJECT_STATUS.ACTIVE_HEALTHY)
+      ? filterStatus.length === 2
         ? filteredProjects
         : filteredProjects.filter((project) => filterStatus.includes(project.status))
       : filteredProjects
