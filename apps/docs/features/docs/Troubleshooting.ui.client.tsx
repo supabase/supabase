@@ -1,7 +1,7 @@
 'use client'
 
 import { X } from 'lucide-react'
-import { Fragment, useEffect, useMemo, useRef, useState, createContext, useContext } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState, Suspense } from 'react'
 
 import {
   Collapsible_Shadcn_,
@@ -19,44 +19,16 @@ import {
   TROUBLESHOOTING_DATA_ATTRIBUTE_PREVIEW,
   TROUBLESHOOTING_ENTRIES_ID,
 } from './Troubleshooting.utils.shared'
-import { useSearchParams } from 'next/navigation'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 
-// Create a context for filter and search state
-const TroubleshootingContext = createContext<
-  | {
-      filterState: string[]
-      searchState: string
-      setFilterState: (state: string[]) => void
-      setSearchState: (state: string) => void
-    }
-  | undefined
->(undefined)
-
-// Create a provider component
-export function TroubleshootingFilterStateProvider({ children }: { children: React.ReactNode }) {
+function useTroubleshootingSearchState() {
   const [filterState, setFilterState] = useQueryState(
     'keywords',
     parseAsArrayOf(parseAsString).withDefault([])
   )
-  const [searchState, setSearchState] = useState('')
+  const [searchState, setSearchState] = useQueryState('search', parseAsString.withDefault(''))
 
-  return (
-    <TroubleshootingContext.Provider
-      value={{ filterState, searchState, setFilterState, setSearchState }}
-    >
-      {children}
-    </TroubleshootingContext.Provider>
-  )
-}
-
-// Custom hook to use the context
-function useTroubleshootingContext() {
-  const context = useContext(TroubleshootingContext)
-  if (context === undefined) {
-    throw new Error('useTroubleshootingContext must be used within a TroubleshootingProvider')
-  }
-  return context
+  return { filterState, searchState, setFilterState, setSearchState }
 }
 
 function entryMatchesFilter(entry: HTMLElement, filterState: Array<string>, searchState: string) {
@@ -69,14 +41,22 @@ function entryMatchesFilter(entry: HTMLElement, filterState: Array<string>, sear
   )
 }
 
-export function TroubleshootingFilter({
-  keywords,
-  className,
-}: {
+interface TroubleshootingFilterProps {
   keywords: string[]
   className?: string
-}) {
-  const { filterState, searchState, setFilterState, setSearchState } = useTroubleshootingContext()
+}
+
+export function TroubleshootingFilter(props: TroubleshootingFilterProps) {
+  return (
+    <Suspense>
+      <TroubleshootingFilterInternal {...props} />
+    </Suspense>
+  )
+}
+
+function TroubleshootingFilterInternal({ keywords, className }: TroubleshootingFilterProps) {
+  const { filterState, searchState, setFilterState, setSearchState } =
+    useTroubleshootingSearchState()
 
   const allTroubleshootingEntries = useRef<Array<HTMLElement>>([])
 
@@ -191,7 +171,15 @@ export function TroubleshootingFilter({
 }
 
 export function TroubleshootingFilterEmptyState() {
-  const { filterState, searchState } = useTroubleshootingContext()
+  return (
+    <Suspense>
+      <TroubleshootingFilterEmptyStateInternal />
+    </Suspense>
+  )
+}
+
+function TroubleshootingFilterEmptyStateInternal() {
+  const { filterState, searchState } = useTroubleshootingSearchState()
   const allTroubleshootingEntries = useRef<Array<HTMLElement>>([])
 
   const [numberResults, setNumberResults] = useState<number | undefined>(undefined)

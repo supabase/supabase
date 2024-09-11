@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import React, { Fragment } from 'react'
+import React, { Fragment, Suspense } from 'react'
 
 import { useBreakpoint } from 'common'
 import {
@@ -29,15 +29,24 @@ import {
 import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 
-const Breadcrumbs = ({
+interface BreadcrumbsProps extends React.HTMLAttributes<HTMLDivElement> {
+  minLength?: number
+  forceDisplayOnMobile?: boolean
+}
+
+export default function Breadcrumbs(props: BreadcrumbsProps) {
+  return (
+    <Suspense>
+      <BreadcrumbsInternal {...props} />
+    </Suspense>
+  )
+}
+
+const BreadcrumbsInternal = ({
   className,
   minLength = 2,
   forceDisplayOnMobile = false,
-}: {
-  className?: string
-  minLength?: number
-  forceDisplayOnMobile?: boolean
-}) => {
+}: BreadcrumbsProps) => {
   const breadcrumbs = useBreadcrumbs()
   const [open, setOpen] = React.useState(false)
   const isMobile = useBreakpoint('md')
@@ -161,7 +170,10 @@ function useBreadcrumbs() {
 
     const [, , section] = pathname.split('/')
     if (section !== 'troubleshooting') {
-      breadcrumbs.push({ name: section, url: `/guides/${section}/troubleshooting` })
+      breadcrumbs.push({
+        name: section[0].toUpperCase() + section.slice(1),
+        url: `/guides/${section}/troubleshooting`,
+      })
     }
 
     return breadcrumbs
@@ -191,5 +203,3 @@ function findMenuItemByUrl(menu, targetUrl, parents = []) {
   // If the URL is not found, return null
   return null
 }
-
-export default Breadcrumbs
