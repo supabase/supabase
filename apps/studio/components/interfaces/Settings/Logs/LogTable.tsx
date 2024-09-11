@@ -11,6 +11,8 @@ import CSVButton from 'components/ui/CSVButton'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { Item, Menu, useContextMenu } from 'react-contexify'
+import { createPortal } from 'react-dom'
 import {
   Alert,
   Button,
@@ -18,9 +20,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconEye,
-  IconEyeOff,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -37,8 +36,6 @@ import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
-import { createPortal } from 'react-dom'
-import { Item, Menu, useContextMenu } from 'react-contexify'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -133,7 +130,6 @@ const LogTable = ({
         return <div className="flex items-center">{v}</div>
       },
       minWidth: 128,
-      maxWidth: v === 'timestamp' ? 240 : 2400, // Without this, the column flickers on first render
     }
 
     return result
@@ -405,7 +401,7 @@ const LogTable = ({
               renderers={{
                 renderRow: RowRenderer,
                 noRowsFallback: !isLoading ? (
-                  <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
+                  <div className="mx-auto flex h-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
                     {!error && renderNoResultAlert()}
                     {error && renderErrorAlert()}
                   </div>

@@ -1,11 +1,6 @@
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  IconChevronDown,
-} from 'ui'
+import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 
 type IParamProps = any
 
@@ -38,7 +33,7 @@ const BodyContentTypeDropdown = ({ types, onSelect }: IParamProps) => {
           "
         >
           {selectedType}
-          <IconChevronDown size={14} strokeWidth={2} />
+          <ChevronDown size={14} strokeWidth={2} />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" side="bottom" className="w-48">

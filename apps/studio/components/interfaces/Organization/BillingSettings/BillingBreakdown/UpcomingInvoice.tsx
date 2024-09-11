@@ -1,14 +1,15 @@
 import clsx from 'clsx'
 
+import * as Tooltip from '@radix-ui/react-tooltip'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgUpcomingInvoiceQuery } from 'data/invoices/org-invoice-upcoming-query'
-import React, { useMemo, useState } from 'react'
-import { Button, Collapsible, IconChevronRight, IconInfo } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { billingMetricUnit, formatUsage } from '../helpers'
-import Link from 'next/link'
 import { formatCurrency } from 'lib/helpers'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
+import { Button, Collapsible } from 'ui'
+import { billingMetricUnit, formatUsage } from '../helpers'
+import { ChevronRight, Info } from 'lucide-react'
 
 export interface UpcomingInvoiceProps {
   slug?: string
@@ -165,7 +166,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                             type="text"
                             className="!px-1"
                             icon={
-                              <IconChevronRight
+                              <ChevronRight
                                 className={clsx(
                                   'transition',
                                   usageFeesExpanded.includes(fee.description) && 'rotate-90'
@@ -283,7 +284,7 @@ const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) =
   return (
     <Tooltip.Root delayDuration={0}>
       <Tooltip.Trigger>
-        <IconInfo size={12} strokeWidth={2} />
+        <Info size={12} strokeWidth={2} />
       </Tooltip.Trigger>
       <Tooltip.Portal>
         <Tooltip.Content side="bottom">

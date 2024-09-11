@@ -21,11 +21,11 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { getURL } from 'lib/helpers'
-import { Alert, Button, IconCreditCard, IconPlus } from 'ui'
+import { CreditCardIcon, Plus } from 'lucide-react'
+import { Alert, Button } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
-import { CreditCardIcon } from 'lucide-react'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
@@ -125,7 +125,7 @@ const PaymentMethods = () => {
                         )}
                         <Button
                           type="default"
-                          icon={<IconPlus />}
+                          icon={<Plus />}
                           disabled={!canUpdatePaymentMethods}
                           onClick={() => setShowAddPaymentMethodModal(true)}
                         >

@@ -14,7 +14,7 @@ import {
 } from '~/features/docs/Reference.generated.singleton'
 import { getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
-import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
+import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 import { BASE_PATH } from '~/lib/constants'
 
@@ -30,8 +30,8 @@ export async function GET(request: Request) {
     slug = maybeVersion
   }
 
-  let section: AbbrevCommonClientLibSection
-  let sectionsWithUrl: Array<AbbrevCommonClientLibSection & { url: URL }>
+  let section: AbbrevApiReferenceSection
+  let sectionsWithUrl: Array<AbbrevApiReferenceSection & { url: URL }>
   try {
     const flattenedSections = (await getFlattenedSections(lib, version)) ?? []
     sectionsWithUrl = flattenedSections.map((section) => {
@@ -72,7 +72,7 @@ function htmlShell(
   lib: string,
   version: string | null,
   slug: string,
-  section: AbbrevCommonClientLibSection,
+  section: AbbrevApiReferenceSection,
   body: string
 ) {
   const libraryName = REFERENCES[lib].name
@@ -96,7 +96,7 @@ function htmlShell(
   )
 }
 
-function libraryNav(sections: Array<AbbrevCommonClientLibSection & { url: URL }>) {
+function libraryNav(sections: Array<AbbrevApiReferenceSection & { url: URL }>) {
   return (
     '<nav><ul>' +
     sections
@@ -106,7 +106,7 @@ function libraryNav(sections: Array<AbbrevCommonClientLibSection & { url: URL }>
   )
 }
 
-async function sectionDetails(lib: string, version: string, section: AbbrevCommonClientLibSection) {
+async function sectionDetails(lib: string, version: string, section: AbbrevApiReferenceSection) {
   const libraryName = REFERENCES[lib].name
   let result = '<h1>' + (libraryName + ': ' + section.title ?? '') + '</h1>'
 
@@ -119,11 +119,7 @@ async function sectionDetails(lib: string, version: string, section: AbbrevCommo
   return result
 }
 
-async function markdown(
-  lib: string,
-  version: string | null,
-  section: AbbrevCommonClientLibSection
-) {
+async function markdown(lib: string, version: string | null, section: AbbrevApiReferenceSection) {
   const dir = !!section.meta?.shared ? 'shared' : lib + (version ? '/' + version : '')
 
   let content = await getRefMarkdown(dir + '/' + section.slug)
@@ -134,7 +130,7 @@ async function markdown(
 async function functionDetails(
   lib: string,
   version: string | null,
-  section: AbbrevCommonClientLibSection
+  section: AbbrevApiReferenceSection
 ) {
   const libraryMeta = REFERENCES[lib]
 

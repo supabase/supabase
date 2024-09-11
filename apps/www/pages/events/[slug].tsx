@@ -13,6 +13,7 @@ import {
   MicrophoneIcon,
   HandIcon,
 } from '@heroicons/react/solid'
+import { capitalize } from 'lodash'
 
 import authors from 'lib/authors.json'
 import { isNotNullOrUndefined } from '~/lib/helpers'
@@ -149,10 +150,15 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
 
   const IS_REGISTRATION_OPEN = event.onDemand || Date.parse(event.date) > Date.now()
 
+  const ogImageUrl = encodeURI(
+    `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=events&eventType=${event.type}&title=${event.meta_title ?? event.title}&description=${event.meta_description ?? event.description}&date=${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)}&duration=${event.duration}`
+  )
+
   const meta = {
-    title: event.meta_title ?? event.title,
+    title: `${event.meta_title ?? event.title} | ${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)} | ${capitalize(event.type)}`,
     description: event.meta_description ?? event.description,
     url: `https://supabase.com/events/${event.slug}`,
+    image: ogImageUrl,
   }
 
   const eventIcons = {
@@ -190,7 +196,9 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
           type: 'article',
           images: [
             {
-              url: `${origin}${router.basePath}/images/events/${event.image ? event.image : event.thumb}`,
+              url:
+                meta.image ??
+                `${origin}${router.basePath}/images/events/${event.image ? event.image : event.thumb}`,
               alt: `${event.title} thumbnail`,
               width: 1200,
               height: 627,

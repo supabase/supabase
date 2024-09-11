@@ -1,9 +1,10 @@
-import { useState } from 'react'
-import { useRouter } from 'next/router'
-import { Button, IconMessageCircle } from 'ui'
-import Tweets from '../../data/tweets/Tweets.json'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { Button } from 'ui'
 import { TweetCard } from 'ui-patterns/TweetCard'
+import Tweets from '../../data/tweets/Tweets.json'
+import { MessageCircle } from 'lucide-react'
 
 function TwitterSocialProof() {
   // base path for images
@@ -32,7 +33,7 @@ function TwitterSocialProof() {
             Supported by a network of early advocates, contributors, and champions.
           </p>
           <div className="my-8 flex justify-center gap-2">
-            <Button asChild size="small" iconRight={<IconMessageCircle size={14} />} type="default">
+            <Button asChild size="small" iconRight={<MessageCircle size={14} />} type="default">
               <Link
                 href={'https://github.com/supabase/supabase/discussions'}
                 target="_blank"
@@ -41,7 +42,7 @@ function TwitterSocialProof() {
                 GitHub discussions
               </Link>
             </Button>
-            <Button asChild type="default" size="small" iconRight={<IconMessageCircle size={14} />}>
+            <Button asChild type="default" size="small" iconRight={<MessageCircle size={14} />}>
               <Link href={'https://discord.supabase.com/'} target="_blank" tabIndex={-1}>
                 Discord
               </Link>

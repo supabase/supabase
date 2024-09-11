@@ -8,7 +8,7 @@ export const tokenizer = getEncoding('cl100k_base')
  */
 export function getChatRequestTokenCount(
   messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-  model = 'gpt-3.5-turbo-0301'
+  model = 'gpt-4o-mini-2024-07-18'
 ): number {
   const tokensPerRequest = 3 // every reply is primed with <|im_start|>assistant<|im_sep|>
   const numTokens = messages.reduce((acc, message) => acc + getMessageTokenCount(message, model), 0)
@@ -24,7 +24,7 @@ export function getChatRequestTokenCount(
  */
 export function getMessageTokenCount(
   message: OpenAI.Chat.Completions.ChatCompletionMessageParam,
-  model = 'gpt-3.5-turbo-0301'
+  model = 'gpt-4o-mini-2024-07-18'
 ): number {
   let tokensPerMessage: number
   let tokensPerName: number

@@ -18,8 +18,9 @@ import { useInvoicesQuery } from 'data/invoices/invoices-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
-import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
+import { Button } from 'ui'
 import CurrentPaymentMethod from '../BillingSettings/PaymentMethods/CurrentPaymentMethod'
+import { FileText, Download, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const PAGE_LIMIT = 10
 
@@ -126,7 +127,7 @@ const InvoicesSettings = () => {
                     return (
                       <Table.tr key={x.id}>
                         <Table.td>
-                          <IconFileText size="xxl" />
+                          <FileText size="24" />
                         </Table.td>
                         <Table.td>
                           <p>{dayjs(x.period_end * 1000).format('MMM DD, YYYY')}</p>
@@ -164,7 +165,7 @@ const InvoicesSettings = () => {
 
                             <Button
                               type="outline"
-                              icon={<IconDownload size={16} strokeWidth={1.5} />}
+                              icon={<Download size={16} strokeWidth={1.5} />}
                               onClick={() => fetchInvoice(x.id)}
                             />
                           </div>
@@ -184,14 +185,14 @@ const InvoicesSettings = () => {
                         </p>
                         <div className="flex items-center space-x-2">
                           <Button
-                            icon={<IconChevronLeft />}
+                            icon={<ChevronLeft />}
                             type="default"
                             size="tiny"
                             disabled={page === 1}
                             onClick={async () => setPage(page - 1)}
                           />
                           <Button
-                            icon={<IconChevronRight />}
+                            icon={<ChevronRight />}
                             type="default"
                             size="tiny"
                             disabled={page * PAGE_LIMIT >= (count ?? 0)}

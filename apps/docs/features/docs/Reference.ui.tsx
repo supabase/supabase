@@ -97,7 +97,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
         // spaced-out in regular position
         'pt-[calc(var(--header-height)+1rem)] -mt-[calc(var(--header-height)+1rem-2px)]',
         // Same for bottom
-        'pb-8 -mb-4',
+        'pb-8 -mb-3',
         'bg-gradient-to-b from-background from-85% to-transparent to-100%',
         'text-2xl font-medium text-foreground',
         'scroll-mt-[calc(var(--header-height)+1rem)]',
@@ -308,7 +308,7 @@ function TypeSubDetails({
   )
 }
 
-function RequiredBadge({ isOptional }: { isOptional: boolean | 'NA' }) {
+export function RequiredBadge({ isOptional }: { isOptional: boolean | 'NA' }) {
   return isOptional === true ? (
     <span className="font-mono text-[10px] text-foreground-lighter tracking-wide">Optional</span>
   ) : isOptional === false ? (

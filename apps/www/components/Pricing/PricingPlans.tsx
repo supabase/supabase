@@ -3,11 +3,12 @@ import { useRouter } from 'next/router'
 
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import { pickFeatures, pickFooter, plans } from 'shared-data/plans'
-import { Button, cn, IconCheck } from 'ui'
+import { Button, cn } from 'ui'
 import { Organization } from '~/data/organizations'
 import gaEvents from '~/lib/gaEvents'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 import UpgradePlan from './UpgradePlan'
+import { Check } from 'lucide-react'
 
 interface PricingPlansProps {
   organizations?: Organization[]
@@ -157,7 +158,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                       >
                         <div className="flex items-center">
                           <div className="flex w-6">
-                            <IconCheck
+                            <Check
                               className={cn(
                                 'h-4 w-4',
                                 plan.name === 'Enterprise' ? 'text-foreground' : 'text-brand'

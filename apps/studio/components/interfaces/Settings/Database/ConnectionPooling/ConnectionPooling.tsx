@@ -31,13 +31,13 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconExternalLink,
   Input_Shadcn_,
   Listbox,
   Separator,
 } from 'ui'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
+import { ExternalLink } from 'lucide-react'
 
 const formId = 'connection-pooling-form'
 
@@ -162,7 +162,7 @@ export const ConnectionPooling = () => {
               </p>
               <Badge>Supavisor</Badge>
             </div>
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <a
                 target="_blank"
                 rel="noreferrer"
