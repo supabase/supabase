@@ -102,7 +102,7 @@ select * from pgmq.send_batch(
 
 #### read
 
-Read 1 or more messages from a queue. The VT specifies the amount of time in seconds that the message will be invisible to other consumers after reading.
+Read 1 or more messages from a queue. The VT specifies the delay in seconds between reading and the message becoming invisible to other consumers.
 
 {/* prettier-ignore */}
 ```sql
