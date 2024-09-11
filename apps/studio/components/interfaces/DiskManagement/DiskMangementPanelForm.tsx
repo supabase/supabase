@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AnimatePresence, motion } from 'framer-motion'
-import { RotateCcw } from 'lucide-react'
+import { InfoIcon, RotateCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -19,6 +19,9 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { GB } from 'lib/constants'
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Badge,
   Button,
   Card,
@@ -46,6 +49,7 @@ import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelS
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import { DiskType, PLAN_DETAILS } from './DiskMangement.constants'
 import { DiskManagementReviewAndSubmitDialog } from './DiskMangementReviewAndSubmitDialog'
+import Link from 'next/link'
 
 export function DiskMangementPanelForm() {
   const org = useSelectedOrganization()
@@ -87,10 +91,11 @@ export function DiskMangementPanelForm() {
     useRemainingDurationForDiskAttributeUpdate({
       projectRef,
     })
-  const disableInput = isRequestingChanges || isWithinCooldownWindow
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const planId = subscription?.plan.id ?? ''
+  const isPlanUpgradeRequired =
+    subscription?.plan.id === 'pro' && !subscription.usage_billing_enabled
 
   // [Joshen] Just FYI eventually we'll need to show the DISK size, although this is okay for now
   const { data: dbSize } = useDatabaseSizeQuery({
@@ -132,6 +137,7 @@ export function DiskMangementPanelForm() {
   const watchedIOPS = watch('provisionedIOPS')
   const { dirtyFields } = formState // Destructure dirtyFields from formState
   const isAllocatedStorageDirty = !!dirtyFields.totalSize // Check if 'allocatedStorage' is dirty
+  const disableInput = isRequestingChanges || isPlanUpgradeRequired || isWithinCooldownWindow
 
   const maxIOPS =
     watchedStorageType === 'gp3'
@@ -197,6 +203,35 @@ export function DiskMangementPanelForm() {
 
     return () => clearInterval(timer)
   }, [remainingTime])
+
+  if (planId === 'free') {
+    return (
+      <div>
+        <FormHeader title="Disk Management" />
+        <Alert_Shadcn_>
+          <InfoIcon />
+          <AlertTitle_Shadcn_>
+            Disk size configuration is not available for projects on the Free Plan
+          </AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>
+            <p>
+              If you are intending to use more than 500MB of disk space, then you will need to
+              upgrade to at least the Pro Plan.
+            </p>
+            <Button asChild type="default" className="mt-3">
+              <Link
+                target="_blank"
+                rel="noreferrer"
+                href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}
+              >
+                Upgrade plan
+              </Link>
+            </Button>
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -523,7 +558,8 @@ export function DiskMangementPanelForm() {
             ) : (
               <DiskCountdownRadial remainingTime={remainingTime} />
             )}
-            <DiskManagementPlanUpgradeRequired />
+
+            {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />}
 
             <Card className="bg-surface-100 rounded-t-none">
               <CardContent className="flex items-center pb-0 py-3 px-8 gap-3 justify-end">
