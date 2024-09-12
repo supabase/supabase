@@ -12,6 +12,7 @@ const PROVIDER_EMAIL = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Email',
+  link: 'https://supabase.com/docs/guides/auth/passwords',
   properties: {
     EXTERNAL_EMAIL_ENABLED: {
       title: 'Enable Email provider',
@@ -180,6 +181,7 @@ const PROVIDER_PHONE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Phone',
+  link: 'https://supabase.com/docs/guides/auth/phone-login',
   properties: {
     EXTERNAL_PHONE_ENABLED: {
       title: 'Enable Phone provider',
@@ -388,6 +390,7 @@ const EXTERNAL_PROVIDER_APPLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Apple',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-apple',
   properties: {
     EXTERNAL_APPLE_ENABLED: {
       title: 'Enable Sign in with Apple',
@@ -530,6 +533,7 @@ const EXTERNAL_PROVIDER_AZURE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Azure',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-azure',
   properties: {
     EXTERNAL_AZURE_ENABLED: {
       title: 'Azure enabled',
@@ -578,6 +582,7 @@ const EXTERNAL_PROVIDER_BITBUCKET = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Bitbucket',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-bitbucket',
   properties: {
     EXTERNAL_BITBUCKET_ENABLED: {
       title: 'Bitbucket enabled',
@@ -616,6 +621,7 @@ const EXTERNAL_PROVIDER_DISCORD = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Discord',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-discord?',
   properties: {
     EXTERNAL_DISCORD_ENABLED: {
       title: 'Discord enabled',
@@ -654,6 +660,7 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Facebook',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-facebook',
   properties: {
     EXTERNAL_FACEBOOK_ENABLED: {
       title: 'Facebook enabled',
@@ -692,6 +699,7 @@ const EXTERNAL_PROVIDER_FIGMA = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Figma',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-figma',
   properties: {
     EXTERNAL_FIGMA_ENABLED: {
       title: 'Figma enabled',
@@ -730,6 +738,7 @@ const EXTERNAL_PROVIDER_GITHUB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitHub',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-github',
   properties: {
     EXTERNAL_GITHUB_ENABLED: {
       title: 'GitHub enabled',
@@ -768,6 +777,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitLab',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-gitlab',
   properties: {
     EXTERNAL_GITLAB_ENABLED: {
       title: 'GitLab enabled',
@@ -814,6 +824,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Google',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-google',
   properties: {
     EXTERNAL_GOOGLE_ENABLED: {
       title: 'Enable Sign in with Google',
@@ -918,6 +929,7 @@ const EXTERNAL_PROVIDER_KAKAO = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Kakao',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-kakao',
   properties: {
     EXTERNAL_KAKAO_ENABLED: {
       title: 'Kakao enabled',
@@ -959,6 +971,7 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'KeyCloak',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-keycloak',
   properties: {
     EXTERNAL_KEYCLOAK_ENABLED: {
       title: 'Keycloak enabled',
@@ -1008,6 +1021,7 @@ const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'LinkedIn (OIDC)',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-linkedin',
   properties: {
     EXTERNAL_LINKEDIN_OIDC_ENABLED: {
       title: 'LinkedIn enabled',
@@ -1046,6 +1060,7 @@ const EXTERNAL_PROVIDER_NOTION = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Notion',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-notion',
   properties: {
     EXTERNAL_NOTION_ENABLED: {
       title: 'Notion enabled',
@@ -1084,6 +1099,7 @@ const EXTERNAL_PROVIDER_TWITCH = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Twitch',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-twitch',
   properties: {
     EXTERNAL_TWITCH_ENABLED: {
       title: 'Twitch enabled',
@@ -1122,6 +1138,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Twitter',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-twitter',
   properties: {
     EXTERNAL_TWITTER_ENABLED: {
       title: 'Twitter enabled',
@@ -1160,6 +1177,7 @@ const EXTERNAL_PROVIDER_SLACK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Slack (Deprecated)',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-slack',
   properties: {
     EXTERNAL_SLACK_ENABLED: {
       title: 'Slack enabled',
@@ -1198,6 +1216,7 @@ const EXTERNAL_PROVIDER_SLACK_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Slack (OIDC)',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-slack',
   properties: {
     EXTERNAL_SLACK_OIDC_ENABLED: {
       title: 'Slack enabled',
@@ -1236,6 +1255,7 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Spotify',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-spotify',
   properties: {
     EXTERNAL_SPOTIFY_ENABLED: {
       title: 'Spotify enabled',
@@ -1274,6 +1294,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'WorkOS',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-workos',
   properties: {
     EXTERNAL_WORKOS_ENABLED: {
       title: 'WorkOS enabled',
@@ -1323,6 +1344,7 @@ const EXTERNAL_PROVIDER_ZOOM = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Zoom',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-zoom',
   properties: {
     EXTERNAL_ZOOM_ENABLED: {
       title: 'Zoom enabled',
@@ -1361,6 +1383,7 @@ const PROVIDER_SAML = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'SAML 2.0',
+  link: 'https://supabase.com/docs/guides/auth/enterprise-sso',
   properties: {
     SAML_ENABLED: {
       title: 'Enable SAML 2.0 Single Sign-on',
