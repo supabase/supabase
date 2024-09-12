@@ -141,7 +141,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
         <DialogHeader>
           <DialogTitle>Review changes</DialogTitle>
           <DialogDescription>
-            Disk configuration changes will take effect after the next restart.
+            Disk configuration changes will be applied shortly once confirmed.
           </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />

@@ -513,7 +513,7 @@ export function DiskManagementPanelForm() {
                           }
                         />
                         <div className="text-xs text-foreground-light">
-                          Your plan includes {includedDiskGB} GB of disk size.
+                          Your plan includes {includedDiskGB} GiB of disk size.
                         </div>
                       </div>
                     </FormItemLayout>
