@@ -29,14 +29,15 @@ import * as z from 'zod'
 
 import { Monaco } from '@monaco-editor/react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import {
   IStandaloneCodeEditor,
   IStandaloneDiffEditor,
 } from 'components/interfaces/SQLEditor/SQLEditor.types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
@@ -50,6 +51,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
+import { useQueryState } from 'nuqs'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
@@ -66,9 +68,6 @@ import { PolicyDetailsV2 } from './PolicyDetailsV2'
 import { PolicyTemplates } from './PolicyTemplates'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
-import { useQueryState } from 'nuqs'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -104,7 +103,6 @@ export const AIPolicyEditorPanel = memo(function ({
   const selectedOrganization = useSelectedOrganization()
 
   const telemetryProps = useTelemetryProps()
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const [editView, setEditView] = useQueryState('view', { defaultValue: 'templates' as const })
@@ -572,13 +570,13 @@ export const AIPolicyEditorPanel = memo(function ({
                   {/* which left side editor to show in the sheet  */}
                   {editView === 'conversation' ? (
                     <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
-                      aaaaaaaaxxxxx
                       <RLSCodeEditor
                         id="rls-sql-policy"
                         defaultValue={''}
                         value={existingPolicyDefinition}
                         placeholder={placeholder}
                         editorRef={editorOneRef}
+                        editView={editView as 'templates' | 'conversation'} // someone help
                       />
                     </div>
                   ) : (
@@ -619,6 +617,7 @@ export const AIPolicyEditorPanel = memo(function ({
                             disableTabToUsePlaceholder
                             readOnly={!canUpdatePolicies}
                             id="rls-exp-one-editor"
+                            editView={editView as 'templates' | 'conversation'} // someone help
                             placeholder={
                               command === 'insert'
                                 ? '-- Provide a SQL expression for the with check statement'
@@ -691,6 +690,7 @@ export const AIPolicyEditorPanel = memo(function ({
                                 editorRef={editorTwoRef}
                                 monacoRef={monacoTwoRef as any}
                                 lineNumberStart={7 + expOneLineCount}
+                                editView={editView as 'templates' | 'conversation'} // someone help
                                 onChange={() => {
                                   setExpTwoContentHeight(
                                     editorTwoRef.current?.getContentHeight() ?? 0
@@ -870,30 +870,23 @@ export const AIPolicyEditorPanel = memo(function ({
                             selectedPolicy={selectedPolicy}
                             selectedTemplate={selectedDiff}
                             onSelectTemplate={(value) => {
-                              if (isAiAssistantEnabled) {
-                                updateEditorWithCheckForDiff({
-                                  id: value.id,
-                                  content: value.statement,
-                                })
+                              form.setValue('name', value.name)
+                              form.setValue('behavior', 'permissive')
+                              form.setValue('command', value.command.toLowerCase())
+                              form.setValue('roles', value.roles.join(', ') ?? '')
+
+                              setUsing(`  ${value.definition}`)
+                              setCheck(`  ${value.check}`)
+                              setExpOneLineCount(1)
+                              setExpTwoLineCount(1)
+                              setFieldError(undefined)
+
+                              if (!['update', 'all'].includes(value.command.toLowerCase())) {
+                                setShowCheckBlock(false)
+                              } else if (value.check.length > 0) {
+                                setShowCheckBlock(true)
                               } else {
-                                form.setValue('name', value.name)
-                                form.setValue('behavior', 'permissive')
-                                form.setValue('command', value.command.toLowerCase())
-                                form.setValue('roles', value.roles.join(', ') ?? '')
-
-                                setUsing(`  ${value.definition}`)
-                                setCheck(`  ${value.check}`)
-                                setExpOneLineCount(1)
-                                setExpTwoLineCount(1)
-                                setFieldError(undefined)
-
-                                if (!['update', 'all'].includes(value.command.toLowerCase())) {
-                                  setShowCheckBlock(false)
-                                } else if (value.check.length > 0) {
-                                  setShowCheckBlock(true)
-                                } else {
-                                  setShowCheckBlock(false)
-                                }
+                                setShowCheckBlock(false)
                               }
                             }}
                           />

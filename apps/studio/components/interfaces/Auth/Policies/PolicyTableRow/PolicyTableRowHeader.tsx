@@ -1,21 +1,13 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { noop } from 'lodash'
-import { LayoutTemplate, Lock } from 'lucide-react'
+import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useQueryState } from 'nuqs'
-import {
-  AiIconAnimation,
-  Badge,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
+import { AiIconAnimation, Badge } from 'ui'
 
 interface PolicyTableRowHeaderProps {
   table: PostgresTable
@@ -33,7 +25,6 @@ const PolicyTableRowHeader = ({
   const router = useRouter()
   const { ref } = router.query
 
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const isRealtimeSchema = table.schema === 'realtime'

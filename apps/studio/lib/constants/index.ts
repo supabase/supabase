@@ -34,7 +34,6 @@ export const LOCAL_STORAGE_KEYS = {
 
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
-  UI_PREVIEW_RLS_AI_ASSISTANT: 'supabase-ui-rls-ai-assistant',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
 
