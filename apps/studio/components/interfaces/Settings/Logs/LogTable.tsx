@@ -364,7 +364,7 @@ const LogTable = ({
   if (!data) return null
 
   return (
-    <section className={'flex w-full flex-col h-full'} style={{ maxHeight }}>
+    <section className={'flex w-full flex-col h-screen'} style={{ maxHeight }}>
       {!queryType && <LogsExplorerTableHeader />}
 
       <ResizablePanelGroup direction="horizontal">

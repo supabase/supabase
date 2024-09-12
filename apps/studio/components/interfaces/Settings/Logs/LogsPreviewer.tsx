@@ -78,14 +78,14 @@ export const LogsPreviewer = ({
   useEffect(() => {
     setFilters((prev) => ({
       ...prev,
-      search_query: s as string,
-      database: db as string,
+      search_query: s,
+      database: db,
     }))
     if (ite || its) {
       setParams((prev) => ({
         ...prev,
-        iso_timestamp_start: (its || '') as string,
-        iso_timestamp_end: (ite || '') as string,
+        iso_timestamp_start: its || '',
+        iso_timestamp_end: ite || '',
       }))
     }
   }, [db, s, ite, its])
@@ -262,7 +262,7 @@ export const LogsPreviewer = ({
           />
         </LoadingOpacity>
       </div>
-      {!error && (
+      {!error && logData.length > 0 && (
         <div className="border-t flex flex-row justify-between p-2">
           <Button
             className={cn({
