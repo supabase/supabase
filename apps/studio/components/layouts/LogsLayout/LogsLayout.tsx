@@ -103,7 +103,6 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
                       {collectionQueryEnabled && collectionsLoading ? (
                         <GenericSkeletonLoader />
                       ) : (
-                        collections?.length &&
                         collections?.map((item) => (
                           <WarehouseMenuItem item={item} key={item.id + '-collection-item'} />
                         ))
