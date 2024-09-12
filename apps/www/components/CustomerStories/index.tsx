@@ -175,6 +175,7 @@ const CustomerCard: React.FC<CustomerCardProps> = ({
           src={logoImage}
           alt={customer.title}
           fill
+          priority
           sizes="100%"
           className={cn('object-contain object-left', className)}
         />
@@ -196,6 +197,7 @@ const CustomerCard: React.FC<CustomerCardProps> = ({
             alt={customer.organization}
             width={300}
             height={150}
+            priority
             className="w-full opacity-50 group-hover/panel:opacity-75 transition-opacity max-w-[140px] filter dark:invert"
           />
         </Panel>
