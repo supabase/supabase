@@ -46,11 +46,12 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
       enabled: showWarehouse,
     }
   )
+  const collectionQueryEnabled = !!tenant
   const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
     {
       projectRef,
     },
-    { enabled: !!tenant }
+    { enabled: collectionQueryEnabled }
   )
 
   const canUseLogsExplorer = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
@@ -87,7 +88,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
                   <Menu.Group
                     title={
                       <div>
-                        Warehouse Events
+                        Collections
                         <Badge variant="warning" size="small" className="ml-2">
                           New
                         </Badge>
@@ -99,7 +100,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
                   <div className="space-y-1">
                     <CreateWarehouseCollectionModal />
                     <div className="pt-3">
-                      {collectionsLoading ? (
+                      {collectionQueryEnabled && collectionsLoading ? (
                         <GenericSkeletonLoader />
                       ) : (
                         collections?.map((item) => (
@@ -119,7 +120,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
                 <Link href={`/project/${ref}/settings/warehouse`}>
                   <Menu.Item rounded>
                     <div className="flex px-3 items-center justify-between">
-                      <p className="truncate">Warehouse Settings</p>
+                      <p className="truncate">Analytics Settings</p>
                       <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
                     </div>
                   </Menu.Item>
