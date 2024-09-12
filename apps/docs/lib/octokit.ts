@@ -8,7 +8,7 @@ import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 
 let octokitInstance: Octokit
 
-function octokit() {
+export function octokit() {
   if (!octokitInstance) {
     const privateKeyPkcs8 = crypto
       .createPrivateKey(process.env.DOCS_GITHUB_APP_PRIVATE_KEY)

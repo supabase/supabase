@@ -318,6 +318,7 @@ export type Database = {
       troubleshooting_entries: {
         Row: {
           api: Json | null
+          checksum: string
           date_created: string
           date_updated: string
           errors: Json[] | null
@@ -329,6 +330,7 @@ export type Database = {
         }
         Insert: {
           api?: Json | null
+          checksum: string
           date_created?: string
           date_updated?: string
           errors?: Json[] | null
@@ -340,6 +342,7 @@ export type Database = {
         }
         Update: {
           api?: Json | null
+          checksum?: string
           date_created?: string
           date_updated?: string
           errors?: Json[] | null
@@ -464,6 +467,33 @@ export type Database = {
         }
         Returns: unknown
       }
+      json_matches_schema: {
+        Args: {
+          schema: Json
+          instance: Json
+        }
+        Returns: boolean
+      }
+      jsonb_matches_schema: {
+        Args: {
+          schema: Json
+          instance: Json
+        }
+        Returns: boolean
+      }
+      jsonschema_is_valid: {
+        Args: {
+          schema: Json
+        }
+        Returns: boolean
+      }
+      jsonschema_validation_errors: {
+        Args: {
+          schema: Json
+          instance: Json
+        }
+        Returns: string[]
+      }
       match_page_sections_v2: {
         Args: {
           embedding: string
@@ -490,6 +520,12 @@ export type Database = {
           check_time: string
         }
         Returns: string
+      }
+      validate_troubleshooting_errors: {
+        Args: {
+          errors: Json[]
+        }
+        Returns: boolean
       }
       vector_avg: {
         Args: {
