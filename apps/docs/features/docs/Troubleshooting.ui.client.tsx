@@ -238,7 +238,7 @@ export function TroubleshootingGlobalSearch() {
   return (
     <>
       <label htmlFor="troubleshooting-global-search" className="sr-only">
-        Seach for more troubleshooting topics
+        Search for more troubleshooting topics
       </label>
       <form
         className="relative"
