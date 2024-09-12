@@ -42,6 +42,8 @@ const VideoWithHighlights = (props: Props) => {
             loop
             muted
             autoPlay
+            controls={false}
+            playsInline
             poster={props.video.poster ?? '/images/index/dashboard/supabase-table-editor.png'}
           >
             {props.video.sources.map((source) => (
