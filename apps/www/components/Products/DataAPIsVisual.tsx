@@ -8,7 +8,7 @@ const DataAPIsVisual = () => (
       {range(0, 3).map((_, idx1: number) => (
         <div
           key={`row-${idx1}`}
-          className="relative h-full !aspect-[330/430] -right-10 -left-10 items-end pb-2 z-10 flex pause animate-[marquee-reverse_30000ms_linear_both_infinite] group-hover:run will-change-transform"
+          className="relative h-full !aspect-[330/430] -right-10 -left-10 items-end pb-2 z-10 flex pause animate-[marquee-reverse_30000ms_linear_both_infinite] motion-safe:group-hover:run will-change-transform"
         >
           <Image
             src="/images/index/products/data-apis-lines-dark.svg"

@@ -3,7 +3,7 @@ export type CustomerStoryType = {
   title: string
   description: string
   organization: string
-  imgUrl?: string
+  imgUrl: string
   logo: string
   logo_inverse?: string
   url?: string
@@ -25,6 +25,7 @@ export const data: CustomerStoryType[] = [
     description:
       'Discover how Maergo, a nationwide expedited parcel delivery service, reduced its codebase by 90%, decreased deployment times to just seconds, and achieved unprecedented scalability with Supabase.',
     organization: 'Maergo',
+    imgUrl: 'images/customers/logos/maergo.png',
     logo: '/images/customers/logos/maergo.png',
     logo_inverse: '/images/customers/logos/light/maergo.png',
     url: '/customers/maergo',
@@ -36,6 +37,7 @@ export const data: CustomerStoryType[] = [
     description:
       'Discover Tinloof, how a full-stack development agency, managed and scaled backend services using Supabase, without having to dedicate resources to infrastructure management.',
     organization: 'Tinloof',
+    imgUrl: 'images/customers/logos/tinloof.png',
     logo: '/images/customers/logos/tinloof.png',
     logo_inverse: '/images/customers/logos/light/tinloof.png',
     url: '/customers/tinloof',
@@ -47,6 +49,7 @@ export const data: CustomerStoryType[] = [
     description:
       'How a bootstrapped startup migrated from Heroku to Supabase in 30 minutes and never looked back.',
     organization: 'HappyTeams',
+    imgUrl: 'images/customers/logos/happyteams.png',
     logo: '/images/customers/logos/happyteams.png',
     logo_inverse: '/images/customers/logos/light/happyteams.png',
     url: '/customers/happyteams',
@@ -59,6 +62,7 @@ export const data: CustomerStoryType[] = [
     description:
       'Mobbin helps over 200,000 creators globally search and view the latest design patterns from well-known apps.',
     organization: 'Mobbin',
+    imgUrl: 'images/customers/logos/shotgun.png',
     logo: '/images/customers/logos/mobbin.png',
     logo_inverse: '/images/customers/logos/light/mobbin.png',
     url: '/customers/mobbin',

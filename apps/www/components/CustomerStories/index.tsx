@@ -102,7 +102,7 @@ const CustomerStories = () => {
               'left-0 z-10',
               'w-auto h-full',
               'flex gap-4 items-end',
-              'run animate-[marquee_50000ms_linear_both_infinite] group-hover/tw-marquee:pause',
+              'motion-safe:run motion-safe:animate-[marquee_50000ms_linear_both_infinite] group-hover/tw-marquee:pause',
               'will-change-transform transition-transform',
               compositionGap
             )}
