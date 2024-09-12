@@ -3,7 +3,7 @@ module.exports = [
     protocol: 'https',
     hostname: 'api.producthunt.com',
     port: '',
-    pathname: '',
+    pathname: '**',
   },
   {
     protocol: 'https',
