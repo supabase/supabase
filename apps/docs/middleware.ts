@@ -38,6 +38,11 @@ export function middleware(request: NextRequest) {
       return NextResponse.rewrite(new URL(rewritePath, request.url))
     }
 
+    if (lib === 'api') {
+      const rewritePath = [REFERENCE_PATH, 'api'].join('/')
+      return NextResponse.rewrite(new URL(rewritePath, request.url))
+    }
+
     if (clientSdkIds.includes(lib)) {
       const version = /v\d+/.test(maybeVersion) ? maybeVersion : null
       const rewritePath = [REFERENCE_PATH, lib, version].filter(Boolean).join('/')
