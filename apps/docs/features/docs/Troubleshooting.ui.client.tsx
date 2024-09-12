@@ -1,6 +1,8 @@
 'use client'
 
-import { X } from 'lucide-react'
+import { CornerDownLeft, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { createSerializer, parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import { Fragment, useEffect, useMemo, useRef, useState, Suspense } from 'react'
 
 import {
@@ -19,7 +21,6 @@ import {
   TROUBLESHOOTING_DATA_ATTRIBUTE_PREVIEW,
   TROUBLESHOOTING_ENTRIES_ID,
 } from './Troubleshooting.utils.shared'
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 
 function useTroubleshootingSearchState() {
   const [filterState, setFilterState] = useQueryState(
@@ -43,7 +44,6 @@ function entryMatchesFilter(entry: HTMLElement, filterState: Array<string>, sear
 
 interface TroubleshootingFilterProps {
   keywords: string[]
-  className?: string
 }
 
 export function TroubleshootingFilter(props: TroubleshootingFilterProps) {
@@ -54,9 +54,11 @@ export function TroubleshootingFilter(props: TroubleshootingFilterProps) {
   )
 }
 
-function TroubleshootingFilterInternal({ keywords, className }: TroubleshootingFilterProps) {
+function TroubleshootingFilterInternal({ keywords }: TroubleshootingFilterProps) {
   const { filterState, searchState, setFilterState, setSearchState } =
     useTroubleshootingSearchState()
+
+  const searchInputRef = useRef<HTMLInputElement | null>(null)
 
   const allTroubleshootingEntries = useRef<Array<HTMLElement>>([])
 
@@ -103,17 +105,34 @@ function TroubleshootingFilterInternal({ keywords, className }: TroubleshootingF
   }, [filterState, searchState])
 
   return (
-    <div className={cn('flex flex-col gap-6', className)}>
+    <>
       <h2 className="sr-only">Search and filter</h2>
       <label htmlFor="troubleshooting-search" className="sr-only">
         Filter by search term
       </label>
-      <Input_Shadcn_
-        id="troubleshooting-search"
-        type="text"
-        placeholder="Search"
-        onChange={(e) => setSearchState(e.target.value)}
-      />
+      <div className="relative">
+        <Input_Shadcn_
+          id="troubleshooting-search"
+          ref={searchInputRef}
+          type="text"
+          placeholder="Search"
+          className="pr-8"
+          value={searchState}
+          onChange={(e) => setSearchState(e.target.value || null)}
+        />
+        {searchState && (
+          <button
+            className="absolute right-1 top-1/2 -translate-y-1/2 text-foreground-light border hover:border-stronger rounded-md p-1 transition-colors"
+            onClick={() => {
+              setSearchState(null)
+              searchInputRef.current?.focus()
+            }}
+          >
+            <span className="sr-only">Clear search</span>
+            <X size={16} />
+          </button>
+        )}
+      </div>
       <h3 className="sr-only">Filter by keyword</h3>
       <h4 className="sr-only">Applied filters</h4>
       <ul className="flex flex-wrap items-center gap-2">
@@ -166,7 +185,7 @@ function TroubleshootingFilterInternal({ keywords, className }: TroubleshootingF
           </li>
         ))}
       </ul>
-    </div>
+    </>
   )
 }
 
@@ -204,6 +223,47 @@ function TroubleshootingFilterEmptyStateInternal() {
       {numberResults} {numberResults === 1 ? 'result' : 'results'}
     </span>
   ) : null
+}
+
+const searchSchema = { search: parseAsString }
+const serializeSearch = createSerializer(searchSchema)
+
+export function TroubleshootingGlobalSearch() {
+  const [searchValue, setSearchValue] = useState('')
+  const showSearchHint = searchValue !== ''
+
+  const router = useRouter()
+  const link = serializeSearch('/guides/troubleshooting', { search: searchValue })
+
+  return (
+    <>
+      <label htmlFor="troubleshooting-global-search" className="sr-only">
+        Seach for more troubleshooting topics
+      </label>
+      <form
+        className="relative"
+        onSubmit={(e) => {
+          e.preventDefault()
+          router.push(link)
+        }}
+      >
+        <Input_Shadcn_
+          id="troubleshooting-global-search"
+          type="text"
+          placeholder="Search for more"
+          className="pr-8"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+        />
+        {showSearchHint && (
+          <button className="absolute right-1 top-1/2 -translate-y-1/2 text-foreground-light border hover:border-stronger rounded-md p-1 transition-colors">
+            <span className="sr-only">Submit search</span>
+            <CornerDownLeft size={16} />
+          </button>
+        )}
+      </form>
+    </>
+  )
 }
 
 interface TroubleshootingEntryAssociatedErrorsProps {

@@ -1,5 +1,6 @@
 import { ChevronRight, Wrench } from 'lucide-react'
 import Link from 'next/link'
+import { type PropsWithChildren, useCallback } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { MDXRemoteBase } from './MdxBase'
@@ -7,6 +8,7 @@ import { type ITroubleshootingEntry, getArticleSlug } from './Troubleshooting.ut
 import {
   TroubleshootingEntryAssociatedErrors,
   TroubleshootingFilter,
+  TroubleshootingGlobalSearch,
 } from './Troubleshooting.ui.client'
 import {
   TROUBLESHOOTING_DATA_ATTRIBUTE,
@@ -89,8 +91,8 @@ export function TroubleshootingSidebar({
   mode?: 'filter' | 'moreInfo'
   keywords: string[]
 }) {
-  if (mode === 'moreInfo') {
-    return (
+  const SharedScaffold = useCallback(
+    ({ children }: PropsWithChildren) => (
       <div className="w-full flex flex-col gap-3">
         <h1>
           <Link
@@ -101,30 +103,38 @@ export function TroubleshootingSidebar({
             Troubleshooting
           </Link>
         </h1>
+        <div className="flex flex-col gap-6">{children}</div>
+      </div>
+    ),
+    []
+  )
+
+  if (mode === 'moreInfo') {
+    return (
+      <SharedScaffold>
+        <TroubleshootingGlobalSearch />
         <h2 className="text-foreground-lighter">Related keywords</h2>
         <ul className="text-foreground-lighter">
-          {keywords.map((keyword) => (
-            <li key={keyword} className="list-['–'] ml-2 pl-2 leading-7">
-              <Link
-                className="underline underline-offset-4 decoration-foreground-muted hover:text-foreground transition-colors"
-                href={`/guides/troubleshooting?keywords=${keyword}`}
-              >
-                {keyword}
-              </Link>
-            </li>
-          ))}
+          {keywords
+            .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+            .map((keyword) => (
+              <li key={keyword} className="list-['–'] ml-2 pl-2 leading-7">
+                <Link
+                  className="underline underline-offset-4 decoration-foreground-muted hover:text-foreground transition-colors"
+                  href={`/guides/troubleshooting?keywords=${keyword}`}
+                >
+                  {keyword}
+                </Link>
+              </li>
+            ))}
         </ul>
-      </div>
+      </SharedScaffold>
     )
   }
 
   return (
-    <div className="w-full flex flex-col gap-3">
-      <h1 className="flex items-center gap-3 my-3 text-brand-link">
-        <Wrench size={16} />
-        Troubleshooting
-      </h1>
+    <SharedScaffold>
       <TroubleshootingFilter keywords={keywords} />
-    </div>
+    </SharedScaffold>
   )
 }
