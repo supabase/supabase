@@ -15,7 +15,6 @@ import {
   useRemainingDurationForDiskAttributeUpdate,
 } from 'data/config/disk-attributes-query'
 import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-update-mutation'
-import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { GB } from 'lib/constants'
