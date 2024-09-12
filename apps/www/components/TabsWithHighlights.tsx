@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import Link from 'next/link'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { Badge, cn } from 'ui'
 import BrowserFrame from './BrowserFrame'
 import { Check } from 'lucide-react'
@@ -17,6 +17,8 @@ interface Props {
 
 const TabsWithHighlights = (props: Props) => {
   const [activeTabIdx, setActiveTabIdx] = useState<number>(0)
+  const sectionRef = useRef(null)
+  const isInView = useInView(sectionRef, { once: true })
 
   const Panel: any = props.tabs[activeTabIdx]?.panel ?? null
   const highlights = props.tabs[activeTabIdx]?.highlights ?? [null]
@@ -26,7 +28,9 @@ const TabsWithHighlights = (props: Props) => {
   }
 
   return (
-    <div className="flex flex-col gap-8 lg:gap-12 items-center">
+    <div className="relative flex flex-col gap-8 lg:gap-12 items-center">
+      {/* Threshold element used to load video 500px before reaching the video component */}
+      <div ref={sectionRef} className="absolute -top-[500px] not-sr-only" />
       <div className="relative w-full col-span-full flex justify-center gap-2" role="tablist">
         {props.tabs.map((tab, index) => (
           <Tab
@@ -58,21 +62,23 @@ const TabsWithHighlights = (props: Props) => {
           ))}
         </motion.ul>
       </AnimatePresence>
-      <BrowserFrame
-        className="overflow-hidden lg:order-last bg-default w-full max-w-7xl mx-auto"
-        contentClassName="aspect-video border overflow-hidden rounded-lg"
-      >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={props.tabs[activeTabIdx]?.label}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: 0.1, delay: 0.2 } }}
-            exit={{ opacity: 0, transition: { duration: 0.05 } }}
-          >
-            <Panel />
-          </motion.div>
-        </AnimatePresence>
-      </BrowserFrame>
+      {isInView && (
+        <BrowserFrame
+          className="overflow-hidden lg:order-last bg-default w-full max-w-6xl mx-auto"
+          contentClassName="aspect-video border overflow-hidden rounded-lg"
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={props.tabs[activeTabIdx]?.label}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, transition: { duration: 0.1, delay: 0.2 } }}
+              exit={{ opacity: 0, transition: { duration: 0.05 } }}
+            >
+              <Panel />
+            </motion.div>
+          </AnimatePresence>
+        </BrowserFrame>
+      )}
     </div>
   )
 }

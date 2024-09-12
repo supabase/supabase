@@ -69,7 +69,7 @@ const RealtimeVisual = () => {
           top: '60%',
           left: '30%',
           transform: `${svgTransform} translate(-50%, -50%)`, // Center the SVG
-          transition: 'transform 0.1s ease-out', // Smooth transition
+          transition: 'transform 0.75s ease-out', // Smooth transition
         }}
       >
         <svg
@@ -101,7 +101,7 @@ const RealtimeVisual = () => {
           top: '80%',
           left: '65%',
           transform: `${svgTransform2} translate(-50%, -50%)`, // Center the SVG
-          transition: 'transform 0.1s ease-out', // Smooth transition
+          transition: 'transform 1s ease-out', // Smooth transition
         }}
       >
         <svg
