@@ -77,10 +77,9 @@ export function DiskManagementPanelForm() {
 
         if (!('requested_modification' in data)) {
           if (refetchInterval !== false) {
-            toast.success('Disk configuration changes have been successfully applied!')
-          } else {
-            setRefetchInterval(false)
             form.reset(formValues)
+            setRefetchInterval(false)
+            toast.success('Disk configuration changes have been successfully applied!')
           }
         }
       },
