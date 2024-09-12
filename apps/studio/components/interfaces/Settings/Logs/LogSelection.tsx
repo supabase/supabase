@@ -92,7 +92,7 @@ const LogSelection = ({
     switch (queryType) {
       case 'warehouse':
         if (!warehouseQueryData) return null
-        return <DefaultPreviewSelectionRenderer log={warehouseQueryData.result[0]} />
+        return <DefaultPreviewSelectionRenderer log={warehouseQueryData.result?.[0] || {}} />
       case 'api':
         if (!fullLog) return null
         if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
@@ -148,7 +148,7 @@ const LogSelection = ({
 
   const rawLog = useMemo(() => {
     if (queryType === 'warehouse') {
-      return warehouseQueryData?.result[0]
+      return warehouseQueryData?.result?.[0] || {}
     }
     return fullLog || partialLog
   }, [queryType, warehouseQueryData, fullLog, partialLog])
