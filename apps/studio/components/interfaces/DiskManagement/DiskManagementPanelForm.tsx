@@ -60,13 +60,12 @@ export function DiskManagementPanelForm() {
   const [remainingTime, setRemainingTime] = useState(0)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
-  const { data } = useDiskAttributesQuery(
+  const { data, isSuccess } = useDiskAttributesQuery(
     { projectRef },
     {
       refetchInterval,
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
-        console.log('SUCCESS', data)
         // @ts-ignore
         const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
         const formValues = {
@@ -75,12 +74,14 @@ export function DiskManagementPanelForm() {
           throughput: throughput_mbps,
           totalSize: size_gb,
         }
+
         if (!('requested_modification' in data)) {
           if (refetchInterval !== false) {
             toast.success('Disk configuration changes have been successfully applied!')
+          } else {
+            setRefetchInterval(false)
+            form.reset(formValues)
           }
-          setRefetchInterval(false)
-          form.reset(formValues)
         }
       },
     }
@@ -135,7 +136,7 @@ export function DiskManagementPanelForm() {
     reValidateMode: 'onChange',
   })
 
-  const { watch, setValue, control, formState } = form
+  const { watch, setValue, trigger, control, formState } = form
   const watchedStorageType = watch('storageType')
   const watchedTotalSize = watch('totalSize')
   const watchedIOPS = watch('provisionedIOPS')
@@ -175,6 +176,11 @@ export function DiskManagementPanelForm() {
     newThroughput: form.getValues('throughput') || 0,
     oldThroughput: form.formState.defaultValues?.throughput || 0,
   })
+
+  useEffect(() => {
+    // Initialize field values properly when data has been loaded
+    if (isSuccess) form.reset(defaultValues)
+  }, [isSuccess])
 
   // Watch storageType and allocatedStorage to adjust constraints dynamically
   useEffect(() => {
@@ -469,6 +475,8 @@ export function DiskManagementPanelForm() {
                                   shouldDirty: true,
                                   shouldValidate: true,
                                 })
+                                trigger('provisionedIOPS')
+                                trigger('throughput')
                               }}
                               min={includedDiskGB}
                             />
