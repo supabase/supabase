@@ -49,13 +49,12 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   })
 
   const { data: projectSubscriptionData } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const { mutate: updateProjectUsage, isLoading: isUpdatingDiskSize } =
-    useProjectDiskResizeMutation({
-      onSuccess: (res, variables) => {
-        toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
-        setShowIncreaseDiskSizeModal(false)
-      },
-    })
+  const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
+    onSuccess: (_, variables) => {
+      toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
+      setShowIncreaseDiskSizeModal(false)
+    },
+  })
 
   const currentDiskSize = project?.volumeSizeGb ?? 0
 

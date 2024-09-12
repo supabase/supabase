@@ -1,3 +1,5 @@
+import { PlanType } from 'data/subscriptions/org-subscription-query'
+
 export enum DiskType {
   GP3 = 'gp3',
   IO2 = 'io2',
@@ -38,8 +40,6 @@ export const DISK_TYPE_LABELS = {
   [DiskType.GP3]: 'General Purpose SSD (gp3)',
   [DiskType.IO2]: 'Provisioned IOPS SSD (io2)',
 }
-
-type PlanType = 'free' | 'pro' | 'team' | 'enterprise'
 
 interface PlanDetails {
   includedDiskGB: number
