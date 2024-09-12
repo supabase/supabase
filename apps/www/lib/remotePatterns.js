@@ -37,6 +37,12 @@ module.exports = [
   },
   {
     protocol: 'https',
+    hostname: 'img.youtube.com',
+    port: '',
+    pathname: '/vi/*',
+  },
+  {
+    protocol: 'https',
     hostname: 'images.unsplash.com',
     port: '',
     pathname: '/photo-*',
