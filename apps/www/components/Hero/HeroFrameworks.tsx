@@ -154,8 +154,8 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
             >
               <div
                 className={cn(
-                  'm-1 bg-[var(--color-bg-darkest)] h-16 w-16 flex transition-opacity items-center justify-center rounded-xl group-hover:border border-brand hover:shadow',
-                  !!activeFramework && activeFramework.name !== framework.name && '!opacity-70'
+                  'm-1 bg-[var(--color-bg-darkest)] h-16 w-16 flex transition-opacity items-center justify-center rounded-md group-hover:border border-foreground-light hover:shadow',
+                  !!activeFramework && activeFramework.name !== framework.name && '!opacity-50'
                 )}
               >
                 <svg

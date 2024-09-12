@@ -148,7 +148,7 @@ const RealtimeVisual = () => {
           absolute pointer-events-none
           w-full h-full max-h-[400px] lg:max-h-none
           inset-0 top-auto
-          lg:bg-[linear-gradient(to_top,transparent_0%,transparent_60%,hsl(var(--background-surface-75))_80%)]
+          bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-surface-75))_85%)]
         "
       />
     </figure>

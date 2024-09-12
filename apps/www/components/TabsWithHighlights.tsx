@@ -1,31 +1,33 @@
 import React, { useState } from 'react'
+import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Badge, cn } from 'ui'
+import BrowserFrame from './BrowserFrame'
+import { Check } from 'lucide-react'
 
 export type Tab = {
   label: string
   panel: React.FC
+  highlights: { label: string; link?: string }[]
 }
 
 interface Props {
   tabs: Tab[]
 }
 
-const BigTabs = (props: Props) => {
+const TabsWithHighlights = (props: Props) => {
   const [activeTabIdx, setActiveTabIdx] = useState<number>(0)
 
   const Panel: any = props.tabs[activeTabIdx]?.panel ?? null
+  const highlights = props.tabs[activeTabIdx]?.highlights ?? [null]
 
   const handleTabClick = (tabIndex: number) => {
     setActiveTabIdx(tabIndex)
   }
 
   return (
-    <div className="flex flex-col items-center">
-      <div
-        className="relative w-full col-span-full flex justify-center pb-8 lg:pb-32 gap-2"
-        role="tablist"
-      >
+    <div className="flex flex-col gap-8 lg:gap-12 items-center">
+      <div className="relative w-full col-span-full flex justify-center gap-2" role="tablist">
         {props.tabs.map((tab, index) => (
           <Tab
             key={index}
@@ -34,15 +36,32 @@ const BigTabs = (props: Props) => {
             onClick={() => handleTabClick(index)}
           />
         ))}
-        {/* <div className="absolute -z-10 mx-auto w-full bottom-0">
-          <img
-            src="/images/index/dashboard/soft-blur-grid-02.svg"
-            alt="background decoration image with grid"
-            className="w-full h-auto opacity-30"
-          />
-        </div> */}
       </div>
-      <div className="w-full aspect-video">
+      <AnimatePresence mode="wait">
+        <motion.ul
+          key={props.tabs[activeTabIdx]?.label}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: { duration: 0.1, delay: 0.2 } }}
+          exit={{ opacity: 0, transition: { duration: 0.05 } }}
+          className="position order-last lg:order-2 w-ful flex flex-wrap items-center gap-x-8 gap-y-4 lg:gap-8 justify-center text-center mx-auto z-30"
+        >
+          {highlights?.map((highlight) => (
+            <li key={highlight.label}>
+              <Link
+                href={highlight.link ?? '#'}
+                className="group cursor-pointer flex items-center gap-2 text-sm whitespace-nowrap text-foreground-light hover:text-foreground transition-colors hover:underline"
+              >
+                <Check className="stroke-2 w-4" />
+                <span>{highlight.label}</span>
+              </Link>
+            </li>
+          ))}
+        </motion.ul>
+      </AnimatePresence>
+      <BrowserFrame
+        className="overflow-hidden lg:order-last bg-default w-full max-w-7xl mx-auto"
+        contentClassName="aspect-video border overflow-hidden rounded-lg"
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={props.tabs[activeTabIdx]?.label}
@@ -53,7 +72,7 @@ const BigTabs = (props: Props) => {
             <Panel />
           </motion.div>
         </AnimatePresence>
-      </div>
+      </BrowserFrame>
     </div>
   )
 }
@@ -81,4 +100,4 @@ const Tab = ({ label, isActive, onClick }: TabProps) => (
   </button>
 )
 
-export default BigTabs
+export default TabsWithHighlights

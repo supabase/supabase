@@ -1,7 +1,5 @@
 import solutions from '~/data/Solutions'
-// import { frameworks } from '../frameworks'
 import VideoWithHighlights from '~/components/VideoWithHighlights'
-import { products } from 'shared-data'
 
 export default {
   heroSection: {
@@ -72,24 +70,24 @@ export default {
               ],
               poster: '/images/index/dashboard/supabase-table-editor.png',
             }}
-            highlights={[
-              {
-                label: 'Full CRUD',
-                link: '/docs/guides/database/tables?queryGroups=database-method&database-method=sql&queryGroups=language&language=js',
-              },
-              {
-                label: 'Materialized Views',
-                link: '/docs/guides/database/tables?queryGroups=database-method&database-method=sql&queryGroups=language&language=js#materialized-views',
-              },
-              {
-                label: 'Foreign Tables',
-                link: '/docs/guides/database/tables?queryGroups=database-method&database-method=sql&queryGroups=language&language=js#joining-tables-with-foreign-keys',
-              },
-              { label: 'Partitioned Tables', link: '/docs/guides/database/partitions' },
-              { label: 'Easy as a spreadsheet', link: '/docs/guides/database/overview#table-view' },
-            ]}
           />
         ),
+        highlights: [
+          {
+            label: 'Full CRUD',
+            link: '/docs/guides/database/tables?queryGroups=database-method&database-method=sql&queryGroups=language&language=js',
+          },
+          {
+            label: 'Materialized Views',
+            link: '/docs/guides/database/tables?queryGroups=database-method&database-method=sql&queryGroups=language&language=js#materialized-views',
+          },
+          {
+            label: 'Foreign Tables',
+            link: '/docs/guides/database/tables?queryGroups=database-method&database-method=sql&queryGroups=language&language=js#joining-tables-with-foreign-keys',
+          },
+          { label: 'Partitioned Tables', link: '/docs/guides/database/partitions' },
+          { label: 'Easy as a spreadsheet', link: '/docs/guides/database/overview#table-view' },
+        ],
       },
       {
         label: 'SQL Editor',
@@ -105,23 +103,23 @@ export default {
               ],
               poster: '/images/index/dashboard/supabase-sql-editor.png',
             }}
-            highlights={[
-              { label: 'AI SQL Editor', link: '/docs/guides/database/overview#the-sql-editor' },
-              {
-                label: 'Row Level Security',
-                link: '/docs/guides/database/postgres/row-level-security',
-              },
-              {
-                label: 'Save time using Templates',
-                link: '/docs/guides/database/overview#the-sql-editor',
-              },
-              {
-                label: 'Save and reuse Queries',
-                link: '/docs/guides/database/overview#the-sql-editor',
-              },
-            ]}
           />
         ),
+        highlights: [
+          { label: 'AI SQL Editor', link: '/docs/guides/database/overview#the-sql-editor' },
+          {
+            label: 'Row Level Security',
+            link: '/docs/guides/database/postgres/row-level-security',
+          },
+          {
+            label: 'Save time using Templates',
+            link: '/docs/guides/database/overview#the-sql-editor',
+          },
+          {
+            label: 'Save and reuse Queries',
+            link: '/docs/guides/database/overview#the-sql-editor',
+          },
+        ],
       },
       {
         label: 'RLS Policies',
@@ -137,27 +135,27 @@ export default {
               ],
               poster: '/images/index/dashboard/supabase-rls.png',
             }}
-            highlights={[
-              { label: 'Email Logins', link: '/docs/guides/auth/auth-email-passwordless' },
-              {
-                label: 'Magic Links',
-                link: '/docs/guides/auth/auth-email-passwordless?queryGroups=language&language=js#with-magic-link',
-              },
-              {
-                label: '20+ Third-party Logins',
-                link: '/docs/guides/auth/social-login#set-up-a-social-provider-with-supabase-auth',
-              },
-              {
-                label: 'Custom Access Policies via RLS',
-                link: '/docs/guides/database/postgres/row-level-security',
-              },
-              {
-                label: 'Password Recovery',
-                link: '/docs/guides/auth/passwords?queryGroups=language&language=js#resetting-a-password',
-              },
-            ]}
           />
         ),
+        highlights: [
+          { label: 'Email Logins', link: '/docs/guides/auth/auth-email-passwordless' },
+          {
+            label: 'Magic Links',
+            link: '/docs/guides/auth/auth-email-passwordless?queryGroups=language&language=js#with-magic-link',
+          },
+          {
+            label: '20+ Third-party Logins',
+            link: '/docs/guides/auth/social-login#set-up-a-social-provider-with-supabase-auth',
+          },
+          {
+            label: 'Custom Access Policies via RLS',
+            link: '/docs/guides/database/postgres/row-level-security',
+          },
+          {
+            label: 'Password Recovery',
+            link: '/docs/guides/auth/passwords?queryGroups=language&language=js#resetting-a-password',
+          },
+        ],
       },
     ],
   },
