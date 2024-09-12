@@ -199,6 +199,19 @@ export const AIPolicyEditorPanel = memo(function ({
     .filter((policy) => policy.schema === schema && policy.table === selectedTable)
     .sort((a, b) => a.name.localeCompare(b.name))
 
+  const existingPolicyDefinition = existingPolicies
+    .map((policy) => {
+      const definition = generatePolicyDefinition(policy)
+      return (
+        definition
+          .trim()
+          .replace(/\s*;\s*$/, '')
+          .replace(/\n\s*$/, '') + ';'
+      )
+    })
+    .join('\n\n')
+
+  console.log({ existingPolicyDefinition })
   const {
     messages: chatMessages,
     append,
@@ -563,7 +576,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       <RLSCodeEditor
                         id="rls-sql-policy"
                         defaultValue={''}
-                        value={'catz'}
+                        value={existingPolicyDefinition}
                         placeholder={placeholder}
                         editorRef={editorOneRef}
                       />
@@ -602,7 +615,6 @@ export const AIPolicyEditorPanel = memo(function ({
                               expOneContentHeight <= 100 ? `${8 + expOneContentHeight}px` : '108px',
                           }}
                         >
-                          hellooooooooooooooo
                           <RLSCodeEditor
                             disableTabToUsePlaceholder
                             readOnly={!canUpdatePolicies}
