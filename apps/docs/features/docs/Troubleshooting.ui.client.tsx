@@ -206,13 +206,40 @@ function TroubleshootingFilterEmptyStateInternal() {
   ) : null
 }
 
-export function TroubleshootingEntryAssociatedErrors({
-  errors,
-}: {
+interface TroubleshootingEntryAssociatedErrorsProps {
   errors: ITroubleshootingMetadata['errors']
-}) {
-  const [isExpanded, setIsExpanded] = useState(false)
+}
+
+export function TroubleshootingEntryAssociatedErrors(
+  props: TroubleshootingEntryAssociatedErrorsProps
+) {
+  return (
+    <Suspense>
+      <TroubleshootingEntryAssociatedErrorsInternal {...props} />
+    </Suspense>
+  )
+}
+
+function TroubleshootingEntryAssociatedErrorsInternal({
+  errors,
+}: TroubleshootingEntryAssociatedErrorsProps) {
+  const [expandedState, setExpandedState] = useState<
+    { expanded: false } | { agent: 'user' | 'app'; expanded: true }
+  >({ expanded: false })
+  const expansionTriggerredByUser = useRef(false)
+  const hiddenErrorsRef = useRef<HTMLDivElement | null>(null)
   const firstExpandedItem = useRef<HTMLLIElement | null>(null)
+
+  const { searchState } = useTroubleshootingSearchState()
+  useEffect(() => {
+    if (searchState !== '' && entryMatchesFilter(hiddenErrorsRef.current, [], searchState)) {
+      if (!expandedState.expanded) {
+        setExpandedState({ agent: 'app', expanded: true })
+      }
+    } else if (searchState === '' && expandedState.expanded && expandedState.agent === 'app') {
+      setExpandedState({ expanded: false })
+    }
+  }, [searchState, expandedState])
 
   const longErrorsList = errors.length > 2
   const Wrapper = useMemo(() => {
@@ -223,8 +250,21 @@ export function TroubleshootingEntryAssociatedErrors({
     <div className="p-[var(--local-padding)]">
       <h3 className="m-0 pb-1 text-sm text-foreground-lighter italic">Related errors</h3>
       <ul className="text-sm p-0 m-0">
-        {/* @ts-expect-error: passing ignored props to Fragment */}
-        <Wrapper open={isExpanded} onOpenChange={setIsExpanded}>
+        <Wrapper
+          // @ts-expect-error: passing ignored props to Fragment
+          open={expandedState.expanded}
+          onOpenChange={(requestingExpand) => {
+            if (requestingExpand) {
+              setExpandedState({
+                agent: expansionTriggerredByUser.current ? 'user' : 'app',
+                expanded: true,
+              })
+              expansionTriggerredByUser.current = false
+            } else {
+              setExpandedState({ expanded: false })
+            }
+          }}
+        >
           {errors.slice(0, 2).map((error, index) => (
             <li key={index} className="line-clamp-1">
               <span className="font-mono mr-2">{`${error.http_status_code} ${error.code}`}</span>
@@ -234,7 +274,11 @@ export function TroubleshootingEntryAssociatedErrors({
           {longErrorsList && (
             <>
               {/* Force mount so the content is available in the DOM for search */}
-              <CollapsibleContent_Shadcn_ forceMount className="data-[state=closed]:hidden">
+              <CollapsibleContent_Shadcn_
+                forceMount
+                className="data-[state=closed]:hidden"
+                ref={hiddenErrorsRef}
+              >
                 {errors.slice(2).map((error, index) => (
                   <li
                     key={index}
@@ -251,12 +295,13 @@ export function TroubleshootingEntryAssociatedErrors({
                 <button
                   className="text-sm text-foreground-lighter"
                   onClick={() => {
+                    expansionTriggerredByUser.current = true
                     setTimeout(() => {
                       firstExpandedItem.current?.focus()
                     })
                   }}
                 >
-                  {isExpanded ? 'Show less' : 'Show more'}
+                  {expandedState ? 'Show less' : 'Show more'}
                 </button>
               </CollapsibleTrigger_Shadcn_>
             </>
