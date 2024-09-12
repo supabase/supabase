@@ -50,6 +50,7 @@ import { DiskManagementDiskSizeReadReplicas } from './DiskManagementDiskSizeRead
 import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
+import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 
 export function DiskManagementPanelForm() {
   const org = useSelectedOrganization()
@@ -101,12 +102,8 @@ export function DiskManagementPanelForm() {
   const isPlanUpgradeRequired =
     subscription?.plan.id === 'pro' && !subscription.usage_billing_enabled
 
-  // [Joshen] Just FYI eventually we'll need to show the DISK size, although this is okay for now
-  const { data: dbSize } = useDatabaseSizeQuery({
-    projectRef,
-    connectionString: project?.connectionString,
-  })
-  const mainDiskUsed = Math.round(((dbSize?.result[0].db_size ?? 0) / GB) * 100) / 100
+  const { data: diskUtil } = useDiskUtilizationQuery({ projectRef })
+  const mainDiskUsed = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
   const { includedDiskGB } = PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
 
   const { mutate: updateDiskConfigurationRQ, isLoading: isUpdatingDiskConfiguration } =

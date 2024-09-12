@@ -13,4 +13,6 @@ export const configKeys = {
     ['projects', projectRef, 'upgrade-status'] as const,
   diskAttributes: (projectRef: string | undefined) =>
     ['projects', projectRef, 'disk-attributes'] as const,
+  diskUtilization: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'disk-utilization'] as const,
 }

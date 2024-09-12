@@ -887,6 +887,10 @@ export interface paths {
     /** Modify database disk */
     post: operations['DiskController_modifyDisk']
   }
+  '/platform/projects/{ref}/disk/util': {
+    /** Get disk utilization */
+    get: operations['DiskController_getDiskUtilization']
+  }
   '/platform/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
     get: operations['InfraMonitoringController_getUsageMetrics']
@@ -1725,6 +1729,10 @@ export interface paths {
     get: operations['DiskController_getDisk']
     /** Modify database disk */
     post: operations['DiskController_modifyDisk']
+  }
+  '/v0/projects/{ref}/disk/util': {
+    /** Get disk utilization */
+    get: operations['DiskController_getDiskUtilization']
   }
   '/v0/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
@@ -3161,6 +3169,15 @@ export interface components {
       size_gb: number
       /** @enum {string} */
       type: 'io2'
+    }
+    DiskUtilMetrics: {
+      fs_avail_bytes: number
+      fs_size_bytes: number
+      fs_used_bytes: number
+    }
+    DiskUtilMetricsResponse: {
+      metrics: components['schemas']['DiskUtilMetrics']
+      timestamp: string
     }
     Domain: {
       created_at?: string
@@ -6073,6 +6090,7 @@ export interface components {
       price_id?: string
       skip_free_plan_validations?: boolean
       skip_outstanding_invoice_check?: boolean
+      skip_payment_method_available_check?: boolean
       /** @enum {string} */
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
     }
@@ -6667,7 +6685,7 @@ export interface operations {
   /** Deletes the installation with provided installation_id */
   InstallationsController_deleteInstallation: {
     responses: {
-      204: {
+      200: {
         content: never
       }
     }
@@ -12290,6 +12308,9 @@ export interface operations {
           'application/json': components['schemas']['DiskResponse']
         }
       }
+      403: {
+        content: never
+      }
       /** @description Failed to get database disk attributes */
       500: {
         content: never
@@ -12317,6 +12338,29 @@ export interface operations {
         content: never
       }
       /** @description Failed to modify database disk */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get disk utilization */
+  DiskController_getDiskUtilization: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DiskUtilMetricsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get disk utilization */
       500: {
         content: never
       }
