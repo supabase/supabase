@@ -5,6 +5,7 @@ import { parse } from 'yaml'
 import type { ModuleTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { type Json } from '../helpers.types'
+import { type IApiEndPoint } from './Reference.api.utils'
 
 let typeSpec: Array<ModuleTypes>
 
@@ -45,6 +46,20 @@ export async function getCliSpec() {
   }
 
   return cliSpec
+}
+
+let apiEndpointsById: Map<string, IApiEndPoint>
+
+export async function getApiEndpointById(id: string) {
+  if (!apiEndpointsById) {
+    const rawJson = await readFile(
+      join(process.cwd(), 'features/docs', './generated/api.latest.endpointsById.json'),
+      'utf-8'
+    )
+    apiEndpointsById = new Map(JSON.parse(rawJson))
+  }
+
+  return apiEndpointsById.get(id)
 }
 
 const functionsList = new Map<string, Array<{ id: unknown }>>()
