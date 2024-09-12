@@ -25,8 +25,8 @@ describe('DiskManagement.utils.ts:calculateDiskSizePrice', () => {
       newSize: 10,
       newStorageType: DiskType.IO2,
     })
-    expect(result.oldPrice).toBe('0.00')
-    expect(result.newPrice).toBe('0.39')
+    expect(result.oldPrice).toBe('1.56')
+    expect(result.newPrice).toBe('1.95')
   })
 })
 

@@ -103,7 +103,6 @@ export function DiskManagementPanelForm() {
 
   const { data: diskUtil } = useDiskUtilizationQuery({ projectRef })
   const mainDiskUsed = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
-  const { includedDiskGB } = PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
 
   const { mutate: updateDiskConfigurationRQ, isLoading: isUpdatingDiskConfiguration } =
     useUpdateDiskAttributesMutation({
@@ -138,6 +137,10 @@ export function DiskManagementPanelForm() {
   const { dirtyFields } = formState // Destructure dirtyFields from formState
   const isAllocatedStorageDirty = !!dirtyFields.totalSize // Check if 'allocatedStorage' is dirty
   const disableInput = isRequestingChanges || isPlanUpgradeRequired || isWithinCooldownWindow
+
+  const { includedDiskGB: includedDiskGBMeta } =
+    PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
+  const includedDiskGB = includedDiskGBMeta[watchedStorageType]
 
   const maxIOPS =
     watchedStorageType === 'gp3'
@@ -507,14 +510,16 @@ export function DiskManagementPanelForm() {
                           afterPrice={Number(diskSizePrice.newPrice)}
                           show={
                             formState.isDirty &&
-                            formState.dirtyFields.totalSize &&
                             !formState.errors.totalSize &&
                             diskSizePrice.oldPrice !== diskSizePrice.newPrice
                           }
                         />
-                        <div className="text-xs text-foreground-light">
-                          Your plan includes {includedDiskGB} GiB of disk size.
-                        </div>
+                        {includedDiskGB > 0 && (
+                          <div className="text-xs text-foreground-light">
+                            Your plan includes {includedDiskGB} GiB of disk size for{' '}
+                            {watchedStorageType}.
+                          </div>
+                        )}
                       </div>
                     </FormItemLayout>
                   )}

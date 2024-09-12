@@ -17,8 +17,13 @@ export const calculateDiskSizePrice = ({
   const newPricePerGiB = DISK_PRICING[newStorageType]?.storage ?? 0
   const { includedDiskGB } = PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
 
-  const oldPrice = (Math.max(oldSize - includedDiskGB, 0) * oldPricePerGiB).toFixed(2)
-  const newPrice = (Math.max(newSize - includedDiskGB, 0) * newPricePerGiB).toFixed(2)
+  const oldPrice = (Math.max(oldSize - includedDiskGB[oldStorageType], 0) * oldPricePerGiB).toFixed(
+    2
+  )
+  const newPrice = (Math.max(newSize - includedDiskGB[newStorageType], 0) * newPricePerGiB).toFixed(
+    2
+  )
+
   return { oldPrice, newPrice }
 }
 

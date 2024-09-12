@@ -42,12 +42,12 @@ export const DISK_TYPE_LABELS = {
 }
 
 interface PlanDetails {
-  includedDiskGB: number
+  includedDiskGB: { gp3: number; io2: number }
 }
 
 export const PLAN_DETAILS: Record<PlanType, PlanDetails> = {
-  free: { includedDiskGB: 1 },
-  pro: { includedDiskGB: 8 },
-  team: { includedDiskGB: 8 },
-  enterprise: { includedDiskGB: 8 },
+  free: { includedDiskGB: { gp3: 1, io2: 0 } },
+  pro: { includedDiskGB: { gp3: 8, io2: 0 } },
+  team: { includedDiskGB: { gp3: 8, io2: 0 } },
+  enterprise: { includedDiskGB: { gp3: 8, io2: 0 } },
 }
