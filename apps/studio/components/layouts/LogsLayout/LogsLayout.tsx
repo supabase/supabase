@@ -132,7 +132,9 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
         </>
       }
     >
-      <main>{children}</main>
+      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
+        {children}
+      </main>
     </ProjectLayout>
   )
 }
