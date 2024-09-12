@@ -504,6 +504,7 @@ export const auth = {
         },
       ],
     },
+
     {
       name: 'Concepts',
       items: [
@@ -582,6 +583,10 @@ export const auth = {
           url: '/guides/auth/signout',
         },
       ],
+    },
+    {
+      name: 'Debugging',
+      items: [{ name: 'Error Codes', url: '/guides/auth/debugging/error-codes' }],
     },
     {
       name: 'Third-party auth',

@@ -1,3 +1,12 @@
+---
+id: 'auth-error-codes'
+title: 'Error Codes'
+description: 'Supabase Auth Error Codes'
+subtitle: 'Learn about the Auth error codes and how to resolve them'
+---
+
+## Auth Error Codes
+
 Supabase Auth can throw or return various errors when using the API. All errors originating from the `supabase.auth` namespace of the client library will be wrapped by the `AuthError` class.
 
 Error objects are split in a few classes:
@@ -11,7 +20,10 @@ Errors originating from the server API classed as `AuthApiError` always have a `
 
 <AuthErrorCodesTable />
 
-### Tips for better error handling
+
+
+
+## Tips for better error handling
 
 - Do not use string matching on error messages! Always use the `name` and `code` properties of error objects to identify the situation.
 - Although HTTP status codes generally don't change, they can suddenly change due to bugs, so avoid relying on them unless absolutely necessary.
