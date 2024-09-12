@@ -70,6 +70,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
     <ProjectLayout
       title={title}
       product="Logs & Analytics"
+      isBlocking={false}
       productMenu={
         <>
           <ProductMenu
