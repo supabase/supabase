@@ -29,16 +29,19 @@ const TwitterSocialProofMobile: FC<Props> = ({ tweets, className }: any) => {
         style={{ zIndex: 0, marginRight: '1px' }}
         initialSlide={0}
         spaceBetween={12}
-        slidesPerView={1.2}
+        slidesPerView={1.1}
         speed={300}
         watchOverflow
         threshold={2}
         updateOnWindowResize
-        autoHeight
+        // autoHeight
         className="h-[400px] !px-6 w-full overflow-visible"
         breakpoints={{
           320: {
-            slidesPerView: 1.5,
+            slidesPerView: 1.1,
+          },
+          540: {
+            slidesPerView: 1.6,
           },
           720: {
             slidesPerView: 2.5,
