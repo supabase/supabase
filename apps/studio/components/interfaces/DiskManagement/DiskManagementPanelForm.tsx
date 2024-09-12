@@ -477,7 +477,7 @@ export function DiskManagementPanelForm() {
                             />
                           </FormControl_Shadcn_>
                           <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
-                            <span className="text-foreground-lighter text-xs font-mono">GiBs</span>
+                            <span className="text-foreground-lighter text-xs font-mono">GiB</span>
                           </div>
                         </div>
                         <AnimatePresence initial={false}>
@@ -513,7 +513,7 @@ export function DiskManagementPanelForm() {
                           }
                         />
                         <div className="text-xs text-foreground-light">
-                          Your plan includes {includedDiskGB}GB of disk size.
+                          Your plan includes {includedDiskGB} GB of disk size.
                         </div>
                       </div>
                     </FormItemLayout>

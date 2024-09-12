@@ -170,8 +170,8 @@ export default function DiskSpaceBar({
                   <TooltipContent_Shadcn_ side="bottom" className="w-[310px] flex flex-col gap-y-1">
                     <p>
                       Supabase expands your disk storage automatically when the database reached 90%
-                      of the disk size. However, auto-scaling can only take place once every 6
-                      hours.
+                      of the disk size. However, any disk modifications, including auto-scaling, can
+                      only take place once every 6 hours.
                     </p>
                     <p>
                       If within those 6 hours you reach 95% of the disk space, your project{' '}
