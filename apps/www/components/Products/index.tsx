@@ -251,7 +251,7 @@ const Products = (props: Props) => {
         onClick={() => sendTelemetryEvent('data-api')}
         image={<DataAPIsVisual />}
       />
-      <p className="text-xl sm:text-2xl text-foreground-lighter col-span-full">
+      <p className="text-xl sm:text-2xl text-foreground-lighter col-span-full tracking-[-.01rem]">
         <span className="text-foreground">Use one or all.</span> Best of breed products. Integrated
         as a platform.
       </p>
