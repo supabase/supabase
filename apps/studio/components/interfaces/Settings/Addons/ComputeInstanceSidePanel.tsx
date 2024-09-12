@@ -163,7 +163,7 @@ const ComputeInstanceSidePanel = () => {
   const selectedCompute = availableOptions.find((option) => option.identifier === selectedOption)
   const hasChanges =
     selectedOption !== (subscriptionCompute?.variant.identifier ?? defaultInstanceSize)
-  const numReadReplicas = 3 // (databases ?? []).filter((db) => db.identifier !== projectRef).length
+  const numReadReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef).length
   const hasReadReplicas = numReadReplicas > 0
 
   const isDowngradingToBelowSmall = ['ci_micro', 'ci_nano'].includes(selectedOption)
