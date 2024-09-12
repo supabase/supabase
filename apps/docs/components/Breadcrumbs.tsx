@@ -67,8 +67,10 @@ const BreadcrumbsInternal = ({
           <>
             <BreadcrumbItem>
               {breadcrumbs[0].url ? (
-                <BreadcrumbLink href={`/docs${breadcrumbs[0].url}`}>
-                  {breadcrumbs[0].title || breadcrumbs[0].name}
+                <BreadcrumbLink asChild>
+                  <Link href={breadcrumbs[0].url}>
+                    {breadcrumbs[0].title || breadcrumbs[0].name}
+                  </Link>
                 </BreadcrumbLink>
               ) : (
                 <BreadcrumbPage>{breadcrumbs[0].title || breadcrumbs[0].name}</BreadcrumbPage>
@@ -92,7 +94,7 @@ const BreadcrumbsInternal = ({
                         className={cn(!crumb.url && 'pointer-events-none')}
                       >
                         {crumb.url ? (
-                          <Link href={`/docs${crumb.url}`}>{crumb.title || crumb.name}</Link>
+                          <Link href={crumb.url}>{crumb.title || crumb.name}</Link>
                         ) : (
                           crumb.title || crumb.name
                         )}
@@ -111,7 +113,7 @@ const BreadcrumbsInternal = ({
                         .slice(1, -2)
                         .map((crumb) =>
                           crumb.url ? (
-                            <Link href={`/docs${crumb.url}`}>{crumb.title || crumb.name}</Link>
+                            <Link href={crumb.url}>{crumb.title || crumb.name}</Link>
                           ) : (
                             crumb.title || crumb.name
                           )
@@ -138,8 +140,8 @@ const BreadcrumbsInternal = ({
               )}
             >
               {crumb.url ? (
-                <BreadcrumbLink href={`/docs${crumb.url}`}>
-                  {crumb.title || crumb.name}
+                <BreadcrumbLink asChild>
+                  <Link href={crumb.url}>{crumb.title || crumb.name}</Link>
                 </BreadcrumbLink>
               ) : (
                 <BreadcrumbPage>{crumb.title || crumb.name}</BreadcrumbPage>
