@@ -2,6 +2,8 @@
 title: 'Edge Functions are now 2x smaller and boot 3x faster'
 description: 'Redeploy your functions with the CLI v1.192.5 for peformance boost'
 author: nyannyacha
+image: edge-functions-faster-smaller/edge-fns-faster-thumb.png
+thumb: edge-functions-faster-smaller/edge-fns-faster-thumb.png
 categories:
   - product
 tags:
@@ -20,10 +22,10 @@ Let’s compare the bundle size and boot time using some popular examples.
 
 **Supabase JavaScript Client:**
 
-|  | **CLI 1.190.0** | **CLI 1.192.5** | **Change** |
-| --- | --- | --- | --- |
-| Bundle size | 1.487MB | 640.4KB | -232.34% |
-| Boot time | 275ms | 25ms | -1100% |
+|             | **CLI 1.190.0** | **CLI 1.192.5** | **Change** |
+| ----------- | --------------- | --------------- | ---------- |
+| Bundle size | 1.487MB         | 640.4KB         | -232.34%   |
+| Boot time   | 275ms           | 25ms            | -1100%     |
 
 ```jsx
 import { createClient } from 'npm:@supabase/supabase-js@2'
@@ -54,64 +56,63 @@ Deno.serve(async (_req) => {
 
 **OpenAI:**
 
-|  | **CLI 1.190.0** | **CLI 1.192.5** | **Change** |
-| --- | --- | --- | --- |
-| Bundle size | 2.533MB | 1.045MB | -242.39% |
-| Boot time | 459ms | 57ms | -805.26% |
+|             | **CLI 1.190.0** | **CLI 1.192.5** | **Change** |
+| ----------- | --------------- | --------------- | ---------- |
+| Bundle size | 2.533MB         | 1.045MB         | -242.39%   |
+| Boot time   | 459ms           | 57ms            | -805.26%   |
 
 ```jsx
-
-import OpenAI from "npm:openai@4.57.3";
+import OpenAI from 'npm:openai@4.57.3'
 
 const client = new OpenAI({
-  apiKey: Deno.env.get("OPEN_AI_KEY")
-});
+  apiKey: Deno.env.get('OPEN_AI_KEY'),
+})
 
 Deno.serve(async (req) => {
-  const { query } = await req.json();
+  const { query } = await req.json()
 
   const chatCompletion = await client.chat.completions.create({
-    messages: [{ role: "user", content: "Say this is a test" }],
-    model: "gpt-3.5-turbo",
-  });
+    messages: [{ role: 'user', content: 'Say this is a test' }],
+    model: 'gpt-3.5-turbo',
+  })
 
-  return new Response(chatCompletion);
-});
+  return new Response(chatCompletion)
+})
 ```
 
 **Drizzle / node-postgres:**
 
-|  | **CLI 1.190.0** | **CLI 1.192.5** | Change |
-| --- | --- | --- | --- |
-| Bundle size | 929.5kB | 491.3kB | -189.19% |
-| Boot time | 301ms | 83ms | -362.65% |
+|             | **CLI 1.190.0** | **CLI 1.192.5** | Change   |
+| ----------- | --------------- | --------------- | -------- |
+| Bundle size | 929.5kB         | 491.3kB         | -189.19% |
+| Boot time   | 301ms           | 83ms            | -362.65% |
 
 ```jsx
-import { drizzle } from "npm:drizzle-orm@0.33.0/node-postgres";
-import pg from "npm:pg@8.12.0";
-const { Client } = pg;
+import { drizzle } from 'npm:drizzle-orm@0.33.0/node-postgres'
+import pg from 'npm:pg@8.12.0'
+const { Client } = pg
 
-import { pgTable, serial, text, varchar } from "npm:drizzle-orm@0.33.0/pg-core";
+import { pgTable, serial, text, varchar } from 'npm:drizzle-orm@0.33.0/pg-core'
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  fullName: text("full_name"),
-  phone: varchar("phone", { length: 256 }),
-});
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  fullName: text('full_name'),
+  phone: varchar('phone', { length: 256 }),
+})
 
 const client = new Client({
-  connectionString: Deno.env.get("SUPABASE_DB_URL"),
-});
+  connectionString: Deno.env.get('SUPABASE_DB_URL'),
+})
 
-await client.connect();
-const db = drizzle(client);
+await client.connect()
+const db = drizzle(client)
 
 Deno.serve(async (req) => {
-  const allUsers = await db.select().from(users);
-  console.log(allUsers);
+  const allUsers = await db.select().from(users)
+  console.log(allUsers)
 
-  return new Response("ok");
-});
+  return new Response('ok')
+})
 ```
 
 ## How did we achieve these gains?
@@ -162,6 +163,5 @@ To get the advantage of these optimizations, follow these steps:
 ## Getting Help
 
 [Supabase Edge Runtime](https://github.com/supabase/edge-runtime) is fully open-source, and we value community contributions. If you would like to make any improvements, feel free to dive into the source and [create an issue](https://github.com/supabase/edge-runtime/issues).
-
 
 If you have any issues with Edge Functions in your hosted project, please request support via [superbase.help](http://supabase.help).
