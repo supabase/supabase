@@ -5411,6 +5411,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "saml_allow_encrypted_assertions": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -5702,6 +5706,7 @@
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
                     "saml_external_url",
+                    "saml_allow_encrypted_assertions",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -6851,6 +6856,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "saml_allow_encrypted_assertions": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7142,6 +7151,7 @@
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
                     "saml_external_url",
+                    "saml_allow_encrypted_assertions",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -12465,6 +12475,10 @@
             "type": "string",
             "nullable": true
           },
+          "saml_allow_encrypted_assertions": {
+            "type": "boolean",
+            "nullable": true
+          },
           "security_captcha_enabled": {
             "type": "boolean",
             "nullable": true
@@ -12756,6 +12770,7 @@
           "refresh_token_rotation_enabled",
           "saml_enabled",
           "saml_external_url",
+          "saml_allow_encrypted_assertions",
           "security_captcha_enabled",
           "security_captcha_provider",
           "security_captcha_secret",

@@ -879,6 +879,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg_net',
         },
         {
+          name: 'pg_partman: Partition Maintenance',
+          url: '/guides/database/extensions/pg_partman',
+        },
+        {
           name: 'pg_plan_filter: Restrict Total Cost',
           url: '/guides/database/extensions/pg_plan_filter',
         },
@@ -897,6 +901,10 @@ export const database: NavMenuConstant = {
         {
           name: 'PostGIS: Geo queries',
           url: '/guides/database/extensions/postgis',
+        },
+        {
+          name: 'pgmq: Queues',
+          url: '/guides/database/extensions/pgmq',
         },
         {
           name: 'pgsodium (pending deprecation): Encryption Features',

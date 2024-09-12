@@ -1,0 +1,100 @@
+---
+id: 'pg_partman'
+title: 'pg_partman: partition management'
+description: 'Automated partition management'
+---
+
+[`pg_partman`](https://github.com/pgpartman/pg_partman) is a PostgreSQL extension that enables automated partition management. It removes the need to create and detach partitions for tables partitioned by time or an integer series.
+
+## Enable the extension
+
+To enable `pg_partman`, first enable the extension in your database inside a dedicated schema.
+
+{/* prettier-ignore */}
+```sql
+create schema partman;
+create extension pg_partman schema partman;
+```
+
+## Setting up Partitioning
+
+pg_partman supports partitioning based on time (e.g., by day, month, or year) or by a sequential integer. Setup is performed using the `create_parent` function.
+
+For time-based partitioning:
+
+{/* prettier-ignore */}
+```sql
+select partman.create_parent('schema_name.table_name', 'partition_column', 'time', 'daily');
+```
+
+or for integer-based partitioning:
+
+{/* prettier-ignore */}
+```sql
+select partman.create_parent('schema_name.table_name', 'partition_column', 'integer', '1000');
+```
+
+## API
+
+- partman.create_parent: creates a parent table for partitioning
+- partman.run_maintenance: ensures partitions are created and dropped as per the defined settings. This should be run periodically, such as via a cron job scheduled by pg_cron
+
+## Example
+
+Let’s set up a simple partitioning example using pg_partman with time-based partitions.
+
+{/* prettier-ignore */}
+```sql
+-- Create the table
+create table public.foo (
+    id serial primary key,
+    data text,
+    created_at timestamp not null
+);
+
+-- Create the parent table
+select
+  partman.create_parent(
+    'public.foo',
+    'created_at',
+    'time',
+    'daily'
+  );
+
+-- Configure the partitioned table
+update
+  partman.part_config 
+set
+  infinite_time_partitions = true,
+  retention = '3 months', 
+  retention_keep_table=true 
+where
+  parent_table = 'public.foo';
+```
+
+For more information about available configuration, see the [pg_partman docs](https://github.com/pgpartman/pg_partman/blob/de93f4a104b8566087f4b9b2a0edf25893672da8/doc/pg_partman.md#configuration-tables).
+
+Following these statements, partitions for `public.foo` will be automatically managed as necessary when the `partman.run_maintenance()` function is called.
+
+## Running Maintenance
+
+It is important to call the `partman.run_maintenance()` procedure frequently to ensure partitions are created and detached according to the partitioned table's configuration.
+
+{/* prettier-ignore */}
+```sql
+call partman.run_maintenance_proc();
+```
+
+To automate this task, consider using `pg_cron`.
+
+{/* prettier-ignore */}
+```sql
+create extension pg_cron;
+
+select
+  cron.schedule('@hourly', $$call partman.run_maintenance_proc()$$);
+```
+
+## Resources
+
+- Official [pg_partman documentation](https://github.com/pgpartman/pg_partman/blob/master/doc/pg_partman_howto.md)

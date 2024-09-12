@@ -9,8 +9,11 @@ import { parseTypeSpec } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { deepFilterRec } from '~/features/helpers.fn'
 import type { Json } from '~/features/helpers.types'
+import apiCommonSections from '~/spec/common-api-sections.json' assert { type: 'json' }
 import cliCommonSections from '~/spec/common-cli-sections.json' assert { type: 'json' }
 import commonClientLibSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
+import openApiSpec from '~/spec/transforms/api_v1_openapi_deparsed.json' assert { type: 'json' }
+import { IApiEndPoint } from './Reference.api.utils'
 
 const DOCS_DIRECTORY = join(dirname(fileURLToPath(import.meta.url)), '../..')
 const SPEC_DIRECTORY = join(DOCS_DIRECTORY, 'spec')
@@ -31,6 +34,24 @@ async function parseFnsList(rawSpec: Json): Promise<Array<{ id: unknown }>> {
   }
 
   return []
+}
+
+function mapEndpointsById(spec: typeof openApiSpec): Map<string, IApiEndPoint> {
+  const endpoints = spec.paths
+  const endpointsById = new Map<string, IApiEndPoint>()
+
+  Object.entries(endpoints).forEach(([path, methods]) => {
+    Object.entries(methods).forEach(([method, details]) => {
+      endpointsById.set(details.operationId, {
+        id: details.operationId,
+        path,
+        method,
+        ...details,
+      })
+    })
+  })
+
+  return endpointsById
 }
 
 function genClientSdkSectionTree(fns: Array<{ id: unknown }>, excludeName: string) {
@@ -55,6 +76,15 @@ async function genCliSectionTree() {
     'items',
     (section) =>
       section.type === 'cli-command' ? cliSpec.commands.some(({ id }) => id === section.id) : true
+  )
+  return validSections
+}
+
+function genApiSectionTree(endpointsById: Map<string, IApiEndPoint>) {
+  const validSections = deepFilterRec(
+    apiCommonSections as Array<AbbrevApiReferenceSection>,
+    'items',
+    (section) => (section.type === 'operation' ? endpointsById.has(section.id) : true)
   )
   return validSections
 }
@@ -89,7 +119,7 @@ async function writeTypes() {
   )
 }
 
-async function writeReferenceSections() {
+async function writeSdkReferenceSections() {
   return Promise.all(
     clientSdkIds
       .flatMap((sdkId) => {
@@ -117,22 +147,10 @@ async function writeReferenceSections() {
           JSON.stringify(sdkSectionTree)
         )
 
-        const cliSectionTree = await genCliSectionTree()
-        const pendingCliSectionTreeWrite = writeFile(
-          join(GENERATED_DIRECTORY, 'cli.latest.sections.json'),
-          JSON.stringify(cliSectionTree)
-        )
-
         const flattenedSdkSections = flattenCommonClientLibSections(sdkSectionTree)
         const pendingFlattenedSdkSectionsWrite = writeFile(
           join(GENERATED_DIRECTORY, `${sdkId}.${version}.flat.json`),
           JSON.stringify(flattenedSdkSections)
-        )
-
-        const flattenedCliSections = flattenCommonClientLibSections(cliSectionTree)
-        const pendingFlattenedCliSectionsWrite = writeFile(
-          join(GENERATED_DIRECTORY, 'cli.latest.flat.json'),
-          JSON.stringify(flattenedCliSections)
         )
 
         const sdkSectionsBySlug = keyBy(flattenedSdkSections, (section) => section.slug)
@@ -141,33 +159,91 @@ async function writeReferenceSections() {
           JSON.stringify(sdkSectionsBySlug)
         )
 
-        const cliSectionsBySlug = keyBy(
-          flattenedCliSections.filter(({ slug }) => !!slug),
-          (section) => section.slug
-        )
-        const pendingCliSlugDictionaryWrite = writeFile(
-          join(GENERATED_DIRECTORY, 'cli.latest.bySlug.json'),
-          JSON.stringify(cliSectionsBySlug)
-        )
-
         return [
           pendingFnListWrite,
           pendingSdkSectionTreeWrite,
-          pendingCliSectionTreeWrite,
           pendingFlattenedSdkSectionsWrite,
-          pendingFlattenedCliSectionsWrite,
           pendingSdkSlugDictionaryWrite,
-          pendingCliSlugDictionaryWrite,
         ]
       })
   )
+}
+
+async function writeCliReferenceSections() {
+  const cliSectionTree = await genCliSectionTree()
+  const pendingCliSectionTreeWrite = writeFile(
+    join(GENERATED_DIRECTORY, 'cli.latest.sections.json'),
+    JSON.stringify(cliSectionTree)
+  )
+
+  const flattenedCliSections = flattenCommonClientLibSections(cliSectionTree)
+  const pendingFlattenedCliSectionsWrite = writeFile(
+    join(GENERATED_DIRECTORY, 'cli.latest.flat.json'),
+    JSON.stringify(flattenedCliSections)
+  )
+
+  const cliSectionsBySlug = keyBy(
+    flattenedCliSections.filter(({ slug }) => !!slug),
+    (section) => section.slug
+  )
+  const pendingCliSlugDictionaryWrite = writeFile(
+    join(GENERATED_DIRECTORY, 'cli.latest.bySlug.json'),
+    JSON.stringify(cliSectionsBySlug)
+  )
+
+  return Promise.all([
+    pendingCliSectionTreeWrite,
+    pendingFlattenedCliSectionsWrite,
+    pendingCliSlugDictionaryWrite,
+  ])
+}
+
+async function writeApiReferenceSections() {
+  const endpointsById = mapEndpointsById(openApiSpec)
+  const pendingEndpointsByIdWrite = writeFile(
+    join(GENERATED_DIRECTORY, 'api.latest.endpointsById.json'),
+    JSON.stringify(Array.from(endpointsById.entries()))
+  )
+
+  const apiSectionTree = genApiSectionTree(endpointsById)
+  const pendingApiSectionTreeWrite = writeFile(
+    join(GENERATED_DIRECTORY, 'api.latest.sections.json'),
+    JSON.stringify(apiSectionTree)
+  )
+
+  const flattenedApiSections = flattenCommonClientLibSections(apiSectionTree)
+  const pendingFlattenedApiSectionsWrite = writeFile(
+    join(GENERATED_DIRECTORY, 'api.latest.flat.json'),
+    JSON.stringify(flattenedApiSections)
+  )
+
+  const apiSectionsBySlug = keyBy(
+    flattenedApiSections.filter(({ slug }) => !!slug),
+    (section) => section.slug
+  )
+  const pendingApiSlugDictionaryWrite = writeFile(
+    join(GENERATED_DIRECTORY, 'api.latest.bySlug.json'),
+    JSON.stringify(apiSectionsBySlug)
+  )
+
+  return Promise.all([
+    pendingEndpointsByIdWrite,
+    pendingApiSectionTreeWrite,
+    pendingFlattenedApiSectionsWrite,
+    pendingApiSlugDictionaryWrite,
+  ])
 }
 
 async function run() {
   try {
     await mkdir(GENERATED_DIRECTORY, { recursive: true })
 
-    await Promise.all([writeTypes(), writeReferenceSections()])
+    await Promise.all([
+      writeTypes(),
+      writeSdkReferenceSections(),
+      writeCliReferenceSections(),
+      writeApiReferenceSections(),
+    ])
   } catch (err) {
     console.error(err)
   }
