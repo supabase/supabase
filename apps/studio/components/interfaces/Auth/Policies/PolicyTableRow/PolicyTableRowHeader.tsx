@@ -78,7 +78,37 @@ const PolicyTableRowHeader = ({
                 {table.rls_enabled ? 'Disable RLS' : 'Enable RLS'}
               </ButtonTooltip>
             )}
-            <DropdownMenu>
+            <ButtonTooltip
+              type="default"
+              disabled={!canToggleRLS}
+              onClick={() => onSelectCreatePolicy()}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to create RLS policies',
+                },
+              }}
+            >
+              Create policy
+            </ButtonTooltip>
+            <ButtonTooltip
+              type="default"
+              disabled={!canToggleRLS}
+              onClick={() => {
+                onSelectCreatePolicy()
+                setEditView('conversation')
+              }}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to create RLS policies',
+                },
+              }}
+            >
+              <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
+            </ButtonTooltip>
+
+            {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <ButtonTooltip
                   type="default"
@@ -119,7 +149,7 @@ const PolicyTableRowHeader = ({
                   with Supabase AI
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenu> */}
             {/* {!isAiAssistantEnabled && (
               <ButtonTooltip
                 type="default"

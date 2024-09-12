@@ -559,9 +559,11 @@ export const AIPolicyEditorPanel = memo(function ({
                   {/* which left side editor to show in the sheet  */}
                   {editView === 'conversation' ? (
                     <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
+                      aaaaaaaaxxxxx
                       <RLSCodeEditor
                         id="rls-sql-policy"
                         defaultValue={''}
+                        value={'catz'}
                         placeholder={placeholder}
                         editorRef={editorOneRef}
                       />
@@ -600,6 +602,7 @@ export const AIPolicyEditorPanel = memo(function ({
                               expOneContentHeight <= 100 ? `${8 + expOneContentHeight}px` : '108px',
                           }}
                         >
+                          hellooooooooooooooo
                           <RLSCodeEditor
                             disableTabToUsePlaceholder
                             readOnly={!canUpdatePolicies}
