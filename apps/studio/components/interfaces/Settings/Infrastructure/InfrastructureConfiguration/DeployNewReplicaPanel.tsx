@@ -84,7 +84,7 @@ const DeployNewReplicaPanel = ({
   const showNewDiskManagementUI =
     diskManagementV2 && subscription?.usage_based_billing_project_addons
   const readReplicaDiskSizes = (size_gb ?? 0) * 1.25
-  const additionalCostDiskSize = readReplicaDiskSizes * DISK_PRICING[type as DiskType].storage
+  const additionalCostDiskSize = readReplicaDiskSizes * DISK_PRICING[type as DiskType]?.storage ?? 0
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
