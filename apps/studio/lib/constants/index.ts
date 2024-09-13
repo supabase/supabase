@@ -68,6 +68,8 @@ export const LOCAL_STORAGE_KEYS = {
   // Track position of nodes for schema visualizer
   SCHEMA_VISUALIZER_POSITIONS: (ref: string, schemaId: number) =>
     `schema-visualizer-positions-${ref}-${schemaId}`,
+  // Used for allowing the main nav panel to expand on hover
+  EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
 }
 
 export const OPT_IN_TAGS = {
