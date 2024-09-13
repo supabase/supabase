@@ -309,6 +309,16 @@ export const sqlEditorState = proxy({
         },
       }
 
+      if (sqlEditorState.favoriteSnippets[id] !== undefined) {
+        sqlEditorState.favoriteSnippets[id] = {
+          projectRef: sqlEditorState.favoriteSnippets[id].projectRef,
+          snippet: {
+            ...sqlEditorState.favoriteSnippets[id].snippet,
+            visibility,
+          } as unknown as SqlSnippet,
+        }
+      }
+
       sqlEditorState.needsSaving.add(id)
     }
   },
