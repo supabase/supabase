@@ -32,7 +32,7 @@ const TwitterSocialSection = () => {
           </Button>
         </div>
       </SectionContainer>
-      <SectionContainer className="relative w-full !px-0 lg:!px-16 xl:!px-0 !pb-0 mb-16 md:mb-24 lg:mb-24 !pt-6 max-w-[1400px]">
+      <SectionContainer className="relative w-full !px-0 lg:!px-16 xl:!px-0 !pb-0 mb-16 md:mb-12 lg:mb-12 !pt-6 max-w-[1400px]">
         <TwitterSocialProofMobile className="lg:hidden -mb-24" tweets={tweets} />
         <TwitterSocialProof className="hidden lg:flex" />
       </SectionContainer>
