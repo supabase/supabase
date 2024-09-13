@@ -7,8 +7,8 @@ import { useOrganizationRolesV2Query } from 'data/organization-members/organizat
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -57,7 +57,7 @@ interface UpdateRolesPanelProps {
 export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelProps) => {
   const { slug } = useParams()
   const organization = useSelectedOrganization()
-  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const { data: projects } = useProjectsQuery()
   const { data: permissions } = usePermissionsQuery()
@@ -275,22 +275,20 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                               </SelectTrigger_Shadcn_>
                               <SelectContent_Shadcn_>
                                 <SelectGroup_Shadcn_>
-                                  {(orgScopedRoles ?? [])
-                                    .sort((a, b) => sortByObject[a.name] - sortByObject[b.name])
-                                    .map((role) => {
-                                      const canAssignRole = rolesAddable.includes(role.id)
+                                  {(orgScopedRoles ?? []).map((role) => {
+                                    const canAssignRole = rolesAddable.includes(role.id)
 
-                                      return (
-                                        <SelectItem_Shadcn_
-                                          key={role.id}
-                                          value={role.id.toString()}
-                                          className="text-sm"
-                                          disabled={!canAssignRole}
-                                        >
-                                          {role.name}
-                                        </SelectItem_Shadcn_>
-                                      )
-                                    })}
+                                    return (
+                                      <SelectItem_Shadcn_
+                                        key={role.id}
+                                        value={role.id.toString()}
+                                        className="text-sm"
+                                        disabled={!canAssignRole}
+                                      >
+                                        {role.name}
+                                      </SelectItem_Shadcn_>
+                                    )
+                                  })}
                                 </SelectGroup_Shadcn_>
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
@@ -303,7 +301,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                   type="text"
                                   disabled={!canRemoveRole}
                                   className="px-1"
-                                  icon={<X size={14} />}
+                                  icon={<X />}
                                   onClick={() => onRemoveProject(project?.ref)}
                                 />
                               </TooltipTrigger_Shadcn_>
@@ -328,7 +326,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 >
                   <PopoverTrigger_Shadcn_ asChild>
                     <Button type="default" className="w-min">
-                      Assign role to project
+                      Add project
                     </Button>
                   </PopoverTrigger_Shadcn_>
                   <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">

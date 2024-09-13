@@ -4,7 +4,7 @@ import { indexOf } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
@@ -21,6 +21,7 @@ import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-pos
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { ExternalLink, Lock } from 'lucide-react'
 import {
   Admonition,
   AlertDescription_Shadcn_,
@@ -37,8 +38,8 @@ import {
   Separator,
   Skeleton,
   Switch,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -48,7 +49,6 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
-import { ExternalLink, Lock } from 'lucide-react'
 import { HardenAPIModal } from './HardenAPIModal'
 
 const formSchema = z

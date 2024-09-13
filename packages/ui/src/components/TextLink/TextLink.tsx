@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { cn } from '../../lib/utils/cn'
-import IconChevronRight from '../Icon/icons/IconChevronRight/IconChevronRight'
+import { ChevronRight } from 'lucide-react'
 
 interface Props {
   label: string
@@ -42,7 +42,7 @@ function TextLink({
               chevronAnimation === 'fadeIn' && 'opacity-0 group-hover:opacity-100'
             )}
           >
-            <IconChevronRight size={14} strokeWidth={2} />
+            <ChevronRight size={14} strokeWidth={2} />
           </div>
         )}
       </div>

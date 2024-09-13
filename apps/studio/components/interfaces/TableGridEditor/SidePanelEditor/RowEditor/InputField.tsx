@@ -1,4 +1,6 @@
 import { includes, noop } from 'lodash'
+import { Edit, Edit2, Link } from 'lucide-react'
+
 import {
   Button,
   DropdownMenu,
@@ -9,12 +11,10 @@ import {
   Listbox,
   Select,
 } from 'ui'
-
-import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
-import { Edit, Edit2, Link } from 'lucide-react'
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { DateTimeInput } from './DateTimeInput'
-import type { RowField } from './RowEditor.types'
+import type { EditValue, RowField } from './RowEditor.types'
+import { isValueTruncated } from './RowEditor.utils'
 
 export interface InputFieldProps {
   field: RowField
@@ -22,7 +22,7 @@ export interface InputFieldProps {
   isEditable?: boolean
   onUpdateField?: (changes: object) => void
   onEditJson?: (data: any) => void
-  onEditText?: (data: any) => void
+  onEditText?: (data: EditValue) => void
   onSelectForeignKey?: () => void
 }
 
@@ -128,7 +128,7 @@ const InputField = ({
   }
 
   if (includes(TEXT_TYPES, field.format)) {
-    const isTruncated = field.value?.endsWith('...') && (field.value ?? '').length > MAX_CHARACTERS
+    const isTruncated = isValueTruncated(field.value)
 
     return (
       <div className="text-area-text-sm">
@@ -148,6 +148,7 @@ const InputField = ({
               )}
             </>
           }
+          textAreaClassName="pr-8"
           labelOptional={field.format}
           disabled={!isEditable || isTruncated}
           error={errors[field.name]}
@@ -172,21 +173,21 @@ const InputField = ({
                   Set to NULL
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => onEditText({ column: field.name, value: field.value })}
+                  onClick={() => onEditText({ column: field.name, value: field.value || '' })}
                 >
                   Expand editor
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           }
-          onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+          onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
         />
       </div>
     )
   }
 
   if (includes(JSON_TYPES, field.format)) {
-    const isTruncated = field.value?.endsWith('...') && (field.value ?? '').length > MAX_CHARACTERS
+    const isTruncated = isValueTruncated(field.value)
 
     return (
       <Input

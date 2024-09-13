@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { MoreVertical, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { TooltipContent } from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
@@ -143,7 +143,7 @@ export const WarehouseAccessTokens = () => {
       <FormHeader
         className="!mb-0"
         title="Access tokens"
-        description="Manage your warehouse access tokens for this project."
+        description="Manage your analytics access tokens for this project."
         actions={
           <CreateWarehouseAccessToken
             open={open}
@@ -160,13 +160,13 @@ export const WarehouseAccessTokens = () => {
       />
 
       {!canReadAccessTokens ? (
-        <NoPermission resourceText="view warehouse access tokens" />
+        <NoPermission resourceText="view analytics access tokens" />
       ) : (
         <div className={cn(['bg-surface-100', 'overflow-hidden', 'rounded-md shadow'])}>
           {!isProjectActive ? (
             <ProjectPausedAlert
               projectRef={projectRef}
-              description="Restore your project to manage your warehouse access tokens"
+              description="Restore your project to manage your analytics access tokens"
             />
           ) : (
             <>

@@ -1,12 +1,12 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import Link from 'next/link'
 import { Badge, cn } from 'ui'
 import { ArrowNarrowRightIcon } from '@heroicons/react/outline'
 
 interface Props {
   url: string
-  announcement: string
-  badge?: string
+  announcement: string | ReactNode
+  badge?: string | ReactNode
   target?: '_self' | '_blank' | string
   className?: string
   hasArrow?: boolean
@@ -20,17 +20,13 @@ const AnnouncementBadge = ({
   className,
   hasArrow = true,
 }: Props) => (
-  <div
-    className={cn(
-      'relative w-full max-w-xl flex justify-center opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]',
-      className
-    )}
-  >
+  <div className={cn('relative w-fit max-w-xl flex justify-center', className)}>
     <Link
       href={url}
       target={target}
       className={cn(
         `
+          announcement-link
           group/announcement
           relative
           flex flex-row
@@ -54,13 +50,13 @@ const AnnouncementBadge = ({
       )}
     >
       {badge && (
-        <Badge variant="brand" size="large" className="py-1">
+        <Badge variant="brand" size="large" className="py-1 announcement-badge">
           {badge}
         </Badge>
       )}
-      <span className="text-foreground">{announcement}</span>
+      <span className="text-foreground announcement-text">{announcement}</span>
       {hasArrow && (
-        <ArrowNarrowRightIcon className="h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
+        <ArrowNarrowRightIcon className="announcement-icon h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
       )}
       <div
         className="absolute inset-0 -z-10 bg-gradient-to-br

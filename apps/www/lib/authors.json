@@ -145,6 +145,14 @@
     "author_image_url": "https://github.com/alaister.png"
   },
   {
+    "author_id": "hieu",
+    "author": "Hieu Pham",
+    "username": "hieu",
+    "position": "Engineering",
+    "author_url": "https://github.com/phamhieu",
+    "author_image_url": "https://github.com/phamhieu.png"
+  },
+  {
     "author_id": "tyler_shukert",
     "author": "Tyler Shukert",
     "username": "dshukertjr",
@@ -240,7 +248,7 @@
   {
     "author_id": "jonny",
     "author": "Jonny Summers-Muir",
-    "position": "Product design",
+    "position": "Product Design",
     "author_url": "https://github.com/mildtomato",
     "author_image_url": "https://github.com/mildtomato.png"
   },
@@ -283,7 +291,7 @@
     "author_id": "marijana",
     "author": "Marijana Pavlinić",
     "position": "Design",
-    "author_url": "https://dribbble.com/marijanapav",
+    "author_url": "https://github.com/marijanapav",
     "author_image_url": "https://github.com/marijanapav.png"
   },
   {
@@ -477,5 +485,45 @@
     "position": "Guest Author",
     "author_url": "https://github.com/PeerRich",
     "author_image_url": "https://github.com/PeerRich.png"
+  },
+  {
+    "author_id": "khajvandi",
+    "author": "Cyrus Khajvandi",
+    "username": "khajvandi",
+    "position": "Co-Founder & CEO, Humata",
+    "author_url": "https://www.linkedin.com/in/khajvandi/",
+    "author_image_url": "https://media.licdn.com/dms/image/v2/D5603AQGZst2tvV47PA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1694666298155?e=1728518400&v=beta&t=Jkt6ii4cV8FsvU4qONEGFVUADw-Zc_WI1h-pSrenxGg"
+  },
+  {
+    "author_id": "anas-araid",
+    "author": "Anas Araid",
+    "username": "anas-araid",
+    "position": "Guest Author",
+    "author_url": "https://github.com/anas-araid",
+    "author_image_url": "https://github.com/anas-araid.png"
+  },
+  {
+    "author_id": "activenode",
+    "author": "David Lorenz",
+    "username": "activenode",
+    "position": "Guest Author",
+    "author_url": "https://github.com/activenode",
+    "author_image_url": "https://github.com/activenode.png"
+  },
+  {
+    "author_id": "craig_cannon",
+    "author": "Craig Cannon",
+    "username": "CraigCannon",
+    "position": "Marketing",
+    "author_url": "https://x.com/CraigCannon",
+    "author_image_url": "https://github.com/craigcannon.png"
+  },
+  {
+    "author_id": "nyannyacha",
+    "author": "Nyannyacha",
+    "username": "nyannyacha",
+    "position": "Engineering",
+    "author_url": "https://github.com/nyannyacha",
+    "author_image_url": "https://github.com/nyannyacha.png"
   }
 ]

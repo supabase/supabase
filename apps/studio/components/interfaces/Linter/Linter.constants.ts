@@ -18,7 +18,7 @@ export const LINT_TABS = [
   {
     id: LINTER_LEVELS.ERROR,
     label: 'Errors',
-    description: 'You should consider these issues urgent and and fix them as soon as you can.',
+    description: 'You should consider these issues urgent and fix them as soon as you can.',
   },
   {
     id: LINTER_LEVELS.WARN,

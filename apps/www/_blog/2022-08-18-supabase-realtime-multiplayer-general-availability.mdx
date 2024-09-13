@@ -89,16 +89,14 @@ const MOUSE_EVENT = 'cursor'
 // Subscribe to mouse events.
 // Our second parameter filters only for mouse events.
 channel
-.on(
-  'broadcast',
-  { event: MOUSE_EVENT },
-  (event) => { receivedCursorPosition(event) }
-)
-.subscribe()
+  .on('broadcast', { event: MOUSE_EVENT }, (event) => {
+    receivedCursorPosition(event)
+  })
+  .subscribe()
 
 // Handle a mouse event.
-const receivedCursorPosition({ event, payload }) => {
-	console.log(`
+const receivedCursorPosition = ({ event, payload }) => {
+  console.log(`
 		User: ${payload.userId}
 		x Position: ${payload.x}
 		y Position: ${payload.y}
@@ -106,14 +104,13 @@ const receivedCursorPosition({ event, payload }) => {
 }
 
 // Helper function for sending our own mouse position.
-const sendMousePosition(channel, userId, x, y) => {
-	return channel.send({
-		type: 'broadcast',
-		event: MOUSE_EVENT,
-		payload: { userId, x, y }
-	})
+const sendMousePosition = (channel, userId, x, y) => {
+  return channel.send({
+    type: 'broadcast',
+    event: MOUSE_EVENT,
+    payload: { userId, x, y },
+  })
 }
-
 ```
 
 ### Presence Example

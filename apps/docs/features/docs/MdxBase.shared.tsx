@@ -13,6 +13,7 @@ import ButtonCard from '~/components/ButtonCard'
 import { Extensions } from '~/components/Extensions'
 import { JwtGenerator } from '~/components/JwtGenerator'
 import {
+  AuthErrorCodesTable,
   AuthRateLimits,
   CreateClientSnippet,
   DatabaseSetup,
@@ -22,6 +23,7 @@ import {
   MigrationWarnings,
   ProjectSetup,
   OAuthPkceFlow,
+  QuickstartDbSetup,
   QuickstartIntro,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
@@ -40,6 +42,7 @@ const components = {
   Accordion,
   AccordionItem,
   Admonition,
+  AuthErrorCodesTable,
   AuthRateLimits,
   AuthSmsProviderConfig,
   AppleSecretGenerator,
@@ -67,6 +70,7 @@ const components = {
   OAuthPkceFlow,
   ProjectConfigVariables,
   ProjectSetup,
+  QuickstartDbSetup,
   QuickstartIntro,
   RealtimeLimitsEstimator,
   RegionsList,

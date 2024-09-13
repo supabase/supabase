@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import toast from 'react-hot-toast'
 
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   AlertDescription_Shadcn_,
@@ -11,26 +12,19 @@ import {
   Alert_Shadcn_,
   Button,
   Modal,
-  Toggle,
   WarningIcon,
 } from 'ui'
+import { SchemaComboBox } from './SchemaComboBox'
 
 const AISettingsModal = () => {
   const snap = useAppStateSnapshot()
   const selectedOrganization = useSelectedOrganization()
-  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const isOptedInToAI = useOrgOptedIntoAi()
+  const selectedProject = useSelectedProject()
 
-  const [hasEnabledAISchema, setHasEnabledAISchema] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA,
-    true
-  )
+  const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(selectedProject?.ref!)
 
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
-
-  const handleOptInToggle = () => {
-    setHasEnabledAISchema((prev) => !prev)
-    toast.success('Successfully saved settings')
-  }
+  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   return (
     <Modal
@@ -40,19 +34,25 @@ const AISettingsModal = () => {
       onCancel={() => snap.setShowAiSettingsModal(false)}
     >
       <Modal.Content className="flex flex-col items-start justify-between gap-y-4">
-        <div className="flex justify-between gap-x-5 mr-8 my-4">
-          <Toggle
+        <div className="flex flex-col justify-between gap-y-2 text-sm">
+          <p className="text-foreground-light">Schemas metadata to be shared with OpenAI</p>
+          <SchemaComboBox
+            size="small"
+            label={
+              includeSchemaMetadata && selectedSchemas.length > 0
+                ? `${selectedSchemas.length} schema${
+                    selectedSchemas.length > 1 ? 's' : ''
+                  } selected`
+                : 'No schemas selected'
+            }
             disabled={IS_PLATFORM && !isOptedInToAI}
-            checked={includeSchemaMetadata}
-            onChange={handleOptInToggle}
+            selectedSchemas={selectedSchemas}
+            onSelectSchemas={setSelectedSchemas}
           />
-          <div className="grid gap-2">
-            <p className="text-sm">Include anonymous database metadata in AI queries</p>
-            <p className="text-sm text-foreground-light">
-              Metadata includes table names, column names and their corresponding data types in the
-              request. This will generate queries that are more relevant to your project.
-            </p>
-          </div>
+          <p className="text-foreground-lighter">
+            Metadata includes table names, column names and their corresponding data types in the
+            request. This will generate queries that are more relevant to your project.
+          </p>
         </div>
         {IS_PLATFORM && !isOptedInToAI && selectedOrganization && (
           <Alert_Shadcn_ variant="warning">

@@ -1,16 +1,27 @@
 import { useDebounce } from '@uidotdev/usehooks'
+import { ChevronDown, ExternalLink, User as IconUser, Loader2, Search, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { User, useUsersQuery } from 'data/auth/users-query'
-import { User as IconUser, Loader2, Search, X } from 'lucide-react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { Button, Input } from 'ui'
-import { getAvatarUrl, getDisplayName } from '../Auth/Users/UserListItem.utils'
+import {
+  Button,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Input,
+  Switch,
+} from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
+
+type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 
 const UserImpersonationSelector = () => {
   const [searchText, setSearchText] = useState('')
+  const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
   const debouncedSearchText = useDebounce(searchText, 300)
 
   const { project } = useProjectContext()
@@ -37,11 +48,16 @@ const UserImpersonationSelector = () => {
       type: 'postgrest',
       role: 'authenticated',
       user,
+      aal,
     })
   }
 
   function stopImpersonating() {
     state.setRole(undefined)
+  }
+
+  function toggleAalState() {
+    setAal((prev) => (prev === 'aal2' ? 'aal1' : 'aal2'))
   }
 
   return (
@@ -91,6 +107,48 @@ const UserImpersonationSelector = () => {
             }
           />
 
+          <Collapsible_Shadcn_>
+            <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+              <div className="flex items-center gap-x-1 w-full">
+                <p className="text-xs text-foreground-light group-hover:text-foreground transition">
+                  Advanced options
+                </p>
+                <ChevronDown
+                  className="transition-transform duration-200"
+                  strokeWidth={1.5}
+                  size={14}
+                />
+              </div>
+            </CollapsibleTrigger_Shadcn_>
+            <CollapsibleContent_Shadcn_ className="mt-1 flex flex-row items-center gap-x-4 text-sm text-foreground-light">
+              <div className="flex items-center gap-x-1">
+                <h3>MFA assurance level</h3>
+                <InfoTooltip side="top" className="flex flex-col gap-1 max-w-96">
+                  <p>
+                    AAL1 verifies users via standard login methods, while AAL2 adds a second
+                    authentication factor.
+                    <br />
+                    If you're not using MFA, you can leave this on AAL1.
+                  </p>
+                  <a
+                    href="/docs/guides/auth/auth-mfa"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-x-1 opacity-50 hover:opacity-100 transition"
+                  >
+                    Learn more about MFA <ExternalLink size={14} strokeWidth={2} />
+                  </a>
+                </InfoTooltip>
+              </div>
+
+              <div className="flex flex-row items-center gap-x-2 text-xs font-bold">
+                <p className={aal === 'aal1' ? undefined : 'text-foreground-lighter'}>AAL1</p>
+                <Switch checked={aal === 'aal2'} onCheckedChange={toggleAalState} />
+                <p className={aal === 'aal2' ? undefined : 'text-foreground-lighter'}>AAL2</p>
+              </div>
+            </CollapsibleContent_Shadcn_>
+          </Collapsible_Shadcn_>
+
           {isLoading && (
             <div className="flex flex-col gap-2 items-center justify-center h-24">
               <Loader2 className="animate-spin" size={24} />
@@ -122,6 +180,7 @@ const UserImpersonationSelector = () => {
           user={impersonatingUser}
           onClick={stopImpersonating}
           isImpersonating={true}
+          aal={aal}
         />
       )}
     </div>
@@ -136,7 +195,12 @@ interface UserRowProps {
   isImpersonating?: boolean
 }
 
-const UserImpersonatingRow = ({ user, onClick, isImpersonating = false }: UserRowProps) => {
+const UserImpersonatingRow = ({
+  user,
+  onClick,
+  isImpersonating = false,
+  aal,
+}: UserRowProps & { aal: AuthenticatorAssuranceLevels }) => {
   const avatarUrl = getAvatarUrl(user)
   const displayName =
     getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown') +
@@ -144,7 +208,7 @@ const UserImpersonatingRow = ({ user, onClick, isImpersonating = false }: UserRo
 
   return (
     <div className="flex items-center gap-3 py-2 text-foreground">
-      <div className="flex items-center gap-4 bg-surface-200 pr-5 pl-0.5 py-0.5 border rounded-full max-w-l">
+      <div className="flex items-center gap-4 bg-surface-200 pr-4 pl-0.5 py-0.5 border rounded-full max-w-l">
         {avatarUrl ? (
           <img className="rounded-full w-5 h-5" src={avatarUrl} alt={displayName} />
         ) : (
@@ -153,7 +217,12 @@ const UserImpersonatingRow = ({ user, onClick, isImpersonating = false }: UserRo
           </div>
         )}
 
-        <span className="text-sm truncate">{displayName}</span>
+        <span className="text-sm truncate">
+          {displayName}{' '}
+          <span className="ml-2 text-foreground-lighter text-xs font-light">
+            {aal === 'aal2' ? 'AAL2' : 'AAL1'}
+          </span>
+        </span>
       </div>
 
       <Button

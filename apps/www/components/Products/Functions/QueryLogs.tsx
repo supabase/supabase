@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Badge, IconAlertCircle, IconInfo, cn } from 'ui'
+import { AlertCircle, Info } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useInterval } from 'react-use'
+import { cn } from 'ui'
 
 enum STATUS {
   LOG = 'LOG',
@@ -109,7 +110,7 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
         className="absolute z-20 pointer-events-none inset-0 top-auto h-32"
         style={{
           background:
-            'linear-gradient(to top, hsl(var(--background-surface-100)) 0%, transparent 100%)',
+            'linear-gradient(to top, hsl(var(--background-surface-75)) 0%, transparent 100%)',
         }}
       />
       <motion.ul
@@ -143,9 +144,9 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
               >
                 <span>
                   {log.status === 'LOG' ? (
-                    <IconInfo size={14} strokeWidth={2} />
+                    <Info size={14} strokeWidth={2} />
                   ) : (
-                    <IconAlertCircle size={14} strokeWidth={2} />
+                    <AlertCircle size={14} strokeWidth={2} />
                   )}
                 </span>
                 <span>{log.status}</span>

@@ -8,32 +8,52 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project">
+    
+    <StepHikeCompact.Details title="Create a Supabase project">
 
-    Head over to [database.new](https://database.new) and create a new Supabase project.
+      Go to [database.new](https://database.new) and create a new Supabase project.
 
-    When your project is up and running, navigate to the [Table Editor](https://supabase.com/dashboard/project/_/editor), create a new table and insert some data.
+      When your project is up and running, go to the [Table Editor](https://supabase.com/dashboard/project/_/editor), create a new table and insert some data.
 
-    Alternatively, you can run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `notes` table with some sample data.
+      Alternatively, you can run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `notes` table with some sample data.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-     ```sql SQL_EDITOR
+      ```sql SQL_EDITOR
       -- Create the table
       create table notes (
-        id serial primary key,
-        title text
+        id bigint primary key generated always as identity,
+        title text not null
       );
 
-      -- Insert some sample data
+      -- Insert some sample data into the table
       insert into notes (title)
       values
         ('Today I created a Supabase project.'),
         ('I added some data and queried it from Next.js.'),
         ('It was awesome!');
-      ````
+
+      alter table notes enable row level security;
+      ```
+
+    </StepHikeCompact.Code>
+
+    <StepHikeCompact.Details>
+
+    Make the data in your table publicly readable by adding an RLS policy:
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql SQL_EDITOR
+      create policy "public can read notes"
+      on public.notes
+      for select to anon
+      using (true);
+      ```
 
     </StepHikeCompact.Code>
 
@@ -106,7 +126,7 @@ hideToc: true
       ```
 
       ```ts utils/supabase/server.ts
-        import { createServerClient, type CookieOptions } from '@supabase/ssr'
+        import { createServerClient } from '@supabase/ssr'
         import { cookies } from 'next/headers'
 
         export function createClient() {
@@ -117,23 +137,16 @@ hideToc: true
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
             {
               cookies: {
-                get(name: string) {
-                  return cookieStore.get(name)?.value
+                getAll() {
+                  return cookieStore.getAll()
                 },
-                set(name: string, value: string, options: CookieOptions) {
+                setAll(cookiesToSet) {
                   try {
-                    cookieStore.set({ name, value, ...options })
-                  } catch (error) {
-                    // The `set` method was called from a Server Component.
-                    // This can be ignored if you have middleware refreshing
-                    // user sessions.
-                  }
-                },
-                remove(name: string, options: CookieOptions) {
-                  try {
-                    cookieStore.set({ name, value: '', ...options })
-                  } catch (error) {
-                    // The `delete` method was called from a Server Component.
+                    cookiesToSet.forEach(({ name, value, options }) =>
+                      cookieStore.set(name, value, options)
+                    )
+                  } catch {
+                    // The `setAll` method was called from a Server Component.
                     // This can be ignored if you have middleware refreshing
                     // user sessions.
                   }

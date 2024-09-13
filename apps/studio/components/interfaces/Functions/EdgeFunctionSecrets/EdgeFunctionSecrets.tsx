@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Search } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -65,11 +65,7 @@ const EdgeFunctionSecrets = () => {
                   icon={<Search size={14} />}
                 />
                 <div className="flex items-center space-x-2">
-                  <Button
-                    asChild
-                    type="default"
-                    icon={<ExternalLink size={14} strokeWidth={1.5} />}
-                  >
+                  <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <a
                       target="_blank"
                       rel="noreferrer"

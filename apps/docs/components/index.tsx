@@ -11,9 +11,10 @@ import { TabPanel, Tabs } from '~/features/ui/Tabs'
 
 // Common components
 import { CH } from '@code-hike/mdx/components'
+import { ArrowDown, Check } from 'lucide-react'
+import { Heading } from 'ui'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import ButtonCard from './ButtonCard'
-import { Heading } from 'ui'
 
 // Reference guide specific
 // [Charis] I think we can factor these out so they aren't in the bundle for absolutely everything
@@ -35,6 +36,7 @@ import { SharedData } from './SharedData'
 
 // Partials
 import HuggingFaceDeployment from './MDX/ai/quickstart_hf_deployment.mdx'
+import AuthErrorCodesTable from './MDX/auth_error_codes_table.mdx'
 import AuthRateLimits from './MDX/auth_rate_limits.mdx'
 import DatabaseSetup from './MDX/database_setup.mdx'
 import GetSessionWarning from './MDX/get_session_warning.mdx'
@@ -47,7 +49,6 @@ import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supab
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
 
 // Icons
-import { IconArrowDown, IconCheck } from 'ui'
 import {
   IconMenuApi,
   IconMenuAuth,
@@ -90,6 +91,7 @@ const components = {
   ),
   AppleSecretGenerator,
   AuthProviders,
+  AuthErrorCodesTable,
   AuthRateLimits,
   AuthSmsProviderConfig,
   Button,
@@ -118,9 +120,9 @@ const components = {
     </Heading>
   ),
   HuggingFaceDeployment,
-  IconCheck,
+  IconCheck: Check,
   IconMenuApi,
-  IconArrowDown,
+  IconArrowDown: ArrowDown,
   IconMenuAuth,
   IconMenuCli,
   IconMenuCsharp,

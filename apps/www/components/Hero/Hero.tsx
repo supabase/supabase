@@ -1,11 +1,11 @@
+import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
+import { BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
-import gaEvents from '~/lib/gaEvents'
-import { Button, IconBookOpen } from 'ui'
+import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import HeroFrameworks from './HeroFrameworks'
+import gaEvents from '~/lib/gaEvents'
+import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 
 const Hero = () => {
   const router = useRouter()
@@ -27,7 +27,7 @@ const Hero = () => {
                       Build in a weekend
                     </span>
                     <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#3ECF8E] via-[#3ECF8E] to-[#3ecfb2] block md:ml-0">
-                      Scale to millions
+                      Scale to billions
                     </span>
                   </h1>
                   <p className="pt-2 text-foreground my-3 text-sm sm:mt-5 lg:mb-0 sm:text-base lg:text-lg">
@@ -47,7 +47,7 @@ const Hero = () => {
                       Start your project
                     </Link>
                   </Button>
-                  <Button asChild size="medium" type="default" icon={<IconBookOpen />}>
+                  <Button asChild size="medium" type="default" icon={<BookOpen />}>
                     <Link
                       href="/docs"
                       as="/docs"
@@ -57,8 +57,6 @@ const Hero = () => {
                     </Link>
                   </Button>
                 </div>
-
-                <HeroFrameworks className="mt-4 lg:mt-6" />
               </div>
             </div>
           </div>

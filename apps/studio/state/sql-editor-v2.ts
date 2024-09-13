@@ -1,13 +1,16 @@
 import { debounce, memoize } from 'lodash'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxySet } from 'valtio/utils'
 
 import { UpsertContentPayloadV2, upsertContent } from 'data/content/content-upsert-v2-mutation'
+import { contentKeys } from 'data/content/keys'
 import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder, SnippetFolderResponse } from 'data/content/sql-folders-query'
-import { SqlSnippet, SqlSnippets } from 'data/content/sql-snippets-query'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { getQueryClient } from 'data/query-client'
+import { getContentById } from 'data/content/content-id-query'
 
 export type StateSnippetFolder = {
   projectRef: string
@@ -59,6 +62,9 @@ export const sqlEditorState = proxy({
   loaded: {} as {
     [projectRef: string]: boolean
   },
+  privateSnippetCount: {} as {
+    [projectRef: string]: number
+  },
   // Synchronous saving of folders and snippets (debounce behavior)
   needsSaving: proxySet<string>([]),
   // Stores the state of each snippet
@@ -67,24 +73,11 @@ export const sqlEditorState = proxy({
   },
   limit: 100,
   order: 'inserted_at' as 'name' | 'inserted_at',
+  // For handling renaming folder failed
+  lastUpdatedFolderName: '',
 
-  get sortedSnippets() {
-    return Object.values(sqlEditorState.snippets)
-      .map((x) => x.snippet)
-      .sort((a, b) => {
-        if (sqlEditorState.order === 'name') return a.name.localeCompare(b.name)
-        else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
-      })
-  },
-
-  get sortedFavoriteSnippets() {
-    return Object.values(sqlEditorState.favoriteSnippets)
-      .map((x) => x.snippet)
-      .sort((a, b) => {
-        if (sqlEditorState.order === 'name') return a.name.localeCompare(b.name)
-        else
-          return new Date(b.inserted_at ?? '').valueOf() - new Date(a.inserted_at ?? '').valueOf()
-      })
+  get allFolderNames() {
+    return Object.values(sqlEditorState.folders).map((x) => x.folder.name)
   },
 
   // ========================================================================
@@ -129,6 +122,10 @@ export const sqlEditorState = proxy({
   },
 
   setOrder: (value: 'name' | 'inserted_at') => (sqlEditorState.order = value),
+
+  setPrivateSnippetCount: ({ projectRef, value }: { projectRef: string; value: number }) => {
+    sqlEditorState.privateSnippetCount[projectRef] = value
+  },
 
   addSnippet: ({ projectRef, snippet }: { projectRef: string; snippet: Snippet }) => {
     if (snippet.id && sqlEditorState.snippets[snippet.id]?.snippet?.content === undefined) {
@@ -213,6 +210,17 @@ export const sqlEditorState = proxy({
 
   saveFolder: ({ id, name }: { id: string; name: string }) => {
     const hasChanges = sqlEditorState.folders[id].folder.name !== name
+
+    if (id === 'new-folder' && sqlEditorState.allFolderNames.includes(name)) {
+      sqlEditorState.removeFolder(id)
+      return toast.error('This folder name already exists')
+    } else if (hasChanges && sqlEditorState.allFolderNames.includes(name)) {
+      sqlEditorState.folders[id] = { ...sqlEditorState.folders[id], status: 'idle' }
+      return toast.error('This folder name already exists')
+    }
+
+    const originalFolderName = sqlEditorState.folders[id].folder.name.slice()
+
     sqlEditorState.folders[id] = {
       projectRef: sqlEditorState.folders[id].projectRef,
       status: hasChanges ? 'saving' : 'idle',
@@ -222,7 +230,10 @@ export const sqlEditorState = proxy({
         name,
       },
     }
-    if (hasChanges) sqlEditorState.needsSaving.add(id)
+    if (hasChanges) {
+      sqlEditorState.lastUpdatedFolderName = originalFolderName
+      sqlEditorState.needsSaving.add(id)
+    }
   },
 
   removeFolder: (id: string) => {
@@ -273,16 +284,41 @@ export const sqlEditorState = proxy({
     }
   },
 
-  shareSnippet: (id: string, visibility: 'user' | 'project' | 'org' | 'public') => {
-    if (sqlEditorState.snippets[id]) {
+  shareSnippet: async (id: string, visibility: 'user' | 'project' | 'org' | 'public') => {
+    const storeSnippet = sqlEditorState.snippets[id]
+
+    if (storeSnippet) {
+      let snippetContent = storeSnippet.snippet.content
+      if (snippetContent === undefined) {
+        const { content } = await getContentById({ projectRef: storeSnippet.projectRef, id })
+        snippetContent = content
+      }
+
+      if (snippetContent === undefined) {
+        // [Joshen] Just as a final check - to ensure that the content is minimally there (empty string is fine)
+        return toast.error('Unable to share snippet: Content is missing')
+      }
+
       sqlEditorState.snippets[id] = {
-        ...sqlEditorState.snippets[id],
+        ...storeSnippet,
         snippet: {
-          ...sqlEditorState.snippets[id].snippet,
+          ...storeSnippet.snippet,
+          content: snippetContent,
           visibility,
           folder_id: null as any,
         },
       }
+
+      if (sqlEditorState.favoriteSnippets[id] !== undefined) {
+        sqlEditorState.favoriteSnippets[id] = {
+          projectRef: sqlEditorState.favoriteSnippets[id].projectRef,
+          snippet: {
+            ...sqlEditorState.favoriteSnippets[id].snippet,
+            visibility,
+          } as unknown as SqlSnippet,
+        }
+      }
+
       sqlEditorState.needsSaving.add(id)
     }
   },
@@ -315,6 +351,38 @@ export const getSqlEditorV2StateSnapshot = () => snapshot(sqlEditorState)
 export const useSqlEditorV2StateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) =>
   useSnapshot(sqlEditorState, options)
 
+export const useSnippetFolders = (projectRef: string) => {
+  const snapshot = useSqlEditorV2StateSnapshot()
+
+  return Object.values(snapshot.folders)
+    .filter((x) => x.projectRef === projectRef)
+    .map((x) => x.folder)
+}
+
+export const useSnippets = (projectRef: string) => {
+  const snapshot = useSqlEditorV2StateSnapshot()
+
+  return Object.values(snapshot.snippets)
+    .filter((x) => x.projectRef === projectRef)
+    .map((x) => x.snippet)
+    .sort((a, b) => {
+      if (snapshot.order === 'name') return a.name.localeCompare(b.name)
+      else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+    })
+}
+
+export const useFavoriteSnippets = (projectRef: string) => {
+  const snapshot = useSqlEditorV2StateSnapshot()
+
+  return Object.values(snapshot.favoriteSnippets)
+    .filter((x) => x.projectRef === projectRef)
+    .map((x) => x.snippet)
+    .sort((a, b) => {
+      if (snapshot.order === 'name') return a.name.localeCompare(b.name)
+      else return new Date(b.inserted_at ?? '').valueOf() - new Date(a.inserted_at ?? '').valueOf()
+    })
+}
+
 // ========================================================================
 // ## Below are all the asynchronous saving logic for the SQL Editor
 // ========================================================================
@@ -322,10 +390,11 @@ export const useSqlEditorV2StateSnapshot = (options?: Parameters<typeof useSnaps
 async function upsertSnippet(id: string, projectRef: string, payload: UpsertContentPayloadV2) {
   try {
     sqlEditorState.savingStates[id] = 'UPDATING'
-    await upsertContent({
-      projectRef,
-      payload,
-    })
+    await upsertContent({ projectRef, payload })
+
+    const queryClient = getQueryClient()
+    await queryClient.invalidateQueries(contentKeys.count(projectRef, 'sql'))
+
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
     sqlEditorState.savingStates[id] = 'UPDATING_FAILED'
@@ -351,12 +420,29 @@ async function upsertFolder(id: string, projectRef: string, name: string) {
     }
   } catch (error: any) {
     toast.error(`Failed to save folder: ${error.message}`)
+    if (error.message.includes('create')) {
+      sqlEditorState.removeFolder(id)
+    } else if (
+      error.message.includes('update') &&
+      sqlEditorState.lastUpdatedFolderName.length > 0
+    ) {
+      sqlEditorState.folders[id] = {
+        ...sqlEditorState.folders[id],
+        status: 'idle',
+        folder: {
+          ...sqlEditorState.folders[id].folder,
+          name: sqlEditorState.lastUpdatedFolderName,
+        },
+      }
+    }
+  } finally {
+    sqlEditorState.lastUpdatedFolderName = ''
   }
 }
 
 if (typeof window !== 'undefined') {
   devtools(sqlEditorState, {
-    name: 'sqlEditorState',
+    name: 'sqlEditorStateV2',
     // [Joshen] So that jest unit tests can ignore this
     enabled: process.env.NEXT_PUBLIC_ENVIRONMENT !== undefined,
   })

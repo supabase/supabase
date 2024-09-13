@@ -261,7 +261,7 @@ parameters:
     title: 'inbucket.port'
     tags: ['local']
     required: false
-    default: 'true'
+    default: '54324'
     description: |
       Port to use for the email testing server web interface.
 

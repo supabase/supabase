@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import Panel from 'components/ui/Panel'
 import { useProjectApiQuery } from 'data/config/project-api-query'
@@ -8,16 +8,9 @@ import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mut
 import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconExternalLink,
-  Modal,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { AlertCircle, ExternalLink } from 'lucide-react'
 
 export type CustomDomainActivateProps = {
   projectRef?: string
@@ -71,7 +64,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
           </div>
           <div className="mt-4">
             <Alert_Shadcn_>
-              <IconAlertCircle className="text-foreground-light" strokeWidth={1.5} />
+              <AlertCircle className="text-foreground-light" strokeWidth={1.5} />
               <AlertTitle_Shadcn_>
                 Remember to restore the original CNAME record from the first step before activating
               </AlertTitle_Shadcn_>
@@ -96,7 +89,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
 
         <Panel.Content className="w-full">
           <div className="flex items-center justify-between">
-            <Button asChild type="default" icon={<IconExternalLink />}>
+            <Button asChild type="default" icon={<ExternalLink />}>
               <Link
                 href="https://supabase.com/docs/guides/platform/custom-domains"
                 target="_blank"

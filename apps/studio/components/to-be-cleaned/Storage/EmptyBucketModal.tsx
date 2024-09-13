@@ -1,17 +1,10 @@
 import { useParams } from 'common'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useBucketEmptyMutation } from 'data/storage/bucket-empty-mutation'
 import type { Bucket } from 'data/storage/buckets-query'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  IconAlertTriangle,
-  Modal,
-} from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export interface EmptyBucketModalProps {
   visible: boolean

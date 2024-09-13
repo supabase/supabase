@@ -176,6 +176,17 @@
                   },
                   "persistent": {
                     "type": "boolean"
+                  },
+                  "status": {
+                    "enum": [
+                      "CREATING_PROJECT",
+                      "RUNNING_MIGRATIONS",
+                      "MIGRATIONS_PASSED",
+                      "MIGRATIONS_FAILED",
+                      "FUNCTIONS_DEPLOYED",
+                      "FUNCTIONS_FAILED"
+                    ],
+                    "type": "string"
                   }
                 }
               }
@@ -491,7 +502,7 @@
                       "free",
                       "pro"
                     ],
-                    "description": "Subscription plan is now set on organization level and is ignored in this request",
+                    "description": "Subscription Plan is now set on organization level and is ignored in this request",
                     "example": "free",
                     "deprecated": true
                   },
@@ -499,6 +510,7 @@
                     "type": "string",
                     "enum": [
                       "us-east-1",
+                      "us-east-2",
                       "us-west-1",
                       "us-west-2",
                       "ap-east-1",
@@ -509,7 +521,9 @@
                       "eu-west-1",
                       "eu-west-2",
                       "eu-west-3",
+                      "eu-north-1",
                       "eu-central-1",
+                      "eu-central-2",
                       "ca-central-1",
                       "ap-south-1",
                       "sa-east-1"
@@ -1410,11 +1424,29 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "desired_instance_size": {
+                    "type": "string",
+                    "enum": [
+                      "micro",
+                      "small",
+                      "medium",
+                      "large",
+                      "xlarge",
+                      "2xlarge",
+                      "4xlarge",
+                      "8xlarge",
+                      "12xlarge",
+                      "16xlarge"
+                    ]
+                  },
                   "branch_name": {
                     "type": "string"
                   },
                   "git_branch": {
                     "type": "string"
+                  },
+                  "persistent": {
+                    "type": "boolean"
                   },
                   "region": {
                     "type": "string"
@@ -1616,11 +1648,9 @@
                               "type": "object",
                               "properties": {
                                 "status": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "validation_records": {
-                                  "required": true,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -1639,7 +1669,6 @@
                                   }
                                 },
                                 "validation_errors": {
-                                  "required": false,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -1653,24 +1682,30 @@
                                     ]
                                   }
                                 }
-                              }
+                              },
+                              "required": [
+                                "status",
+                                "validation_records"
+                              ]
                             },
                             "ownership_verification": {
                               "type": "object",
                               "properties": {
                                 "type": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "name": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "value": {
-                                  "required": true,
                                   "type": "string"
                                 }
-                              }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "value"
+                              ]
                             },
                             "custom_origin_server": {
                               "type": "string"
@@ -1852,11 +1887,9 @@
                               "type": "object",
                               "properties": {
                                 "status": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "validation_records": {
-                                  "required": true,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -1875,7 +1908,6 @@
                                   }
                                 },
                                 "validation_errors": {
-                                  "required": false,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -1889,24 +1921,30 @@
                                     ]
                                   }
                                 }
-                              }
+                              },
+                              "required": [
+                                "status",
+                                "validation_records"
+                              ]
                             },
                             "ownership_verification": {
                               "type": "object",
                               "properties": {
                                 "type": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "name": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "value": {
-                                  "required": true,
                                   "type": "string"
                                 }
-                              }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "value"
+                              ]
                             },
                             "custom_origin_server": {
                               "type": "string"
@@ -2034,11 +2072,9 @@
                               "type": "object",
                               "properties": {
                                 "status": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "validation_records": {
-                                  "required": true,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -2057,7 +2093,6 @@
                                   }
                                 },
                                 "validation_errors": {
-                                  "required": false,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -2071,24 +2106,30 @@
                                     ]
                                   }
                                 }
-                              }
+                              },
+                              "required": [
+                                "status",
+                                "validation_records"
+                              ]
                             },
                             "ownership_verification": {
                               "type": "object",
                               "properties": {
                                 "type": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "name": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "value": {
-                                  "required": true,
                                   "type": "string"
                                 }
-                              }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "value"
+                              ]
                             },
                             "custom_origin_server": {
                               "type": "string"
@@ -2216,11 +2257,9 @@
                               "type": "object",
                               "properties": {
                                 "status": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "validation_records": {
-                                  "required": true,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -2239,7 +2278,6 @@
                                   }
                                 },
                                 "validation_errors": {
-                                  "required": false,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -2253,24 +2291,30 @@
                                     ]
                                   }
                                 }
-                              }
+                              },
+                              "required": [
+                                "status",
+                                "validation_records"
+                              ]
                             },
                             "ownership_verification": {
                               "type": "object",
                               "properties": {
                                 "type": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "name": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "value": {
-                                  "required": true,
                                   "type": "string"
                                 }
-                              }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "value"
+                              ]
                             },
                             "custom_origin_server": {
                               "type": "string"
@@ -4062,6 +4106,7 @@
                     "type": "string",
                     "enum": [
                       "us-east-1",
+                      "us-east-2",
                       "us-west-1",
                       "us-west-2",
                       "ap-east-1",
@@ -4072,7 +4117,9 @@
                       "eu-west-1",
                       "eu-west-2",
                       "eu-west-3",
+                      "eu-north-1",
                       "eu-central-1",
+                      "eu-central-2",
                       "ca-central-1",
                       "ap-south-1",
                       "sa-east-1"
@@ -4090,6 +4137,9 @@
         },
         "responses": {
           "201": {
+            "description": ""
+          },
+          "403": {
             "description": ""
           },
           "500": {
@@ -4143,6 +4193,9 @@
         },
         "responses": {
           "201": {
+            "description": ""
+          },
+          "403": {
             "description": ""
           },
           "500": {
@@ -5283,6 +5336,33 @@
                       "type": "number",
                       "nullable": true
                     },
+                    "mfa_totp_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_totp_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_otp_length": {
+                      "type": "number"
+                    },
+                    "mfa_phone_template": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mfa_phone_max_frequency": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "password_hibp_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -5329,6 +5409,10 @@
                     },
                     "saml_external_url": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "saml_allow_encrypted_assertions": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "security_captcha_enabled": {
@@ -5603,6 +5687,13 @@
                     "mailer_templates_reauthentication_content",
                     "mailer_templates_recovery_content",
                     "mfa_max_enrolled_factors",
+                    "mfa_totp_enroll_enabled",
+                    "mfa_totp_verify_enabled",
+                    "mfa_phone_enroll_enabled",
+                    "mfa_phone_verify_enabled",
+                    "mfa_phone_otp_length",
+                    "mfa_phone_template",
+                    "mfa_phone_max_frequency",
                     "password_hibp_enabled",
                     "password_min_length",
                     "password_required_characters",
@@ -5615,6 +5706,7 @@
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
                     "saml_external_url",
+                    "saml_allow_encrypted_assertions",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -6223,6 +6315,31 @@
                   },
                   "api_max_request_duration": {
                     "type": "number"
+                  },
+                  "mfa_totp_enroll_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_totp_verify_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_phone_enroll_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_phone_verify_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_phone_max_frequency": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 32767
+                  },
+                  "mfa_phone_otp_length": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 32767
+                  },
+                  "mfa_phone_template": {
+                    "type": "string"
                   }
                 }
               }
@@ -6664,6 +6781,33 @@
                       "type": "number",
                       "nullable": true
                     },
+                    "mfa_totp_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_totp_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_phone_otp_length": {
+                      "type": "number"
+                    },
+                    "mfa_phone_template": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mfa_phone_max_frequency": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "password_hibp_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -6710,6 +6854,10 @@
                     },
                     "saml_external_url": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "saml_allow_encrypted_assertions": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "security_captcha_enabled": {
@@ -6984,6 +7132,13 @@
                     "mailer_templates_reauthentication_content",
                     "mailer_templates_recovery_content",
                     "mfa_max_enrolled_factors",
+                    "mfa_totp_enroll_enabled",
+                    "mfa_totp_verify_enabled",
+                    "mfa_phone_enroll_enabled",
+                    "mfa_phone_verify_enabled",
+                    "mfa_phone_otp_length",
+                    "mfa_phone_template",
+                    "mfa_phone_max_frequency",
                     "password_hibp_enabled",
                     "password_min_length",
                     "password_required_characters",
@@ -6996,6 +7151,7 @@
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
                     "saml_external_url",
+                    "saml_allow_encrypted_assertions",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -7062,7 +7218,7 @@
     "/v1/projects/{ref}/config/auth/third-party-auth": {
       "post": {
         "operationId": "createTPAForProject",
-        "summary": "[Alpha] Creates a new third-party auth integration",
+        "summary": "Creates a new third-party auth integration",
         "parameters": [
           {
             "name": "ref",
@@ -9241,7 +9397,8 @@
                               "FAILED",
                               "PENDING",
                               "REMOVED",
-                              "ARCHIVED"
+                              "ARCHIVED",
+                              "CANCELLED"
                             ]
                           },
                           "is_physical_backup": {
@@ -9550,6 +9707,17 @@
           },
           "persistent": {
             "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "CREATING_PROJECT",
+              "RUNNING_MIGRATIONS",
+              "MIGRATIONS_PASSED",
+              "MIGRATIONS_FAILED",
+              "FUNCTIONS_DEPLOYED",
+              "FUNCTIONS_FAILED"
+            ],
+            "type": "string"
           }
         }
       },
@@ -9763,7 +9931,7 @@
               "free",
               "pro"
             ],
-            "description": "Subscription plan is now set on organization level and is ignored in this request",
+            "description": "Subscription Plan is now set on organization level and is ignored in this request",
             "example": "free",
             "deprecated": true
           },
@@ -9771,6 +9939,7 @@
             "type": "string",
             "enum": [
               "us-east-1",
+              "us-east-2",
               "us-west-1",
               "us-west-2",
               "ap-east-1",
@@ -9781,7 +9950,9 @@
               "eu-west-1",
               "eu-west-2",
               "eu-west-3",
+              "eu-north-1",
               "eu-central-1",
+              "eu-central-2",
               "ca-central-1",
               "ap-south-1",
               "sa-east-1"
@@ -10280,11 +10451,29 @@
       "CreateBranchBody": {
         "type": "object",
         "properties": {
+          "desired_instance_size": {
+            "type": "string",
+            "enum": [
+              "micro",
+              "small",
+              "medium",
+              "large",
+              "xlarge",
+              "2xlarge",
+              "4xlarge",
+              "8xlarge",
+              "12xlarge",
+              "16xlarge"
+            ]
+          },
           "branch_name": {
             "type": "string"
           },
           "git_branch": {
             "type": "string"
+          },
+          "persistent": {
+            "type": "boolean"
           },
           "region": {
             "type": "string"
@@ -10320,6 +10509,69 @@
           "message"
         ]
       },
+      "SslValidation": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "validation_records": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "txt_name": {
+                  "type": "string"
+                },
+                "txt_value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "txt_name",
+                "txt_value"
+              ]
+            }
+          },
+          "validation_errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        },
+        "required": [
+          "status",
+          "validation_records"
+        ]
+      },
+      "OwnershipVerification": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "name",
+          "value"
+        ]
+      },
       "CustomHostnameDetails": {
         "type": "object",
         "properties": {
@@ -10333,11 +10585,9 @@
             "type": "object",
             "properties": {
               "status": {
-                "required": true,
                 "type": "string"
               },
               "validation_records": {
-                "required": true,
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -10356,7 +10606,6 @@
                 }
               },
               "validation_errors": {
-                "required": false,
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -10370,24 +10619,30 @@
                   ]
                 }
               }
-            }
+            },
+            "required": [
+              "status",
+              "validation_records"
+            ]
           },
           "ownership_verification": {
             "type": "object",
             "properties": {
               "type": {
-                "required": true,
                 "type": "string"
               },
               "name": {
-                "required": true,
                 "type": "string"
               },
               "value": {
-                "required": true,
                 "type": "string"
               }
-            }
+            },
+            "required": [
+              "type",
+              "name",
+              "value"
+            ]
           },
           "custom_origin_server": {
             "type": "string"
@@ -10442,11 +10697,9 @@
                 "type": "object",
                 "properties": {
                   "status": {
-                    "required": true,
                     "type": "string"
                   },
                   "validation_records": {
-                    "required": true,
                     "type": "array",
                     "items": {
                       "type": "object",
@@ -10465,7 +10718,6 @@
                     }
                   },
                   "validation_errors": {
-                    "required": false,
                     "type": "array",
                     "items": {
                       "type": "object",
@@ -10479,24 +10731,30 @@
                       ]
                     }
                   }
-                }
+                },
+                "required": [
+                  "status",
+                  "validation_records"
+                ]
               },
               "ownership_verification": {
                 "type": "object",
                 "properties": {
                   "type": {
-                    "required": true,
                     "type": "string"
                   },
                   "name": {
-                    "required": true,
                     "type": "string"
                   },
                   "value": {
-                    "required": true,
                     "type": "string"
                   }
-                }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "value"
+                ]
               },
               "custom_origin_server": {
                 "type": "string"
@@ -10575,11 +10833,9 @@
                     "type": "object",
                     "properties": {
                       "status": {
-                        "required": true,
                         "type": "string"
                       },
                       "validation_records": {
-                        "required": true,
                         "type": "array",
                         "items": {
                           "type": "object",
@@ -10598,7 +10854,6 @@
                         }
                       },
                       "validation_errors": {
-                        "required": false,
                         "type": "array",
                         "items": {
                           "type": "object",
@@ -10612,24 +10867,30 @@
                           ]
                         }
                       }
-                    }
+                    },
+                    "required": [
+                      "status",
+                      "validation_records"
+                    ]
                   },
                   "ownership_verification": {
                     "type": "object",
                     "properties": {
                       "type": {
-                        "required": true,
                         "type": "string"
                       },
                       "name": {
-                        "required": true,
                         "type": "string"
                       },
                       "value": {
-                        "required": true,
                         "type": "string"
                       }
-                    }
+                    },
+                    "required": [
+                      "type",
+                      "name",
+                      "value"
+                    ]
                   },
                   "custom_origin_server": {
                     "type": "string"
@@ -11303,6 +11564,7 @@
             "type": "string",
             "enum": [
               "us-east-1",
+              "us-east-2",
               "us-west-1",
               "us-west-2",
               "ap-east-1",
@@ -11313,7 +11575,9 @@
               "eu-west-1",
               "eu-west-2",
               "eu-west-3",
+              "eu-north-1",
               "eu-central-1",
+              "eu-central-2",
               "ca-central-1",
               "ap-south-1",
               "sa-east-1"
@@ -12136,6 +12400,33 @@
             "type": "number",
             "nullable": true
           },
+          "mfa_totp_enroll_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_totp_verify_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_phone_enroll_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_phone_verify_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_phone_otp_length": {
+            "type": "number"
+          },
+          "mfa_phone_template": {
+            "type": "string",
+            "nullable": true
+          },
+          "mfa_phone_max_frequency": {
+            "type": "number",
+            "nullable": true
+          },
           "password_hibp_enabled": {
             "type": "boolean",
             "nullable": true
@@ -12182,6 +12473,10 @@
           },
           "saml_external_url": {
             "type": "string",
+            "nullable": true
+          },
+          "saml_allow_encrypted_assertions": {
+            "type": "boolean",
             "nullable": true
           },
           "security_captcha_enabled": {
@@ -12456,6 +12751,13 @@
           "mailer_templates_reauthentication_content",
           "mailer_templates_recovery_content",
           "mfa_max_enrolled_factors",
+          "mfa_totp_enroll_enabled",
+          "mfa_totp_verify_enabled",
+          "mfa_phone_enroll_enabled",
+          "mfa_phone_verify_enabled",
+          "mfa_phone_otp_length",
+          "mfa_phone_template",
+          "mfa_phone_max_frequency",
           "password_hibp_enabled",
           "password_min_length",
           "password_required_characters",
@@ -12468,6 +12770,7 @@
           "refresh_token_rotation_enabled",
           "saml_enabled",
           "saml_external_url",
+          "saml_allow_encrypted_assertions",
           "security_captcha_enabled",
           "security_captcha_provider",
           "security_captcha_secret",
@@ -13037,6 +13340,31 @@
           },
           "api_max_request_duration": {
             "type": "number"
+          },
+          "mfa_totp_enroll_enabled": {
+            "type": "boolean"
+          },
+          "mfa_totp_verify_enabled": {
+            "type": "boolean"
+          },
+          "mfa_phone_enroll_enabled": {
+            "type": "boolean"
+          },
+          "mfa_phone_verify_enabled": {
+            "type": "boolean"
+          },
+          "mfa_phone_max_frequency": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 32767
+          },
+          "mfa_phone_otp_length": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 32767
+          },
+          "mfa_phone_template": {
+            "type": "string"
           }
         }
       },
@@ -14225,7 +14553,8 @@
               "FAILED",
               "PENDING",
               "REMOVED",
-              "ARCHIVED"
+              "ARCHIVED",
+              "CANCELLED"
             ]
           },
           "is_physical_backup": {
@@ -14276,7 +14605,8 @@
                     "FAILED",
                     "PENDING",
                     "REMOVED",
-                    "ARCHIVED"
+                    "ARCHIVED",
+                    "CANCELLED"
                   ]
                 },
                 "is_physical_backup": {

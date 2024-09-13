@@ -7,6 +7,7 @@ import {
 } from 'lib/role-impersonation'
 import type { ResponseError } from 'types'
 import { sqlKeys } from './keys'
+import { MB } from 'lib/constants'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
@@ -38,6 +39,12 @@ export async function executeSql(
   signal?: AbortSignal
 ): Promise<{ result: any }> {
   if (!projectRef) throw new Error('projectRef is required')
+
+  const sqlSize = new Blob([sql]).size
+  // [Joshen] I think the limit is around 1MB from testing, but its not exactly 1MB it seems
+  if (sqlSize > 0.98 * MB) {
+    throw new Error('Query is too large to be run via the SQL Editor')
+  }
 
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
