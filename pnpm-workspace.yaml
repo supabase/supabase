@@ -1,0 +1,6 @@
+packages:
+  - "apps/**"
+  - "packages/**"
+  - "apps/docs/spec/parser"
+  - "tests"
+  - "playwright-tests"

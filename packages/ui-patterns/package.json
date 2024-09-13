@@ -12,7 +12,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@supabase/sql-to-rest": "^0.1.6",
     "cmdk": "^1.0.0",
-    "common": "*",
+    "common": "workspace:*",
     "common-tags": "^1.8.2",
     "framer-motion": "^11.1.9",
     "lodash": "*",
@@ -27,8 +27,8 @@
     "reactflow": "*",
     "remark-gfm": "^4.0.0",
     "sql-formatter": "^15.3.1",
-    "tsconfig": "*",
-    "ui": "*",
+    "tsconfig": "workspace:*",
+    "ui": "workspace:*",
     "valtio": "*"
   },
   "devDependencies": {
@@ -41,7 +41,7 @@
     "@types/lodash": "^4.17.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "api-types": "*",
+    "api-types": "workspace:*",
     "next-router-mock": "^0.9.13",
     "vitest": "^2.0.3"
   },

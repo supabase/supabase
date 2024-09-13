@@ -11,7 +11,7 @@
     "cleanse-css-for-tailwind": "node internals/tokens/cleanse-css-for-tailwind.js",
     "transform-tokens": "node ./transformTokens.js",
     "extract-design-tokens": "node internals/tokens/extract-design-tokens.js",
-    "generate-styles": "npm run extract-design-tokens && npm run transform-tokens && npm run cleanse-css-for-tailwind && npm run generate-demo-tailwind-classes",
+    "generate-styles": "pnpm run extract-design-tokens && pnpm run transform-tokens && pnpm run cleanse-css-for-tailwind && pnpm run generate-demo-tailwind-classes",
     "test": "jest"
   },
   "dependencies": {
@@ -106,8 +106,8 @@
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "^18.2.8",
     "@types/react-syntax-highlighter": "^15.5.6",
-    "common": "*",
-    "config": "*",
+    "common": "workspace:*",
+    "config": "workspace:*",
     "copyfiles": "^2.4.1",
     "glob": "^8.1.0",
     "jest-environment-jsdom": "^29.7.0",
@@ -115,7 +115,7 @@
     "sql-formatter": "^12.2.0",
     "style-dictionary": "^3.7.1",
     "ts-jest": "^29.1.1",
-    "tsconfig": "*",
+    "tsconfig": "workspace:*",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
     "typescript": "^5.5.0"
   },
