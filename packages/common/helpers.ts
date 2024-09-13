@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { vi } from 'vitest'
 
 export const detectBrowser = () => {
   if (!navigator) return undefined
@@ -13,6 +14,20 @@ export const detectBrowser = () => {
 }
 
 export const isBrowser = typeof window !== 'undefined'
+
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+})
 
 const prefersReducedMotionMediaQuery =
   isBrowser && window.matchMedia('(prefers-reduced-motion: reduce)')
