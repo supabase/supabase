@@ -58,17 +58,17 @@ export default {
     tabs: [
       {
         label: 'Table Editor',
-        panel: () => (
+        panel: ({ isDark }: { isDark: boolean }) => (
           <VideoWithHighlights
             video={{
               title: 'Supabase dashboard table editor',
               sources: [
                 {
-                  src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor.mp4',
+                  src: `https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor${isDark ? '' : '-light'}`,
                   type: 'video/mp4',
                 },
               ],
-              poster: '/images/index/dashboard/supabase-table-editor.png',
+              poster: `/images/index/dashboard/supabase-table-editor${isDark ? '' : '-light'}.png`,
             }}
           />
         ),
@@ -91,17 +91,17 @@ export default {
       },
       {
         label: 'SQL Editor',
-        panel: () => (
+        panel: ({ isDark }: { isDark: boolean }) => (
           <VideoWithHighlights
             video={{
               title: 'Supabase dashboard SQL editor',
               sources: [
                 {
-                  src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-sql-editor.mp4',
+                  src: `https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-sql-editor${isDark ? '' : '-light'}`,
                   type: 'video/mp4',
                 },
               ],
-              poster: '/images/index/dashboard/supabase-sql-editor.png',
+              poster: `/images/index/dashboard/supabase-sql-editor${isDark ? '' : '-light'}.png`,
             }}
           />
         ),
@@ -123,17 +123,17 @@ export default {
       },
       {
         label: 'RLS Policies',
-        panel: () => (
+        panel: ({ isDark }: { isDark: boolean }) => (
           <VideoWithHighlights
             video={{
               title: 'Supabase dashboard Row Level Security',
               sources: [
                 {
-                  src: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-rls.mp4',
+                  src: `https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-rls${isDark ? '' : '-light'}`,
                   type: 'video/mp4',
                 },
               ],
-              poster: '/images/index/dashboard/supabase-rls.png',
+              poster: `/images/index/dashboard/supabase-rls${isDark ? '' : '-light'}.png`,
             }}
           />
         ),

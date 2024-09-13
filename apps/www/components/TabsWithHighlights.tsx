@@ -1,13 +1,14 @@
 import React, { useRef, useState } from 'react'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
+import { Check } from 'lucide-react'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { Badge, cn } from 'ui'
 import BrowserFrame from './BrowserFrame'
-import { Check } from 'lucide-react'
 
 export type Tab = {
   label: string
-  panel: React.FC
+  panel: React.FC<{ isDark: boolean }>
   highlights: { label: string; link?: string }[]
 }
 
@@ -16,6 +17,7 @@ interface Props {
 }
 
 const TabsWithHighlights = (props: Props) => {
+  const { resolvedTheme } = useTheme()
   const [activeTabIdx, setActiveTabIdx] = useState<number>(0)
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true })
@@ -74,7 +76,10 @@ const TabsWithHighlights = (props: Props) => {
               animate={{ opacity: 1, transition: { duration: 0.1, delay: 0.2 } }}
               exit={{ opacity: 0, transition: { duration: 0.05 } }}
             >
-              <Panel />
+              <Panel
+                key={resolvedTheme?.includes('dark')}
+                isDark={resolvedTheme?.includes('dark')}
+              />
             </motion.div>
           </AnimatePresence>
         </BrowserFrame>
