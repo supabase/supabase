@@ -1,16 +1,15 @@
-import { CodeBlock, Input } from 'ui'
+import { CodeBlock } from 'ui'
 import type { LogQueryError } from '../Logs.types'
-import { Label } from '@ui/components/shadcn/ui/label'
 
 export interface ErrorRendererProps {
   error: LogQueryError
   isCustomQuery: boolean
 }
 
-const DefaultErrorRenderer: React.FC<ErrorRendererProps> = ({ error }) => (
-  <div className="flex w-full flex-col gap-2 prose min-w-full">
-    <Label>Error</Label>
+export const DefaultErrorRenderer: React.FC<ErrorRendererProps> = ({ error }) => (
+  <div className="w-full prose min-w-full text-foreground text-sm">
     <CodeBlock
+      title="Error fetching logs"
       language="json"
       hideLineNumbers
       value={typeof error === 'string' ? error : JSON.stringify(error, null, 2)}
@@ -18,4 +17,3 @@ const DefaultErrorRenderer: React.FC<ErrorRendererProps> = ({ error }) => (
     />
   </div>
 )
-export default DefaultErrorRenderer

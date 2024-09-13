@@ -33,7 +33,7 @@ import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnR
 import LogSelection, { LogSelectionProps } from './LogSelection'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
-import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
+import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 
 interface Props {
@@ -325,17 +325,17 @@ const LogTable = ({
       isCustomQuery: queryType ? false : true,
       error: error!,
     }
-    let Renderer = DefaultErrorRenderer
+
     if (
       typeof error === 'object' &&
       error.error?.errors.find((err) => err.reason === 'resourcesExceeded')
     ) {
-      Renderer = ResourcesExceededErrorRenderer
+      return <ResourcesExceededErrorRenderer {...childProps} />
     }
 
     return (
       <div className="text-foreground flex gap-2 font-mono px-6">
-        <Renderer {...childProps} />
+        <DefaultErrorRenderer {...childProps} />
       </div>
     )
   }
