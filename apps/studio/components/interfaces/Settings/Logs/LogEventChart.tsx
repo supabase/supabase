@@ -5,10 +5,12 @@ import type { EventChartData } from './Logs.types'
 export interface LogEventChartProps {
   data: EventChartData[]
   onBarClick: (isoTimestamp: string) => void
+  className?: string
 }
 
-const LogEventChart = ({ data, onBarClick }: LogEventChartProps) => (
+const LogEventChart = ({ data, onBarClick, className }: LogEventChartProps) => (
   <BarChart
+    className={className}
     minimalHeader
     size="tiny"
     yAxisKey="count"

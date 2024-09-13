@@ -7,7 +7,11 @@ import { useParams } from 'common'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import {
+  MAX_REPLICAS_ABOVE_XL,
+  MAX_REPLICAS_BELOW_XL,
+  useReadReplicasQuery,
+} from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -44,11 +48,23 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
-  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+
+  // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
+  const [defaultRegion] = Object.entries(AWS_REGIONS).find(
+    ([_, name]) => name === AWS_REGIONS_DEFAULT
+  ) ?? ['ap-southeast-1']
+  // Will be following the primary's compute size for the time being
+  const defaultCompute =
+    addons?.selected_addons.find((addon) => addon.type === 'compute_instance')?.variant
+      .identifier ?? 'ci_micro'
+
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
+  const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
+  const [selectedCompute, setSelectedCompute] = useState(defaultCompute)
 
   useProjectDetailQuery(
     { ref: projectRef },
@@ -85,7 +101,13 @@ const DeployNewReplicaPanel = ({
     (project?.dbVersion ?? '').split('supabase-postgres-')[1]?.split('.')[0]
   )
 
-  const reachedMaxReplicas = (data ?? []).filter((db) => db.identifier !== projectRef).length >= 2
+  const maxNumberOfReplicas = ['ci_micro', 'ci_small', 'ci_medium', 'ci_large'].includes(
+    selectedCompute
+  )
+    ? MAX_REPLICAS_BELOW_XL
+    : MAX_REPLICAS_ABOVE_XL
+  const reachedMaxReplicas =
+    (data ?? []).filter((db) => db.identifier !== projectRef).length >= maxNumberOfReplicas
   const isFreePlan = subscription?.plan.id === 'free'
   const isAWSProvider = project?.cloud_provider === 'AWS'
   const isWalgEnabled = project?.is_physical_backups_enabled
@@ -105,18 +127,6 @@ const DeployNewReplicaPanel = ({
 
   const computeAddons =
     addons?.available_addons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
-
-  // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
-  const [defaultRegion] = Object.entries(AWS_REGIONS).find(
-    ([_, name]) => name === AWS_REGIONS_DEFAULT
-  ) ?? ['ap-southeast-1']
-  // Will be following the primary's compute size for the time being
-  const defaultCompute =
-    addons?.selected_addons.find((addon) => addon.type === 'compute_instance')?.variant
-      .identifier ?? 'ci_micro'
-
-  const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
-  const [selectedCompute, setSelectedCompute] = useState(defaultCompute)
   const selectedComputeMeta = computeAddons.find((addon) => addon.identifier === selectedCompute)
 
   const availableRegions =
@@ -153,26 +163,6 @@ const DeployNewReplicaPanel = ({
       header="Deploy a new read replica"
       onConfirm={() => onSubmit()}
       confirmText="Deploy replica"
-      // [Joshen] Refer to EnablePhysicalBackupsModal as to why this is commented out for now
-      // customFooter={
-      //   <div className="border-t p-2 flex items-center justify-end space-x-2">
-      //     <Button type="default" disabled={false} onClick={onClose}>
-      //       Cancel
-      //     </Button>
-      //     {isMinimallyOnSmallCompute && !isWalgEnabled ? (
-      //       <EnablePhysicalBackupsModal selectedRegion={selectedRegion} />
-      //     ) : (
-      //       <Button
-      //         type="primary"
-      //         disabled={!canDeployReplica}
-      //         loading={isSettingUp}
-      //         onClick={onSubmit}
-      //       >
-      //         Deploy replica
-      //       </Button>
-      //     )}
-      //   </div>
-      // }
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-4">
         {!isAWSProvider ? (
@@ -312,12 +302,36 @@ const DeployNewReplicaPanel = ({
               <Alert_Shadcn_>
                 <WarningIcon />
                 <AlertTitle_Shadcn_>
-                  You can only deploy up to 2 read replicas at once
+                  You can only deploy up to {maxNumberOfReplicas} read replicas at once
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   If you'd like to spin up another read replica, please drop an existing replica
                   first.
                 </AlertDescription_Shadcn_>
+                {maxNumberOfReplicas === MAX_REPLICAS_BELOW_XL && (
+                  <>
+                    <AlertDescription_Shadcn_>
+                      <span>
+                        Alternatively, you may deploy up to{' '}
+                        <span className="text-foreground">{MAX_REPLICAS_ABOVE_XL}</span> replicas if
+                        your project is on an XL compute or higher.
+                      </span>
+                      <div className="flex items-center gap-x-2 mt-3">
+                        <Button asChild type="default">
+                          <Link
+                            href={
+                              isFreePlan
+                                ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                                : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                            }
+                          >
+                            Upgrade compute size
+                          </Link>
+                        </Button>
+                      </div>
+                    </AlertDescription_Shadcn_>
+                  </>
+                )}
               </Alert_Shadcn_>
             )}
           </>

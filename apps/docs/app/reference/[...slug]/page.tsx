@@ -1,8 +1,10 @@
 import { redirect } from 'next/navigation'
 
 import { REFERENCES } from '~/content/navigation.references'
+import { ApiReferencePage } from '~/features/docs/Reference.apiPage'
 import { CliReferencePage } from '~/features/docs/Reference.cliPage'
 import { ClientSdkReferencePage } from '~/features/docs/Reference.sdkPage'
+import { SelfHostingReferencePage } from '~/features/docs/Reference.selfHostingPage'
 import {
   generateReferenceMetadata,
   generateReferenceStaticParams,
@@ -16,13 +18,16 @@ export default async function ReferencePage({
 }: {
   params: { slug: Array<string> }
 }) {
-  if (!Object.keys(REFERENCES).includes(slug[0])) {
+  if (!Object.keys(REFERENCES).includes(slug[0].replaceAll('-', '_'))) {
     redirect(notFoundLink(slug.join('/')))
   }
 
   const parsedPath = parseReferencePath(slug)
   const isClientSdkReference = parsedPath.__type === 'clientSdk'
   const isCliReference = parsedPath.__type === 'cli'
+  const isApiReference = parsedPath.__type === 'api'
+  const isSelfHostingReference = parsedPath.__type === 'self-hosting'
+
   if (isClientSdkReference) {
     const { sdkId, maybeVersion, path } = parsedPath
 
@@ -35,8 +40,13 @@ export default async function ReferencePage({
     return <ClientSdkReferencePage sdkId={sdkId} libVersion={version} />
   } else if (isCliReference) {
     return <CliReferencePage />
+  } else if (isApiReference) {
+    return <ApiReferencePage />
+  } else if (isSelfHostingReference) {
+    return (
+      <SelfHostingReferencePage service={parsedPath.service} servicePath={parsedPath.servicePath} />
+    )
   } else {
-    // Unimplemented -- eventually API
     redirect(notFoundLink(slug.join('/')))
   }
 }
