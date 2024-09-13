@@ -532,3 +532,11 @@ const _getTruncation = (date: Dayjs) => {
   }[zeroCount]!
   return truncation
 }
+
+export function checkForWithClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  // Check for WITH clause, ensuring it's not inside a string literal
+  const withClauseRegex = /\b(WITH)\b(?=(?:[^']*'[^']*')*[^']*$)/i
+  return withClauseRegex.test(queryWithoutComments)
+}

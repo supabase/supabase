@@ -27,6 +27,7 @@ import {
   LogsWarning,
 } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
+  checkForWithClause,
   maybeShowUpgradePrompt,
   useEditorHints,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
@@ -185,6 +186,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
     const query = typeof value === 'string' ? value || editorValue : editorValue
+    const usesWith = checkForWithClause(query)
+
+    if (usesWith) {
+      toast.error('WITH clause is not supported in Log Explorer.')
+      return
+    }
 
     if (value && typeof value === 'string') {
       setEditorValue(value)
