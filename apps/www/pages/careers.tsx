@@ -1,21 +1,22 @@
-import { GlobeAltIcon } from '@heroicons/react/outline'
-import { Check } from 'lucide-react'
 import { NextPage } from 'next'
-import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import ReactMarkdown from 'react-markdown'
+import { NextSeo } from 'next-seo'
+import { GlobeAltIcon } from '@heroicons/react/outline'
+import { Check } from 'lucide-react'
 import { Badge, Button, Separator, buttonVariants, cn } from 'ui'
+import ReactMarkdown from 'react-markdown'
+import Styles from '~/styles/career.module.css'
+
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+
 import career from '~/data/career.json'
-import Styles from '~/styles/career.module.css'
 
 export async function getStaticProps() {
-  const job_res = await fetch('https://boards-api.greenhouse.io/v1/boards/supabase/jobs')
-
+  const job_res = await fetch('https://api.ashbyhq.com/posting-api/job-board/supabase')
   const job_data = await job_res.json()
 
   const contributor_res = await fetch(
@@ -75,6 +76,9 @@ export async function getStaticProps() {
     },
   }
 }
+
+const PLACEHOLDER_JOB_ID = '64d76968-1fe1-458c-8c6d-8859168c3fb7'
+const filterGenericJob = (job: JobItemProps) => job.id === PLACEHOLDER_JOB_ID
 
 const CareerPage: NextPage = ({ jobs, contributors }: any) => {
   const { basePath } = useRouter()
@@ -446,64 +450,65 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                 <br /> We’d love to talk to you.
               </p>
               <div className="mt-10 -space-y-px">
-                {jobs.map(
-                  (
-                    job: {
-                      title: string
-                      location: any
-                      employment: string
-                      description: string
-                      absolute_url: string
-                    },
-                    i: number
-                  ) => {
-                    return (
-                      <Link
-                        href={job.absolute_url}
-                        key={i}
-                        className="
-                        first-of-type:rounded-t-md last-of-type:rounded-b-md
-                        cursor-pointer md:cursor-default bg-surface-75 border border-muted drop-shadow-sm p-4 px-7
-                        flex flex-col md:flex-row
-                        md:items-center
-                        transition hover:bg-surface-100
-                        hover:cursor-pointer"
-                      >
-                        <h2 className="text-base min-w-[240px] lg:min-w-[316px] sm:truncate mr-6">
-                          {job.title}
-                        </h2>
-                        <div className="flex justify-between justify-[normal] pt-2 md:pt-0 w-full items-center">
-                          <div className="flex items-center space-x-4">
-                            <Badge
-                              className="bg-surface-200 bg-opacity-100 border-muted"
-                              variant={'default'}
-                            >
-                              <GlobeAltIcon className="w-3 h-3" />
-
-                              <span className="ml-1">{job.location.name}</span>
-                            </Badge>
-                            <span className="hidden md:block">{job.employment}</span>
-                          </div>
-                          <p className="hidden lg:block lg:text-sm">{job.description}</p>
-                          <div
-                            className={cn(
-                              buttonVariants({ type: 'default', size: 'tiny' }),
-                              'rounded-full'
-                            )}
-                          >
-                            Apply for position
-                          </div>
-                        </div>
-                      </Link>
-                    )
-                  }
-                )}
+                {jobs
+                  .filter((job: any) => !filterGenericJob(job))
+                  .map((job: JobItemProps) => (
+                    <JobItem job={job} key={job.id} />
+                  ))}
+              </div>
+              <div className="mt-10 -space-y-px">
+                {jobs.filter(filterGenericJob).map((job: JobItemProps) => (
+                  <JobItem job={job} key={job.id} />
+                ))}
               </div>
             </SectionContainer>
           </div>
         </div>
       </DefaultLayout>
     </>
+  )
+}
+
+interface JobItemProps {
+  id: string
+  title: string
+  location: any
+  employment: string
+  descriptionHtml: string
+  jobUrl: string
+}
+
+const JobItem: React.FC<{ job: JobItemProps }> = ({ job }) => {
+  const isPlaceholderJob = job.id === PLACEHOLDER_JOB_ID
+
+  return (
+    <Link
+      href={job.jobUrl}
+      className="
+        first-of-type:rounded-t-md last-of-type:rounded-b-md
+        cursor-pointer md:cursor-default bg-surface-75 border border-muted drop-shadow-sm p-4 px-7
+        flex flex-col md:flex-row
+        md:items-center
+        transition hover:bg-surface-100
+        hover:cursor-pointer
+      "
+      target="_blank"
+    >
+      <h2 className="text-base min-w-[240px] lg:min-w-[316px] sm:truncate mr-6">{job.title}</h2>
+      <div className="flex justify-between justify-[normal] pt-2 md:pt-0 w-full items-center">
+        <div className="flex items-center space-x-4">
+          <Badge className="bg-surface-200 bg-opacity-100 border-muted" variant={'default'}>
+            <GlobeAltIcon className="w-3 h-3" />
+
+            <span className="ml-1">{job.location}</span>
+          </Badge>
+          <span className="hidden md:block">{job.employment}</span>
+        </div>
+        <div className={cn(buttonVariants({ type: 'default', size: 'tiny' }), 'rounded-full')}>
+          {isPlaceholderJob ? 'Submit resume' : 'Apply for position'}
+        </div>
+      </div>
+    </Link>
   )
 }
 
