@@ -27,7 +27,7 @@ const RealtimeVisual = () => {
       setSvgTransform2(
         `translate(${mouseX > cardWidth / 2 + 40 ? -svgX * 3 : svgX * 1.6}px, ${mouseY > cardHeight / 2 - 100 ? svgY * 1.2 : svgY * 2.8}px)`
       )
-      setSvgTransformSelf(`translate(${mouseX}px, ${mouseY}px)`)
+      setSvgTransformSelf(`translate(${mouseX + 12}px, ${mouseY + 4}px)`)
     }
   }
 
@@ -39,7 +39,7 @@ const RealtimeVisual = () => {
   return (
     <figure
       ref={cardRef}
-      className="absolute inset-0 xl:-bottom-2 2xl:bottom-0 z-0 w-full overflow-hidden !pointer-events-auto"
+      className="absolute inset-0 xl:-bottom-2 2xl:bottom-0 z-0 w-full overflow-hidden pointer-events-auto"
       role="img"
       aria-label="Supabase Realtime multiplayer app demo"
       onMouseMove={reduceMotion ? undefined : handleMouseMove}
@@ -127,7 +127,7 @@ const RealtimeVisual = () => {
       </div>
       {/* Self */}
       <div
-        className="absolute will-change-transform w-1 h-1 opacity-0 motion-safe:group-hover:opacity-100 delay-0 group-hover:delay-200 duration-75 group-hover:duration-300 transition-opacity"
+        className="absolute will-change-transform w-1 h-1 opacity-0 motion-safe:group-hover:opacity-100 delay-0 duration-75 group-hover:duration-300 transition-opacity"
         style={{
           position: 'absolute',
           top: '0',

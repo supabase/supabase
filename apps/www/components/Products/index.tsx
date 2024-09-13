@@ -2,15 +2,15 @@ import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import { useRouter } from 'next/router'
 import { Check } from 'lucide-react'
 
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import AuthVisual from './AuthVisual'
+import DataAPIsVisual from './DataAPIsVisual'
 import DatabaseVisual from './DatabaseVisual'
 import FunctionsVisual from './FunctionsVisual'
 import ProductCard from './ProductCard'
 import RealtimeVisual from './RealtimeVisual'
 import StorageVisual from './StorageVisual'
 import VectorVisual from './VectorVisual'
-import DataAPIsVisual from './DataAPIsVisual'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import gaEvents from '~/lib/gaEvents'
@@ -161,7 +161,11 @@ const Products = (props: Props) => {
         }
         onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.REALTIME)}
         image={<RealtimeVisual />}
-        className="col-span-6 xl:col-span-3 hover:!cursor-[url('/images/index/products/realtime-cursor-light.svg'),_auto] dark:hover:!cursor-[url('/images/index/products/realtime-cursor-dark.svg'),_auto]"
+        className="
+          col-span-6 pointer-events-none xl:col-span-3
+          hover:!cursor-[url('/images/index/products/realtime-cursor-light.svg'),_auto]
+          dark:hover:!cursor-[url('/images/index/products/realtime-cursor-dark.svg'),_auto]
+        "
       />
       <ProductCard
         alignLeft

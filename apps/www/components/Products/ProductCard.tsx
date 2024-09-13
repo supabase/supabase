@@ -39,7 +39,7 @@ const ProductCard = ({
       hasShimmer={isBrowser && detectBrowser() !== 'Safari'}
       hasActiveOnHover
       hasMotion={title.includes('Edge Functions')}
-      outerClassName="relative w-full h-full pointer-events-none"
+      outerClassName="relative w-full h-full"
       innerClassName={cn(
         'relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between',
         'bg-surface-75 w-full h-full text-foreground-lighter [&_strong]:!font-normal [&_strong]:!text-foreground'

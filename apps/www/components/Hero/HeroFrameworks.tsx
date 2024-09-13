@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { AnimatePresence, motion } from 'framer-motion'
-import { EASE_IN, EASE_OUT } from '~/lib/animations'
 import { useBreakpoint, useTelemetryProps } from 'common'
-import Telemetry from '~/lib/telemetry'
 import { cn } from 'ui'
+import Telemetry from '~/lib/telemetry'
+import { EASE_IN, EASE_OUT } from '~/lib/animations'
 import SectionContainer from '../Layouts/SectionContainer'
 
 type Framework = {
@@ -154,8 +154,11 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
             >
               <div
                 className={cn(
-                  'm-1 bg-[var(--color-bg-darkest)] h-16 w-16 flex transition-opacity items-center justify-center rounded-md group-hover:border border-foreground-light hover:shadow',
-                  !!activeFramework && activeFramework.name !== framework.name && '!opacity-50'
+                  'm-1 bg-[var(--color-bg-darkest)] h-16 w-16 flex items-center justify-center rounded-md group-hover:border transition-all text-foreground-light border-foreground-light hover:shadow',
+                  !!activeFramework &&
+                    activeFramework.name !== framework.name &&
+                    'text-foreground-muted',
+                  activeFramework?.name === framework.name && 'text-foreground'
                 )}
               >
                 <svg
@@ -167,7 +170,7 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path d={framework.icon} fill="hsl(var(--foreground-lighter))" />
+                  <path d={framework.icon} fill="currentColor" />
                 </svg>
               </div>
             </Link>
