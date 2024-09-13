@@ -39,7 +39,7 @@ export default function TopHeader() {
       className={cn(
         'relative',
         'w-full px-5',
-        !isHome && 'bg-dash-sidebar',
+        'bg-dash-sidebar',
         isPreview
           ? 'bg-[#05A5FF]/5 items-start flex flex-col gap-3 h-[80px] delay-500'
           : 'h-[48px]',

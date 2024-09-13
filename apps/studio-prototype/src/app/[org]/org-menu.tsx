@@ -37,7 +37,7 @@ export default function OrgMenu() {
           <DropdownMenuTrigger asChild>
             <Button size="tiny" type="default" iconRight={<ChevronsUpDown />} className="pl-0">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-foreground flex items-center justify-center text-background rounded border text-[10px]">
+                <div className="w-6 h-6 bg-foreground flex items-center justify-center text-background rounded-md border text-[10px]">
                   {selectedOrg?.name?.slice(0, 2).toUpperCase()}
                 </div>
                 {config?.selectedOrg?.name}
@@ -52,7 +52,7 @@ export default function OrgMenu() {
             sideOffset={8}
           >
             <div className="p-2 flex gap-3 items-center">
-              <div className="w-10 h-10 bg-foreground flex items-center justify-center text-background rounded border">
+              <div className="w-10 h-10 bg-foreground flex items-center justify-center text-background rounded-md border">
                 {selectedOrg?.name?.slice(0, 2).toUpperCase()}
               </div>
               <div className="flex flex-col gap-0">
@@ -80,9 +80,10 @@ export default function OrgMenu() {
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
                   {orgs.map((org) => (
-                    <DropdownMenuItem
+                    <Link
+                      href={`/${org.key}/projects`}
                       key={org.key}
-                      onSelect={() => {
+                      onClick={() => {
                         router.push(`/${org.key}/projects`)
                         setConfig({
                           ...config,
@@ -98,29 +99,30 @@ export default function OrgMenu() {
                         })
                         setOpenState(false)
                       }}
-                      className="flex items-center justify-between"
                     >
-                      <div className="flex items-center gap-2">
+                      <DropdownMenuItem key={org.key} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className={cn(
+                              'w-[26px] h-[26px] border bg-foreground rounded-md',
+                              'flex items-center justify-center text-background text-xs font-semibold'
+                            )}
+                          >
+                            {org.name?.slice(0, 2).toUpperCase()}
+                          </div>
+                          <span className="truncate">{org.name}</span>
+                        </div>
                         <div
                           className={cn(
-                            'w-[26px] h-[26px] border bg-foreground rounded-md',
-                            'flex items-center justify-center text-background text-xs font-semibold'
+                            'w-4 h-4 bg-foreground rounded-full',
+                            'flex items-center justify-center',
+                            selectedOrg?.key === org.key ? 'opacity-100' : 'opacity-0'
                           )}
                         >
-                          {org.name?.slice(0, 2).toUpperCase()}
+                          <Check className={cn('h-2 w-2 text-background')} strokeWidth={5} />
                         </div>
-                        <span className="truncate">{org.name}</span>
-                      </div>
-                      <div
-                        className={cn(
-                          'w-4 h-4 bg-foreground rounded-full',
-                          'flex items-center justify-center',
-                          selectedOrg?.key === org.key ? 'opacity-100' : 'opacity-0'
-                        )}
-                      >
-                        <Check className={cn('h-2 w-2 text-background')} strokeWidth={5} />
-                      </div>
-                    </DropdownMenuItem>
+                      </DropdownMenuItem>
+                    </Link>
                   ))}
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>

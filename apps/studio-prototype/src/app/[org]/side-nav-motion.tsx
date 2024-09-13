@@ -1,38 +1,19 @@
+// components/SideNavMotion.tsx
+
 'use client'
 
-import { motion, useAnimation, AnimationControls } from 'framer-motion'
-import { usePathname } from 'next/navigation'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
+import { useConfig } from '@/src/hooks/use-config'
+import { useParams, usePathname } from 'next/navigation'
+import { Pin, PinOff } from 'lucide-react'
+import { useHoverControls } from '@/src/app/[org]/side-nav-hover-context'
 import { cn } from 'ui'
 
-interface HoverContextProps {
-  isHovered: boolean
-  setIsHovered: React.Dispatch<React.SetStateAction<boolean>>
-  controls: AnimationControls
-}
-
-const HoverContext = createContext<HoverContextProps | undefined>(undefined)
-
-export const useHoverControls = (): HoverContextProps => {
-  const context = useContext(HoverContext)
-  if (!context) {
-    throw new Error('useHoverControls must be used within a HoverProvider')
-  }
-  return context
-}
-
 export default function SideNavMotion({ children }: { children: React.ReactNode }) {
+  const [config, setConfig] = useConfig()
+  const { org, project } = useParams()
   const pathName = usePathname()
-  const controls = useAnimation()
-  const [isHovered, setIsHovered] = useState(false)
-
-  useEffect(() => {
-    controls.start({
-      x: 0,
-      opacity: 1,
-      transition: { ease: 'easeInOut', duration: 0.15, delay: 0.1 },
-    })
-  }, [controls])
+  const { isHovered, setIsHovered, controls } = useHoverControls()
 
   const handleHoverStart = () => {
     setIsHovered(true)
@@ -45,29 +26,82 @@ export default function SideNavMotion({ children }: { children: React.ReactNode 
   }
 
   return (
-    <motion.div
-      initial={{ x: -48, opacity: 0, width: 64, position: 'fixed' }}
-      // animate={{ x: 0, opacity: 1 }}
-      animate={controls}
-      transition={{ ease: 'easeInOut', duration: 0.05, delay: 0.1 }}
-      whileHover={{
-        width: 256,
-      }}
-      onHoverStart={handleHoverStart}
-      onHoverEnd={handleHoverEnd}
+    <div
       className={cn(
-        !pathName.startsWith('/new') && 'h-full bg-dash-sidebar border-r',
-        'flex flex-col py-[10px]',
-        'items-center',
-        'transition-all',
-        'z-10',
-        'overlay-hidden'
+        'relative',
+        config.stickySidebar ? '!w-[256px] !min-w-[256px]' : 'w-16',
+        'h-full transition-all'
       )}
-      // whileHover={{ width: 256, position: 'fixed' }}
     >
-      <HoverContext.Provider value={{ isHovered, setIsHovered, controls }}>
+      <motion.div
+        key={project ? `${org}-${project}-sidebar` : `${org}-sidebar`}
+        initial={{ x: -64, opacity: 0 }}
+        animate={controls}
+        transition={{ ease: 'easeInOut', duration: 0.02, delay: 0.1 }}
+        variants={
+          !config.stickySidebar
+            ? {
+                rest: { x: 0, opacity: 1, width: 64, position: 'fixed' },
+                hover: { opacity: 1, width: 256 },
+              }
+            : { rest: { x: 0, opacity: 1, width: 64, position: 'fixed' } }
+        }
+        onHoverStart={handleHoverStart}
+        onHoverEnd={handleHoverEnd}
+        className={cn(
+          !pathName.startsWith('/new') && 'h-full bg-dash-sidebar border-r',
+          'flex flex-col py-[10px]',
+          'items-center',
+          'transition-all',
+          'z-10',
+          'overlay-hidden',
+          config.stickySidebar ? '!w-[256px] !block' : 'w-16'
+        )}
+      >
         {!pathName.startsWith('/new') && children}
-      </HoverContext.Provider>
-    </motion.div>
+
+        {config.stickySidebar ? (
+          <motion.div
+            animate={controls}
+            initial="rest"
+            className="group absolute bottom-32 -right-3 bg-surface-200 p-1 rounded-full border hover:bg-surface-300 hover:border-strong"
+            variants={
+              !config.stickySidebar
+                ? {
+                    rest: { x: -8, opacity: 0 },
+                    hover: { x: 0, opacity: 1 },
+                  }
+                : { rest: { x: 0, opacity: 1 } }
+            }
+          >
+            <PinOff
+              className="text-foreground-muted group-hover:text-foreground"
+              onClick={() => setConfig({ ...config, stickySidebar: false })}
+              size={16}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            animate={controls}
+            initial="rest"
+            className="group absolute bottom-32 -right-3 bg-surface-200 p-1 rounded-full border hover:bg-surface-300 hover:border-strong"
+            variants={
+              !config.stickySidebar
+                ? {
+                    rest: { x: -8, opacity: 0 },
+                    hover: { x: 0, opacity: 1 },
+                  }
+                : { rest: { x: 0, opacity: 1 } }
+            }
+          >
+            <Pin
+              className="text-foreground-muted group-hover:text-foreground"
+              onClick={() => setConfig({ ...config, stickySidebar: true })}
+              size={16}
+            />
+          </motion.div>
+        )}
+      </motion.div>
+    </div>
   )
 }

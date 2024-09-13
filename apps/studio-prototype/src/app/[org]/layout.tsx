@@ -15,10 +15,8 @@ export default function OrgLayout({
 }>) {
   const { project } = useParams()
 
-  console.log('project', project)
-
   return (
-    <div className={cn('w-screen h-screen flex')}>
+    <div className={cn('w-screen h-screen flex')} key={'org-layout'}>
       <div className={cn(project && 'hidden', 'h-full')}>
         <SideNav />
       </div>

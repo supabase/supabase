@@ -15,7 +15,6 @@ export default function RedirectCatcher() {
     if (
       selectedOrg?.key &&
       selectedProject?.key &&
-      // &&
       // (selectedOrg?.key !== org || selectedProject.key !== project)
       selectedOrg.key === org
     ) {

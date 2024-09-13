@@ -13,20 +13,19 @@ export default function ProjectContentTransition({
   const { isChangingProject, selectedProject } = config
 
   useEffect(() => {
-    if (selectedProject) {
-      setConfig({
-        ...config,
-        isChangingProject: true,
-      })
-
-      // wait 3 seconds
-      setTimeout(() => {
-        setConfig({
-          ...config,
-          isChangingProject: false,
-        })
-      }, 1000)
-    }
+    // if (selectedProject) {
+    //   setConfig({
+    //     ...config,
+    //     isChangingProject: true,
+    //   })
+    //   // wait 3 seconds
+    //   setTimeout(() => {
+    //     setConfig({
+    //       ...config,
+    //       isChangingProject: false,
+    //     })
+    //   }, 1000)
+    // }
   }, [selectedProject])
 
   return (

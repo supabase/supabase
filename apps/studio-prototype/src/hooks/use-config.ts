@@ -19,6 +19,7 @@ type Config = {
   selectedProject?: Project
   selectedOrg?: Org
   activeTab?: number
+  stickySidebar?: boolean
   db: {
     orgs: Org[]
   }
@@ -44,6 +45,7 @@ const configAtom = atomWithStorage<Config>('config', {
   settingsAllPreviews: false,
   selectedProject: orgs[0].projects[0],
   selectedOrg: orgs[0],
+  stickySidebar: false,
   db: {
     orgs: [...orgs],
   },

@@ -4,13 +4,13 @@ import { useConfig } from '@/src/hooks/use-config'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
 import { cn } from 'ui'
-import { useHoverControls } from './side-nav-motion'
+import { useHoverControls } from './side-nav-hover-context'
 import { motion } from 'framer-motion'
 
 export default function SideNavMenuIcon({ product }: { product: any }) {
   const { org } = useParams()
   const [config] = useConfig()
-  const { selectedOrg, selectedProject } = config
+  const { selectedOrg, selectedProject, stickySidebar } = config
   const pathname = usePathname()
 
   const isActive =
@@ -37,6 +37,9 @@ export default function SideNavMenuIcon({ product }: { product: any }) {
     <Link
       key={product.name}
       href={overrideHref || `/${org}/${selectedProject?.key}${product.href}`}
+      onClick={() => {
+        controls.start('rest')
+      }}
       className={cn('relative', 'w-full', 'group/nav-item-anchor', 'overflow-hidden')}
       aria-current={isActive ? 'page' : undefined}
     >
@@ -53,17 +56,24 @@ export default function SideNavMenuIcon({ product }: { product: any }) {
         <motion.span
           animate={controls}
           initial="rest"
-          variants={{
-            rest: { opacity: 0, x: 48, display: 'none' },
-            hover: { opacity: 100, x: 64, display: 'block' },
-          }}
-          transition={{ ease: 'easeInOut', duration: 0.2, delay: 0.2 }}
+          variants={
+            !stickySidebar
+              ? {
+                  rest: { opacity: 0, x: 48, display: 'none' },
+                  hover: { opacity: 100, x: 64, display: 'block' },
+                }
+              : {
+                  rest: { opacity: 100, x: 64, display: 'block' },
+                }
+          }
+          transition={{ ease: 'easeInOut', duration: 0.1, delay: 0.2 }}
           className={
             cn(
-              'absolute w-[250px] hidden',
+              !stickySidebar && 'hidden',
+              'absolute w-[250px]',
               'text-sm',
-              'hover:text-foreground',
-              'text-foreground-light'
+              'group-hover/nav-item-anchor:text-foreground',
+              isActive ? 'text-foreground' : 'text-foreground-light'
             )
             // 'w-[250px]',
             // 'hidden',
@@ -75,6 +85,8 @@ export default function SideNavMenuIcon({ product }: { product: any }) {
           {product.label}
         </motion.span>
       </div>
+      <div></div>
+
       {/* <span className="text-xs mt-1">{product.label}</span> */}
     </Link>
   )

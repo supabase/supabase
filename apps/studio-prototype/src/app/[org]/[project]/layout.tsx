@@ -19,7 +19,7 @@ export default function ProjectLayout({
           <ProjectContentTransition>{children}</ProjectContentTransition>
         </div>
       </EntranceTransition>
-      <RedirectCatcher />
+      {/* <RedirectCatcher /> */}
     </div>
   )
 }
