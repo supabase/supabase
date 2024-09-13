@@ -26,6 +26,9 @@ import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -40,12 +43,19 @@ DatabaseReport.getLayout = (page) => <ReportsLayout title="Database">{page}</Rep
 export default DatabaseReport
 
 const DatabaseUsage = () => {
-  const { db, chart } = useParams()
+  const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
-  const [dateRange, setDateRange] = useState<any>(undefined)
+  const diskManagementV2 = useFlag('diskManagementV2')
+
+  const org = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
+  const [dateRange, setDateRange] = useState<any>(undefined)
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const showNewDiskManagementUI =
+    subscription?.usage_based_billing_project_addons && diskManagementV2
 
   const report = useDatabaseReport()
   const { data } = useDatabaseSizeQuery({
@@ -213,21 +223,29 @@ const DatabaseUsage = () => {
                   </div>
 
                   <div className="col-span-8 text-right">
-                    <ButtonTooltip
-                      type="default"
-                      disabled={!canUpdateDiskSizeConfig}
-                      onClick={() => setshowIncreaseDiskSizeModal(true)}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canUpdateDiskSizeConfig
-                            ? 'You need additional permissions to increase the disk size'
-                            : undefined,
-                        },
-                      }}
-                    >
-                      Increase disk size
-                    </ButtonTooltip>
+                    {showNewDiskManagementUI ? (
+                      <Button asChild type="default">
+                        <Link href={`/project/${ref}/settings/database#disk-management`}>
+                          Increase disk size
+                        </Link>
+                      </Button>
+                    ) : (
+                      <ButtonTooltip
+                        type="default"
+                        disabled={!canUpdateDiskSizeConfig}
+                        onClick={() => setshowIncreaseDiskSizeModal(true)}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canUpdateDiskSizeConfig
+                              ? 'You need additional permissions to increase the disk size'
+                              : undefined,
+                          },
+                        }}
+                      >
+                        Increase disk size
+                      </ButtonTooltip>
+                    )}
                   </div>
                 </div>
 
