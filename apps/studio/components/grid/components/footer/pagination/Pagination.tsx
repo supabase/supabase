@@ -48,10 +48,16 @@ const Pagination = () => {
   const table = state.table ?? undefined
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
-  const [value, setValue] = useState<string>(page.toString())
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
   const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
   const [isConfirmFetchExactCountModalOpen, setIsConfirmFetchExactCountModalOpen] = useState(false)
+
+  const [value, setValue] = useState<string>(page.toString())
+
+  // keep input value in-sync with actual page
+  useEffect(() => {
+    setValue(String(page))
+  }, [page])
 
   const { data, isLoading, isSuccess, isError, isFetching } = useTableRowsCountQuery(
     {
