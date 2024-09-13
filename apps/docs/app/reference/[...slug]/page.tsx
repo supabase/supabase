@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 
 import { REFERENCES } from '~/content/navigation.references'
 import { ApiReferencePage } from '~/features/docs/Reference.apiPage'
@@ -11,7 +11,6 @@ import {
   parseReferencePath,
   redirectNonexistentReferenceSection,
 } from '~/features/docs/Reference.utils'
-import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 
 export default async function ReferencePage({
   params: { slug },
@@ -19,7 +18,7 @@ export default async function ReferencePage({
   params: { slug: Array<string> }
 }) {
   if (!Object.keys(REFERENCES).includes(slug[0].replaceAll('-', '_'))) {
-    redirect(notFoundLink(slug.join('/')))
+    notFound()
   }
 
   const parsedPath = parseReferencePath(slug)
@@ -47,7 +46,7 @@ export default async function ReferencePage({
       <SelfHostingReferencePage service={parsedPath.service} servicePath={parsedPath.servicePath} />
     )
   } else {
-    redirect(notFoundLink(slug.join('/')))
+    notFound()
   }
 }
 
