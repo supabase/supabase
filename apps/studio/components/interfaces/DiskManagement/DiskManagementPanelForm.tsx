@@ -8,13 +8,14 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import {
   useDiskAttributesQuery,
   useRemainingDurationForDiskAttributeUpdate,
 } from 'data/config/disk-attributes-query'
 import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-update-mutation'
+import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { GB } from 'lib/constants'
@@ -49,8 +50,6 @@ import { DiskManagementDiskSizeReadReplicas } from './DiskManagementDiskSizeRead
 import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
-import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 
 export function DiskManagementPanelForm() {
   const org = useSelectedOrganization()

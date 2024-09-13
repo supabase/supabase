@@ -15,7 +15,6 @@ import {
   InfoIcon,
 } from 'ui'
 import BillingChangeBadge from './BillingChangeBadge'
-import DiskSpaceBar from './DiskSpaceBar'
 import { DISK_PRICING, DiskType } from './DiskManagement.constants'
 
 interface DiskManagementDiskSizeReadReplicasProps {
@@ -117,12 +116,13 @@ export const DiskManagementDiskSizeReadReplicas = ({
                       WAL files{' '}
                     </span>
                   </p>
-                  <DiskSpaceBar
+                  {/* Hide for now until we have the utilization for each RR specifically */}
+                  {/* <DiskSpaceBar
                     showNewBar={isDirty}
                     totalSize={totalSize}
                     usedSize={usedSize}
                     newTotalSize={newTotalSize}
-                  />
+                  /> */}
                 </motion.div>
               </CollapsibleContent>
             </motion.div>
