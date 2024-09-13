@@ -57,15 +57,7 @@ export interface paths {
   }
   '/partners/vercel/callback': {
     /** Redirects to Supabase dashboard after completing Vercel sso flow */
-    get: operations['CallbackController_redirectToDashboardFlyioExtensionScreen']
-  }
-  '/partners/vercel/mock-usage': {
-    /** Fake it till you make it */
-    get: operations['MockBillingController_mockUsage']
-  }
-  '/partners/vercel/mock-usage/invoice': {
-    /** Fake it till you make it */
-    get: operations['MockBillingController_sendInvoice']
+    get: operations['CallbackController_redirectToDashboardVercelExtensionScreen']
   }
   '/partners/vercel/v1/installations/{installation_id}': {
     /** Gets the set of billing plans available to a specific Installation */
@@ -158,6 +150,10 @@ export interface paths {
   '/platform/database/{ref}/backups/download': {
     /** Download project backup */
     post: operations['BackupsController_downloadBackup']
+  }
+  '/platform/database/{ref}/backups/downloadable-backups': {
+    /** Gets backups that might be downloadable, but potentially not restorable. */
+    get: operations['BackupsController_getDownloadableBackups']
   }
   '/platform/database/{ref}/backups/enable-physical-backups': {
     /** Enable usage of physical backups */
@@ -885,6 +881,16 @@ export interface paths {
     /** Updates the database password */
     patch: operations['DbPasswordController_updatePassword']
   }
+  '/platform/projects/{ref}/disk': {
+    /** Get database disk attributes */
+    get: operations['DiskController_getDisk']
+    /** Modify database disk */
+    post: operations['DiskController_modifyDisk']
+  }
+  '/platform/projects/{ref}/disk/util': {
+    /** Get disk utilization */
+    get: operations['DiskController_getDiskUtilization']
+  }
   '/platform/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
     get: operations['InfraMonitoringController_getUsageMetrics']
@@ -1113,6 +1119,10 @@ export interface paths {
     /** Processes Vercel event */
     post: operations['VercelWebhooksController_processEvent']
   }
+  '/system/orb/vercel/sync/invoices/{invoice_id}': {
+    /** Syncs an invoice to Vercel. If already synced, Vercel will not process it again. */
+    post: operations['VercelSyncController_syncInvoice']
+  }
   '/system/orb/webhooks': {
     /** Processes Orb events */
     post: operations['OrbWebhooksController_processEvent']
@@ -1218,6 +1228,10 @@ export interface paths {
     /** Refreshes secrets */
     post: operations['SecretsRefreshController_refreshSecrets']
   }
+  '/system/projects/{ref}/wal-verification-reporting': {
+    /** Processes a project's WAL verification report. */
+    put: operations['WalVerificationReportingController_processWalVerification']
+  }
   '/system/stripe/webhooks': {
     /** Processes Stripe event */
     post: operations['StripeWebhooksController_processEvent']
@@ -1269,6 +1283,10 @@ export interface paths {
   '/v0/database/{ref}/backups/download': {
     /** Download project backup */
     post: operations['BackupsController_downloadBackup']
+  }
+  '/v0/database/{ref}/backups/downloadable-backups': {
+    /** Gets backups that might be downloadable, but potentially not restorable. */
+    get: operations['BackupsController_getDownloadableBackups']
   }
   '/v0/database/{ref}/backups/enable-physical-backups': {
     /** Enable usage of physical backups */
@@ -1705,6 +1723,16 @@ export interface paths {
   '/v0/projects/{ref}/db-password': {
     /** Updates the database password */
     patch: operations['DbPasswordController_updatePassword']
+  }
+  '/v0/projects/{ref}/disk': {
+    /** Get database disk attributes */
+    get: operations['DiskController_getDisk']
+    /** Modify database disk */
+    post: operations['DiskController_modifyDisk']
+  }
+  '/v0/projects/{ref}/disk/util': {
+    /** Get disk utilization */
+    get: operations['DiskController_getDiskUtilization']
   }
   '/v0/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
@@ -2366,6 +2394,7 @@ export interface components {
       rate_limit_token_refresh: number | null
       rate_limit_verify: number | null
       refresh_token_rotation_enabled: boolean | null
+      saml_allow_encrypted_assertions: boolean | null
       saml_enabled: boolean | null
       saml_external_url: string | null
       security_captcha_enabled: boolean | null
@@ -3101,11 +3130,64 @@ export interface components {
     DetachPaymentMethodBody: {
       card_id: string
     }
+    DiskRequestAttributesGP3: {
+      iops: number
+      size_gb: number
+      throughput_mbps: number
+      /** @enum {string} */
+      type: 'gp3'
+    }
+    DiskRequestAttributesIO2: {
+      iops: number
+      size_gb: number
+      /** @enum {string} */
+      type: 'io2'
+    }
+    DiskRequestBody: {
+      attributes:
+        | components['schemas']['DiskRequestAttributesGP3']
+        | components['schemas']['DiskRequestAttributesIO2']
+    }
+    DiskResponse: {
+      attributes:
+        | components['schemas']['DiskResponseAttributesGP3']
+        | components['schemas']['DiskResponseAttributesIO2']
+      last_modified_at?: string
+      requested_modification?:
+        | components['schemas']['DiskResponseAttributesGP3']
+        | components['schemas']['DiskResponseAttributesIO2']
+    }
+    DiskResponseAttributesGP3: {
+      iops: number
+      size_gb: number
+      throughput_mbps: number
+      /** @enum {string} */
+      type: 'gp3'
+    }
+    DiskResponseAttributesIO2: {
+      iops: number
+      size_gb: number
+      /** @enum {string} */
+      type: 'io2'
+    }
+    DiskUtilMetrics: {
+      fs_avail_bytes: number
+      fs_size_bytes: number
+      fs_used_bytes: number
+    }
+    DiskUtilMetricsResponse: {
+      metrics: components['schemas']['DiskUtilMetrics']
+      timestamp: string
+    }
     Domain: {
       created_at?: string
       domain?: string
       id: string
       updated_at?: string
+    }
+    DownloadableBackupsResponse: {
+      backups: components['schemas']['Backup'][]
+      status: Record<string, never>
     }
     DownloadBackupBody: {
       data: Record<string, never>
@@ -3552,6 +3634,7 @@ export interface components {
       RATE_LIMIT_TOKEN_REFRESH: number
       RATE_LIMIT_VERIFY: number
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
+      SAML_ALLOW_ENCRYPTED_ASSERTIONS: boolean
       SAML_ENABLED: boolean
       SAML_EXTERNAL_URL: string
       SECURITY_CAPTCHA_ENABLED: boolean
@@ -5407,6 +5490,7 @@ export interface components {
       price_id?: string
       /** @enum {string} */
       proration_behaviour?: 'prorate_and_invoice_end_of_cycle' | 'prorate_and_invoice_now'
+      skip_outstanding_invoice_check?: boolean
     }
     UpdateAddonBody: {
       addon_type: components['schemas']['ProjectAddonType']
@@ -5797,6 +5881,7 @@ export interface components {
       RATE_LIMIT_TOKEN_REFRESH?: number
       RATE_LIMIT_VERIFY?: number
       REFRESH_TOKEN_ROTATION_ENABLED?: boolean
+      SAML_ALLOW_ENCRYPTED_ASSERTIONS?: boolean
       SAML_ENABLED?: boolean
       SAML_EXTERNAL_URL?: string
       SECURITY_CAPTCHA_ENABLED?: boolean
@@ -6004,6 +6089,8 @@ export interface components {
       payment_method?: string
       price_id?: string
       skip_free_plan_validations?: boolean
+      skip_outstanding_invoice_check?: boolean
+      skip_payment_method_available_check?: boolean
       /** @enum {string} */
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
     }
@@ -6399,6 +6486,10 @@ export interface components {
     VercelRedirectResponse: {
       url: string
     }
+    WalVerificationReportBody: {
+      reportingToken: string
+      walVerification: Record<string, never>
+    }
   }
   responses: never
   parameters: never
@@ -6412,7 +6503,7 @@ export type $defs = Record<string, never>
 export type external = Record<string, never>
 
 export interface operations {
-  /** Redirects to Supabase dashboard after completing Vercel sso flow */
+  /** Redirects to Supabase dashboard after completing Fly sso */
   CallbackController_redirectToDashboardFlyioExtensionScreen: {
     responses: {
       200: {
@@ -6567,16 +6658,8 @@ export interface operations {
       }
     }
   }
-  /** Fake it till you make it */
-  MockBillingController_mockUsage: {
-    responses: {
-      200: {
-        content: never
-      }
-    }
-  }
-  /** Fake it till you make it */
-  MockBillingController_sendInvoice: {
+  /** Redirects to Supabase dashboard after completing Vercel sso flow */
+  CallbackController_redirectToDashboardVercelExtensionScreen: {
     responses: {
       200: {
         content: never
@@ -6602,7 +6685,7 @@ export interface operations {
   /** Deletes the installation with provided installation_id */
   InstallationsController_deleteInstallation: {
     responses: {
-      204: {
+      200: {
         content: never
       }
     }
@@ -6696,11 +6779,6 @@ export interface operations {
   }
   /** Return quotes for different billing plans for a specific product */
   ProductsController_listResources: {
-    parameters: {
-      path: {
-        product_id: string
-      }
-    }
     responses: {
       200: {
         content: never
@@ -7058,6 +7136,26 @@ export interface operations {
         }
       }
       /** @description Failed to download project backup */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets backups that might be downloadable, but potentially not restorable. */
+  BackupsController_getDownloadableBackups: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DownloadableBackupsResponse']
+        }
+      }
+      /** @description Failed to get project backups */
       500: {
         content: never
       }
@@ -12196,6 +12294,78 @@ export interface operations {
       }
     }
   }
+  /** Get database disk attributes */
+  DiskController_getDisk: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DiskResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get database disk attributes */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Modify database disk */
+  DiskController_modifyDisk: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DiskRequestBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to modify database disk */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get disk utilization */
+  DiskController_getDiskUtilization: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DiskUtilMetricsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get disk utilization */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets project's usage metrics */
   InfraMonitoringController_getUsageMetrics: {
     parameters: {
@@ -13460,6 +13630,26 @@ export interface operations {
       }
     }
   }
+  /** Syncs an invoice to Vercel. If already synced, Vercel will not process it again. */
+  VercelSyncController_syncInvoice: {
+    parameters: {
+      query: {
+        dryRun: boolean
+      }
+      path: {
+        invoice_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to sync invoice */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Processes Orb events */
   OrbWebhooksController_processEvent: {
     requestBody: {
@@ -14013,6 +14203,29 @@ export interface operations {
         content: never
       }
       /** @description Failed to refresh secrets */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Processes a project's WAL verification report. */
+  WalVerificationReportingController_processWalVerification: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['WalVerificationReportBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to update health status. */
       500: {
         content: never
       }
