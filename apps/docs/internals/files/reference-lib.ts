@@ -6,6 +6,16 @@ export async function generateReferencePages() {
     await Promise.all(
       Object.keys(REFERENCES)
         .flatMap((key) => {
+          if (REFERENCES[key].versions.length === 0) {
+            return [
+              {
+                sdkId: REFERENCES[key].libPath,
+                version: 'latest',
+                isLatestVersion: true,
+                libPath: REFERENCES[key].libPath,
+              },
+            ]
+          }
           return REFERENCES[key].versions.map((version) => {
             return {
               sdkId: key,

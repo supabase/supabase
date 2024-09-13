@@ -12,7 +12,7 @@ export interface IApiEndPoint {
     schema: ISchema
   }>
   requestBody?: {
-    required: boolean
+    required?: boolean
     content: IApiRequestBody
   }
   responses: {
@@ -99,13 +99,13 @@ interface ISchemaOneOf extends ISchemaBase {
 interface IApiRequestBody extends IApiJsonDTO, IApiFormUrlEncodedDTO {}
 
 interface IApiJsonDTO {
-  'application/json': {
+  'application/json'?: {
     schema: ISchema
   }
 }
 
 interface IApiFormUrlEncodedDTO {
-  'application/x-www-form-urlencoded': {
+  'application/x-www-form-urlencoded'?: {
     schema: ISchema
   }
 }
