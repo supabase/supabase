@@ -130,7 +130,6 @@ const LogTable = ({
         return <div className="flex items-center">{v}</div>
       },
       minWidth: 128,
-      maxWidth: v === 'timestamp' ? 240 : 2400, // Without this, the column flickers on first render
     }
 
     return result
@@ -365,76 +364,75 @@ const LogTable = ({
   if (!data) return null
 
   return (
-    <section className={'flex w-full flex-col h-full'} style={{ maxHeight }}>
+    <section className={'flex w-full flex-col h-screen'} style={{ maxHeight }}>
       {!queryType && <LogsExplorerTableHeader />}
-      <div className={`flex h-full flex-row overflow-x-auto`}>
-        <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={focusedLog ? 60 : 100}>
-            <DataGrid
-              role="table"
-              style={{ height: '100%' }}
-              className={cn('flex-1 flex-grow h-full', {
-                'data-grid--simple-logs': queryType,
-                'data-grid--logs-explorer': !queryType,
-              })}
-              rowHeight={40}
-              headerRowHeight={queryType ? 0 : 28}
-              onSelectedCellChange={(row) => {
-                setFocusedLog(row.row as LogData)
-                setCellPosition(row)
-              }}
-              selectedRows={new Set([])}
-              columns={columns}
-              rowClass={(row: LogData) =>
-                [
-                  'font-mono tracking-tight',
-                  isEqual(row, focusedLog)
-                    ? '!bg-surface-300 rdg-row--focused'
-                    : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
-                ].join(' ')
-              }
-              rows={logDataRows}
-              rowKeyGetter={(r) => {
-                if (!hasId) return JSON.stringify(r)
-                const row = r as LogData
-                return row.id
-              }}
-              renderers={{
-                renderRow: RowRenderer,
-                noRowsFallback: !isLoading ? (
-                  <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
-                    {!error && renderNoResultAlert()}
-                    {error && renderErrorAlert()}
-                  </div>
-                ) : null,
-              }}
+
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel defaultSize={focusedLog ? 60 : 100}>
+          <DataGrid
+            role="table"
+            style={{ height: '100%' }}
+            className={cn('flex-1 flex-grow h-full', {
+              'data-grid--simple-logs': queryType,
+              'data-grid--logs-explorer': !queryType,
+            })}
+            rowHeight={40}
+            headerRowHeight={queryType ? 0 : 28}
+            onSelectedCellChange={(row) => {
+              setFocusedLog(row.row as LogData)
+              setCellPosition(row)
+            }}
+            selectedRows={new Set([])}
+            columns={columns}
+            rowClass={(row: LogData) =>
+              [
+                'font-mono tracking-tight',
+                isEqual(row, focusedLog)
+                  ? '!bg-surface-300 rdg-row--focused'
+                  : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
+              ].join(' ')
+            }
+            rows={logDataRows}
+            rowKeyGetter={(r) => {
+              if (!hasId) return JSON.stringify(r)
+              const row = r as LogData
+              return row.id
+            }}
+            renderers={{
+              renderRow: RowRenderer,
+              noRowsFallback: !isLoading ? (
+                <div className="mx-auto flex h-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
+                  {!error && renderNoResultAlert()}
+                  {error && renderErrorAlert()}
+                </div>
+              ) : null,
+            }}
+          />
+          {typeof window !== 'undefined' &&
+            createPortal(
+              <Menu id={LOGS_EXPLORER_CONTEXT_MENU_ID} animation={false}>
+                <Item onClick={onCopyCell}>
+                  <Clipboard size={14} />
+                  <span className="ml-2 text-xs">Copy cell content</span>
+                </Item>
+              </Menu>,
+              document.body
+            )}
+        </ResizablePanel>
+        <ResizableHandle />
+        {focusedLog && (
+          <ResizablePanel defaultSize={40}>
+            <LogSelection
+              projectRef={projectRef}
+              onClose={() => setFocusedLog(null)}
+              log={focusedLog}
+              queryType={queryType}
+              params={params}
+              collectionName={collectionName}
             />
-            {typeof window !== 'undefined' &&
-              createPortal(
-                <Menu id={LOGS_EXPLORER_CONTEXT_MENU_ID} animation={false}>
-                  <Item onClick={onCopyCell}>
-                    <Clipboard size={14} />
-                    <span className="ml-2 text-xs">Copy cell content</span>
-                  </Item>
-                </Menu>,
-                document.body
-              )}
           </ResizablePanel>
-          <ResizableHandle />
-          {focusedLog && (
-            <ResizablePanel defaultSize={40}>
-              <LogSelection
-                projectRef={projectRef}
-                onClose={() => setFocusedLog(null)}
-                log={focusedLog}
-                queryType={queryType}
-                params={params}
-                collectionName={collectionName}
-              />
-            </ResizablePanel>
-          )}
-        </ResizablePanelGroup>
-      </div>
+        )}
+      </ResizablePanelGroup>
     </section>
   )
 }

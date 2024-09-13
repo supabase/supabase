@@ -42,6 +42,7 @@ export const ProjectCardStatus = ({
     if (projectStatus === 'isRestarting') return 'Project is restarting'
     if (projectStatus === 'isComingUp') return 'Project is coming up'
     if (projectStatus === 'isRestoring') return 'Project is restoring'
+    if (projectStatus === 'isUpgrading') return 'Project is upgrading'
     if (projectStatus === 'isRestoreFailed') return 'Project restore failed'
     if (projectStatus === 'isPauseFailed') return 'Project pause failed'
 
@@ -61,6 +62,7 @@ export const ProjectCardStatus = ({
     if (projectStatus === 'isRestarting') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isComingUp') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isRestoring') return 'Your project will be ready in a few minutes'
+    if (projectStatus === 'isUpgrading') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isRestoreFailed') return 'Please contact support for assistance'
     if (projectStatus === 'isPauseFailed') return 'Please contact support for assistance'
 
