@@ -90,6 +90,7 @@
     "react-dom": "^18.2.0",
     "react-error-boundary": "^4.0.13",
     "react-grid-layout": "^1.4.2",
+    "react-hook-form": "*",
     "react-inlinesvg": "^4.0.4",
     "react-intersection-observer": "^9.5.3",
     "react-markdown": "^8.0.3",
