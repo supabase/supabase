@@ -6,8 +6,8 @@ type VideoType = {
     src: string
     type?: string
   }[]
-  poster?: string
-  title?: string
+  poster: string
+  title: string
 }
 
 interface Props {
@@ -19,10 +19,9 @@ const VideoWithHighlights = (props: Props) => {
   const { resolvedTheme } = useTheme()
 
   return (
-    <div className="relative">
+    <div className="relative h-full w-full">
       <video
-        className="relative z-0 block reduce-motion:hidden"
-        title="Supabase Table Editor"
+        className="relative z-10 block w-full h-full reduce-motion:hidden"
         height="100%"
         width="100%"
         loop
@@ -44,11 +43,11 @@ const VideoWithHighlights = (props: Props) => {
         ))}
       </video>
       <Image
-        src="/images/index/dashboard/supabase-table-editor.png"
-        alt="Supabase Table Editor"
+        src={props.video.poster}
+        alt={props.video.title}
         width={1920}
         height={1080}
-        className="reduce-motion:block hidden relative z-0 overflow-hidden"
+        className="reduce-motion:block relative z-0 overflow-hidden"
       />
     </div>
   )

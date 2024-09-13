@@ -64,17 +64,18 @@ const TabsWithHighlights = (props: Props) => {
           ))}
         </motion.ul>
       </AnimatePresence>
-      {isInView && (
-        <BrowserFrame
-          className="overflow-hidden lg:order-last bg-default w-full max-w-6xl mx-auto"
-          contentClassName="aspect-video border overflow-hidden rounded-lg"
-        >
+      <BrowserFrame
+        className="overflow-hidden lg:order-last bg-default w-full max-w-6xl mx-auto"
+        contentClassName="aspect-video border overflow-hidden rounded-lg"
+      >
+        {isInView && (
           <AnimatePresence mode="wait">
             <motion.div
               key={props.tabs[activeTabIdx]?.label}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, transition: { duration: 0.1, delay: 0.2 } }}
               exit={{ opacity: 0, transition: { duration: 0.05 } }}
+              className="relative w-full max-w-full h-full"
             >
               <Panel
                 key={resolvedTheme?.includes('dark')}
@@ -82,8 +83,8 @@ const TabsWithHighlights = (props: Props) => {
               />
             </motion.div>
           </AnimatePresence>
-        </BrowserFrame>
-      )}
+        )}
+      </BrowserFrame>
     </div>
   )
 }
