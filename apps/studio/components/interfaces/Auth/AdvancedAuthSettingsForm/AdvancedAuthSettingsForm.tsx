@@ -235,9 +235,9 @@ const AdvancedAuthSettingsForm = () => {
                     handleReset={handleReset}
                     disabled={!canUpdateConfig}
                     helper={
-                      !canUpdateConfig
-                        ? 'You need additional permissions to update authentication settings'
-                        : undefined
+                    !canUpdateConfig
+                    ? 'You need additional permissions to update authentication settings'
+                    : undefined
                     }
                   />
                 </div>
@@ -314,6 +314,17 @@ const AdvancedAuthSettingsForm = () => {
                     />
                   )}
                   <FormField
+                    name="MFA_WEB_AUTHN"
+                    properties={{
+                      type: 'select',
+                      title: 'WebAuthn',
+                      description: 'Control use of WebAuthn factors',
+                      enum: MFAFactorSelectionOptions,
+                    }}
+                    formValues={values}
+                    disabled={!canUpdateConfig || !isProPlanAndUp}
+                  />
+                  <FormField
                     name="MFA_PHONE"
                     properties={{
                       type: 'select',
@@ -325,6 +336,7 @@ const AdvancedAuthSettingsForm = () => {
                     disabled={!canUpdateConfig || !isProPlanAndUp}
                     setFieldValue={setFieldValue}
                   />
+
                   {!hasValidMFAProvider && phoneMFAIsEnabled && (
                     <Alert_Shadcn_ variant="warning">
                       <WarningIcon />
