@@ -6,25 +6,28 @@ export const calculateDiskSizePrice = ({
   oldStorageType,
   newSize,
   newStorageType,
+  numReplicas = 0,
 }: {
   planId: string
   oldSize: number
   oldStorageType: DiskType
   newSize: number
   newStorageType: DiskType
+  numReplicas?: number
 }) => {
   const oldPricePerGiB = DISK_PRICING[oldStorageType]?.storage ?? 0
   const newPricePerGiB = DISK_PRICING[newStorageType]?.storage ?? 0
   const { includedDiskGB } = PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
 
-  const oldPrice = (Math.max(oldSize - includedDiskGB[oldStorageType], 0) * oldPricePerGiB).toFixed(
-    2
-  )
-  const newPrice = (Math.max(newSize - includedDiskGB[newStorageType], 0) * newPricePerGiB).toFixed(
-    2
-  )
+  const oldPrice = Math.max(oldSize - includedDiskGB[oldStorageType], 0) * oldPricePerGiB
+  const oldPriceReplica = oldSize * oldPricePerGiB
+  const newPrice = Math.max(newSize - includedDiskGB[newStorageType], 0) * newPricePerGiB
+  const newPriceReplica = newSize * newPricePerGiB
 
-  return { oldPrice, newPrice }
+  return {
+    oldPrice: (oldPrice + numReplicas * oldPriceReplica).toFixed(2),
+    newPrice: (newPrice + numReplicas * newPriceReplica).toFixed(2),
+  }
 }
 
 export const calculateIOPSPrice = ({

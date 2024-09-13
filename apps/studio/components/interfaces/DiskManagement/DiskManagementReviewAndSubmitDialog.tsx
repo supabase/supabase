@@ -20,6 +20,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
@@ -42,6 +45,7 @@ interface TableDataRowProps {
   beforePrice: number
   afterPrice: number
   hidePrice?: boolean
+  priceTooltip?: string
 }
 
 const TableDataRow = ({
@@ -52,6 +56,7 @@ const TableDataRow = ({
   beforePrice,
   afterPrice,
   hidePrice = false,
+  priceTooltip,
 }: TableDataRowProps) => (
   <TableRow>
     <TableCell className="pl-5">
@@ -80,7 +85,12 @@ const TableDataRow = ({
       {hidePrice ? (
         <span className="text-xs font-mono">-</span>
       ) : beforePrice !== afterPrice ? (
-        <BillingChangeBadge show={true} beforePrice={beforePrice} afterPrice={afterPrice} />
+        <BillingChangeBadge
+          show={true}
+          beforePrice={beforePrice}
+          afterPrice={afterPrice}
+          tooltip={priceTooltip}
+        />
       ) : (
         <span className="text-xs font-mono">${beforePrice}</span>
       )}
@@ -91,6 +101,7 @@ const TableDataRow = ({
 interface DiskSizeMeterProps {
   loading: boolean
   form: UseFormReturn<DiskStorageSchemaType>
+  numReplicas: number
   iopsPrice: { oldPrice: string; newPrice: string }
   throughputPrice: { oldPrice: string; newPrice: string }
   diskSizePrice: { oldPrice: string; newPrice: string }
@@ -105,6 +116,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
   setIsDialogOpen,
   isWithinCooldown,
   form,
+  numReplicas,
   loading,
   onSubmit,
   iopsPrice,
@@ -167,6 +179,11 @@ export const DiskManagementReviewAndSubmitDialog = ({
               unit="GiB"
               beforePrice={Number(diskSizePrice.oldPrice)}
               afterPrice={Number(diskSizePrice.newPrice)}
+              priceTooltip={
+                numReplicas > 0
+                  ? `Price change includes for primary database and ${numReplicas} replicas`
+                  : undefined
+              }
             />
             <TableDataRow
               attribute="IOPS"

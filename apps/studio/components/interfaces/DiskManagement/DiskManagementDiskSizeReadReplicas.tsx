@@ -16,12 +16,15 @@ import {
 } from 'ui'
 import BillingChangeBadge from './BillingChangeBadge'
 import DiskSpaceBar from './DiskSpaceBar'
+import { DISK_PRICING, DiskType } from './DiskManagement.constants'
 
 interface DiskManagementDiskSizeReadReplicasProps {
   isDirty: boolean
   totalSize: number
   usedSize: number
   newTotalSize: number
+  oldStorageType: DiskType
+  newStorageType: DiskType
 }
 
 export const DiskManagementDiskSizeReadReplicas = ({
@@ -29,12 +32,16 @@ export const DiskManagementDiskSizeReadReplicas = ({
   totalSize,
   usedSize,
   newTotalSize,
+  oldStorageType,
+  newStorageType,
 }: DiskManagementDiskSizeReadReplicasProps) => {
   const { ref: projectRef } = useParams()
   const [isOpen, setIsOpen] = useState(false)
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
+  const beforePrice = totalSize * DISK_PRICING[oldStorageType]?.storage ?? 0
+  const afterPrice = newTotalSize * DISK_PRICING[newStorageType]?.storage ?? 0
 
   if (readReplicas.length === 0) return null
 
@@ -50,7 +57,7 @@ export const DiskManagementDiskSizeReadReplicas = ({
           >
             <Alert variant="default" className="bg-transparent">
               <InfoIcon />
-              <AlertTitle>An extra 25% disk space is provisioned for Read replicas.</AlertTitle>
+              <AlertTitle>An extra 25% disk space is provisioned for read replicas.</AlertTitle>
               <AlertDescription>
                 Each replica is billed separately
                 <ul className="list-disc pl-4 my-3 flex flex-col gap-2">
@@ -61,9 +68,9 @@ export const DiskManagementDiskSizeReadReplicas = ({
                           ID: {formatDatabaseID(replica.identifier)} ({replica.region}):
                         </span>
                         <BillingChangeBadge
-                          beforePrice={(totalSize * 0.25) / readReplicas.length}
-                          afterPrice={(newTotalSize * 0.25) / readReplicas.length}
-                          show={true}
+                          show
+                          beforePrice={beforePrice}
+                          afterPrice={afterPrice}
                         />
                       </div>
                     </li>

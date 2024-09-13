@@ -50,6 +50,7 @@ import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelS
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 
 export function DiskManagementPanelForm() {
   const org = useSelectedOrganization()
@@ -58,6 +59,9 @@ export function DiskManagementPanelForm() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [remainingTime, setRemainingTime] = useState(0)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
+
+  const { data: databases } = useReadReplicasQuery({ projectRef })
+  const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
 
   const { data, isSuccess } = useDiskAttributesQuery(
     { projectRef },
@@ -159,6 +163,15 @@ export function DiskManagementPanelForm() {
     oldStorageType: form.formState.defaultValues?.storageType as DiskType,
     newSize: form.getValues('totalSize'),
     newStorageType: form.getValues('storageType') as DiskType,
+  })
+
+  const diskSizePriceIncReplicas = calculateDiskSizePrice({
+    planId,
+    oldSize: form.formState.defaultValues?.totalSize || 0,
+    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
+    newSize: form.getValues('totalSize'),
+    newStorageType: form.getValues('storageType') as DiskType,
+    numReplicas: readReplicas.length,
   })
 
   const iopsPrice = calculateIOPSPrice({
@@ -548,6 +561,8 @@ export function DiskManagementPanelForm() {
                           ? size_gb * 1.25
                           : form.getValues('totalSize') * 1.25
                       }
+                      oldStorageType={form.formState.defaultValues?.storageType as DiskType}
+                      newStorageType={form.getValues('storageType') as DiskType}
                     />
                   </div>
                 </div>
@@ -585,13 +600,14 @@ export function DiskManagementPanelForm() {
                     Cancel
                   </Button>
                   <DiskManagementReviewAndSubmitDialog
-                    onSubmit={onSubmit}
+                    numReplicas={readReplicas.length}
                     isDialogOpen={isDialogOpen}
-                    setIsDialogOpen={setIsDialogOpen}
                     isWithinCooldown={disableInput}
+                    onSubmit={onSubmit}
+                    setIsDialogOpen={setIsDialogOpen}
                     form={form}
                     loading={isUpdatingDiskConfiguration}
-                    diskSizePrice={diskSizePrice}
+                    diskSizePrice={diskSizePriceIncReplicas}
                     iopsPrice={iopsPrice}
                     throughputPrice={throughputPrice}
                   />
