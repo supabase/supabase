@@ -13,6 +13,7 @@ import type {
 } from 'components/interfaces/Settings/Logs/Logs.types'
 import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { checkForWithClause } from 'components/interfaces/Settings/Logs/Logs.utils'
 
 export interface LogsQueryHook {
   params: LogsEndpointParams
@@ -47,6 +48,8 @@ const useLogsQuery = (
 
   const queryParams = genQueryParams(params as any)
 
+  const usesWith = checkForWithClause(params.sql || '')
+
   const {
     data,
     error: rqError,
@@ -69,6 +72,12 @@ const useLogsQuery = (
 
   if (!error && data?.error) {
     error = data?.error
+  }
+  if (usesWith) {
+    error = {
+      message: 'The parser does not yet support WITH and subquery statements.',
+      docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-with-keyword-and-subqueries-are-not-supported',
+    }
   }
   const changeQuery = (newQuery = '') => {
     setParams((prev) => ({ ...prev, sql: newQuery }))

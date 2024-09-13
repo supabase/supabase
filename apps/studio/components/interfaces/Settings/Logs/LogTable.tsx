@@ -14,7 +14,6 @@ import { useProfile } from 'lib/profile'
 import { Item, Menu, useContextMenu } from 'react-contexify'
 import { createPortal } from 'react-dom'
 import {
-  Alert,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -319,8 +318,9 @@ const LogTable = ({
     </div>
   )
 
-  const renderErrorAlert = () => {
+  const RenderErrorAlert = () => {
     if (!error) return null
+
     const childProps = {
       isCustomQuery: queryType ? false : true,
       error: error!,
@@ -334,19 +334,17 @@ const LogTable = ({
     }
 
     return (
-      <div className="flex w-1/2 justify-center px-5">
-        <Alert variant="danger" title="Sorry! An error occurred when fetching data." withIcon>
-          <Renderer {...childProps} />
-        </Alert>
+      <div className="text-foreground flex gap-2 font-mono px-6">
+        <Renderer {...childProps} />
       </div>
     )
   }
 
-  const renderNoResultAlert = () => {
+  const RenderNoResultAlert = () => {
     if (emptyState) return emptyState
     else
       return (
-        <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
+        <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100 h-full">
           <div className="flex flex-col gap-1">
             <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
             <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
@@ -401,9 +399,9 @@ const LogTable = ({
             renderers={{
               renderRow: RowRenderer,
               noRowsFallback: !isLoading ? (
-                <div className="mx-auto flex h-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
-                  {!error && renderNoResultAlert()}
-                  {error && renderErrorAlert()}
+                <div className="">
+                  {logDataRows.length === 0 && !error && <RenderNoResultAlert />}
+                  {error && <RenderErrorAlert />}
                 </div>
               ) : null,
             }}

@@ -186,12 +186,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
     const query = typeof value === 'string' ? value || editorValue : editorValue
-    const usesWith = checkForWithClause(query)
-
-    if (usesWith) {
-      toast.error('WITH clause is not supported in Log Explorer.')
-      return
-    }
 
     if (value && typeof value === 'string') {
       setEditorValue(value)
@@ -304,7 +298,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   return (
     <div className="w-full h-full mx-auto">
       <ResizablePanelGroup
-        className="w-full h-full"
+        className="w-full h-full max-h-screen"
         direction="vertical"
         autoSaveId={LOCAL_STORAGE_KEYS.LOG_EXPLORER_SPLIT_SIZE}
       >
@@ -357,9 +351,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           )}
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel collapsible minSize={5} className="flex flex-col flex-grow">
+        <ResizablePanel collapsible minSize={5} className="overflow-auto">
           <LoadingOpacity active={isLoading}>
             <LogTable
+              maxHeight="100%"
               showHistogramToggle={false}
               onRun={handleRun}
               onSave={handleOnSave}
@@ -369,10 +364,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               error={error}
               projectRef={projectRef}
             />
+
+            <div className="flex flex-row justify-end mt-2">
+              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
+            </div>
           </LoadingOpacity>
-          <div className="flex flex-row justify-end mt-2">
-            <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
-          </div>
         </ResizablePanel>
       </ResizablePanelGroup>
 
