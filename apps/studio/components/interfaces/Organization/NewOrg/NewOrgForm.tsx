@@ -80,7 +80,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const { mutate: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org: any) => {
       await invalidateOrganizationsQuery(queryClient)
-      router.push(`/new/${org.slug}`)
+      router.push(`/new/${org.slug}?projectName=New%20Project`)
     },
     onError: () => {
       resetPaymentMethod()

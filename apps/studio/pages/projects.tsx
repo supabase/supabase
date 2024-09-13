@@ -12,9 +12,11 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { useProfile } from 'lib/profile'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const user = useProfile()
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<string[]>([
     PROJECT_STATUS.ACTIVE_HEALTHY,
@@ -43,13 +45,17 @@ const ProjectsPage: NextPageWithLayout = () => {
 
     if (orgCreationExperimentGroup === 'group-b' && !navLayoutV2 && isSuccess && hasWindowLoaded) {
       // navigate to new page exactly once
+      const hasNoOrg = organizations.length === 0
       const hasShownNewPage = localStorage.getItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN)
-      if (!hasShownNewPage && organizations.length === 0) {
+      if (hasNoOrg && !hasShownNewPage && user && !user.isLoading) {
         localStorage.setItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN, 'true')
-        router.push('/new')
+        const prefilledOrgName = user?.profile?.username
+          ? user.profile.username + `'s Org`
+          : 'My Org'
+        router.push(`/new?name=${prefilledOrgName}`)
       }
     }
-  }, [navLayoutV2, isSuccess, hasWindowLoaded])
+  }, [navLayoutV2, isSuccess, hasWindowLoaded, user.isLoading])
 
   return (
     <>
