@@ -1,4 +1,12 @@
+import { uniqBy } from 'lodash'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { useState } from 'react'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  DatabaseFunctionsData,
+  useDatabaseFunctionsQuery,
+} from 'data/database-functions/database-functions-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -16,10 +24,7 @@ import {
   ScrollArea,
 } from 'ui'
 
-import { convertArgumentTypes } from 'components/interfaces/Database/Functions/Functions.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
-import { Check, Code } from 'lucide-react'
+type DatabaseFunction = DatabaseFunctionsData[number]
 
 interface FunctionSelectorProps {
   className?: string
@@ -29,6 +34,9 @@ interface FunctionSelectorProps {
   value: string
   onChange: (value: string) => void
   disabled?: boolean
+  // used to filter the functions by a criteria
+  filterFunction?: (func: DatabaseFunction) => boolean
+  noResultsLabel?: React.ReactNode
 }
 
 const FunctionSelector = ({
@@ -39,6 +47,8 @@ const FunctionSelector = ({
   schema,
   value,
   onChange,
+  filterFunction = () => true,
+  noResultsLabel = <span>No functions found in this schema.</span>,
 }: FunctionSelectorProps) => {
   const { project } = useProjectContext()
   const [open, setOpen] = useState(false)
@@ -48,14 +58,10 @@ const FunctionSelector = ({
     connectionString: project?.connectionString,
   })
 
-  const functions = (data ?? [])
+  const filteredFunctions = (data ?? [])
     .filter((func) => schema && func.schema === schema)
-    .filter((func) => func.return_type === 'json' || func.return_type === 'jsonb')
-    .filter((func) => {
-      const { value } = convertArgumentTypes(func.argument_types)
-      if (value.length !== 1) return false
-      return value[0].type === 'json' || value[0].type === 'jsonb'
-    })
+    .filter(filterFunction)
+  const functions = uniqBy(filteredFunctions, (func) => func.name)
 
   return (
     <div className={className}>
@@ -86,12 +92,12 @@ const FunctionSelector = ({
           <PopoverTrigger_Shadcn_ asChild>
             <Button
               size={size}
+              disabled={!!disabled}
               type="default"
               className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
               iconRight={
-                <Code className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
+                <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
               }
-              disabled={!!disabled}
             >
               <div className="w-full flex gap-1">
                 <p className="text-foreground-lighter">function:</p>
@@ -112,11 +118,7 @@ const FunctionSelector = ({
                         disabled={true}
                         className="flex items-center justify-between space-x-2 w-full"
                       >
-                        <span>
-                          No function with a single JSON/B argument
-                          <br />
-                          and JSON/B return type found in this schema.
-                        </span>
+                        {noResultsLabel}
                       </CommandItem_Shadcn_>
                     )}
                     {functions?.map((func) => (
