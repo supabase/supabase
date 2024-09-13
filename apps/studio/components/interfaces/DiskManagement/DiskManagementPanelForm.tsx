@@ -53,7 +53,6 @@ import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 
 export function DiskManagementPanelForm() {
   const org = useSelectedOrganization()
-  const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)

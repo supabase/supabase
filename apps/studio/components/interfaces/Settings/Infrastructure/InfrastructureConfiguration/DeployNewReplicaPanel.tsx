@@ -1,9 +1,14 @@
-import { ExternalLink } from 'lucide-react'
+import { ChevronDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import {
+  DISK_PRICING,
+  DiskType,
+} from 'components/interfaces/DiskManagement/DiskManagement.constants'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
@@ -16,6 +21,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
@@ -24,9 +30,19 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   Listbox,
   SidePanel,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   WarningIcon,
+  cn,
 } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 
@@ -48,10 +64,12 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
+  const diskManagementV2 = useFlag('diskManagementV2')
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
@@ -61,6 +79,12 @@ const DeployNewReplicaPanel = ({
   const defaultCompute =
     addons?.selected_addons.find((addon) => addon.type === 'compute_instance')?.variant
       .identifier ?? 'ci_micro'
+
+  const { size_gb, type } = diskConfiguration?.attributes ?? {}
+  const showNewDiskManagementUI =
+    diskManagementV2 && subscription?.usage_based_billing_project_addons
+  const readReplicaDiskSizes = (size_gb ?? 0) * 1.25
+  const additionalCostDiskSize = readReplicaDiskSizes * DISK_PRICING[type as DiskType].storage
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
@@ -128,6 +152,7 @@ const DeployNewReplicaPanel = ({
   const computeAddons =
     addons?.available_addons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
   const selectedComputeMeta = computeAddons.find((addon) => addon.identifier === selectedCompute)
+  const estComputeMonthlyCost = Math.floor((selectedComputeMeta?.price ?? 0) * 730) // 730 hours in a month
 
   const availableRegions =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
@@ -160,6 +185,7 @@ const DeployNewReplicaPanel = ({
       onCancel={onClose}
       loading={isSettingUp}
       disabled={!canDeployReplica}
+      className={cn(showNewDiskManagementUI ? 'max-w-[500px]' : '')}
       header="Deploy a new read replica"
       onConfirm={() => onSubmit()}
       confirmText="Deploy replica"
@@ -366,11 +392,70 @@ const DeployNewReplicaPanel = ({
           </Listbox>
 
           <div className="flex flex-col gap-y-2">
-            <p className="text-foreground-light text-sm">
-              Read replicas will be on the same compute size as your primary database. Deploying a
-              read replica on the {selectedComputeMeta?.name} size incurs additional{' '}
-              <span className="text-foreground">{selectedComputeMeta?.price_description}</span>.
-            </p>
+            {showNewDiskManagementUI ? (
+              <>
+                <Collapsible_Shadcn_>
+                  <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
+                    <p className="text-sm">
+                      Deploying a new replica will cost an additional $
+                      {estComputeMonthlyCost + additionalCostDiskSize}/month
+                    </p>
+                    <ChevronDown size={14} className="transition" />
+                  </CollapsibleTrigger_Shadcn_>
+                  <CollapsibleContent_Shadcn_ className="flex flex-col gap-y-1 mt-1">
+                    <p className="text-foreground-light text-sm">
+                      Read replicas will match the compute size of your primary database and will
+                      include 25% more disk space than the primary database to accommodate WAL
+                      files.
+                    </p>
+                    <p className="text-foreground-light text-sm">
+                      The additional cost per replica is based on your current compute size of{' '}
+                      <span className="text-foreground">{selectedComputeMeta?.name}</span> and your
+                      current disk size of{' '}
+                      <span className="text-foreground">
+                        {diskConfiguration?.attributes.size_gb}GiB
+                      </span>
+                      , broken down as follows:
+                    </p>
+                    <Table>
+                      <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:pb-2 [&_th]:pt-4">
+                        <TableRow>
+                          <TableHead className="w-[140px] pl-0">Item</TableHead>
+                          <TableHead>Description</TableHead>
+                          <TableHead className="text-right pr-0">Cost</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
+                        <TableRow>
+                          <TableCell className="pl-0">Compute size</TableCell>
+                          <TableCell>{selectedComputeMeta?.name}</TableCell>
+                          <TableCell className="text-right font-mono pr-0">
+                            ~${estComputeMonthlyCost}/month
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="pl-0">Disk size</TableCell>
+                          <TableCell>
+                            {(size_gb ?? 0) * 1.25}GiB ({type})
+                          </TableCell>
+                          <TableCell className="text-right font-mono pr-0">
+                            ${additionalCostDiskSize}/month
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </CollapsibleContent_Shadcn_>
+                </Collapsible_Shadcn_>
+              </>
+            ) : (
+              <p className="text-foreground-light text-sm">
+                Read replicas will be on the same compute size as your primary database. Deploying a
+                read replica on the{' '}
+                <span className="text-foreground">{selectedComputeMeta?.name}</span> size incurs
+                additional{' '}
+                <span className="text-foreground">{selectedComputeMeta?.price_description}</span>.
+              </p>
+            )}
 
             <p className="text-foreground-light text-sm">
               Read more about{' '}
