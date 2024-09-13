@@ -234,18 +234,6 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
             <Collapsible.Content>
               <div className="group border-t border-strong bg-surface-100 py-6 px-6 text-foreground">
                 <div className="mx-auto my-6 max-w-lg space-y-6">
-                  <div className="flex items-end justify-end flex-col relative">
-                    <Button
-                      asChild
-                      type="default"
-                      icon={<ExternalLink strokeWidth={1.5} />}
-                      className="mt-2"
-                    >
-                      <Link href={provider.link} target="_blank" rel="noreferrer">
-                        Learn more
-                      </Link>
-                    </Button>
-                  </div>
                   {showAlert(provider.title)}
                   {Object.keys(provider.properties).map((x: string) => (
                     <FormField
@@ -286,33 +274,40 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                       />
                     </>
                   )}
-                  <div className="flex items-center justify-end gap-3">
-                    <Button
-                      type="default"
-                      htmlType="reset"
-                      onClick={() => {
-                        handleReset()
-                        setOpen(false)
-                      }}
-                      disabled={isUpdatingConfig}
-                    >
-                      Cancel
+                  <div className="flex items-center justify-between">
+                    <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                      <Link href={provider.link} target="_blank" rel="noreferrer">
+                        Documentation
+                      </Link>
                     </Button>
-                    <ButtonTooltip
-                      htmlType="submit"
-                      loading={isUpdatingConfig}
-                      disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canUpdateConfig
-                            ? 'You need additional permissions to update provider settings'
-                            : undefined,
-                        },
-                      }}
-                    >
-                      Save
-                    </ButtonTooltip>
+                    <div className="flex items-center gap-x-3">
+                      <Button
+                        type="default"
+                        htmlType="reset"
+                        onClick={() => {
+                          handleReset()
+                          setOpen(false)
+                        }}
+                        disabled={isUpdatingConfig}
+                      >
+                        Cancel
+                      </Button>
+                      <ButtonTooltip
+                        htmlType="submit"
+                        loading={isUpdatingConfig}
+                        disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canUpdateConfig
+                              ? 'You need additional permissions to update provider settings'
+                              : undefined,
+                          },
+                        }}
+                      >
+                        Save
+                      </ButtonTooltip>
+                    </div>
                   </div>
                 </div>
               </div>
