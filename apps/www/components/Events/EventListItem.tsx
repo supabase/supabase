@@ -54,26 +54,20 @@ const EventListItem = ({ event }: Props) => {
             )}
           </div>
         )}
-        {event.date && (
-          <p className="text-foreground-lighter lg:text-right flex-grow lg:w-full text-nowrap group-hover:text-foreground-light min-w-40 inline-flex items-center lg:justify-end gap-1.5 flex-1 w-full">
-            {dayjs(event.date)
-              .tz(event.timezone ?? 'America/Los_Angeles')
-              .format('DD MMM YYYY')}
-            <span className="min-w-px h-[16px] bg-muted" />
-            <span className="">
-              {dayjs(event.date)
-                .tz(event.timezone ?? 'America/Los_Angeles')
-                .format('hA')}
-            </span>
-            <span className="min-w-px h-[16px] bg-muted" />
-            {dayjs(event.date)
-              .tz(event.timezone ?? 'America/Los_Angeles')
-              .format('z')}
-          </p>
-        )}
+        {event.date && <EventDate event={event} />}
       </div>
     </Link>
   )
 }
+
+const EventDate: React.FC<{ event: PostTypes }> = ({ event }) => (
+  <p className="text-foreground-lighter lg:text-right flex-grow lg:w-full text-nowrap group-hover:text-foreground-light min-w-40 inline-flex items-center lg:justify-end gap-1.5 flex-1 w-full">
+    {dayjs(event.date).tz(event.timezone).format('DD MMM YYYY')}
+    <span className="min-w-px h-[16px] bg-muted" />
+    <span className="">{dayjs(event.date).tz(event.timezone).format('hA')}</span>
+    <span className="min-w-px h-[16px] bg-muted" />
+    {dayjs(event.date).tz(event.timezone).format('z')}
+  </p>
+)
 
 export default EventListItem

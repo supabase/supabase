@@ -11,7 +11,7 @@ import type { OrgMetricsUsage, OrgUsageResponse } from 'data/usage/org-usage-que
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { useMemo } from 'react'
 import type { ResponseError } from 'types'
-import { Button, IconAlertTriangle, IconBarChart2 } from 'ui'
+import { Button } from 'ui'
 import SectionContent from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 import {
@@ -21,6 +21,7 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
+import { AlertTriangle, BarChart2 } from 'lucide-react'
 
 export interface AttributeUsageProps {
   slug: string
@@ -105,7 +106,7 @@ const AttributeUsage = ({
                             <Tooltip.Trigger asChild>
                               {usageRatio >= 1 ? (
                                 <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
-                                  <IconAlertTriangle
+                                  <AlertTriangle
                                     size={14}
                                     strokeWidth={2}
                                     className={exceededLimitStyle}
@@ -115,7 +116,7 @@ const AttributeUsage = ({
                               ) : (
                                 usageRatio >= USAGE_APPROACHING_THRESHOLD && (
                                   <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
-                                    <IconAlertTriangle
+                                    <AlertTriangle
                                       size={14}
                                       strokeWidth={2}
                                       className="text-amber-900"
@@ -247,7 +248,7 @@ const AttributeUsage = ({
                   <Panel>
                     <Panel.Content>
                       <div className="flex flex-col items-center justify-center">
-                        <IconBarChart2 className="text-foreground-light mb-2" />
+                        <BarChart2 className="text-foreground-light mb-2" />
                         <p className="text-sm">No data in period</p>
                         <p className="text-sm text-foreground-light">
                           May take up to 24 hours to show

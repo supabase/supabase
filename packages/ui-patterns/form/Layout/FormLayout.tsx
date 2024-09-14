@@ -8,6 +8,7 @@ import {
   cn,
 } from 'ui'
 import { SIZE } from 'ui/src/lib/constants'
+import { AnimatePresence, motion } from 'framer-motion'
 
 type Props = {
   align?: 'left' | 'right'
@@ -60,7 +61,7 @@ const ContainerVariants = cva('relative grid gap-2', {
   defaultVariants: {},
 })
 
-const LabelContainerVariants = cva('', {
+const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
   variants: {
     flex: {
       true: '',
@@ -107,7 +108,7 @@ const LabelContainerVariants = cva('', {
   defaultVariants: {},
 })
 
-const DataContainerVariants = cva('', {
+const DataContainerVariants = cva('transition-all duration-500 ease-in-out', {
   variants: {
     flex: {
       true: '',
@@ -278,7 +279,18 @@ export const FormLayout = React.forwardRef<
     const flex = layout === 'flex'
     const hasLabel = Boolean(label || beforeLabel || afterLabel)
     const renderError = isReactForm && !hideMessage && (
-      <FormMessage_Shadcn_ className="mt-2" data-formlayout-id={'message'} />
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="mt-2"
+      >
+        <FormMessage_Shadcn_
+          className="mt-2 transition-opacity duration-300 ease-in-out"
+          data-formlayout-id={'message'}
+        />
+      </motion.div>
     )
 
     const renderDescription =

@@ -879,6 +879,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg_net',
         },
         {
+          name: 'pg_partman: Partition Maintenance',
+          url: '/guides/database/extensions/pg_partman',
+        },
+        {
           name: 'pg_plan_filter: Restrict Total Cost',
           url: '/guides/database/extensions/pg_plan_filter',
         },
@@ -897,6 +901,10 @@ export const database: NavMenuConstant = {
         {
           name: 'PostGIS: Geo queries',
           url: '/guides/database/extensions/postgis',
+        },
+        {
+          name: 'pgmq: Queues',
+          url: '/guides/database/extensions/pgmq',
         },
         {
           name: 'pgsodium (pending deprecation): Encryption Features',
@@ -1670,6 +1678,10 @@ export const ai = {
           name: 'Amazon Bedrock',
           url: '/guides/ai/integrations/amazon-bedrock',
         },
+        {
+          name: 'Mixpeek',
+          url: '/guides/ai/examples/mixpeek-video-search',
+        },
       ],
     },
   ],
@@ -2248,6 +2260,10 @@ export const reference_cli = {
   title: 'Supabase CLI',
   url: '/guides/reference/cli',
   parent: '/',
+  pkg: {
+    name: 'supabase',
+    repo: 'https://github.com/supabase/cli',
+  },
 }
 export const reference_api = {
   icon: 'reference-api',

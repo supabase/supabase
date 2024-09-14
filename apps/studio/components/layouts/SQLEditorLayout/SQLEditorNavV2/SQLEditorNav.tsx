@@ -384,6 +384,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                       onSelectCopyPersonal={() => {
                         onSelectCopyPersonal(element.metadata as Snippet)
                       }}
+                      onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                       onSelectUnshare={() => {
                         setSelectedSnippetToUnshare(element.metadata as Snippet)
                       }}
@@ -531,8 +532,11 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                   onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                   onEditSave={(name: string) => {
                     // [Joshen] Inline editing only for folders for now
-                    if (name.length === 0) snapV2.removeFolder(element.id as string)
-                    else snapV2.saveFolder({ id: element.id as string, name })
+                    if (name.length === 0 && element.id === 'new-folder') {
+                      snapV2.removeFolder(element.id as string)
+                    } else if (name.length > 0) {
+                      snapV2.saveFolder({ id: element.id as string, name })
+                    }
                   }}
                 />
               )}

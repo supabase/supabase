@@ -1346,7 +1346,7 @@ functions:
         code: |
           ```dart
           final ResendResponse res = await supabase.auth.resend(
-            type: OtpType.email,
+            type: OtpType.signup,
             email: 'email@example.com',
           );
           ```

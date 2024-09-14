@@ -1,6 +1,7 @@
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
+import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, IconAlertCircle } from 'ui'
+import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 interface RAMWarningsProps {
   isFreePlan: boolean
@@ -12,7 +13,7 @@ const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => 
   if (severity === 'warning') {
     return (
       <Alert_Shadcn_ variant="warning">
-        <IconAlertCircle />
+        <AlertCircle />
         <AlertTitle>Your memory usage has exceeded 80%</AlertTitle>
         <AlertDescription_Shadcn_>
           High memory usage could result in overall degraded performance, and in rare cases, your
@@ -36,7 +37,7 @@ const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => 
   if (severity === 'critical') {
     return (
       <Alert_Shadcn_ variant="destructive">
-        <IconAlertCircle />
+        <AlertCircle />
         <AlertTitle>Your memory usage has reached 100%</AlertTitle>
         <AlertDescription_Shadcn_>
           High memory usage could result in overall degraded performance, and in rare cases, your

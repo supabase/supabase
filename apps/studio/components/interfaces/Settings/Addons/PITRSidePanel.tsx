@@ -25,13 +25,12 @@ import {
   Alert_Shadcn_,
   Button,
   CriticalIcon,
-  IconAlertTriangle,
-  IconExternalLink,
   Radio,
   SidePanel,
   WarningIcon,
   cn,
 } from 'ui'
+import { ExternalLink, AlertTriangle } from 'lucide-react'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -158,7 +157,7 @@ const PITRSidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Point in Time Recovery</h4>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
               target="_blank"
@@ -390,7 +389,7 @@ const PITRSidePanel = () => {
                   // Scheduled billing plan change
                   subscription.scheduled_plan_change?.target_plan !== undefined && (
                     <Alert_Shadcn_ variant={'warning'} className="mb-2">
-                      <IconAlertTriangle className="h-4 w-4" />
+                      <AlertTriangle className="h-4 w-4" />
                       <AlertDescription_Shadcn_>
                         You have a scheduled subscription change that will be canceled if you change
                         your PITR add on.

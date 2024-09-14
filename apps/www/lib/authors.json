@@ -517,5 +517,13 @@
     "position": "Marketing",
     "author_url": "https://x.com/CraigCannon",
     "author_image_url": "https://github.com/craigcannon.png"
+  },
+  {
+    "author_id": "nyannyacha",
+    "author": "Nyannyacha",
+    "username": "nyannyacha",
+    "position": "Engineering",
+    "author_url": "https://github.com/nyannyacha",
+    "author_image_url": "https://github.com/nyannyacha.png"
   }
 ]

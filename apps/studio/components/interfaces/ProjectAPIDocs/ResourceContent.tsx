@@ -1,9 +1,10 @@
 import { useParams } from 'common'
 import Link from 'next/link'
-import { Button, IconExternalLink } from 'ui'
+import { Button } from 'ui'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import { Markdown } from '../Markdown'
+import { ExternalLink } from 'lucide-react'
 
 interface ResourceContentProps {
   selectedLanguage: 'js' | 'bash'
@@ -25,7 +26,7 @@ const ResourceContent = ({ selectedLanguage, snippet, codeSnippets }: ResourceCo
         <div className="flex items-center justify-between">
           <h2 className="doc-heading">{snippet.title}</h2>
           {snippet.docsUrl !== undefined && (
-            <Button asChild type="default" icon={<IconExternalLink />}>
+            <Button asChild type="default" icon={<ExternalLink />}>
               <Link href={snippet.docsUrl} target="_blank" rel="noreferrer">
                 Documentation
               </Link>

@@ -274,33 +274,40 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                       />
                     </>
                   )}
-                  <div className="flex items-center justify-end gap-3">
-                    <Button
-                      type="default"
-                      htmlType="reset"
-                      onClick={() => {
-                        handleReset()
-                        setOpen(false)
-                      }}
-                      disabled={isUpdatingConfig}
-                    >
-                      Cancel
+                  <div className="flex items-center justify-between">
+                    <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                      <Link href={provider.link} target="_blank" rel="noreferrer">
+                        Documentation
+                      </Link>
                     </Button>
-                    <ButtonTooltip
-                      htmlType="submit"
-                      loading={isUpdatingConfig}
-                      disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canUpdateConfig
-                            ? 'You need additional permissions to update provider settings'
-                            : undefined,
-                        },
-                      }}
-                    >
-                      Save
-                    </ButtonTooltip>
+                    <div className="flex items-center gap-x-3">
+                      <Button
+                        type="default"
+                        htmlType="reset"
+                        onClick={() => {
+                          handleReset()
+                          setOpen(false)
+                        }}
+                        disabled={isUpdatingConfig}
+                      >
+                        Cancel
+                      </Button>
+                      <ButtonTooltip
+                        htmlType="submit"
+                        loading={isUpdatingConfig}
+                        disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canUpdateConfig
+                              ? 'You need additional permissions to update provider settings'
+                              : undefined,
+                          },
+                        }}
+                      >
+                        Save
+                      </ButtonTooltip>
+                    </div>
                   </div>
                 </div>
               </div>

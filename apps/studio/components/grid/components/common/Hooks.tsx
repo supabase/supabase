@@ -15,7 +15,7 @@ function includes(array: string[], element: string) {
  *                                  trigger shortcut event
  */
 export function useKeyboardShortcuts(
-  keyMap: { [id: string]: (event: KeyboardEvent) => void },
+  keyMap: { [id: KeyboardEvent['key']]: (event: KeyboardEvent) => void },
   whitelistNodes: string[] = [],
   whitelistClasses: string[] = []
 ) {
