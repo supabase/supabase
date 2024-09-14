@@ -13,6 +13,7 @@ import {
   Switch,
   Theme,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
@@ -87,25 +88,21 @@ const ThemeSettings = () => {
             <SingleThemeSelection />
           </div>
         </div>
-        <Separator />
-        <div className="grid grid-cols-12">
-          <div className="col-span-4 flex flex-col gap-5">
-            <Label_Shadcn_ htmlFor="theme" className="text-light">
-              Expand Navigation menu
-            </Label_Shadcn_>
-            <p className="text-sm text-foreground-lighter max-w-[220px]">
-              Allow the Navigation panel to expand on hover
-            </p>
-          </div>
 
-          <div className="col-span-8 flex gap-4 justify-end">
-            <Switch
-              size="large"
-              checked={expandNavigationPanel}
-              onCheckedChange={() => handleExpandNavigationPanel()}
-            />
-          </div>
-        </div>
+        <Separator />
+
+        <FormItemLayout
+          isReactForm={false}
+          label="Expand Navigation menu"
+          layout="flex-row-reverse"
+          description="Allow the Navigation panel to expand on hover"
+        >
+          <Switch
+            size="large"
+            checked={expandNavigationPanel}
+            onCheckedChange={() => handleExpandNavigationPanel()}
+          />
+        </FormItemLayout>
       </Panel.Content>
     </Panel>
   )
