@@ -118,8 +118,47 @@ export const REFERENCES = {
     versions: [],
     icon: 'reference-api',
   },
+  self_hosting_analytics: {
+    type: 'self-hosting',
+    name: 'Self-Hosting Analytics',
+    libPath: 'self-hosting-analytics',
+    versions: [],
+    icon: 'reference-analytics',
+  },
+  self_hosting_auth: {
+    type: 'self-hosting',
+    name: 'Self-Hosting Auth',
+    libPath: 'self-hosting-auth',
+    versions: [],
+    icon: 'self-hosting',
+  },
+  self_hosting_functions: {
+    type: 'self-hosting',
+    name: 'Self-Hosting Functions',
+    libPath: 'self-hosting-functions',
+    versions: [],
+    icon: 'reference-functions',
+  },
+  self_hosting_realtime: {
+    type: 'self-hosting',
+    name: 'Self-Hosting Realtime',
+    libPath: 'self-hosting-realtime',
+    versions: [],
+    icon: 'self-hosting',
+  },
+  self_hosting_storage: {
+    type: 'self-hosting',
+    name: 'Self-Hosting Storage',
+    libPath: 'self-hosting-storage',
+    versions: [],
+    icon: 'self-hosting',
+  },
 } as const
 
 export const clientSdkIds = Object.keys(REFERENCES).filter(
   (reference) => REFERENCES[reference].type === 'sdk'
+)
+
+export const selfHostingServices = Object.keys(REFERENCES).filter(
+  (reference) => REFERENCES[reference].type === 'self-hosting'
 )

@@ -1573,11 +1573,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/reference',
-    destination: '/docs#reference-documentation',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/auth/passwordless-login',
     destination: '/docs/guides/auth/phone-login',
   },
