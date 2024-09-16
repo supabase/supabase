@@ -68,6 +68,7 @@ export const LOCAL_STORAGE_KEYS = {
   // Track position of nodes for schema visualizer
   SCHEMA_VISUALIZER_POSITIONS: (ref: string, schemaId: number) =>
     `schema-visualizer-positions-${ref}-${schemaId}`,
+  GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
 }
 
 export const OPT_IN_TAGS = {
