@@ -16,6 +16,7 @@ import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { formatClipboardValue } from 'components/grid/utils/common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -38,6 +39,8 @@ import {
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  ResizablePanel,
+  ResizablePanelGroup,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -49,9 +52,9 @@ import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AddUserDropdown from './AddUserDropdown'
+import { UserPanel } from './UserPanel'
 import { formatUsersData, isAtBottom } from './Users.utils'
 import UsersSidePanel from './UserSidePanel'
-import { formatClipboardValue } from 'components/grid/utils/common'
 
 type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 const USERS_TABLE_COLUMNS = [
@@ -425,66 +428,80 @@ export const UsersV2 = () => {
             <AddUserDropdown projectKpsVersion={project?.kpsVersion} />
           </div>
         </div>
-        <div className="flex flex-col w-full h-full">
-          <DataGrid
-            ref={gridRef}
-            className="flex-grow"
-            rowHeight={44}
-            headerRowHeight={36}
-            columns={usersTableColumns}
-            rows={formatUsersData(users ?? [])}
-            rowClass={(_, idx) => {
-              const isSelected = idx === selectedRow
-              return [
-                `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-                '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
-                '[&>.rdg-cell:first-child>div]:ml-4',
-              ].join(' ')
-            }}
-            onScroll={handleScroll}
-            renderers={{
-              renderRow(idx, props) {
-                return (
-                  <Row
-                    {...props}
-                    key={props.row.id}
-                    onClick={() => {
-                      if (typeof idx === 'number' && idx >= 0) {
-                        setSelectedRow(idx)
-                        gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-                      }
-                    }}
-                  />
-                )
-              },
-              noRowsFallback: isLoading ? (
-                <div className="absolute top-14 px-6 w-full">
-                  <GenericSkeletonLoader />
-                </div>
-              ) : isError ? (
-                <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
-                  <AlertError subject="Failed to retrieve users" error={error} />
-                </div>
-              ) : (
-                <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                  <Users className="text-foreground-lighter" strokeWidth={1} />
-                  <div className="text-center">
-                    <p className="text-foreground">
-                      {filter !== 'all' || filterKeywords.length > 0
-                        ? 'No users found'
-                        : 'No users in your project'}
-                    </p>
-                    <p className="text-foreground-light">
-                      {filter !== 'all' || filterKeywords.length > 0
-                        ? 'There are currently no users based on the filters applied'
-                        : 'There are currently no users who signed up to your project'}
-                    </p>
-                  </div>
-                </div>
-              ),
-            }}
-          />
-        </div>
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="relative flex flex-grow bg-alternative min-h-0"
+          autoSaveId="query-performance-layout-v1"
+        >
+          <ResizablePanel defaultSize={1}>
+            <div className="flex flex-col w-full h-full">
+              <DataGrid
+                ref={gridRef}
+                className="flex-grow"
+                rowHeight={44}
+                headerRowHeight={36}
+                columns={usersTableColumns}
+                rows={formatUsersData(users ?? [])}
+                rowClass={(_, idx) => {
+                  const isSelected = idx === selectedRow
+                  return [
+                    `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
+                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                    '[&>.rdg-cell:first-child>div]:ml-4',
+                  ].join(' ')
+                }}
+                onScroll={handleScroll}
+                renderers={{
+                  renderRow(idx, props) {
+                    return (
+                      <Row
+                        {...props}
+                        key={props.row.id}
+                        onClick={() => {
+                          if (typeof idx === 'number' && idx >= 0) {
+                            setSelectedRow(idx)
+                            gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                          }
+                        }}
+                      />
+                    )
+                  },
+                  noRowsFallback: isLoading ? (
+                    <div className="absolute top-14 px-6 w-full">
+                      <GenericSkeletonLoader />
+                    </div>
+                  ) : isError ? (
+                    <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
+                      <AlertError subject="Failed to retrieve users" error={error} />
+                    </div>
+                  ) : (
+                    <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+                      <Users className="text-foreground-lighter" strokeWidth={1} />
+                      <div className="text-center">
+                        <p className="text-foreground">
+                          {filter !== 'all' || filterKeywords.length > 0
+                            ? 'No users found'
+                            : 'No users in your project'}
+                        </p>
+                        <p className="text-foreground-light">
+                          {filter !== 'all' || filterKeywords.length > 0
+                            ? 'There are currently no users based on the filters applied'
+                            : 'There are currently no users who signed up to your project'}
+                        </p>
+                      </div>
+                    </div>
+                  ),
+                }}
+              />
+            </div>
+          </ResizablePanel>
+          {selectedRow !== undefined && (
+            <UserPanel
+              selectedUser={users?.[selectedRow]}
+              onClose={() => setSelectedRow(undefined)}
+            />
+          )}
+        </ResizablePanelGroup>
         <div className="flex min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
           Total: {totalUsers} users
         </div>
