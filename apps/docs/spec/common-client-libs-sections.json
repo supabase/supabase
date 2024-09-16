@@ -397,21 +397,6 @@
         "type": "function"
       },
       {
-        "id": "auth-error-codes",
-        "title": "Error codes",
-        "slug": "auth-error-codes",
-        "type": "markdown",
-        "excludes": [
-          "reference_csharp_v0",
-          "reference_csharp_v1",
-          "reference_dart_v1",
-          "reference_javascript_v1",
-          "reference_kotlin_v1",
-          "reference_swift_v1",
-          "reference_swift_v2"
-        ]
-      },
-      {
         "id": "sign-up",
         "title": "Create a new user",
         "slug": "auth-signup",

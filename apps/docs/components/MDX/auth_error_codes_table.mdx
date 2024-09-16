@@ -1,11 +1,3 @@
-In general the HTTP status codes you will likely receive are:
-
-- [403 Forbidden](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403) is sent out in rare situations where a certain Auth feature is not available for the user, and you as the developer are not checking a precondition whether that API is available for the user.
-- [422 Unprocessable Entity](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422) is sent out when the API request is accepted, but cannot be processed because the user or Auth server is in a state where it cannot satisfy the request.
-- [429 Too Many Requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429) is sent out when rate-limits are breached for an API. You should handle this status code often, especially in functions that authenticate a user.
-- [500 Internal Server Error](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) often means that the Auth server's service is degraded. Most often it points to issues in your database setup such as a misbehaving trigger on a schema, function, view or other database object.
-- [501 Not Implemented](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/501) is sent out when a feature is not enabled on the Auth server, and you are trying to use an API which requires it.
-
 To supplement HTTP status codes, Supabase Auth returns a string error code which gives you more insight into what went wrong. These codes are stable and can be used to present an internationalized message to your users.
 
 | Code                                    | Description                                                                                                                                                                                                                                                                                                   |
