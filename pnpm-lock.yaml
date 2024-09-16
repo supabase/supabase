@@ -1226,8 +1226,8 @@ importers:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@20.12.11)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2))
       libpg-query:
-        specifier: 15.1.0
-        version: 15.1.0(encoding@0.1.13)
+        specifier: ^15.2.0
+        version: 15.2.0(encoding@0.1.13)
       mdast-util-from-markdown:
         specifier: ^2.0.0
         version: 2.0.0
@@ -4038,6 +4038,9 @@ packages:
   '@opentelemetry/semantic-conventions@1.24.1':
     resolution: {integrity: sha512-VkliWlS4/+GHLLW7J/rVBA00uXus1SWvwFvcUDxDwmFxYfg/2VI6ekwdXS28cjI8Qz2ky2BzG8OUHo+WeYIWqw==}
     engines: {node: '>=14'}
+
+  '@pgsql/types@15.0.2':
+    resolution: {integrity: sha512-K3gtnbqbSUuUVmPm143qx5Gy2EmKuooshV95yMD48EUQ1256sgZBriEfY61OWJnlzdREdqHTIOxQqpZAb7XdZg==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -9550,8 +9553,8 @@ packages:
   libpg-query@13.3.1:
     resolution: {integrity: sha512-RLvnKPLWngNR7bNep/Q9euPcfFJVFfDg/iP13lYGxcSI01emS/1vbTw6EBd8UordweWFdvUuK+31sHp104dukA==}
 
-  libpg-query@15.1.0:
-    resolution: {integrity: sha512-bGtPycX7BLPmy/QEEG1HmsANKMU/yGSA2299Zj7KoVQJ5pPfnSZBFfUbq/3QvDq2ruVIa+ZaDjuMgX1uXdylVA==}
+  libpg-query@15.2.0:
+    resolution: {integrity: sha512-fBi14tsU3/ahtfU0C+/tvmtlt0EJM6kXe0Dl4/cSbiNmJ3IwLIuk3lawwiK5ByXU4sXwyAzbkvSl26jVXzYuaA==}
 
   lie@3.1.1:
     resolution: {integrity: sha512-RiNhHysUjhrDQntfYSfY4MU24coXXdEOgw9WGcKHNeEwffDYbF//u87M1EWaMGzuFoSbqW0C9C6lEEhDOAswfw==}
@@ -16320,6 +16323,8 @@ snapshots:
 
   '@opentelemetry/semantic-conventions@1.24.1': {}
 
+  '@pgsql/types@15.0.2': {}
+
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
@@ -18609,7 +18614,7 @@ snapshots:
   '@supabase/sql-to-rest@0.1.6(encoding@0.1.13)':
     dependencies:
       '@babel/parser': 7.24.7
-      libpg-query: 15.1.0(encoding@0.1.13)
+      libpg-query: 15.2.0(encoding@0.1.13)
       prettier: 3.2.5
     transitivePeerDependencies:
       - encoding
@@ -23307,10 +23312,11 @@ snapshots:
       - encoding
       - supports-color
 
-  libpg-query@15.1.0(encoding@0.1.13):
+  libpg-query@15.2.0(encoding@0.1.13):
     dependencies:
       '@emnapi/runtime': 0.43.1
       '@mapbox/node-pre-gyp': 1.0.11(encoding@0.1.13)
+      '@pgsql/types': 15.0.2
       node-addon-api: 7.1.0
       node-gyp: 10.1.0
     transitivePeerDependencies:
