@@ -316,8 +316,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       openai:
-        specifier: ^4.20.1
-        version: 4.26.1(encoding@0.1.13)
+        specifier: ^4.61.0
+        version: 4.61.0(encoding@0.1.13)(zod@3.23.8)
       openapi-fetch:
         specifier: ^0.8.2
         version: 0.8.2
@@ -641,8 +641,8 @@ importers:
         specifier: ^1.17.8
         version: 1.17.8(next@14.2.3(@babel/core@7.24.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))
       openai:
-        specifier: ^4.20.1
-        version: 4.26.1(encoding@0.1.13)
+        specifier: ^4.61.0
+        version: 4.61.0(encoding@0.1.13)(zod@3.23.8)
       openapi-fetch:
         specifier: ^0.6.2
         version: 0.6.2
@@ -947,6 +947,9 @@ importers:
       '@octokit/rest':
         specifier: ^20.0.2
         version: 20.0.2
+      '@radix-ui/react-dialog':
+        specifier: ^1.0.5
+        version: 1.0.5(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@react-three/fiber':
         specifier: ^7.0.29
         version: 7.0.29(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(three@0.136.0)
@@ -962,18 +965,27 @@ importers:
       '@vercel/og':
         specifier: ^0.6.2
         version: 0.6.2
+      ai-commands:
+        specifier: workspace:*
+        version: link:../../packages/ai-commands
       animejs:
         specifier: ^3.2.2
         version: 3.2.2
       classnames:
         specifier: ^2.3.1
         version: 2.3.2
+      clsx:
+        specifier: ^1.2.1
+        version: 1.2.1
       cobe:
         specifier: ^0.6.2
         version: 0.6.3
       common:
         specifier: workspace:*
         version: link:../../packages/common
+      common-tags:
+        specifier: ^1.8.2
+        version: 1.8.2
       config:
         specifier: workspace:*
         version: link:../../packages/config
@@ -1001,6 +1013,9 @@ importers:
       icons:
         specifier: workspace:*
         version: link:../../packages/icons
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       lucide-react:
         specifier: '*'
         version: 0.436.0(react@18.2.0)
@@ -1022,6 +1037,9 @@ importers:
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      openai:
+        specifier: ^4.61.0
+        version: 4.61.0(encoding@0.1.13)(zod@3.23.8)
       parse-numeric-range:
         specifier: ^1.3.0
         version: 1.3.0
@@ -1098,15 +1116,24 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
     devDependencies:
+      '@supabase/auth-ui-shared':
+        specifier: ^0.1.8
+        version: 0.1.8(@supabase/supabase-js@2.44.3)
       '@types/animejs':
         specifier: ^3.1.12
         version: 3.1.12
       '@types/classnames':
         specifier: ^2.3.1
         version: 2.3.1
+      '@types/common-tags':
+        specifier: ^1.8.4
+        version: 1.8.4
       '@types/dat.gui':
         specifier: ^0.7.10
         version: 0.7.12
+      '@types/lodash':
+        specifier: ^4.17.7
+        version: 4.17.7
       '@types/mdx-js__react':
         specifier: ^1.5.6
         version: 1.5.6
@@ -1168,8 +1195,8 @@ importers:
         specifier: ^3.5.0
         version: 3.5.0
       openai:
-        specifier: ^4.26.1
-        version: 4.26.1(encoding@0.1.13)
+        specifier: ^4.61.0
+        version: 4.61.0(encoding@0.1.13)(zod@3.23.8)
     devDependencies:
       '@babel/core':
         specifier: ^7.23.6
@@ -1348,8 +1375,8 @@ importers:
   packages/pg-meta:
     dependencies:
       zod:
-        specifier: ^3.22.4
-        version: 3.22.4
+        specifier: ^3.23.8
+        version: 3.23.8
     devDependencies:
       typescript:
         specifier: ^5.5.0
@@ -1503,8 +1530,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       openai:
-        specifier: ^4.17.0
-        version: 4.26.1(encoding@0.1.13)
+        specifier: ^4.61.0
+        version: 4.61.0(encoding@0.1.13)(zod@3.23.8)
       postcss:
         specifier: ^8.4.31
         version: 8.4.38
@@ -1587,8 +1614,8 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
       zod:
-        specifier: ^3.22.3
-        version: 3.22.4
+        specifier: ^3.23.8
+        version: 3.23.8
     devDependencies:
       '@babel/plugin-syntax-flow':
         specifier: ^7.21.4
@@ -5674,6 +5701,11 @@ packages:
     peerDependencies:
       '@supabase/supabase-js': ^2.21.0
 
+  '@supabase/auth-ui-shared@0.1.8':
+    resolution: {integrity: sha512-ouQ0DjKcEFg+0gZigFIEgu01V3e6riGZPzgVD0MJsCBNsMsiDT74+GgCEIElMUpTGkwSja3xLwdFRFgMNFKcjg==}
+    peerDependencies:
+      '@supabase/supabase-js': ^2.21.0
+
   '@supabase/functions-js@2.4.1':
     resolution: {integrity: sha512-8sZ2ibwHlf+WkHDUZJUXqqmPvWQ3UHN0W30behOJngVh/qHHekhJLCFbh0AjkE9/FqqXtf9eoVvmYgfCLk5tNA==}
 
@@ -6196,9 +6228,6 @@ packages:
 
   '@types/qs@6.9.16':
     resolution: {integrity: sha512-7i+zxXdPD0T4cKDuxCUXJ4wHcsJLwENa6Z3dCu8cfCK743OGy5Nu1RmAGqDPsoTDINVEcdXKRvR/zre+P2Ku1A==}
-
-  '@types/qs@6.9.8':
-    resolution: {integrity: sha512-u95svzDlTysU5xecFNTgfFG5RUWu1A9P0VzgpcIiGZA9iraHOdSzcxMxQ55DyeRaGCSxQi7LxXDI4rzq/MYfdg==}
 
   '@types/randombytes@2.0.3':
     resolution: {integrity: sha512-+NRgihTfuURllWCiIAhm1wsJqzsocnqXM77V/CalsdJIYSRGEHMnritxh+6EsBklshC+clo1KgnN14qgSGeQdw==}
@@ -6919,9 +6948,6 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
-  base-64@0.1.0:
-    resolution: {integrity: sha512-Y5gU45svrR5tI2Vt/X9GPd3L0HNIKzGu202EjxrXMpuc2V2CiKgemAbUUsqYmZJvPtCXoUKjNZwBJzsNScUbXA==}
-
   base64-js@0.0.8:
     resolution: {integrity: sha512-3XSA2cR/h/73EzlXXdU6YNycmYI7+kicTxks4eJg2g39biHR84slg2+des+p7iHYhbRg/udIS4TD53WabcOUkw==}
     engines: {node: '>= 0.4'}
@@ -7096,9 +7122,6 @@ packages:
 
   character-reference-invalid@2.0.1:
     resolution: {integrity: sha512-iBZ4F4wRbyORVsu0jPV7gXkOsGYjGHPmAyv+HiHG8gi5PtC9KI2j1+v8/tlibRvjoWX027ypmG/n0HtO5t7unw==}
-
-  charenc@0.0.2:
-    resolution: {integrity: sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==}
 
   check-error@1.0.3:
     resolution: {integrity: sha512-iKEoDYaRmd1mxM90a2OEfWhjsjPpYPuQ+lMYsoxB126+t8fw7ySEO48nmDg5COTjxDI65/Y2OWpeEHk3ZOe8zg==}
@@ -7375,9 +7398,6 @@ packages:
   cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
-
-  crypt@0.0.2:
-    resolution: {integrity: sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==}
 
   css-background-parser@0.1.0:
     resolution: {integrity: sha512-2EZLisiZQ+7m4wwur/qiYJRniHX4K5Tc9w93MT3AS0WS1u5kaZ4FKXlOTBhOjc+CgEgPiGY+fX1yWD8UwpEqUA==}
@@ -7679,9 +7699,6 @@ packages:
   diff@5.1.0:
     resolution: {integrity: sha512-D+mk+qE8VC/PAUrlAU34N+VfXev0ghe5ywmpqrawphmVZc1bEfn56uo9qpyGp1p4xpzOHkSW4ztBd6L7Xx4ACw==}
     engines: {node: '>=0.3.1'}
-
-  digest-fetch@1.3.0:
-    resolution: {integrity: sha512-CGJuv6iKNM7QyZlM2T3sPAdZWd/p9zQiRNS9G+9COUCwzWFTs0Xp8NF5iePx7wtvhDykReiRRrSeNb4oMmB8lA==}
 
   dir-glob@3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
@@ -9792,9 +9809,6 @@ packages:
   math-random@1.0.4:
     resolution: {integrity: sha512-rUxjysqif/BZQH2yhd5Aaq7vXMSx9NdEsQcyA07uEzIvxgI7zIr33gGsh+RU0/XjmQpCW7RsVof1vlkvQVCK5A==}
 
-  md5@2.3.0:
-    resolution: {integrity: sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==}
-
   mdast-util-definitions@4.0.0:
     resolution: {integrity: sha512-k8AJ6aNnUkB7IE+5azR9h81O5EQ/cTDXtWdMq9Kk5KcEW/8ritU5CeLg/9HhOC++nALHBlaogJ5jz0Ybk3kPMQ==}
 
@@ -10695,10 +10709,6 @@ packages:
   oo-ascii-tree@1.98.0:
     resolution: {integrity: sha512-+GE7ywhtS6MctbfcO+vZzqIxcFzucZCwmawcwCVo89DxQDakV1JFfFViTXG4A90UzTAsU4tQteGmwDtwOlOXLw==}
     engines: {node: '>= 14.17.0'}
-
-  openai@4.26.1:
-    resolution: {integrity: sha512-DvWbjhWbappsFRatOWmu4Dp1/Q4RG9oOz6CfOSjy0/Drb8G+5iAiqWAO4PfpGIkhOOKtvvNfQri2SItl+U7LhQ==}
-    hasBin: true
 
   openai@4.61.0:
     resolution: {integrity: sha512-xkygRBRLIUumxzKGb1ug05pWmJROQsHkGuj/N6Jiw2dj0dI19JvbFpErSZKmJ/DA+0IvpcugZqCAyk8iLpyM6Q==}
@@ -13636,9 +13646,6 @@ packages:
 
   zeptomatch@1.2.2:
     resolution: {integrity: sha512-0ETdzEO0hdYmT8aXHHf5aMjpX+FHFE61sG4qKFAoJD2Umt3TWdCmH7ADxn2oUiWTlqBGC+SGr8sYMfr+37J8pQ==}
-
-  zod@3.22.4:
-    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
 
   zod@3.23.8:
     resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
@@ -18394,7 +18401,7 @@ snapshots:
       '@storybook/csf': 0.1.11
       '@storybook/global': 5.0.0
       '@storybook/types': 7.5.3
-      '@types/qs': 6.9.8
+      '@types/qs': 6.9.16
       dequal: 2.0.3
       lodash: 4.17.21
       memoizerific: 1.11.3
@@ -18411,7 +18418,7 @@ snapshots:
       '@storybook/csf': 0.1.11
       '@storybook/global': 5.0.0
       '@storybook/types': 7.6.17
-      '@types/qs': 6.9.8
+      '@types/qs': 6.9.16
       dequal: 2.0.3
       lodash: 4.17.21
       memoizerific: 1.11.3
@@ -18428,7 +18435,7 @@ snapshots:
       '@storybook/csf': 0.1.11
       '@storybook/global': 5.0.0
       '@storybook/types': 7.6.20
-      '@types/qs': 6.9.8
+      '@types/qs': 6.9.16
       dequal: 2.0.3
       lodash: 4.17.21
       memoizerific: 1.11.3
@@ -18558,6 +18565,10 @@ snapshots:
       react-dom: 18.2.0(react@18.2.0)
 
   '@supabase/auth-ui-shared@0.1.7(@supabase/supabase-js@2.44.3)':
+    dependencies:
+      '@supabase/supabase-js': 2.44.3
+
+  '@supabase/auth-ui-shared@0.1.8(@supabase/supabase-js@2.44.3)':
     dependencies:
       '@supabase/supabase-js': 2.44.3
 
@@ -19024,7 +19035,7 @@ snapshots:
   '@types/express-serve-static-core@4.17.37':
     dependencies:
       '@types/node': 20.12.11
-      '@types/qs': 6.9.8
+      '@types/qs': 6.9.16
       '@types/range-parser': 1.2.5
       '@types/send': 0.17.2
 
@@ -19032,7 +19043,7 @@ snapshots:
     dependencies:
       '@types/body-parser': 1.19.3
       '@types/express-serve-static-core': 4.17.37
-      '@types/qs': 6.9.8
+      '@types/qs': 6.9.16
       '@types/serve-static': 1.15.3
 
   '@types/extend@3.0.4': {}
@@ -19171,8 +19182,6 @@ snapshots:
   '@types/prop-types@15.7.8': {}
 
   '@types/qs@6.9.16': {}
-
-  '@types/qs@6.9.8': {}
 
   '@types/randombytes@2.0.3':
     dependencies:
@@ -20102,8 +20111,6 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  base-64@0.1.0: {}
-
   base64-js@0.0.8: {}
 
   base64-js@1.5.1: {}
@@ -20313,8 +20320,6 @@ snapshots:
   character-reference-invalid@1.1.4: {}
 
   character-reference-invalid@2.0.1: {}
-
-  charenc@0.0.2: {}
 
   check-error@1.0.3:
     dependencies:
@@ -20621,8 +20626,6 @@ snapshots:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  crypt@0.0.2: {}
-
   css-background-parser@0.1.0: {}
 
   css-box-model@1.2.1:
@@ -20899,11 +20902,6 @@ snapshots:
   diff@4.0.2: {}
 
   diff@5.1.0: {}
-
-  digest-fetch@1.3.0:
-    dependencies:
-      base-64: 0.1.0
-      md5: 2.3.0
 
   dir-glob@3.0.1:
     dependencies:
@@ -23605,12 +23603,6 @@ snapshots:
 
   math-random@1.0.4: {}
 
-  md5@2.3.0:
-    dependencies:
-      charenc: 0.0.2
-      crypt: 0.0.2
-      is-buffer: 1.1.6
-
   mdast-util-definitions@4.0.0:
     dependencies:
       unist-util-visit: 2.0.3
@@ -25111,20 +25103,6 @@ snapshots:
       mimic-fn: 4.0.0
 
   oo-ascii-tree@1.98.0: {}
-
-  openai@4.26.1(encoding@0.1.13):
-    dependencies:
-      '@types/node': 18.19.26
-      '@types/node-fetch': 2.6.6
-      abort-controller: 3.0.0
-      agentkeepalive: 4.5.0
-      digest-fetch: 1.3.0
-      form-data-encoder: 1.7.2
-      formdata-node: 4.4.1
-      node-fetch: 2.7.0(encoding@0.1.13)
-      web-streams-polyfill: 3.2.1
-    transitivePeerDependencies:
-      - encoding
 
   openai@4.61.0(encoding@0.1.13)(zod@3.23.8):
     dependencies:
@@ -28599,8 +28577,6 @@ snapshots:
   zeptomatch@1.2.2:
     dependencies:
       grammex: 3.1.2
-
-  zod@3.22.4: {}
 
   zod@3.23.8: {}
 

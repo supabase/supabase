@@ -17,7 +17,7 @@
     "config": "workspace:*",
     "js-tiktoken": "^1.0.10",
     "jsonrepair": "^3.5.0",
-    "openai": "^4.26.1"
+    "openai": "^4.61.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.6",

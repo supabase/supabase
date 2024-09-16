@@ -14,7 +14,8 @@ import 'swiper/css'
 
 import { useBreakpoint } from 'common'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
-import { Admonition, Button } from 'ui'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
 import ImageModal from '~/components/ImageModal'

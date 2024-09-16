@@ -3,7 +3,6 @@ import { PropsWithChildren } from 'react'
 import { CH } from '@code-hike/mdx/components'
 import { ArrowUpRight, Triangle } from 'lucide-react'
 import {
-  Admonition,
   Badge,
   cn,
   Collapsible_Shadcn_,
@@ -12,6 +11,7 @@ import {
   Heading,
   Image,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { type ImageProps } from 'ui/src/components/Image/Image'
 import Avatar from '~/components/Avatar'
 import Chart from '~/components/Charts/PGCharts'

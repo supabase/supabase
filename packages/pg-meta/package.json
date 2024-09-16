@@ -6,7 +6,7 @@
   "main": "./src/index.ts",
   "repository": "supabase/supabase",
   "dependencies": {
-    "zod": "^3.22.4"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "typescript": "^5.5.0"
