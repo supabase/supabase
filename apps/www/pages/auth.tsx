@@ -1,24 +1,29 @@
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
-import Solutions from 'data/Solutions'
 import { ArrowUpRight, Briefcase, Eye, Link as IconLink, Shield } from 'lucide-react'
 import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PRODUCT_NAMES } from 'shared-data/products'
 import { Button, Image } from 'ui'
-import AuthWidgetSection from '~/components/AuthWidget/AuthWidgetSection'
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
-import CTABanner from '~/components/CTABanner'
-import FeatureColumn from '~/components/FeatureColumn'
+
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductsNav from '~/components/Products/ProductsNav'
-import APISection from '~/components/Sections/APISection'
-import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
+
+import Solutions from 'data/Solutions'
+import { PRODUCT_NAMES } from 'shared-data/products'
 import AuthProviders from '~/data/auth.json'
+
+const SplitCodeBlockCarousel = dynamic(
+  () => import('~/components/Carousels/SplitCodeBlockCarousel')
+)
+const CTABanner = dynamic(() => import('~/components/CTABanner'))
+const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
+const APISection = dynamic(() => import('~/components/Sections/APISection'))
+const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
 function AuthPage() {
   // base path for images
