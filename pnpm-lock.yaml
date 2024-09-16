@@ -1214,6 +1214,9 @@ importers:
         specifier: ^17.4.0
         version: 17.5.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
     devDependencies:
+      '@types/lodash':
+        specifier: ^4.17.7
+        version: 4.17.7
       '@types/react':
         specifier: ^18.2.24
         version: 18.3.3
@@ -5808,6 +5811,9 @@ packages:
 
   '@types/lodash@4.17.5':
     resolution: {integrity: sha512-MBIOHVZqVqgfro1euRDWX7OO0fBVUUMrN6Pwm8LQsz8cWhEpihlvR70ENj3f40j58TNxZaWv2ndSkInykNBBJw==}
+
+  '@types/lodash@4.17.7':
+    resolution: {integrity: sha512-8wTvZawATi/lsmNu10/j2hk1KEP0IvjubqPE3cu1Xz7xfXXt5oCq3SNUz4fMIP4XGF9Ky+Ue2tBA3hcS7LSBlA==}
 
   '@types/markdown-table@3.0.0':
     resolution: {integrity: sha512-vX5zya26rnLLHdAKA3E9ZOT07CJslYp2gZfAZiXKUY5vd2RRiJyOQKrSlmUjyJ+eNoDAPkHflebG3PsfqC32aA==}
@@ -18571,6 +18577,8 @@ snapshots:
       '@types/lodash': 4.17.5
 
   '@types/lodash@4.17.5': {}
+
+  '@types/lodash@4.17.7': {}
 
   '@types/markdown-table@3.0.0':
     dependencies:
