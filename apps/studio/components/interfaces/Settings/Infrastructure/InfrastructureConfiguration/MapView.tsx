@@ -140,9 +140,8 @@ const MapView = ({
           {AVAILABLE_REPLICA_REGIONS.map((region) => {
             const dbs =
               databases.filter((database) => database.region.includes(region.region)) ?? []
-            const coordinates = AVAILABLE_REPLICA_REGIONS.find(
-              (r) => r.region === region.region
-            )?.coordinates
+            const coordinates = AVAILABLE_REPLICA_REGIONS.find((r) => r.region === region.region)
+              ?.coordinates
 
             const hasNoDatabases = dbs.length === 0
             const hasPrimary = dbs.some((database) => database.identifier === ref)
