@@ -44,6 +44,11 @@ jobs:
         with:
           sparse-checkout: |
             i18n
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9.10.0
+          run_install: false
       - name: Setup node
         uses: actions/setup-node@v4
         with:
@@ -67,6 +72,11 @@ jobs:
           sparse-checkout: |
             apps/docs/pages
             apps/docs/content
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9.10.0
+          run_install: false
       # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
       - name: Download dependencies
         run: |
