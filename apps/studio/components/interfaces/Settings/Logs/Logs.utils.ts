@@ -536,7 +536,13 @@ const _getTruncation = (date: Dayjs) => {
 export function checkForWithClause(query: string) {
   const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
 
-  // Check for WITH clause, ensuring it's not inside a string literal
   const withClauseRegex = /\b(WITH)\b(?=(?:[^']*'[^']*')*[^']*$)/i
   return withClauseRegex.test(queryWithoutComments)
+}
+
+export function checkForILIKEClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const ilikeClauseRegex = /\b(ILIKE)\b(?=(?:[^']*'[^']*')*[^']*$)/i
+  return ilikeClauseRegex.test(queryWithoutComments)
 }

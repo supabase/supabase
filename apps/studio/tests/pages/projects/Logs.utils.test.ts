@@ -1,4 +1,7 @@
-import { checkForWithClause } from 'components/interfaces/Settings/Logs/Logs.utils'
+import {
+  checkForWithClause,
+  checkForILIKEClause,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
 
 describe('checkForWithClause', () => {
   test('basic queries', () => {
@@ -32,6 +35,43 @@ describe('checkForWithClause', () => {
     expect(
       checkForWithClause(
         'SELECT * FROM table WHERE column IN (WITH subquery AS (SELECT 1) SELECT * FROM subquery)'
+      )
+    ).toBe(true)
+  })
+})
+
+describe('checkForILIKEClause', () => {
+  test('basic queries', () => {
+    expect(checkForILIKEClause('SELECT * FROM table')).toBe(false)
+    expect(checkForILIKEClause('SELECT * FROM table WHERE column ILIKE "%value%"')).toBe(true)
+    expect(checkForILIKEClause('SELECT * FROM table WHERE column LIKE "%value%"')).toBe(false)
+    expect(checkForILIKEClause('SELECT * FROM ilikesomething')).toBe(false)
+  })
+
+  test('case sensitivity', () => {
+    expect(checkForILIKEClause('SELECT * FROM table WHERE column ilike "%value%"')).toBe(true)
+    expect(checkForILIKEClause('SELECT * FROM table WHERE column IlIkE "%value%"')).toBe(true)
+  })
+
+  test('comments', () => {
+    expect(checkForILIKEClause('SELECT * FROM table -- ILIKE clause')).toBe(false)
+    expect(checkForILIKEClause('SELECT * FROM table /* ILIKE clause */')).toBe(false)
+    expect(checkForILIKEClause('-- ILIKE clause\nSELECT * FROM table')).toBe(false)
+    expect(checkForILIKEClause('/* ILIKE clause */\nSELECT * FROM table')).toBe(false)
+  })
+
+  test('string literals', () => {
+    expect(checkForILIKEClause("SELECT 'ILIKE' FROM table")).toBe(false)
+    expect(checkForILIKEClause("SELECT * FROM table WHERE column = 'ILIKE clause'")).toBe(false)
+  })
+
+  test('subqueries', () => {
+    expect(
+      checkForILIKEClause('SELECT * FROM (SELECT * FROM table WHERE column ILIKE "%value%")')
+    ).toBe(true)
+    expect(
+      checkForILIKEClause(
+        'SELECT * FROM table WHERE column IN (SELECT * FROM subtable WHERE column ILIKE "%value%")'
       )
     ).toBe(true)
   })

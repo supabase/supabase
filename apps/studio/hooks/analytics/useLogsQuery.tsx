@@ -13,7 +13,11 @@ import type {
 } from 'components/interfaces/Settings/Logs/Logs.types'
 import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { checkForWithClause } from 'components/interfaces/Settings/Logs/Logs.utils'
+import {
+  checkForILIKEClause,
+  checkForWithClause,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
+import { IS_PLATFORM } from 'common'
 
 export interface LogsQueryHook {
   params: LogsEndpointParams
@@ -49,6 +53,7 @@ const useLogsQuery = (
   const queryParams = genQueryParams(params as any)
 
   const usesWith = checkForWithClause(params.sql || '')
+  const usesILIKE = checkForILIKEClause(params.sql || '')
 
   const {
     data,
@@ -73,10 +78,19 @@ const useLogsQuery = (
   if (!error && data?.error) {
     error = data?.error
   }
-  if (usesWith) {
-    error = {
-      message: 'The parser does not yet support WITH and subquery statements.',
-      docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-with-keyword-and-subqueries-are-not-supported',
+
+  if (IS_PLATFORM) {
+    if (usesWith) {
+      error = {
+        message: 'The parser does not yet support WITH and subquery statements.',
+        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-with-keyword-and-subqueries-are-not-supported',
+      }
+    }
+    if (usesILIKE) {
+      error = {
+        message: 'BigQuery does not support ILIKE. Use REGEXP_CONTAINS instead.',
+        docs: 'https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions#regexp_contains',
+      }
     }
   }
   const changeQuery = (newQuery = '') => {

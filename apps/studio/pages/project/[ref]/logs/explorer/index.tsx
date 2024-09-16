@@ -27,7 +27,6 @@ import {
   LogsWarning,
 } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
-  checkForWithClause,
   maybeShowUpgradePrompt,
   useEditorHints,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
