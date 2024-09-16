@@ -1,9 +1,9 @@
 import { Editor } from '@monaco-editor/react'
 import { PostgresTable } from '@supabase/postgres-meta'
 import { Loader } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { useCallback, useEffect, useState } from 'react'
 import remarkGfm from 'remark-gfm'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -43,7 +43,7 @@ export const TextEditor = ({
   const value = row?.[column as keyof typeof row] as unknown as string
   const isTruncated = isValueTruncated(value)
 
-  const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
+  const { mutate: getCellValue, isLoading, isSuccess, reset } = useGetCellValueMutation()
 
   const loadFullValue = () => {
     if (selectedTable === undefined || project === undefined || row === undefined) return
@@ -78,11 +78,18 @@ export const TextEditor = ({
     }
   }, [visible])
 
+  // reset the mutation when the panel closes. Fixes an issue where the value is truncated if you close and reopen the
+  // panel again
+  const onClose = useCallback(() => {
+    reset()
+    closePanel()
+  }, [reset])
+
   return (
     <SidePanel
       size="large"
       visible={visible}
-      onCancel={() => closePanel()}
+      onCancel={onClose}
       header={
         <div className="flex items-center justify-between">
           <p>
@@ -101,7 +108,7 @@ export const TextEditor = ({
       customFooter={
         <ActionBar
           hideApply={readOnly}
-          closePanel={closePanel}
+          closePanel={onClose}
           backButtonLabel="Cancel"
           applyButtonLabel="Save value"
           applyFunction={readOnly ? undefined : saveValue}

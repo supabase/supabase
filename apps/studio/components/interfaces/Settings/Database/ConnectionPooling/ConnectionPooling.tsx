@@ -2,9 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { capitalize } from 'lodash'
+import { ExternalLink } from 'lucide-react'
 import { Fragment, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import z from 'zod'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -31,7 +32,6 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconExternalLink,
   Input_Shadcn_,
   Listbox,
   Separator,
@@ -162,7 +162,7 @@ export const ConnectionPooling = () => {
               </p>
               <Badge>Supavisor</Badge>
             </div>
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <a
                 target="_blank"
                 rel="noreferrer"

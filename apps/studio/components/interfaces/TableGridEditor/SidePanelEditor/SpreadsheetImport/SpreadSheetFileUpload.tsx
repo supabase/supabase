@@ -1,7 +1,8 @@
 import { DragEvent, useRef, useState } from 'react'
-import { Button, IconFileText, IconLoader } from 'ui'
+import { Button } from 'ui'
 
 import SparkBar from 'components/ui/SparkBar'
+import { FileText, Loader } from 'lucide-react'
 
 interface SpreadSheetFileUploadProps {
   parseProgress: number
@@ -64,7 +65,7 @@ const SpreadSheetFileUpload = ({
       ) : (
         <div className="flex h-28 flex-col items-center justify-center space-y-2 rounded-md border border-dashed border-strong">
           <div className="flex items-center space-x-2">
-            <IconFileText size={14} strokeWidth={1.5} />
+            <FileText size={14} strokeWidth={1.5} />
             <p className="text-sm text-foreground">{uploadedFile.name}</p>
           </div>
           {parseProgress === 100 ? (
@@ -73,7 +74,7 @@ const SpreadSheetFileUpload = ({
             </Button>
           ) : (
             <div className="flex w-3/5 items-center space-x-2">
-              <IconLoader className="h-4 w-4 animate-spin" />
+              <Loader className="h-4 w-4 animate-spin" />
               <SparkBar
                 value={parseProgress}
                 max={100}

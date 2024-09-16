@@ -1,9 +1,10 @@
+import { useMemo, useRef, useState } from 'react'
+
 import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
+import PartnerIcon from 'components/ui/PartnerIcon'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import type { IntegrationName } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useMemo, useRef, useState } from 'react'
-
 import type { Organization } from 'types'
 import {
   Badge,
@@ -14,12 +15,12 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  IconChevronDown,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   cn,
 } from 'ui'
+import { ChevronDown } from 'lucide-react'
 
 export interface OrganizationPickerProps {
   integrationName: IntegrationName
@@ -69,7 +70,7 @@ const OrganizationPicker = ({
             disabled={disabled}
             iconRight={
               <span className="grow flex justify-end">
-                <IconChevronDown />
+                <ChevronDown />
               </span>
             }
           >
@@ -111,6 +112,7 @@ const OrganizationPicker = ({
                         setOpen(false)
                       }}
                     >
+                      <PartnerIcon organization={org} />
                       <span className="truncate">{org.name}</span>{' '}
                       {configurationId && installed[org.slug] && (
                         <Badge className="!flex-none">Integration Installed</Badge>

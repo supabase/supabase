@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { FormMessage } from '@ui/components/shadcn/ui/form'
@@ -15,7 +15,6 @@ import { useUpdateCollection } from 'data/analytics/warehouse-collections-update
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
-  Checkbox_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -23,7 +22,6 @@ import {
   DropdownMenuTrigger,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormLabel_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   Modal,
@@ -96,11 +94,14 @@ export const WarehouseMenuItem = ({ item }: Props) => {
         key={item.token + '-collection-item'}
         href={`/project/${projectRef}/logs/collections/${item.token}`}
       >
-        <div>{item.name}</div>
+        <div className="truncate">{item.name}</div>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
+              onClick={(e) => {
+                e.preventDefault()
+              }}
               loading={isLoading}
               type="text"
               className="px-1 opacity-50 hover:opacity-100 !bg-transparent"
@@ -223,8 +224,9 @@ export const WarehouseMenuItem = ({ item }: Props) => {
           >
             <div className="p-3 px-6 space-y-4">
               <p className="text-sm text-foreground-light">
-                Are you sure you want to delete the selected collection?
-                <br /> This action cannot be undone.
+                All data in this collection will be deleted.
+                <br />
+                <div className="mt-2">This action cannot be undone.</div>
               </p>
             </div>
 

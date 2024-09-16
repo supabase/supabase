@@ -1,7 +1,8 @@
+import { Loader, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { IconLoader, IconSearch, Input } from 'ui'
+import { Input } from 'ui'
 import { useDebounce } from 'use-debounce'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -117,7 +118,7 @@ function IntegrationPartnersPage(props: Props) {
 
                 <Input
                   size="small"
-                  icon={<IconSearch />}
+                  icon={<Search />}
                   placeholder="Search..."
                   type="text"
                   value={search}
@@ -125,7 +126,7 @@ function IntegrationPartnersPage(props: Props) {
                   actions={
                     isSearching && (
                       <span className="mr-1 animate-spin text-white">
-                        <IconLoader />
+                        <Loader />
                       </span>
                     )
                   }

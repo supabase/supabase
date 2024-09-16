@@ -3,8 +3,8 @@ import { X } from 'lucide-react'
 import randomBytes from 'randombytes'
 import { useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
@@ -300,7 +300,16 @@ export const CreateHookSheet = ({
               control={form.control}
               name="enabled"
               render={({ field }) => (
-                <FormItemLayout className="px-8" label={`Enable ${values.hookType}`} layout="flex">
+                <FormItemLayout
+                  layout="flex"
+                  className="px-8"
+                  label={`Enable ${values.hookType}`}
+                  description={
+                    values.hookType === 'Send SMS hook'
+                      ? 'SMS Provider settings will be disabled in favor of SMS hooks'
+                      : undefined
+                  }
+                >
                   <FormControl_Shadcn_>
                     <Switch
                       checked={field.value}

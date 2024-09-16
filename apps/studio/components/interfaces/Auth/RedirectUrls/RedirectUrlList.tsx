@@ -1,8 +1,9 @@
 import { noop } from 'lodash'
-import { Button, IconGlobe, IconTrash } from 'ui'
+import { Button } from 'ui'
 
 import { EmptyListState } from 'components/ui/States'
 import ValueContainer from './ValueContainer'
+import { Globe, Trash } from 'lucide-react'
 
 interface RedirectUrlListProps {
   URI_ALLOW_LIST_ARRAY: string[]
@@ -23,16 +24,12 @@ const RedirectUrlList = ({
             <ValueContainer key={url}>
               <div className="flex items-center gap-4 font-mono">
                 <span className="text-foreground-lighter">
-                  <IconGlobe strokeWidth={2} size={14} />
+                  <Globe strokeWidth={2} size={14} />
                 </span>
                 <span className="text-sm">{url}</span>
               </div>
               {canUpdate && (
-                <Button
-                  type="default"
-                  icon={<IconTrash />}
-                  onClick={() => onSelectUrlToDelete(url)}
-                >
+                <Button type="default" icon={<Trash />} onClick={() => onSelectUrlToDelete(url)}>
                   Remove
                 </Button>
               )}

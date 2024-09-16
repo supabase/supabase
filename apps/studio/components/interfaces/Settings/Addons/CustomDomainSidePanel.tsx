@@ -1,8 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -14,23 +13,20 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { formatCurrency } from 'lib/helpers'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconExternalLink,
   Radio,
   SidePanel,
   cn,
 } from 'ui'
+import { ExternalLink, AlertCircle, AlertTriangle } from 'lucide-react'
 
 const CustomDomainSidePanel = () => {
-  const router = useRouter()
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
   const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
@@ -42,22 +38,15 @@ const CustomDomainSidePanel = () => {
     'stripe.subscriptions'
   )
 
-  const snap = useSubscriptionPageStateSnapshot()
-  const visible = snap.panelKey === 'customDomain'
-  const onClose = () => {
-    const { panel, ...queryWithoutPanel } = router.query
-    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
-      shallow: true,
-    })
-    snap.setPanelKey(undefined)
-  }
+  const { panel, closePanel } = useAddonsPagePanel()
+  const visible = panel === 'customDomain'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled custom domain`)
-      onClose()
+      closePanel()
     },
     onError: (error) => {
       toast.error(`Unable to enable custom domain: ${error.message}`)
@@ -66,7 +55,7 @@ const CustomDomainSidePanel = () => {
   const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled custom domain`)
-      onClose()
+      closePanel()
     },
     onError: (error) => {
       toast.error(`Unable to disable custom domain: ${error.message}`)
@@ -109,7 +98,7 @@ const CustomDomainSidePanel = () => {
     <SidePanel
       size="large"
       visible={visible}
-      onCancel={onClose}
+      onCancel={closePanel}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
       disabled={
@@ -131,7 +120,7 @@ const CustomDomainSidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Custom domains</h4>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://supabase.com/docs/guides/platform/custom-domains"
               target="_blank"
@@ -149,7 +138,7 @@ const CustomDomainSidePanel = () => {
             selectedCustomDomain !== undefined &&
             customDomainsDisabledDueToQuota && (
               <Alert_Shadcn_ variant="default" className="mb-2">
-                <IconAlertCircle className="h-4 w-4" />
+                <AlertCircle className="h-4 w-4" />
                 <AlertTitle_Shadcn_>
                   Adding new custom domains temporarily disabled
                 </AlertTitle_Shadcn_>
@@ -271,7 +260,7 @@ const CustomDomainSidePanel = () => {
                   // Scheduled billing plan change
                   subscription.scheduled_plan_change?.target_plan !== undefined && (
                     <Alert_Shadcn_ variant={'warning'} className="mb-2">
-                      <IconAlertTriangle className="h-4 w-4" />
+                      <AlertTriangle className="h-4 w-4" />
                       <AlertDescription_Shadcn_>
                         You have a scheduled subscription change that will be canceled if you change
                         your custom domain add on.

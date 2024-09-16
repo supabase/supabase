@@ -12,8 +12,8 @@ import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { Loader2 } from 'lucide-react'
-import { Badge, Button, IconArrowRight } from 'ui'
+import { ArrowRight, Loader2 } from 'lucide-react'
+import { Badge, Button } from 'ui'
 
 const BuildingState = () => {
   const { ref } = useParams()
@@ -162,7 +162,7 @@ const ChecklistItem = ({ description }: any) => {
   return (
     <li className="my-3 flex flex-wrap space-x-3">
       <div className="mt-0.5">
-        <IconArrowRight className="text-foreground-lighter" size="tiny" />
+        <ArrowRight className="text-foreground-lighter" size={14} />
       </div>
       <div className="flex-1">{description}</div>
     </li>

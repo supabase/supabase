@@ -78,6 +78,7 @@ export namespace Dashboards {
     }
     interval: '1m' | '5m' | '1h' | '1d' | '1w' | '1M' | '1y' // this is the data interval
     layout: Chart[]
+    favorite?: boolean // not used yet
   }
 
   /**

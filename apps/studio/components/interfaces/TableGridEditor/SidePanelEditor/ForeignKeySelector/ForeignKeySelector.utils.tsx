@@ -1,8 +1,8 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { IconHelpCircle } from 'ui'
 
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import { HelpCircle } from 'lucide-react'
 import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
 import type { ForeignKey } from './ForeignKeySelector.types'
 
@@ -54,7 +54,7 @@ export const generateCascadeActionDescription = (
           <span className="text-foreground-light">{actionName}</span>
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger className="translate-y-[3px] mx-1">
-              <IconHelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
+              <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">

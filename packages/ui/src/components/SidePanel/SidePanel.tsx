@@ -75,14 +75,16 @@ const SidePanel = ({
       {onConfirm !== undefined && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              htmlType="submit"
-              disabled={disabled || loading}
-              loading={loading}
-              onClick={() => (onConfirm ? onConfirm() : null)}
-            >
-              {confirmText}
-            </Button>
+            <span className="inline-block">
+              <Button
+                htmlType="submit"
+                disabled={disabled || loading}
+                loading={loading}
+                onClick={() => (onConfirm ? onConfirm() : null)}
+              >
+                {confirmText}
+              </Button>
+            </span>
           </TooltipTrigger>
           {tooltip !== undefined && <TooltipContent side="bottom">{tooltip}</TooltipContent>}
         </Tooltip>

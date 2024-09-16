@@ -1,4 +1,6 @@
 import { includes, noop } from 'lodash'
+import { Edit, Edit2, Link } from 'lucide-react'
+
 import {
   Button,
   DropdownMenu,
@@ -9,11 +11,9 @@ import {
   Listbox,
   Select,
 } from 'ui'
-
-import { Edit, Edit2, Link } from 'lucide-react'
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { DateTimeInput } from './DateTimeInput'
-import type { RowField } from './RowEditor.types'
+import type { EditValue, RowField } from './RowEditor.types'
 import { isValueTruncated } from './RowEditor.utils'
 
 export interface InputFieldProps {
@@ -22,7 +22,7 @@ export interface InputFieldProps {
   isEditable?: boolean
   onUpdateField?: (changes: object) => void
   onEditJson?: (data: any) => void
-  onEditText?: (data: any) => void
+  onEditText?: (data: EditValue) => void
   onSelectForeignKey?: () => void
 }
 
@@ -173,14 +173,14 @@ const InputField = ({
                   Set to NULL
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => onEditText({ column: field.name, value: field.value })}
+                  onClick={() => onEditText({ column: field.name, value: field.value || '' })}
                 >
                   Expand editor
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           }
-          onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+          onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
         />
       </div>
     )
