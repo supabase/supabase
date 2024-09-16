@@ -15,6 +15,7 @@ import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import {
   checkForILIKEClause,
+  checkForWildcard,
   checkForWithClause,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { IS_PLATFORM } from 'common'
@@ -54,6 +55,7 @@ const useLogsQuery = (
 
   const usesWith = checkForWithClause(params.sql || '')
   const usesILIKE = checkForILIKEClause(params.sql || '')
+  const usesWildcard = checkForWildcard(params.sql || '')
 
   const {
     data,
@@ -89,7 +91,14 @@ const useLogsQuery = (
     if (usesILIKE) {
       error = {
         message: 'BigQuery does not support ILIKE. Use REGEXP_CONTAINS instead.',
-        docs: 'https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions#regexp_contains',
+        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-ilike-and-similar-to-keywords-are-not-supported',
+      }
+    }
+    if (usesWildcard) {
+      error = {
+        message:
+          'Wildcard (*) queries are not supported. Please remove the wildcard and try again.',
+        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-wildcard-operator--to-select-columns-is-not-supported',
       }
     }
   }

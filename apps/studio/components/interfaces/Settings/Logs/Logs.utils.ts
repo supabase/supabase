@@ -546,3 +546,11 @@ export function checkForILIKEClause(query: string) {
   const ilikeClauseRegex = /\b(ILIKE)\b(?=(?:[^']*'[^']*')*[^']*$)/i
   return ilikeClauseRegex.test(queryWithoutComments)
 }
+
+export function checkForWildcard(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+  console.log(queryWithoutComments)
+
+  const wildcardRegex = /\*/
+  return wildcardRegex.test(queryWithoutComments)
+}

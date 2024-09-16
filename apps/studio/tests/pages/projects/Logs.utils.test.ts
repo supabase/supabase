@@ -1,6 +1,7 @@
 import {
   checkForWithClause,
   checkForILIKEClause,
+  checkForWildcard,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 
 describe('checkForWithClause', () => {
@@ -74,5 +75,19 @@ describe('checkForILIKEClause', () => {
         'SELECT * FROM table WHERE column IN (SELECT * FROM subtable WHERE column ILIKE "%value%")'
       )
     ).toBe(true)
+  })
+})
+
+describe('checkForWildcard', () => {
+  test('basic queries', () => {
+    expect(checkForWildcard('SELECT * FROM table')).toBe(true)
+    expect(checkForWildcard('SELECT column FROM table')).toBe(false)
+  })
+
+  test('comments', () => {
+    expect(checkForWildcard('SELECT column FROM table -- *')).toBe(false)
+    expect(checkForWildcard('SELECT column FROM table /* * */')).toBe(false)
+    expect(checkForWildcard('-- *\nSELECT column FROM table')).toBe(false)
+    expect(checkForWildcard('/* * */\nSELECT column FROM table')).toBe(false)
   })
 })
