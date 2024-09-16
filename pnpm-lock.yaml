@@ -167,7 +167,7 @@ importers:
         version: 14.2.3
       '@next/mdx':
         specifier: ^14.2.3
-        version: 14.2.3(@mdx-js/loader@2.3.0)(@mdx-js/react@2.3.0(react@18.2.0))
+        version: 14.2.3(@mdx-js/loader@2.3.0(webpack@5.94.0))(@mdx-js/react@2.3.0(react@18.2.0))
       '@octokit/auth-app':
         specifier: ^6.0.3
         version: 6.0.3
@@ -832,7 +832,7 @@ importers:
         version: 2.3.0(typescript@5.5.2)
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@14.2.3(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
+        version: 0.9.13(next@14.2.3(@babel/core@7.24.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
       postcss:
         specifier: ^8.4.31
         version: 8.4.38
@@ -865,7 +865,7 @@ importers:
         version: 14.2.3
       '@next/mdx':
         specifier: ^14.2.3
-        version: 14.2.3(@mdx-js/loader@2.3.0)(@mdx-js/react@2.3.0(react@18.2.0))
+        version: 14.2.3(@mdx-js/loader@2.3.0(webpack@5.94.0(esbuild@0.20.2)))(@mdx-js/react@2.3.0(react@18.2.0))
       '@octokit/auth-app':
         specifier: ^6.0.3
         version: 6.0.3
@@ -1578,6 +1578,9 @@ importers:
       glob:
         specifier: ^8.1.0
         version: 8.1.0
+      jest:
+        specifier: ^29.7.0
+        version: 29.7.0(@types/node@20.12.11)
       jest-environment-jsdom:
         specifier: ^29.7.0
         version: 29.7.0
@@ -1710,7 +1713,7 @@ importers:
         version: link:../api-types
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@14.2.3(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
+        version: 0.9.13(next@14.2.3(@babel/core@7.24.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
       vitest:
         specifier: ^2.0.3
         version: 2.0.3(@types/node@20.12.11)(jsdom@20.0.3)(sass@1.72.0)(terser@5.32.0)
@@ -1756,6 +1759,9 @@ importers:
       cross-fetch:
         specifier: ^3.1.5
         version: 3.1.5(encoding@0.1.13)
+      jest:
+        specifier: ^29.7.0
+        version: 29.7.0(@types/node@20.12.11)
       jest-allure2-adapter:
         specifier: ^0.3.12
         version: 0.3.12
@@ -7674,7 +7680,6 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
-    bundledDependencies: []
 
   eslint-plugin-import@2.29.1:
     resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
@@ -15314,6 +15319,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@mdx-js/loader@2.3.0(webpack@5.94.0(esbuild@0.20.2))':
+    dependencies:
+      '@mdx-js/mdx': 2.3.0
+      source-map: 0.7.4
+      webpack: 5.94.0(esbuild@0.20.2)
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
+
   '@mdx-js/loader@2.3.0(webpack@5.94.0)':
     dependencies:
       '@mdx-js/mdx': 2.3.0
@@ -15457,7 +15471,14 @@ snapshots:
     dependencies:
       glob: 10.3.10
 
-  '@next/mdx@14.2.3(@mdx-js/loader@2.3.0)(@mdx-js/react@2.3.0(react@18.2.0))':
+  '@next/mdx@14.2.3(@mdx-js/loader@2.3.0(webpack@5.94.0(esbuild@0.20.2)))(@mdx-js/react@2.3.0(react@18.2.0))':
+    dependencies:
+      source-map: 0.7.4
+    optionalDependencies:
+      '@mdx-js/loader': 2.3.0(webpack@5.94.0(esbuild@0.20.2))
+      '@mdx-js/react': 2.3.0(react@18.2.0)
+
+  '@next/mdx@14.2.3(@mdx-js/loader@2.3.0(webpack@5.94.0))(@mdx-js/react@2.3.0(react@18.2.0))':
     dependencies:
       source-map: 0.7.4
     optionalDependencies:
@@ -24125,7 +24146,7 @@ snapshots:
     dependencies:
       js-yaml-loader: 1.2.2
 
-  next-router-mock@0.9.13(next@14.2.3(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0):
+  next-router-mock@0.9.13(next@14.2.3(@babel/core@7.24.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0):
     dependencies:
       next: 14.2.3(@babel/core@7.24.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       react: 18.2.0
@@ -26597,6 +26618,18 @@ snapshots:
       esbuild: 0.18.20
     optional: true
 
+  terser-webpack-plugin@5.3.10(esbuild@0.20.2)(webpack@5.94.0(esbuild@0.20.2)):
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.25
+      jest-worker: 27.5.1
+      schema-utils: 3.3.0
+      serialize-javascript: 6.0.2
+      terser: 5.32.0
+      webpack: 5.94.0(esbuild@0.20.2)
+    optionalDependencies:
+      esbuild: 0.20.2
+    optional: true
+
   terser-webpack-plugin@5.3.10(webpack@5.94.0):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
@@ -27576,6 +27609,37 @@ snapshots:
       schema-utils: 3.3.0
       tapable: 2.2.1
       terser-webpack-plugin: 5.3.10(esbuild@0.18.20)(webpack@5.94.0(esbuild@0.18.20))
+      watchpack: 2.4.2
+      webpack-sources: 3.2.3
+    transitivePeerDependencies:
+      - '@swc/core'
+      - esbuild
+      - uglify-js
+    optional: true
+
+  webpack@5.94.0(esbuild@0.20.2):
+    dependencies:
+      '@types/estree': 1.0.5
+      '@webassemblyjs/ast': 1.12.1
+      '@webassemblyjs/wasm-edit': 1.12.1
+      '@webassemblyjs/wasm-parser': 1.12.1
+      acorn: 8.11.3
+      acorn-import-attributes: 1.9.5(acorn@8.11.3)
+      browserslist: 4.23.3
+      chrome-trace-event: 1.0.3
+      enhanced-resolve: 5.17.1
+      es-module-lexer: 1.5.3
+      eslint-scope: 5.1.1
+      events: 3.3.0
+      glob-to-regexp: 0.4.1
+      graceful-fs: 4.2.11
+      json-parse-even-better-errors: 2.3.1
+      loader-runner: 4.3.0
+      mime-types: 2.1.35
+      neo-async: 2.6.2
+      schema-utils: 3.3.0
+      tapable: 2.2.1
+      terser-webpack-plugin: 5.3.10(esbuild@0.20.2)(webpack@5.94.0(esbuild@0.20.2))
       watchpack: 2.4.2
       webpack-sources: 3.2.3
     transitivePeerDependencies:

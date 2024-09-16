@@ -110,6 +110,7 @@
     "config": "workspace:*",
     "copyfiles": "^2.4.1",
     "glob": "^8.1.0",
+    "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "next": "*",
     "sql-formatter": "^12.2.0",
