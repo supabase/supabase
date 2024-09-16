@@ -79,19 +79,19 @@ Disk throughput is capped at 19,000 Mbps and IOPS is capped at 80,000 IOPS for a
 
 ### Self-Serve Configurability
 
-You can now adjust storage type, IOPS and disk size parameters yourself through the Dashboard [here](https://supabase.com/dashboard/project/_/settings/database).
+You can now adjust storage type, IOPS and disk size parameters yourself through the Dashboard [Database Settings page](https://supabase.com/dashboard/project/_/settings/database).
 
 ![Disk management configuration](/docs/img/guides/platform/disk-mgmt-io.png)
 
 <Admonition type="caution">
 
-Be aware that increasing IOPS or throughput incur additional charges.
+Increasing IOPS or throughput incurs additional charges.
 
 </Admonition>
 
 ### Understanding I/O Balance and Bursting (Smaller Instances)
 
-For smaller instances like Nano, Micro, and Small, you get I/O balance and burst capacity. These instances have limited base performance for IOPS and throughput. However, they come with burst credits that let you handle temporary spikes for 30 minutes in a day in demand by briefly exceeding their baseline performance. This means you can achieve higher performance for short bursts before reverting to your baseline limits.
+For smaller instances like Nano, Micro, and Small, you get I/O balance and burst capacity. These instances have limited base performance for IOPS and throughput. However, they come with burst credits that let you handle temporary spikes for 30 minutes in a day on demand by briefly exceeding their baseline performance. This means you can achieve higher performance for short bursts before reverting to your baseline limits.
 
 For example, the micro plan can burst up to 2,085 Mbps for 30 minutes a day and reverts to the baseline performance of 87 Mbps. Your disk IO budget gets replenished throughout the day.
 
