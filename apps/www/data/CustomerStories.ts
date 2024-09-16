@@ -6,7 +6,7 @@ export type CustomerStoryType = {
   imgUrl: string
   logo: string
   logo_inverse?: string
-  url?: string
+  url: string
   ctaText?: string
   path?: string
   postMeta?: {
