@@ -555,7 +555,14 @@ export function DiskManagementPanelForm() {
                   name="totalSize"
                   control={control}
                   render={({ field }) => (
-                    <FormItemLayout label="Disk Size" layout="horizontal">
+                    <FormItemLayout
+                      label="Disk Size"
+                      layout="horizontal"
+                      description={
+                        includedDiskGB > 0 &&
+                        `Your plan includes ${includedDiskGB} GiB of disk size for ${watchedStorageType}.`
+                      }
+                    >
                       <div className="mt-1 relative flex gap-2 items-center">
                         <div className="flex -space-x-px max-w-48">
                           <FormControl_Shadcn_>
@@ -589,7 +596,6 @@ export function DiskManagementPanelForm() {
                               animate={{ opacity: 1, scale: 1, x: 0 }}
                               exit={{ opacity: 0, scale: 0.95, x: -2 }}
                               transition={{ duration: 0.15 }}
-                              style={{ overflow: 'hidden' }}
                             >
                               <Button
                                 htmlType="button"
@@ -612,12 +618,6 @@ export function DiskManagementPanelForm() {
                             diskSizePrice.oldPrice !== diskSizePrice.newPrice
                           }
                         />
-                        {includedDiskGB > 0 && (
-                          <div className="text-xs text-foreground-light">
-                            Your plan includes {includedDiskGB} GiB of disk size for{' '}
-                            {watchedStorageType}.
-                          </div>
-                        )}
                       </div>
                     </FormItemLayout>
                   )}
