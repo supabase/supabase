@@ -20,7 +20,7 @@
     "@faker-js/faker": "^6.1.2",
     "@supabase/supabase-js": "^2.44.3",
     "@testdeck/jest": "^0.3.3",
-    "@types/jest": "^29.5.4",
+    "@types/jest": "^29.5.13",
     "@types/node": "^20.11.16",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",

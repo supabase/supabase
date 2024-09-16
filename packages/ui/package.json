@@ -102,6 +102,7 @@
     "@testing-library/react": "^14.0.0",
     "@tokens-studio/sd-transforms": "^0.8.5",
     "@types/common-tags": "^1.8.1",
+    "@types/jest": "^29.5.13",
     "@types/react": "^18.2.24",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "^18.2.8",
