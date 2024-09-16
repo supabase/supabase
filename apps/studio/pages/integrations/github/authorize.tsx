@@ -6,7 +6,7 @@ import { useGitHubAuthorizationCreateMutation } from 'data/integrations/github-a
 const GitHubIntegrationAuthorize = () => {
   const { code, state } = useParams()
 
-  const { mutate, isSuccess, isError } = useGitHubAuthorizationCreateMutation({
+  const { mutate, isSuccess, isError, isLoading } = useGitHubAuthorizationCreateMutation({
     onSuccess() {
       window.close()
     },
@@ -22,11 +22,9 @@ const GitHubIntegrationAuthorize = () => {
     <div className="h-screen flex flex-col justify-center items-center gap-4">
       <h2 className="text-xl">Completing GitHub Authorization...</h2>
 
-      {isSuccess ? (
-        <p>You can now close this window.</p>
-      ) : (
-        <p>Unable to authorize. Please try again.</p>
-      )}
+      {isSuccess && <p>You can now close this window.</p>}
+      {isLoading && <p>Authorizing...</p>}
+      {isError && <p>Unable to authorize. Please try again.</p>}
     </div>
   )
 }
