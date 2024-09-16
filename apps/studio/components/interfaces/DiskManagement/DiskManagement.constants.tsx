@@ -1,9 +1,17 @@
 import { PlanType } from 'data/subscriptions/org-subscription-query'
-import { AddonVariantId } from 'data/subscriptions/types'
 
 export enum DiskType {
   GP3 = 'gp3',
   IO2 = 'io2',
+}
+
+export const IOPS_RANGE = {
+  [DiskType.GP3]: { min: 3000, max: 16000 },
+  [DiskType.IO2]: { min: 100, max: 256000 },
+}
+
+export const THROUGHPUT_RANGE = {
+  [DiskType.GP3]: { min: 125, max: 1000 },
 }
 
 export const DISK_PRICING = {

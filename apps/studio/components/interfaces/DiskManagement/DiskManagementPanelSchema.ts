@@ -5,7 +5,7 @@ const baseSchema = z.object({
   totalSize: z
     .number()
     .min(8, { message: 'Allocated disk size must be at least 8 GiB.' })
-    .max(16384, { message: 'Allocated disk size must not exceed 16 TiB.' })
+    .max(16384, { message: 'Allocated disk size must not exceed 16,384 GiB.' })
     .describe('Allocated disk size in GiB'),
   provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
   throughput: z.number().optional().describe('Throughput in MiBps for gp3'),
@@ -20,14 +20,14 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
     if (provisionedIOPS < 100) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Provisioned IOPS must be at least 100 for io2.',
+        message: 'Provisioned IOPS must be at least 100',
         path: ['provisionedIOPS'],
       })
     } else if (provisionedIOPS > maxIOPS) {
       if (totalSize >= 8) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Provisioned IOPS must be at most ${maxIOPS} for io2.`,
+          message: `Provisioned IOPS must be at most ${maxIOPS}.`,
           path: ['provisionedIOPS'],
         })
       } else {
@@ -53,14 +53,14 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
     if (provisionedIOPS < 3000) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Provisioned IOPS must be at least 3000 for gp3.`,
+        message: `Provisioned IOPS must be at least 3000`,
         path: ['provisionedIOPS'],
       })
     } else if (provisionedIOPS > maxIOPS) {
       if (totalSize >= 8) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Provisioned IOPS must be at most ${maxIOPS} for gp3.`,
+          message: `Provisioned IOPS must be at most ${maxIOPS}`,
           path: ['provisionedIOPS'],
         })
       } else {
