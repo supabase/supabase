@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-      # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
+          cache: 'pnpm'
       - name: Download dependencies
         run: |
           pnpm i
@@ -53,12 +53,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-      # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
+          cache: 'pnpm'
       - name: Download dependencies
         run: |
-          rm package.json
-          rm pnpm-lock.yaml
-          pnpm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
+          pnpm i
       - name: Run prettier
         run: |-
           npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
@@ -77,12 +75,14 @@ jobs:
         with:
           version: 9.10.0
           run_install: false
-      # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
       - name: Download dependencies
         run: |
-          rm package.json
-          rm pnpm-lock.yaml
-          pnpm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
+          pnpm i
       - name: Run prettier
         run: |-
           # Check mdx files which contain sql code blocks
