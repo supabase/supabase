@@ -8,13 +8,13 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import {
   useDiskAttributesQuery,
   useRemainingDurationForDiskAttributeUpdate,
 } from 'data/config/disk-attributes-query'
 import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-update-mutation'
+import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { GB } from 'lib/constants'
@@ -39,7 +39,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskCountdownRadial } from './DiskCountdownRadial'
-import { DiskType, PLAN_DETAILS } from './DiskManagement.constants'
+import { COMPUTE_SIZE_MAX_IOPS, DiskType, PLAN_DETAILS } from './DiskManagement.constants'
 import {
   calculateDiskSizePrice,
   calculateIOPSPrice,
@@ -49,11 +49,10 @@ import { DiskManagementDiskSizeReadReplicas } from './DiskManagementDiskSizeRead
 import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
-import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 
 export function DiskManagementPanelForm() {
   const org = useSelectedOrganization()
-  const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
@@ -93,6 +92,12 @@ export function DiskManagementPanelForm() {
     useRemainingDurationForDiskAttributeUpdate({
       projectRef,
     })
+
+  const { data: addons } = useProjectAddonsQuery({ projectRef })
+  const currentCompute = (addons?.selected_addons ?? []).find((x) => x.type === 'compute_instance')
+    ?.variant
+  const maxIopsBasedOnCompute =
+    COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
@@ -338,19 +343,32 @@ export function DiskManagementPanelForm() {
                       layout="horizontal"
                       label="IOPS"
                       description={
-                        watchedStorageType === 'io2' ? (
-                          <>
-                            For <code className="text-xs">io2</code> storage type, IOPS must be{' '}
-                            {watchedTotalSize >= 8 ? `between 100 and ${maxIOPS}.` : `at least 100`}
-                          </>
-                        ) : (
-                          <>
-                            For <code className="text-xs">gp3</code> storage type, IOPS must be{' '}
-                            {watchedTotalSize >= 8
-                              ? `between 3,000 and ${maxIOPS.toLocaleString()}.`
-                              : `at least 3,000`}
-                          </>
-                        )
+                        <>
+                          {watchedStorageType === 'io2' ? (
+                            <>
+                              For <code className="text-xs">io2</code> storage type, IOPS must be{' '}
+                              {watchedTotalSize >= 8
+                                ? `between 100 and ${maxIOPS}.`
+                                : `at least 100`}
+                            </>
+                          ) : (
+                            <>
+                              For <code className="text-xs">gp3</code> storage type, IOPS must be{' '}
+                              {watchedTotalSize >= 8
+                                ? `between 3,000 and ${maxIOPS.toLocaleString()}.`
+                                : `at least 3,000`}
+                            </>
+                          )}
+                          {field.value > maxIopsBasedOnCompute && (
+                            <p>
+                              Note: Final usable IOPS will be at{' '}
+                              <span className="text-foreground">
+                                {maxIopsBasedOnCompute.toLocaleString()}
+                              </span>{' '}
+                              based on your current compute size of {currentCompute?.name}
+                            </p>
+                          )}
+                        </>
                       }
                       labelOptional="Input/output operations per second. Higher IOPS is suitable for applications requiring high throughput."
                     >
