@@ -213,8 +213,6 @@ function AuthPage() {
           </div>
         </SectionContainer>
 
-        <AuthWidgetSection />
-
         <CTABanner />
       </DefaultLayout>
     </>
