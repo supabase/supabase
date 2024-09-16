@@ -116,6 +116,7 @@
     "sql-formatter": "^12.2.0",
     "style-dictionary": "^3.7.1",
     "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.2",
     "tsconfig": "workspace:*",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
     "typescript": "^5.5.0"
