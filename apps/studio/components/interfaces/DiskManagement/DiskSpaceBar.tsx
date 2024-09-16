@@ -5,9 +5,6 @@ import { useState } from 'react'
 import {
   badgeVariants,
   cn,
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
   Tooltip_Shadcn_,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
@@ -26,8 +23,6 @@ export default function DiskSpaceBar({
   usedSize,
   newTotalSize,
 }: DiskSpaceBarProps) {
-  //   const [totalSize, setTotalSize] = useState<number>(8) // 8 GB total disk size
-  //   const [usedSize, setUsedSize] = useState<number>(4) // Starting with 4 GB used (50% usage)
   const [resizeThreshold, setResizeThreshold] = useState<number>(0.5) // 500 MB threshold for resize
 
   const usedPercentage = (usedSize / totalSize) * 100
@@ -42,7 +37,7 @@ export default function DiskSpaceBar({
     <div className="flex flex-col gap-2">
       <div className="flex items-center h-6 gap-3">
         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-          {usedSize.toFixed(2)} GB used of{' '}
+          {usedSize.toFixed(2)} GiB used of{' '}
           <span className="text-foreground font-semibold -mt-[2px]">
             <MotionNumber
               value={newTotalSize}
@@ -53,7 +48,7 @@ export default function DiskSpaceBar({
               className="font-mono"
             />
           </span>{' '}
-          GB
+          GiB
         </span>
       </div>
       <div className="relative">
