@@ -9,8 +9,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.1.1",
     "@monaco-editor/react": "^4.6.0",
     "@supabase/sql-to-rest": "^0.1.6",
+    "class-variance-authority": "^0.6.0",
     "cmdk": "^1.0.0",
     "common": "workspace:*",
     "common-tags": "^1.8.2",
@@ -20,16 +22,19 @@
     "monaco-editor": "*",
     "next-themes": "*",
     "react-error-boundary": "^4.0.12",
+    "react-hook-form": "^7.45.0",
     "react-markdown": "^9.0.1",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "*",
     "react-use": "^17.5.0",
     "reactflow": "*",
     "remark-gfm": "^4.0.0",
+    "sonner": "^1.5.0",
     "sql-formatter": "^15.3.1",
     "tsconfig": "workspace:*",
     "ui": "workspace:*",
-    "valtio": "*"
+    "valtio": "*",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@supabase/auth-helpers-react": "^0.4.2",

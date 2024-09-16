@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest'
 import { checkIfAppendLimitRequired, suffixWithLimit } from './SQLEditor.utils'
 
 describe('SQLEditor.utils.ts:checkIfAppendLimitRequired', () => {

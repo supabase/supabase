@@ -460,6 +460,9 @@ importers:
       '@heroicons/react':
         specifier: ^2.1.3
         version: 2.1.3(react@18.2.0)
+      '@hookform/resolvers':
+        specifier: ^3.1.1
+        version: 3.3.1(react-hook-form@7.47.0(react@18.2.0))
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.33.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -532,6 +535,9 @@ importers:
       configcat-js:
         specifier: ^7.0.0
         version: 7.0.1
+      date-fns:
+        specifier: ^2.30.0
+        version: 2.30.0
       dayjs:
         specifier: ^1.11.10
         version: 1.11.12
@@ -568,6 +574,9 @@ importers:
       markdown-table:
         specifier: ^3.0.3
         version: 3.0.3
+      memoize-one:
+        specifier: ^6.0.0
+        version: 6.0.0
       mime-db:
         specifier: ^1.53.0
         version: 1.53.0
@@ -646,6 +655,9 @@ importers:
       react-grid-layout:
         specifier: ^1.4.2
         version: 1.4.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      react-hook-form:
+        specifier: ^7.45.0
+        version: 7.47.0(react@18.2.0)
       react-inlinesvg:
         specifier: ^4.0.4
         version: 4.0.4(react@18.2.0)
@@ -676,12 +688,18 @@ importers:
       recharts:
         specifier: ^2.8.0
         version: 2.12.7(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      remark-gfm:
+        specifier: ^4.0.0
+        version: 4.0.0
       semver:
         specifier: ^6.3.1
         version: 6.3.1
       shared-data:
         specifier: workspace:*
         version: link:../../packages/shared-data
+      sonner:
+        specifier: ^1.5.0
+        version: 1.5.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       sql-formatter:
         specifier: ^13.1.0
         version: 13.1.0
@@ -715,6 +733,9 @@ importers:
       yup-password:
         specifier: ^0.3.0
         version: 0.3.0
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
       zxcvbn:
         specifier: ^4.4.2
         version: 4.4.2
@@ -740,6 +761,9 @@ importers:
       '@testing-library/dom':
         specifier: ^9.3.3
         version: 9.3.4
+      '@testing-library/jest-dom':
+        specifier: ^6.5.0
+        version: 6.5.0
       '@testing-library/react':
         specifier: ^14.0.0
         version: 14.0.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1549,8 +1573,8 @@ importers:
         specifier: ^29.6.0
         version: 29.6.3
       '@testing-library/jest-dom':
-        specifier: ^6.1.3
-        version: 6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.13)(jest@29.7.0(@types/node@20.12.11)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(vitest@2.0.3(@types/node@20.12.11)(jsdom@20.0.3)(sass@1.72.0)(terser@5.32.0))
+        specifier: ^6.4.6
+        version: 6.5.0
       '@testing-library/react':
         specifier: ^14.0.0
         version: 14.0.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1620,12 +1644,18 @@ importers:
 
   packages/ui-patterns:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^3.1.1
+        version: 3.3.1(react-hook-form@7.47.0(react@18.2.0))
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.33.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@supabase/sql-to-rest':
         specifier: ^0.1.6
         version: 0.1.6
+      class-variance-authority:
+        specifier: ^0.6.0
+        version: 0.6.1
       cmdk:
         specifier: ^1.0.0
         version: 1.0.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1662,6 +1692,9 @@ importers:
       react-error-boundary:
         specifier: ^4.0.12
         version: 4.0.13(react@18.2.0)
+      react-hook-form:
+        specifier: ^7.45.0
+        version: 7.47.0(react@18.2.0)
       react-markdown:
         specifier: ^9.0.1
         version: 9.0.1(@types/react@18.3.3)(react@18.2.0)
@@ -1680,6 +1713,9 @@ importers:
       remark-gfm:
         specifier: ^4.0.0
         version: 4.0.0
+      sonner:
+        specifier: ^1.5.0
+        version: 1.5.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       sql-formatter:
         specifier: ^15.3.1
         version: 15.3.1
@@ -1692,6 +1728,9 @@ importers:
       valtio:
         specifier: '*'
         version: 1.12.0(@types/react@18.3.3)(react@18.2.0)
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
     devDependencies:
       '@supabase/auth-helpers-react':
         specifier: ^0.4.2
@@ -5478,6 +5517,10 @@ packages:
         optional: true
       vitest:
         optional: true
+
+  '@testing-library/jest-dom@6.5.0':
+    resolution: {integrity: sha512-xGGHpBXYSHUUr6XsKBfs85TWlYKpTc37cSBBVrXcib2MkHLboWlkClhWF37JKlDb9KEq3dHs+f2xR7XJEWGBxA==}
+    engines: {node: '>=14', npm: '>=6', yarn: '>=1'}
 
   '@testing-library/react@14.0.0':
     resolution: {integrity: sha512-S04gSNJbYE30TlIMLTzv6QCTzt9AqIF5y6s6SzVFILNcNvbV/jU96GeiTPillGQo+Ny64M/5PV7klNYYgv5Dfg==}
@@ -9611,6 +9654,9 @@ packages:
   memoize-one@5.2.1:
     resolution: {integrity: sha512-zYiwtZUcYyXKo/np96AGZAckk+FWWsUdJ3cHGGmld7+AhvcWmQyGCYUh1hc4Q/pkOhb65dQR/pqCyK0cOaHz4Q==}
 
+  memoize-one@6.0.0:
+    resolution: {integrity: sha512-rkpe71W0N0c0Xz6QD0eJETuWAJGnJ9afsl1srmwPrI+yBCkge5EycXXbYRyvL29zZVUWQCY7InPRCv3GDXuZNw==}
+
   memoizerific@1.11.3:
     resolution: {integrity: sha512-/EuHYwAPdLtXwAwSZkh/Gutery6pD2KYd44oQLhAvQp/50mpyduZh8Q7PYHXTCJ+wuXxt7oij2LXyIJOOYFPog==}
 
@@ -13245,6 +13291,9 @@ packages:
   zod@3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
 
+  zod@3.23.8:
+    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+
   zustand@3.7.2:
     resolution: {integrity: sha512-PIJDIZKtokhof+9+60cpockVOq05sJzHCriyvaLBmEJixseQ1a5Kdov6fWZfWOu5SK9c+FhH1jU0tntLxRJYMA==}
     engines: {node: '>=12.7.0'}
@@ -14620,7 +14669,7 @@ snapshots:
       ts-pattern: 5.1.1
       unified: 11.0.4
       yaml: 2.4.5
-      zod: 3.22.4
+      zod: 3.23.8
     transitivePeerDependencies:
       - '@effect-ts/otel-node'
       - esbuild
@@ -18202,6 +18251,16 @@ snapshots:
       jest: 29.7.0(@types/node@20.12.11)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2))
       vitest: 2.0.3(@types/node@20.12.11)(jsdom@20.0.3)(sass@1.72.0)(terser@5.32.0)
 
+  '@testing-library/jest-dom@6.5.0':
+    dependencies:
+      '@adobe/css-tools': 4.4.0
+      aria-query: 5.3.0
+      chalk: 3.0.0
+      css.escape: 1.5.1
+      dom-accessibility-api: 0.6.3
+      lodash: 4.17.21
+      redent: 3.0.0
+
   '@testing-library/react@14.0.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@babel/runtime': 7.24.7
@@ -18590,7 +18649,7 @@ snapshots:
 
   '@types/mdast@4.0.1':
     dependencies:
-      '@types/unist': 3.0.2
+      '@types/unist': 2.0.8
 
   '@types/mdx-js__react@1.5.6':
     dependencies:
@@ -23430,6 +23489,8 @@ snapshots:
 
   memoize-one@5.2.1: {}
 
+  memoize-one@6.0.0: {}
+
   memoizerific@1.11.3:
     dependencies:
       map-or-similar: 1.5.0
@@ -27963,6 +28024,8 @@ snapshots:
       grammex: 3.1.2
 
   zod@3.22.4: {}
+
+  zod@3.23.8: {}
 
   zustand@3.7.2(react@18.2.0):
     optionalDependencies:
