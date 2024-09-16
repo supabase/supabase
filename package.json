@@ -36,6 +36,7 @@
     "api:codegen": "cd packages/api-types && pnpm run codegen"
   },
   "devDependencies": {
+    "@playwright/test": "^1.41.2",
     "eslint": "^8.57.0",
     "prettier": "^4.0.0-alpha.8",
     "prettier-plugin-sql-cst": "^0.11.0",
@@ -51,6 +52,13 @@
     "pnpm": "^9.0.0",
     "node": "^20.0.0"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
   "packageManager": "pnpm@9.10.0"
 }

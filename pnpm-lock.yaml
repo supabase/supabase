@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@playwright/test':
+        specifier: ^1.41.2
+        version: 1.41.2
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -1143,7 +1146,7 @@ importers:
         version: 15.3.1
       ts-jest:
         specifier: ^29.1.1
-        version: 29.1.2(@babel/core@7.24.7)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.24.7))(jest@29.7.0(@types/node@20.12.11))(typescript@5.5.2)
+        version: 29.1.2(@babel/core@7.24.7)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.24.7))(jest@29.7.0(@types/node@20.12.11)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(typescript@5.5.2)
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -1544,7 +1547,7 @@ importers:
         version: 29.6.3
       '@testing-library/jest-dom':
         specifier: ^6.1.3
-        version: 6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.13)(jest@29.7.0(@types/node@20.12.11))(vitest@2.0.3(@types/node@20.12.11)(jsdom@20.0.3)(sass@1.72.0)(terser@5.32.0))
+        version: 6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.13)(jest@29.7.0(@types/node@20.12.11)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(vitest@2.0.3(@types/node@20.12.11)(jsdom@20.0.3)(sass@1.72.0)(terser@5.32.0))
       '@testing-library/react':
         specifier: ^14.0.0
         version: 14.0.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1598,7 +1601,7 @@ importers:
         version: 3.8.0
       ts-jest:
         specifier: ^29.1.1
-        version: 29.1.2(@babel/core@7.24.7)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.24.7))(jest@29.7.0(@types/node@20.12.11))(typescript@5.5.2)
+        version: 29.1.2(@babel/core@7.24.7)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.24.7))(jest@29.7.0(@types/node@20.12.11)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(typescript@5.5.2)
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@20.12.11)(typescript@5.5.2)
@@ -1695,7 +1698,7 @@ importers:
         version: 10.1.0
       '@testing-library/jest-dom':
         specifier: ^6.4.6
-        version: 6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.13)(jest@29.7.0(@types/node@20.12.11))(vitest@2.0.3(@types/node@20.12.11)(jsdom@20.0.3)(sass@1.72.0)(terser@5.32.0))
+        version: 6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.13)(jest@29.7.0(@types/node@20.12.11)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(vitest@2.0.3(@types/node@20.12.11)(jsdom@20.0.3)(sass@1.72.0)(terser@5.32.0))
       '@testing-library/react':
         specifier: ^16.0.0
         version: 16.0.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1779,7 +1782,7 @@ importers:
         version: 3.3.5
       ts-jest:
         specifier: ^29.1.1
-        version: 29.1.2(@babel/core@7.24.7)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.24.7))(jest@29.7.0(@types/node@20.12.11))(typescript@5.5.2)
+        version: 29.1.2(@babel/core@7.24.7)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.24.7))(jest@29.7.0(@types/node@20.12.11)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(typescript@5.5.2)
       typescript:
         specifier: ^5.5.0
         version: 5.5.2
@@ -18177,7 +18180,7 @@ snapshots:
       lz-string: 1.5.0
       pretty-format: 27.5.1
 
-  '@testing-library/jest-dom@6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.13)(jest@29.7.0(@types/node@20.12.11))(vitest@2.0.3(@types/node@20.12.11)(jsdom@20.0.3)(sass@1.72.0)(terser@5.32.0))':
+  '@testing-library/jest-dom@6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.13)(jest@29.7.0(@types/node@20.12.11)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(vitest@2.0.3(@types/node@20.12.11)(jsdom@20.0.3)(sass@1.72.0)(terser@5.32.0))':
     dependencies:
       '@adobe/css-tools': 4.4.0
       '@babel/runtime': 7.24.7
@@ -26898,7 +26901,7 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
-  ts-jest@29.1.2(@babel/core@7.24.7)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.24.7))(jest@29.7.0(@types/node@20.12.11))(typescript@5.5.2):
+  ts-jest@29.1.2(@babel/core@7.24.7)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.24.7))(jest@29.7.0(@types/node@20.12.11)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(typescript@5.5.2):
     dependencies:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0

@@ -36,8 +36,6 @@ jobs:
       - uses: supabase/setup-cli@v1
       - name: Install dependencies
         run: pnpm i
-      - name: Install Playwright Command
-        run: pnpm i -D @playwright/test
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
       - name: Run Playwright tests
