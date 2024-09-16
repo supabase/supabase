@@ -1,9 +1,10 @@
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 import Solutions from 'data/Solutions'
-import { ArrowUpRight, Briefcase, Eye, Link as IconLink, Link, Shield } from 'lucide-react'
+import { ArrowUpRight, Briefcase, Eye, Link as IconLink, Shield } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import NextImage from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PRODUCT_NAMES } from 'shared-data/products'
 import { Button, Image } from 'ui'
@@ -143,16 +144,9 @@ function AuthPage() {
             content={ApiExamples}
             size="large"
             text={[
-              <p key={0}>
-                <p className="text-base lg:text-lg">
-                  APIs that you can understand. With powerful libraries that work on client and
-                  server-side applications.
-                </p>
-                {/* I think less is more here ... */}
-                {/* <p>
-                  With powerful client libraries that work on both client and server-side
-                  applications.
-                </p> */}
+              <p key={0} className="text-base lg:text-lg">
+                APIs that you can understand. With powerful libraries that work on client and
+                server-side applications.
               </p>,
             ]}
             footer={[
@@ -205,7 +199,9 @@ function AuthPage() {
               <p className="p">Policies can be written in SQL or using the dashboard online.</p>
 
               <Button asChild size="small" type="default" className="mt-4" icon={<ArrowUpRight />}>
-                <Link href="/docs/guides/auth#policy-examples">Explore documentation</Link>
+                <Link href="/docs/guides/database/postgres/row-level-security">
+                  Explore documentation
+                </Link>
               </Button>
             </div>
             <div className="col-span-12 lg:col-span-6 lg:col-start-7">
