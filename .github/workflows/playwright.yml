@@ -4,12 +4,12 @@ on:
     branches: [master]
     paths:
       - 'apps/studio/**'
-      - 'package-lock.json'
+      - 'pnpm-lock.yaml'
   pull_request:
     branches: [master]
     paths:
       - 'apps/studio/**'
-      - 'package-lock.json'
+      - 'pnpm-lock.yaml'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
@@ -26,7 +26,7 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 9
+          version: 9.10.0
           run_install: false
       - name: Use Node.js
         uses: actions/setup-node@v4

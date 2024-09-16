@@ -52,5 +52,5 @@
     "node": "^20.0.0"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@9.40.0"
+  "packageManager": "pnpm@9.10.0"
 }

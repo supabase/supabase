@@ -21,7 +21,7 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 9
+          version: 9.10.0
           run_install: false
       - name: Setup node
         uses: actions/setup-node@v4
@@ -52,7 +52,7 @@ jobs:
       - name: Download dependencies
         run: |
           rm package.json
-          rm package-lock.json
+          rm pnpm-lock.yaml
           pnpm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
       - name: Run prettier
         run: |-
@@ -71,7 +71,7 @@ jobs:
       - name: Download dependencies
         run: |
           rm package.json
-          rm package-lock.json
+          rm pnpm-lock.yaml
           pnpm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
       - name: Run prettier
         run: |-
