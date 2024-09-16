@@ -45,6 +45,7 @@ import BillingChangeBadge from './BillingChangeBadge'
 import { DiskCountdownRadial } from './DiskCountdownRadial'
 import {
   COMPUTE_SIZE_MAX_IOPS,
+  COMPUTE_SIZE_MAX_THROUGHPUT,
   DiskType,
   IOPS_RANGE,
   PLAN_DETAILS,
@@ -103,11 +104,14 @@ export function DiskManagementPanelForm() {
     })
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const currentCompute = (addons?.selected_addons ?? []).find(
-    (x) => x.type === 'compute_instance'
-  )?.variant
+  const currentCompute = (addons?.selected_addons ?? []).find((x) => x.type === 'compute_instance')
+    ?.variant
   const maxIopsBasedOnCompute =
     COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
+  const maxThroughputBasedOnCompute =
+    COMPUTE_SIZE_MAX_THROUGHPUT[
+      (currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_THROUGHPUT
+    ]
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
@@ -162,6 +166,8 @@ export function DiskManagementPanelForm() {
     watchedStorageType === 'gp3'
       ? Math.min(500 * watchedTotalSize, IOPS_RANGE[DiskType.GP3].max)
       : Math.min(1000 * watchedTotalSize, IOPS_RANGE[DiskType.IO2].max)
+  const minThroughput =
+    watchedStorageType === 'gp3' ? THROUGHPUT_RANGE[watchedStorageType]?.min ?? 0 : 0
   const maxThroughput =
     watchedStorageType === 'gp3'
       ? Math.min(0.25 * watchedIOPS, THROUGHPUT_RANGE[DiskType.GP3].max)
@@ -470,24 +476,37 @@ export function DiskManagementPanelForm() {
                             label="Throughput (MiBps)"
                             layout="horizontal"
                             description={
-                              <div className="flex items-center gap-x-2">
-                                <span>
-                                  Throughput must be between 125 and {maxThroughput} MiBps based on
-                                  your IOPS.
-                                </span>
-                                <Tooltip_Shadcn_>
-                                  <TooltipTrigger_Shadcn_ asChild>
-                                    <HelpCircle
-                                      size={14}
-                                      className="transition hover:text-foreground"
-                                    />
-                                  </TooltipTrigger_Shadcn_>
-                                  <TooltipContent_Shadcn_ side="bottom" className="w-64">
-                                    Min throughput is at 125MiBps, while max throughput is at
-                                    0.25MiBps * IOPS or 1000, whichever is lower
-                                  </TooltipContent_Shadcn_>
-                                </Tooltip_Shadcn_>
-                              </div>
+                              <>
+                                <div className="flex items-center gap-x-2">
+                                  <span>
+                                    Throughput must be between {minThroughput} and {maxThroughput}{' '}
+                                    MiBps based on your IOPS.
+                                  </span>
+                                  <Tooltip_Shadcn_>
+                                    <TooltipTrigger_Shadcn_ asChild>
+                                      <HelpCircle
+                                        size={14}
+                                        className="transition hover:text-foreground"
+                                      />
+                                    </TooltipTrigger_Shadcn_>
+                                    <TooltipContent_Shadcn_ side="bottom" className="w-64">
+                                      Min throughput is at 125MiBps, while max throughput is at
+                                      0.25MiBps * IOPS or 1000, whichever is lower
+                                    </TooltipContent_Shadcn_>
+                                  </Tooltip_Shadcn_>
+                                </div>
+                                {field.value !== undefined &&
+                                  field.value > maxThroughputBasedOnCompute && (
+                                    <p>
+                                      Note: Final usable throughput will be at{' '}
+                                      <span className="text-foreground">
+                                        {maxThroughputBasedOnCompute.toFixed(0)}
+                                      </span>{' '}
+                                      MiBps based on your current compute size of{' '}
+                                      {currentCompute?.name}
+                                    </p>
+                                  )}
+                              </>
                             }
                           >
                             <div className="flex gap-3 items-center">

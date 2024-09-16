@@ -75,14 +75,14 @@ export const COMPUTE_SIZE_MAX_IOPS = {
 }
 
 export const COMPUTE_SIZE_MAX_THROUGHPUT = {
-  ci_micro: 2085,
-  ci_small: 2085,
-  ci_medium: 2085,
-  ci_large: 4750,
-  ci_xlarge: 4750,
-  ci_2xlarge: 4750,
-  ci_4xlarge: 4750,
-  ci_8xlarge: 9500,
-  ci_12xlarge: 14250,
-  ci_16xlarge: 19000,
+  ci_micro: 260.625,
+  ci_small: 260.625,
+  ci_medium: 260.625,
+  ci_large: 593.75,
+  ci_xlarge: 593.75,
+  ci_2xlarge: 593.75,
+  ci_4xlarge: 593.75,
+  ci_8xlarge: 1187.5,
+  ci_12xlarge: 1781.25,
+  ci_16xlarge: 2375,
 }
