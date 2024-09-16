@@ -36,6 +36,7 @@ import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import * as CH from '~/features/ui/CodeHike'
+import { ShowUntil } from '~/features/ui/ShowUntil'
 import { Tabs, TabPanel } from '~/features/ui/Tabs'
 
 const components = {
@@ -75,6 +76,7 @@ const components = {
   RealtimeLimitsEstimator,
   RegionsList,
   SharedData,
+  ShowUntil,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
   SqlToRest,

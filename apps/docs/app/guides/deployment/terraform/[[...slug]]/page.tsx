@@ -3,7 +3,7 @@ import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { notFound } from 'next/navigation'
 import rehypeSlug from 'rehype-slug'
 
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { isValidGuideFrontmatter } from '~/lib/docs'
@@ -119,7 +119,11 @@ const getContent = async ({ slug }: Params) => {
   let rawContent = await response.text()
   // Strip out HTML comments
   rawContent = rawContent.replace(/<!--.*?-->/, '')
-  const { content, data } = matter(rawContent)
+  let { content, data } = matter(rawContent)
+
+  // Remove the title from the content so it isn't duplicated in the final display
+  content = removeRedundantH1(content)
+
   Object.assign(meta, data)
 
   if (!isValidGuideFrontmatter(meta)) {

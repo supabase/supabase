@@ -2584,6 +2584,156 @@ module.exports = [
     source: '/docs/guides/platform/enterprise-billing',
     destination: '/docs/guides/platform/org-based-billing',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/cli',
+    destination: '/docs/guides/local-development',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/getting-started',
+    destination: '/docs/guides/local-development/cli/getting-started',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/config',
+    destination: '/docs/guides/local-development/cli/config',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/local-development',
+    destination: '/docs/guides/local-development/overview',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/:path*',
+    destination: '/docs/guides/local-development/cli/:path*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/managing-environments',
+    destination: '/docs/guides/deployment/managing-environments',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/branching',
+    destination: '/docs/guides/deployment/branching',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/terraform',
+    destination: '/docs/guides/deployment/terraform',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/terraform/:path*',
+    destination: '/docs/guides/deployment/terraform/:path*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/going-into-prod',
+    destination: '/docs/guides/deployment/going-into-prod',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/maturity-model',
+    destination: '/docs/guides/deployment/maturity-model',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/shared-responsibility-model',
+    destination: '/docs/guides/deployment/shared-responsibility-model',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/github-actions/:path*',
+    destination: '/docs/guides/deployment/ci/:path*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/migrating-to-supabase/:path*',
+    destination: '/docs/guides/platform/migrating-to-supabase/:path*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/migrating-and-upgrading-projects',
+    destination: '/docs/guides/platform/upgrading',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/vercel-marketplace',
+    destination: '/docs/guides/integrations/vercel-marketplace',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/marketplace',
+    destination: '/docs/guides/integrations/supabase-marketplace',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
+    destination: '/docs/guides/integrations/build-a-supabase-integration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/oauth-apps/oauth-scopes',
+    destination: '/docs/guides/integrations/build-a-supabase-integration/oauth-scopes',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/logs',
+    destination: '/docs/guides/monitoring-troubleshooting/logs',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/metrics',
+    destination: '/docs/guides/monitoring-troubleshooting/metrics',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/sentry-monitoring',
+    destination: '/docs/guides/monitoring-troubleshooting/sentry-monitoring',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/advanced-log-filtering',
+    destination: '/docs/guides/monitoring-troubleshooting/advanced-log-filtering',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/exhaust-disk-io',
+    destination: '/docs/guides/monitoring-troubleshooting/exhaust-disk-io',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/exhaust-cpu',
+    destination: '/docs/guides/monitoring-troubleshooting/exhaust-cpu',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/exhaust-ram',
+    destination: '/docs/guides/monitoring-troubleshooting/exhaust-ram',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/exhaust-swap',
+    destination: '/docs/guides/monitoring-troubleshooting/exhaust-swap',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/http-status-codes',
+    destination: '/docs/guides/monitoring-troubleshooting/http-status-codes',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/troubleshooting',
+    destination: '/docs/guides/monitoring-troubleshooting/troubleshooting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/log-drains',
+    destination: '/docs/guides/monitoring-troubleshooting/log-drains',
+  },
 
   // marketing
 
