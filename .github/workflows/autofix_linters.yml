@@ -28,10 +28,10 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Install required dependencies
-        run: npm ci
+        run: pnpm i
 
       - name: Run Prettier in fix mode
-        run: npm run format
+        run: pnpm run format
 
       - name: Commit changes and push to existing branch
         run: |

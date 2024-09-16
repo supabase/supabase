@@ -26,10 +26,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install deps
-        run: npm ci
+        run: pnpm i
 
       - name: Run tests
-        run: npm --prefix="apps/docs" run test:smoke
+        run: pnpm --prefix="apps/docs" run test:smoke

@@ -35,13 +35,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
       - name: Install deps
-        run: npm ci
+        run: pnpm i
         working-directory: ./
       - name: Run Tests
         env:
           # Default is 2 GB, increase to have less frequent OOM errors
           NODE_OPTIONS: '--max_old_space_size=3072'
-        run: npm run test:studio
+        run: pnpm run test:studio
         working-directory: ./

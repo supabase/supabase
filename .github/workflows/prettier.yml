@@ -25,10 +25,10 @@ jobs:
       # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
       - name: Download dependencies
         run: |
-          npm ci
+          pnpm i
       - name: Run prettier
         run: |-
-          npm run test:prettier
+          pnpm run test:prettier
 
   # i18n is not a node package, so we handle that one separately
   format-i18n:
@@ -48,7 +48,7 @@ jobs:
         run: |
           rm package.json
           rm package-lock.json
-          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
+          pnpm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
       - name: Run prettier
         run: |-
           npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
@@ -67,7 +67,7 @@ jobs:
         run: |
           rm package.json
           rm package-lock.json
-          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
+          pnpm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
       - name: Run prettier
         run: |-
           # Check mdx files which contain sql code blocks

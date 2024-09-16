@@ -44,7 +44,7 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Download dependencies
-        run: npm ci
+        run: pnpm i
 
       # Need the miscellaneous use API, which is available publicly (by design) in www
       - name: Copy environment variables
@@ -53,9 +53,9 @@ jobs:
       - name: Update embeddings
         working-directory: ./apps/docs
         if: ${{ !inputs.refresh }}
-        run: npm run embeddings
+        run: pnpm run embeddings
 
       - name: Refresh embeddings
         working-directory: ./apps/docs
         if: ${{ inputs.refresh }}
-        run: npm run embeddings:refresh
+        run: pnpm run embeddings:refresh

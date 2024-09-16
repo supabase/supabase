@@ -27,14 +27,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
       - uses: supabase/setup-cli@v1
       - name: Install dependencies
-        run: npm ci
+        run: pnpm i
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
-        run: npm run test:playwright
+        run: pnpm run test:playwright
         # mark the action as succeeded even if the tests failed. This is temporarily until we make the tests more stable.
         # continue-on-error: true
       - uses: actions/upload-artifact@v4
