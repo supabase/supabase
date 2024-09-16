@@ -32,9 +32,18 @@ importers:
 
   apps/design-system:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^3.1.1
+        version: 3.3.1(react-hook-form@7.47.0(react@18.2.0))
       '@radix-ui/react-alert-dialog':
         specifier: ^1.0.5
         version: 1.0.5(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@radix-ui/react-dropdown-menu':
+        specifier: ^2.0.6
+        version: 2.0.6(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      clsx:
+        specifier: ^1.2.1
+        version: 1.2.1
       contentlayer2:
         specifier: 0.4.6
         version: 0.4.6(esbuild@0.21.5)(markdown-wasm@1.2.0)
@@ -44,6 +53,12 @@ importers:
       fs:
         specifier: ^0.0.1-security
         version: 0.0.1-security
+      icons:
+        specifier: workspace:*
+        version: link:../../packages/icons
+      input-otp:
+        specifier: ^1.2.3
+        version: 1.2.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       jotai:
         specifier: ^2.8.0
         version: 2.8.1(@types/react@18.3.3)(react@18.2.0)
@@ -62,21 +77,33 @@ importers:
       next-contentlayer2:
         specifier: 0.4.6
         version: 0.4.6(contentlayer2@0.4.6(esbuild@0.21.5)(markdown-wasm@1.2.0))(esbuild@0.21.5)(markdown-wasm@1.2.0)(next@14.2.3(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      next-themes:
+        specifier: ^0.3.0
+        version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react:
         specifier: ^18.2.0
         version: 18.2.0
+      react-accessible-treeview:
+        specifier: ^2.8.3
+        version: 2.8.3(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-docgen:
         specifier: ^7.0.3
         version: 7.0.3
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      react-hook-form:
+        specifier: ^7.45.0
+        version: 7.47.0(react@18.2.0)
       react-inlinesvg:
         specifier: ^4.0.4
         version: 4.0.4(react@18.2.0)
       react-wrap-balancer:
         specifier: ^1.1.0
         version: 1.1.0(react@18.2.0)
+      recharts:
+        specifier: ^2.12.7
+        version: 2.12.7(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       rehype-autolink-headings:
         specifier: ^7.1.0
         version: 7.1.0
@@ -95,15 +122,27 @@ importers:
       remark-gfm:
         specifier: ^4.0.0
         version: 4.0.0
+      sonner:
+        specifier: ^1.5.0
+        version: 1.5.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      tailwind-merge:
+        specifier: ^1.13.2
+        version: 1.14.0
       ts-morph:
         specifier: ^22.0.0
         version: 22.0.0
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
+      ui-patterns:
+        specifier: workspace:*
+        version: link:../../packages/ui-patterns
       unist-util-visit:
         specifier: ^5.0.0
         version: 5.0.0
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
     devDependencies:
       '@shikijs/compat':
         specifier: ^1.1.7
@@ -124,7 +163,7 @@ importers:
         specifier: ^10.0.1
         version: 10.4.16(postcss@8.4.38)
       config:
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/config
       mdast-util-toc:
         specifier: ^6.1.1
@@ -859,7 +898,7 @@ importers:
         version: 2.3.0(typescript@5.5.2)
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@14.2.3(@babel/core@7.24.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
+        version: 0.9.13(next@14.2.3(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
       postcss:
         specifier: ^8.4.31
         version: 8.4.38
@@ -1258,7 +1297,7 @@ importers:
     dependencies:
       '@mertasan/tailwindcss-variables':
         specifier: ^2.2.3
-        version: 2.7.0(autoprefixer@10.4.16(postcss@8.4.38))(postcss@8.4.38)
+        version: 2.7.0(autoprefixer@10.4.16(postcss@8.4.47))(postcss@8.4.47)
       '@radix-ui/colors':
         specifier: ^0.1.8
         version: 0.1.9
@@ -1779,7 +1818,7 @@ importers:
         version: link:../api-types
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@14.2.3(@babel/core@7.24.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
+        version: 0.9.13(next@14.2.3(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
       vite:
         specifier: ^5.4.5
         version: 5.4.5(@types/node@20.12.11)(sass@1.72.0)(terser@5.32.0)
@@ -8011,6 +8050,7 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
+    bundledDependencies: []
 
   eslint-plugin-import@2.29.1:
     resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
@@ -15899,6 +15939,12 @@ snapshots:
       lodash: 4.17.21
       postcss: 8.4.38
 
+  '@mertasan/tailwindcss-variables@2.7.0(autoprefixer@10.4.16(postcss@8.4.47))(postcss@8.4.47)':
+    dependencies:
+      autoprefixer: 10.4.16(postcss@8.4.47)
+      lodash: 4.17.21
+      postcss: 8.4.47
+
   '@monaco-editor/loader@1.4.0(monaco-editor@0.33.0)':
     dependencies:
       monaco-editor: 0.33.0
@@ -19498,7 +19544,7 @@ snapshots:
       '@babel/parser': 7.24.7
       '@vue/shared': 3.3.9
       estree-walker: 2.0.2
-      source-map-js: 1.2.0
+      source-map-js: 1.2.1
 
   '@vue/compiler-dom@3.3.9':
     dependencies:
@@ -19515,8 +19561,8 @@ snapshots:
       '@vue/shared': 3.3.9
       estree-walker: 2.0.2
       magic-string: 0.30.10
-      postcss: 8.4.38
-      source-map-js: 1.2.0
+      postcss: 8.4.47
+      source-map-js: 1.2.1
 
   '@vue/compiler-ssr@3.3.9':
     dependencies:
@@ -19933,6 +19979,16 @@ snapshots:
       normalize-range: 0.1.2
       picocolors: 1.0.1
       postcss: 8.4.38
+      postcss-value-parser: 4.2.0
+
+  autoprefixer@10.4.16(postcss@8.4.47):
+    dependencies:
+      browserslist: 4.23.3
+      caniuse-lite: 1.0.30001651
+      fraction.js: 4.3.6
+      normalize-range: 0.1.2
+      picocolors: 1.0.1
+      postcss: 8.4.47
       postcss-value-parser: 4.2.0
 
   available-typed-arrays@1.0.7:
@@ -24752,7 +24808,7 @@ snapshots:
     dependencies:
       js-yaml-loader: 1.2.2
 
-  next-router-mock@0.9.13(next@14.2.3(@babel/core@7.24.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0):
+  next-router-mock@0.9.13(next@14.2.3(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0):
     dependencies:
       next: 14.2.3(@babel/core@7.24.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       react: 18.2.0
