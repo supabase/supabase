@@ -35,7 +35,7 @@ jobs:
         run: pnpm i
 
       - name: Run TypeScript type check
-        run: npx turbo run typecheck
+        run: pnpm exec turbo run typecheck
 
       - name: Run Lint
-        run: npx turbo run lint
+        run: pnpm exec turbo run lint

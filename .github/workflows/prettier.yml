@@ -59,7 +59,7 @@ jobs:
           pnpm i
       - name: Run prettier
         run: |-
-          npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
+          pnpm exec prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
 
   format-sql:
     runs-on: ubuntu-latest
@@ -86,4 +86,4 @@ jobs:
       - name: Run prettier
         run: |-
           # Check mdx files which contain sql code blocks
-          grep -lr '```sql' apps/docs/{pages,content}/**/*.mdx | xargs npx prettier -c
+          grep -lr '```sql' apps/docs/{pages,content}/**/*.mdx | xargs pnpm exec prettier -c
