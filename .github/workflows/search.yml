@@ -38,6 +38,12 @@ jobs:
             apps/www/.env.local.example
             supabase
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9
+          run_install: false
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:
