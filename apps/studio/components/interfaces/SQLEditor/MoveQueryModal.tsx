@@ -71,20 +71,12 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
     },
   })
 
-  const FormSchema = z
-    .object({ name: z.string().min(1, 'Please provide a name for the folder') })
-    .refine(
-      (data) => {
-        return !snapV2.allFolderNames.includes(data.name)
-      },
-      {
-        message: 'This folder name already exists',
-        path: ['name'],
-      }
-    )
+  const FormSchema = z.object({
+    name: z.string().optional(),
+  })
+
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
-    reValidateMode: 'onSubmit',
     resolver: zodResolver(FormSchema),
     defaultValues: { name: '' },
   })
@@ -106,11 +98,21 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
   const onConfirmMove = async (values: z.infer<typeof FormSchema>) => {
     if (!ref) return console.error('Project ref is required')
 
+    if (selectedId === 'new-folder' && (!values.name || values.name.trim() === '')) {
+      form.setError('name', { type: 'manual', message: 'Please provide a name for the folder' })
+      return
+    }
+
+    if (selectedId === 'new-folder' && snapV2.allFolderNames.includes(values.name!)) {
+      form.setError('name', { type: 'manual', message: 'This folder name already exists' })
+      return
+    }
+
     try {
       let folderId = selectedId
 
       if (selectedId === 'new-folder') {
-        const { id } = await createFolder({ projectRef: ref, name: values.name })
+        const { id } = await createFolder({ projectRef: ref, name: values.name ?? '' })
         folderId = id
       }
 
@@ -170,11 +172,15 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
     }
   }, [visible, snippets])
 
+  const onError = (errors: any) => {
+    console.log('Form errors:', errors)
+  }
+
   return (
     <Dialog open={visible} onOpenChange={() => onClose()}>
       <DialogContent>
         <Form_Shadcn_ {...form}>
-          <form id="move-snippet" onSubmit={form.handleSubmit(onConfirmMove)}>
+          <form id="move-snippet" onSubmit={form.handleSubmit(onConfirmMove, onError)}>
             <DialogHeader>
               <DialogTitle>
                 Move {snippets.length === 1 ? `"${snippets[0].name}"` : `${snippets.length}`} to a
