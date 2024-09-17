@@ -70,6 +70,7 @@ export const LOCAL_STORAGE_KEYS = {
     `schema-visualizer-positions-${ref}-${schemaId}`,
   // Used for allowing the main nav panel to expand on hover
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
+  GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
 }
 
 export const OPT_IN_TAGS = {

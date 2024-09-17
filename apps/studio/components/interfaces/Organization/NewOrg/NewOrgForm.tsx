@@ -11,7 +11,11 @@ import { useParams } from 'common'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import {
+  invalidateOrganizationsQuery,
+  useOrganizationsQuery,
+} from 'data/organizations/organizations-query'
+import { useProfile } from 'lib/profile'
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { Button, Input, Listbox, Toggle } from 'ui'
@@ -44,6 +48,8 @@ interface NewOrgFormProps {
  */
 const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const router = useRouter()
+  const user = useProfile()
+  const { data: organizations, isSuccess } = useOrganizationsQuery()
   const stripe = useStripe()
   const elements = useElements()
   const queryClient = useQueryClient()
@@ -77,10 +83,20 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     router.push({ query })
   }, [dbPricingTierKey, orgName, orgKind, orgSize, isSpendCapEnabled])
 
+  useEffect(() => {
+    if (!orgName && organizations?.length === 0 && !user.isLoading) {
+      const prefilledOrgName = user.profile?.username ? user.profile.username + `'s Org` : 'My Org'
+      setOrgName(prefilledOrgName)
+    }
+  }, [isSuccess])
+
   const { mutate: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org: any) => {
       await invalidateOrganizationsQuery(queryClient)
-      router.push(`/new/${org.slug}`)
+      const prefilledProjectName = user.profile?.username
+        ? user.profile.username + `'s Project`
+        : 'My Project'
+      router.push(`/new/${org.slug}?projectName=${prefilledProjectName}`)
     },
     onError: () => {
       resetPaymentMethod()
