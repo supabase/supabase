@@ -989,6 +989,12 @@ export interface paths {
     /** Get infrastructure status */
     get: operations['StatusController_getStatus']
   }
+  '/platform/storage/{ref}/archive': {
+    /** Gets project storage archive */
+    get: operations['StorageArchiveController_getArchive']
+    /** Creates project storage archive */
+    post: operations['StorageArchiveController_createArchive']
+  }
   '/platform/storage/{ref}/buckets': {
     /** Gets list of buckets */
     get: operations['StorageBucketsController_getBuckets']
@@ -1794,6 +1800,12 @@ export interface paths {
     /** Get infrastructure status */
     get: operations['StatusController_getStatus']
   }
+  '/v0/storage/{ref}/archive': {
+    /** Gets project storage archive */
+    get: operations['StorageArchiveController_getArchive']
+    /** Creates project storage archive */
+    post: operations['StorageArchiveController_createArchive']
+  }
   '/v0/storage/{ref}/buckets': {
     /** Gets list of buckets */
     get: operations['StorageBucketsController_getBuckets']
@@ -1919,6 +1931,14 @@ export interface paths {
   '/v1/projects/{ref}/api-keys': {
     /** Get project api keys */
     get: operations['v1-get-project-api-keys']
+    /** [Alpha] Creates a new API key for the project */
+    post: operations['ApiKeysController_createApiKey']
+  }
+  '/v1/projects/{ref}/api-keys/{id}': {
+    /** [Alpha] Deletes an API key for the project */
+    delete: operations['ApiKeysController_deleteApiKey']
+    /** [Alpha] Updates an API key for the project */
+    patch: operations['ApiKeysController_updateApiKey']
   }
   '/v1/projects/{ref}/branches': {
     /**
@@ -2242,7 +2262,18 @@ export interface components {
     }
     ApiKeyResponse: {
       api_key: string
+      description?: string | null
+      hash?: string | null
+      id?: string | null
+      inserted_at?: string | null
       name: string
+      prefix?: string | null
+      secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+      type?: unknown
+      updated_at?: string | null
+    }
+    ApiKeySecretJWTTemplate: {
+      role: string
     }
     ApiResponse: {
       autoApiService: components['schemas']['AutoApiService']
@@ -2621,6 +2652,12 @@ export interface components {
       scope?: 'V0'
       token: string
       token_alias: string
+    }
+    CreateApiKeyBody: {
+      description?: string | null
+      secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+      /** @enum {string} */
+      type: 'publishable' | 'secret'
     }
     CreateAwsPartnerOrganizationBody: {
       name: string
@@ -3295,6 +3332,9 @@ export interface components {
       updated_at: number
       verify_jwt?: boolean
       version: number
+    }
+    GetArchiveResponse: {
+      fileUrl: string
     }
     GetContentCountResponse: {
       count: number
@@ -5495,6 +5535,10 @@ export interface components {
     UpdateAddonBody: {
       addon_type: components['schemas']['ProjectAddonType']
       addon_variant: components['schemas']['AddonVariantId']
+    }
+    UpdateApiKeyBody: {
+      description?: string | null
+      secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
     }
     UpdateAuthConfigBody: {
       api_max_request_duration?: number
@@ -12450,6 +12494,9 @@ export interface operations {
       201: {
         content: never
       }
+      403: {
+        content: never
+      }
       /** @description Failed to pause the project */
       500: {
         content: never
@@ -12557,6 +12604,9 @@ export interface operations {
         content: {
           'application/json': components['schemas']['RestoreCancellation']
         }
+      }
+      403: {
+        content: never
       }
       /** @description Failed to cancel project restoration */
       500: {
@@ -12811,6 +12861,44 @@ export interface operations {
         content: never
       }
       /** @description Failed to retrieve infrastructure status */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project storage archive */
+  StorageArchiveController_getArchive: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetArchiveResponse']
+        }
+      }
+      /** @description Failed to get project storage archive */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates project storage archive */
+  StorageArchiveController_createArchive: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create project storage archive */
       500: {
         content: never
       }
@@ -14531,8 +14619,68 @@ export interface operations {
           'application/json': components['schemas']['ApiKeyResponse'][]
         }
       }
+    }
+  }
+  /** [Alpha] Creates a new API key for the project */
+  ApiKeysController_createApiKey: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateApiKeyBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ApiKeyResponse']
+        }
+      }
+    }
+  }
+  /** [Alpha] Deletes an API key for the project */
+  ApiKeysController_deleteApiKey: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ApiKeyResponse']
+        }
+      }
       403: {
         content: never
+      }
+    }
+  }
+  /** [Alpha] Updates an API key for the project */
+  ApiKeysController_updateApiKey: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateApiKeyBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ApiKeyResponse']
+        }
       }
     }
   }
