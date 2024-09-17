@@ -57,7 +57,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     0
 
   const isFreePlan = subscription?.plan?.id === 'free'
-  const isRestoreDisabled = true // enforceNinetyDayUnpauseExpiry && isSuccess && !pauseStatus.can_restore
+  const isRestoreDisabled = enforceNinetyDayUnpauseExpiry && isSuccess && !pauseStatus.can_restore
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug: orgSlug },
