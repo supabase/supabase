@@ -1,13 +1,14 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { ChevronUp, Loader2 } from 'lucide-react'
+import { AlertTriangle, ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { format } from 'sql-formatter'
 
+import { Separator } from '@ui/components/SidePanel/SidePanel'
 import { useParams, useTelemetryProps } from 'common'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
@@ -53,7 +54,7 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { AiAssistantPanel } from './AiAssistantPanel'
@@ -133,9 +134,10 @@ const SQLEditor = () => {
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const [isAiOpen, setIsAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
-  const [isDestructiveConfirmModalOpen, setIsDestructiveConfirmModalOpen] = useState(false)
-  const [isUpdateWithoutWhereConfirmModalOpen, setIsUpdateWithoutWhereConfirmModalOpen] =
-    useState(false)
+
+  const [showPotentialIssuesModal, setShowPotentialIssuesModal] = useState(false)
+  const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
+  const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
 
   const isOptedInToAI = useOrgOptedIntoAi()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
@@ -147,9 +149,6 @@ const SQLEditor = () => {
   const [selectedDiffType, setSelectedDiffType] = useState<DiffType | undefined>(undefined)
   const [isFirstRender, setIsFirstRender] = useState(true)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
-
-  const [containsDestructiveOperations, setContainsDestructiveOperations] = useState(false)
-  const [containsUpdateWithoutWhereClause, setContainsUpdateWithoutWhereClause] = useState(false)
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
@@ -297,21 +296,14 @@ const SQLEditor = () => {
         const destructiveOperations = checkDestructiveQuery(sql)
         const updateWithoutWhereClause = isUpdateWithoutWhere(sql)
 
-        setContainsDestructiveOperations(destructiveOperations)
-        setContainsUpdateWithoutWhereClause(updateWithoutWhereClause)
+        if (destructiveOperations) {
+          setShowPotentialIssuesModal(true)
+          setQueryHasDestructiveOperations(true)
+        }
 
-        // check if the query is destructive OR contains an update without a where clause before returning
-        if (!force) {
-          let shouldReturn = false
-          if (destructiveOperations) {
-            setIsDestructiveConfirmModalOpen(true)
-            shouldReturn = true
-          }
-          if (updateWithoutWhereClause) {
-            setIsUpdateWithoutWhereConfirmModalOpen(true)
-            shouldReturn = true
-          }
-          if (shouldReturn) return
+        if (updateWithoutWhereClause) {
+          setShowPotentialIssuesModal(true)
+          setQueryHasUpdateWithoutWhere(true)
         }
 
         if (!hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
@@ -635,40 +627,55 @@ const SQLEditor = () => {
 
   return (
     <>
-      <ConfirmModal
-        visible={isUpdateWithoutWhereConfirmModalOpen}
-        title="Query uses UPDATE without WHERE"
-        danger
-        description="Without a WHERE clause, this could update all rows in the table. Please confirm that you would like to execute this query."
-        buttonLabel="Run update query"
-        onSelectCancel={() => {
-          setIsUpdateWithoutWhereConfirmModalOpen(false)
-          // [Joshen] Somehow calling this immediately doesn't work, hence the timeout
+      <ConfirmationModal
+        visible={showPotentialIssuesModal}
+        size="large"
+        title={`Potential issue${queryHasDestructiveOperations && queryHasUpdateWithoutWhere ? 's' : ''} detected with your query`}
+        confirmLabel="Run this query"
+        onCancel={() => {
+          setShowPotentialIssuesModal(false)
+          setQueryHasDestructiveOperations(false)
+          setQueryHasUpdateWithoutWhere(false)
           setTimeout(() => editorRef.current?.focus(), 100)
         }}
-        onSelectConfirm={() => {
-          setIsUpdateWithoutWhereConfirmModalOpen(false)
-          // only run the query if the destructive modal isn't open
-          if (!isDestructiveConfirmModalOpen) executeQuery(true)
+        onConfirm={() => {
+          setShowPotentialIssuesModal(false)
+          executeQuery(true)
         }}
-      />
-
-      <ConfirmModal
-        visible={isDestructiveConfirmModalOpen}
-        title="Destructive operation"
-        danger
-        description="We detected a potentially destructive operation in the query. Please confirm that you would like to execute this query."
-        buttonLabel="Run destructive query"
-        onSelectCancel={() => {
-          setIsDestructiveConfirmModalOpen(false)
-          setTimeout(() => editorRef.current?.focus(), 100)
-        }}
-        onSelectConfirm={() => {
-          setIsDestructiveConfirmModalOpen(false)
-          // only run the query if the update without where clause modal isn't open
-          if (!isUpdateWithoutWhereConfirmModalOpen) executeQuery(true)
-        }}
-      />
+      >
+        <div className="text-sm ">
+          <div className="flex items-center gap-2 ">
+            <AlertTriangle />
+            <span>
+              {queryHasDestructiveOperations && queryHasUpdateWithoutWhere
+                ? 'Issues detected:'
+                : 'Issue detected:'}
+            </span>
+          </div>
+          <ul className="ml-8 mt-3 grid gap-4 bg-surface-200 p-4">
+            {queryHasDestructiveOperations && (
+              <li className="grid">
+                <span className="font-bold">Query has destructive operation</span>
+                <span className="text-foreground-lighter">
+                  Make sure you are not accidentally dropping a table
+                </span>
+              </li>
+            )}
+            {queryHasDestructiveOperations && queryHasUpdateWithoutWhere && <Separator />}
+            {queryHasUpdateWithoutWhere && (
+              <li className="grid">
+                <span className="font-bold">Query uses update without a where clause</span>
+                <span className="text-foreground-lighter">
+                  Without a <code>where</code> clause, this could update all rows in the table.
+                </span>
+              </li>
+            )}
+          </ul>
+        </div>
+        <p className="text-sm text-foreground-light mt-6 ml-8 ">
+          Please confirm that you would like to execute this query.
+        </p>
+      </ConfirmationModal>
 
       <ResizablePanelGroup
         className="flex h-full"
