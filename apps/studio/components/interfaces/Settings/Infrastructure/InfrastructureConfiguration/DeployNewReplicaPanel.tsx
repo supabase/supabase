@@ -413,7 +413,7 @@ const DeployNewReplicaPanel = ({
                       <span className="text-foreground">{selectedComputeMeta?.name}</span> and your
                       current disk size of{' '}
                       <span className="text-foreground">
-                        {diskConfiguration?.attributes.size_gb}GiB
+                        {diskConfiguration?.attributes.size_gb}GB
                       </span>
                       , broken down as follows:
                     </p>
@@ -436,7 +436,7 @@ const DeployNewReplicaPanel = ({
                         <TableRow>
                           <TableCell className="pl-0">Disk size</TableCell>
                           <TableCell>
-                            {(size_gb ?? 0) * 1.25}GiB ({type})
+                            {(size_gb ?? 0) * 1.25}GB ({type})
                           </TableCell>
                           <TableCell className="text-right font-mono pr-0">
                             ${additionalCostDiskSize}/month

@@ -176,7 +176,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
               attribute="Disk size"
               defaultValue={form.formState.defaultValues?.totalSize ?? 0}
               newValue={form.getValues('totalSize')}
-              unit="GiB"
+              unit="GB"
               beforePrice={Number(diskSizePrice.oldPrice)}
               afterPrice={Number(diskSizePrice.newPrice)}
               priceTooltip={
@@ -198,7 +198,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 attribute="Throughput"
                 defaultValue={form.formState.defaultValues?.throughput ?? 0}
                 newValue={form.getValues('throughput') ?? 0}
-                unit="MiBps"
+                unit="MB/s"
                 beforePrice={Number(throughputPrice.oldPrice)}
                 afterPrice={Number(throughputPrice.newPrice)}
               />

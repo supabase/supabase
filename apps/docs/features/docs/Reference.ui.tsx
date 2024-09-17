@@ -344,15 +344,17 @@ export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['paramete
           {param.name}
         </span>
         <RequiredBadge isOptional={!param.required} />
-        {param.schema.deprecated && <span className="text-xs text-warning-600">Deprecated</span>}
-        <span className="text-xs text-foreground-muted">
-          {getTypeDisplayFromSchema(param.schema).displayName}
-        </span>
+        {param.schema?.deprecated && <span className="text-xs text-warning-600">Deprecated</span>}
+        {param.schema && (
+          <span className="text-xs text-foreground-muted">
+            {getTypeDisplayFromSchema(param.schema)?.displayName ?? ''}
+          </span>
+        )}
       </div>
       {param.description && (
         <ReactMarkdown className="prose break-words text-sm">{param.description}</ReactMarkdown>
       )}
-      <ApiSchemaParamSubdetails schema={param.schema} />
+      {param.schema && <ApiSchemaParamSubdetails schema={param.schema} />}
     </li>
   )
 }
@@ -481,14 +483,20 @@ export function ApiSchemaParamSubdetails({
   const subContent =
     'enum' in schema
       ? schema.enum
-      : 'type' in schema && schema.type === 'string'
-        ? ['minLength', 'maxLength', 'pattern']
-            .filter((key) => key in schema)
-            .map((key) => ({
-              constraint: key,
-              value: schema[key],
-            }))
-        : []
+      : 'anyOf' in schema
+        ? schema.anyOf
+        : 'oneOf' in schema
+          ? schema.oneOf
+          : 'allOf' in schema
+            ? schema.allOf
+            : 'type' in schema && schema.type === 'string'
+              ? ['minLength', 'maxLength', 'pattern']
+                  .filter((key) => key in schema)
+                  .map((key) => ({
+                    constraint: key,
+                    value: schema[key],
+                  }))
+              : []
 
   return (
     <Collapsible_Shadcn_>
@@ -552,6 +560,10 @@ export function ApiSchemaParamSubdetails({
                     </span>
                     {detail.value}
                   </span>
+                ) : 'anyOf' in schema || 'allOf' in schema || 'oneOf' in schema ? (
+                  <ApiSchemaParamDetails
+                    param={{ name: '', schema: detail, required: !detail.nullable, in: 'body' }}
+                  />
                 ) : null}
               </li>
             ))}

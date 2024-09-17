@@ -1,0 +1,104 @@
+---
+id: 'auth-error-codes'
+title: 'Error Codes'
+description: 'Supabase Auth Error Codes'
+subtitle: 'Learn about the Auth error codes and how to resolve them'
+---
+
+## Auth Error Codes
+
+Supabase Auth can return various errors when using its API. This guide explains how to handle these errors effectively across different programming languages.
+
+## Error Types
+
+Supabase Auth errors are generally categorized into two main types:
+
+- API Errors: Originate from the Supabase Auth API.
+- Client Errors: Originate from the client library's state.
+
+Client errors differ by language so do refer to the appropriate section below:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+>
+<TabPanel id="javascript" label="JavaScript">
+All errors originating from the `supabase.auth` namespace of the client library will be wrapped by the `AuthError` class.
+
+Error objects are split in a few classes:
+
+- `AuthApiError` -- errors which originate from the Supabase Auth API.
+  - Use `isAuthApiError` instead of `instanceof` checks to see if an error you caught is of this type.
+- `CustomAuthError` -- errors which generally originate from state in the client library.
+  - Use the `name` property on the error to identify the class of error received.
+
+Errors originating from the server API classed as `AuthApiError` always have a `code` property that can be used to identify the error returned by the server. The `status` property is also present, encoding the HTTP status code received in the response.
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+All errors originating from the `supabase.auth` namespace of the client library will be wrapped by the `AuthException` class.
+
+Error objects are split in a few classes. `AuthApiException` is an exception which originates from the Supabase Auth API.
+
+Errors originating from the server API classed as `AuthApiException` always have a `code` property that can be used to identify the error returned by the server. The `statusCode` property is also present, encoding the HTTP status code received in the response.
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+All errors originating from the `supabase.auth` namespace of the client library will be wrapped by the `AuthError` class.
+
+Error objects are split in a few classes. `AuthApiError` is an error which originate from the Supabase Auth API.
+
+Errors originating from the server API classed as `AuthApiError` always have a `code` property that can be used to identify the error returned by the server. The `status` property is also present, encoding the HTTP status code received in the response.
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+All errors originating from the `supabase.auth` namespace of the JavaScript client library will be wrapped by the `AuthError` class.
+
+Error objects are split in a few classes:
+
+- `AuthApiError` -- errors which originate from the Supabase Auth API.
+  - Use `isAuthApiError` instead of `instanceof` checks to see if an error you caught is of this type.
+- `CustomAuthError` -- errors which generally originate from state in the client library.
+  - Use the `name` property on the error to identify the class of error received.
+
+Errors originating from the server API classed as `AuthApiError` always have a `code` property that can be used to identify the error returned by the server. The `status` property is also present, encoding the HTTP status code received in the response.
+
+</TabPanel>
+
+</Tabs>
+
+## HTTP Status Codes
+
+Below are the most common HTTP status codes you might encounter, along with their meanings in the context of Supabase Auth:
+
+### [403 Forbidden](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403)
+
+Sent out in rare situations where a certain Auth feature is not available for the user, and you as the developer are not checking a precondition whether that API is available for the user.
+
+### [422 Unprocessable Entity](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422)
+
+Sent out when the API request is accepted, but cannot be processed because the user or Auth server is in a state where it cannot satisfy the request.
+
+### [429 Too Many Requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429)
+
+Sent out when rate-limits are breached for an API. You should handle this status code often, especially in functions that authenticate a user.
+
+### [500 Internal Server Error](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500)
+
+Indicate that the Auth server's service is degraded. Most often it points to issues in your database setup such as a misbehaving trigger on a schema, function, view or other database object.
+
+### [501 Not Implemented](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/501)
+
+Sent out when a feature is not enabled on the Auth server, and you are trying to use an API which requires it.
+
+The following table provides a comprehensive list of error codes you may encounter when working with Supabase Auth. Each error code is associated with a specific issue and includes a description to help you understand and resolve the problem efficiently.
+
+## Auth Error Codes Table
+
+<AuthErrorCodesTable />
+
+## Best Practices for Error Handling
+
+- Always use `error.code` and `error.name` to identify errors, not string matching on error messages.
+- Avoid relying solely on HTTP status codes, as they may change unexpectedly.
