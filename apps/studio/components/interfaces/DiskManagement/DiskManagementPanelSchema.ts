@@ -4,11 +4,11 @@ const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
   totalSize: z
     .number()
-    .min(8, { message: 'Allocated disk size must be at least 8 GiB.' })
-    .max(16384, { message: 'Allocated disk size must not exceed 16,384 GiB.' })
-    .describe('Allocated disk size in GiB'),
+    .min(8, { message: 'Allocated disk size must be at least 8 GB.' })
+    .max(16384, { message: 'Allocated disk size must not exceed 16,384 GB.' })
+    .describe('Allocated disk size in GB'),
   provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
-  throughput: z.number().optional().describe('Throughput in MiBps for gp3'),
+  throughput: z.number().optional().describe('Throughput in MB/s for gp3'),
 })
 
 export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
@@ -75,7 +75,7 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
     if (throughput !== undefined && (throughput < 125 || throughput > maxThroughput)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Throughput must be set between 125 and ${maxThroughput} MiBps.`,
+        message: `Throughput must be set between 125 and ${maxThroughput} MB/s.`,
         path: ['throughput'],
       })
     }

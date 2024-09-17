@@ -13,14 +13,14 @@ export const calculateDiskSizePrice = ({
   newSize: number
   newStorageType: DiskType
 }) => {
-  const oldPricePerGiB = DISK_PRICING[oldStorageType]?.storage ?? 0
-  const newPricePerGiB = DISK_PRICING[newStorageType]?.storage ?? 0
+  const oldPricePerGB = DISK_PRICING[oldStorageType]?.storage ?? 0
+  const newPricePerGB = DISK_PRICING[newStorageType]?.storage ?? 0
   const { includedDiskGB } = PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
 
-  const oldPrice = (Math.max(oldSize - includedDiskGB[oldStorageType], 0) * oldPricePerGiB).toFixed(
+  const oldPrice = (Math.max(oldSize - includedDiskGB[oldStorageType], 0) * oldPricePerGB).toFixed(
     2
   )
-  const newPrice = (Math.max(newSize - includedDiskGB[newStorageType], 0) * newPricePerGiB).toFixed(
+  const newPrice = (Math.max(newSize - includedDiskGB[newStorageType], 0) * newPricePerGB).toFixed(
     2
   )
 
@@ -62,7 +62,7 @@ export const calculateIOPSPrice = ({
 }
 
 // This is only applicable for GP3 storage type, no need to consider IO2 at all
-// Also assumes that disk size is > 400 GiB (separate requirement to update throughput)
+// Also assumes that disk size is > 400 GB (separate requirement to update throughput)
 export const calculateThroughputPrice = ({
   storageType,
   newThroughput,

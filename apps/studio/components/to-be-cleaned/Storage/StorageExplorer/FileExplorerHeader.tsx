@@ -7,6 +7,20 @@ import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeatureP
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Columns,
+  Edit2,
+  FolderPlus,
+  List,
+  Loader,
+  RefreshCw,
+  Search,
+  Upload,
+  X,
+} from 'lucide-react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
@@ -19,22 +33,8 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   Input,
-  Upload,
 } from 'ui'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
-import {
-  Loader,
-  Edit2,
-  ChevronRight,
-  ChevronLeft,
-  RefreshCw,
-  List,
-  Columns,
-  Check,
-  FolderPlus,
-  Search,
-  X,
-} from 'lucide-react'
 
 const VIEW_OPTIONS = [
   { key: STORAGE_VIEWS.COLUMNS, name: 'As columns' },

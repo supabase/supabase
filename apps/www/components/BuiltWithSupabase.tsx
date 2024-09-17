@@ -1,12 +1,12 @@
 import { Button, IconGitHubSolid } from 'ui'
 import Link from 'next/link'
 
-import SectionContainer from '../Layouts/SectionContainer'
-import ExampleCard from '../ExampleCard'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import ExampleCard from './ExampleCard'
 
 import Examples from 'data/Examples'
 
-const BuiltExamples = () => {
+const BuiltWithSupabase = () => {
   return (
     <SectionContainer id="examples" className="xl:pt-32">
       <div className="text-center">
@@ -18,7 +18,12 @@ const BuiltExamples = () => {
           <Button asChild type="default" size="small" className="h-full">
             <Link href="/docs/guides/examples">View all examples</Link>
           </Button>
-          <Button asChild type="default" icon={<IconGitHubSolid size="tiny" />} size="small">
+          <Button
+            asChild
+            type="default"
+            icon={<IconGitHubSolid size="tiny" className="!w-full !h-full" />}
+            size="small"
+          >
             <Link href="https://github.com/supabase/supabase/tree/master/examples">
               Official GitHub library
             </Link>
@@ -41,4 +46,4 @@ const BuiltExamples = () => {
   )
 }
 
-export default BuiltExamples
+export default BuiltWithSupabase

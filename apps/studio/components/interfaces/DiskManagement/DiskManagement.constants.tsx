@@ -1,5 +1,8 @@
 import { PlanType } from 'data/subscriptions/org-subscription-query'
 
+// Disk Storage expands automatically when the database reaches 90% of the disk size
+export const AUTOSCALING_THRESHOLD = 0.9
+
 export enum DiskType {
   GP3 = 'gp3',
   IO2 = 'io2',
@@ -16,12 +19,12 @@ export const THROUGHPUT_RANGE = {
 
 export const DISK_PRICING = {
   [DiskType.GP3]: {
-    storage: 0.125, // per GiB per month
+    storage: 0.125, // per GB per month
     iops: 0.024, // per IOPS per month, charged after 3000 IOPS
     throughput: 0.095, // per MB/s per month, charged after 125 MB/s
   },
   [DiskType.IO2]: {
-    storage: 0.195, // per GiB per month
+    storage: 0.195, // per GB per month
     iops: 0.119, // per IOPS per month
   },
 }
