@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Device as User Device
+    participant Server
+    participant Authenticator
+    participant User
+
+    Device->>Server: 1. Request challenge
+    Server-->>Authenticator: 2. Send challenge
+    Authenticator->>User: 3. Request user verification
+    User-->>Authenticator: 4. Provide verification (e.g., fingerprint)
+    Authenticator-->>Server: 5. Sign challenge with private key
+    Server-->>Server: 6. Validate signature with public key
+    Server->>Device: 7. Complete authentication

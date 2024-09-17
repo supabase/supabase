@@ -1,0 +1,174 @@
+---
+id: 'auth-mfa-webauthn'
+title: 'Multi-Factor Authentication (WebAuthn)'
+description: 'Add an additional layer of security with passwordless authentication using biometrics and security keys.'
+---
+
+## What is WebAuthn?
+
+WebAuthn (Web Authentication) is a web standard that enables secure, passwordless authentication using public-key cryptography. It allows users to log in to websites and applications using built-in authenticators like fingerprint sensors, facial recognition, or external devices like security keys.
+
+### When to Use WebAuthn?
+
+Consider implementing WebAuthn when:
+
+1. You want to enhance security beyond traditional passwords
+2. You aim to provide a more user-friendly authentication experience
+3. You need to reduce costs associated with SMS-based authentication
+4. You want to offer a hardware backup to existing authentication factors
+
+WebAuthn is particularly suitable for security-conscious applications that require a user-friendly, passwordless solution.
+
+### Pricing and Availability
+
+WebAuthn MFA is part of the Auth Advanced MFA Add-on. Here's the breakdown of pricing:
+
+- Cost: $75 per month for the first project in the organization
+- Additional projects: $10 per month each
+- Included in the Add-on: Phone and other advanced MFA features
+
+## Types of Authenticators
+
+An authenticator is a component that securely generates and stores cryptographic keys associated with a particular relying \***\*party (web page origin) and a credential \*\***ID (a unique identifier for the key). The authenticator uses these keys to authenticate the user to the relying party without directly storing user-specific data like the user ID.
+
+There are two main types of authenticators:
+
+1. **Platform Authenticators**: Built into the user's device
+   - Examples:
+     - Desktop: Touch ID (macOS), Windows Hello (Windows)
+     - Mobile: Face ID (iOS), Biometrics (Android)
+2. **Roaming Authenticators**: Portable devices that work across multiple platforms
+   - Examples: YubiKey, Google Titan Security Key, Solokeys
+
+## Authentication Flows
+
+WebAuthn involves two primary processes: Enrollment and Login. Both follow a similar pattern:
+
+<Image
+  alt="Diagram showing the flow of Multi-Factor authentication"
+  src={{
+    light: '/docs/img/guides/auth-mfa/auth-mfa-webauthn-flow.svg',
+    dark: '/docs/img/guides/auth-mfa/auth-mfa-webauthn-flow.svg',
+  }}
+  containerClassName="max-w-[700px]"
+/>
+
+### Step-by-Step Explanation
+
+1. The user's device initiates the process by requesting a challenge from the server.
+2. The server generates and sends a unique challenge to the authenticator.
+3. The authenticator prompts the user for verification.
+4. The user provides the required verification (e.g., fingerprint, face scan).
+5. Upon successful user verification, the authenticator signs the challenge using its private key.
+6. The server validates the signed challenge using the corresponding public key.
+7. If the validation is successful, the authentication process is completed.
+
+This flow applies to both enrollment (when setting up WebAuthn) and login (when using WebAuthn to authenticate).
+
+**Navigator API**
+
+In both flows, WebAuthn interacts with the browser through the Navigator API, specifically using the `navigator.credentials` interface. This API provides methods like `create()` for registering new credentials and `get()` for authenticating existing ones. By handling the secure communication with authenticators (such as hardware tokens or biometrics), the Navigator API simplifies the implementation of WebAuthn, allowing developers to focus on integrating strong, passwordless authentication into their web applications.
+
+### Add enrollment flow
+
+An enrollment flow provides a UI for users to set up additional authentication factors. Most applications add the enrollment flow in two places within their app:
+
+1. Right after login or sign up.
+   This allows users quickly set up Multi Factor Authentication (MFA) post login or account creation. Where possible, encourage all users to set up MFA. Many applications offer this as an opt-in step in an
+   effort to reduce onboarding friction.
+2. From within a settings page.
+   Allows users to set up, disable or modify their MFA settings.
+
+As far as possible, maintain a generic flow that you can reuse in both cases with minor modifications.
+
+You can enroll a WebAuthn factor with a single step:
+
+```
+import { browserSupportsWebAuthn } from '@supabase/supabase-js'
+if (supabase.auth.browserSupportsWebAuthn()) {
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn'})
+}) else {
+   // Use another MFA method, such as MFA (Phone)
+   // const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'phone', phone: '<your-phone-number>' })
+};
+```
+
+Or in multiple-steps by setting the `useMultiStepEnroll` parameter to true.
+
+```
+const { data: { factorId }, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn', useMultiStep: true })
+
+const { data: {options}, error } = await supabase.auth.mfa.challenge({ factorId })
+const options = await supabase.auth.generateRegistrationOptions{
+		options,
+		rp_name,
+		user: {
+			name,
+			display_name,
+		}
+		authenticator_options: {
+			attestation: 'direct', // or developer choice of 'enterprise'
+			authenticatorAttachment,
+			requireResidentKey,
+			userVerification,
+		}
+	}
+})
+
+const credential = await navigator.credentials.create(data)
+const { data, error } = await supabase.auth.mfa.verify({ factorId, credential })
+```
+
+`useMultiStep` informs Auth to abstract away the complexities of interacting with the browser API. Multi Step enrollment is recommended only for Advanced Users who require a heightened level of customization in their application
+
+When using multi-step enroll there are a substantial number of fields to deal with. The fields are highlighted below:
+
+| Field Type       | Field Name                | Configurability                                                                                      | Description                                                           |
+| ---------------- | ------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Non-Configurable | `excludeCredentials`      | Generated by auth server                                                                             | Prevents enrollment of multiple credentials                           |
+| Non-Configurable | `rp.id`                   | Generated by auth server                                                                             | Relying Party ID                                                      |
+| Non-Configurable | `challenge`               | Generated by auth server                                                                             | Unique challenge for the authentication attempt                       |
+| Configurable     | `user.name`               | Generated by auth server. Can be overridden by specifying `webauthn_user_name` in `user_metadata`    | User's account name in the Relying Party's system                     |
+| Configurable     | `user.displayName`        | Generated by Auth server. Can be overridden by specifying `webauthn_display_name` in `user_metadata` | User's display name                                                   |
+| Configurable     | `attestation`             | Developer choice                                                                                     | Type of attestation requested (e.g., 'direct', 'indirect', 'none')    |
+| Configurable     | `authenticatorAttachment` | Developer choice                                                                                     | Preferred authenticator type ('platform' or 'cross-platform')         |
+| Configurable     | `requireResidentKey`      | Developer choice                                                                                     | Whether a resident key is required (true or false)                    |
+| Configurable     | `userVerification`        | Developer choice                                                                                     | User verification preference ('required', 'preferred', 'discouraged') |
+| Configurable     | `rp.name`                 | Developer choice                                                                                     | Human-readable name for the Relying Party                             |
+
+While configurable fields can be set by developers, it's important to choose appropriate values based on your security requirements and user experience considerations.
+
+Visit the MDN Documentation for a full description of each field [here](https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions)
+
+## Add Login Flow
+
+Once a user has registered a factor, they can proceed to log in. In single-step mode this is accomplished with:
+
+```jsx
+const { data, error } = await supabase.auth.mfa.verify({ factorType: 'webauthn' })
+```
+
+As with enrollment, developers have the option of performing verification over multiple steps
+
+```
+const { data: factors, error } = await supabase.auth.mfa.listFactors()
+const { data, error } = await supabase.auth.mfa.challenge({
+	factorId: factors.find((type) => type === 'webauthn'), // use first verified factor
+	})
+
+const credential = await generateAuthenticationOptions({authenticator: {userVerification, timeout, authenticatorAttachment}})
+
+const { data: factor, error } = await supabase.auth.mfa.verify({ factorId, credential, useMultiStep: true, allowAnyCredential: true })
+```
+
+In both modes, developers can set `allowAnyCredentials` to true to prioritize User Experience. Users often have multiple security keys for multi-factor authentication. These could be used for different services or different work contexts. These keys are physically identical, which can lead to confusion during the verification process where a user could use a key registered with service A to authenticate against service B
+
+When a user has multiple registered security keys (e.g., known Key A and unknown Key B), they might accidentally use an unknown key during verification.
+
+For example:
+
+1. The app requests verification using known Key A.
+2. The user inserts unknown Key B.
+3. The app rejects the key, saying it's not recognized.
+
+This creates a confusing experience for the user, who has the correct keys but in the wrong order.
