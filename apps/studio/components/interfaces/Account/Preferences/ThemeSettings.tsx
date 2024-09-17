@@ -72,7 +72,7 @@ const ThemeSettings = () => {
 
   return (
     <Panel title={<h5 key="panel-title">Appearance</h5>}>
-      <Panel.Content className="grid gap-12">
+      <Panel.Content className="grid gap-8">
         <div className="grid grid-cols-12">
           <div className="col-span-4 flex flex-col gap-5">
             <Label_Shadcn_ htmlFor="theme" className="text-light">
@@ -96,6 +96,7 @@ const ThemeSettings = () => {
           label="Expand Navigation menu"
           layout="flex-row-reverse"
           description="Allow the Navigation panel to expand on hover"
+          className="pb-3"
         >
           <Switch
             size="large"
