@@ -96,7 +96,7 @@ const ThemeSettings = () => {
           label="Expand Navigation menu"
           layout="flex-row-reverse"
           description="Allow the Navigation panel to expand on hover"
-          className="pb-2"
+          className="pb-3"
         >
           <Switch
             size="large"
