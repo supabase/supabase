@@ -33,7 +33,7 @@ export default function DiskSpaceBar({
     <div className="flex flex-col gap-2">
       <div className="flex items-center h-6 gap-3">
         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-          {usedSize.toFixed(2)} GiB used of{' '}
+          {usedSize.toFixed(2)} GB used of{' '}
           <span className="text-foreground font-semibold -mt-[2px]">
             <MotionNumber
               value={newTotalSize}
@@ -44,7 +44,7 @@ export default function DiskSpaceBar({
               className="font-mono"
             />
           </span>{' '}
-          GiB
+          GB
         </span>
       </div>
       <div className="relative">

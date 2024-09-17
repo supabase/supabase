@@ -104,9 +104,8 @@ export function DiskManagementPanelForm() {
     })
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const currentCompute = (addons?.selected_addons ?? []).find(
-    (x) => x.type === 'compute_instance'
-  )?.variant
+  const currentCompute = (addons?.selected_addons ?? []).find((x) => x.type === 'compute_instance')
+    ?.variant
   const maxIopsBasedOnCompute =
     COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
   const maxThroughputBasedOnCompute =
@@ -210,7 +209,7 @@ export function DiskManagementPanelForm() {
     if (watchedStorageType === 'io2') {
       setValue('throughput', undefined) // Throughput is not configurable for 'io2'
     } else if (watchedStorageType === 'gp3') {
-      // Ensure throughput is within the allowed range if it's greater than or equal to 400 GiB
+      // Ensure throughput is within the allowed range if it's greater than or equal to 400 GB
       const currentThroughput = form.getValues('throughput')
       const { min, max } = THROUGHPUT_RANGE[DiskType.GP3]
       if (!currentThroughput || currentThroughput < min || currentThroughput > max) {
@@ -382,7 +381,7 @@ export function DiskManagementPanelForm() {
                                 </TooltipTrigger_Shadcn_>
                                 <TooltipContent_Shadcn_ side="bottom">
                                   For io2 storage type, min IOPS is at {minIOPS}, while max IOPS is
-                                  at 1000 * disk size in GiB or{' '}
+                                  at 1000 * disk size in GB or{' '}
                                   {IOPS_RANGE[DiskType.IO2].max.toLocaleString()}, whichever is
                                   lower
                                 </TooltipContent_Shadcn_>
@@ -405,7 +404,7 @@ export function DiskManagementPanelForm() {
                                 </TooltipTrigger_Shadcn_>
                                 <TooltipContent_Shadcn_ side="bottom" className="w-64">
                                   For gp3 storage type, min IOPS is at {minIOPS} while max IOPS is
-                                  at 500 * disk size in GiB or{' '}
+                                  at 500 * disk size in GB or{' '}
                                   {IOPS_RANGE[DiskType.GP3].max.toLocaleString()}, whichever is
                                   lower
                                 </TooltipContent_Shadcn_>
@@ -474,14 +473,14 @@ export function DiskManagementPanelForm() {
                         control={control}
                         render={({ field }) => (
                           <FormItemLayout
-                            label="Throughput (MiBps)"
+                            label="Throughput (MB/s)"
                             layout="horizontal"
                             description={
                               <>
                                 <div className="flex items-center gap-x-2">
                                   <span>
                                     Throughput must be between {minThroughput} and {maxThroughput}{' '}
-                                    MiBps based on your IOPS.
+                                    MB/s based on your IOPS.
                                   </span>
                                   <Tooltip_Shadcn_>
                                     <TooltipTrigger_Shadcn_ asChild>
@@ -491,8 +490,8 @@ export function DiskManagementPanelForm() {
                                       />
                                     </TooltipTrigger_Shadcn_>
                                     <TooltipContent_Shadcn_ side="bottom" className="w-64">
-                                      Min throughput is at 125MiBps, while max throughput is at
-                                      0.25MiBps * IOPS or 1000, whichever is lower
+                                      Min throughput is at 125MB/s, while max throughput is at
+                                      0.25MB/s * IOPS or 1000, whichever is lower
                                     </TooltipContent_Shadcn_>
                                   </Tooltip_Shadcn_>
                                 </div>
@@ -503,7 +502,7 @@ export function DiskManagementPanelForm() {
                                       <span className="text-foreground">
                                         {maxThroughputBasedOnCompute.toFixed(0)}
                                       </span>{' '}
-                                      MiBps based on your current compute size of{' '}
+                                      MB/s based on your current compute size of{' '}
                                       {currentCompute?.name}
                                     </p>
                                   )}
@@ -528,7 +527,7 @@ export function DiskManagementPanelForm() {
                                 </FormControl_Shadcn_>
                                 <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
                                   <span className="text-foreground-lighter text-xs font-mono">
-                                    MiBps
+                                    MB/s
                                   </span>
                                 </div>
                               </div>
@@ -560,7 +559,7 @@ export function DiskManagementPanelForm() {
                       layout="horizontal"
                       description={
                         includedDiskGB > 0 &&
-                        `Your plan includes ${includedDiskGB} GiB of disk size for ${watchedStorageType}.`
+                        `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`
                       }
                     >
                       <div className="mt-1 relative flex gap-2 items-center">
@@ -585,7 +584,7 @@ export function DiskManagementPanelForm() {
                             />
                           </FormControl_Shadcn_>
                           <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
-                            <span className="text-foreground-lighter text-xs font-mono">GiB</span>
+                            <span className="text-foreground-lighter text-xs font-mono">GB</span>
                           </div>
                         </div>
                         <AnimatePresence initial={false}>

@@ -64,7 +64,7 @@ describe('DiskManagement.utils.ts:calculateIOPSPrice', () => {
 })
 
 describe('DiskManagement.utils.ts:calculateThroughputPrice', () => {
-  test('GP3 with 125 MiBps 150 MiBps', () => {
+  test('GP3 with 125 MB/s 150 MB/s', () => {
     const result = calculateThroughputPrice({
       storageType: DiskType.GP3,
       oldThroughput: 125,
@@ -73,7 +73,7 @@ describe('DiskManagement.utils.ts:calculateThroughputPrice', () => {
     expect(result.oldPrice).toBe('0.00')
     expect(result.newPrice).toBe('2.38')
   })
-  test('IO1 with 125 MiBps 150 MiBps', () => {
+  test('IO1 with 125 MB/s 150 MB/s', () => {
     const result = calculateThroughputPrice({
       storageType: DiskType.IO2,
       oldThroughput: 125,
