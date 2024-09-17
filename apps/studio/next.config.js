@@ -431,11 +431,31 @@ const nextConfig = {
   images: {
     // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
     dangerouslyAllowSVG: true,
-    domains: [
-      'github.com',
-      'avatars.githubusercontent.com',
-      'api-frameworks.vercel.sh',
-      'vercel.com',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'github.com',
+        port: '',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        port: '',
+        pathname: '/u/*',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api-frameworks.vercel.sh',
+        port: '',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'vercel.com',
+        port: '',
+        pathname: '**',
+      },
     ],
   },
   transpilePackages: [

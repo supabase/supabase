@@ -77,7 +77,8 @@ You can use Supabase to store and process Protected Health Information (PHI). Yo
 - Enabling [Point in Time Recovery](/docs/guides/platform/backups#point-in-time-recovery) which requires at least a [small compute add-on](/docs/guides/platform/compute-add-ons).
 - Turning on [SSL Enforcement](/docs/guides/platform/ssl-enforcement).
 - Enabling [Network Restrictions](/docs/guides/platform/network-restrictions).
-- Disabling [Supabase AI editor](https://supabase.com/dashboard/org/_/general) in our dashboard.
+- Disabling data sharing for [Supabase AI editor](https://supabase.com/dashboard/org/_/general) in our dashboard.
+  - Specifically, "_Opt-in to sending anonymous data to OpenAI_" should be disabled (Opt-out).
 - Complying with encryption requirements in the HIPAA Security Rule. Data is encrypted at rest and in transit by Supabase. You can consider encrypting the data at your application layer.
 - Not using [Edge functions](/docs/guides/functions) or [Fly Postgres](/docs/guides/platform/fly-postgres) to process PHI.
 - Not using [branching](/docs/guides/platform/branching) to process PHI.

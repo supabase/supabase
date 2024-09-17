@@ -9,7 +9,7 @@ export function EmailRateLimitsAlert() {
   return (
     <Alert_Shadcn_ variant="warning">
       <WarningIcon />
-      <AlertTitle_Shadcn_>Built-in email service is rate-limited!</AlertTitle_Shadcn_>
+      <AlertTitle_Shadcn_>Email rate-limits and template changes</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
         You're using the built-in email service. The service has rate limits and it's not meant to
         be used for production apps. Check the{' '}
@@ -27,8 +27,13 @@ export function EmailRateLimitsAlert() {
           href={`/project/${projectRef}/settings/auth#auth-config-smtp-form`}
         >
           custom SMTP server
-        </Link>{' '}
-        if you're planning on having large number of users.
+        </Link>
+        .<br />
+        <strong>
+          You will not be able to modify the email templates unless you've set up a custom SMTP
+          server or Send Email Hook server, except if you had changed it before this restriction
+          went into effect.
+        </strong>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )

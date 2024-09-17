@@ -36,6 +36,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_RLS_AI_ASSISTANT: 'supabase-ui-rls-ai-assistant',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
+  UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
 
@@ -67,6 +68,9 @@ export const LOCAL_STORAGE_KEYS = {
   // Track position of nodes for schema visualizer
   SCHEMA_VISUALIZER_POSITIONS: (ref: string, schemaId: number) =>
     `schema-visualizer-positions-${ref}-${schemaId}`,
+  // Used for allowing the main nav panel to expand on hover
+  EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
+  GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
 }
 
 export const OPT_IN_TAGS = {

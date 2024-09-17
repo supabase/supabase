@@ -6,7 +6,7 @@ import type { Metadata, ResolvingMetadata } from 'next'
 import { redirect } from 'next/navigation'
 import { visit } from 'unist-util-visit'
 
-import { REFERENCES, clientSdkIds } from '~/content/navigation.references'
+import { REFERENCES, clientSdkIds, selfHostingServices } from '~/content/navigation.references'
 import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
@@ -26,6 +26,8 @@ export interface AbbrevApiReferenceSection {
 export function parseReferencePath(slug: Array<string>) {
   const isClientSdkReference = clientSdkIds.includes(slug[0])
   const isCliReference = slug[0] === 'cli'
+  const isApiReference = slug[0] === 'api'
+  const isSelfHostingReference = slug[0].startsWith('self-hosting-')
 
   if (isClientSdkReference) {
     let [sdkId, maybeVersion, maybeCrawlers, ...path] = slug
@@ -49,6 +51,18 @@ export function parseReferencePath(slug: Array<string>) {
   } else if (isCliReference) {
     return {
       __type: 'cli' as const,
+      path: slug.slice(1),
+    }
+  } else if (isApiReference) {
+    return {
+      __type: 'api' as const,
+      path: slug.slice(1),
+    }
+  } else if (isSelfHostingReference) {
+    return {
+      __type: 'self-hosting' as const,
+      service: slug[0].replace('self-hosting-', ''),
+      servicePath: slug[0],
       path: slug.slice(1),
     }
   } else {
@@ -91,7 +105,17 @@ export async function generateReferenceStaticParams() {
     },
   ]
 
-  return [...sdkPages, ...cliPages]
+  const apiPages = [
+    {
+      slug: ['api'],
+    },
+  ]
+
+  const selfHostingPages = selfHostingServices.map((service) => ({
+    slug: [REFERENCES[service].libPath],
+  }))
+
+  return [...sdkPages, ...cliPages, ...apiPages, ...selfHostingPages]
 }
 
 export async function generateReferenceMetadata(
@@ -103,7 +127,8 @@ export async function generateReferenceMetadata(
   const parsedPath = parseReferencePath(slug)
   const isClientSdkReference = parsedPath.__type === 'clientSdk'
   const isCliReference = parsedPath.__type === 'cli'
-
+  const isApiReference = parsedPath.__type === 'api'
+  const isSelfHostingReference = parsedPath.__type === 'self-hosting'
   if (isClientSdkReference) {
     const { sdkId, maybeVersion } = parsedPath
     const version = maybeVersion ?? REFERENCES[sdkId].versions[0]
@@ -143,6 +168,15 @@ export async function generateReferenceMetadata(
     return {
       title: 'CLI Reference | Supabase Docs',
       description: 'CLI reference for the Supabase CLI',
+    }
+  } else if (isApiReference) {
+    return {
+      title: 'Management API Reference | Supabase Docs',
+      description: 'Management API reference for the Supabase API',
+    }
+  } else if (isSelfHostingReference) {
+    return {
+      title: 'Self-Hosting | Supabase Docs',
     }
   } else {
     return {}
