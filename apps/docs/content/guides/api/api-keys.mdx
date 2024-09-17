@@ -4,23 +4,20 @@ title: 'Understanding API Keys'
 description: 'Securing your Data API with Postgres Row Level Security.'
 ---
 
-Supabase provides two default keys when you create a project: an `anon` key, and a `service_role` key. You can find both keys in the [API Settings](https://supabase.com/dashboard/project/_/settings/api).
+Supabase provides 2 default keys when you create a project: a `publishable` key, and a `secret` key. You can find both keys in the [API Settings](https://supabase.com/dashboard/project/_/settings/api).
 
-The data APIs are designed to work with Postgres Row Level Security (RLS). These keys both map to Postgres roles. You can find an `anon` user and a `service_role` user in the [Roles](http://supabase.com/dashboard/project/_/database/roles) section of the dashboard.
+The data APIs are designed to work with Postgres Row Level Security (RLS). These keys map to the following Postgres roles:
 
-The keys are both long-lived JWTs. If you decode these keys, you will see that they contain the "role", an "issued date", and an "expiry date" ~10 years in the future.
+| Key           | Postgres Role  |
+| ------------- | -------------- |
+| `publishable` | `anon`         |
+| `secret`      | `service_role` |
 
-```json
-{
-  "role": "anon",
-  "iat": 1625137684,
-  "exp": 1940713684
-}
-```
+You can find an `anon` user and a `service_role` user in the [Roles](http://supabase.com/dashboard/project/_/database/roles) section of the dashboard.
 
-## The `anon` key
+## Publishable key
 
-The `anon` key has very few privileges. You can use it in your [RLS policies](/docs/guides/database/postgres/row-level-security) to allow unauthenticated access. For example, this policy will allow unauthenticated access to the `profiles` table:
+The `publishable` key maps to the `anon` Postgres role, which has very few privileges. You can use it in your [RLS policies](/docs/guides/database/postgres/row-level-security) to allow unauthenticated access. For example, this policy will allow unauthenticated access to the `profiles` table:
 
 ```sql
 create policy "Allow public access" on profiles to anon for
@@ -44,22 +41,44 @@ select
   using (true);
 ```
 
-## The `service_role` key
+## Secret key
 
-The "service_role" is a predefined Postgres role with elevated privileges, designed to perform various administrative and service-related tasks. It can bypass Row Level Security, so it should only be used on a private server.
+The `secret` key maps to the `service_role` Postgres role, which is a predefined Postgres role with elevated privileges, designed to perform various administrative and service-related tasks. It can bypass Row Level Security, so it should only be used on a private server.
 
 <Admonition type="caution">
 
-Never expose the `service_role` key in a browser or anywhere where a user can see it.
+Never expose the `secret` key in a browser or anywhere where a user can see it.
 
 </Admonition>
 
-A common use case for the `service_role` key is running data analytics jobs on the backend. To support joins on user id, it is often useful to grant the service role read access to `auth.users` table.
+A common use case for the `secret` key is running data analytics jobs on the backend. To support joins on user id, it is often useful to grant the service role read access to `auth.users` table.
 
 ```sql
 grant
 select
   on table auth.users to service_role;
+```
+
+## Legacy API Keys
+
+<Admonition type="warning" label="Legacy API keys">
+
+The `anon` and `service_role` keys are being deprecated on 1st May 2025 for new and restored projects. For existing projects, these keys will be deprecated on 1st October 2025. For more information, read the [announcement](https://github.com/orgs/supabase/discussions/29260).
+
+</Admonition>
+
+You can find the `anon` and `service_role` keys in the [API Settings](https://supabase.com/dashboard/project/_/settings/api).
+
+The data APIs are designed to work with Postgres Row Level Security (RLS). These keys both map to Postgres roles. You can find an `anon` user and a `service_role` user in the [Roles](http://supabase.com/dashboard/project/_/database/roles) section of the dashboard.
+
+The keys are both long-lived JWTs. If you decode these keys, you will see that they contain the "role", an "issued date", and an "expiry date" ~10 years in the future.
+
+```json
+{
+  "role": "anon",
+  "iat": 1625137684,
+  "exp": 1940713684
+}
 ```
 
 We have [partnered with GitHub](https://github.blog/changelog/2022-03-28-supabase-is-now-a-github-secret-scanning-partner/) to scan for Supabase `service_role` keys pushed to public repositories.
