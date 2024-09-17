@@ -1,14 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-const HUBSPOT_PORTAL_ID = 'HS_PORTAL_ID'
-const HUBSPOT_FORM_GUID = 'HS_FORM_GUID'
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const HUBSPOT_PORTAL_ID = process.env.HUBSPOT_PORTAL_ID
+  const HUBSPOT_FORM_GUID = process.env.HUBSPOT_ENTERPRISE_FORM_GUID
+
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' })
   }
 
-  console.log('req', req.body)
   const { firstName, secondName, companyEmail, message } = req.body
 
   if (!firstName || !secondName || !companyEmail || !message) {
@@ -17,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const response = await fetch(
-      `https://api.hsforms.com/submissions/v3/integration/secure/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_GUID}`,
+      `https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_GUID}`,
       {
         method: 'POST',
         headers: {
@@ -25,14 +24,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
         body: JSON.stringify({
           fields: [
-            { name: 'firstname', value: firstName },
-            { name: 'lastname', value: secondName },
-            { name: 'email', value: companyEmail },
-            { name: 'message', value: message },
+            { objectTypeId: '0-1', name: 'firstname', value: firstName },
+            { objectTypeId: '0-1', name: 'lastname', value: secondName },
+            { objectTypeId: '0-1', name: 'email', value: companyEmail },
+            { objectTypeId: '0-1', name: 'message', value: message },
           ],
           context: {
             pageUri: 'https://supabase.com/contact/sales',
-            pageName: 'Enterprise Sales - Request Demo contact form',
+            pageName: 'Enterprise Form - www contact-sales',
+          },
+          legalConsentOptions: {
+            consent: {
+              consentToProcess: true,
+              text: 'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
+            },
           },
         }),
       }

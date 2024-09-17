@@ -1,17 +1,9 @@
-import { CircleAlert } from 'lucide-react'
-import { NextSeo } from 'next-seo'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
-import {
-  Button,
-  ButtonProps,
-  cn,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  Separator,
-  TextArea_Shadcn_,
-} from 'ui'
+import { NextSeo } from 'next-seo'
+import { CircleAlert } from 'lucide-react'
+import { Button, cn, Input_Shadcn_, Label_Shadcn_, Separator, TextArea_Shadcn_ } from 'ui'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -64,17 +56,17 @@ const formConfig: FormConfig = {
   },
   message: {
     type: 'textarea',
-    label: 'Message',
-    placeholder: 'Message',
+    label: 'What are you interested in?',
+    placeholder: 'Share more about what you want to accomplish',
     required: true,
-    className: '',
+    className: '[&_textarea]:min-h-[100px] [&_textarea]:bg-foreground/[.026]',
     component: TextArea_Shadcn_,
   },
 }
 
 const isValidEmail = (email: string): boolean => {
   // Basic email validation regex
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const emailPattern = /^[\w-\.+]+@([\w-]+\.)+[\w-]{2,8}$/
   return emailPattern.test(email)
 }
 
@@ -83,21 +75,31 @@ const data = {
   meta_description: 'Book a demo to explore how Supabase can support your business growth',
 }
 
+const defaultFormValue: FormData = {
+  firstName: '',
+  secondName: '',
+  companyEmail: '',
+  message: '',
+}
+
 const ContactSales = () => {
   const router = useRouter()
-  const [formData, setFormData] = useState<FormData>({
-    firstName: '',
-    secondName: '',
-    companyEmail: '',
-    message: '',
-  })
+  const [formData, setFormData] = useState<FormData>(defaultFormValue)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
+    setErrors({})
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleReset = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault()
+    setFormData(defaultFormValue)
+    setSuccess(null)
+    setErrors({})
   }
 
   const validate = (): boolean => {
@@ -106,7 +108,7 @@ const ContactSales = () => {
     // Check required fields
     for (const key in formConfig) {
       if (formConfig[key as keyof FormData].required && !formData[key as keyof FormData]) {
-        newErrors[key as keyof FormData] = `required field`
+        newErrors[key as keyof FormData] = `This field is required`
       }
     }
 
@@ -164,77 +166,101 @@ const ContactSales = () => {
         }}
       />
       <DefaultLayout className="!min-h-fit">
-        <div className="">
-          <SectionContainer className="space-y-2 text-center max-w-2xl">
-            <h1 className="h1">Talk to our Sales team</h1>
-            <p className="text-lg text-foreground-lighter">
-              Book a demo to explore how Supabase can support your business growth with features and
-              plans designed to scale.
-            </p>
-          </SectionContainer>
-        </div>
-        <SectionContainer className="text grid gap-8 lg:gap-12 md:grid-cols-2 max-w-6xl !pt-0">
-          <div className="md:h-full flex flex-col gap-4">
-            <p className="p">lorem</p>
+        <SectionContainer className="text grid gap-8 lg:gap-12 md:grid-cols-2 md:max-w-6xl">
+          <div className="md:px-4 md:h-full w-full md:max-w-md flex flex-col justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <h1 className="h1">Talk to our Sales team</h1>
+              <p className="md:text-lg text-foreground-lighter">
+                Book a demo to explore how Supabase can support your business growth with features
+                and plans designed to scale.
+              </p>
+            </div>
+            <div className="md:pb-8">Quotes here...</div>
           </div>
-          <Panel innerClassName="p-4">
-            <form
-              id="support-form"
-              className={cn('flex flex-col md:grid md:grid-cols-2 gap-4')}
-              onSubmit={handleSubmit}
-            >
-              {Object.entries(formConfig).map(([key, { component: Component, ...fieldValue }]) => {
-                const formKey = key as keyof FormData
-                const fieldName = formData[formKey as keyof FormData]
-                return (
-                  <div
-                    key={key}
-                    className={cn('flex flex-col col-span-full gap-y-2', fieldValue.className)}
-                  >
-                    <Label_Shadcn_
-                      htmlFor={formKey}
-                      className="text-foreground-light flex justify-between"
-                    >
-                      {fieldValue.label}
-                      {/* {fieldValue.required && <span className="text-error">*</span>} */}
-                      <div
-                        className={cn(
-                          'flex flex-nowrap gap-1 items-center text-xs leading-none transition-opacity opacity-0 !text-foreground-lighter',
-                          errors[key as keyof FormData] && 'opacity-100 animate-flash-code'
-                        )}
-                      >
-                        <CircleAlert className="w-3 h-3" /> {errors[formKey]}
-                      </div>
-                    </Label_Shadcn_>
-                    <Component
-                      type="text"
-                      id={formKey}
-                      name={formKey}
-                      value={formData[formKey]}
-                      onChange={handleChange}
-                      placeholder={fieldValue.placeholder}
-                    />
-                  </div>
-                )
-              })}
-              <Separator className="col-span-full" />
-              <Button
-                block
-                htmlType="submit"
-                size="small"
-                className="col-span-full"
-                disabled={isSubmitting}
-                loading={isSubmitting}
-              >
-                Request a demo
-              </Button>
-              {errors.general && (
-                <div className="text-foreground text-center text-sm col-span-full">
-                  {errors.general}
+          <div className="flex flex-col gap-4 w-full items-center justify-center min-h-[300px]">
+            <Panel innerClassName="p-4 md:p-6 w-full md:max-w-lg min-h-[300px]">
+              {success ? (
+                <div className="flex flex-col h-full w-full min-w-[300px] gap-2 items-center justify-center opacity-0 transition-opacity animate-fade-in scale-1">
+                  <p className="text-center">{success}</p>
+                  <Button onClick={handleReset}>Reset form</Button>
                 </div>
+              ) : (
+                <form
+                  id="support-form"
+                  className={cn('flex flex-col lg:grid lg:grid-cols-2 gap-4')}
+                  onSubmit={handleSubmit}
+                >
+                  {Object.entries(formConfig).map(
+                    ([key, { component: Component, ...fieldValue }]) => {
+                      const fieldKey = key as keyof FormData
+
+                      return (
+                        <div
+                          key={key}
+                          className={cn(
+                            'flex flex-col col-span-full gap-y-2',
+                            fieldValue.className
+                          )}
+                        >
+                          <Label_Shadcn_
+                            htmlFor={fieldKey}
+                            className="text-foreground-light flex justify-between"
+                          >
+                            {fieldValue.label}
+                            <div
+                              className={cn(
+                                'flex flex-nowrap text-right gap-1 items-center text-xs leading-none transition-opacity opacity-0 text-foreground-muted',
+                                errors[key as keyof FormData] && 'opacity-100 animate-fade-in'
+                              )}
+                            >
+                              {errors[fieldKey]}
+                            </div>
+                          </Label_Shadcn_>
+                          <Component
+                            type="text"
+                            id={fieldKey}
+                            name={fieldKey}
+                            value={formData[fieldKey]}
+                            onChange={handleChange}
+                            placeholder={fieldValue.placeholder}
+                          />
+                        </div>
+                      )
+                    }
+                  )}
+                  <Separator className="col-span-full" />
+                  <Button
+                    block
+                    htmlType="submit"
+                    size="small"
+                    className="col-span-full"
+                    disabled={isSubmitting}
+                    loading={isSubmitting}
+                  >
+                    Request a demo
+                  </Button>
+                  <p className="text-foreground-lighter text-sm col-span-full">
+                    By submitting this form, I confirm that I have read and understood the{' '}
+                    <Link href="/privacy" className="text-foreground hover:underline">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </p>
+                  {errors.general && (
+                    <div className="text-foreground text-center text-sm col-span-full">
+                      <CircleAlert className="w-3 h-3" /> {errors.general}
+                    </div>
+                  )}
+                </form>
               )}
-            </form>
-          </Panel>
+            </Panel>
+            <p className="text-foreground-lighter text-sm">
+              <Link href="/support" className="text-foreground hover:underline">
+                Contact support
+              </Link>{' '}
+              if you need technical help.
+            </p>
+          </div>
         </SectionContainer>
       </DefaultLayout>
     </>
