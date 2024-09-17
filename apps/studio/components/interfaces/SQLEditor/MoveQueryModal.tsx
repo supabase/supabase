@@ -115,12 +115,11 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
     try {
       let folderId = selectedId
 
-      if (selectedId === 'new-folder') {
+      if (selectedId === 'new-folder' && 'name' in values) {
         const { id } = await createFolder({
           projectRef: ref,
-          name: (values as { name: string }).name,
+          name: values.name,
         })
-
         folderId = id
       }
 
