@@ -460,14 +460,14 @@ const DeployNewReplicaPanel = ({
             <p className="text-foreground-light text-sm">
               Read more about{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                href="https://supabase.com/docs/guides/platform/org-based-billing#read-replicas"
                 target="_blank"
                 rel="noreferrer"
                 className="underline hover:text-foreground transition"
               >
-                usage-based billing
+                billing
               </Link>{' '}
-              for compute.
+              for read replicas.
             </p>
           </div>
         </div>
