@@ -27,8 +27,8 @@ const auth0 = new Auth0Client({
   domain: '<AUTH0_DOMAIN>',
   clientId: '<AUTH0_CLIENT_ID>',
   authorizationParams: {
-    redirect_uri: '<MY_CALLBACK_URL>'
-  }
+    redirect_uri: '<MY_CALLBACK_URL>',
+  },
 })
 
 const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
