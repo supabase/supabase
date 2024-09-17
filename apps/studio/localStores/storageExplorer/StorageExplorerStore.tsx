@@ -746,7 +746,7 @@ class StorageExplorerStore {
                 // Unsupported mime type
                 toast.error(
                   capitalize(
-                    error.originalResponse.getBody() ??
+                    error.originalResponse.getBody() ||
                       `Failed to upload ${file.name}: ${metadata.mimetype} is not allowed`
                   ),
                   {
