@@ -672,7 +672,7 @@ const SQLEditor = () => {
             )}
           </ul>
         </div>
-        <p className="text-sm text-foreground-light mt-6 ml-8 ">
+        <p className="text-sm text-foreground-light mt-6 mb-4 ml-8 ">
           Please confirm that you would like to execute this query.
         </p>
       </ConfirmationModal>
