@@ -682,6 +682,21 @@ class StorageExplorerStore {
 
       return () => {
         return new Promise<void>(async (resolve, reject) => {
+          // Check if the mime type is NOT allowed
+          if (
+            !(
+              this.selectedBucket.allowed_mime_types &&
+              metadata.mimetype &&
+              this.selectedBucket.allowed_mime_types.includes(metadata.mimetype)
+            )
+          ) {
+            numberOfFilesUploadedFail += 1
+            toast.error(`Failed to upload ${file.name}: ${metadata.mimetype} is not allowed`, {
+              description: `Allowed MIME types: ${this.selectedBucket.allowed_mime_types?.join(', ')}`,
+            })
+            return reject(new Error(`Invalid file type: ${metadata.mimetype} is not allowed`))
+          }
+
           const fileSizeInMB = file.size / (1024 * 1024)
           const startTime = Date.now()
 
