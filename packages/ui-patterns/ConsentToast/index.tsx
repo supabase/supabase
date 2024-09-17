@@ -9,8 +9,8 @@ import {
 } from 'common'
 import { noop } from 'lodash'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
-import { toast } from 'react-hot-toast'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from 'ui'
 
 interface ConsentToastProps {
@@ -63,19 +63,16 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
   )
 }
 
-// Use with PortalToast from 'ui/src/layout/PortalToast'
 export const useConsent = () => {
   const { TELEMETRY_CONSENT } = LOCAL_STORAGE_KEYS
-  const consentToastId = useRef<string>()
-  const isClient = typeof window !== 'undefined'
-  if (!isClient) return {}
+  const consentToastId = useRef<string | number>()
   const telemetryProps = useTelemetryProps()
-  const [consentValue, setConsentValue] = useState<string | null>(
-    localStorage?.getItem(TELEMETRY_CONSENT)
-  )
+
+  const initialValue = isBrowser ? localStorage?.getItem(TELEMETRY_CONSENT) : null
+  const [consentValue, setConsentValue] = useState<string | null>(initialValue)
 
   const handleConsent = (value: 'true' | 'false') => {
-    if (!isClient) return
+    if (!isBrowser) return
     setConsentValue(value)
     localStorage.setItem(TELEMETRY_CONSENT, value)
 
@@ -84,17 +81,8 @@ export const useConsent = () => {
       handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname, telemetryProps)
   }
 
-  useEffect(() => {
-    const handleSetLocalStorage = () => {
-      if (localStorage?.getItem(TELEMETRY_CONSENT)) toast.dismiss(consentToastId.current)
-    }
-
-    window.addEventListener('storage', handleSetLocalStorage)
-    return window.removeEventListener('storage', () => null)
-  }, [])
-
-  useEffect(() => {
-    if (isClient && consentValue === null) {
+  const triggerConsentToast = useCallback(() => {
+    if (isBrowser && consentValue === null) {
       consentToastId.current = toast(
         <ConsentToast
           onAccept={() => handleConsent('true')}
@@ -104,21 +92,39 @@ export const useConsent = () => {
           id: 'consent-toast',
           position: 'bottom-right',
           duration: Infinity,
-          className:
-            '!w-screen !-m-4 !border-t !rounded-none !max-w-none !bg-overlay !text sm:!m-0 sm:!rounded-lg sm:!w-auto sm:!max-w-[400px] sm:border',
+          closeButton: true,
         }
       )
     }
+  }, [])
+
+  useEffect(() => {
+    const handleSetLocalStorage = () => {
+      if (localStorage?.getItem(TELEMETRY_CONSENT)) toast.dismiss(consentToastId.current)
+    }
+
+    if (isBrowser) {
+      window.addEventListener('storage', handleSetLocalStorage)
+      return window.removeEventListener('storage', () => null)
+    }
+  }, [])
+
+  useEffect(() => {
+    triggerConsentToast()
   }, [consentValue])
 
-  return { consentValue, setConsentValue, hasAcceptedConsent: consentValue === 'true' }
+  return {
+    consentValue,
+    setConsentValue,
+    hasAcceptedConsent: consentValue === 'true',
+    triggerConsentToast,
+  }
 }
 
 export const useConsentValue = (KEY_NAME: string) => {
-  if (!isBrowser) return {}
-
   const telemetryProps = useTelemetryProps()
-  const [consentValue, setConsentValue] = useState<string | null>(localStorage?.getItem(KEY_NAME))
+  const initialValue = isBrowser ? localStorage?.getItem(KEY_NAME) : null
+  const [consentValue, setConsentValue] = useState<string | null>(initialValue)
 
   const handleConsent = (value: 'true' | 'false') => {
     if (!isBrowser) return

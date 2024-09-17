@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -17,7 +17,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { Button, IconInfo, Listbox } from 'ui'
+import { Button, Listbox } from 'ui'
 import { Restriction } from '../BillingSettings/Restriction'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
@@ -207,7 +207,7 @@ const Usage = () => {
             }
             defaultVisibility
             hideCollapse
-            icon={<IconInfo />}
+            icon={<Info />}
           />
         </ScaffoldContainer>
       ) : (

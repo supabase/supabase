@@ -1,9 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { X as IconX } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
@@ -16,10 +15,12 @@ import AlertError from 'components/ui/AlertError'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   FormControl_Shadcn_,
@@ -36,9 +37,12 @@ import {
 } from 'ui'
 import { TAX_IDS } from './TaxID.constants'
 import { checkTaxIdEqual, sanitizeTaxIdValue } from './TaxID.utils'
+import { X } from 'lucide-react'
 
 const TaxID = () => {
   const { slug } = useParams()
+  const selectedOrganization = useSelectedOrganization()
+
   const { data: taxId, error, isLoading, isSuccess, isError } = useOrganizationTaxIdQuery({ slug })
   const { mutate: updateTaxId, isLoading: isUpdating } = useOrganizationTaxIdUpdateMutation({
     onSuccess: () => {
@@ -137,7 +141,16 @@ const TaxID = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!canReadTaxId ? (
+        {selectedOrganization?.managed_by !== undefined &&
+        selectedOrganization?.managed_by !== 'supabase' ? (
+          <PartnerManagedResource
+            partner={selectedOrganization?.managed_by}
+            resource="Tax IDs"
+            cta={{
+              installationId: selectedOrganization?.partner_id,
+            }}
+          />
+        ) : !canReadTaxId ? (
           <NoPermission resourceText="view this organization's tax ID" />
         ) : (
           <>
@@ -229,7 +242,7 @@ const TaxID = () => {
                         <Button
                           type="text"
                           className="px-1"
-                          icon={<IconX />}
+                          icon={<X />}
                           onClick={() => onRemoveTaxId()}
                         />
                       </div>

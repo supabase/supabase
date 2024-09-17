@@ -1,14 +1,15 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
 
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { Button, IconChevronRight, IconPieChart } from 'ui'
-import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
-import { billingMetricUnit, formatUsage } from '../helpers'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { useMemo } from 'react'
 import { formatCurrency } from 'lib/helpers'
+import { useMemo } from 'react'
+import { Button } from 'ui'
+import { billingMetricUnit, formatUsage } from '../helpers'
+import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
+import { ChevronRight, PieChart } from 'lucide-react'
 
 export interface BillingMetricProps {
   idx: number
@@ -85,7 +86,7 @@ const BillingMetric = ({
               <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                 {metric.name}
               </p>
-              <IconChevronRight strokeWidth={1.5} size={16} className="transition" />
+              <ChevronRight strokeWidth={1.5} size={16} className="transition" />
             </div>
           </Link>
         ) : (
@@ -137,7 +138,7 @@ const BillingMetric = ({
                   />
                 </svg>
               ) : (
-                <IconPieChart className="h-8 w-8 p-1" />
+                <PieChart className="h-8 w-8 p-1" />
               )}
             </Tooltip.Trigger>
             <Tooltip.Portal>

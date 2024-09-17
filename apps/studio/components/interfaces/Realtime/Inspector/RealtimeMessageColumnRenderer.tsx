@@ -1,6 +1,7 @@
 import { Column } from 'react-data-grid'
-import { IconAlertTriangle, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
+import { cn, IconBroadcast, IconDatabaseChanges, IconPresence } from 'ui'
 
+import { AlertTriangle } from 'lucide-react'
 import type { LogData, PreviewLogData } from './Messages.types'
 import { RowLayout } from './MessagesFormatters'
 import { isErrorLog } from './MessagesTable'
@@ -9,7 +10,7 @@ const ICONS = {
   PRESENCE: <IconPresence size="xlarge" />,
   BROADCAST: <IconBroadcast size="xlarge" />,
   POSTGRES: <IconDatabaseChanges size="xlarge" />,
-  SYSTEM: <IconAlertTriangle size="large" />,
+  SYSTEM: <AlertTriangle size="20" strokeWidth={1} />,
 }
 
 export const ColumnRenderer: Column<LogData, unknown>[] = [

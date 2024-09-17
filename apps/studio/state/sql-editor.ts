@@ -120,7 +120,7 @@ export const sqlEditorState = proxy({
     }
   },
   setSql: (id: string, sql: string) => {
-    if (sqlEditorState.snippets[id]) {
+    if (sqlEditorState.snippets[id] && sqlEditorState.snippets[id].snippet.type === 'sql') {
       sqlEditorState.snippets[id].snippet.content.sql = sql
       sqlEditorState.needsSaving.add(id)
     }
@@ -164,14 +164,15 @@ export const sqlEditorState = proxy({
       sqlEditorState.results[id].unshift({ rows: [], error, autoLimit })
     }
   },
+  // [Jordi] Only SQL snippets can be favorites for now.
   addFavorite: (id: string) => {
-    if (sqlEditorState.snippets[id]) {
+    if (sqlEditorState.snippets[id] && sqlEditorState.snippets[id].snippet.type === 'sql') {
       sqlEditorState.snippets[id].snippet.content.favorite = true
       sqlEditorState.needsSaving.add(id)
     }
   },
   removeFavorite: (id: string) => {
-    if (sqlEditorState.snippets[id]) {
+    if (sqlEditorState.snippets[id] && sqlEditorState.snippets[id].snippet.type === 'sql') {
       sqlEditorState.snippets[id].snippet.content.favorite = false
       sqlEditorState.needsSaving.add(id)
     }

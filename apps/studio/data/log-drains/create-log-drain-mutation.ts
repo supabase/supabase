@@ -1,14 +1,15 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { logDrainsKeys } from './keys'
-import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 
 export type LogDrainCreateVariables = {
   projectRef: string
   name: string
+  description: string
   config: Record<string, never>
   type: LogDrainType
 }
@@ -18,6 +19,7 @@ export async function createLogDrain(payload: LogDrainCreateVariables) {
     params: { path: { ref: payload.projectRef } },
     body: {
       name: payload.name,
+      description: payload.description,
       type: payload.type,
       config: payload.config,
     },

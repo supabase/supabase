@@ -11,6 +11,7 @@ import {
   Button,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
+  CommandList_Shadcn_,
   cn,
   markdownComponents,
 } from 'ui'
@@ -39,7 +40,6 @@ const questions = [
 ]
 
 const DocsAiPage = () => {
-  const query = useQuery()
   const setQuery = useSetQuery()
 
   const isBelowSm = useBreakpoint('sm')
@@ -55,11 +55,6 @@ const DocsAiPage = () => {
     setIsLoading,
   })
 
-  useHistoryKeys({
-    enable: !isResponding,
-    stack: messages.filter(({ role }) => role === MessageRole.User).map(({ content }) => content),
-  })
-
   const handleSubmit = useCallback(
     (message: string) => {
       setQuery('')
@@ -73,12 +68,6 @@ const DocsAiPage = () => {
     reset()
   }, [reset])
 
-  useEffect(() => {
-    if (query) {
-      handleSubmit(query)
-    }
-  }, [])
-
   return (
     <CommandWrapper
       className={cn(
@@ -91,7 +80,8 @@ const DocsAiPage = () => {
         <Breadcrumb />
         {isBelowSm && (
           <PromptInput
-            submit={submit}
+            submit={handleSubmit}
+            reset={handleReset}
             messages={messages}
             isLoading={isLoading}
             isResponding={isResponding}
@@ -105,7 +95,8 @@ const DocsAiPage = () => {
       </div>
       {!isBelowSm && (
         <PromptInput
-          submit={submit}
+          submit={handleSubmit}
+          reset={handleReset}
           messages={messages}
           isLoading={isLoading}
           isResponding={isResponding}
@@ -120,37 +111,31 @@ const DocsAiPage = () => {
 
 function PromptInput({
   submit,
+  reset,
   messages,
   isLoading,
   isResponding,
   className,
 }: {
-  submit: (query: string) => Promise<void>
+  submit: (query: string) => void
+  reset: () => void
   messages: Array<Message>
   isLoading: boolean
   isResponding: boolean
   className?: string
 }) {
   const query = useQuery()
-  const setQuery = useSetQuery()
 
   useHistoryKeys({
     enable: !isResponding,
     stack: messages.filter(({ role }) => role === MessageRole.User).map(({ content }) => content),
   })
 
-  const handleSubmit = useCallback(
-    (message: string) => {
-      setQuery('')
-      submit(message)
-    },
-    [submit]
-  )
-
   useEffect(() => {
     if (query) {
-      handleSubmit(query)
+      submit(query)
     }
+    return reset
   }, [])
 
   // Detect an IME composition (so that we can ignore Enter keypress)
@@ -181,7 +166,7 @@ function PromptInput({
             if (!query || isLoading || isResponding || isImeComposing) {
               return
             }
-            return handleSubmit(query)
+            return submit(query)
           default:
             return
         }
@@ -192,71 +177,78 @@ function PromptInput({
 
 function AiMessages({ messages }: { messages: Array<Message> }) {
   return (
-    <div
-      className={cn(
-        'flex-grow min-h-0 overflow-auto p-4',
-        'grid gap-6 md:grid-cols-[max-content,1fr] grid-rows-[max-content]'
-      )}
-    >
-      {messages.map((message, index) => {
-        switch (message.role) {
-          case MessageRole.User:
-            return (
-              <Fragment key={index}>
-                <div className="flex items-center gap-4">
-                  <div
-                    className={cn(
-                      'w-7 h-7',
-                      'border border-muted bg-background shadow-sm rounded-full',
-                      'flex items-center justify-center',
-                      'text-foreground-lighter'
-                    )}
-                  >
-                    <User strokeWidth={1.5} size={16} />
+    <>
+      {/* cmdk menus need a CommandList descendent in order to not throw an
+      error. This display doesn't actually need the Command Menu, but it's
+      needed for the empty state to work with the input, so this is a somewhat
+      hacktastic way of making it not error. */}
+      <CommandList_Shadcn_ />
+      <div
+        className={cn(
+          'flex-grow min-h-0 overflow-auto p-4',
+          'grid gap-6 md:grid-cols-[max-content,1fr] grid-rows-[max-content]'
+        )}
+      >
+        {messages.map((message, index) => {
+          switch (message.role) {
+            case MessageRole.User:
+              return (
+                <Fragment key={index}>
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={cn(
+                        'w-7 h-7',
+                        'border border-muted bg-background shadow-sm rounded-full',
+                        'flex items-center justify-center',
+                        'text-foreground-lighter'
+                      )}
+                    >
+                      <User strokeWidth={1.5} size={16} />
+                    </div>
+                    <span className="font-mono text-sm text-foreground-muted uppercase tracking-widest md:hidden">
+                      You
+                    </span>
                   </div>
-                  <span className="font-mono text-sm text-foreground-muted uppercase tracking-widest md:hidden">
-                    You
-                  </span>
-                </div>
-                <div className="prose text-foreground-lighter">{message.content}</div>
-              </Fragment>
-            )
-          case MessageRole.Assistant:
-            return (
-              <Fragment key={index}>
-                <div className="flex items-center md:items-start gap-4">
-                  <AiIconAnimation
-                    className="ml-0.5"
-                    loading={
-                      message.status === MessageStatus.Pending ||
-                      message.status === MessageStatus.InProgress
-                    }
-                    allowHoverEffect
-                  />
-                  <span className="font-mono text-sm text-foreground-muted uppercase tracking-widest md:hidden">
-                    Supabase AI
-                  </span>
-                </div>
-                <div>
-                  {message.status === MessageStatus.Pending && (
-                    <span className="inline-block h-[1lh] w-[0.8lh] mt-1 bg-border-strong animate-bounce" />
-                  )}
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      ...markdownComponents,
-                      a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" />,
-                    }}
-                    className="prose dark:prose-dark break-words"
-                  >
-                    {message.content}
-                  </ReactMarkdown>
-                </div>
-              </Fragment>
-            )
-        }
-      })}
-    </div>
+                  <div className="prose text-foreground-lighter">{message.content}</div>
+                </Fragment>
+              )
+            case MessageRole.Assistant:
+              return (
+                <Fragment key={index}>
+                  <div className="flex items-center md:items-start gap-4">
+                    <AiIconAnimation
+                      className="ml-0.5"
+                      loading={
+                        message.status === MessageStatus.Pending ||
+                        message.status === MessageStatus.InProgress
+                      }
+                      allowHoverEffect
+                    />
+                    <span className="font-mono text-sm text-foreground-muted uppercase tracking-widest md:hidden">
+                      Supabase AI
+                    </span>
+                  </div>
+                  <div>
+                    {message.status === MessageStatus.Pending && (
+                      <span className="inline-block h-[1lh] w-[0.8lh] mt-1 bg-border-strong animate-bounce" />
+                    )}
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        ...markdownComponents,
+                        a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+                      }}
+                      className="prose dark:prose-dark break-words"
+                    >
+                      {message.content}
+                    </ReactMarkdown>
+                  </div>
+                </Fragment>
+              )
+          }
+        })}
+      </div>
+    </>
   )
 }
 
@@ -264,34 +256,36 @@ function EmptyState({ handleSubmit }: { handleSubmit: (message: string) => void 
   const query = useQuery()
 
   return (
-    <CommandGroup_Shadcn_
-      heading="Examples"
-      className={cn(
-        // Double padding from command group primitive and container, remove the primitive one
-        '!p-0',
-        'text-border-strong',
-        '[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5',
-        '[&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted'
-      )}
-    >
-      {questions.map((question) => {
-        const key = question.replace(/\s+/g, '_')
-        return (
-          <CommandItem_Shadcn_
-            className={generateCommandClassNames(false)}
-            onSelect={() => {
-              if (!query) {
-                handleSubmit(question)
-              }
-            }}
-            key={key}
-          >
-            <AiIconAnimation />
-            {question}
-          </CommandItem_Shadcn_>
-        )
-      })}
-    </CommandGroup_Shadcn_>
+    <CommandList_Shadcn_>
+      <CommandGroup_Shadcn_
+        heading="Examples"
+        className={cn(
+          // Double padding from command group primitive and container, remove the primitive one
+          '!p-0',
+          'text-border-strong',
+          '[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5',
+          '[&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted'
+        )}
+      >
+        {questions.map((question) => {
+          const key = question.replace(/\s+/g, '_')
+          return (
+            <CommandItem_Shadcn_
+              className={generateCommandClassNames(false)}
+              onSelect={() => {
+                if (!query) {
+                  handleSubmit(question)
+                }
+              }}
+              key={key}
+            >
+              <AiIconAnimation />
+              {question}
+            </CommandItem_Shadcn_>
+          )
+        })}
+      </CommandGroup_Shadcn_>
+    </CommandList_Shadcn_>
   )
 }
 

@@ -55,6 +55,50 @@ export interface paths {
     /** Updates organization subscription linked to the provided Fly organization id */
     put: operations['FlyOrganizationsController_updateOrganization']
   }
+  '/partners/vercel/callback': {
+    /** Redirects to Supabase dashboard after completing Vercel sso flow */
+    get: operations['CallbackController_redirectToDashboardVercelExtensionScreen']
+  }
+  '/partners/vercel/v1/installations/{installation_id}': {
+    /** Gets the set of billing plans available to a specific Installation */
+    get: operations['InstallationsController_getInstallation']
+    /** Upserts an installation for the account with installation_id */
+    put: operations['InstallationsController_createInstallation']
+    /** Deletes the installation with provided installation_id */
+    delete: operations['InstallationsController_deleteInstallation']
+    /** Updates an installation for the account with installation_id */
+    patch: operations['InstallationsController_updateInstallation']
+  }
+  '/partners/vercel/v1/installations/{installation_id}/plans': {
+    /** Gets the set of billing plans available to a specific Installation */
+    get: operations['InstallationsController_getInstallationBillingPlans']
+  }
+  '/partners/vercel/v1/installations/{installation_id}/resources': {
+    /** Lists all resources */
+    get: operations['ResourcesController_listResources']
+    /** Provisions a resource */
+    post: operations['ResourcesController_createResource']
+  }
+  '/partners/vercel/v1/installations/{installation_id}/resources/{resource_id}': {
+    /** Fetches a resource by resource_id */
+    get: operations['ResourcesController_getResource']
+    /** Uninstalls and de-provisions a resource */
+    delete: operations['ResourcesController_deleteResource']
+    /** Updates a resource */
+    patch: operations['ResourcesController_updateResource']
+  }
+  '/partners/vercel/v1/installations/{installation_id}/resources/{resource_id}/plans': {
+    /** Returns the set of billing plans available to a specific resource */
+    get: operations['ResourcesController_getResourcePlans']
+  }
+  '/partners/vercel/v1/products/{product_id}/plans': {
+    /** Return quotes for different billing plans for a specific product */
+    get: operations['ProductsController_listResources']
+  }
+  '/partners/vercel/webhooks': {
+    /** Webhooks endpoint */
+    post: operations['WebhooksController_processWebhook']
+  }
   '/platform/auth/{ref}/config': {
     /** Gets GoTrue config */
     get: operations['GoTrueConfigController_getGoTrueConfig']
@@ -106,6 +150,10 @@ export interface paths {
   '/platform/database/{ref}/backups/download': {
     /** Download project backup */
     post: operations['BackupsController_downloadBackup']
+  }
+  '/platform/database/{ref}/backups/downloadable-backups': {
+    /** Gets backups that might be downloadable, but potentially not restorable. */
+    get: operations['BackupsController_getDownloadableBackups']
   }
   '/platform/database/{ref}/backups/enable-physical-backups': {
     /** Enable usage of physical backups */
@@ -833,6 +881,16 @@ export interface paths {
     /** Updates the database password */
     patch: operations['DbPasswordController_updatePassword']
   }
+  '/platform/projects/{ref}/disk': {
+    /** Get database disk attributes */
+    get: operations['DiskController_getDisk']
+    /** Modify database disk */
+    post: operations['DiskController_modifyDisk']
+  }
+  '/platform/projects/{ref}/disk/util': {
+    /** Get disk utilization */
+    get: operations['DiskController_getDiskUtilization']
+  }
   '/platform/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
     get: operations['InfraMonitoringController_getUsageMetrics']
@@ -1029,6 +1087,10 @@ export interface paths {
     /** Creates the environment variable for the given project ID on behalf of the given team ID */
     post: operations['VercelEnvironmentVariablesController_createEnvironmentVariable']
   }
+  '/platform/vercel/redirect/{installation_id}': {
+    /** Gets the Vercel redirect url */
+    get: operations['VercelRedirectController_getRedirectUrl']
+  }
   '/platform/vercel/token': {
     /** Gets the Vercel access token for the given code */
     get: operations['VercelAccessTokenController_getAccessToken']
@@ -1056,6 +1118,10 @@ export interface paths {
   '/system/integrations/vercel/webhooks': {
     /** Processes Vercel event */
     post: operations['VercelWebhooksController_processEvent']
+  }
+  '/system/orb/vercel/sync/invoices/{invoice_id}': {
+    /** Syncs an invoice to Vercel. If already synced, Vercel will not process it again. */
+    post: operations['VercelSyncController_syncInvoice']
   }
   '/system/orb/webhooks': {
     /** Processes Orb events */
@@ -1162,6 +1228,10 @@ export interface paths {
     /** Refreshes secrets */
     post: operations['SecretsRefreshController_refreshSecrets']
   }
+  '/system/projects/{ref}/wal-verification-reporting': {
+    /** Processes a project's WAL verification report. */
+    put: operations['WalVerificationReportingController_processWalVerification']
+  }
   '/system/stripe/webhooks': {
     /** Processes Stripe event */
     post: operations['StripeWebhooksController_processEvent']
@@ -1213,6 +1283,10 @@ export interface paths {
   '/v0/database/{ref}/backups/download': {
     /** Download project backup */
     post: operations['BackupsController_downloadBackup']
+  }
+  '/v0/database/{ref}/backups/downloadable-backups': {
+    /** Gets backups that might be downloadable, but potentially not restorable. */
+    get: operations['BackupsController_getDownloadableBackups']
   }
   '/v0/database/{ref}/backups/enable-physical-backups': {
     /** Enable usage of physical backups */
@@ -1649,6 +1723,16 @@ export interface paths {
   '/v0/projects/{ref}/db-password': {
     /** Updates the database password */
     patch: operations['DbPasswordController_updatePassword']
+  }
+  '/v0/projects/{ref}/disk': {
+    /** Get database disk attributes */
+    get: operations['DiskController_getDisk']
+    /** Modify database disk */
+    post: operations['DiskController_modifyDisk']
+  }
+  '/v0/projects/{ref}/disk/util': {
+    /** Get disk utilization */
+    get: operations['DiskController_getDiskUtilization']
   }
   '/v0/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
@@ -2131,6 +2215,8 @@ export interface components {
       | 'pitr_14'
       | 'pitr_28'
       | 'ipv4_default'
+      | 'auth_mfa_phone_default'
+      | 'log_drain_default'
     AmiSearchOptions: {
       search_tags?: Record<string, never>
     }
@@ -2291,6 +2377,11 @@ export interface components {
       mailer_templates_reauthentication_content: string | null
       mailer_templates_recovery_content: string | null
       mfa_max_enrolled_factors: number | null
+      mfa_phone_enroll_enabled: boolean | null
+      mfa_phone_max_frequency: number | null
+      mfa_phone_otp_length: number
+      mfa_phone_template: string | null
+      mfa_phone_verify_enabled: boolean | null
       mfa_totp_enroll_enabled: boolean | null
       mfa_totp_verify_enabled: boolean | null
       password_hibp_enabled: boolean | null
@@ -2303,6 +2394,7 @@ export interface components {
       rate_limit_token_refresh: number | null
       rate_limit_verify: number | null
       refresh_token_rotation_enabled: boolean | null
+      saml_allow_encrypted_assertions: boolean | null
       saml_enabled: boolean | null
       saml_external_url: string | null
       security_captcha_enabled: boolean | null
@@ -2544,7 +2636,9 @@ export interface components {
     }
     CreateBranchBody: {
       branch_name: string
+      desired_instance_size?: components['schemas']['DesiredInstanceSize']
       git_branch?: string
+      persistent?: boolean
       region?: string
     }
     CreateCliLoginSessionBody: {
@@ -2692,10 +2786,15 @@ export interface components {
       data_api_use_api_schema?: boolean
       db_pass: string
       db_pricing_tier_id?: string
+      /**
+       * @description Provider region description
+       * @example Southeast Asia (Singapore)
+       */
       db_region: string
       db_sql?: string
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
       name: string
+      /** @deprecated */
       org_id?: number
       organization_slug?: string
     }
@@ -3031,11 +3130,64 @@ export interface components {
     DetachPaymentMethodBody: {
       card_id: string
     }
+    DiskRequestAttributesGP3: {
+      iops: number
+      size_gb: number
+      throughput_mbps: number
+      /** @enum {string} */
+      type: 'gp3'
+    }
+    DiskRequestAttributesIO2: {
+      iops: number
+      size_gb: number
+      /** @enum {string} */
+      type: 'io2'
+    }
+    DiskRequestBody: {
+      attributes:
+        | components['schemas']['DiskRequestAttributesGP3']
+        | components['schemas']['DiskRequestAttributesIO2']
+    }
+    DiskResponse: {
+      attributes:
+        | components['schemas']['DiskResponseAttributesGP3']
+        | components['schemas']['DiskResponseAttributesIO2']
+      last_modified_at?: string
+      requested_modification?:
+        | components['schemas']['DiskResponseAttributesGP3']
+        | components['schemas']['DiskResponseAttributesIO2']
+    }
+    DiskResponseAttributesGP3: {
+      iops: number
+      size_gb: number
+      throughput_mbps: number
+      /** @enum {string} */
+      type: 'gp3'
+    }
+    DiskResponseAttributesIO2: {
+      iops: number
+      size_gb: number
+      /** @enum {string} */
+      type: 'io2'
+    }
+    DiskUtilMetrics: {
+      fs_avail_bytes: number
+      fs_size_bytes: number
+      fs_used_bytes: number
+    }
+    DiskUtilMetricsResponse: {
+      metrics: components['schemas']['DiskUtilMetrics']
+      timestamp: string
+    }
     Domain: {
       created_at?: string
       domain?: string
       id: string
       updated_at?: string
+    }
+    DownloadableBackupsResponse: {
+      backups: components['schemas']['Backup'][]
+      status: Record<string, never>
     }
     DownloadBackupBody: {
       data: Record<string, never>
@@ -3251,7 +3403,7 @@ export interface components {
       addons: components['schemas']['BillingSubscriptionAddon'][]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner: 'fly' | 'aws'
+      billing_partner: 'fly' | 'aws' | 'vercel_marketplace'
       billing_via_partner: boolean
       current_period_end: number
       current_period_start: number
@@ -3465,6 +3617,11 @@ export interface components {
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: string
       MAILER_TEMPLATES_RECOVERY_CONTENT: string
       MFA_MAX_ENROLLED_FACTORS: number
+      MFA_PHONE_ENROLL_ENABLED: boolean
+      MFA_PHONE_MAX_FREQUENCY: number
+      MFA_PHONE_OTP_LENGTH: number
+      MFA_PHONE_TEMPLATE: string
+      MFA_PHONE_VERIFY_ENABLED: boolean
       MFA_TOTP_ENROLL_ENABLED: boolean
       MFA_TOTP_VERIFY_ENABLED: boolean
       PASSWORD_HIBP_ENABLED: boolean
@@ -3477,6 +3634,7 @@ export interface components {
       RATE_LIMIT_TOKEN_REFRESH: number
       RATE_LIMIT_VERIFY: number
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
+      SAML_ALLOW_ENCRYPTED_ASSERTIONS: boolean
       SAML_ENABLED: boolean
       SAML_EXTERNAL_URL: string
       SECURITY_CAPTCHA_ENABLED: boolean
@@ -3614,11 +3772,11 @@ export interface components {
       id: string
       invoice_pdf: string
       number: string
+      payment_attempted: boolean
       period_end: number
       status: string
       subscription: string | null
       subtotal: number
-      payment_attempted: boolean
     }
     JoinResponse: {
       billing_email: string
@@ -3744,6 +3902,7 @@ export interface components {
     Member: {
       gotrue_id: string
       is_sso_user: boolean | null
+      metadata: unknown
       mfa_enabled: boolean
       primary_email: string | null
       role_ids: number[]
@@ -3956,7 +4115,14 @@ export interface components {
         | 'STORAGE_IMAGES_TRANSFORMED'
         | 'REALTIME_MESSAGE_COUNT'
         | 'REALTIME_PEAK_CONNECTIONS'
-        | 'DISK_SIZE_GB_HOURS'
+        | 'DISK_SIZE_GB_HOURS_GP3'
+        | 'DISK_SIZE_GB_HOURS_IO2'
+        | 'AUTH_MFA_PHONE'
+        | 'LOG_DRAIN_EVENTS'
+        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+        | 'DISK_THROUGHPUT_GP3'
+        | 'DISK_IOPS_GP3'
+        | 'DISK_IOPS_IO2'
         | 'COMPUTE_HOURS_BRANCH'
         | 'COMPUTE_HOURS_XS'
         | 'COMPUTE_HOURS_SM'
@@ -3973,12 +4139,13 @@ export interface components {
         | 'PITR_14'
         | 'PITR_28'
         | 'IPV4'
+        | 'LOG_DRAIN'
       pricing_free_units?: number
       pricing_package_price?: number
       pricing_package_size?: number
       pricing_per_unit_price?: number
       /** @enum {string} */
-      pricing_strategy: 'UNIT' | 'PACKAGE' | 'NONE'
+      pricing_strategy: 'UNIT' | 'PACKAGE' | 'TIERED' | 'NONE'
       project_allocations: components['schemas']['ProjectAllocation'][]
       unit_price_desc: string
       unlimited: boolean
@@ -4338,7 +4505,13 @@ export interface components {
       selected_addons: components['schemas']['SelectedAddonResponse'][]
     }
     /** @enum {string} */
-    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4'
+    ProjectAddonType:
+      | 'custom_domain'
+      | 'compute_instance'
+      | 'pitr'
+      | 'ipv4'
+      | 'auth_mfa_phone'
+      | 'log_drain'
     /** @enum {string} */
     ProjectAddonVariantPricingType: 'fixed' | 'usage'
     ProjectAddonVariantResponse: {
@@ -4990,6 +5163,7 @@ export interface components {
        */
       read_replica_region:
         | 'us-east-1'
+        | 'us-east-2'
         | 'us-west-1'
         | 'us-west-2'
         | 'ap-east-1'
@@ -5000,7 +5174,9 @@ export interface components {
         | 'eu-west-1'
         | 'eu-west-2'
         | 'eu-west-3'
+        | 'eu-north-1'
         | 'eu-central-1'
+        | 'eu-central-2'
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
@@ -5184,6 +5360,7 @@ export interface components {
        */
       region:
         | 'us-east-1'
+        | 'us-east-2'
         | 'us-west-1'
         | 'us-west-2'
         | 'ap-east-1'
@@ -5194,7 +5371,9 @@ export interface components {
         | 'eu-west-1'
         | 'eu-west-2'
         | 'eu-west-3'
+        | 'eu-north-1'
         | 'eu-central-1'
+        | 'eu-central-2'
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
@@ -5311,6 +5490,7 @@ export interface components {
       price_id?: string
       /** @enum {string} */
       proration_behaviour?: 'prorate_and_invoice_end_of_cycle' | 'prorate_and_invoice_now'
+      skip_outstanding_invoice_check?: boolean
     }
     UpdateAddonBody: {
       addon_type: components['schemas']['ProjectAddonType']
@@ -5424,6 +5604,11 @@ export interface components {
       mailer_templates_reauthentication_content?: string
       mailer_templates_recovery_content?: string
       mfa_max_enrolled_factors?: number
+      mfa_phone_enroll_enabled?: boolean
+      mfa_phone_max_frequency?: number
+      mfa_phone_otp_length?: number
+      mfa_phone_template?: string
+      mfa_phone_verify_enabled?: boolean
       mfa_totp_enroll_enabled?: boolean
       mfa_totp_verify_enabled?: boolean
       password_hibp_enabled?: boolean
@@ -5495,6 +5680,14 @@ export interface components {
       git_branch?: string
       persistent?: boolean
       reset_on_push?: boolean
+      /** @enum {string} */
+      status?:
+        | 'CREATING_PROJECT'
+        | 'RUNNING_MIGRATIONS'
+        | 'MIGRATIONS_PASSED'
+        | 'MIGRATIONS_FAILED'
+        | 'FUNCTIONS_DEPLOYED'
+        | 'FUNCTIONS_FAILED'
     }
     UpdateColumnBody: {
       check?: string
@@ -5666,6 +5859,11 @@ export interface components {
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT?: string
       MAILER_TEMPLATES_RECOVERY_CONTENT?: string
       MFA_MAX_ENROLLED_FACTORS?: number
+      MFA_PHONE_ENROLL_ENABLED?: boolean
+      MFA_PHONE_MAX_FREQUENCY?: number
+      MFA_PHONE_OTP_LENGTH?: number
+      MFA_PHONE_TEMPLATE?: string
+      MFA_PHONE_VERIFY_ENABLED?: boolean
       MFA_TOTP_ENROLL_ENABLED?: boolean
       MFA_TOTP_VERIFY_ENABLED?: boolean
       PASSWORD_HIBP_ENABLED?: boolean
@@ -5683,6 +5881,7 @@ export interface components {
       RATE_LIMIT_TOKEN_REFRESH?: number
       RATE_LIMIT_VERIFY?: number
       REFRESH_TOKEN_ROTATION_ENABLED?: boolean
+      SAML_ALLOW_ENCRYPTED_ASSERTIONS?: boolean
       SAML_ENABLED?: boolean
       SAML_EXTERNAL_URL?: string
       SECURITY_CAPTCHA_ENABLED?: boolean
@@ -5890,6 +6089,8 @@ export interface components {
       payment_method?: string
       price_id?: string
       skip_free_plan_validations?: boolean
+      skip_outstanding_invoice_check?: boolean
+      skip_payment_method_available_check?: boolean
       /** @enum {string} */
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
     }
@@ -6117,6 +6318,7 @@ export interface components {
        */
       region:
         | 'us-east-1'
+        | 'us-east-2'
         | 'us-west-1'
         | 'us-west-2'
         | 'ap-east-1'
@@ -6127,7 +6329,9 @@ export interface components {
         | 'eu-west-1'
         | 'eu-west-2'
         | 'eu-west-3'
+        | 'eu-north-1'
         | 'eu-central-1'
+        | 'eu-central-2'
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
@@ -6278,6 +6482,13 @@ export interface components {
       gitCredentialId?: string
       productionBranch?: string
       type?: string
+    }
+    VercelRedirectResponse: {
+      url: string
+    }
+    WalVerificationReportBody: {
+      reportingToken: string
+      walVerification: Record<string, never>
     }
   }
   responses: never
@@ -6443,6 +6654,146 @@ export interface operations {
     }
     responses: {
       200: {
+        content: never
+      }
+    }
+  }
+  /** Redirects to Supabase dashboard after completing Vercel sso flow */
+  CallbackController_redirectToDashboardVercelExtensionScreen: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Gets the set of billing plans available to a specific Installation */
+  InstallationsController_getInstallation: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Upserts an installation for the account with installation_id */
+  InstallationsController_createInstallation: {
+    responses: {
+      201: {
+        content: never
+      }
+    }
+  }
+  /** Deletes the installation with provided installation_id */
+  InstallationsController_deleteInstallation: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Updates an installation for the account with installation_id */
+  InstallationsController_updateInstallation: {
+    responses: {
+      204: {
+        content: never
+      }
+    }
+  }
+  /** Gets the set of billing plans available to a specific Installation */
+  InstallationsController_getInstallationBillingPlans: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Lists all resources */
+  ResourcesController_listResources: {
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Provisions a resource */
+  ResourcesController_createResource: {
+    responses: {
+      201: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Fetches a resource by resource_id */
+  ResourcesController_getResource: {
+    parameters: {
+      path: {
+        resource_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Uninstalls and de-provisions a resource */
+  ResourcesController_deleteResource: {
+    parameters: {
+      path: {
+        resource_id: string
+      }
+    }
+    responses: {
+      204: {
+        content: never
+      }
+    }
+  }
+  /** Updates a resource */
+  ResourcesController_updateResource: {
+    parameters: {
+      path: {
+        resource_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
+  /** Returns the set of billing plans available to a specific resource */
+  ResourcesController_getResourcePlans: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Return quotes for different billing plans for a specific product */
+  ProductsController_listResources: {
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Webhooks endpoint */
+  WebhooksController_processWebhook: {
+    parameters: {
+      header: {
+        'x-vercel-signature': string
+      }
+    }
+    responses: {
+      201: {
         content: never
       }
     }
@@ -6785,6 +7136,26 @@ export interface operations {
         }
       }
       /** @description Failed to download project backup */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets backups that might be downloadable, but potentially not restorable. */
+  BackupsController_getDownloadableBackups: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DownloadableBackupsResponse']
+        }
+      }
+      /** @description Failed to get project backups */
       500: {
         content: never
       }
@@ -7848,7 +8219,14 @@ export interface operations {
           | 'STORAGE_IMAGES_TRANSFORMED'
           | 'REALTIME_MESSAGE_COUNT'
           | 'REALTIME_PEAK_CONNECTIONS'
-          | 'DISK_SIZE_GB_HOURS'
+          | 'DISK_SIZE_GB_HOURS_GP3'
+          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'AUTH_MFA_PHONE'
+          | 'LOG_DRAIN_EVENTS'
+          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+          | 'DISK_THROUGHPUT_GP3'
+          | 'DISK_IOPS_GP3'
+          | 'DISK_IOPS_IO2'
           | 'COMPUTE_HOURS_BRANCH'
           | 'COMPUTE_HOURS_XS'
           | 'COMPUTE_HOURS_SM'
@@ -7865,6 +8243,7 @@ export interface operations {
           | 'PITR_14'
           | 'PITR_28'
           | 'IPV4'
+          | 'LOG_DRAIN'
         interval: string
         endDate: string
         startDate: string
@@ -11673,8 +12052,8 @@ export interface operations {
   /** Gets the count of a user's content by type */
   ContentController_getContentCount: {
     parameters: {
-      query: {
-        type: string
+      query?: {
+        type?: string
       }
       path: {
         /** @description Project ref */
@@ -11910,6 +12289,78 @@ export interface operations {
         content: never
       }
       /** @description Failed to update database password */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get database disk attributes */
+  DiskController_getDisk: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DiskResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get database disk attributes */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Modify database disk */
+  DiskController_modifyDisk: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DiskRequestBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to modify database disk */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get disk utilization */
+  DiskController_getDiskUtilization: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DiskUtilMetricsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get disk utilization */
       500: {
         content: never
       }
@@ -13018,6 +13469,25 @@ export interface operations {
       }
     }
   }
+  /** Gets the Vercel redirect url */
+  VercelRedirectController_getRedirectUrl: {
+    parameters: {
+      path: {
+        installation_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['VercelRedirectResponse']
+        }
+      }
+      /** @description Failed to get Vercel redirect url */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets the Vercel access token for the given code */
   VercelAccessTokenController_getAccessToken: {
     parameters: {
@@ -13155,6 +13625,26 @@ export interface operations {
         content: never
       }
       /** @description Failed to process Vercel event */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Syncs an invoice to Vercel. If already synced, Vercel will not process it again. */
+  VercelSyncController_syncInvoice: {
+    parameters: {
+      query: {
+        dryRun: boolean
+      }
+      path: {
+        invoice_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to sync invoice */
       500: {
         content: never
       }
@@ -13713,6 +14203,29 @@ export interface operations {
         content: never
       }
       /** @description Failed to refresh secrets */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Processes a project's WAL verification report. */
+  WalVerificationReportingController_processWalVerification: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['WalVerificationReportBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to update health status. */
       500: {
         content: never
       }

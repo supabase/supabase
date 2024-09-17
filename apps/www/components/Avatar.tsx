@@ -17,7 +17,10 @@ export default function Avatar(props: Props) {
         width={32}
         height={32}
       />
-      <figcaption style={{ marginTop: 0 }} className="text-foreground-lighter">
+      <figcaption
+        style={{ marginTop: 0 }}
+        className="text-foreground-lighter font-normal not-italic not-prose"
+      >
         <p>{caption}</p>
       </figcaption>
     </div>
