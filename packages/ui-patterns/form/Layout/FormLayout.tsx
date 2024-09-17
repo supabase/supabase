@@ -16,7 +16,7 @@ type Props = {
   error?: string | React.ReactNode
   label?: string | React.ReactNode
   labelOptional?: string | React.ReactNode
-  layout?: 'horizontal' | 'vertical' | 'flex'
+  layout?: 'horizontal' | 'vertical' | 'flex' | 'flex-row-reverse'
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   beforeLabel?: string | React.ReactNode
   afterLabel?: string | React.ReactNode
@@ -45,6 +45,7 @@ const ContainerVariants = cva('relative grid gap-2', {
       horizontal: 'grid grid-cols-12',
       vertical: 'flex flex-col gap-3',
       flex: 'flex flex-row gap-3',
+      'flex-row-reverse': 'flex flex-row gap-3 flex-row-reverse justify-between',
     },
     flex: {
       true: '',
@@ -54,6 +55,11 @@ const ContainerVariants = cva('relative grid gap-2', {
   compoundVariants: [
     {
       layout: 'flex',
+      align: 'right',
+      className: 'justify-between',
+    },
+    {
+      layout: 'flex-row-reverse',
       align: 'right',
       className: 'justify-between',
     },
@@ -75,6 +81,7 @@ const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
       horizontal: 'flex flex-col gap-2 col-span-4',
       vertical: 'flex flex-row gap-2 justify-between',
       flex: 'flex flex-col gap-0',
+      'flex-row-reverse': 'flex flex-col gap-2',
     },
     labelLayout: {
       horizontal: '',
@@ -122,6 +129,7 @@ const DataContainerVariants = cva('transition-all duration-500 ease-in-out', {
       horizontal: '',
       vertical: '',
       flex: '',
+      'flex-row-reverse': '',
     },
   },
   compoundVariants: [
@@ -162,6 +170,7 @@ const DescriptionVariants = cva('text-foreground-lighter leading-normal', {
       vertical: 'mt-2',
       horizontal: 'mt-2',
       flex: '',
+      'flex-row-reverse': '',
     },
   },
   defaultVariants: {},
@@ -232,6 +241,7 @@ const NonBoxInputContainer = cva('', {
     layout: {
       vertical: '',
       horizontal: '',
+      'flex-row-reverse': '',
     },
   },
   compoundVariants: [
@@ -276,7 +286,7 @@ export const FormLayout = React.forwardRef<
     },
     ref
   ) => {
-    const flex = layout === 'flex'
+    const flex = layout === 'flex' || layout === 'flex-row-reverse'
     const hasLabel = Boolean(label || beforeLabel || afterLabel)
     const renderError = isReactForm && !hideMessage && (
       <motion.div
