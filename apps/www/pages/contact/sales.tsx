@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -7,7 +8,7 @@ import { Button, cn, Input_Shadcn_, Label_Shadcn_, Separator, TextArea_Shadcn_ }
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import Panel from '~/components/Panel'
+import EnterpriseFormQuotes from '~/components/EnterpriseFormQuotes'
 
 interface FormData {
   firstName: string
@@ -118,6 +119,7 @@ const ContactSales = () => {
     }
 
     setErrors(newErrors)
+
     return Object.keys(newErrors).length === 0
   }
 
@@ -166,19 +168,55 @@ const ContactSales = () => {
         }}
       />
       <DefaultLayout className="!min-h-fit">
-        <SectionContainer className="text grid gap-8 lg:gap-12 md:grid-cols-2 md:max-w-6xl">
-          <div className="md:px-4 md:h-full w-full md:max-w-md flex flex-col justify-between gap-2">
-            <div className="flex flex-col gap-2">
-              <h1 className="h1">Talk to our Sales team</h1>
+        <SectionContainer className="text grid gap-8 lg:gap-12 md:grid-cols-2">
+          <div className="md:px-4 lg:pb-8 md:h-full w-full flex flex-col justify-between gap-2">
+            <div className="flex flex-col gap-2 md:max-w-md">
+              <h1 className="h1 !m-0">Talk to our Sales team</h1>
               <p className="md:text-lg text-foreground-lighter">
                 Book a demo to explore how Supabase can support your business growth with features
                 and plans designed to scale.
               </p>
             </div>
-            <div className="md:pb-8">Quotes here...</div>
+            <EnterpriseFormQuotes
+              className="hidden md:flex"
+              tabs={[
+                {
+                  label: (
+                    <CustomerLogo title="Goodtape" logo="/images/customers/logos/good-tape.png" />
+                  ),
+                  panel: (
+                    <CustomerQuote
+                      quote="My biggest regret is not having gone with Supabase from the beginning."
+                      author="Jakob Steinn, Co-founder & Tech Lead, Good Tape"
+                    />
+                  ),
+                },
+                {
+                  label: <CustomerLogo title="Xendit" logo="/images/customers/logos/xendit.png" />,
+                  panel: (
+                    <CustomerQuote
+                      quote="The full solution was built and in production in less than one week."
+                      author="Developer, Xendit"
+                    />
+                  ),
+                },
+                {
+                  label: (
+                    <CustomerLogo title="Chatbase" logo="/images/customers/logos/chatbase.png" />
+                  ),
+                  panel: (
+                    <CustomerQuote
+                      quote="Supabase is great because it has everything. I don’t need a different solution for authentication, a different solution for database, or a different solution for storage."
+                      author="Yasser Elsaid, Founder, Chatbase"
+                      className="max-w-none"
+                    />
+                  ),
+                },
+              ]}
+            />
           </div>
           <div className="flex flex-col gap-4 w-full items-center justify-center min-h-[300px]">
-            <Panel innerClassName="p-4 md:p-6 w-full md:max-w-lg min-h-[300px]">
+            <div className="border rounded-xl bg-surface-75 p-4 md:p-6 w-full md:max-w-lg min-h-[300px]">
               {success ? (
                 <div className="flex flex-col h-full w-full min-w-[300px] gap-2 items-center justify-center opacity-0 transition-opacity animate-fade-in scale-1">
                   <p className="text-center">{success}</p>
@@ -253,18 +291,94 @@ const ContactSales = () => {
                   )}
                 </form>
               )}
-            </Panel>
+            </div>
             <p className="text-foreground-lighter text-sm">
               <Link href="/support" className="text-foreground hover:underline">
                 Contact support
               </Link>{' '}
-              if you need technical help.
+              if you need technical help
             </p>
           </div>
+          <EnterpriseFormQuotes
+            className="md:hidden mt-4"
+            tabs={[
+              {
+                label: (
+                  <CustomerLogo title="Goodtape" logo="/images/customers/logos/good-tape.png" />
+                ),
+                panel: (
+                  <CustomerQuote
+                    quote="My biggest regret is not having gone with Supabase from the beginning."
+                    author="Jakob Steinn Co-founder & Tech Lead"
+                  />
+                ),
+              },
+              {
+                label: <CustomerLogo title="Xendit" logo="/images/customers/logos/xendit.png" />,
+                panel: (
+                  <CustomerQuote
+                    quote="The full solution was built and in production in less than one week."
+                    author="Xendit developer"
+                  />
+                ),
+              },
+              {
+                label: (
+                  <CustomerLogo title="Chatbase" logo="/images/customers/logos/chatbase.png" />
+                ),
+                panel: (
+                  <CustomerQuote
+                    quote="Supabase is great because it has everything. I don’t need a different solution for authentication, a different solution for database, or a different solution for storage."
+                    author="Yasser Elsaid, Founder, Chatbase"
+                    className="max-w-none"
+                  />
+                ),
+              },
+            ]}
+          />
         </SectionContainer>
       </DefaultLayout>
     </>
   )
 }
+
+const CustomerQuote = ({
+  quote,
+  author,
+  className,
+}: {
+  quote: string
+  author: string
+  className?: string
+}) => (
+  <div
+    className={cn('text-foreground flex text-base lg:text-lg flex-col gap-1 max-w-xs', className)}
+  >
+    <p>"{quote}"</p>
+    <p className="text-foreground-lighter text-sm">{author}</p>
+  </div>
+)
+
+const CustomerLogo = ({ title, logo }: { title: string; logo: string }) => (
+  <div className="relative h-8 max-h-6 w-28">
+    <Image
+      fill
+      src={logo}
+      alt={`${title} logo`}
+      priority
+      placeholder="blur"
+      blurDataURL="/images/blur.png"
+      draggable={false}
+      className="
+        bg-no-repeat m-0
+        object-left object-contain
+
+        [[data-theme*=dark]_&]:brightness-200
+        [[data-theme*=dark]_&]:contrast-0
+        [[data-theme*=dark]_&]:filter
+      "
+    />
+  </div>
+)
 
 export default ContactSales
