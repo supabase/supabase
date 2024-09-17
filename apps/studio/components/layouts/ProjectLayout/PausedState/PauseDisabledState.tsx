@@ -1,8 +1,16 @@
-import { toast } from 'sonner'
 import { ChevronDown, Download } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
+import { useStorageArchiveCreateMutation } from 'data/storage/storage-archive-create-mutation'
+import { useStorageArchiveQuery } from 'data/storage/storage-archive-query'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Database, Storage } from 'icons'
+import { PROJECT_STATUS } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -10,20 +18,17 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   WarningIcon,
 } from 'ui'
 import { useProjectContext } from '../ProjectContext'
-import { PROJECT_STATUS } from 'lib/constants'
-import { useFlag } from 'hooks/ui/useFlag'
-import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
-import { useStorageArchiveQuery } from 'data/storage/storage-archive-query'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { Database, Storage } from 'icons'
 
 export const PauseDisabledState = () => {
   const { ref } = useParams()
   const { project } = useProjectContext()
+  const [toastId, setToastId] = useState<string | number>()
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
 
   const { data: pauseStatus } = useProjectPauseStatusQuery(
@@ -34,7 +39,21 @@ export const PauseDisabledState = () => {
   )
   const latestBackup = pauseStatus?.latest_downloadable_backup_id
 
-  const { data: storageArchive } = useStorageArchiveQuery({ projectRef: ref })
+  const { data: storageArchive } = useStorageArchiveQuery(
+    { projectRef: ref },
+    {
+      refetchInterval,
+      refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        if (data.fileUrl && refetchInterval !== false) {
+          toast.success('Downloading storage objects', { id: toastId })
+          setToastId(undefined)
+          setRefetchInterval(false)
+          downloadStorageArchive(data.fileUrl)
+        }
+      },
+    }
+  )
   const storageArchiveUrl = storageArchive?.fileUrl
 
   const { mutate: downloadBackup } = useBackupDownloadMutation({
@@ -47,6 +66,16 @@ export const PauseDisabledState = () => {
       document.body.appendChild(tempLink)
       tempLink.click()
       document.body.removeChild(tempLink)
+    },
+  })
+
+  const { mutate: createStorageArchive } = useStorageArchiveCreateMutation({
+    onSuccess: () => {
+      const toastId = toast.loading(
+        'Retrieving storage archive. This may take a few minutes depending on the size of your storage objects.'
+      )
+      setToastId(toastId)
+      setRefetchInterval(5000)
     },
   })
 
@@ -77,15 +106,21 @@ export const PauseDisabledState = () => {
     )
   }
 
-  const onSelectDownloadStorageArchive = () => {
-    if (!storageArchiveUrl) return toast.error('No storage archive available for download')
-    toast.success('Downloading storage objects')
-    // Trigger browser download by create,trigger and remove tempLink
+  const downloadStorageArchive = (url: string) => {
     const tempLink = document.createElement('a')
-    tempLink.href = storageArchiveUrl
+    tempLink.href = url
     document.body.appendChild(tempLink)
     tempLink.click()
     document.body.removeChild(tempLink)
+  }
+
+  const onSelectDownloadStorageArchive = () => {
+    if (!storageArchiveUrl) {
+      createStorageArchive({ projectRef: ref })
+    } else {
+      toast.success('Downloading storage objects')
+      downloadStorageArchive(storageArchiveUrl)
+    }
   }
 
   return (
@@ -122,20 +157,10 @@ export const PauseDisabledState = () => {
               <Database size={16} />
               Download database backup
             </DropdownMenuItemTooltip>
-            <DropdownMenuItemTooltip
-              disabled={!storageArchiveUrl}
-              className="gap-x-2"
-              onClick={() => onSelectDownloadStorageArchive()}
-              tooltip={{
-                content: {
-                  side: 'right',
-                  text: 'No storage archive available for download',
-                },
-              }}
-            >
+            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDownloadStorageArchive()}>
               <Storage size={16} />
               Download storage objects
-            </DropdownMenuItemTooltip>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </AlertDescription_Shadcn_>
