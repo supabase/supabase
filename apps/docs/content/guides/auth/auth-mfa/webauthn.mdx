@@ -148,7 +148,7 @@ Once a user has registered a factor, they can proceed to log in. In single-step 
 const { data, error } = await supabase.auth.mfa.verify({ factorType: 'webauthn' })
 ```
 
-As with enrollment, developers have the option of performing verification over multiple steps
+As with enrollment, developers have the option of performing verification over multiple steps.
 
 ```
 const { data: factors, error } = await supabase.auth.mfa.listFactors()
@@ -158,17 +158,30 @@ const { data, error } = await supabase.auth.mfa.challenge({
 
 const credential = await generateAuthenticationOptions({authenticator: {userVerification, timeout, authenticatorAttachment}})
 
-const { data: factor, error } = await supabase.auth.mfa.verify({ factorId, credential, useMultiStep: true, allowAnyCredential: true })
+const { data: factor, error } = await supabase.auth.mfa.verify({ factorId, credential, useMultiStep: true})
 ```
 
-In both modes, developers can set `allowAnyCredentials` to true to prioritize User Experience. Users often have multiple security keys for multi-factor authentication. These could be used for different services or different work contexts. These keys are physically identical, which can lead to confusion during the verification process where a user could use a key registered with service A to authenticate against service B
+Note that you do not have to specify a `factorId` parameter. Unlike MFA (Phone) and MFA (TOTP), authentication via the WebAuthn factor does not depend on the specific factor in use. Auth will check the assertion against all verified factors owned by the user, as well as the existing WebAuthn session, and make a decision on authentication based on the information given.
 
-When a user has multiple registered security keys (e.g., known Key A and unknown Key B), they might accidentally use an unknown key during verification.
+## Factor Management
 
-For example:
+## Best Practices
 
-1. The app requests verification using known Key A.
-2. The user inserts unknown Key B.
-3. The app rejects the key, saying it's not recognized.
+You can use the following directives to help control availability of a credential in an iframe. Add these directives so that WebAuthn pop-ups for authentication can be shown in the iframe.
 
-This creates a confusing experience for the user, who has the correct keys but in the wrong order.
+- [`publickey-credentials-create`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy/publickey-credentials-create): Controls the availability of [`navigator.credentials.create()`](https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/create) with the `publicKey` option.
+- [`publickey-credentials-get`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy/publickey-credentials-get): Controls the availability of [`navigator.credentials.get()`](https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get) with the `publicKey` option.
+
+Both directives have a default allowlist value of `"self"`, meaning that by default these methods can be used in top-level document contexts.
+
+```jsx
+<iframe
+  src="https://auth.provider.com"
+  allow="publickey-credentials-get *">
+</iframe>
+```
+
+```html
+<iframe
+  src="https://auth.provider.com"allow="publickey-credentials-create 'self' https://a.auth.provider.com https://b.auth.provider.com"></iframe>
+```
