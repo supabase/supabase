@@ -141,8 +141,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     if (q) {
       onSelectTemplate({
         mode: 'custom',
-        searchString: q as string,
+        searchString: q,
       })
+      setWarehouseEditorValue(q)
     }
   }, [])
 
@@ -193,7 +194,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       const whQuery = warehouseEditorValue
 
       if (!warehouseCollections?.length) {
-        toast.error('You do not have any collections in your warehouse yet.')
+        toast.error('You do not have any collections yet.')
         return
       }
 
@@ -213,9 +214,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       const logsSourceExists = logsSources.find((source) => whQuery.includes(source))
 
       if (logsSourceExists) {
-        toast.error(
-          'Cannot query logs tables from a warehouse query. Please remove the logs table from the query.'
-        )
+        toast.error('Cannot query logs tables from current query.')
         return
       }
 
@@ -298,7 +297,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   return (
     <div className="w-full h-full mx-auto">
       <ResizablePanelGroup
-        className="w-full h-full"
+        className="w-full h-full max-h-screen"
         direction="vertical"
         autoSaveId={LOCAL_STORAGE_KEYS.LOG_EXPLORER_SPLIT_SIZE}
       >
@@ -351,9 +350,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           )}
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel collapsible minSize={5} className="flex flex-col flex-grow">
+        <ResizablePanel collapsible minSize={5} className="overflow-auto">
           <LoadingOpacity active={isLoading}>
             <LogTable
+              maxHeight="100%"
               showHistogramToggle={false}
               onRun={handleRun}
               onSave={handleOnSave}
@@ -363,10 +363,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               error={error}
               projectRef={projectRef}
             />
+
+            <div className="flex flex-row justify-end mt-2">
+              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
+            </div>
           </LoadingOpacity>
-          <div className="flex flex-row justify-end mt-2">
-            <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
-          </div>
         </ResizablePanel>
       </ResizablePanelGroup>
 

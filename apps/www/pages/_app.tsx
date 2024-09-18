@@ -69,10 +69,10 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.isReady, consentValue])
 
   const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
-  const { basePath, pathname } = useRouter()
+  const { basePath } = useRouter()
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()
-  const forceDarkMode = pathname === '/' || isDarkLaunchWeek
+  const forceDarkMode = isDarkLaunchWeek
 
   let applicationName = 'Supabase'
   let faviconRoute = DEFAULT_FAVICON_ROUTE

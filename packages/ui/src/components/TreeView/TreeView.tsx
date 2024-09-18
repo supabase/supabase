@@ -70,8 +70,16 @@ const TreeViewItem = forwardRef<
     useEffect(() => {
       if (isEditing) {
         inputRef.current?.focus()
+      } else {
+        setLocalValueState(name)
       }
     }, [isEditing])
+
+    useEffect(() => {
+      if (!isLoading) {
+        setLocalValueState(name)
+      }
+    }, [isLoading])
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()

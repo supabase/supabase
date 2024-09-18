@@ -15,7 +15,7 @@ import {
   Switch,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { getAvatarUrl, getDisplayName } from '../Auth/Users/UserListItem.utils'
+import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 

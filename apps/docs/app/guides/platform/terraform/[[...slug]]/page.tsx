@@ -1,11 +1,11 @@
 import matter from 'gray-matter'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import rehypeSlug from 'rehype-slug'
+
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
-import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 import { isValidGuideFrontmatter } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
@@ -103,7 +103,7 @@ const getContent = async ({ slug }: Params) => {
   const page = pageMap.find((page) => page.slug === requestedSlug)
 
   if (!page) {
-    redirect(notFoundLink('platform/terraform' + (slug?.join('/') ?? '')))
+    notFound()
   }
 
   const { meta, remoteFile, useRoot } = page

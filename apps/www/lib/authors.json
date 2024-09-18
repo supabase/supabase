@@ -525,5 +525,13 @@
     "position": "Guest Author",
     "author_url": "https://x.com/jmeistrich",
     "author_image_url": "https://github.com/jmeistrich.png"
+  },
+  {
+    "author_id": "nyannyacha",
+    "author": "Nyannyacha",
+    "username": "nyannyacha",
+    "position": "Engineering",
+    "author_url": "https://github.com/nyannyacha",
+    "author_image_url": "https://github.com/nyannyacha.png"
   }
 ]
