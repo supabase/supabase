@@ -128,6 +128,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
   const planId = subscription?.plan.id ?? ''
   const isDirty = Object.keys(form.formState.dirtyFields).length > 0
 
+  const replicaTooltipText = `Price change includes primary database and ${numReplicas} replica${numReplicas > 1 ? 's' : ''}`
+
   const diskSizePrice = calculateDiskSizePrice({
     planId,
     oldSize: form.formState.defaultValues?.totalSize || 0,
@@ -206,11 +208,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
               unit="IOPS"
               beforePrice={Number(iopsPrice.oldPrice)}
               afterPrice={Number(iopsPrice.newPrice)}
-              priceTooltip={
-                numReplicas > 0
-                  ? `Price change includes for primary database and ${numReplicas} replicas`
-                  : undefined
-              }
+              priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
             />
             {form.getValues('storageType') === 'gp3' ? (
               <TableDataRow
@@ -220,11 +218,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 unit="MB/s"
                 beforePrice={Number(throughputPrice.oldPrice)}
                 afterPrice={Number(throughputPrice.newPrice)}
-                priceTooltip={
-                  numReplicas > 0
-                    ? `Price change includes for primary database and ${numReplicas} replicas`
-                    : undefined
-                }
+                priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
               />
             ) : (
               <TableRow>
@@ -247,11 +241,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
               unit="GB"
               beforePrice={Number(diskSizePrice.oldPrice)}
               afterPrice={Number(diskSizePrice.newPrice)}
-              priceTooltip={
-                numReplicas > 0
-                  ? `Price change includes for primary database and ${numReplicas} replicas`
-                  : undefined
-              }
+              priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
             />
           </TableBody>
           <TableCaption className="mt-2 mb-2">

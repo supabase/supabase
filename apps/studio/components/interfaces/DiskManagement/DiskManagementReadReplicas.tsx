@@ -58,7 +58,7 @@ export const DiskManagementDiskSizeReadReplicas = ({
             <Alert variant="default" className="bg-transparent">
               <InfoIcon />
               <AlertTitle>
-                Read replicas are provisioned with extra 25% disk space to account for WAL files
+                Read replicas are provisioned with extra 25% disk size to account for WAL files
               </AlertTitle>
               <AlertDescription>
                 Each replica will have a disk size of {newTotalSize}GB, and are billed separately
@@ -172,7 +172,6 @@ export const DiskManagementIOPSReadReplicas = ({
             <InfoIcon />
             <AlertTitle>Read replica IOPS will also be updated to the same value</AlertTitle>
             <AlertDescription>
-              Each replica will have IOPS of {newIOPS}, and are billed separately
               <ul className="list-disc pl-4 my-3 flex flex-col gap-2">
                 {readReplicas.map((replica, index) => (
                   <li key={index} className="marker:text-foreground-light">
@@ -236,7 +235,6 @@ export const DiskManagementThroughputReadReplicas = ({
             <InfoIcon />
             <AlertTitle>Read replica throughput will also be updated to the same value</AlertTitle>
             <AlertDescription>
-              Each replica will have a throughput of {newThroughput} MB/s, and are billed separately
               <ul className="list-disc pl-4 my-3 flex flex-col gap-2">
                 {readReplicas.map((replica, index) => (
                   <li key={index} className="marker:text-foreground-light">

@@ -422,24 +422,23 @@ const DeployNewReplicaPanel = ({
                   <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
                     <p className="text-sm text-left">
                       New replicas will cost an additional $
-                      {(estComputeMonthlyCost + additionalCostDiskSize).toFixed(2)}/month
+                      {(
+                        estComputeMonthlyCost +
+                        additionalCostDiskSize +
+                        Number(additionalCostIOPS) +
+                        Number(additionalCostThroughput)
+                      ).toFixed(2)}
+                      /month
                     </p>
                     <ChevronDown size={14} className="transition" />
                   </CollapsibleTrigger_Shadcn_>
                   <CollapsibleContent_Shadcn_ className="flex flex-col gap-y-1 mt-1">
                     <p className="text-foreground-light text-sm">
                       Read replicas will match the compute size of your primary database and will
-                      include 25% more disk space than the primary database to accommodate WAL
-                      files.
+                      include 25% more disk size than the primary database to accommodate WAL files.
                     </p>
                     <p className="text-foreground-light text-sm">
-                      The additional cost per replica is based on your current compute size of{' '}
-                      <span className="text-foreground">{selectedComputeMeta?.name}</span> and your
-                      current disk size of{' '}
-                      <span className="text-foreground">
-                        {diskConfiguration?.attributes.size_gb}GB
-                      </span>
-                      , broken down as follows:
+                      The additional cost per replica breaks down to:
                     </p>
                     <Table>
                       <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:pb-2 [&_th]:pt-4">
@@ -460,7 +459,7 @@ const DeployNewReplicaPanel = ({
                         <TableRow>
                           <TableCell className="pl-0">Disk size</TableCell>
                           <TableCell>
-                            {(size_gb ?? 0) * 1.25}GB ({type})
+                            {(size_gb ?? 0) * 1.25} GB ({type})
                           </TableCell>
                           <TableCell className="text-right font-mono pr-0">
                             ${additionalCostDiskSize.toFixed(2)}
@@ -468,7 +467,7 @@ const DeployNewReplicaPanel = ({
                         </TableRow>
                         <TableRow>
                           <TableCell className="pl-0">IOPS</TableCell>
-                          <TableCell>{iops}IOPS</TableCell>
+                          <TableCell>{iops} IOPS</TableCell>
                           <TableCell className="text-right font-mono pr-0">
                             ${additionalCostIOPS}
                           </TableCell>
@@ -476,7 +475,7 @@ const DeployNewReplicaPanel = ({
                         {type === 'gp3' && (
                           <TableRow>
                             <TableCell className="pl-0">Throughput</TableCell>
-                            <TableCell>{throughput_mbps}MB/s</TableCell>
+                            <TableCell>{throughput_mbps} MB/s</TableCell>
                             <TableCell className="text-right font-mono pr-0">
                               ${additionalCostThroughput}
                             </TableCell>
