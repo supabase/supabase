@@ -76,7 +76,9 @@ const PolicyTableRowHeader = ({
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: 'You need additional permissions to create RLS policies',
+                  text: !canToggleRLS
+                    ? 'You need additional permissions to create RLS policies'
+                    : undefined,
                 },
               }}
             >
@@ -92,7 +94,9 @@ const PolicyTableRowHeader = ({
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: 'You need additional permissions to create RLS policies',
+                  text: !canToggleRLS
+                    ? 'You need additional permissions to create RLS policies'
+                    : 'Use Supabase Assistant to help',
                 },
               }}
             >
