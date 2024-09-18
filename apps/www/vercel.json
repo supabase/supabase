@@ -1,8 +1,7 @@
 {
   "functions": {
-    "**/api/contact-sales.tsx": {
-      "memory": 3009,
-      "maxDuration": 30
+    "api/**": {
+      "excludeFiles": "{.next,*.cache,node_modules,public,app}/**"
     }
   }
 }
