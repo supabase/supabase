@@ -69,7 +69,7 @@ export const Restriction = () => {
                   {subscription.plan.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}
                 </Link>
               </Button>
-              <Button asChild type="default" icon={<ExternalLink size={14} />}>
+              <Button asChild type="default" icon={<ExternalLink />}>
                 <a href="https://supabase.com/docs/guides/platform/spend-cap">About spend cap</a>
               </Button>
             </div>
@@ -95,7 +95,7 @@ export const Restriction = () => {
               <Button asChild key="upgrade-button" type="default">
                 <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
               </Button>
-              <Button asChild type="default" icon={<ExternalLink size={14} />}>
+              <Button asChild type="default" icon={<ExternalLink />}>
                 <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
                   About Fair Use Policy
                 </a>
@@ -122,7 +122,7 @@ export const Restriction = () => {
               <Button key="upgrade-button" asChild type="default">
                 <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
               </Button>
-              <Button asChild type="default" icon={<ExternalLink size={14} />}>
+              <Button asChild type="default" icon={<ExternalLink />}>
                 <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
                   About Fair Use Policy
                 </a>
@@ -149,7 +149,7 @@ export const Restriction = () => {
               <Button key="upgrade-button" asChild type="default">
                 <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
               </Button>
-              <Button asChild type="default" icon={<ExternalLink size={14} />}>
+              <Button asChild type="default" icon={<ExternalLink />}>
                 <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
                   About Fair Use Policy
                 </a>

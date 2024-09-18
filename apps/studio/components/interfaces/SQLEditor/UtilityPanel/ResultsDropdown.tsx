@@ -3,14 +3,16 @@ import { markdownTable } from 'markdown-table'
 import { useRouter } from 'next/router'
 import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useTelemetryProps } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useFlag } from 'hooks/ui/useFlag'
 import { copyToClipboard } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { ChevronDownIcon, Clipboard, Download } from 'lucide-react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
   DropdownMenu,
@@ -18,8 +20,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export type ResultsDropdownProps = {
   id: string

@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -8,8 +8,9 @@ import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
 import type { VaultSecret } from 'types'
-import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
+import { Button, Form, Input, Modal } from 'ui'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
+import { EyeOff, Eye } from 'lucide-react'
 
 interface EditSecretModalProps {
   selectedSecret: VaultSecret | undefined
@@ -145,7 +146,7 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
                     <div className="mr-1">
                       <Button
                         type="default"
-                        icon={showSecretValue ? <IconEyeOff /> : <IconEye />}
+                        icon={showSecretValue ? <EyeOff /> : <Eye />}
                         onClick={() => setShowSecretValue(!showSecretValue)}
                       />
                     </div>

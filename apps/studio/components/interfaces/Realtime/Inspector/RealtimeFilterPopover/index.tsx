@@ -18,10 +18,10 @@ import {
 } from 'ui'
 
 import Telemetry from 'lib/telemetry'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig

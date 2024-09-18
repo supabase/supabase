@@ -2,27 +2,16 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { noop } from 'lodash'
 import Link from 'next/link'
 import { ReactNode } from 'react'
-import {
-  Alert,
-  Button,
-  IconCalendar,
-  IconCircle,
-  IconExternalLink,
-  IconHash,
-  IconToggleRight,
-  IconType,
-  Input,
-  Listbox,
-} from 'ui'
+import { Alert, Button, Input, Listbox } from 'ui'
 
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { Calendar, Circle, ExternalLink, Hash, ListPlus, ToggleRight, Type } from 'lucide-react'
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
   RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '../SidePanelEditor.constants'
 import type { PostgresDataTypeOption } from '../SidePanelEditor.types'
-import { ListPlus } from 'lucide-react'
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 
 interface ColumnTypeProps {
   value: string
@@ -59,11 +48,11 @@ const ColumnType = ({
   const inferIcon = (type: string) => {
     switch (type) {
       case 'number':
-        return <IconHash size={16} className="text-foreground" strokeWidth={1.5} />
+        return <Hash size={16} className="text-foreground" strokeWidth={1.5} />
       case 'time':
-        return <IconCalendar size={16} className="text-foreground" strokeWidth={1.5} />
+        return <Calendar size={16} className="text-foreground" strokeWidth={1.5} />
       case 'text':
-        return <IconType size={16} className="text-foreground" strokeWidth={1.5} />
+        return <Type size={16} className="text-foreground" strokeWidth={1.5} />
       case 'json':
         return (
           <div className="text-foreground" style={{ padding: '0px 1px' }}>
@@ -71,9 +60,9 @@ const ColumnType = ({
           </div>
         )
       case 'bool':
-        return <IconToggleRight size={16} className="text-foreground" strokeWidth={1.5} />
+        return <ToggleRight size={16} className="text-foreground" strokeWidth={1.5} />
       default:
-        return <IconCircle size={16} className="text-foreground p-0.5" strokeWidth={1.5} />
+        return <Circle size={16} className="text-foreground p-0.5" strokeWidth={1.5} />
     }
   }
 
@@ -243,7 +232,7 @@ const ColumnType = ({
             unless you have a very specific use case.
           </p>
           <div className="flex items-center space-x-2 mt-3">
-            <Button asChild type="default" icon={<IconExternalLink />}>
+            <Button asChild type="default" icon={<ExternalLink />}>
               <Link href={recommendation.reference} target="_blank" rel="noreferrer">
                 Read more
               </Link>

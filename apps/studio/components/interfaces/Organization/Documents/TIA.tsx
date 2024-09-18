@@ -3,7 +3,8 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { Button, IconExternalLink } from 'ui'
+import { ExternalLink } from 'lucide-react'
+import { Button } from 'ui'
 
 const TIA = () => {
   return (
@@ -24,7 +25,7 @@ const TIA = () => {
           rel="noreferrer noopener"
           download={true}
         >
-          <Button type="default" iconRight={<IconExternalLink />}>
+          <Button type="default" iconRight={<ExternalLink />}>
             View TIA
           </Button>
         </a>

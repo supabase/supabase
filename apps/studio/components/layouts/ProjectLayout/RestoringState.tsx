@@ -1,13 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
-import { Button, IconCheckCircle, IconLoader } from 'ui'
+import { Button } from 'ui'
 
 import { projectKeys } from 'data/projects/keys'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useProjectContext } from './ProjectContext'
+import { CheckCircle, Loader } from 'lucide-react'
 
 const RestoringState = () => {
   const { ref } = useParams()
@@ -54,7 +55,7 @@ const RestoringState = () => {
           <div className="space-y-6 pt-6">
             <div className="flex px-8 space-x-8">
               <div className="mt-1">
-                <IconCheckCircle className="text-brand" size={18} strokeWidth={2} />
+                <CheckCircle className="text-brand" size={18} strokeWidth={2} />
               </div>
               <div className="space-y-1">
                 <p>Restoration complete!</p>
@@ -73,7 +74,7 @@ const RestoringState = () => {
           <div className="space-y-6 py-6">
             <div className="flex px-8 space-x-8">
               <div className="mt-1">
-                <IconLoader className="animate-spin" size={18} />
+                <Loader className="animate-spin" size={18} />
               </div>
               <div className="space-y-1">
                 <p>Restoration in progress</p>

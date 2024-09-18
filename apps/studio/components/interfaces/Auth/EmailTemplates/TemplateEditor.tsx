@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
+import { useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
@@ -11,16 +11,8 @@ import InformationBox from 'components/ui/InformationBox'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { FormSchema } from 'types'
-import {
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Form,
-  IconCode,
-  IconInfo,
-  IconMonitor,
-  Input,
-  Tabs,
-} from 'ui'
+import { AlertTitle_Shadcn_, Alert_Shadcn_, Form, Input, Tabs } from 'ui'
+import { Code, Monitor, Info } from 'lucide-react'
 
 interface TemplateEditorProps {
   template: FormSchema
@@ -46,6 +38,8 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT`
   const messageProperty = properties[messageSlug]
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
 
@@ -64,10 +58,26 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
             values: values,
             initialValues: values,
           })
+          setHasUnsavedChanges(false) // Reset the unsaved changes state
         },
       }
     )
   }
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        e.returnValue = '' // deprecated, but older browsers still require this
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [hasUnsavedChanges])
 
   return (
     <Form id={formId} className="!border-t-0" initialValues={INITIAL_VALUES} onSubmit={onSubmit}>
@@ -136,22 +146,27 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                       />
                     </div>
                     <Tabs defaultActiveId="source" type="underlined" size="tiny">
-                      <Tabs.Panel id={'source'} icon={<IconCode />} label="Source">
+                      <Tabs.Panel id={'source'} icon={<Code />} label="Source">
                         <div className="relative h-96">
                           <CodeEditor
                             id="code-id"
                             language="html"
                             isReadOnly={!canUpdateConfig}
                             className="!mb-0 h-96 overflow-hidden rounded border"
-                            onInputChange={(e: string | undefined) => setBodyValue(e ?? '')}
+                            onInputChange={(e: string | undefined) => {
+                              setBodyValue(e ?? '')
+                              if (bodyValue !== e) {
+                                setHasUnsavedChanges(true)
+                              }
+                            }}
                             options={{ wordWrap: 'off', contextmenu: false }}
                             value={bodyValue}
                           />
                         </div>
                       </Tabs.Panel>
-                      <Tabs.Panel id={'preview'} icon={<IconMonitor />} label="Preview">
+                      <Tabs.Panel id={'preview'} icon={<Monitor />} label="Preview">
                         <Alert_Shadcn_ className="mb-2" variant="default">
-                          <IconInfo strokeWidth={1.5} />
+                          <Info strokeWidth={1.5} />
                           <AlertTitle_Shadcn_>
                             The preview may differ slightly from the actual rendering in the email
                             client.

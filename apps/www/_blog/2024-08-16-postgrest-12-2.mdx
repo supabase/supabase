@@ -1,0 +1,87 @@
+---
+title: 'PostgREST 12.2: Prometheus metrics'
+description: New features in the latest 12.2 release of PostgREST
+author: steve_chavez
+image: lw12/day-5/OG_postgREST.png
+thumb: lw12/day-5/thumb_postgREST.png
+launchweek: '12'
+categories:
+  - launch-week
+  - developers
+  - platform
+tags:
+  - launch-week
+  - release-notes
+  - tech
+date: '2024-08-16'
+toc_depth: 3
+---
+
+[PostgREST 12.2](https://github.com/PostgREST/postgrest/releases/tag/v12.2.0) is out! It comes with Observability and API improvements. In this post, we'll see what's new.
+
+## Prometheus Metrics
+
+Version 12.2 ships with Prometheus-compatible metrics for PostgREST's schema cache and connection pool. These are useful for troubleshooting, for example, when PostgREST's pool is starved for connections.
+
+```bash
+curl localhost:3001/metrics
+
+# HELP pgrst_db_pool_timeouts_total The total number of pool connection timeouts
+# TYPE pgrst_db_pool_timeouts_total counter
+pgrst_db_pool_timeouts_total 7.0
+
+# ....
+```
+
+A full list of supported metrics is available in the [PostgREST documentation](https://postgrest.org/en/latest/references/observability.html#metrics).
+
+## Hoisted Function Settings
+
+Sometimes it's handy to set a custom timeout per function. You can now do this on 12.2 projects with:
+
+```sql
+create or replace function special_function()
+returns void as $$
+  select pg_sleep(3); -- simulating some long-running process
+$$
+language sql
+set statement_timeout to '4s';
+```
+
+And calling the function with the [RPC interface](https://supabase.com/docs/reference/javascript/rpc).
+
+When doing `set statement_timeout`on the function, the `statement_timeout` will be “hoisted” and applied per transaction.
+
+By default this also works for other settings, namely `plan_filter.statement_cost_limit` and `default_transaction_isolation`. The list of hoisted settings can be extended by modifying the [db-hoisted-tx-settings](https://postgrest.org/en/latest/references/configuration.html#db-hoisted-tx-settings) configuration.
+
+Before 12.2, this could be done by setting a `statement_timeout` on the API roles, but this affected all the SQL statements executed by those roles.
+
+## Max Affected
+
+In prior versions of PostgREST, users could limit the number of records impacted by mutations (insert/update/delete) to 1 row using vendor media type `application/vnd.pgrst.object+json`. That supports a common use case but is not flexible enough to support user defined values.
+
+12.2 introduces the `max-affected` preference to limit the affected rows up to a custom value.
+
+For example:
+
+```bash
+curl -i "http://localhost:3000/items?id=lt.15" -X DELETE \
+  -H "Content-Type: application/json" \
+  -H "Prefer: handling=strict, max-affected=10"
+```
+
+If the number of affected records exceeds `max-affected` , an error is returned:
+
+```bash
+HTTP/1.1 400 Bad Request
+{
+    "code": "PGRST124",
+    "message": "Query result exceeds max-affected preference constraint",
+    "details": "The query affects 14 rows",
+    "hint": null
+}
+```
+
+## **Try it out**
+
+PostgREST v12.2 is already available on the Supabase platform on its latest patch version ([v12.2.3](https://github.com/PostgREST/postgrest/releases/tag/v12.2.3)) for new projects. Spin up a new project or upgrade your existing project to try it out!

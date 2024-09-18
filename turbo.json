@@ -6,12 +6,6 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"]
     },
-    "database-design#build": {
-      "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_*", "OPENAI_API_KEY", "VERCEL_URL"],
-      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.local"],
-      "outputs": [".next/**", "!.next/cache/**"]
-    },
     "design-system#build": {
       "dependsOn": ["^build"],
       "env": ["NEXT_PUBLIC_*"],

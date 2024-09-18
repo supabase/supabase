@@ -1,4 +1,5 @@
 import { BASE_PATH } from 'lib/constants'
+import { Terminal, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -7,8 +8,6 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  IconChevronDown,
-  IconTerminal,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -46,11 +45,11 @@ const LanguageSelector = ({ simplifiedVersion = false }: LanguageSelectorProps) 
                     width="14"
                   />
                 ) : (
-                  <IconTerminal size={14} strokeWidth={2.5} />
+                  <Terminal size={14} strokeWidth={2.5} />
                 )
               ) : undefined
             }
-            iconRight={!simplifiedVersion && <IconChevronDown size={14} strokeWidth={2} />}
+            iconRight={!simplifiedVersion && <ChevronDown size={14} strokeWidth={2} />}
           >
             {!simplifiedVersion
               ? `Language: ${snap.docsLanguage === 'js' ? 'Javascript' : 'Bash'}`

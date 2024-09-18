@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { isEmpty, noop, partition } from 'lodash'
-import { HelpCircle, Key } from 'lucide-react'
+import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
 import { useState } from 'react'
 import {
   DragDropContext,
@@ -17,11 +17,8 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconEdit,
-  IconExternalLink,
-  IconTrash,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
@@ -135,7 +132,7 @@ const ColumnManagement = ({
         <div className="flex items-center justify-between w-full">
           <h5>Columns</h5>
           <div className="flex items-center gap-x-2">
-            <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+            <Button asChild type="default" icon={<ExternalLink size={12} strokeWidth={2} />}>
               <a
                 href="https://supabase.com/docs/guides/database/tables#data-types"
                 target="_blank"
@@ -149,10 +146,10 @@ const ColumnManagement = ({
                 <div className="py-3 border-r" />
                 {hasImportContent ? (
                   <div className="flex items-center gap-x-2">
-                    <Button type="default" icon={<IconEdit />} onClick={onSelectImportData}>
+                    <Button type="default" icon={<Edit />} onClick={onSelectImportData}>
                       Edit content
                     </Button>
-                    <Button type="danger" icon={<IconTrash />} onClick={onClearImportContent}>
+                    <Button type="danger" icon={<Trash />} onClick={onClearImportContent}>
                       Remove content
                     </Button>
                   </div>

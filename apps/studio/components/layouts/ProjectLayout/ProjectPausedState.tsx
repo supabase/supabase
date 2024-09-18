@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { Download, PauseCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -28,10 +28,10 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  WarningIcon,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import { WarningIcon } from 'ui'
 import { useProjectContext } from './ProjectContext'
 import { RestorePaidPlanProjectNotice } from './RestorePaidPlanProjectNotice'
 

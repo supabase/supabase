@@ -136,7 +136,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             />
           </div>
           <div className="flex items-center gap-x-2">
-            <Button type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />} asChild>
+            <Button type="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>
               <a
                 target="_blank"
                 rel="noreferrer"

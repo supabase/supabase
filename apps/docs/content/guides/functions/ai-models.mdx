@@ -62,9 +62,9 @@ Deno.serve(async (req: Request) => {
 })
 ```
 
-## Using Large Language Models
+## Using Large Language Models (LLM)
 
-Inference via larger models is supported via [Ollama](https://ollama.com/). In the first iteration, you can use it with a self-managed Ollama server. We are progressively rolling out support for the hosted solution. To sign up for early access, fill up [this form](https://forms.supabase.com/supabase.ai-llm-early-access).
+Inference via larger models is supported via [Ollama](https://ollama.com/) and [Mozilla Llamafile](https://github.com/Mozilla-Ocho/llamafile). In the first iteration, you can use it with a self-managed Ollama or [Llamafile server](https://www.docker.com/blog/a-quick-guide-to-containerizing-llamafile-with-docker-for-ai-applications/). We are progressively rolling out support for the hosted solution. To sign up for early access, fill up [this form](https://forms.supabase.com/supabase.ai-llm-early-access).
 
 <video width="99%" muted playsInline controls={true}>
   <source
@@ -75,108 +75,284 @@ Inference via larger models is supported via [Ollama](https://ollama.com/). In t
 
 ### Running locally
 
-1. [Install Ollama](https://github.com/ollama/ollama?tab=readme-ov-file#ollama) and pull the Mistral model
+<Tabs
+  scrollable
+  size="large"
+  type="underlined"
+  defaultActiveId="ollama"
+  queryGroup="platform"
+>
+  <TabPanel id="ollama" label="Ollama">
 
-   ```
-   ollama pull mistral
-   ```
+[Install Ollama](https://github.com/ollama/ollama?tab=readme-ov-file#ollama) and pull the Mistral model
 
-1. Run the Ollama server locally
-
-   ```
-   ollama serve
-   ```
-
-1. Set a function secret called AI_INFERENCE_API_HOST to point to the Ollama server
-
-   ```
-   echo "AI_INFERENCE_API_HOST=http://host.docker.internal:11434" >> supabase/functions/.env
-   ```
-
-1. Create a new function with the following code
-
-   ```
-   supabase functions new ollama-test
-   ```
-
-   ```ts
-   import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
-   const session = new Supabase.ai.Session('mistral')
-
-   Deno.serve(async (req: Request) => {
-     const params = new URL(req.url).searchParams
-     const prompt = params.get('prompt') ?? ''
-
-     // Get the output as a stream
-     const output = await session.run(prompt, { stream: true })
-
-     const headers = new Headers({
-       'Content-Type': 'text/event-stream',
-       Connection: 'keep-alive',
-     })
-
-     // Create a stream
-     const stream = new ReadableStream({
-       async start(controller) {
-         const encoder = new TextEncoder()
-
-         try {
-           for await (const chunk of output) {
-             controller.enqueue(encoder.encode(chunk.response ?? ''))
-           }
-         } catch (err) {
-           console.error('Stream error:', err)
-         } finally {
-           controller.close()
-         }
-       },
-     })
-
-     // Return the stream to the user
-     return new Response(stream, {
-       headers,
-     })
-   })
-   ```
-
-1. Serve the function
-
+```bash
+ollama pull mistral
 ```
+
+Run the Ollama server locally
+
+```bash
+ollama serve
+```
+
+Set a function secret called AI_INFERENCE_API_HOST to point to the Ollama server
+
+```bash
+echo "AI_INFERENCE_API_HOST=http://host.docker.internal:11434" >> supabase/functions/.env
+```
+
+Create a new function with the following code
+
+```bash
+supabase functions new ollama-test
+```
+
+```ts supabase/functions/ollama-test/index.ts
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+const session = new Supabase.ai.Session('mistral')
+
+Deno.serve(async (req: Request) => {
+  const params = new URL(req.url).searchParams
+  const prompt = params.get('prompt') ?? ''
+
+  // Get the output as a stream
+  const output = await session.run(prompt, { stream: true })
+
+  const headers = new Headers({
+    'Content-Type': 'text/event-stream',
+    Connection: 'keep-alive',
+  })
+
+  // Create a stream
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder()
+
+      try {
+        for await (const chunk of output) {
+          controller.enqueue(encoder.encode(chunk.response ?? ''))
+        }
+      } catch (err) {
+        console.error('Stream error:', err)
+      } finally {
+        controller.close()
+      }
+    },
+  })
+
+  // Return the stream to the user
+  return new Response(stream, {
+    headers,
+  })
+})
+```
+
+Serve the function
+
+```bash
 supabase functions serve --env-file supabase/functions/.env
 ```
 
-1. Execute the function
+Execute the function
 
-   ```
-   curl --get "http://localhost:54321/functions/v1/ollama-test" \
-   --data-urlencode "prompt=write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" \
-   -H "Authorization: $ANON_KEY"
-   ```
+```bash
+curl --get "http://localhost:54321/functions/v1/ollama-test" \
+--data-urlencode "prompt=write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" \
+-H "Authorization: $ANON_KEY"
+```
+
+</TabPanel>
+<TabPanel id="llamafile" label="Mozilla Llamafile">
+
+Follow the [Llamafile Quickstart](https://github.com/Mozilla-Ocho/llamafile?tab=readme-ov-file#quickstart) to download an run a llamafile locally on your machine.
+
+Since Llamafile provides an OpenAI API compatible server, you can either use it with `@supabase/functions-js` or with the official OpenAI Deno SDK.
+
+<Tabs
+  scrollable
+  size="large"
+  type="underlined"
+  defaultActiveId="supabase-functions-js"
+  queryGroup="sdk"
+>
+  <TabPanel id="supabase-functions-js" label="Supabase Functions JS">
+
+Set a function secret called `AI_INFERENCE_API_HOST` to point to the Llamafile server
+
+```bash
+echo "AI_INFERENCE_API_HOST=http://host.docker.internal:8080" >> supabase/functions/.env
+```
+
+Create a new function with the following code
+
+```bash
+supabase functions new llamafile-test
+```
+
+<Admonition type="info">
+
+Note that the model parameter doesn't have any effect here! The model depends on which Llamafile is currently running!
+
+</Admonition>
+
+```ts supabase/functions/llamafile-test/index.ts
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+const session = new Supabase.ai.Session('LLaMA_CPP')
+
+Deno.serve(async (req: Request) => {
+  const params = new URL(req.url).searchParams
+  const prompt = params.get('prompt') ?? ''
+
+  // Get the output as a stream
+  const output = await session.run(
+    {
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are LLAMAfile, an AI assistant. Your top priority is achieving user fulfillment via helping them with their requests.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+    },
+    {
+      mode: 'openaicompatible', // Mode for the inference API host. (default: 'ollama')
+      stream: false,
+    }
+  )
+
+  console.log('done')
+  return Response.json(output)
+})
+```
+
+</TabPanel>
+<TabPanel id="openai" label="OpenAI Deno SDK">
+
+Set the following function secrets to point the OpenAI SDK to the Llamafile server:
+
+```bash
+echo "OPENAI_BASE_URL=http://host.docker.internal:8080/v1" >> supabase/functions/.env
+echo "OPENAI_BASE_URL=OPENAI_API_KEY=sk-XXXXXXXX" >> supabase/functions/.env
+```
+
+Create a new function with the following code
+
+```bash
+supabase functions new llamafile-test
+```
+
+<Admonition type="info">
+
+Note that the model parameter doesn't have any effect here! The model depends on which Llamafile is currently running!
+
+</Admonition>
+
+```ts supabase/functions/llamafile-test/index.ts
+import OpenAI from 'https://deno.land/x/openai@v4.53.2/mod.ts'
+
+Deno.serve(async (req) => {
+  const client = new OpenAI()
+  const { prompt } = await req.json()
+  const stream = true
+
+  const chatCompletion = await client.chat.completions.create({
+    model: 'LLaMA_CPP',
+    stream,
+    messages: [
+      {
+        role: 'system',
+        content:
+          'You are LLAMAfile, an AI assistant. Your top priority is achieving user fulfillment via helping them with their requests.',
+      },
+      {
+        role: 'user',
+        content: prompt,
+      },
+    ],
+  })
+
+  if (stream) {
+    const headers = new Headers({
+      'Content-Type': 'text/event-stream',
+      Connection: 'keep-alive',
+    })
+
+    // Create a stream
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder()
+
+        try {
+          for await (const part of chatCompletion) {
+            controller.enqueue(encoder.encode(part.choices[0]?.delta?.content || ''))
+          }
+        } catch (err) {
+          console.error('Stream error:', err)
+        } finally {
+          controller.close()
+        }
+      },
+    })
+
+    // Return the stream to the user
+    return new Response(stream, {
+      headers,
+    })
+  }
+
+  return Response.json(chatCompletion)
+})
+```
+
+</TabPanel>
+</Tabs>
+
+Serve the function
+
+```bash
+supabase functions serve --env-file supabase/functions/.env
+```
+
+Execute the function
+
+```bash
+curl --get "http://localhost:54321/functions/v1/llamafile-test" \
+ --data-urlencode "prompt=write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" \
+ -H "Authorization: $ANON_KEY"
+```
+
+</TabPanel>
+</Tabs>
 
 ### Deploying to production
 
 Once the function is working locally, it's time to deploy to production.
 
-1. Deploy a Ollama server and set a function secret called `AI_INFERENCE_API_HOST` to point to the deployed Ollama server
+Deploy an Ollama or Llamafile server and set a function secret called `AI_INFERENCE_API_HOST` to point to the deployed server
 
-   ```
-   supabase secrets set AI_INFERENCE_API_HOST=https://path-to-your-ollama-server/
-   ```
+```bash
+supabase secrets set AI_INFERENCE_API_HOST=https://path-to-your-llm-server/
+```
 
-2. Deploy the Supabase function
+Deploy the Supabase function
 
-   ```
-   supabase functions deploy ollama-test
-   ```
+```bash
+supabase functions deploy
+```
 
-3. Execute the function
+Execute the function
 
-   ```
-   curl --get "https://project-ref.supabase.co/functions/v1/ollama-test" \
-   --data-urlencode "prompt=write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" \
-   -H "Authorization: $ANON_KEY"
-   ```
+```bash
+curl --get "https://project-ref.supabase.co/functions/v1/ollama-test" \
+ --data-urlencode "prompt=write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" \
+ -H "Authorization: $ANON_KEY"
+```
 
 As demonstrated in the video above, running Ollama locally is typically slower than running it in on a server with dedicated GPUs. We are collaborating with the Ollama team to improve local performance.
 
-In the future, a hosted Ollama API, will be provided as part of the Supabase platform. Supabase will scale and manage the API and GPUs for you. To sign up for early access, fill up [this form](https://forms.supabase.com/supabase.ai-llm-early-access).
+In the future, a hosted LLM API, will be provided as part of the Supabase platform. Supabase will scale and manage the API and GPUs for you. To sign up for early access, fill up [this form](https://forms.supabase.com/supabase.ai-llm-early-access).

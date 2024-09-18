@@ -1,13 +1,14 @@
 import Link from 'next/link'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { generateTypes } from 'data/projects/project-type-generation-query'
-import { Button, IconDownload, IconExternalLink } from 'ui'
+import { Button } from 'ui'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
+import { ExternalLink, Download } from 'lucide-react'
 
 const Entities = ({ language }: ContentProps) => {
   const { ref } = useParams()
@@ -38,7 +39,7 @@ const Entities = ({ language }: ContentProps) => {
       <div>
         <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.generatingTypes} />
         <div className="flex items-center space-x-2 px-4 mt-3">
-          <Button asChild type="default" icon={<IconExternalLink />}>
+          <Button asChild type="default" icon={<ExternalLink />}>
             <Link
               href="https://supabase.com/docs/guides/database/api/generating-types"
               target="_blank"
@@ -51,7 +52,7 @@ const Entities = ({ language }: ContentProps) => {
             type="default"
             disabled={isGeneratingTypes}
             loading={isGeneratingTypes}
-            icon={<IconDownload strokeWidth={1.5} />}
+            icon={<Download strokeWidth={1.5} />}
             onClick={onClickGenerateTypes}
           >
             Generate and download types

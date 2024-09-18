@@ -72,7 +72,7 @@ const StorageMenu = () => {
           <ButtonTooltip
             block
             type="default"
-            icon={<Edit size={14} />}
+            icon={<Edit />}
             disabled={!canCreateBuckets}
             style={{ justifyContent: 'start' }}
             onClick={() => setShowCreateBucketModal(true)}

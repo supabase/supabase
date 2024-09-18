@@ -1,13 +1,13 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
 
-import type { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { IconChevronRight, IconPieChart } from 'ui'
-import { Metric } from './BillingBreakdown.constants'
-import { formatUsage } from '../helpers'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import React, { useMemo } from 'react'
+import type { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { formatCurrency } from 'lib/helpers'
+import { useMemo } from 'react'
+import { formatUsage } from '../helpers'
+import { Metric } from './BillingBreakdown.constants'
+import { ChevronRight, PieChart } from 'lucide-react'
 
 export interface ComputeMetricProps {
   slug?: string
@@ -43,7 +43,7 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
             <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
               {metric.name}
             </p>
-            <IconChevronRight strokeWidth={1.5} size={16} className="transition" />
+            <ChevronRight strokeWidth={1.5} size={16} className="transition" />
           </div>
         </Link>
         <span className="text-sm">{usageLabel}</span>&nbsp;
@@ -54,7 +54,7 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
       <div>
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
-            <IconPieChart className="h-8 w-8 p-1" />
+            <PieChart className="h-8 w-8 p-1" />
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
@@ -69,7 +69,7 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
                       is active, it incurs compute costs based on the compute size of your project.
                       Paused projects do not incur compute costs.{' '}
                       <Link
-                        href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                        href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
                         target="_blank"
                         className="transition text-brand hover:text-brand-600 underline"
                       >

@@ -5,13 +5,13 @@ import {
 } from '@supabase/supabase-js/dist/main/lib/constants'
 import { merge, sortBy, take } from 'lodash'
 import { Dispatch, SetStateAction, useCallback, useEffect, useReducer, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
-import type { LogData } from './Messages.types'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import type { LogData } from './Messages.types'
 
 function reducer(
   state: LogData[],

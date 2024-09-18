@@ -176,6 +176,17 @@
                   },
                   "persistent": {
                     "type": "boolean"
+                  },
+                  "status": {
+                    "enum": [
+                      "CREATING_PROJECT",
+                      "RUNNING_MIGRATIONS",
+                      "MIGRATIONS_PASSED",
+                      "MIGRATIONS_FAILED",
+                      "FUNCTIONS_DEPLOYED",
+                      "FUNCTIONS_FAILED"
+                    ],
+                    "type": "string"
                   }
                 }
               }
@@ -499,6 +510,7 @@
                     "type": "string",
                     "enum": [
                       "us-east-1",
+                      "us-east-2",
                       "us-west-1",
                       "us-west-2",
                       "ap-east-1",
@@ -509,7 +521,9 @@
                       "eu-west-1",
                       "eu-west-2",
                       "eu-west-3",
+                      "eu-north-1",
                       "eu-central-1",
+                      "eu-central-2",
                       "ca-central-1",
                       "ap-south-1",
                       "sa-east-1"
@@ -1410,11 +1424,29 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "desired_instance_size": {
+                    "type": "string",
+                    "enum": [
+                      "micro",
+                      "small",
+                      "medium",
+                      "large",
+                      "xlarge",
+                      "2xlarge",
+                      "4xlarge",
+                      "8xlarge",
+                      "12xlarge",
+                      "16xlarge"
+                    ]
+                  },
                   "branch_name": {
                     "type": "string"
                   },
                   "git_branch": {
                     "type": "string"
+                  },
+                  "persistent": {
+                    "type": "boolean"
                   },
                   "region": {
                     "type": "string"
@@ -4074,6 +4106,7 @@
                     "type": "string",
                     "enum": [
                       "us-east-1",
+                      "us-east-2",
                       "us-west-1",
                       "us-west-2",
                       "ap-east-1",
@@ -4084,7 +4117,9 @@
                       "eu-west-1",
                       "eu-west-2",
                       "eu-west-3",
+                      "eu-north-1",
                       "eu-central-1",
+                      "eu-central-2",
                       "ca-central-1",
                       "ap-south-1",
                       "sa-east-1"
@@ -5376,6 +5411,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "saml_allow_encrypted_assertions": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -5667,6 +5706,7 @@
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
                     "saml_external_url",
+                    "saml_allow_encrypted_assertions",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -6816,6 +6856,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "saml_allow_encrypted_assertions": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7107,6 +7151,7 @@
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
                     "saml_external_url",
+                    "saml_allow_encrypted_assertions",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -9662,6 +9707,17 @@
           },
           "persistent": {
             "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "CREATING_PROJECT",
+              "RUNNING_MIGRATIONS",
+              "MIGRATIONS_PASSED",
+              "MIGRATIONS_FAILED",
+              "FUNCTIONS_DEPLOYED",
+              "FUNCTIONS_FAILED"
+            ],
+            "type": "string"
           }
         }
       },
@@ -9883,6 +9939,7 @@
             "type": "string",
             "enum": [
               "us-east-1",
+              "us-east-2",
               "us-west-1",
               "us-west-2",
               "ap-east-1",
@@ -9893,7 +9950,9 @@
               "eu-west-1",
               "eu-west-2",
               "eu-west-3",
+              "eu-north-1",
               "eu-central-1",
+              "eu-central-2",
               "ca-central-1",
               "ap-south-1",
               "sa-east-1"
@@ -10392,11 +10451,29 @@
       "CreateBranchBody": {
         "type": "object",
         "properties": {
+          "desired_instance_size": {
+            "type": "string",
+            "enum": [
+              "micro",
+              "small",
+              "medium",
+              "large",
+              "xlarge",
+              "2xlarge",
+              "4xlarge",
+              "8xlarge",
+              "12xlarge",
+              "16xlarge"
+            ]
+          },
           "branch_name": {
             "type": "string"
           },
           "git_branch": {
             "type": "string"
+          },
+          "persistent": {
+            "type": "boolean"
           },
           "region": {
             "type": "string"
@@ -11487,6 +11564,7 @@
             "type": "string",
             "enum": [
               "us-east-1",
+              "us-east-2",
               "us-west-1",
               "us-west-2",
               "ap-east-1",
@@ -11497,7 +11575,9 @@
               "eu-west-1",
               "eu-west-2",
               "eu-west-3",
+              "eu-north-1",
               "eu-central-1",
+              "eu-central-2",
               "ca-central-1",
               "ap-south-1",
               "sa-east-1"
@@ -12395,6 +12475,10 @@
             "type": "string",
             "nullable": true
           },
+          "saml_allow_encrypted_assertions": {
+            "type": "boolean",
+            "nullable": true
+          },
           "security_captcha_enabled": {
             "type": "boolean",
             "nullable": true
@@ -12686,6 +12770,7 @@
           "refresh_token_rotation_enabled",
           "saml_enabled",
           "saml_external_url",
+          "saml_allow_encrypted_assertions",
           "security_captcha_enabled",
           "security_captcha_provider",
           "security_captcha_secret",

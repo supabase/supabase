@@ -1,26 +1,28 @@
 import matter from 'gray-matter'
-import { NextSeo } from 'next-seo'
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
+import { MDXRemote } from 'next-mdx-remote'
+import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { MDXRemote } from 'next-mdx-remote'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import { Badge, IconChevronLeft } from 'ui'
+import { Badge } from 'ui'
+import dayjs from 'dayjs'
 
 import authors from 'lib/authors.json'
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
+import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 
-import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
-import CTABanner from '~/components/CTABanner'
-import DefaultLayout from '~/components/Layouts/Default'
-import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
+import CTABanner from '~/components/CTABanner'
 import LW11Summary from '~/components/LaunchWeek/11/LW11Summary'
 import LW12Summary from '~/components/LaunchWeek/12/LWSummary'
+import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
+import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
+import DefaultLayout from '~/components/Layouts/Default'
+import { ChevronLeft } from 'lucide-react'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
@@ -151,7 +153,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               </div>
               <div>
                 <h4 className="text-foreground text-lg">{post.title}</h4>
-                <p className="small">{post.date}</p>
+                <p className="small">{post.formattedDate}</p>
               </div>
             </div>
           </div>
@@ -248,7 +250,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                 href="/blog"
                 className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
               >
-                <IconChevronLeft style={{ padding: 0 }} />
+                <ChevronLeft style={{ padding: 0 }} />
                 Back
               </Link>
             </div>
@@ -261,7 +263,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   </Link>
                   <h1 className="text-2xl sm:text-4xl">{props.blog.title}</h1>
                   <div className="text-light flex space-x-3 text-sm">
-                    <p>{props.blog.date}</p>
+                    <p>{dayjs(props.blog.date).format('DD MMM YYYY')}</p>
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.source)}</p>
                   </div>
@@ -320,7 +322,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                         />
                       ) : (
                         props.blog.thumb && (
-                          <div className="hidden md:block relative mb-8 h-96 w-full overflow-auto rounded-lg border">
+                          <div className="hidden md:block relative mb-8 w-full aspect-video overflow-auto rounded-lg border">
                             <Image
                               src={'/images/blog/' + props.blog.thumb}
                               alt={props.blog.title}

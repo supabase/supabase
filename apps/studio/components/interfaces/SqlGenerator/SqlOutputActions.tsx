@@ -3,7 +3,7 @@ import { codeBlock, stripIndent } from 'common-tags'
 import { Check, Clipboard, Save } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
@@ -135,13 +135,7 @@ export function SQLOutputActions({ answer, messages, className }: SQLOutputActio
       <CopyToClipboard text={answer?.replace(/```.*/g, '').trim()}>
         <Button
           type="default"
-          icon={
-            showCopied ? (
-              <Check size="tiny" className="text-brand" strokeWidth={2} />
-            ) : (
-              <Clipboard size="tiny" />
-            )
-          }
+          icon={showCopied ? <Check className="text-brand" strokeWidth={2} /> : <Clipboard />}
           onClick={() => setShowCopied(true)}
         >
           {showCopied ? 'Copied' : 'Copy SQL'}
@@ -152,13 +146,7 @@ export function SQLOutputActions({ answer, messages, className }: SQLOutputActio
           type="default"
           loading={isSaving}
           disabled={isSaving}
-          icon={
-            isSaved ? (
-              <Check size="tiny" className="text-brand" strokeWidth={2} />
-            ) : (
-              <Save size="tiny" />
-            )
-          }
+          icon={isSaved ? <Check className="text-brand" strokeWidth={2} /> : <Save />}
           onClick={() => onSelectSaveSnippet()}
         >
           {isSaved ? 'Snippet saved!' : 'Save into new snippet'}
