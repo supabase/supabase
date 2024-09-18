@@ -435,5 +435,23 @@ services:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
     command: [ "--config", "etc/vector/vector.yml" ]
 
+#Integrating with metabase for data visualization
+#Go to http://localhost:3000 and Add your Supabase PostgreSQL database by selecting "PostgreSQL" as the database type and entering the connection details (host, database, username, password, etc.).
+#host = host-ip-address
+#database = postgres
+#username = supabase_admin
+#password = your-super-secret-and-long-postgres-password  (For default postgres database. You can change the postgres database password)
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: supabase-metabase
+    ports:
+      - "3000:3000"
+    environment:
+      MB_DB_FILE: /metabase-data/metabase.db
+    volumes:
+      - ./metabase-data:/metabase-data
+    restart: unless-stopped
+
 volumes:
   db-config:
