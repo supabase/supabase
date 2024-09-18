@@ -3,7 +3,9 @@ import { codeBlock, oneLine, stripIndent } from 'common-tags'
 import type OpenAI from 'openai'
 import { ContextLengthError } from '../errors'
 import type { Message } from '../types'
-import { DatabasePoliciesData } from '../../../../apps/studio/data/database-policies/database-policies-query'
+import { components } from 'api-types'
+
+type DatabasePoliciesData = components['schemas']['PostgresPolicy']
 
 /**
  * Responds to a conversation about building an RLS policy.
@@ -14,7 +16,7 @@ export async function chatRlsPolicy(
   openai: OpenAI,
   messages: Message[],
   entityDefinitions?: string[],
-  existingPolicies?: DatabasePoliciesData,
+  existingPolicies?: DatabasePoliciesData[],
   policyDefinition?: string
 ): Promise<ReadableStream<Uint8Array>> {
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
