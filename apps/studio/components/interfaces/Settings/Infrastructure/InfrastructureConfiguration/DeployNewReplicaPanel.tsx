@@ -82,7 +82,9 @@ const DeployNewReplicaPanel = ({
 
   const { size_gb, type } = diskConfiguration?.attributes ?? {}
   const showNewDiskManagementUI =
-    diskManagementV2 && subscription?.usage_based_billing_project_addons
+    diskManagementV2 &&
+    subscription?.usage_based_billing_project_addons &&
+    project?.cloud_provider === 'AWS'
   const readReplicaDiskSizes = (size_gb ?? 0) * 1.25
   const additionalCostDiskSize = readReplicaDiskSizes * DISK_PRICING[type as DiskType]?.storage ?? 0
 
@@ -396,9 +398,9 @@ const DeployNewReplicaPanel = ({
               <>
                 <Collapsible_Shadcn_>
                   <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
-                    <p className="text-sm">
-                      Deploying a new replica will cost an additional $
-                      {estComputeMonthlyCost + additionalCostDiskSize}/month
+                    <p className="text-sm text-left">
+                      New replicas will cost an additional $
+                      {(estComputeMonthlyCost + additionalCostDiskSize).toFixed(2)}/month
                     </p>
                     <ChevronDown size={14} className="transition" />
                   </CollapsibleTrigger_Shadcn_>
@@ -430,7 +432,7 @@ const DeployNewReplicaPanel = ({
                           <TableCell className="pl-0">Compute size</TableCell>
                           <TableCell>{selectedComputeMeta?.name}</TableCell>
                           <TableCell className="text-right font-mono pr-0">
-                            ~${estComputeMonthlyCost}/month
+                            ${estComputeMonthlyCost}/month
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -439,7 +441,7 @@ const DeployNewReplicaPanel = ({
                             {(size_gb ?? 0) * 1.25}GB ({type})
                           </TableCell>
                           <TableCell className="text-right font-mono pr-0">
-                            ${additionalCostDiskSize}/month
+                            ${additionalCostDiskSize.toFixed(2)}/month
                           </TableCell>
                         </TableRow>
                       </TableBody>
