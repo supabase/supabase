@@ -75,7 +75,7 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
     if (throughput !== undefined && (throughput < 125 || throughput > maxThroughput)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Throughput must be set between 125 and ${maxThroughput} MB/s.`,
+        message: `Throughput must be set between 125 and ${maxThroughput?.toLocaleString()} MB/s.`,
         path: ['throughput'],
       })
     }
