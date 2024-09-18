@@ -157,6 +157,8 @@ export const DiskManagementIOPSReadReplicas = ({
   const afterPrice =
     (newIOPS - DISK_LIMITS[newStorageType]?.includedIops) * DISK_PRICING[newStorageType]?.iops ?? 0
 
+  if (readReplicas.length === 0) return null
+
   return (
     <AnimatePresence>
       {isDirty && (
@@ -218,6 +220,8 @@ export const DiskManagementThroughputReadReplicas = ({
       ? (newThroughput - DISK_LIMITS[newStorageType].includedThroughput) *
           DISK_PRICING[newStorageType]?.throughput ?? 0
       : 0
+
+  if (readReplicas.length === 0) return null
 
   return (
     <AnimatePresence>
