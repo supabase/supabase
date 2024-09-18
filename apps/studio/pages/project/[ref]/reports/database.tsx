@@ -55,7 +55,9 @@ const DatabaseUsage = () => {
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const showNewDiskManagementUI =
-    subscription?.usage_based_billing_project_addons && diskManagementV2
+    subscription?.usage_based_billing_project_addons &&
+    diskManagementV2 &&
+    project?.cloud_provider === 'AWS'
 
   const report = useDatabaseReport()
   const { data } = useDatabaseSizeQuery({

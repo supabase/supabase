@@ -28,6 +28,18 @@ describe('DiskManagement.utils.ts:calculateDiskSizePrice', () => {
     expect(result.oldPrice).toBe('1.56')
     expect(result.newPrice).toBe('1.95')
   })
+  test('GP3 with 8GB to GP3 with 10GB, with 2 replicas', () => {
+    const result = calculateDiskSizePrice({
+      planId: 'pro',
+      oldSize: 8,
+      oldStorageType: DiskType.GP3,
+      newSize: 10,
+      newStorageType: DiskType.GP3,
+      numReplicas: 2,
+    })
+    expect(result.oldPrice).toBe('2.50')
+    expect(result.newPrice).toBe('3.38')
+  })
 })
 
 describe('DiskManagement.utils.ts:calculateIOPSPrice', () => {

@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Alert_Shadcn_ as Alert,
@@ -14,7 +13,6 @@ import {
 
 export function DiskManagementPlanUpgradeRequired() {
   const org = useSelectedOrganization()
-  const { data } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
 
   return (
     <AnimatePresence>
