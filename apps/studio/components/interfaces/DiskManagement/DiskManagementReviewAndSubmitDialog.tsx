@@ -24,6 +24,14 @@ import {
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskMangementCoolDownSection } from './DiskManagementCoolDownSection'
+import {
+  calculateDiskSizePrice,
+  calculateIOPSPrice,
+  calculateThroughputPrice,
+} from './DiskManagement.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { DiskType } from './DiskManagement.constants'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -99,9 +107,6 @@ interface DiskSizeMeterProps {
   loading: boolean
   form: UseFormReturn<DiskStorageSchemaType>
   numReplicas: number
-  iopsPrice: { oldPrice: string; newPrice: string }
-  throughputPrice: { oldPrice: string; newPrice: string }
-  diskSizePrice: { oldPrice: string; newPrice: string }
   isDialogOpen: boolean
   isWithinCooldown: boolean
   setIsDialogOpen: (isOpen: boolean) => void
@@ -116,11 +121,36 @@ export const DiskManagementReviewAndSubmitDialog = ({
   numReplicas,
   loading,
   onSubmit,
-  iopsPrice,
-  throughputPrice,
-  diskSizePrice,
 }: DiskSizeMeterProps) => {
+  const org = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+
+  const planId = subscription?.plan.id ?? ''
   const isDirty = Object.keys(form.formState.dirtyFields).length > 0
+
+  const diskSizePrice = calculateDiskSizePrice({
+    planId,
+    oldSize: form.formState.defaultValues?.totalSize || 0,
+    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
+    newSize: form.getValues('totalSize'),
+    newStorageType: form.getValues('storageType') as DiskType,
+    numReplicas,
+  })
+
+  const iopsPrice = calculateIOPSPrice({
+    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
+    oldProvisionedIOPS: form.formState.defaultValues?.provisionedIOPS || 0,
+    newStorageType: form.getValues('storageType') as DiskType,
+    newProvisionedIOPS: form.getValues('provisionedIOPS'),
+    numReplicas,
+  })
+
+  const throughputPrice = calculateThroughputPrice({
+    storageType: form.getValues('storageType') as DiskType,
+    newThroughput: form.getValues('throughput') || 0,
+    oldThroughput: form.formState.defaultValues?.throughput || 0,
+    numReplicas,
+  })
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -170,19 +200,6 @@ export const DiskManagementReviewAndSubmitDialog = ({
               afterPrice={0}
             />
             <TableDataRow
-              attribute="Disk size"
-              defaultValue={form.formState.defaultValues?.totalSize ?? 0}
-              newValue={form.getValues('totalSize')}
-              unit="GB"
-              beforePrice={Number(diskSizePrice.oldPrice)}
-              afterPrice={Number(diskSizePrice.newPrice)}
-              priceTooltip={
-                numReplicas > 0
-                  ? `Price change includes for primary database and ${numReplicas} replicas`
-                  : undefined
-              }
-            />
-            <TableDataRow
               attribute="IOPS"
               defaultValue={form.formState.defaultValues?.provisionedIOPS ?? 0}
               newValue={form.getValues('provisionedIOPS')}
@@ -223,6 +240,19 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 </TableCell>
               </TableRow>
             )}
+            <TableDataRow
+              attribute="Disk size"
+              defaultValue={form.formState.defaultValues?.totalSize ?? 0}
+              newValue={form.getValues('totalSize')}
+              unit="GB"
+              beforePrice={Number(diskSizePrice.oldPrice)}
+              afterPrice={Number(diskSizePrice.newPrice)}
+              priceTooltip={
+                numReplicas > 0
+                  ? `Price change includes for primary database and ${numReplicas} replicas`
+                  : undefined
+              }
+            />
           </TableBody>
           <TableCaption className="mt-2 mb-2">
             Please take note of the above billing changes

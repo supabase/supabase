@@ -57,7 +57,11 @@ import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
-import { DiskManagementDiskSizeReadReplicas } from './DiskManagementDiskSizeReadReplicas'
+import {
+  DiskManagementDiskSizeReadReplicas,
+  DiskManagementIOPSReadReplicas,
+  DiskManagementThroughputReadReplicas,
+} from './DiskManagementReadReplicas'
 import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
@@ -190,28 +194,17 @@ export function DiskManagementPanelForm() {
     newStorageType: form.getValues('storageType') as DiskType,
   })
 
-  const diskSizePriceIncReplicas = calculateDiskSizePrice({
-    planId,
-    oldSize: form.formState.defaultValues?.totalSize || 0,
-    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
-    newSize: form.getValues('totalSize'),
-    newStorageType: form.getValues('storageType') as DiskType,
-    numReplicas: readReplicas.length,
-  })
-
   const iopsPrice = calculateIOPSPrice({
     oldStorageType: form.formState.defaultValues?.storageType as DiskType,
     oldProvisionedIOPS: form.formState.defaultValues?.provisionedIOPS || 0,
     newStorageType: form.getValues('storageType') as DiskType,
     newProvisionedIOPS: form.getValues('provisionedIOPS'),
-    numReplicas: readReplicas.length,
   })
 
   const throughputPrice = calculateThroughputPrice({
     storageType: form.getValues('storageType') as DiskType,
     newThroughput: form.getValues('throughput') || 0,
     oldThroughput: form.formState.defaultValues?.throughput || 0,
-    numReplicas: readReplicas.length,
   })
 
   useEffect(() => {
@@ -378,64 +371,76 @@ export function DiskManagementPanelForm() {
                       layout="horizontal"
                       label="IOPS"
                       description={
-                        <>
-                          {watchedStorageType === 'io2' ? (
-                            <div className="flex items-center gap-x-2">
-                              <span>
-                                IOPS must be{' '}
-                                {watchedTotalSize >= 8
-                                  ? `between ${minIOPS} and ${maxIOPS.toLocaleString()} based on your disk size.`
-                                  : `at least ${minIOPS}`}
-                              </span>
-                              <Tooltip_Shadcn_>
-                                <TooltipTrigger_Shadcn_ asChild>
-                                  <HelpCircle
-                                    size={14}
-                                    className="transition hover:text-foreground"
-                                  />
-                                </TooltipTrigger_Shadcn_>
-                                <TooltipContent_Shadcn_ side="bottom">
-                                  For io2 storage type, min IOPS is at {minIOPS}, while max IOPS is
-                                  at 1000 * disk size in GB or{' '}
-                                  {IOPS_RANGE[DiskType.IO2].max.toLocaleString()}, whichever is
-                                  lower
-                                </TooltipContent_Shadcn_>
-                              </Tooltip_Shadcn_>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-x-2">
-                              <span>
-                                IOPS must be{' '}
-                                {watchedTotalSize >= 8
-                                  ? `between ${minIOPS.toLocaleString()} and ${maxIOPS.toLocaleString()} based on your disk size.`
-                                  : `at least ${minIOPS.toLocaleString()}`}
-                              </span>
-                              <Tooltip_Shadcn_>
-                                <TooltipTrigger_Shadcn_ asChild>
-                                  <HelpCircle
-                                    size={14}
-                                    className="transition hover:text-foreground"
-                                  />
-                                </TooltipTrigger_Shadcn_>
-                                <TooltipContent_Shadcn_ side="bottom" className="w-64">
-                                  For gp3 storage type, min IOPS is at {minIOPS} while max IOPS is
-                                  at 500 * disk size in GB or{' '}
-                                  {IOPS_RANGE[DiskType.GP3].max.toLocaleString()}, whichever is
-                                  lower
-                                </TooltipContent_Shadcn_>
-                              </Tooltip_Shadcn_>
-                            </div>
+                        <div className="flex flex-col gap-y-2">
+                          <div>
+                            {watchedStorageType === 'io2' ? (
+                              <div className="flex items-center gap-x-2">
+                                <span>
+                                  IOPS must be{' '}
+                                  {watchedTotalSize >= 8
+                                    ? `between ${minIOPS} and ${maxIOPS.toLocaleString()} based on your disk size.`
+                                    : `at least ${minIOPS}`}
+                                </span>
+                                <Tooltip_Shadcn_>
+                                  <TooltipTrigger_Shadcn_ asChild>
+                                    <HelpCircle
+                                      size={14}
+                                      className="transition hover:text-foreground"
+                                    />
+                                  </TooltipTrigger_Shadcn_>
+                                  <TooltipContent_Shadcn_ side="bottom">
+                                    For io2 storage type, min IOPS is at {minIOPS}, while max IOPS
+                                    is at 1000 * disk size in GB or{' '}
+                                    {IOPS_RANGE[DiskType.IO2].max.toLocaleString()}, whichever is
+                                    lower
+                                  </TooltipContent_Shadcn_>
+                                </Tooltip_Shadcn_>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-x-2">
+                                <span>
+                                  IOPS must be{' '}
+                                  {watchedTotalSize >= 8
+                                    ? `between ${minIOPS.toLocaleString()} and ${maxIOPS.toLocaleString()} based on your disk size.`
+                                    : `at least ${minIOPS.toLocaleString()}`}
+                                </span>
+                                <Tooltip_Shadcn_>
+                                  <TooltipTrigger_Shadcn_ asChild>
+                                    <HelpCircle
+                                      size={14}
+                                      className="transition hover:text-foreground"
+                                    />
+                                  </TooltipTrigger_Shadcn_>
+                                  <TooltipContent_Shadcn_ side="bottom" className="w-64">
+                                    For gp3 storage type, min IOPS is at {minIOPS} while max IOPS is
+                                    at 500 * disk size in GB or{' '}
+                                    {IOPS_RANGE[DiskType.GP3].max.toLocaleString()}, whichever is
+                                    lower
+                                  </TooltipContent_Shadcn_>
+                                </Tooltip_Shadcn_>
+                              </div>
+                            )}
+                            {!form.formState.errors.provisionedIOPS &&
+                              field.value > maxIopsBasedOnCompute && (
+                                <p>
+                                  Note: Final usable IOPS will be at{' '}
+                                  <span className="text-foreground">
+                                    {maxIopsBasedOnCompute.toLocaleString()}
+                                  </span>{' '}
+                                  based on your current compute size of {currentCompute?.name}
+                                </p>
+                              )}
+                          </div>
+                          {!form.formState.errors.provisionedIOPS && (
+                            <DiskManagementIOPSReadReplicas
+                              isDirty={form.formState.dirtyFields.provisionedIOPS !== undefined}
+                              oldIOPS={iops ?? 0}
+                              newIOPS={field.value}
+                              oldStorageType={form.formState.defaultValues?.storageType as DiskType}
+                              newStorageType={form.getValues('storageType') as DiskType}
+                            />
                           )}
-                          {field.value > maxIopsBasedOnCompute && (
-                            <p>
-                              Note: Final usable IOPS will be at{' '}
-                              <span className="text-foreground">
-                                {maxIopsBasedOnCompute.toLocaleString()}
-                              </span>{' '}
-                              based on your current compute size of {currentCompute?.name}
-                            </p>
-                          )}
-                        </>
+                        </div>
                       }
                       labelOptional="Input/output operations per second. Higher IOPS is suitable for applications requiring high throughput."
                     >
@@ -491,37 +496,51 @@ export function DiskManagementPanelForm() {
                             label="Throughput (MB/s)"
                             layout="horizontal"
                             description={
-                              <>
-                                <div className="flex items-center gap-x-2">
-                                  <span>
-                                    Throughput must be between {minThroughput} and {maxThroughput}{' '}
-                                    MB/s based on your IOPS.
-                                  </span>
-                                  <Tooltip_Shadcn_>
-                                    <TooltipTrigger_Shadcn_ asChild>
-                                      <HelpCircle
-                                        size={14}
-                                        className="transition hover:text-foreground"
-                                      />
-                                    </TooltipTrigger_Shadcn_>
-                                    <TooltipContent_Shadcn_ side="bottom" className="w-64">
-                                      Min throughput is at 125MB/s, while max throughput is at
-                                      0.25MB/s * IOPS or 1000, whichever is lower
-                                    </TooltipContent_Shadcn_>
-                                  </Tooltip_Shadcn_>
+                              <div className="flex flex-col gap-y-2">
+                                <div>
+                                  <div className="flex items-center gap-x-2">
+                                    <span>
+                                      Throughput must be between {minThroughput} and {maxThroughput}{' '}
+                                      MB/s based on your IOPS.
+                                    </span>
+                                    <Tooltip_Shadcn_>
+                                      <TooltipTrigger_Shadcn_ asChild>
+                                        <HelpCircle
+                                          size={14}
+                                          className="transition hover:text-foreground"
+                                        />
+                                      </TooltipTrigger_Shadcn_>
+                                      <TooltipContent_Shadcn_ side="bottom" className="w-64">
+                                        Min throughput is at 125MB/s, while max throughput is at
+                                        0.25MB/s * IOPS or 1000, whichever is lower
+                                      </TooltipContent_Shadcn_>
+                                    </Tooltip_Shadcn_>
+                                  </div>
+                                  {!form.formState.errors.throughput &&
+                                    field.value !== undefined &&
+                                    field.value > maxThroughputBasedOnCompute && (
+                                      <p>
+                                        Note: Final usable throughput will be at{' '}
+                                        <span className="text-foreground">
+                                          {maxThroughputBasedOnCompute.toFixed(0)}
+                                        </span>{' '}
+                                        MB/s based on your current compute size of{' '}
+                                        {currentCompute?.name}
+                                      </p>
+                                    )}
                                 </div>
-                                {field.value !== undefined &&
-                                  field.value > maxThroughputBasedOnCompute && (
-                                    <p>
-                                      Note: Final usable throughput will be at{' '}
-                                      <span className="text-foreground">
-                                        {maxThroughputBasedOnCompute.toFixed(0)}
-                                      </span>{' '}
-                                      MB/s based on your current compute size of{' '}
-                                      {currentCompute?.name}
-                                    </p>
-                                  )}
-                              </>
+                                {!form.formState.errors.throughput && (
+                                  <DiskManagementThroughputReadReplicas
+                                    isDirty={form.formState.dirtyFields.throughput !== undefined}
+                                    oldThroughput={throughput_mbps ?? 0}
+                                    newThroughput={field.value ?? 0}
+                                    oldStorageType={
+                                      form.formState.defaultValues?.storageType as DiskType
+                                    }
+                                    newStorageType={form.getValues('storageType') as DiskType}
+                                  />
+                                )}
+                              </div>
                             }
                           >
                             <div className="flex gap-3 items-center">
@@ -646,21 +665,13 @@ export function DiskManagementPanelForm() {
                       showNewBar={form.formState.dirtyFields.totalSize !== undefined}
                       totalSize={size_gb}
                       usedSize={mainDiskUsed}
-                      newTotalSize={
-                        form.getValues('totalSize') <= size_gb
-                          ? size_gb
-                          : form.getValues('totalSize')
-                      }
+                      newTotalSize={watchedTotalSize}
                     />
                     <DiskManagementDiskSizeReadReplicas
                       isDirty={form.formState.dirtyFields.totalSize !== undefined}
                       totalSize={size_gb * 1.25}
                       usedSize={mainDiskUsed}
-                      newTotalSize={
-                        form.getValues('totalSize') <= size_gb
-                          ? size_gb * 1.25
-                          : form.getValues('totalSize') * 1.25
-                      }
+                      newTotalSize={watchedTotalSize * 1.25}
                       oldStorageType={form.formState.defaultValues?.storageType as DiskType}
                       newStorageType={form.getValues('storageType') as DiskType}
                     />
@@ -700,16 +711,13 @@ export function DiskManagementPanelForm() {
                     Cancel
                   </Button>
                   <DiskManagementReviewAndSubmitDialog
+                    loading={isUpdatingDiskConfiguration}
+                    form={form}
                     numReplicas={readReplicas.length}
                     isDialogOpen={isDialogOpen}
                     isWithinCooldown={disableInput}
                     onSubmit={onSubmit}
                     setIsDialogOpen={setIsDialogOpen}
-                    form={form}
-                    loading={isUpdatingDiskConfiguration}
-                    diskSizePrice={diskSizePriceIncReplicas}
-                    iopsPrice={iopsPrice}
-                    throughputPrice={throughputPrice}
                   />
                 </div>
               </CardContent>
