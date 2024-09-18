@@ -135,7 +135,7 @@ const ContactSales = () => {
     setSuccess(null)
 
     try {
-      const response = await fetch('/api/contact-sales', {
+      const response = await fetch('/api-v2/contact-sales', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -367,8 +367,6 @@ const CustomerLogo = ({ title, logo }: { title: string; logo: string }) => (
       src={logo}
       alt={`${title} logo`}
       priority
-      placeholder="blur"
-      blurDataURL="/images/blur.png"
       draggable={false}
       className="
         bg-no-repeat m-0

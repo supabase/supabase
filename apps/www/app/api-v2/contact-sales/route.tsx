@@ -1,17 +1,29 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+export async function POST(req: Request, res: Response) {
   const HUBSPOT_PORTAL_ID = process.env.HUBSPOT_PORTAL_ID
   const HUBSPOT_FORM_GUID = process.env.HUBSPOT_ENTERPRISE_FORM_GUID
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' })
-  }
+  const body = await req.json()
 
-  const { firstName, secondName, companyEmail, message } = req.body
+  // if (req.method !== 'POST') {
+  //   return res.status(405).json({ message: 'Method not allowed' })
+  // }
+
+  const { firstName, secondName, companyEmail, message } = body
+
+  console.log('bodyyyyy', req.body)
 
   if (!firstName || !secondName || !companyEmail || !message) {
-    return res.status(400).json({ message: 'All fields are required' })
+    return new Response(JSON.stringify({ message: 'All fields are required' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 400,
+    })
   }
 
   try {
@@ -45,11 +57,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!response.ok) {
       const errorData = await response.json()
-      return res.status(response.status).json({ message: errorData.message })
+      return new Response(JSON.stringify({ message: errorData.message }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: response.status,
+      })
     }
 
-    return res.status(200).json({ message: 'Submission successful' })
-  } catch (error) {
-    return res.status(500).json({ message: 'Internal server error' })
+    return new Response(JSON.stringify({ message: 'Submission successful' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    })
+  } catch (error: any) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500,
+    })
   }
 }
