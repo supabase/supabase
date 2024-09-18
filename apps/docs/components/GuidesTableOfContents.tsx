@@ -121,7 +121,7 @@ const GuidesTableOfContents = ({
 
   if (!displayedList.length) return
 
-  const tocVideoPreview = `http://img.youtube.com/vi/${video}/0.jpg`
+  const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
   return (
     <div className={cn('border-l', 'thin-scrollbar overflow-y-auto', 'px-2', className)}>
