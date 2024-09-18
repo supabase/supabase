@@ -256,6 +256,19 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'Advanced Multi-Factor Auth - WebAuthn',
+        plans: {
+          free: false,
+          pro: ['$75 per month for first project', 'then $10 per month per additional projects'],
+          team: ['$75 per month for first project', 'then $10 per month per additional projects'],
+          enterprise: 'Custom',
+        },
+        tooltips: {
+          main: 'Multi-factor authentication (MFA), sometimes called two-factor authentication (2FA), using WebAuthn.',
+        },
+        usage_based: false,
+      },
+      {
         title: 'Third-Party MAUs',
         plans: {
           free: '50 included',
