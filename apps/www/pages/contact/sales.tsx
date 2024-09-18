@@ -67,7 +67,6 @@ const formConfig: FormConfig = {
 }
 
 const isValidEmail = (email: string): boolean => {
-  // Basic email validation regex
   const emailPattern = /^[\w-\.+]+@([\w-]+\.)+[\w-]{2,8}$/
   return emailPattern.test(email)
 }

@@ -43,7 +43,7 @@ const Hero = () => {
                       Start your project
                     </Link>
                   </Button>
-                  <Button asChild size="medium" type="default" icon={<BookOpen />}>
+                  <Button asChild size="medium" type="default">
                     <Link
                       href="/contact/sales"
                       as="/contact/sales"
