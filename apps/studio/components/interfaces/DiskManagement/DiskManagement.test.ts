@@ -37,8 +37,8 @@ describe('DiskManagement.utils.ts:calculateDiskSizePrice', () => {
       newStorageType: DiskType.GP3,
       numReplicas: 2,
     })
-    expect(result.oldPrice).toBe('2.00')
-    expect(result.newPrice).toBe('2.75')
+    expect(result.oldPrice).toBe('2.50')
+    expect(result.newPrice).toBe('3.38')
   })
 })
 
