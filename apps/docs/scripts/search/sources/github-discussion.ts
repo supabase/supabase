@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
@@ -14,6 +15,13 @@ export type Discussion = {
   title: string
   body: string
   databaseId: number
+  createdAt: string
+  labels: {
+    nodes: {
+      name: string
+    }[]
+  }
+  ragIgnore?: boolean
 }
 
 export type DiscussionsResponse = {
@@ -21,6 +29,10 @@ export type DiscussionsResponse = {
     discussions: {
       totalCount: number
       nodes: Discussion[]
+      pageInfo: {
+        hasNextPage: boolean
+        endCursor: string
+      }
     }
   }
 }
@@ -74,6 +86,87 @@ export async function fetchDiscussions(owner: string, repo: string, categoryId: 
   return discussions
 }
 
+export async function fetchDiscussionsSinceDate(
+  owner: string,
+  repo: string,
+  categoryId: string,
+  { batchSize = 100, orderBy, sinceDate }: { batchSize?: number; orderBy?: string; sinceDate: Date }
+) {
+  const octokit = new ExtendedOctokit({
+    authStrategy: createAppAuth,
+    auth: {
+      appId: process.env.SEARCH_GITHUB_APP_ID,
+      installationId: process.env.SEARCH_GITHUB_APP_INSTALLATION_ID,
+      privateKey: process.env.SEARCH_GITHUB_APP_PRIVATE_KEY,
+    },
+  })
+
+  let endCursor: string | undefined
+  let hasNextPage = true
+  let allDiscussions: Discussion[] = []
+
+  while (hasNextPage) {
+    const {
+      repository: {
+        discussions: { nodes: discussions, pageInfo },
+      },
+    } = await octokit.graphql<DiscussionsResponse>(
+      `
+        query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!, $batchSize: Int!, $orderBy: DiscussionOrderField!) {
+          repository(owner: $owner, name: $repo) {
+            discussions(first: $batchSize, after: $cursor, categoryId: $categoryId, orderBy: {field: $orderBy, direction: DESC}) {
+              totalCount
+              nodes {
+                id
+                updatedAt
+                url
+                title
+                body
+                databaseId
+                createdAt
+                labels(first: $batchSize) {
+                  nodes {
+                    name
+                  }
+                }
+              }
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+            }
+          }
+        }
+      `,
+      {
+        owner,
+        repo,
+        categoryId,
+        batchSize,
+        orderBy,
+        cursor: endCursor,
+      }
+    )
+
+    allDiscussions.push(...discussions)
+    hasNextPage = pageInfo.hasNextPage
+    endCursor = pageInfo.endCursor
+
+    if (discussions.length > 0) {
+      const lastDiscussionDate = new Date(discussions[discussions.length - 1].createdAt)
+      if (lastDiscussionDate < sinceDate) {
+        break
+      }
+    }
+  }
+
+  const discussions = allDiscussions.filter(
+    (discussion) => new Date(discussion.createdAt) >= sinceDate
+  )
+
+  return discussions
+}
+
 export class GitHubDiscussionLoader extends BaseLoader {
   type = 'github-discussions' as const
 
@@ -101,7 +194,7 @@ export class GitHubDiscussionSource extends BaseSource {
   }
 
   process() {
-    const { id, title, updatedAt, body, databaseId } = this.discussion
+    const { id, title, updatedAt, body, databaseId, ragIgnore } = this.discussion
 
     const checksum = createHash('sha256').update(updatedAt).digest('base64')
 
@@ -132,6 +225,7 @@ export class GitHubDiscussionSource extends BaseSource {
     return {
       checksum,
       meta,
+      ragIgnore,
       sections,
     }
   }
