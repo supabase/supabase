@@ -98,64 +98,6 @@ const PolicyTableRowHeader = ({
             >
               <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
             </ButtonTooltip>
-
-            {/* <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <ButtonTooltip
-                  type="default"
-                  disabled={!canToggleRLS}
-                  // onClick={() => onSelectCreatePolicy()}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: 'You need additional permissions to create RLS policies',
-                    },
-                  }}
-                >
-                  Create policy
-                </ButtonTooltip>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="end" className="w-40">
-                <DropdownMenuItem
-                  className="flex items-center gap-2"
-                  onClick={() => {
-                    onSelectCreatePolicy()
-                    setEditView('templates')
-                  }}
-                >
-                  <LayoutTemplate size={16} />
-                  from a template
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="flex items-center gap-2"
-                  onClick={() => {
-                    onSelectCreatePolicy()
-                    setEditView('conversation')
-                  }}
-                >
-                  <AiIconAnimation
-                    allowHoverEffect
-                    className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white"
-                  />
-                  with Supabase AI
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu> */}
-            {/* {!isAiAssistantEnabled && (
-              <ButtonTooltip
-                type="default"
-                disabled={!canToggleRLS}
-                onClick={() => onSelectCreatePolicy()}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: 'You need additional permissions to create RLS policies',
-                  },
-                }}
-              >
-                Create policy
-              </ButtonTooltip>
-            )} */}
           </div>
         </div>
       )}

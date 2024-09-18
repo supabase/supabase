@@ -191,7 +191,7 @@ export const AIPolicyChat = ({
               className="[&>div>div]:border-black dark:[&>div>div]:border-white"
             />
           }
-          placeholder="Ask for some changes to your policy"
+          placeholder="Ask for help with your RLS policies"
           value={value}
           onValueChange={(e) => setValue(e.target.value)}
           onSubmit={(event) => {
