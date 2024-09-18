@@ -760,6 +760,20 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'functions.function_name.enabled'
+    title: 'functions.<function_name>.enabled'
+    tags: ['edge-functions']
+    required: false
+    default: 'true'
+    description: |
+      Controls whether a function is deployed or served. When set to false,
+      the function will be skipped during deployment and won't be served locally.
+      This is useful for disabling demo functions or temporarily disabling a function
+      without removing its code.
+    links:
+      - name: '`supabase functions` CLI subcommands'
+        link: 'https://supabase.com/docs/reference/cli/supabase-functions'
+
   - id: 'functions.function_name.verify_jwt'
     title: 'functions.<function_name>.verify_jwt'
     tags: ['edge-functions']
