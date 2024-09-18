@@ -663,7 +663,7 @@ const SQLEditor = () => {
             )}
             {queryHasDestructiveOperations && queryHasUpdateWithoutWhere && <Separator />}
             {queryHasUpdateWithoutWhere && (
-              <li className="grid">
+              <li className="grid gap-1">
                 <span className="font-bold">Query uses update without a where clause</span>
                 <span className="text-foreground-lighter">
                   Without a <code>where</code> clause, this could update all rows in the table.
