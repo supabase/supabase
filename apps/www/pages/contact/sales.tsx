@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { CircleAlert } from 'lucide-react'
 import { Button, cn, Input_Shadcn_, Label_Shadcn_, Separator, TextArea_Shadcn_ } from 'ui'
+import { Alert } from 'ui/src/components/shadcn/ui/alert'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -218,9 +219,9 @@ const ContactSales = () => {
           <div className="flex flex-col gap-4 w-full items-center justify-center min-h-[300px]">
             <div className="border rounded-xl bg-surface-75 p-4 md:p-6 w-full md:max-w-lg min-h-[300px]">
               {success ? (
-                <div className="flex flex-col h-full w-full min-w-[300px] gap-2 items-center justify-center opacity-0 transition-opacity animate-fade-in scale-1">
-                  <p className="text-center">{success}</p>
-                  <Button onClick={handleReset}>Reset form</Button>
+                <div className="flex flex-col h-full w-full min-w-[300px] gap-4 items-center justify-center opacity-0 transition-opacity animate-fade-in scale-1">
+                  <p className="text-center text-sm">{success}</p>
+                  <Button onClick={handleReset}>Reset</Button>
                 </div>
               ) : (
                 <form
@@ -285,9 +286,9 @@ const ContactSales = () => {
                     .
                   </p>
                   {errors.general && (
-                    <div className="text-foreground text-center text-sm col-span-full">
-                      <CircleAlert className="w-3 h-3" /> {errors.general}
-                    </div>
+                    <Alert className="flex gap-2 text-foreground text-sm col-span-full">
+                      <CircleAlert className="w-3 h-3" /> <span>{errors.general}</span>
+                    </Alert>
                   )}
                 </form>
               )}
