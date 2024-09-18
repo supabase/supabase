@@ -48,6 +48,7 @@ const nextConfig = {
   swcMinify: true,
   experimental: {
     cache: true,
+    outputFileTracing: true,
   },
   images: {
     dangerouslyAllowSVG: true,

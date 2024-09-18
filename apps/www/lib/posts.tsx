@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
-import { generateReadingTime } from './helpers'
-import { BlogPost } from '../.contentlayer/generated'
+// import { generateReadingTime } from './helpers'
+// import { BlogPost } from '../.contentlayer/generated'
 
 type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'
 
@@ -43,15 +43,12 @@ export const getSortedPosts = ({
 
       //Extracts contents of the MDX file
       const fileContents = fs.readFileSync(fullPath, 'utf8')
-      const { data, content } = matter(fileContents) as unknown as {
+      const { data } = matter(fileContents) as unknown as {
         data: { [key: string]: any; tags?: string[] }
-        content: string
       }
 
       const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
       const formattedDate = new Date(data.date).toLocaleDateString('en-IN', options)
-
-      const readingTime = generateReadingTime(content)
 
       const url = `/${directory.replace('_', '')}/${slug}`
       const contentPath = `/${directory.replace('_', '')}/${slug}`
@@ -59,7 +56,6 @@ export const getSortedPosts = ({
       const frontmatter = {
         ...data,
         formattedDate,
-        readingTime,
         url: url,
         path: contentPath,
       }

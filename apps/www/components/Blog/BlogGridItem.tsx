@@ -51,12 +51,12 @@ const BlogGridItem = ({ post }: Props) => {
           {post.date && (
             <div className="text-foreground-lighter flex items-center space-x-1.5 text-sm">
               <p>{dayjs(post.date).format('D MMM YYYY')}</p>
-              {post.readingTime && (
+              {/* {post.readingTime && (
                 <>
                   <p>•</p>
                   <p>{post.readingTime}</p>
                 </>
-              )}
+              )} */}
             </div>
           )}
           <h3 className="text-foreground max-w-sm text-xl">{post.title}</h3>

@@ -157,7 +157,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
   }
 
   return (
-    <div className="flex flex-row items-center justify-between gap-2">
+    <div className="flex flex-row items-center justify-between gap-2" suppressHydrationWarning>
       <AnimatePresence mode="wait">
         {!showSearchInput && (
           <motion.div
@@ -273,7 +273,11 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
         onClick={handleViewSelection}
         className="h-full p-1.5"
       >
-        {isList ? <Grid /> : <AlignJustify />}
+        {isList ? (
+          <Grid size={18} className="stroke-1" />
+        ) : (
+          <AlignJustify size={18} className="stroke-1" />
+        )}
       </Button>
     </div>
   )

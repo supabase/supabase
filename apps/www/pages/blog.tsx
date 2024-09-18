@@ -1,26 +1,29 @@
 import fs from 'fs'
-import { useState } from 'react'
+import React from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
 import { getSortedPosts } from '~/lib/posts'
 
-import type PostTypes from '~/types/post'
-import DefaultLayout from '~/components/Layouts/Default'
-import BlogGridItem from '~/components/Blog/BlogGridItem'
-import BlogListItem from '~/components/Blog/BlogListItem'
-import BlogFilters from '~/components/Blog/BlogFilters'
-import FeaturedThumb from '~/components/Blog/FeaturedThumb'
-import { cn } from 'ui'
 import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
+import { cn } from 'ui'
+import DefaultLayout from '~/components/Layouts/Default'
+import FeaturedThumb from '~/components/Blog/FeaturedThumb'
+
+import type PostTypes from '~/types/post'
+
+const BlogFilters = dynamic(() => import('~/components/Blog/BlogFilters'), { ssr: false })
+const BlogListItem = dynamic(() => import('~/components/Blog/BlogListItem'))
+const BlogGridItem = dynamic(() => import('~/components/Blog/BlogGridItem'))
 
 export type BlogView = 'list' | 'grid'
 
 function Blog(props: any) {
   const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
   const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
-  const [blogs, setBlogs] = useState(props.blogs)
-  const [view, setView] = useState<BlogView>(localView ?? 'list')
+  const [blogs, setBlogs] = React.useState(props.blogs)
+  const [view, setView] = React.useState<BlogView>(localView ?? 'list')
   const isList = view === 'list'
   const router = useRouter()
 
@@ -61,7 +64,7 @@ function Blog(props: any) {
         <div className="border-default border-t">
           <div className="md:container mx-auto mt-6 lg:mt-8 px-6 sm:px-16 xl:px-20">
             <BlogFilters
-              allPosts={props.blogs}
+              allPosts={props.blogs ?? []}
               setPosts={setBlogs}
               view={view as BlogView}
               setView={setView}
