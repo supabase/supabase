@@ -1,5 +1,5 @@
 import { cn } from 'ui'
-import { range } from 'lodash'
+import range from 'lodash/range'
 
 const Logos: React.FC = () => {
   const gap = 'gap-4 lg:gap-8'

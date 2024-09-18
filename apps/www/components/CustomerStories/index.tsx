@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
-import { range } from 'lodash'
+import range from 'lodash/range'
 import { ArrowRight } from 'lucide-react'
 import { Button, cn } from 'ui'
 

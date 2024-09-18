@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { codeBlock } from 'common-tags'
 import { CodeBlock } from 'ui'
-import { range } from 'lodash'
+import range from 'lodash/range'
 import { Pencil, X } from 'lucide-react'
 import Tilt from 'vanilla-tilt'
 import { useParams } from 'common'

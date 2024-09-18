@@ -13,7 +13,7 @@ import {
   MicrophoneIcon,
   HandIcon,
 } from '@heroicons/react/solid'
-import { capitalize } from 'lodash'
+import capitalize from 'lodash/capitalize'
 
 import authors from 'lib/authors.json'
 import { isNotNullOrUndefined } from '~/lib/helpers'

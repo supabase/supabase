@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import { range } from 'lodash'
+import range from 'lodash/range'
 
 const DataAPIsVisual = () => (
   <figure className="absolute inset-0 overflow-hidden">

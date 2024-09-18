@@ -174,8 +174,8 @@ const ContactSales = () => {
             <div className="flex flex-col gap-2 md:max-w-md">
               <h1 className="h1 !m-0">Talk to our Sales team</h1>
               <p className="md:text-lg text-foreground-lighter">
-                Book a demo to explore how Supabase can support your business growth with features
-                and plans designed to scale.
+                Book a demo and set up a trial Enterprise account to see how Supabase's scalable
+                features can accelerate your business growth and app development.
               </p>
             </div>
             <EnterpriseFormQuotes

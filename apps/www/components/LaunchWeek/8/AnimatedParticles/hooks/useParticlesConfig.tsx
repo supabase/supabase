@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { range } from 'lodash'
+import range from 'lodash/range'
 
 let defaultConfig = {
   particles: 700,

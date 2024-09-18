@@ -1,4 +1,4 @@
-import { range } from 'lodash'
+import range from 'lodash/range'
 import { File, Image, Video } from 'lucide-react'
 
 const StorageVisual = () => {

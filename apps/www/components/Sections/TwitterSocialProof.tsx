@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
 import { TweetCard } from 'ui-patterns/TweetCard'
-import { range } from 'lodash'
+import range from 'lodash/range'
 
 import Tweets from '~/data/tweets/Tweets.json'
 import { useBreakpoint } from 'common'
