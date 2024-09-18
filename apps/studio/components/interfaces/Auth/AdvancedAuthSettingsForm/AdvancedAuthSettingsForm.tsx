@@ -235,9 +235,9 @@ const AdvancedAuthSettingsForm = () => {
                     handleReset={handleReset}
                     disabled={!canUpdateConfig}
                     helper={
-                    !canUpdateConfig
-                    ? 'You need additional permissions to update authentication settings'
-                    : undefined
+                      !canUpdateConfig
+                        ? 'You need additional permissions to update authentication settings'
+                        : undefined
                     }
                   />
                 </div>
