@@ -52,6 +52,9 @@ const nextConfig = {
     outputFileTracing: true,
     webpackBuildWorker: true,
   },
+  outputFileTracingExcludes: {
+    '*': ['node_modules/@swc/**/*', 'node_modules/@esbuild/**/*', 'node_modules/webpack/**/*'],
+  },
   images: {
     dangerouslyAllowSVG: true,
     domains: [
