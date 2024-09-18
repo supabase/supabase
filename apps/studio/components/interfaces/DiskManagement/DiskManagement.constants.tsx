@@ -45,6 +45,8 @@ export const DISK_LIMITS = {
     maxStorage: 16384,
     minIops: 100,
     maxIops: 256000,
+    includedIops: 0,
+    includedThroughput: 0,
   },
 }
 

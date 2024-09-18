@@ -1,14 +1,21 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { formatCurrency } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
-import { Badge } from 'ui'
+import { Badge, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 interface BillingChangeBadgeProps {
   beforePrice?: number
   afterPrice?: number
   show: boolean | undefined
+  tooltip?: string
 }
 
-const BillingChangeBadge = ({ beforePrice, afterPrice, show }: BillingChangeBadgeProps) => {
+const BillingChangeBadge = ({
+  beforePrice,
+  afterPrice,
+  show,
+  tooltip,
+}: BillingChangeBadgeProps) => {
   return (
     <AnimatePresence>
       {beforePrice !== undefined && afterPrice !== undefined && show && (
@@ -19,13 +26,22 @@ const BillingChangeBadge = ({ beforePrice, afterPrice, show }: BillingChangeBadg
           transition={{ duration: 0.15 }}
         >
           <Badge variant="default" className="bg-alternative bg-opacity-100">
-            <div className="flex items-center gap-1">
-              <span className="text-xs font-mono text-foreground-muted">
-                ${beforePrice.toFixed(2)}
-              </span>
-              <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
-              <span className="text-xs font-mono text-foreground">${afterPrice.toFixed(2)}</span>
-            </div>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs font-mono text-foreground-muted">
+                    {formatCurrency(beforePrice)}
+                  </span>
+                  <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
+                  <span className="text-xs font-mono text-foreground">
+                    {formatCurrency(afterPrice)}
+                  </span>
+                </div>
+              </TooltipTrigger_Shadcn_>
+              {tooltip !== undefined && (
+                <TooltipContent_Shadcn_ side="bottom">{tooltip}</TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
           </Badge>
         </motion.div>
       )}

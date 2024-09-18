@@ -1,3 +1,4 @@
+import './mocks/browser'
 import { beforeAll, vi } from 'vitest'
 import { setupServer } from 'msw/node'
 import { APIMock } from './mocks/api'
