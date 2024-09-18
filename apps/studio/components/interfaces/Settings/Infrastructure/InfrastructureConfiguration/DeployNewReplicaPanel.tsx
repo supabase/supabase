@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
+  DISK_LIMITS,
   DISK_PRICING,
   DiskType,
 } from 'components/interfaces/DiskManagement/DiskManagement.constants'
@@ -45,6 +46,10 @@ import {
   cn,
 } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
+import {
+  calculateIOPSPrice,
+  calculateThroughputPrice,
+} from 'components/interfaces/DiskManagement/DiskManagement.utils'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -80,13 +85,30 @@ const DeployNewReplicaPanel = ({
     addons?.selected_addons.find((addon) => addon.type === 'compute_instance')?.variant
       .identifier ?? 'ci_micro'
 
-  const { size_gb, type } = diskConfiguration?.attributes ?? {}
+  // @ts-ignore
+  const { size_gb, type, throughput_mbps, iops } = diskConfiguration?.attributes ?? {}
   const showNewDiskManagementUI =
     diskManagementV2 &&
     subscription?.usage_based_billing_project_addons &&
     project?.cloud_provider === 'AWS'
   const readReplicaDiskSizes = (size_gb ?? 0) * 1.25
   const additionalCostDiskSize = readReplicaDiskSizes * DISK_PRICING[type as DiskType]?.storage ?? 0
+  const additionalCostIOPS = calculateIOPSPrice({
+    oldStorageType: type as DiskType,
+    newStorageType: type as DiskType,
+    oldProvisionedIOPS: 0,
+    newProvisionedIOPS: iops ?? 0,
+    numReplicas: 0,
+  }).newPrice
+  const additionalCostThroughput =
+    type === 'gp3'
+      ? calculateThroughputPrice({
+          storageType: type as DiskType,
+          newThroughput: throughput_mbps ?? 0,
+          oldThroughput: 0,
+          numReplicas: 0,
+        }).newPrice
+      : 0
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
@@ -424,7 +446,7 @@ const DeployNewReplicaPanel = ({
                         <TableRow>
                           <TableHead className="w-[140px] pl-0">Item</TableHead>
                           <TableHead>Description</TableHead>
-                          <TableHead className="text-right pr-0">Cost</TableHead>
+                          <TableHead className="text-right pr-0">Cost (/month)</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
@@ -432,7 +454,7 @@ const DeployNewReplicaPanel = ({
                           <TableCell className="pl-0">Compute size</TableCell>
                           <TableCell>{selectedComputeMeta?.name}</TableCell>
                           <TableCell className="text-right font-mono pr-0">
-                            ${estComputeMonthlyCost}/month
+                            ${estComputeMonthlyCost}
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -441,9 +463,25 @@ const DeployNewReplicaPanel = ({
                             {(size_gb ?? 0) * 1.25}GB ({type})
                           </TableCell>
                           <TableCell className="text-right font-mono pr-0">
-                            ${additionalCostDiskSize.toFixed(2)}/month
+                            ${additionalCostDiskSize.toFixed(2)}
                           </TableCell>
                         </TableRow>
+                        <TableRow>
+                          <TableCell className="pl-0">IOPS</TableCell>
+                          <TableCell>{iops}IOPS</TableCell>
+                          <TableCell className="text-right font-mono pr-0">
+                            ${additionalCostIOPS}
+                          </TableCell>
+                        </TableRow>
+                        {type === 'gp3' && (
+                          <TableRow>
+                            <TableCell className="pl-0">Throughput</TableCell>
+                            <TableCell>{throughput_mbps}MB/s</TableCell>
+                            <TableCell className="text-right font-mono pr-0">
+                              ${additionalCostThroughput}
+                            </TableCell>
+                          </TableRow>
+                        )}
                       </TableBody>
                     </Table>
                   </CollapsibleContent_Shadcn_>

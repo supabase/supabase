@@ -204,12 +204,14 @@ export function DiskManagementPanelForm() {
     oldProvisionedIOPS: form.formState.defaultValues?.provisionedIOPS || 0,
     newStorageType: form.getValues('storageType') as DiskType,
     newProvisionedIOPS: form.getValues('provisionedIOPS'),
+    numReplicas: readReplicas.length,
   })
 
   const throughputPrice = calculateThroughputPrice({
     storageType: form.getValues('storageType') as DiskType,
     newThroughput: form.getValues('throughput') || 0,
     oldThroughput: form.formState.defaultValues?.throughput || 0,
+    numReplicas: readReplicas.length,
   })
 
   useEffect(() => {

@@ -20,9 +20,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
 } from 'ui'
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
@@ -192,6 +189,11 @@ export const DiskManagementReviewAndSubmitDialog = ({
               unit="IOPS"
               beforePrice={Number(iopsPrice.oldPrice)}
               afterPrice={Number(iopsPrice.newPrice)}
+              priceTooltip={
+                numReplicas > 0
+                  ? `Price change includes for primary database and ${numReplicas} replicas`
+                  : undefined
+              }
             />
             {form.getValues('storageType') === 'gp3' ? (
               <TableDataRow
@@ -201,6 +203,11 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 unit="MB/s"
                 beforePrice={Number(throughputPrice.oldPrice)}
                 afterPrice={Number(throughputPrice.newPrice)}
+                priceTooltip={
+                  numReplicas > 0
+                    ? `Price change includes for primary database and ${numReplicas} replicas`
+                    : undefined
+                }
               />
             ) : (
               <TableRow>

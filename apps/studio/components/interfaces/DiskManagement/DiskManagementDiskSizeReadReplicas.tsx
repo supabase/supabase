@@ -110,7 +110,6 @@ export const DiskManagementDiskSizeReadReplicas = ({
                   transition={{ duration: 0.2 }}
                 >
                   <p className="flex flex-col gap-y-1 text-sm text-foreground-light mb-3">
-                    <span>All read replicas are provisioned with the following:</span>
                     <span className="text-foreground-lighter">
                       Read replicas have 25% more disk size than the primary database to account for
                       WAL files{' '}
