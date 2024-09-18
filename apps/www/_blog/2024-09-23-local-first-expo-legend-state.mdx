@@ -249,7 +249,7 @@ const Todos = observer(({ todos$ }: { todos$: typeof _todos$ }) => {
 
 It turns the entire component into an observing context - it automatically tracks observables for changes when `get()` is called, even from within hooks or helper functions.
 
-This mean, as long as realtime is enabled on the respective table, the component will automatically update when changes are made to the data!
+This means, as long as realtime is enabled on the respective table, the component will automatically update when changes are made to the data!
 
 Also, thanks to the persist and retry settings above, Legend-State will automatically retry to sync changes if the connection is lost.
 
