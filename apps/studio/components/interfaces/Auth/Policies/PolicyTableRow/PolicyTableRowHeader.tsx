@@ -7,7 +7,14 @@ import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useQueryState } from 'nuqs'
-import { AiIconAnimation, Badge } from 'ui'
+import {
+  AiIconAnimation,
+  Badge,
+  Button,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 
 interface PolicyTableRowHeaderProps {
   table: PostgresTable
@@ -84,24 +91,26 @@ const PolicyTableRowHeader = ({
             >
               Create policy
             </ButtonTooltip>
-            <ButtonTooltip
-              type="default"
-              disabled={!canToggleRLS}
-              onClick={() => {
-                onSelectCreatePolicy()
-                setEditView('conversation')
-              }}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canToggleRLS
-                    ? 'You need additional permissions to create RLS policies'
-                    : 'Use the Supabase Assistant to help',
-                },
-              }}
-            >
-              <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-            </ButtonTooltip>
+
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <Button
+                  type="default"
+                  className="px-1"
+                  onClick={() => {
+                    onSelectCreatePolicy()
+                    setEditView('conversation')
+                  }}
+                >
+                  <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
+                </Button>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="top">
+                {!canToggleRLS
+                  ? 'You need additional permissions to create RLS policies'
+                  : 'Create with the Supabase Assistant'}
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           </div>
         </div>
       )}
