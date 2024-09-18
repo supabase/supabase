@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { formatCurrency } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
 import { Badge, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
@@ -29,11 +30,11 @@ const BillingChangeBadge = ({
               <TooltipTrigger_Shadcn_ asChild>
                 <div className="flex items-center gap-1">
                   <span className="text-xs font-mono text-foreground-muted">
-                    ${beforePrice.toFixed(2)}
+                    {formatCurrency(beforePrice)}
                   </span>
                   <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
                   <span className="text-xs font-mono text-foreground">
-                    ${afterPrice.toFixed(2)}
+                    {formatCurrency(afterPrice)}
                   </span>
                 </div>
               </TooltipTrigger_Shadcn_>

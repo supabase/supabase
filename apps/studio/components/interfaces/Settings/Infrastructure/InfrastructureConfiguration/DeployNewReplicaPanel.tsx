@@ -50,6 +50,7 @@ import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from 'components/interfaces/DiskManagement/DiskManagement.utils'
+import { formatCurrency } from 'lib/helpers'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -421,13 +422,13 @@ const DeployNewReplicaPanel = ({
                 <Collapsible_Shadcn_>
                   <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
                     <p className="text-sm text-left">
-                      New replicas will cost an additional $
-                      {(
+                      New replica will cost an additional
+                      {formatCurrency(
                         estComputeMonthlyCost +
-                        additionalCostDiskSize +
-                        Number(additionalCostIOPS) +
-                        Number(additionalCostThroughput)
-                      ).toFixed(2)}
+                          additionalCostDiskSize +
+                          Number(additionalCostIOPS) +
+                          Number(additionalCostThroughput)
+                      )}
                       /month
                     </p>
                     <ChevronDown size={14} className="transition" />
@@ -438,7 +439,7 @@ const DeployNewReplicaPanel = ({
                       include 25% more disk size than the primary database to accommodate WAL files.
                     </p>
                     <p className="text-foreground-light text-sm">
-                      The additional cost per replica breaks down to:
+                      The additional cost for the replica breaks down to:
                     </p>
                     <Table>
                       <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:pb-2 [&_th]:pt-4">
@@ -453,31 +454,31 @@ const DeployNewReplicaPanel = ({
                           <TableCell className="pl-0">Compute size</TableCell>
                           <TableCell>{selectedComputeMeta?.name}</TableCell>
                           <TableCell className="text-right font-mono pr-0">
-                            ${estComputeMonthlyCost}
+                            {formatCurrency(estComputeMonthlyCost)}
                           </TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="pl-0">Disk size</TableCell>
                           <TableCell>
-                            {(size_gb ?? 0) * 1.25} GB ({type})
+                            {((size_gb ?? 0) * 1.25).toLocaleString()} GB ({type})
                           </TableCell>
                           <TableCell className="text-right font-mono pr-0">
-                            ${additionalCostDiskSize.toFixed(2)}
+                            {formatCurrency(additionalCostDiskSize)}
                           </TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="pl-0">IOPS</TableCell>
-                          <TableCell>{iops} IOPS</TableCell>
+                          <TableCell>{iops?.toLocaleString()} IOPS</TableCell>
                           <TableCell className="text-right font-mono pr-0">
-                            ${additionalCostIOPS}
+                            {formatCurrency(+additionalCostIOPS)}
                           </TableCell>
                         </TableRow>
                         {type === 'gp3' && (
                           <TableRow>
                             <TableCell className="pl-0">Throughput</TableCell>
-                            <TableCell>{throughput_mbps} MB/s</TableCell>
+                            <TableCell>{throughput_mbps?.toLocaleString()} MB/s</TableCell>
                             <TableCell className="text-right font-mono pr-0">
-                              ${additionalCostThroughput}
+                              {formatCurrency(+additionalCostThroughput)}
                             </TableCell>
                           </TableRow>
                         )}

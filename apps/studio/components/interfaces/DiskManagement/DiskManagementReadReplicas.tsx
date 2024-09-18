@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -9,14 +8,10 @@ import {
   Alert_Shadcn_ as Alert,
   AlertDescription_Shadcn_ as AlertDescription,
   AlertTitle_Shadcn_ as AlertTitle,
-  Collapsible_Shadcn_ as Collapsible,
-  CollapsibleContent_Shadcn_ as CollapsibleContent,
-  CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
   InfoIcon,
 } from 'ui'
 import BillingChangeBadge from './BillingChangeBadge'
 import { DISK_LIMITS, DISK_PRICING, DiskType } from './DiskManagement.constants'
-import DiskSpaceBar from './DiskSpaceBar'
 
 interface DiskManagementDiskSizeReadReplicasProps {
   isDirty: boolean

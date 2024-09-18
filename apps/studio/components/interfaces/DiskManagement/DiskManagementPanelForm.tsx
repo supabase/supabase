@@ -112,9 +112,8 @@ export function DiskManagementPanelForm() {
     })
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const currentCompute = (addons?.selected_addons ?? []).find(
-    (x) => x.type === 'compute_instance'
-  )?.variant
+  const currentCompute = (addons?.selected_addons ?? []).find((x) => x.type === 'compute_instance')
+    ?.variant
   const maxIopsBasedOnCompute =
     COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
   const maxThroughputBasedOnCompute =
@@ -501,8 +500,8 @@ export function DiskManagementPanelForm() {
                                 <div>
                                   <div className="flex items-center gap-x-2">
                                     <span>
-                                      Throughput must be between {minThroughput} and {maxThroughput}{' '}
-                                      MB/s based on your IOPS.
+                                      Throughput must be between {minThroughput.toLocaleString()}{' '}
+                                      and {maxThroughput?.toLocaleString()} MB/s based on your IOPS.
                                     </span>
                                     <Tooltip_Shadcn_>
                                       <TooltipTrigger_Shadcn_ asChild>
@@ -513,7 +512,7 @@ export function DiskManagementPanelForm() {
                                       </TooltipTrigger_Shadcn_>
                                       <TooltipContent_Shadcn_ side="bottom" className="w-64">
                                         Min throughput is at 125MB/s, while max throughput is at
-                                        0.25MB/s * IOPS or 1000, whichever is lower
+                                        0.25MB/s * IOPS or 1,000, whichever is lower
                                       </TooltipContent_Shadcn_>
                                     </Tooltip_Shadcn_>
                                   </div>

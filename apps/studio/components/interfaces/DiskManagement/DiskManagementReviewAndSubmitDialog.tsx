@@ -32,6 +32,7 @@ import {
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { DiskType } from './DiskManagement.constants'
+import { formatCurrency } from 'lib/helpers'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -97,7 +98,7 @@ const TableDataRow = ({
           tooltip={priceTooltip}
         />
       ) : (
-        <span className="text-xs font-mono">${beforePrice}</span>
+        <span className="text-xs font-mono">{formatCurrency(beforePrice)}</span>
       )}
     </TableCell>
   </TableRow>
@@ -203,8 +204,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
             />
             <TableDataRow
               attribute="IOPS"
-              defaultValue={form.formState.defaultValues?.provisionedIOPS ?? 0}
-              newValue={form.getValues('provisionedIOPS')}
+              defaultValue={form.formState.defaultValues?.provisionedIOPS?.toLocaleString() ?? 0}
+              newValue={form.getValues('provisionedIOPS').toLocaleString()}
               unit="IOPS"
               beforePrice={Number(iopsPrice.oldPrice)}
               afterPrice={Number(iopsPrice.newPrice)}
@@ -213,8 +214,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
             {form.getValues('storageType') === 'gp3' ? (
               <TableDataRow
                 attribute="Throughput"
-                defaultValue={form.formState.defaultValues?.throughput ?? 0}
-                newValue={form.getValues('throughput') ?? 0}
+                defaultValue={form.formState.defaultValues?.throughput?.toLocaleString() ?? 0}
+                newValue={form.getValues('throughput')?.toLocaleString() ?? 0}
                 unit="MB/s"
                 beforePrice={Number(throughputPrice.oldPrice)}
                 afterPrice={Number(throughputPrice.newPrice)}
@@ -236,17 +237,14 @@ export const DiskManagementReviewAndSubmitDialog = ({
             )}
             <TableDataRow
               attribute="Disk size"
-              defaultValue={form.formState.defaultValues?.totalSize ?? 0}
-              newValue={form.getValues('totalSize')}
+              defaultValue={form.formState.defaultValues?.totalSize?.toLocaleString() ?? 0}
+              newValue={form.getValues('totalSize').toLocaleString()}
               unit="GB"
               beforePrice={Number(diskSizePrice.oldPrice)}
               afterPrice={Number(diskSizePrice.newPrice)}
               priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
             />
           </TableBody>
-          <TableCaption className="mt-2 mb-2">
-            Please take note of the above billing changes
-          </TableCaption>
         </Table>
 
         <DialogSectionSeparator />
