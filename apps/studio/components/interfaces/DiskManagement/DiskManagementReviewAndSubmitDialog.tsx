@@ -15,7 +15,6 @@ import {
   DialogTrigger,
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -205,7 +204,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
             <TableDataRow
               attribute="IOPS"
               defaultValue={form.formState.defaultValues?.provisionedIOPS?.toLocaleString() ?? 0}
-              newValue={form.getValues('provisionedIOPS').toLocaleString()}
+              newValue={form.getValues('provisionedIOPS')?.toLocaleString()}
               unit="IOPS"
               beforePrice={Number(iopsPrice.oldPrice)}
               afterPrice={Number(iopsPrice.newPrice)}
@@ -238,7 +237,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
             <TableDataRow
               attribute="Disk size"
               defaultValue={form.formState.defaultValues?.totalSize?.toLocaleString() ?? 0}
-              newValue={form.getValues('totalSize').toLocaleString()}
+              newValue={form.getValues('totalSize')?.toLocaleString()}
               unit="GB"
               beforePrice={Number(diskSizePrice.oldPrice)}
               afterPrice={Number(diskSizePrice.newPrice)}
