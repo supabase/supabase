@@ -1,5 +1,5 @@
 import { hover } from '@testing-library/user-event/dist/hover'
-import { drop } from 'lodash'
+import drop from 'lodash/drop'
 import Image from 'next/image'
 import xl from 'react-syntax-highlighter/dist/esm/languages/hljs/xl'
 import { cn } from 'ui/src/lib/utils'

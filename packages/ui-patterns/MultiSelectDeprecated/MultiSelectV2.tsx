@@ -1,4 +1,5 @@
-import { orderBy, without } from 'lodash'
+import orderBy from 'lodash/orderBy'
+import without from 'lodash/without'
 import { Check, ChevronDown } from 'lucide-react'
 import { ReactNode, useState } from 'react'
 import {

@@ -46,12 +46,8 @@ const nextConfig = {
   transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons', 'api-types'],
   reactStrictMode: true,
   swcMinify: true,
-  outputFileTracingExcludes: {
-    '*': [
-      'node_modules/@swc/core-linux-x64-gnu',
-      'node_modules/@swc/core-linux-x64-musl',
-      'node_modules/@esbuild/linux-x64',
-    ],
+  experimental: {
+    cache: true,
   },
   images: {
     dangerouslyAllowSVG: true,

@@ -1,5 +1,7 @@
 import clsx from 'clsx'
-import { filter, orderBy, without } from 'lodash'
+import filter from 'lodash/filter'
+import orderBy from 'lodash/orderBy'
+import without from 'lodash/without'
 import { AlertCircle, Check, ChevronDown, Plus, Search } from 'lucide-react'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import {

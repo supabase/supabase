@@ -7,7 +7,7 @@ import {
   useBreakpoint,
   useTelemetryProps,
 } from 'common'
-import { noop } from 'lodash'
+import noop from 'lodash/noop'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'

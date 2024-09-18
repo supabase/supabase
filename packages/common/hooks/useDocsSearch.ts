@@ -1,7 +1,9 @@
 'use client'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { compact, debounce, uniqBy } from 'lodash'
+import compact from 'lodash/compact'
+import debounce from 'lodash/debounce'
+import uniqBy from 'lodash/uniqBy'
 import { useCallback, useMemo, useReducer, useRef } from 'react'
 
 const NUMBER_SOURCES = 2

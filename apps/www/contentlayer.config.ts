@@ -11,6 +11,7 @@ export const BlogPost = defineDocumentType(() => ({
     author_title: { type: 'string', required: false },
     author_image_url: { type: 'string', required: false },
     date: { type: 'string', required: true },
+    published_at: { type: 'string', required: false },
     description: { type: 'string', required: true },
     categories: { type: 'list', of: { type: 'string' }, required: true },
     image: { type: 'string', required: false },

@@ -1,5 +1,5 @@
 import { useSearchParamsShallow } from 'common'
-import { xor } from 'lodash'
+import xor from 'lodash/xor'
 import { Children, useEffect, useRef, type FC, type PropsWithChildren } from 'react'
 import { type TabsProps } from 'ui'
 

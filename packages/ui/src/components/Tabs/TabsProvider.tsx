@@ -1,6 +1,6 @@
 'use client'
 
-import { xor } from 'lodash'
+import xor from 'lodash/xor'
 import {
   type Dispatch,
   type PropsWithChildren,
