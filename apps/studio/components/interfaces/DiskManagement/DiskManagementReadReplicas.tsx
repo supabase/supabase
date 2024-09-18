@@ -153,9 +153,9 @@ export const DiskManagementIOPSReadReplicas = ({
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
 
   const beforePrice =
-    (oldIOPS - DISK_LIMITS[oldStorageType].includedIops) * DISK_PRICING[oldStorageType]?.iops ?? 0
+    (oldIOPS - DISK_LIMITS[oldStorageType]?.includedIops) * DISK_PRICING[oldStorageType]?.iops ?? 0
   const afterPrice =
-    (newIOPS - DISK_LIMITS[newStorageType].includedIops) * DISK_PRICING[newStorageType]?.iops ?? 0
+    (newIOPS - DISK_LIMITS[newStorageType]?.includedIops) * DISK_PRICING[newStorageType]?.iops ?? 0
 
   return (
     <AnimatePresence>
