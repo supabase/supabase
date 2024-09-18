@@ -2312,6 +2312,27 @@ functions:
           {
             data: {
               id: '<ID>',
+              type: 'phone',
+              expires_at: 1700000000
+            },
+            error: null
+          }
+          ```
+      - id: create-mfa-webauthn-challenge
+        name: Create a challenge for a WebAuthn factor
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'webauthn',
               expires_at: 1700000000
             },
             error: null
