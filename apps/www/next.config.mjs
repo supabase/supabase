@@ -46,9 +46,11 @@ const nextConfig = {
   transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons', 'api-types'],
   reactStrictMode: true,
   swcMinify: true,
+  productionBrowserSourceMaps: false,
   experimental: {
     cache: true,
     outputFileTracing: true,
+    webpackBuildWorker: true,
   },
   images: {
     dangerouslyAllowSVG: true,
