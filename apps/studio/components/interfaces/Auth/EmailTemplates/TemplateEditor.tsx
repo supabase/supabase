@@ -21,7 +21,9 @@ interface TemplateEditorProps {
 
 const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+    onError: (error) => toast.error(`Failed to update email templates: ${error.message}`),
+  })
 
   const { id, properties } = template
 
@@ -51,7 +53,6 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
-        onError: () => toast.error('Failed to update settings'),
         onSuccess: () => {
           toast.success('Successfully updated settings')
           resetForm({
