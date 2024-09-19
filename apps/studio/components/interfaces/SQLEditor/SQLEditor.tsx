@@ -276,86 +276,90 @@ const SQLEditor = () => {
     }
   }, [formatQuery, id, isDiffOpen, project, snap])
 
-  const executeQuery = useCallback(
-    async (force: boolean = false) => {
-      if (isDiffOpen) return
+  const executeQuery = useCallback(async () => {
+    if (isDiffOpen) return
 
-      // use the latest state
-      const state = enableFolders ? getSqlEditorV2StateSnapshot() : getSqlEditorStateSnapshot()
-      const snippet = state.snippets[id]
+    // use the latest state
+    const state = enableFolders ? getSqlEditorV2StateSnapshot() : getSqlEditorStateSnapshot()
+    const snippet = state.snippets[id]
 
-      if (editorRef.current !== null && !isExecuting && project !== undefined) {
-        const editor = editorRef.current
-        const selection = editor.getSelection()
-        const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
+    if (editorRef.current !== null && !isExecuting && project !== undefined) {
+      const editor = editorRef.current
+      const selection = editor.getSelection()
+      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
-        const sql = snippet
-          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
-          : selectedValue || editorRef.current?.getValue()
+      const sql = snippet
+        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+        : selectedValue || editorRef.current?.getValue()
 
-        const destructiveOperations = checkDestructiveQuery(sql)
-        const updateWithoutWhereClause = isUpdateWithoutWhere(sql)
+      let queryHasIssues = false
 
-        if (destructiveOperations) {
-          setShowPotentialIssuesModal(true)
-          setQueryHasDestructiveOperations(true)
-        }
-
-        if (updateWithoutWhereClause) {
-          setShowPotentialIssuesModal(true)
-          setQueryHasUpdateWithoutWhere(true)
-        }
-
-        if (!hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
-          // Intentionally don't await title gen (lazy)
-          setAiTitle(id, sql)
-        }
-
-        if (lineHighlights.length > 0) {
-          editor?.deltaDecorations(lineHighlights, [])
-          setLineHighlights([])
-        }
-
-        const impersonatedRole = getImpersonatedRole()
-        const connectionString = databases?.find(
-          (db) => db.identifier === databaseSelectorState.selectedDatabaseId
-        )?.connectionString
-        if (IS_PLATFORM && !connectionString) {
-          return toast.error('Unable to run query: Connection string is missing')
-        }
-
-        const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
-        const formattedSql = suffixWithLimit(sql, limit)
-
-        execute({
-          projectRef: project.ref,
-          connectionString: connectionString,
-          sql: wrapWithRoleImpersonation(formattedSql, {
-            projectRef: project.ref,
-            role: impersonatedRole,
-          }),
-          autoLimit: appendAutoLimit ? limit : undefined,
-          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
-          handleError: (error) => {
-            throw error
-          },
-        })
+      const destructiveOperations = checkDestructiveQuery(sql)
+      if (destructiveOperations) {
+        setShowPotentialIssuesModal(true)
+        setQueryHasDestructiveOperations(true)
+        queryHasIssues = true
       }
-    },
-    [
-      isDiffOpen,
-      id,
-      isExecuting,
-      project,
-      hasHipaaAddon,
-      execute,
-      getImpersonatedRole,
-      setAiTitle,
-      databaseSelectorState.selectedDatabaseId,
-      databases,
-      limit,
-    ]
-  )
+
+      const updateWithoutWhereClause = isUpdateWithoutWhere(sql)
+      if (updateWithoutWhereClause) {
+        setShowPotentialIssuesModal(true)
+        setQueryHasUpdateWithoutWhere(true)
+        queryHasIssues = true
+      }
+
+      if (queryHasIssues) {
+        return
+      }
+
+      if (!hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
+        // Intentionally don't await title gen (lazy)
+        setAiTitle(id, sql)
+      }
+
+      if (lineHighlights.length > 0) {
+        editor?.deltaDecorations(lineHighlights, [])
+        setLineHighlights([])
+      }
+
+      const impersonatedRole = getImpersonatedRole()
+      const connectionString = databases?.find(
+        (db) => db.identifier === databaseSelectorState.selectedDatabaseId
+      )?.connectionString
+      if (IS_PLATFORM && !connectionString) {
+        return toast.error('Unable to run query: Connection string is missing')
+      }
+
+      const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+      const formattedSql = suffixWithLimit(sql, limit)
+
+      execute({
+        projectRef: project.ref,
+        connectionString: connectionString,
+        sql: wrapWithRoleImpersonation(formattedSql, {
+          projectRef: project.ref,
+          role: impersonatedRole,
+        }),
+        autoLimit: appendAutoLimit ? limit : undefined,
+        isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+        handleError: (error) => {
+          throw error
+        },
+      })
+    }
+  }, [
+    isDiffOpen,
+    id,
+    isExecuting,
+    project,
+    hasHipaaAddon,
+    execute,
+    getImpersonatedRole,
+    setAiTitle,
+    databaseSelectorState.selectedDatabaseId,
+    databases,
+    limit,
+  ])
 
   const handleNewQuery = useCallback(
     async (sql: string, name: string) => {
@@ -640,7 +644,7 @@ const SQLEditor = () => {
         }}
         onConfirm={() => {
           setShowPotentialIssuesModal(false)
-          executeQuery(true)
+          executeQuery()
         }}
       >
         <div className="text-sm ">
