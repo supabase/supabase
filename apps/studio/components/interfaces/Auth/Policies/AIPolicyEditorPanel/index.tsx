@@ -128,7 +128,7 @@ export const AIPolicyEditorPanel = memo(function ({
   const [tabId, setTabId] = useState<'templates' | 'conversation'>(
     editView as 'templates' | 'conversation'
   )
-  console.log({ editView }, { tabId })
+
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const placeholder = generatePlaceholder(selectedPolicy)
   const isOptedInToAI = useOrgOptedIntoAi()
@@ -209,7 +209,6 @@ export const AIPolicyEditorPanel = memo(function ({
     })
     .join('\n\n')
 
-  console.log({ existingPolicyDefinition })
   const {
     messages: chatMessages,
     append,

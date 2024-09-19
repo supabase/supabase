@@ -108,7 +108,7 @@ const PolicyTableRowHeader = ({
               <TooltipContent_Shadcn_ side="top">
                 {!canToggleRLS
                   ? 'You need additional permissions to create RLS policies'
-                  : 'Create with the Supabase Assistant'}
+                  : 'Create with Supabase Assistant'}
               </TooltipContent_Shadcn_>
             </Tooltip_Shadcn_>
           </div>
