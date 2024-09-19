@@ -13,7 +13,15 @@
     },
     "docs#build": {
       "dependsOn": ["^build"],
-      "env": ["ANALYZE", "NEXT_PUBLIC_*", "NODE_ENV", "OPENAI_API_KEY"],
+      "env": [
+        "ANALYZE",
+        "DOCS_REVALIDATION_KEYS",
+        "DOCS_REVALIDATION_OVERRIDE_KEYS",
+        "NEXT_PUBLIC_*",
+        "NODE_ENV",
+        "OPENAI_API_KEY",
+        "SUPABASE_SECRET_KEY"
+      ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "studio#build": {
