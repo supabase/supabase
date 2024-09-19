@@ -50,9 +50,6 @@ export const LOCAL_STORAGE_KEYS = {
   GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
   CLS_SELECT_STAR_WARNING: 'cls-select-star-warning-dismissed',
-  PGBOUNCER_IPV6_DEPRECATION_WARNING: 'pgbouncer-ipv6-deprecation-warning-dismissed',
-  VERCEL_IPV6_DEPRECATION_WARNING: 'vercel-ipv6-deprecation-warning-dismissed',
-  PGBOUNCER_DEPRECATION_WARNING: 'pgbouncer-deprecation-warning-dismissed',
   PROJECT_LINT_IGNORE_LIST: 'supabase-project-lint-ignore-list',
   QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
   // Key to track account deletion requests
@@ -71,6 +68,8 @@ export const LOCAL_STORAGE_KEYS = {
   // Used for allowing the main nav panel to expand on hover
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
+  // Notice banner keys
+  AUTH_SMTP_CHANGES_WARNING: 'auth-smtp-changes-warning-dismissed',
 }
 
 export const OPT_IN_TAGS = {
