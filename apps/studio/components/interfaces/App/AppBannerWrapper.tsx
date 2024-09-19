@@ -30,7 +30,7 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
     <div className="min-h-full flex flex-col">
       <div className="flex-none">
         {ongoingIncident && <IncidentBanner />}
-        {showNoticeBanner && <NoticeBanner />}
+        {true && <NoticeBanner />}
         {profile !== undefined && <RestrictionBanner />}
       </div>
       {children}
