@@ -385,7 +385,7 @@ export const UsersV2 = () => {
               size="tiny"
               className="w-64"
               icon={<Search size={14} className="text-foreground-lighter" />}
-              placeholder="Search by email or phone number"
+              placeholder="Search by email, phone number or UID"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
