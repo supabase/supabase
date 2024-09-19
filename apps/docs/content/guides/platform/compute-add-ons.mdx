@@ -52,31 +52,80 @@ When considering compute upgrades, assess whether your bottlenecks are hardware-
 
 ## Disk IO
 
-SSD Disks are attached to your servers and the disk performance depends on the compute add-on of your instance. Disk IO refers to two metrics: throughput (Megabits per Second) and IOPS (Input/Output Operations per Second). Disk throughput is capped at 1,048 Mbps and IOPS is capped at 3,000 IOPS for all compute add-ons.
+SSD disks are attached to your servers, and their performance depends on the compute add-on of your instance as well as the attributes set for the disk.
 
-| Plan        | Baseline Disk Throughput | Baseline IOPS |
-| ----------- | ------------------------ | ------------- |
-| Nano (free) | 43 Mbps                  | 250 IOPS      |
-| Micro       | 87 Mbps                  | 500 IOPS      |
-| Small       | 174 Mbps                 | 1,000 IOPS    |
-| Medium      | 347 Mbps                 | 2,000 IOPS    |
-| Large       | 630 Mbps                 | 3,000 IOPS    |
-| XL          | 1,048 Mbps               | 3,000 IOPS    |
-| 2XL         | 1,048 Mbps               | 3,000 IOPS    |
-| 4XL         | 1,048 Mbps               | 3,000 IOPS    |
-| 8XL         | 1,048 Mbps               | 3,000 IOPS    |
-| 12XL        | 1,048 Mbps               | 3,000 IOPS    |
-| 16XL        | 1,048 Mbps               | 3,000 IOPS    |
+Disk I/O Metrics:
 
-[Contact us](https://supabase.com/contact/enterprise) if you require a plan with higher disk throughput and IOPS.
+- Throughput: Measured in Megabits per Second (Mbps), which indicates the rate of data transfer.
+- IOPS: Input/Output Operations per Second, which measures the number of read and write operations.
 
-### Bursting and disk IO budget
+Performance Limits:
 
-Smaller compute instances can burst up to 1,048 Mbps and 3,000 IOPS for 30 minutes in a day. Beyond that, the performance reverts to the baseline. For example, the micro plan can burst up to 1,048 Mbps for 30 minutes a day and reverts to the baseline performance of 87 Mbps. Your disk IO budget gets replenished throughout the day.
+Disk throughput is capped at 19,000 Mbps and IOPS is capped at 80,000 IOPS for all compute add-ons.
 
-If you need consistent disk performance, choose the XL or larger compute add-on which has the same baseline and maximum disk throughput and IOPS.
+| Plan        | Max Disk Throughput | Baseline Disk Throughput | Max IOPS    | Baseline IOPS |
+| ----------- | ------------------- | ------------------------ | ----------- | ------------- |
+| Nano (free) | 2,085 Mbps          | 43 Mbps                  | 11,800 IOPS | 250 IOPS      |
+| Micro       | 2,085 Mbps          | 87 Mbps                  | 11,800 IOPS | 500 IOPS      |
+| Small       | 2,085 Mbps          | 174 Mbps                 | 11,800 IOPS | 1,000 IOPS    |
+| Medium      | 2,085 Mbps          | 347 Mbps                 | 11,800 IOPS | 2,000 IOPS    |
+| Large       | 4,750 Mbps          | 630 Mbps                 | 20,000 IOPS | 3,600 IOPS    |
+| XL          | 4,750 Mbps          | 1,188 Mbps               | 20,000 IOPS | 6,000 IOPS    |
+| 2XL         | 4,750 Mbps          | 2,375 Mbps               | 20,000 IOPS | 12,000 IOPS   |
+| 4XL         | 4,750 Mbps          | 4,750 Mbps               | 20,000 IOPS | 20,000 IOPS   |
+| 8XL         | 9,500 Mbps          | 9,500 Mbps               | 40,000 IOPS | 40,000 IOPS   |
+| 12XL        | 14,250 Mbps         | 14,250 Mbps              | 50,000 IOPS | 50,000 IOPS   |
+| 16XL        | 19,000 Mbps         | 19,000 Mbps              | 80,000 IOPS | 80,000 IOPS   |
+
+### Self-Serve Configurability
+
+You can now adjust storage type, IOPS and disk size parameters yourself through the Dashboard [Database Settings page](https://supabase.com/dashboard/project/_/settings/database).
+
+![Disk management configuration](/docs/img/guides/platform/disk-mgmt-io.png)
+
+<Admonition type="caution">
+
+Increasing IOPS or throughput incurs additional charges.
+
+</Admonition>
+
+### Understanding I/O Balance and Bursting (Smaller Instances)
+
+For smaller instances like Nano, Micro, and Small, you get I/O balance and burst capacity. These instances have limited base performance for IOPS and throughput. However, they come with burst credits that let you handle temporary spikes for 30 minutes in a day on demand by briefly exceeding their baseline performance. This means you can achieve higher performance for short bursts before reverting to your baseline limits.
+
+For example, the micro plan can burst up to 2,085 Mbps for 30 minutes a day and reverts to the baseline performance of 87 Mbps. Your disk IO budget gets replenished throughout the day.
+
+### Dedicated I/O Resources (Larger Instances)
+
+Larger instances, such as 4XL and above, come with dedicated I/O resources and don't rely on I/O balance or burst capacity. These instances are designed for sustained, high performance with specific IOPS and throughput limits. They provide consistent performance without needing to burst. If you hit your IOPS or throughput limit, throttling will occur, but you won't have burst credits to exceed these limits.
+
+### Storage Volume Types: gp3 vs. io2
+
+Here’s how **gp3** and **io2** storage volumes differ:
+
+**gp3 (General Purpose SSD) (default)** This is a versatile and cost-effective option, perfect for a range of everyday workloads that need moderate IOPS and throughput. It supports volume sizes from 1GB to 16TB. You get IOPS ranging from 3,000 (default) up to 16,000 (maximum), and throughput from 125 MB/s (default) to 1,000 MB/s (maximum). It’s well-suited for general tasks like boot volumes and small to medium-sized databases.
+
+**io2 (Provisioned IOPS SSD)** Designed for high-demand scenarios where very high IOPS and low latency are crucial. It supports volumes ranging from 4GB to 16TB. With IOPS reaching up to 256,000 (depending on your instance type) and throughput scaling with IOPS, io2 is designed for large-scale databases and mission-critical applications. While it offers top-tier performance, it does come with a higher price tag.
+
+If you’re choosing between these two, think about your workload needs to find the best fit.
+
+### Choosing the Right Compute Add-On for Consistent Disk Performance
+
+If you need consistent disk performance, choose the 4XL or larger compute add-on which has the same baseline and maximum disk throughput and IOPS.
 
 If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://supabase.com/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has burst beyond the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget and will revert to baseline performance. Projects that use any disk IO budget are good candidates for upgrading to a larger compute add-on with higher baseline throughput.
+
+<Admonition type="information">
+
+Compute add-on changes will not cause you to lose your settings.
+
+</Admonition>
+
+### Constraints
+
+- After **any** attribute change, there is a cooldown period of approximately six hours before you can make further adjustments. During this time, no changes are allowed. If you encounter throttling, you’ll need to wait until the cooldown period concludes before making additional modifications.
+- You can increase volume size but cannot decrease it.
+- The performance of EBS volumes is affected by the instance type to which you are attached.
 
 ## Postgres replication slots and WAL senders
 
