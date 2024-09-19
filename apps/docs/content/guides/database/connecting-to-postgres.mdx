@@ -85,7 +85,7 @@ Application-side poolers are built into connection libraries and API servers, su
 
 Postgres connections are like websockets, once established, they are preserved until the client (application servers) disconnects. A server might only make a single 10 ms query, but needlessly reserve its database connection for seconds or longer.
 
-Serverside-poolers, such as Supabase's Supavisor in transaction mode, sit between clients and the database and can be thought of as load balancers for Postgres connections.
+Serverside-poolers, such as Supabase's [Supavisor](https://github.com/supabase/supavisor) in transaction mode, sit between clients and the database and can be thought of as load balancers for Postgres connections.
 
 <Image
   alt="New migration files trigger migrations on the preview instance."
