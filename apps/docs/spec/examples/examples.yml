@@ -1131,7 +1131,7 @@ functions:
               games (id, home_team, away_team, name)
             values
               (1, 1, 2, 'Green vs Blue'),
-              (2, 2, 1, 'Blue vs Green')
+              (2, 2, 1, 'Blue vs Green');
             ```
         response: |
           ```json
