@@ -417,6 +417,10 @@ export const AIPolicyEditorPanel = memo(function ({
     }
   }
 
+  const clearHistory = () => {
+    setChatId(uuidv4())
+  }
+
   // when the panel is closed, reset all values
   useEffect(() => {
     if (!visible) {
@@ -822,7 +826,7 @@ export const AIPolicyEditorPanel = memo(function ({
                   className={cn(
                     'border-l shadow-[rgba(0,0,0,0.13)_-4px_0px_6px_0px] z-10',
                     assistantVisible && 'w-[50%]',
-                    'bg-studio'
+                    'bg-studio overflow-auto'
                   )}
                 >
                   <Tabs_Shadcn_
@@ -910,6 +914,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         }
                         onDiff={updateEditorWithCheckForDiff}
                         loading={isLoading || isDebugSqlLoading}
+                        clearHistory={clearHistory}
                       />
                     </TabsContent_Shadcn_>
                   </Tabs_Shadcn_>

@@ -32,6 +32,7 @@ interface AIPolicyChatProps {
   loading: boolean
   onSubmit: (s: string) => void
   onDiff: (message: { id: string; content: string }) => void
+  clearHistory?: () => void
 }
 
 export const AIPolicyChat = ({
@@ -41,6 +42,7 @@ export const AIPolicyChat = ({
   loading,
   onSubmit,
   onDiff,
+  clearHistory,
 }: AIPolicyChatProps) => {
   const router = useRouter()
   const project = useSelectedProject()
@@ -79,7 +81,14 @@ export const AIPolicyChat = ({
 
   return (
     <div id={'ai-chat-assistant'} className="flex flex-col h-full max-w-full">
-      <div className="overflow-auto flex-1 divide-y divide-border">
+      <div className="overflow-auto flex-1 divide-y divide-border relative">
+        <div className="flex gap-2 absolute right-4 top-4">
+          {messages.length > 0 && (
+            <Button type="warning" onClick={clearHistory}>
+              Clear history
+            </Button>
+          )}
+        </div>
         <Message
           key="zero"
           role="assistant"
@@ -138,7 +147,6 @@ export const AIPolicyChat = ({
             </ButtonTooltip>
           )}
         </Message>
-
         {messages.map((m) => (
           <Message
             key={`message-${m.id}`}
@@ -154,7 +162,6 @@ export const AIPolicyChat = ({
         {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
         <div ref={bottomRef} className="h-1" />
       </div>
-
       {!hasSuggested && (
         <div className="flex flex-row justify-between m-4">
           <Tooltip_Shadcn_>
@@ -179,7 +186,6 @@ export const AIPolicyChat = ({
           </Tooltip_Shadcn_>
         </div>
       )}
-
       <div className="sticky p-5 flex-0 border-t">
         <AssistantChatForm
           textAreaRef={inputRef}
