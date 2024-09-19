@@ -28,10 +28,17 @@ export const NoticeBanner = () => {
 
   const { data: authConfig } = useAuthConfigQuery({ projectRef })
   const smtpEnabled = isSmtpEnabled(authConfig)
+  const hasAuthEmailHookEnabled = authConfig?.HOOK_SEND_EMAIL_ENABLED
 
   const acknowledged = authSmtpBannerAcknowledged.includes(projectRef ?? '')
 
-  if (isLoadingProfile || router.pathname.includes('sign-in') || smtpEnabled || acknowledged) {
+  if (
+    isLoadingProfile ||
+    router.pathname.includes('sign-in') ||
+    smtpEnabled ||
+    hasAuthEmailHookEnabled ||
+    acknowledged
+  ) {
     return null
   }
 
