@@ -1,7 +1,7 @@
 'use client'
 
 import { User } from 'lucide-react'
-import { Fragment, useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -125,12 +125,10 @@ function PromptInput({
   className?: string
 }) {
   const query = useQuery()
-
-  useHistoryKeys({
-    enable: !isResponding,
-    stack: messages.filter(({ role }) => role === MessageRole.User).map(({ content }) => content),
-  })
-
+  const previousQuery = useRef(query)
+  const setQuery = useSetQuery()
+  // If the user has already typed something when they select Supabase AI, we want to
+  // submit it immediately.
   useEffect(() => {
     if (query) {
       submit(query)
@@ -138,8 +136,23 @@ function PromptInput({
     return reset
   }, [])
 
-  // Detect an IME composition (so that we can ignore Enter keypress)
+  const [inputValue, setInputValue] = useState('')
+  // Support CJK IME input
   const [isImeComposing, setIsImeComposing] = useState(false)
+  useEffect(() => {
+    if (query !== previousQuery.current) {
+      setInputValue(query)
+      previousQuery.current = query
+    } else if (!isImeComposing) {
+      setQuery(inputValue)
+      previousQuery.current = inputValue
+    }
+  }, [inputValue, query, isImeComposing])
+
+  useHistoryKeys({
+    enable: !isResponding,
+    stack: messages.filter(({ role }) => role === MessageRole.User).map(({ content }) => content),
+  })
 
   return (
     <CommandInput
@@ -157,7 +170,8 @@ function PromptInput({
       placeholder={
         isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
       }
-      value={query}
+      value={inputValue}
+      onValueChange={setInputValue}
       onCompositionStart={() => setIsImeComposing(true)}
       onCompositionEnd={() => setIsImeComposing(false)}
       onKeyDown={(e) => {
