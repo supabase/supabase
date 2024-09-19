@@ -3,27 +3,21 @@ import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
+
+import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'lucide-react'
 import {
   Button,
-  IconActivity,
-  IconBookOpen,
-  IconHelpCircle,
-  IconMail,
-  IconMessageCircle,
-  IconTool,
   Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
+import { useProjectContext } from '../ProjectContext'
 
-interface HelpPopoverProps {
-  alt?: boolean
-}
-
-const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
+const HelpPopover = () => {
   const router = useRouter()
-  const projectRef = router.query.ref
+  const { project } = useProjectContext()
+  const projectRef = project?.parent_project_ref ?? router.query.ref
   const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
 
   return (
@@ -34,36 +28,26 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
             <div className="relative flex items-center">
               <Button
                 id="help-popover-button"
-                type={alt ? 'text' : 'default'}
-                className={alt ? 'px-1' : ''}
-                icon={
-                  <IconHelpCircle
-                    size={alt ? 18 : 16}
-                    strokeWidth={1.5}
-                    className={alt ? 'text-foreground-light' : 'text-foreground-lighter'}
-                  />
-                }
-              >
-                {!alt && <span>Help</span>}
-              </Button>
+                type="text"
+                className="px-1"
+                icon={<HelpCircle size={16} strokeWidth={1.5} className="text-foreground-light" />}
+              />
             </div>
           </Tooltip.Trigger>
         </PopoverTrigger_Shadcn_>
-        {alt ? (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'space-y-2 border border-background',
-                ].join(' ')}
-              >
-                <p className="text-xs text-foreground">Help</p>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        ) : null}
+        <Tooltip.Portal>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                'space-y-2 border border-background',
+              ].join(' ')}
+            >
+              <p className="text-xs text-foreground">Help</p>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Portal>
       </Tooltip.Root>
       <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">
         <div className="mb-5 space-y-4 px-5">
@@ -73,7 +57,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
             services.
           </p>
           <div className="space-x-1">
-            <Button asChild type="default" icon={<IconTool />}>
+            <Button asChild type="default" icon={<Wrench />}>
               <Link
                 href="https://supabase.com/docs/guides/platform/troubleshooting"
                 target="_blank"
@@ -82,12 +66,12 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
                 Troubleshooting
               </Link>
             </Button>
-            <Button asChild type="text" size="tiny" icon={<IconBookOpen />}>
+            <Button asChild type="text" size="tiny" icon={<BookOpen />}>
               <Link href="https://supabase.com/docs/" target="_blank" rel="noreferrer">
                 Docs
               </Link>
             </Button>
-            <Button asChild type="text" size="tiny" icon={<IconActivity />}>
+            <Button asChild type="text" size="tiny" icon={<Activity />}>
               <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
                 Supabase Status
               </Link>
@@ -98,7 +82,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
             prioritized.
           </p>
           <div>
-            <Button asChild type="default" icon={<IconMail />}>
+            <Button asChild type="default" icon={<Mail />}>
               <Link href={supportUrl}>Contact Support</Link>
             </Button>
           </div>
@@ -155,7 +139,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
                   objectFit="cover"
                   alt="discord illustration header"
                 />
-                <Button type="secondary" icon={<IconMessageCircle />}>
+                <Button type="secondary" icon={<MessageCircle />}>
                   GitHub Discussions
                 </Button>
               </a>

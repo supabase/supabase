@@ -58,7 +58,7 @@ Supabase adalah kombinasi dari alat sumber terbuka. Kami membangun fitur-fitur F
 Supabase adalah [platform yang di-host](https://supabase.com/dashboard). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
 Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/overview) dan [mengembangkan secara lokal](https://supabase.com/docs/guides/local-development).
 
-![Arsitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Arsitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) adalah sistem basis data relasional objek dengan lebih dari 30 tahun pengembangan aktif yang telah membuatnya memiliki reputasi yang kuat dalam hal keandalan, ketangguhan fitur, dan kinerja.
 - [Realtime](https://github.com/supabase/realtime) adalah server Elixir yang memungkinkan Anda untuk mendengarkan penyisipan, pembaruan, dan penghapusan PostgreSQL menggunakan websocket. Realtime melakukan polling terhadap fungsionalitas replikasi bawaan Postgres untuk perubahan database, mengkonversi perubahan ke JSON, kemudian menyiarkan JSON melalui websockets ke klien yang berwenang.

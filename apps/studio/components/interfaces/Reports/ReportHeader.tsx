@@ -1,28 +1,32 @@
-import { Button, IconRefreshCw } from 'ui'
+import { useRouter } from 'next/router'
 
-interface Props {
+import { useParams } from 'common'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
+
+interface ReportHeaderProps {
   title: string
-  onRefresh: () => void
-  isLoading: boolean
+  showDatabaseSelector?: boolean
 }
 
-const ReportHeader: React.FC<Props> = ({ title, onRefresh, isLoading }) => (
-  <div className="flex flex-row justify-between gap-4 items-center">
-    <h1 className="text-2xl text-foreground">{title}</h1>
-    <Button
-      type="default"
-      size="tiny"
-      onClick={onRefresh}
-      disabled={isLoading ? true : false}
-      icon={
-        <IconRefreshCw
-          size="tiny"
-          className={`text-foreground-light ${isLoading ? 'animate-spin' : ''}`}
+const ReportHeader = ({ title, showDatabaseSelector }: ReportHeaderProps) => {
+  const router = useRouter()
+  const { ref } = useParams()
+  const { db, chart, ...params } = router.query
+
+  return (
+    <div className="flex flex-row justify-between gap-4 items-center">
+      <h1 className="text-2xl text-foreground">{title}</h1>
+      {showDatabaseSelector && (
+        <DatabaseSelector
+          onSelectId={(db) => {
+            router.push({
+              pathname: router.pathname,
+              query: db !== ref ? { ...params, db } : params,
+            })
+          }}
         />
-      }
-    >
-      {isLoading ? 'Refreshing' : 'Refresh'}
-    </Button>
-  </div>
-)
+      )}
+    </div>
+  )
+}
 export default ReportHeader

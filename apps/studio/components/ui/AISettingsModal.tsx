@@ -1,67 +1,85 @@
 import Link from 'next/link'
-import { Alert, IconExternalLink, Modal, Toggle } from 'ui'
 
-import { useLocalStorageQuery, useSelectedOrganization, useStore } from 'hooks'
-import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Modal,
+  WarningIcon,
+} from 'ui'
+import { SchemaComboBox } from './SchemaComboBox'
 
 const AISettingsModal = () => {
   const snap = useAppStateSnapshot()
-
   const selectedOrganization = useSelectedOrganization()
-  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
-  const [hasEnabledAISchema, setHasEnabledAISchema] = useLocalStorageQuery(
-    'supabase_sql-editor-ai-schema-enabled',
-    true
-  )
-  const { ui } = useStore()
+  const isOptedInToAI = useOrgOptedIntoAi()
+  const selectedProject = useSelectedProject()
 
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
+  const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(selectedProject?.ref!)
 
-  const handleOptInToggle = () => {
-    setHasEnabledAISchema((prev) => !prev)
-    ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
-  }
+  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   return (
     <Modal
-      header="Supabase AI Settings"
       hideFooter
+      header="Supabase AI Settings"
       visible={snap.showAiSettingsModal}
       onCancel={() => snap.setShowAiSettingsModal(false)}
     >
-      <div className="flex flex-col items-start justify-between gap-4 px-6 py-3">
-        {IS_PLATFORM && !isOptedInToAI && selectedOrganization && (
-          <Alert
-            variant="warning"
-            title="This option is only available if your organization has opted-in to sending anonymous data to OpenAI."
-          >
-            <Link
-              href={`/org/${selectedOrganization.slug}/general`}
-              className="flex flex-row gap-1 items-center"
-              target="_blank"
-              rel="noopener"
-            >
-              Go to your organization's settings to opt-in.
-              <IconExternalLink className="inline-block w-3 h-3" />
-            </Link>
-          </Alert>
-        )}
-        <div className="flex justify-between gap-8 mr-8 my-4">
-          <Toggle
+      <Modal.Content className="flex flex-col items-start justify-between gap-y-4">
+        <div className="flex flex-col justify-between gap-y-2 text-sm">
+          <p className="text-foreground-light">Schemas metadata to be shared with OpenAI</p>
+          <SchemaComboBox
+            size="small"
+            label={
+              includeSchemaMetadata && selectedSchemas.length > 0
+                ? `${selectedSchemas.length} schema${
+                    selectedSchemas.length > 1 ? 's' : ''
+                  } selected`
+                : 'No schemas selected'
+            }
             disabled={IS_PLATFORM && !isOptedInToAI}
-            checked={includeSchemaMetadata}
-            onChange={handleOptInToggle}
+            selectedSchemas={selectedSchemas}
+            onSelectSchemas={setSelectedSchemas}
           />
-          <div className="grid gap-2">
-            <p className="text-sm">Include anonymous database metadata in AI queries</p>
-            <p className="text-sm text-foreground-light">
-              Metadata includes table names, column names and their corresponding data types in the
-              request. This will generate queries that are more relevant to your project.
-            </p>
-          </div>
+          <p className="text-foreground-lighter">
+            Metadata includes table names, column names and their corresponding data types in the
+            request. This will generate queries that are more relevant to your project.
+          </p>
         </div>
-      </div>
+        {IS_PLATFORM && !isOptedInToAI && selectedOrganization && (
+          <Alert_Shadcn_ variant="warning">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Your organization does not allow sending anonymous data to OpenAI
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              This option is only available if your organization has opted-in to sending anonymous
+              data to OpenAI. You may configure your opt-in preferences through your organization's
+              settings.
+            </AlertDescription_Shadcn_>
+            <AlertDescription_Shadcn_ className="mt-3">
+              <Button asChild type="default">
+                <Link
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`/org/${selectedOrganization.slug}/general`}
+                  className="flex flex-row gap-1 items-center"
+                >
+                  Head to organization settings
+                </Link>
+              </Button>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
+      </Modal.Content>
     </Modal>
   )
 }

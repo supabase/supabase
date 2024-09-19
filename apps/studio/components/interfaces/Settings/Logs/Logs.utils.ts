@@ -1,12 +1,15 @@
-import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
+import { useMonaco } from '@monaco-editor/react'
 import dayjs, { Dayjs } from 'dayjs'
 import { get, isEqual } from 'lodash'
-import { useMonaco } from '@monaco-editor/react'
-import logConstants from 'shared-data/logConstants'
-import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
-import { PlanId } from 'data/subscriptions/types'
+
+import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
+import type { PlanId } from 'data/subscriptions/types'
+import logConstants from 'shared-data/logConstants'
+import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
+import type { Filters, LogData, LogsEndpointParams } from './Logs.types'
+import { IS_PLATFORM } from 'common'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -80,7 +83,7 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
     if (value !== undefined && typeof template === 'function') {
       return template(value)
     } else if (template === undefined) {
-      // resolve unknwon filters (possibly from filter overrides)
+      // resolve unknown filters (possibly from filter overrides)
       // no template, set a default
       if (typeof value === 'string') {
         return `${dotKey} = '${value}'`
@@ -99,7 +102,12 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
 
   const statement = keys
     .map((rootKey) => {
-      if (typeof filters[rootKey] === 'object') {
+      if (
+        filters[rootKey] === undefined ||
+        (typeof filters[rootKey] === 'string' && (filters[rootKey] as string).length === 0)
+      ) {
+        return null
+      } else if (typeof filters[rootKey] === 'object') {
         // join all statements with an OR
         const nestedStatements = getDotKeys(filters[rootKey] as Filters, rootKey)
           .map(_resolveTemplateToStatement)
@@ -131,9 +139,21 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   const where = genWhereStatement(table, filters)
   const joins = genCrossJoinUnnests(table)
   const orderBy = 'order by timestamp desc'
+
   switch (table) {
     case 'edge_logs':
-      return `select id, timestamp, event_message, request.method, request.path, response.status_code
+      if (IS_PLATFORM === false) {
+        return `
+-- local dev edge_logs query
+select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code 
+from edge_logs 
+${joins}
+${where}
+${orderBy}
+limit 100;
+`
+      }
+      return `select id, identifier, timestamp, event_message, request.method, request.path, response.status_code
   from ${table}
   ${joins}
   ${where}
@@ -142,7 +162,17 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   `
 
     case 'postgres_logs':
-      return `select postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
+      if (IS_PLATFORM === false) {
+        return `
+select postgres_logs.timestamp, id, event_message, parsed.error_severity
+from postgres_logs
+${joins}
+${where}
+${orderBy}
+limit 100
+  `
+      }
+      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
   ${joins}
   ${where}
   ${orderBy}
@@ -172,6 +202,8 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   ${orderBy}
   limit 100
   `
+    case 'supavisor_logs':
+      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit 100`
 
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
@@ -207,6 +239,9 @@ const genCrossJoinUnnests = (table: LogsTableName) => {
       return `cross join unnest(metadata) as m
   cross join unnest(m.response) as response
   cross join unnest(m.request) as request`
+
+    case 'supavisor_logs':
+      return `cross join unnest(metadata) as m`
 
     default:
       return ''
@@ -431,9 +466,10 @@ export const fillTimeseries = (
   // Intentional throwing of error here to be caught by Sentry, as this would indicate a bug since charts shouldn't be rendering more than 10k data points
   if (diff > 10000) {
     throw new Error(
-      'Data error, filling timeseries dynamically with more than 10k data points degrades performance.'
+      'The selected date range will render more than 10,000 data points within the charts, which will degrade browser performance. Please select a smaller date range.'
     )
   }
+
   for (let i = 0; i <= diff; i++) {
     const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
 
@@ -495,4 +531,25 @@ const _getTruncation = (date: Dayjs) => {
     3: 'day' as const,
   }[zeroCount]!
   return truncation
+}
+
+export function checkForWithClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const withClauseRegex = /\b(WITH)\b(?=(?:[^']*'[^']*')*[^']*$)/i
+  return withClauseRegex.test(queryWithoutComments)
+}
+
+export function checkForILIKEClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const ilikeClauseRegex = /\b(ILIKE)\b(?=(?:[^']*'[^']*')*[^']*$)/i
+  return ilikeClauseRegex.test(queryWithoutComments)
+}
+
+export function checkForWildcard(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const wildcardRegex = /\*/
+  return wildcardRegex.test(queryWithoutComments)
 }

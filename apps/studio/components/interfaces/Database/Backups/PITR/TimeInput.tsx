@@ -1,10 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import { isNaN, noop } from 'lodash'
+import { Clock } from 'lucide-react'
 import { ChangeEvent, useEffect, useState } from 'react'
-import { IconClock } from 'ui'
 
-import { Time } from './PITR.types'
+import type { Time } from './PITR.types'
 import { formatNumberToTwoDigits, formatTimeToTimeString } from './PITR.utils'
 
 // [Joshen] This is trying to do the same thing as TimeSplitInput.tsx
@@ -84,13 +84,13 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
       <div
         className={[
           'flex items-center justify-between transition',
-          'rounded-md bg-background border px-3.5 py-2 w-[200px]',
+          'rounded-md bg-studio border px-3.5 py-2 w-[200px]',
           `${
             isFocused ? 'border-stronger' : error === undefined ? 'border-strong' : 'border-red-800'
           }`,
         ].join(' ')}
       >
-        <IconClock className="text-foreground-light" size={18} strokeWidth={1.5} />
+        <Clock className="text-foreground-light" size={18} strokeWidth={1.5} />
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
             <input

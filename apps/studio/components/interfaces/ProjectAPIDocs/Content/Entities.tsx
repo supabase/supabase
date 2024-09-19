@@ -1,18 +1,17 @@
-import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, IconDownload, IconExternalLink } from 'ui'
+import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { generateTypes } from 'data/projects/project-type-generation-query'
-import { useStore } from 'hooks'
+import { Button } from 'ui'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
-import { ContentProps } from './Content.types'
+import type { ContentProps } from './Content.types'
+import { ExternalLink, Download } from 'lucide-react'
 
 const Entities = ({ language }: ContentProps) => {
-  const { ui } = useStore()
   const { ref } = useParams()
-
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
   const onClickGenerateTypes = async () => {
@@ -26,16 +25,9 @@ const Entities = ({ language }: ContentProps) => {
       document.body.appendChild(element)
       element.click()
       document.body.removeChild(element)
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully generated types! File is being downloaded`,
-      })
+      toast.success(`Successfully generated types! File is being downloaded`)
     } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to generate types: ${error.message}`,
-      })
+      toast.error(`Failed to generate types: ${error.message}`)
     } finally {
       setIsGeneratingTypes(false)
     }
@@ -47,7 +39,7 @@ const Entities = ({ language }: ContentProps) => {
       <div>
         <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.generatingTypes} />
         <div className="flex items-center space-x-2 px-4 mt-3">
-          <Button asChild type="default" icon={<IconExternalLink />}>
+          <Button asChild type="default" icon={<ExternalLink />}>
             <Link
               href="https://supabase.com/docs/guides/database/api/generating-types"
               target="_blank"
@@ -60,7 +52,7 @@ const Entities = ({ language }: ContentProps) => {
             type="default"
             disabled={isGeneratingTypes}
             loading={isGeneratingTypes}
-            icon={<IconDownload strokeWidth={1.5} />}
+            icon={<Download strokeWidth={1.5} />}
             onClick={onClickGenerateTypes}
           >
             Generate and download types

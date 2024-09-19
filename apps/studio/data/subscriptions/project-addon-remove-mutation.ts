@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { del } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { subscriptionKeys } from './keys'
-import { AddonVariantId } from './types'
+import type { AddonVariantId } from './types'
 
 export type ProjectAddonRemoveVariables = {
   projectRef: string
@@ -27,8 +27,7 @@ export async function removeSubscriptionAddon({
     },
   })
 
-  if (error) throw error
-
+  if (error) handleError(error)
   return data
 }
 

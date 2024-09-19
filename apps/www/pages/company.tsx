@@ -15,7 +15,7 @@ import InvestorData from 'data/Investors'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Button, Card, Space } from 'ui'
+import { Button, Card_legacy_, Space } from 'ui'
 import { NextSeo } from 'next-seo'
 
 type Props = {}
@@ -38,7 +38,7 @@ const Index = ({}: Props) => {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+              url: `https://supabase.com/images/og/supabase-og.png`,
             },
           ],
         }}
@@ -304,7 +304,7 @@ const Press = () => {
       <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-3">
         {PressData.filter((x) => x.type == 'article').map((x) => (
           <Link href={x.href} key={x.href} target="_blank">
-            <Card key={`press_${x.href}`} hoverable className="h-36">
+            <Card_legacy_ key={`press_${x.href}`} hoverable className="h-36">
               <Space className="h-40 justify-between" direction="vertical">
                 <div>
                   <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
@@ -313,14 +313,14 @@ const Press = () => {
                   </p>
                 </div>
               </Space>
-            </Card>
+            </Card_legacy_>
           </Link>
         ))}
       </div>
       <div className="mx-auto mt-5 grid gap-5 sm:grid-cols-2 lg:max-w-none lg:grid-cols-4">
         {PressData.filter((x) => x.type == 'podcast').map((x) => (
           <Link href={x.href} key={x.href} target="_blank">
-            <Card key={`press_${x.href}`} hoverable className="h-36">
+            <Card_legacy_ key={`press_${x.href}`} hoverable className="h-36">
               <Space className="h-40 justify-between" direction="vertical">
                 <div>
                   <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
@@ -329,7 +329,7 @@ const Press = () => {
                   </p>
                 </div>
               </Space>
-            </Card>
+            </Card_legacy_>
           </Link>
         ))}
       </div>

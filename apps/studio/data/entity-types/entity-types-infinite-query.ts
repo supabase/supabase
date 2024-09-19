@@ -1,6 +1,6 @@
 import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
-import { Entity } from './entity-type-query'
+import type { Entity } from './entity-type-query'
 import { entityTypeKeys } from './keys'
 
 export type EntityTypesVariables = {
@@ -10,6 +10,7 @@ export type EntityTypesVariables = {
   limit?: number
   page?: number
   sort?: 'alphabetical' | 'grouped-alphabetical'
+  filterTypes?: string[]
 } & Pick<ExecuteSqlVariables, 'connectionString'>
 
 export type EntityTypesResponse = {
@@ -28,6 +29,7 @@ export async function getEntityTypes(
     limit = 100,
     page = 0,
     sort = 'alphabetical',
+    filterTypes,
   }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
@@ -49,12 +51,13 @@ export async function getEntityTypes(
           when 'p' then 5
         end as "type_sort",
         obj_description(c.oid) as "comment",
-        count(*) over() as "count"
+        count(*) over() as "count",
+        c.relrowsecurity as "rls_enabled"
       from
         pg_namespace nc
         join pg_class c on nc.oid = c.relnamespace
       where
-        c.relkind in ('r', 'v', 'm', 'f', 'p')
+        c.relkind in (${filterTypes === undefined ? `'r', 'v', 'm', 'f', 'p'` : filterTypes.map((x) => `'${x}'`).join(', ')})
         and not pg_is_other_temp_schema(nc.oid)
         and (
           pg_has_role(c.relowner, 'USAGE')
@@ -78,7 +81,8 @@ export async function getEntityTypes(
             'schema', r.schema,
             'name', r.name,
             'type', r.type,
-            'comment', r.comment
+            'comment', r.comment,
+            'rls_enabled', r.rls_enabled
           )
           order by ${outerOrderBy}
         ), '[]'::jsonb),
@@ -111,6 +115,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
     search,
     limit = 100,
     sort,
+    filterTypes,
   }: Omit<EntityTypesVariables, 'page'>,
   {
     enabled = true,
@@ -118,14 +123,15 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   }: UseInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
 ) =>
   useInfiniteQuery<EntityTypesData, EntityTypesError, TData>(
-    entityTypeKeys.list(projectRef, { schema, search, sort, limit }),
+    entityTypeKeys.list(projectRef, { schema, search, sort, limit, filterTypes }),
     ({ signal, pageParam }) =>
       getEntityTypes(
-        { projectRef, connectionString, schema, search, limit, page: pageParam, sort },
+        { projectRef, connectionString, schema, search, limit, page: pageParam, sort, filterTypes },
         signal
       ),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      staleTime: 0,
       getNextPageParam(lastPage, pages) {
         const page = pages.length
         const currentTotalCount = page * limit

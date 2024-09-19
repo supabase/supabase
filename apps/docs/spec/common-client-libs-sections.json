@@ -10,10 +10,7 @@
     "id": "installing",
     "slug": "installing",
     "type": "markdown",
-    "excludes": [
-      "reference_javascript_v1",
-      "reference_swift_v1"
-    ]
+    "excludes": ["reference_javascript_v1", "reference_kotlin_v1", "reference_swift_v1"]
   },
   {
     "title": "Initializing",
@@ -32,7 +29,9 @@
       "reference_dart_v2",
       "reference_python_v2",
       "reference_csharp_v0",
+      "reference_csharp_v1",
       "reference_swift_v1",
+      "reference_swift_v2",
       "reference_kotlin_v1",
       "reference_kotlin_v2"
     ]
@@ -47,7 +46,9 @@
       "reference_dart_v1",
       "reference_python_v2",
       "reference_csharp_v0",
+      "reference_csharp_v1",
       "reference_swift_v1",
+      "reference_swift_v2",
       "reference_kotlin_v1",
       "reference_kotlin_v2"
     ]
@@ -424,6 +425,13 @@
         "type": "function"
       },
       {
+        "id": "sign-in-anonymously",
+        "title": "Create an anonymous user",
+        "slug": "auth-signinanonymously",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "sign-in-with-password",
         "title": "Sign in a user",
         "slug": "auth-signinwithpassword",
@@ -609,6 +617,20 @@
         "id": "exchange-code-for-session",
         "title": "Exchange an auth code for a session",
         "slug": "auth-exchangecodeforsession",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "start-auto-refresh",
+        "title": "Start auto-refresh session (non-browser)",
+        "slug": "auth-startautorefresh",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "stop-auto-refresh",
+        "title": "Stop auto-refresh session (non-browser)",
+        "slug": "auth-stopautorefresh",
         "product": "auth",
         "type": "function"
       },
@@ -962,11 +984,12 @@
     "excludes": [
       "reference_dart_v1",
       "reference_dart_v2",
-      "reference_python_v2",
-      "reference_csharp_v0",
-      "reference_swift_v1",
+      "reference_javascript_v1",
       "reference_kotlin_v1",
-      "reference_kotlin_v2"
+      "reference_kotlin_v2",
+      "reference_python_v2",
+      "reference_swift_v1",
+      "reference_swift_v2"
     ],
     "items": [
       {

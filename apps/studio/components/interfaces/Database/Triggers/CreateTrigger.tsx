@@ -2,12 +2,12 @@ import { has, isEmpty, mapValues, union, without } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { createContext, useContext, useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
 import SVG from 'react-inlinesvg'
+import { toast } from 'sonner'
+import { Badge, Button, Checkbox, Input, Listbox, SidePanel } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { Dictionary } from 'types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 import FormEmptyBox from 'components/ui/FormBoxEmpty'
 import NoTableState from 'components/ui/States/NoTableState'
 import {
@@ -17,22 +17,11 @@ import {
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import {
-  Badge,
-  Button,
-  Checkbox,
-  IconPauseCircle,
-  IconPlayCircle,
-  IconTerminal,
-  Input,
-  Listbox,
-  Modal,
-  SidePanel,
-} from 'ui'
+import type { Dictionary } from 'types'
 import ChooseFunctionForm from './ChooseFunctionForm'
+import { PauseCircle, PlayCircle, Terminal } from 'lucide-react'
 
 class CreateTriggerFormState {
   id: number | undefined
@@ -237,7 +226,6 @@ interface CreateTriggerProps {
 
 const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => {
   const { project } = useProjectContext()
-  const { ui, meta } = useStore()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const _localState = useLocalObservable(() => new CreateTriggerStore())
 
@@ -385,20 +373,18 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
             </CreateTriggerContext.Provider>
             <ConfirmationModal
               visible={isClosingPanel}
-              header="Discard changes"
-              buttonLabel="Discard"
-              onSelectCancel={() => setIsClosingPanel(false)}
-              onSelectConfirm={() => {
+              title="Discard changes"
+              confirmLabel="Discard"
+              onCancel={() => setIsClosingPanel(false)}
+              onConfirm={() => {
                 setIsClosingPanel(false)
                 setVisible(!visible)
               }}
             >
-              <Modal.Content>
-                <p className="py-4 text-sm text-foreground-light">
-                  There are unsaved changes. Are you sure you want to close the panel? Your changes
-                  will be lost.
-                </p>
-              </Modal.Content>
+              <p className="text-sm text-foreground-light">
+                There are unsaved changes. Are you sure you want to close the panel? Your changes
+                will be lost.
+              </p>
             </ConfirmationModal>
           </div>
         ) : (
@@ -460,7 +446,7 @@ const SelectEnabledMode = observer(({}) => {
         label="Origin"
       >
         Origin
-        <span className="block text-foreground-lighter">This is a default behaviour</span>
+        <span className="block text-foreground-lighter">This is a default behavior</span>
       </Listbox.Option>
       <Listbox.Option
         addOnBefore={({ active, selected }: any) => {
@@ -665,7 +651,7 @@ const ListboxActivation = observer(({}) => {
         label={'Before the event'}
         addOnBefore={() => (
           <div className="flex items-center justify-center rounded bg-foreground p-1 text-background">
-            <IconPauseCircle strokeWidth={2} size="small" />
+            <PauseCircle strokeWidth={2} size="18" />
           </div>
         )}
       >
@@ -682,7 +668,7 @@ const ListboxActivation = observer(({}) => {
         label={'After the event'}
         addOnBefore={() => (
           <div className="flex items-center justify-center rounded bg-green-1200 p-1 text-background">
-            <IconPlayCircle strokeWidth={2} size="small" />
+            <PlayCircle strokeWidth={2} size="18" />
           </div>
         )}
       >
@@ -732,7 +718,7 @@ const FunctionEmpty = observer(({}) => {
       ].join(' ')}
     >
       <FormEmptyBox
-        icon={<IconTerminal size={14} strokeWidth={2} />}
+        icon={<Terminal size={14} strokeWidth={2} />}
         text="Choose a function to trigger"
       />
     </button>
@@ -755,7 +741,7 @@ const FunctionWithArguments = observer(({}) => {
       >
         <div className="flex items-center gap-2">
           <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-opacity-10">
-            <IconTerminal size="small" strokeWidth={2} width={14} />
+            <Terminal size="18" strokeWidth={2} width={14} />
           </div>
           <div className="flex items-center gap-2">
             <p className="text-foreground-light">{_localState!.formState.functionName.value}</p>

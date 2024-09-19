@@ -1,5 +1,5 @@
-import { IconChevronRight } from '../Icon/icons/IconChevronRight'
 // @ts-ignore
+import { ChevronRight } from 'lucide-react'
 import BreadcrumbStyle from './Breadcrumb.module.css'
 
 interface Props {
@@ -9,6 +9,9 @@ interface Props {
   spacing?: 'small' | 'medium' | 'large'
 }
 
+/**
+ * @deprecated Use ./Breadcrumb_shadcn_ instead
+ */
 const Breadcrumb = ({ className, style, children, spacing = 'small' }: Props) => {
   let classes = [BreadcrumbStyle['sbui-breadcrumb--container']]
   let separatorClasses = [BreadcrumbStyle['sbui-breadcrumb--separator']]
@@ -27,7 +30,7 @@ const Breadcrumb = ({ className, style, children, spacing = 'small' }: Props) =>
         <li className={BreadcrumbStyle['sbui-breadcrumb--item-container']}>
           {child}
           {idx + 1 < children!.length && (
-            <IconChevronRight size={12} className={separatorClasses.join(' ')} aria-hidden="true" />
+            <ChevronRight size={12} className={separatorClasses.join(' ')} aria-hidden="true" />
           )}
         </li>
       ))}
@@ -42,6 +45,9 @@ interface ItemProps {
   style?: React.CSSProperties
 }
 
+/**
+ * @deprecated Use ./BreadcrumbItem_shadcn_ instead
+ */
 export function Item({ children, active, onClick, style }: ItemProps) {
   let classes = [BreadcrumbStyle['sbui-breadcrumb--item']]
   if (active) classes.push(BreadcrumbStyle['sbui-breadcrumb--item__active'])

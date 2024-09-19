@@ -1,10 +1,11 @@
-import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import { IntegrationName } from 'data/integrations/integrations.types'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useMemo, useRef, useState } from 'react'
 
-import { Organization } from 'types'
+import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
+import PartnerIcon from 'components/ui/PartnerIcon'
+import { useIntegrationsQuery } from 'data/integrations/integrations-query'
+import type { IntegrationName } from 'data/integrations/integrations.types'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import type { Organization } from 'types'
 import {
   Badge,
   Button,
@@ -14,12 +15,12 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  IconChevronDown,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   cn,
 } from 'ui'
+import { ChevronDown } from 'lucide-react'
 
 export interface OrganizationPickerProps {
   integrationName: IntegrationName
@@ -69,7 +70,7 @@ const OrganizationPicker = ({
             disabled={disabled}
             iconRight={
               <span className="grow flex justify-end">
-                <IconChevronDown />
+                <ChevronDown />
               </span>
             }
           >
@@ -78,7 +79,7 @@ const OrganizationPicker = ({
                 {selectedOrg?.name ? selectedOrg?.name : 'Choose an organization'}
               </span>
               {selectedOrg && configurationId && installed[selectedOrg.slug] && (
-                <Badge color="scale">Integration Installed</Badge>
+                <Badge>Integration Installed</Badge>
               )}
             </div>
           </Button>
@@ -111,11 +112,10 @@ const OrganizationPicker = ({
                         setOpen(false)
                       }}
                     >
+                      <PartnerIcon organization={org} />
                       <span className="truncate">{org.name}</span>{' '}
                       {configurationId && installed[org.slug] && (
-                        <Badge color="scale" className="!flex-none">
-                          Integration Installed
-                        </Badge>
+                        <Badge className="!flex-none">Integration Installed</Badge>
                       )}
                     </CommandItem_Shadcn_>
                   )

@@ -1,55 +1,48 @@
-import { useParams, useTelemetryProps } from 'common'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
+import { useParams, useTelemetryProps } from 'common'
+import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Input } from 'ui'
+import { WarningIcon } from 'ui'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-  Input,
-} from 'ui'
-import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
-import DatabaseConnectionString from './DatabaseConnectionString'
+  DefaultSessionModeNotice,
+  IPv4AddonDirectConnectionNotice,
+  IPv4DeprecationNotice,
+} from '../DatabaseConnectionNotices'
+import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import ResetDbPassword from './ResetDbPassword'
 
 const DatabaseSettings = () => {
   const router = useRouter()
   const { ref: projectRef, connectionString } = useParams()
   const telemetryProps = useTelemetryProps()
+  const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedProject = useSelectedProject()
-  const organization = useSelectedOrganization()
 
-  const readReplicasEnabled = useFlag('readReplicas')
-  const showReadReplicasUI = readReplicasEnabled && selectedProject?.is_read_replicas_enabled
   const connectionStringsRef = useRef<HTMLDivElement>(null)
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session'>('transaction')
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const {
-    data,
-    error: projectSettingsError,
-    isLoading: isLoadingProjectSettings,
-    isError: isErrorProjectSettings,
-    isSuccess: isSuccessProjectSettings,
-  } = useProjectSettingsQuery({ projectRef })
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+    data: poolingInfo,
+    error: poolingInfoError,
+    isLoading: isLoadingPoolingInfo,
+    isError: isErrorPoolingInfo,
+    isSuccess: isSuccessPoolingInfo,
+  } = usePoolingConfigurationQuery({
+    projectRef,
+  })
   const {
     data: databases,
     error: readReplicasError,
@@ -57,25 +50,38 @@ const DatabaseSettings = () => {
     isError: isErrorReadReplicas,
     isSuccess: isSuccessReadReplicas,
   } = useReadReplicasQuery({ projectRef })
-  const error = showReadReplicasUI ? readReplicasError : projectSettingsError
-  const isLoading = showReadReplicasUI ? isLoadingReadReplicas : isLoadingProjectSettings
-  const isError = showReadReplicasUI ? isErrorReadReplicas : isErrorProjectSettings
-  const isSuccess = showReadReplicasUI ? isSuccessReadReplicas : isSuccessProjectSettings
+  const {
+    data: addons,
+    error: addOnsError,
+    isLoading: isLoadingAddons,
+    isError: isErrorAddons,
+    isSuccess: isSuccessAddons,
+  } = useProjectAddonsQuery({ projectRef })
+  const error = readReplicasError || poolingInfoError || addOnsError
+  const isLoading = isLoadingReadReplicas || isLoadingPoolingInfo || isLoadingAddons
+  const isError = isErrorReadReplicas || isErrorPoolingInfo || isErrorAddons
+  const isSuccess = isSuccessReadReplicas && isSuccessPoolingInfo && isSuccessAddons
 
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
   )
+  const primaryConfig = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+  const defaultPoolingMode = primaryConfig?.pool_mode
+  const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
+  const isMd5 = primaryConfig?.connectionString.includes('?options=reference')
 
-  const isReadOnlyMode =
-    (resourceWarnings ?? [])?.find((warning) => warning.project === projectRef)
-      ?.is_readonly_mode_enabled ?? false
-
-  const { project } = data ?? {}
-  const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
+  const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user']
   const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
-  const connectionInfo = showReadReplicasUI
-    ? pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
-    : pluckObjectFields(project || emptyState, DB_FIELDS)
+  const dbConnectionInfo = pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
+
+  const connectionInfo = snap.usePoolerConnection
+    ? {
+        db_host: primaryConfig?.db_host,
+        db_name: primaryConfig?.db_name,
+        db_port: primaryConfig?.db_port,
+        db_user: primaryConfig?.db_user,
+      }
+    : dbConnectionInfo
 
   const handleCopy = (labelValue?: string) =>
     Telemetry.sendEvent(
@@ -95,157 +101,141 @@ const DatabaseSettings = () => {
     }
   }, [connectionString])
 
+  useEffect(() => {
+    if (primaryConfig?.pool_mode === 'session') {
+      setPoolingMode(primaryConfig.pool_mode)
+    }
+  }, [primaryConfig?.pool_mode])
+
   return (
     <>
-      <div className="space-y-10">
-        <section className="space-y-6">
-          <h3 className="text-foreground mb-2 text-xl">Database Settings</h3>
-
-          {isReadOnlyMode && (
-            <Alert_Shadcn_ variant="destructive">
-              <IconAlertTriangle />
-              <AlertTitle_Shadcn_>
-                Project is in read-only mode and database is no longer accepting write requests
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                You have reached 95% of your project's disk space, and read-only mode has been
-                enabled to preserve your database's stability and prevent your project from
-                exceeding its current billing plan. To resolve this, you may:
-                <ul className="list-disc pl-6 mt-1">
-                  <li>
-                    Temporarily disable read-only mode to free up space and reduce your database
-                    size
-                  </li>
-                  {subscription?.plan.id === 'free' ? (
-                    <li>
-                      <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
-                        <a className="text underline">Upgrade to the Pro plan</a>
-                      </Link>{' '}
-                      to increase your database size limit to 8GB.
-                    </li>
-                  ) : subscription?.plan.id === 'pro' && subscription?.usage_billing_enabled ? (
-                    <li>
-                      <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
-                        <a className="text-foreground underline">Disable your Spend Cap</a>
-                      </Link>{' '}
-                      to allow your project to auto-scale and expand beyond the 8GB database size
-                      limit
-                    </li>
-                  ) : null}
-                </ul>
-              </AlertDescription_Shadcn_>
-              <div className="mt-4 flex items-center space-x-2">
-                <Button type="default" onClick={() => setShowConfirmationModal(true)}>
-                  Disable read-only mode
-                </Button>
-                <Button asChild type="default" icon={<IconExternalLink />}>
-                  <Link
-                    href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Learn more
-                  </Link>
-                </Button>
+      <section id="direct-connection">
+        <Panel
+          className="!m-0"
+          title={
+            <div className="w-full flex items-center justify-between">
+              <div className="flex items-center gap-x-2">
+                <h5 className="mb-0">Connection parameters</h5>
               </div>
-            </Alert_Shadcn_>
-          )}
-
-          <Panel
-            title={
-              <div className="w-full flex items-center justify-between">
-                <h5 key="panel-title" className="mb-0">
-                  Connection info
-                </h5>
-                {showReadReplicasUI && <DatabaseSelector />}
-              </div>
-            }
-            className="!m-0"
-          >
-            <Panel.Content className="space-y-6">
-              {isLoading &&
-                Array.from({ length: 5 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="grid gap-2 items-center md:grid md:grid-cols-12 md:gap-x-4 w-full"
-                  >
-                    <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
-                    <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
-                  </div>
-                ))}
-              {isError && <AlertError error={error} subject="Failed to retrieve databases" />}
-              {isSuccess && (
-                <>
+              <DatabaseSelector />
+            </div>
+          }
+        >
+          <Panel.Content className="space-y-6">
+            {isLoading &&
+              Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="grid gap-2 items-center md:grid md:grid-cols-12 md:gap-x-4 w-full"
+                >
+                  <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
+                  <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
+                </div>
+              ))}
+            {isError && <AlertError error={error} subject="Failed to retrieve databases" />}
+            {isSuccess && (
+              <>
+                <div className="space-y-4">
+                  <UsePoolerCheckbox
+                    id="connection-params"
+                    checked={snap.usePoolerConnection}
+                    ipv4AddonAdded={!!ipv4Addon}
+                    poolingMode={poolingMode}
+                    onCheckedChange={snap.setUsePoolerConnection}
+                    onSelectPoolingMode={setPoolingMode}
+                  />
+                  {defaultPoolingMode === 'session' && poolingMode === 'transaction' && (
+                    <DefaultSessionModeNotice />
+                  )}
+                  {ipv4Addon !== undefined &&
+                    poolingMode === 'session' &&
+                    snap.usePoolerConnection && <IPv4AddonDirectConnectionNotice />}
+                  {ipv4Addon === undefined && !snap.usePoolerConnection && (
+                    <IPv4DeprecationNotice />
+                  )}
+                  {isMd5 && (
+                    <Alert_Shadcn_>
+                      <WarningIcon />
+                      <AlertTitle_Shadcn_>
+                        If you are connecting to your database via a GUI client, use the{' '}
+                        <span tabIndex={0}>connection string</span> above instead
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        GUI clients only support database connections for Postgres 13 via a
+                        connection string.
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
+                </div>
+                <Input
+                  className="input-mono"
+                  layout="horizontal"
+                  readOnly
+                  copy
+                  disabled
+                  value={connectionInfo.db_host}
+                  label="Host"
+                  onCopy={() => {
+                    handleCopy('Host')
+                  }}
+                />
+                <Input
+                  className="input-mono"
+                  layout="horizontal"
+                  readOnly
+                  copy
+                  disabled
+                  value={connectionInfo.db_name}
+                  label="Database name"
+                />
+                <Input
+                  className="input-mono"
+                  layout="horizontal"
+                  readOnly
+                  copy
+                  disabled
+                  value={poolingMode === 'transaction' ? connectionInfo.db_port : '5432'}
+                  label="Port"
+                />
+                {isMd5 && snap.usePoolerConnection && (
                   <Input
                     className="input-mono"
                     layout="horizontal"
                     readOnly
                     copy
                     disabled
-                    value={connectionInfo.db_host}
-                    label="Host"
-                    onCopy={() => {
-                      handleCopy('Host')
-                    }}
+                    value={`reference=${projectRef}`}
+                    label="Options"
                   />
+                )}
+                <Input
+                  layout="horizontal"
+                  className="input-mono table-input-cell text-base"
+                  readOnly
+                  copy
+                  disabled
+                  value={connectionInfo.db_user}
+                  label="User"
+                />
+                <Input
+                  className="input-mono"
+                  layout="horizontal"
+                  disabled
+                  readOnly
+                  value={
+                    state.selectedDatabaseId !== projectRef
+                      ? '[The password for your primary database]'
+                      : '[The password for your database]'
+                  }
+                  label="Password"
+                />
+              </>
+            )}
+          </Panel.Content>
+        </Panel>
+      </section>
 
-                  <Input
-                    className="input-mono"
-                    layout="horizontal"
-                    readOnly
-                    copy
-                    disabled
-                    value={connectionInfo.db_name}
-                    label="Database name"
-                  />
-
-                  <Input
-                    className="input-mono"
-                    layout="horizontal"
-                    readOnly
-                    copy
-                    disabled
-                    value={connectionInfo.db_port.toString()}
-                    label="Port"
-                  />
-
-                  <Input
-                    layout="horizontal"
-                    className="input-mono table-input-cell text-base"
-                    readOnly
-                    copy
-                    disabled
-                    value={connectionInfo.db_user}
-                    label="User"
-                  />
-
-                  <Input
-                    className="input-mono"
-                    layout="horizontal"
-                    disabled
-                    readOnly
-                    value={
-                      state.selectedDatabaseId !== projectRef
-                        ? '[The password for your primary database]'
-                        : '[The password you provided when you created this project]'
-                    }
-                    label="Password"
-                  />
-                </>
-              )}
-            </Panel.Content>
-          </Panel>
-        </section>
-
-        <DatabaseConnectionString />
-
-        <ResetDbPassword disabled={isLoading || isError} />
-      </div>
-
-      <ConfirmDisableReadOnlyModeModal
-        visible={showConfirmationModal}
-        onClose={() => setShowConfirmationModal(false)}
-      />
+      <ResetDbPassword disabled={isLoading || isError} />
     </>
   )
 }

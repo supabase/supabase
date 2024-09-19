@@ -1,21 +1,22 @@
 import { QueryClient, QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { post } from 'data/fetchers'
+import { handleError as handleErrorFetchers, post } from 'data/fetchers'
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
 } from 'lib/role-impersonation'
+import type { ResponseError } from 'types'
 import { sqlKeys } from './keys'
-
-export type Error = { code: number; message: string; requestId: string }
+import { MB } from 'lib/constants'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
   connectionString?: string
   sql: string
   queryKey?: QueryKey
-  handleError?: (error: { code: number; message: string; requestId: string }) => any
+  handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
+  autoLimit?: number
 }
 
 export async function executeSql(
@@ -39,6 +40,12 @@ export async function executeSql(
 ): Promise<{ result: any }> {
   if (!projectRef) throw new Error('projectRef is required')
 
+  const sqlSize = new Blob([sql]).size
+  // [Joshen] I think the limit is around 1MB from testing, but its not exactly 1MB it seems
+  if (sqlSize > 0.98 * MB) {
+    throw new Error('Query is too large to be run via the SQL Editor')
+  }
+
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
@@ -52,7 +59,7 @@ export async function executeSql(
     },
     body: { query: sql },
     headers: Object.fromEntries(headers),
-  })
+  } as any) // Needed to fix generated api types for now
 
   if (error) {
     if (
@@ -85,7 +92,7 @@ export async function executeSql(
     }
 
     if (handleError !== undefined) return handleError(error as any)
-    else throw error
+    else handleErrorFetchers(error)
   }
 
   if (
@@ -100,7 +107,7 @@ export async function executeSql(
 }
 
 export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
-export type ExecuteSqlError = unknown
+export type ExecuteSqlError = ResponseError
 
 export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
   {
@@ -120,7 +127,7 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
         { projectRef, connectionString, sql, queryKey, handleError, isRoleImpersonationEnabled },
         signal
       ),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )
 
 export const prefetchExecuteSql = (

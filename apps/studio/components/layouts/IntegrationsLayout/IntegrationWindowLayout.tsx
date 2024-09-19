@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode, forwardRef } from 'react'
-import { IconBook, IconLifeBuoy, IconX, LoadingLine, cn } from 'ui'
+import { LoadingLine, cn } from 'ui'
 
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
-import { LayoutWrapper } from '../LayoutWrapper'
 import { ScaffoldContainer } from '../Scaffold'
+import { Book, LifeBuoy, X } from 'lucide-react'
 
 export type IntegrationWindowLayoutProps = {
   title: string
@@ -22,11 +22,11 @@ const IntegrationWindowLayout = ({
   docsHref,
 }: PropsWithChildren<IntegrationWindowLayoutProps>) => {
   return (
-    <LayoutWrapper className="flex w-full flex-col">
+    <div className="flex w-full flex-col">
       <Header title={title} integrationIcon={integrationIcon} />
       <LoadingLine loading={loading} />
       <main className="overflow-auto flex flex-col h-full bg">{children}</main>
-      <ScaffoldContainer className="bg-background flex flex-row gap-6 py-6 border-t">
+      <ScaffoldContainer className="bg-studio flex flex-row gap-6 py-6 border-t">
         {docsHref && (
           <Link
             href={docsHref}
@@ -34,7 +34,7 @@ const IntegrationWindowLayout = ({
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-xs text-foreground-light hover:text"
           >
-            <IconBook size={16} />
+            <Book size={16} />
             Docs
           </Link>
         )}
@@ -44,11 +44,11 @@ const IntegrationWindowLayout = ({
           rel="noopener noreferrer"
           className="flex items-center gap-2 text-xs text-light hover:text"
         >
-          <IconLifeBuoy size={16} />
+          <LifeBuoy size={16} />
           Support
         </Link>
       </ScaffoldContainer>
-    </LayoutWrapper>
+    </div>
   )
 }
 
@@ -72,7 +72,7 @@ const Header = ({ title, integrationIcon }: HeaderProps) => {
             <div className="bg-white shadow border rounded p-1 w-8 h-8 flex justify-center items-center">
               <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-4" />
             </div>
-            <IconX className="text-border-stronger" strokeWidth={2} size={16} />
+            <X className="text-border-stronger" strokeWidth={2} size={16} />
             {integrationIcon}
           </div>
           <span className="text-sm" title={title}>

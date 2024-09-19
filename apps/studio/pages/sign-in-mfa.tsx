@@ -1,15 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useTelemetryProps } from 'common'
 import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
-import { SignInLayout } from 'components/layouts'
-import Loading from 'components/ui/Loading'
+import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
+import { Loading } from 'components/ui/Loading'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import Telemetry from 'lib/telemetry'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()

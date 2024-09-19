@@ -1,25 +1,23 @@
 import type { PostgresExtension } from '@supabase/postgres-meta'
-import { ExternalLinkIcon } from 'lucide-react'
+import { Database, ExternalLinkIcon, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useStore } from 'hooks'
+import { executeSql } from 'data/sql/execute-sql-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   Form,
-  IconAlertTriangle,
-  IconDatabase,
-  IconPlus,
   Input,
   Listbox,
   Modal,
+  WarningIcon,
 } from 'ui'
 
 interface EnableExtensionModalProps {
@@ -30,7 +28,6 @@ interface EnableExtensionModalProps {
 
 const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionModalProps) => {
   const { project } = useProjectContext()
-  const { meta } = useStore()
   const [defaultSchema, setDefaultSchema] = useState()
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
@@ -62,10 +59,15 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
           setFetchingSchemaInfo(true)
           setDefaultSchema(undefined)
         }
-        const res = await meta.query(
-          `select * from pg_available_extension_versions where name = '${extension.name}'`
-        )
-        if (!res.error && !cancel) setDefaultSchema(res[0].schema)
+        try {
+          const res = await executeSql({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            sql: `select * from pg_available_extension_versions where name = '${extension.name}'`,
+          })
+          if (!cancel) setDefaultSchema(res.result[0].schema)
+        } catch (error) {}
+
         setFetchingSchemaInfo(false)
       }
       checkExtensionSchema()
@@ -89,8 +91,8 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       defaultSchema !== undefined && defaultSchema !== null
         ? defaultSchema
         : values.schema === 'custom'
-        ? values.name
-        : values.schema
+          ? values.name
+          : values.schema
 
     enableExtension({
       projectRef: project.ref,
@@ -126,7 +128,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       >
         {({ values }: any) => {
           return (
-            <div className="space-y-4 py-4">
+            <>
               <Modal.Content>
                 {fetchingSchemaInfo || isSchemasLoading ? (
                   <div className="space-y-2">
@@ -155,7 +157,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       id="custom"
                       label={`Create a new schema "${extension.name}"`}
                       value="custom"
-                      addOnBefore={() => <IconPlus size={16} strokeWidth={1.5} />}
+                      addOnBefore={() => <Plus size={16} strokeWidth={1.5} />}
                     >
                       Create a new schema "{extension.name}"
                     </Listbox.Option>
@@ -167,7 +169,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                           id={schema.name}
                           label={schema.name}
                           value={schema.name}
-                          addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
+                          addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
                         >
                           {schema.name}
                         </Listbox.Option>
@@ -186,14 +188,14 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
               {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
                 <Modal.Content>
                   <Alert_Shadcn_ variant="warning">
-                    <IconAlertTriangle strokeWidth={2} />
+                    <WarningIcon />
                     <AlertTitle_Shadcn_>
                       The pg_cron extension is not fully supported for Fly projects
                     </AlertTitle_Shadcn_>
 
                     <AlertDescription_Shadcn_>
                       You can still enable the extension, but pg_cron jobs may not run due to the
-                      behaviour of Fly projects.
+                      behavior of Fly projects.
                     </AlertDescription_Shadcn_>
 
                     <AlertDescription_Shadcn_ className="mt-3">
@@ -214,19 +216,16 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                   </Alert_Shadcn_>
                 </Modal.Content>
               )}
-
               <Modal.Separator />
-              <Modal.Content>
-                <div className="flex items-center justify-end space-x-2">
-                  <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
-                    Cancel
-                  </Button>
-                  <Button htmlType="submit" disabled={isEnabling} loading={isEnabling}>
-                    Enable extension
-                  </Button>
-                </div>
+              <Modal.Content className="flex items-center justify-end space-x-2">
+                <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
+                  Cancel
+                </Button>
+                <Button htmlType="submit" disabled={isEnabling} loading={isEnabling}>
+                  Enable extension
+                </Button>
               </Modal.Content>
-            </div>
+            </>
           )
         }}
       </Form>

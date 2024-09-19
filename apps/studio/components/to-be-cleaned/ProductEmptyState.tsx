@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { ExternalLink } from 'lucide-react'
 import { PropsWithChildren } from 'react'
-import { Button, IconExternalLink } from 'ui'
+import { Button } from 'ui'
 
 interface ProductEmptyStateProps {
   title?: string
@@ -30,12 +31,12 @@ const ProductEmptyState = ({
 
   return (
     <div className="flex h-full w-full items-center justify-center">
-      <div className="flex space-x-4 rounded border border-overlay bg-surface-100 p-6 shadow-md">
+      <div className="flex space-x-4 rounded border bg-surface-100 p-6 shadow-md">
         {/* A graphic can probably be placed here as a sibling to the div below*/}
         <div className="flex flex-col">
           <div className={`${size === 'medium' ? 'w-80' : 'w-[400px]'} space-y-4`}>
-            <h5>{title}</h5>
-            <div className="flex flex-col space-y-2">{children}</div>
+            <h5 className="text-foreground">{title}</h5>
+            <div className="flex flex-col space-y-2 text-foreground-light">{children}</div>
             {hasAction && (
               <div className="flex items-center space-x-2">
                 {ctaButtonLabel && onClickCta && (
@@ -68,7 +69,7 @@ const ProductEmptyState = ({
                   </Tooltip.Root>
                 )}
                 {infoButtonUrl && infoButtonLabel ? (
-                  <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+                  <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <a target="_blank" rel="noreferrer" href={infoButtonUrl}>
                       {infoButtonLabel}
                     </a>

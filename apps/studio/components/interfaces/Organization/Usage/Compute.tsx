@@ -1,15 +1,16 @@
-import { DataPoint } from 'data/analytics/constants'
-import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
-import { OrgSubscription } from 'data/subscriptions/types'
-import SectionContent from './SectionContent'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { BarChart2 } from 'lucide-react'
+import { useMemo } from 'react'
+
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
-import { IconBarChart2 } from 'ui'
-import UsageBarChart from './UsageBarChart'
-import { Attribute, AttributeColor } from './Usage.constants'
-import { useMemo } from 'react'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { DataPoint } from 'data/analytics/constants'
 import { useOrgDailyComputeStatsQuery } from 'data/analytics/org-daily-compute-stats-query'
+import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import SectionContent from './SectionContent'
+import { Attribute, AttributeColor } from './Usage.constants'
+import UsageBarChart from './UsageBarChart'
 
 export interface ComputeProps {
   orgSlug: string
@@ -69,7 +70,7 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
         section={{
           name: 'Compute Hours',
           description:
-            'Amount of hours your projects were active. Each project is a dedicated server and database.\nPaid plans come with $10 in Compute Credits to cover one project running on Starter Compute or parts of any compute add-on.\nBilling is based on the sum of Compute Hours used. Paused projects do not count towards usage.',
+            'Amount of hours your projects were active. Each project is a dedicated server and database.\nPaid plans come with $10 in Compute Credits to cover one project running on Micro Compute or parts of any compute add-on.\nBilling is based on the sum of Compute Hours used. Paused projects do not count towards usage.',
           links: [
             {
               name: 'Compute Add-ons',
@@ -77,7 +78,7 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
             },
             {
               name: 'Usage-billing for Compute',
-              url: 'https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute',
+              url: 'https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
             },
           ],
         }}
@@ -134,7 +135,7 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
               <Panel>
                 <Panel.Content>
                   <div className="flex flex-col items-center justify-center">
-                    <IconBarChart2 className="text-foreground-light mb-2" />
+                    <BarChart2 className="text-foreground-light mb-2" />
                     <p className="text-sm">No data in period</p>
                     <p className="text-sm text-foreground-light">May take up to one hour to show</p>
                   </div>

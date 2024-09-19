@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Input, SidePanel } from 'ui'
-import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
@@ -9,10 +9,9 @@ import ActionBar from './ActionBar'
 interface SchemaEditorProps {
   visible: boolean
   closePanel: () => void
-  saveChanges: (resolve: any) => void
 }
 
-const SchemaEditor = ({ visible, closePanel, saveChanges }: SchemaEditorProps) => {
+const SchemaEditor = ({ visible, closePanel }: SchemaEditorProps) => {
   const { project } = useProjectContext()
 
   const [errors, setErrors] = useState<{ name?: string }>({ name: undefined })

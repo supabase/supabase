@@ -1,18 +1,8 @@
-import clsx from 'clsx'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import {
-  Alert,
-  Button,
-  Collapsible,
-  Form,
-  IconChevronDown,
-  Input,
-  Listbox,
-  Modal,
-  Toggle,
-} from 'ui'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
@@ -22,8 +12,8 @@ import {
 } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
-import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
+import { Alert, Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
 
 export interface CreateBucketModalProps {
   visible: boolean
@@ -31,16 +21,12 @@ export interface CreateBucketModalProps {
 }
 
 const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
-  const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
 
   const { mutate: createBucket, isLoading: isCreating } = useBucketCreateMutation({
     onSuccess: (res) => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created bucket ${res.name}`,
-      })
+      toast.success(`Successfully created bucket ${res.name}`)
       router.push(`/project/${ref}/storage/buckets/${res.name}`)
       onClose()
     },
@@ -120,7 +106,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
       >
         {({ values }: { values: any }) => {
           return (
-            <div className="space-y-4 py-4">
+            <>
               <Modal.Content>
                 <Input
                   id="name"
@@ -160,16 +146,16 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                 <Collapsible.Trigger asChild>
                   <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-default">
                     <p className="text-sm">Additional configuration</p>
-                    <IconChevronDown
+                    <ChevronDown
                       size={18}
                       strokeWidth={2}
-                      className={clsx('text-foreground-light', showConfiguration && 'rotate-180')}
+                      className={cn('text-foreground-light', showConfiguration && 'rotate-180')}
                     />
                   </div>
                 </Collapsible.Trigger>
                 <Collapsible.Content className="py-4">
-                  <div className="w-full space-y-4 px-5">
-                    <div className="space-y-2">
+                  <div className="w-full space-y-5 px-5">
+                    <div className="space-y-5">
                       <Toggle
                         id="has_file_size_limit"
                         name="has_file_size_limit"
@@ -240,28 +226,21 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   </div>
                 </Collapsible.Content>
               </Collapsible>
-              <div className="w-full border-t border-default !mt-0" />
-              <Modal.Content>
-                <div className="flex items-center space-x-2 justify-end">
-                  <Button
-                    type="default"
-                    htmlType="button"
-                    disabled={isCreating}
-                    onClick={() => onClose()}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={isCreating}
-                    disabled={isCreating}
-                  >
-                    Save
-                  </Button>
-                </div>
+              <Modal.Separator />
+              <Modal.Content className="flex items-center space-x-2 justify-end">
+                <Button
+                  type="default"
+                  htmlType="button"
+                  disabled={isCreating}
+                  onClick={() => onClose()}
+                >
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit" loading={isCreating} disabled={isCreating}>
+                  Save
+                </Button>
               </Modal.Content>
-            </div>
+            </>
           )
         }}
       </Form>

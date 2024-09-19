@@ -1,17 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Form, Input } from 'ui'
-
-import CodeEditor from 'components/ui/CodeEditor'
-import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
-import InformationBox from 'components/ui/InformationBox'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import InformationBox from 'components/ui/InformationBox'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
-import { FormSchema } from 'types'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import type { FormSchema } from 'types'
+import { AlertTitle_Shadcn_, Alert_Shadcn_, Form, Input, Tabs } from 'ui'
+import { Code, Monitor, Info } from 'lucide-react'
 
 interface TemplateEditorProps {
   template: FormSchema
@@ -19,7 +20,6 @@ interface TemplateEditorProps {
 }
 
 const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
@@ -38,6 +38,7 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT`
   const messageProperty = properties[messageSlug]
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
@@ -50,19 +51,33 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
-        onError: () => {
-          ui.setNotification({ category: 'error', message: 'Failed to update settings' })
-        },
+        onError: () => toast.error('Failed to update settings'),
         onSuccess: () => {
-          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+          toast.success('Successfully updated settings')
           resetForm({
             values: values,
             initialValues: values,
           })
+          setHasUnsavedChanges(false) // Reset the unsaved changes state
         },
       }
     )
   }
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        e.returnValue = '' // deprecated, but older browsers still require this
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [hasUnsavedChanges])
 
   return (
     <Form id={formId} className="!border-t-0" initialValues={INITIAL_VALUES} onSubmit={onSubmit}>
@@ -130,17 +145,40 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                         }
                       />
                     </div>
-                    <div className="relative h-96">
-                      <CodeEditor
-                        id="code-id"
-                        language="html"
-                        isReadOnly={!canUpdateConfig}
-                        className="!mb-0 h-96 overflow-hidden rounded border"
-                        onInputChange={(e: string | undefined) => setBodyValue(e ?? '')}
-                        options={{ wordWrap: 'off', contextmenu: false }}
-                        value={bodyValue}
-                      />
-                    </div>
+                    <Tabs defaultActiveId="source" type="underlined" size="tiny">
+                      <Tabs.Panel id={'source'} icon={<Code />} label="Source">
+                        <div className="relative h-96">
+                          <CodeEditor
+                            id="code-id"
+                            language="html"
+                            isReadOnly={!canUpdateConfig}
+                            className="!mb-0 h-96 overflow-hidden rounded border"
+                            onInputChange={(e: string | undefined) => {
+                              setBodyValue(e ?? '')
+                              if (bodyValue !== e) {
+                                setHasUnsavedChanges(true)
+                              }
+                            }}
+                            options={{ wordWrap: 'off', contextmenu: false }}
+                            value={bodyValue}
+                          />
+                        </div>
+                      </Tabs.Panel>
+                      <Tabs.Panel id={'preview'} icon={<Monitor />} label="Preview">
+                        <Alert_Shadcn_ className="mb-2" variant="default">
+                          <Info strokeWidth={1.5} />
+                          <AlertTitle_Shadcn_>
+                            The preview may differ slightly from the actual rendering in the email
+                            client.
+                          </AlertTitle_Shadcn_>
+                        </Alert_Shadcn_>
+                        <iframe
+                          className="!mb-0 overflow-hidden h-96 w-full rounded border"
+                          title={id}
+                          srcDoc={bodyValue}
+                        />
+                      </Tabs.Panel>
+                    </Tabs>
                   </>
                 )}
                 <div className="col-span-12 flex w-full">
@@ -172,4 +210,4 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
   )
 }
 
-export default observer(TemplateEditor)
+export default TemplateEditor

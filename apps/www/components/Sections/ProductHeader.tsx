@@ -1,11 +1,12 @@
-import { Button, IconBookOpen } from 'ui'
 import Link from 'next/link'
+import { Button } from 'ui'
 import ProductIcon from '../ProductIcon'
+import { BookOpen } from 'lucide-react'
 
 type subheader = string
 interface Types {
   h1: string | React.ReactNode
-  subheader: string[]
+  subheader: (string | React.ReactNode)[]
   icon?: string
   title?: string
   image?: React.ReactNode
@@ -43,13 +44,13 @@ const ProductHeader = (props: Types) => (
             })}
         </div>
         <div className="flex flex-row md:flex-row md:items-center">
-          <Button asChild size="medium" className="text-white">
+          <Button asChild size="medium">
             <Link href="https://supabase.com/dashboard" as="https://supabase.com/dashboard">
               Start a project
             </Link>
           </Button>
           {props.documentation_url && (
-            <Button asChild type="default" size="medium" icon={<IconBookOpen />}>
+            <Button asChild type="default" size="medium" icon={<BookOpen />}>
               <Link href={props.documentation_url} as={props.documentation_url} className="ml-2">
                 See documentation
               </Link>

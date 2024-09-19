@@ -1,8 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { usageKeys } from './keys'
-import { ResponseError } from 'types'
-import { components } from 'data/api'
 
 export type OrgUsageVariables = {
   orgSlug?: string
@@ -26,7 +27,7 @@ export async function getOrgUsage(
     },
     signal,
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

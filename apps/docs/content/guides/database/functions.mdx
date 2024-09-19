@@ -1,0 +1,634 @@
+---
+id: 'functions'
+title: 'Database Functions'
+description: 'Creating and using Postgres functions.'
+video: 'https://www.youtube.com/v/MJZCCpCYEqk'
+---
+
+Postgres has built-in support for [SQL functions](https://www.postgresql.org/docs/current/sql-createfunction.html).
+These functions live inside your database, and they can be [used with the API](../../reference/javascript/rpc).
+
+## Quick demo
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/MJZCCpCYEqk"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## Getting started
+
+Supabase provides several options for creating database functions. You can use the Dashboard or create them directly using SQL.
+We provide a SQL editor within the Dashboard, or you can [connect](../../guides/database/connecting-to-postgres) to your database
+and run the SQL queries yourself.
+
+1. Go to the "SQL editor" section.
+2. Click "New Query".
+3. Enter the SQL to create or replace your Database function.
+4. Click "Run" or cmd+enter (ctrl+enter).
+
+## Simple functions
+
+Let's create a basic Database Function which returns a string "hello world".
+
+```sql
+create or replace function hello_world() -- 1
+returns text -- 2
+language sql -- 3
+as $$  -- 4
+  select 'hello world';  -- 5
+$$; --6
+
+```
+
+<details>
+<summary>Show/Hide Details</summary>
+
+At it's most basic a function has the following parts:
+
+1. `create or replace function hello_world()`: The function declaration, where `hello_world` is the name of the function. You can use either `create` when creating a new function or `replace` when replacing an existing function. Or you can use `create or replace` together to handle either.
+2. `returns text`: The type of data that the function returns. If it returns nothing, you can `returns void`.
+3. `language sql`: The language used inside the function body. This can also be a procedural language: `plpgsql`, `plv8`, `plpython`, etc.
+4. `as $$`: The function wrapper. Anything enclosed inside the `$$` symbols will be part of the function body.
+5. `select 'hello world';`: A simple function body. The final `select` statement inside a function body will be returned if there are no statements following it.
+6. `$$;`: The closing symbols of the function wrapper.
+
+</details>
+
+<br />
+
+After the Function is created, we have several ways of "executing" the function - either directly inside the database using SQL, or with one of the client libraries.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select hello_world();
+```
+
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.rpc('hello_world')
+```
+
+Reference: [rpc()](../../reference/javascript/rpc)
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase
+  .rpc('hello_world');
+```
+
+Reference: [rpc()](../../reference/dart/rpc)
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+try await supabase.rpc("hello_world").execute()
+```
+
+Reference: [rpc()](../../reference/swift/rpc)
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.postgrest.rpc("hello_world")
+```
+
+Reference: [rpc()](../../reference/kotlin/rpc)
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.rpc('hello_world').execute()
+```
+
+Reference: [rpc()](../../reference/python/rpc)
+
+</TabPanel>
+</Tabs>
+
+## Returning data sets
+
+Database Functions can also return data sets from [Tables](../../guides/database/tables) or Views.
+
+For example, if we had a database with some Star Wars data inside:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="data"
+  queryGroup="example-view"
+>
+<TabPanel id="data" label="Data">
+
+<h4>Planets</h4>
+
+| id  | name     |
+| --- | -------- |
+| 1   | Tattoine |
+| 2   | Alderaan |
+| 3   | Kashyyyk |
+
+<h4>People</h4>
+
+| id  | name             | planet_id |
+| --- | ---------------- | --------- |
+| 1   | Anakin Skywalker | 1         |
+| 2   | Luke Skywalker   | 1         |
+| 3   | Princess Leia    | 2         |
+| 4   | Chewbacca        | 3         |
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+```sql
+create table planets (
+  id serial primary key,
+  name text
+);
+
+insert into planets
+  (id, name)
+values
+  (1, 'Tattoine'),
+  (2, 'Alderaan'),
+  (3, 'Kashyyyk');
+
+create table people (
+  id serial primary key,
+  name text,
+  planet_id bigint references planets
+);
+
+insert into people
+  (id, name, planet_id)
+values
+  (1, 'Anakin Skywalker', 1),
+  (2, 'Luke Skywalker', 1),
+  (3, 'Princess Leia', 2),
+  (4, 'Chewbacca', 3);
+```
+
+</TabPanel>
+</Tabs>
+
+We could create a function which returns all the planets:
+
+```sql
+create or replace function get_planets()
+returns setof planets
+language sql
+as $$
+  select * from planets;
+$$;
+```
+
+Because this function returns a table set, we can also apply filters and selectors. For example, if we only wanted the first planet:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select *
+from get_planets()
+where id = 1;
+```
+
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = supabase.rpc('get_planets').eq('id', 1)
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase
+  .rpc('get_planets')
+  .eq('id', 1);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await supabase.rpc("get_planets").eq("id", value: 1).execute()
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.postgrest.rpc("get_planets") {
+    filter {
+        eq("id", 1)
+    }
+}
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.rpc('get_planets').eq('id', 1).execute()
+```
+
+</TabPanel>
+</Tabs>
+
+## Passing parameters
+
+Let's create a Function to insert a new planet into the `planets` table and return the new ID. Note that this time we're using the `plpgsql` language.
+
+```sql
+create or replace function add_planet(name text)
+returns bigint
+language plpgsql
+as $$
+declare
+  new_row bigint;
+begin
+  insert into planets(name)
+  values (add_planet.name)
+  returning id into new_row;
+
+  return new_row;
+end;
+$$;
+```
+
+Once again, you can execute this function either inside your database using a `select` query, or with the client libraries:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select * from add_planet('Jakku');
+```
+
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.rpc('add_planet', { name: 'Jakku' })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase
+  .rpc('add_planet', params: { 'name': 'Jakku' });
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Using `Encodable` type:
+
+```swift
+struct Planet: Encodable {
+  let name: String
+}
+
+try await supabase.rpc(
+  "add_planet",
+  params: Planet(name: "Jakku")
+)
+.execute()
+```
+
+Using `AnyJSON` convenience` type:
+
+```swift
+try await supabase.rpc(
+  "add_planet",
+  params: ["name": AnyJSON.string("Jakku")]
+)
+.execute()
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.postgrest.rpc(
+    function = "add_planet",
+    parameters = buildJsonObject { //You can put here any serializable object including your own classes
+        put("name", "Jakku")
+    }
+)
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.rpc('add_planet', params={'name': 'Jakku'}).execute()
+```
+
+</TabPanel>
+</Tabs>
+
+## Suggestions
+
+### Database Functions vs Edge Functions
+
+For data-intensive operations, use Database Functions, which are executed within your database
+and can be called remotely using the [REST and GraphQL API](../api).
+
+For use-cases which require low-latency, use [Edge Functions](../../guides/functions), which are globally-distributed and can be written in Typescript.
+
+### Security `definer` vs `invoker`
+
+Postgres allows you to specify whether you want the function to be executed as the user _calling_ the function (`invoker`), or as the _creator_ of the function (`definer`). For example:
+
+```sql
+create function hello_world()
+returns text
+language plpgsql
+security definer set search_path = ''
+as $$
+begin
+  select 'hello world';
+end;
+$$;
+```
+
+It is best practice to use `security invoker` (which is also the default). If you ever use `security definer`, you _must_ set the `search_path`.
+This limits the potential damage if you allow access to schemas which the user executing the function should not have.
+
+### Function privileges
+
+By default, database functions can be executed by any role. There are two main ways to restrict this:
+
+1.  On a case-by-case basis. Specifically revoke permissions for functions you want to protect. Execution needs to be revoked for both `public` and the role you're restricting:
+
+    ```sql
+    revoke execute on function public.hello_world from public;
+    revoke execute on function public.hello_world from anon;
+    ```
+
+1.  Restrict function execution by default. Specifically _grant_ access when you want a function to be executable by a specific role.
+
+    To restrict all existing functions, revoke execution permissions from both `public` _and_ the role you want to restrict:
+
+    ```sql
+    revoke execute on all functions in schema public from public;
+    revoke execute on all functions in schema public from anon, authenticated;
+    ```
+
+    To restrict all new functions, change the default privileges for both `public` _and_ the role you want to restrict:
+
+    ```sql
+    alter default privileges in schema public revoke execute on functions from public;
+    alter default privileges in schema public revoke execute on functions from anon, authenticated;
+    ```
+
+    You can then regrant permissions for a specific function to a specific role:
+
+    ```sql
+    grant execute on function public.hello_world to authenticated;
+    ```
+
+### Debugging functions
+
+You can add logs to help you debug functions. This is especially recommended for complex functions.
+
+Good targets to log include:
+
+- Values of (non-sensitive) variables
+- Returned results from queries
+
+#### General logging
+
+To create custom logs in the [Dashboard's Postgres Logs](https://supabase.com/dashboard/project/_/logs/postgres-logs), you can use the `raise` keyword. By default, there are 3 observed severity levels:
+
+- `log`
+- `warning`
+- `exception` (error level)
+
+```sql
+create function logging_example(
+  log_message text,
+  warning_message text,
+  error_message text
+)
+returns void
+language plpgsql
+as $$
+begin
+  raise log 'logging message: %', log_message;
+  raise warning 'logging warning: %', warning_message;
+
+  -- immediately ends function and reverts transaction
+  raise exception 'logging error: %', error_message;
+end;
+$$;
+
+select logging_example('LOGGED MESSAGE', 'WARNING MESSAGE', 'ERROR MESSAGE');
+```
+
+#### Error handling
+
+You can create custom errors with the `raise exception` keywords.
+
+A common pattern is to throw an error when a variable doesn't meet a condition:
+
+```sql
+create or replace function error_if_null(some_val text)
+returns text
+language plpgsql
+as $$
+begin
+  -- error if some_val is null
+  if some_val is null then
+    raise exception 'some_val should not be NULL';
+  end if;
+  -- return some_val if it is not null
+  return some_val;
+end;
+$$;
+
+select error_if_null(null);
+```
+
+Value checking is common, so Postgres provides a shorthand: the `assert` keyword. It uses the following format:
+
+```sql
+-- throw error when condition is false
+assert <some condition>, 'message';
+```
+
+Below is an example
+
+```sql
+create function assert_example(name text)
+returns uuid
+language plpgsql
+as $$
+declare
+  student_id uuid;
+begin
+  -- save a user's id into the user_id variable
+  select
+    id into student_id
+  from attendance_table
+  where student = name;
+
+  -- throw an error if the student_id is null
+  assert student_id is not null, 'assert_example() ERROR: student not found';
+
+  -- otherwise, return the user's id
+  return student_id;
+end;
+$$;
+
+select assert_example('Harry Potter');
+```
+
+Error messages can also be captured and modified with the `exception` keyword:
+
+```sql
+create function error_example()
+returns void
+language plpgsql
+as $$
+begin
+  -- fails: cannot read from nonexistent table
+  select * from table_that_does_not_exist;
+
+  exception
+      when others then
+          raise exception 'An error occurred in function <function name>: %', sqlerrm;
+end;
+$$;
+```
+
+#### Advanced logging
+
+For more complex functions or complicated debugging, try logging:
+
+- Formatted variables
+- Individual rows
+- Start and end of function calls
+
+```sql
+create or replace function advanced_example(num int default 10)
+returns text
+language plpgsql
+as $$
+declare
+    var1 int := 20;
+    var2 text;
+begin
+    -- Logging start of function
+    raise log 'logging start of function call: (%)', (select now());
+
+    -- Logging a variable from a SELECT query
+    select
+      col_1 into var1
+    from some_table
+    limit 1;
+    raise log 'logging a variable (%)', var1;
+
+    -- It is also possible to avoid using variables, by returning the values of your query to the log
+    raise log 'logging a query with a single return value(%)', (select col_1 from some_table limit 1);
+
+    -- If necessary, you can even log an entire row as JSON
+    raise log 'logging an entire row as JSON (%)', (select to_jsonb(some_table.*) from some_table limit 1);
+
+    -- When using INSERT or UPDATE, the new value(s) can be returned
+    -- into a variable.
+    -- When using DELETE, the deleted value(s) can be returned.
+    -- All three operations use "RETURNING value(s) INTO variable(s)" syntax
+    insert into some_table (col_2)
+    values ('new val')
+    returning col_2 into var2;
+
+    raise log 'logging a value from an INSERT (%)', var2;
+
+    return var1 || ',' || var2;
+exception
+    -- Handle exceptions here if needed
+    when others then
+        raise exception 'An error occurred in function <advanced_example>: %', sqlerrm;
+end;
+$$;
+
+select advanced_example();
+```
+
+## Resources
+
+- Official Client libraries: [JavaScript](../../reference/javascript/rpc) and [Flutter](../../reference/dart/rpc)
+- Community client libraries: [github.com/supabase-community](https://github.com/supabase-community)
+- PostgreSQL Official Docs: [Chapter 9. Functions and Operators](https://www.postgresql.org/docs/current/functions.html)
+- PostgreSQL Reference: [CREATE FUNCTION](https://www.postgresql.org/docs/9.1/sql-createfunction.html)
+
+## Deep dive
+
+### Create Database Functions
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/MJZCCpCYEqk"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+### Call Database Functions using JavaScript
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/I6nnp9AINJk"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+### Using Database Functions to call an external API
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/rARgrELRCwY"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>

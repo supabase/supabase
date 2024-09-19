@@ -1,9 +1,12 @@
-import { useState } from 'react'
-// Import Swiper React components
-import { Button, IconArrowUpRight, Tabs } from 'ui'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import CodeBlock from '../CodeBlock/CodeBlock'
+// Import Swiper styles if swiper used on page
+import 'swiper/css'
+
 import Link from 'next/link'
+import { useState } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button, Tabs } from 'ui'
+import CodeBlock from '../CodeBlock/CodeBlock'
+import { ArrowUpRight } from 'lucide-react'
 
 interface Example {
   lang: 'js' | 'py' | 'sql'
@@ -38,7 +41,7 @@ function APISection(props: Props) {
         <h2 className="h3">{props.title}</h2>
         <div className="p">{props.text}</div>
         {props.documentation_link && (
-          <Button asChild size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
+          <Button asChild size="small" className="mt-4" type="default" icon={<ArrowUpRight />}>
             <Link href={props.documentation_link} as={props.documentation_link}>
               Explore documentation
             </Link>

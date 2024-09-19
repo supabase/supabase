@@ -1,7 +1,25 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { IconHelpCircle } from 'ui'
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import { HelpCircle } from 'lucide-react'
 import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
+import type { ForeignKey } from './ForeignKeySelector.types'
+
+export const formatForeignKeys = (fks: ForeignKeyConstraint[]): ForeignKey[] => {
+  return fks.map((x) => {
+    return {
+      id: x.id,
+      name: x.constraint_name,
+      tableId: x.target_id,
+      schema: x.target_schema,
+      table: x.target_table,
+      columns: x.source_columns.map((y, i) => ({ source: y, target: x.target_columns[i] })),
+      deletionAction: x.deletion_action,
+      updateAction: x.update_action,
+    }
+  })
+}
 
 export const generateCascadeActionDescription = (
   action: 'update' | 'delete',
@@ -36,7 +54,7 @@ export const generateCascadeActionDescription = (
           <span className="text-foreground-light">{actionName}</span>
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger className="translate-y-[3px] mx-1">
-              <IconHelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
+              <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">

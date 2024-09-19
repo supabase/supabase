@@ -6,12 +6,12 @@ import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
-import { OrgSubscription } from 'data/subscriptions/types'
-import { OrgMetricsUsage, OrgUsageResponse } from 'data/usage/org-usage-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import type { OrgMetricsUsage, OrgUsageResponse } from 'data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { useMemo } from 'react'
-import { ResponseError } from 'types'
-import { Button, IconAlertTriangle, IconBarChart2 } from 'ui'
+import type { ResponseError } from 'types'
+import { Button } from 'ui'
 import SectionContent from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 import {
@@ -21,6 +21,7 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
+import { AlertTriangle, BarChart2 } from 'lucide-react'
 
 export interface AttributeUsageProps {
   slug: string
@@ -93,7 +94,7 @@ const AttributeUsage = ({
 
         {isSuccess && (
           <>
-            {usageMeta?.available_in_plan ? (
+            {!usageMeta || usageMeta?.available_in_plan ? (
               <>
                 {!projectRef && (
                   <div className="space-y-2">
@@ -105,7 +106,7 @@ const AttributeUsage = ({
                             <Tooltip.Trigger asChild>
                               {usageRatio >= 1 ? (
                                 <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
-                                  <IconAlertTriangle
+                                  <AlertTriangle
                                     size={14}
                                     strokeWidth={2}
                                     className={exceededLimitStyle}
@@ -115,7 +116,7 @@ const AttributeUsage = ({
                               ) : (
                                 usageRatio >= USAGE_APPROACHING_THRESHOLD && (
                                   <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
-                                    <IconAlertTriangle
+                                    <AlertTriangle
                                       size={14}
                                       strokeWidth={2}
                                       className="text-amber-900"
@@ -150,7 +151,7 @@ const AttributeUsage = ({
                       </div>
                     </div>
 
-                    {currentBillingCycleSelected && !usageMeta.unlimited && (
+                    {currentBillingCycleSelected && usageMeta && !usageMeta.unlimited && (
                       <SparkBar
                         type="horizontal"
                         barClass={clsx(
@@ -159,9 +160,9 @@ const AttributeUsage = ({
                               ? 'bg-foreground-light'
                               : 'bg-red-900'
                             : usageBasedBilling === false &&
-                              usageRatio >= USAGE_APPROACHING_THRESHOLD
-                            ? 'bg-amber-900'
-                            : 'bg-foreground-light'
+                                usageRatio >= USAGE_APPROACHING_THRESHOLD
+                              ? 'bg-amber-900'
+                              : 'bg-foreground-light'
                         )}
                         bgClass="bg-surface-300"
                         value={usageMeta?.usage ?? 0}
@@ -169,8 +170,8 @@ const AttributeUsage = ({
                       />
                     )}
 
-                    {
-                      <div>
+                    <div>
+                      {usageMeta && (
                         <div className="flex items-center justify-between border-b py-1">
                           <p className="text-xs text-foreground-light">
                             Included in {subscription?.plan?.name.toLowerCase()} plan
@@ -179,43 +180,42 @@ const AttributeUsage = ({
                             <p className="text-xs">Unlimited</p>
                           ) : (
                             <p className="text-xs">
-                              {attribute.unit === 'bytes'
+                              {attribute.unit === 'bytes' || attribute.unit === 'gigabytes'
                                 ? `${usageMeta.pricing_free_units ?? 0} GB`
                                 : (usageMeta.pricing_free_units ?? 0).toLocaleString()}
                             </p>
                           )}
                         </div>
-                        {currentBillingCycleSelected && (
-                          <div className="flex items-center justify-between py-1">
-                            <p className="text-xs text-foreground-light">
-                              {attribute.chartPrefix || 'Used '} in period
-                            </p>
-                            <p className="text-xs">
-                              {attribute.unit === 'bytes'
-                                ? `${(usageMeta?.usage ?? 0).toFixed(2)} GB`
-                                : (usageMeta?.usage ?? 0).toLocaleString()}
-                            </p>
-                          </div>
-                        )}
-                        {currentBillingCycleSelected &&
-                          (usageMeta?.pricing_free_units ?? 0) > 0 && (
-                            <div className="flex items-center justify-between border-t py-1">
-                              <p className="text-xs text-foreground-light">Overage in period</p>
-                              <p className="text-xs">
-                                {(usageMeta?.pricing_free_units ?? 0) === -1 || usageExcess < 0
-                                  ? `0${attribute.unit === 'bytes' ? ' GB' : ''}`
-                                  : attribute.unit === 'bytes'
-                                  ? `${usageExcess.toFixed(2)} GB`
-                                  : usageExcess.toLocaleString()}
-                              </p>
-                            </div>
-                          )}
-                      </div>
-                    }
+                      )}
+                      {currentBillingCycleSelected && usageMeta && (
+                        <div className="flex items-center justify-between py-1">
+                          <p className="text-xs text-foreground-light">
+                            {attribute.chartPrefix || 'Used '} in period
+                          </p>
+                          <p className="text-xs">
+                            {attribute.unit === 'bytes' || attribute.unit === 'gigabytes'
+                              ? `${(usageMeta?.usage ?? 0).toFixed(2)} GB`
+                              : (usageMeta?.usage ?? 0).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                      {currentBillingCycleSelected && (usageMeta?.pricing_free_units ?? 0) > 0 && (
+                        <div className="flex items-center justify-between border-t py-1">
+                          <p className="text-xs text-foreground-light">Overage in period</p>
+                          <p className="text-xs">
+                            {(usageMeta?.pricing_free_units ?? 0) === -1 || usageExcess < 0
+                              ? `0${attribute.unit === 'bytes' || attribute.unit === 'gigabytes' ? ' GB' : ''}`
+                              : attribute.unit === 'bytes' || attribute.unit === 'gigabytes'
+                                ? `${usageExcess.toFixed(2)} GB`
+                                : usageExcess.toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
-                {attribute.additionalInfo?.(subscription, usage)}
+                {attribute.additionalInfo?.(usage)}
 
                 <div className="space-y-1">
                   <p className="text-sm">
@@ -248,7 +248,7 @@ const AttributeUsage = ({
                   <Panel>
                     <Panel.Content>
                       <div className="flex flex-col items-center justify-center">
-                        <IconBarChart2 className="text-foreground-light mb-2" />
+                        <BarChart2 className="text-foreground-light mb-2" />
                         <p className="text-sm">No data in period</p>
                         <p className="text-sm text-foreground-light">
                           May take up to 24 hours to show

@@ -20,11 +20,6 @@ export interface SupabaseGridProps {
    * database table id
    */
   tableId?: string
-  /**
-   *
-   * run sql query
-   */
-  onSqlQuery: (query: string) => Promise<{ data?: any; error?: any }>
 
   /**
    * Optional react node to display in grid header
@@ -69,6 +64,7 @@ export interface SupabaseGridProps {
   onEditRow?: (row: SupaRow) => void
   onError?: (error: any) => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
+  onExpandTextEditor: (column: string, row: SupaRow) => void
   updateTableRow: (previousRow: any, updatedData: any) => void
   onEditForeignKeyColumnValue: (args: {
     foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>

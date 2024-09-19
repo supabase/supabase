@@ -2,14 +2,15 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import Link from 'next/link'
 import { useState } from 'react'
-import { IconAlertCircle, IconLoader, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Input } from 'ui'
+import { AlertCircle, Loader } from 'lucide-react'
 
 const generateInitSnippet = (endpoint: string) => ({
   js: `
@@ -84,14 +85,14 @@ const APIKeys = () => {
     >
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <IconAlertCircle size={16} strokeWidth={1.5} />
+          <AlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
       ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
+          <Loader className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             {isProjectSettingsLoading || isApiKeysEmpty
               ? 'Retrieving API keys'
@@ -142,10 +143,10 @@ const APIKeys = () => {
                 !canReadAPIKeys
                   ? 'You need additional permissions to view API keys'
                   : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
-                  ? 'JWT secret update failed, new API key may have issues'
-                  : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
-                  ? 'Updating JWT secret...'
-                  : apiService?.defaultApiKey
+                    ? 'JWT secret update failed, new API key may have issues'
+                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
+                      ? 'Updating JWT secret...'
+                      : apiService?.defaultApiKey
               }
               onChange={() => {}}
               descriptionText={
@@ -165,7 +166,7 @@ const APIKeys = () => {
             />
           </Panel.Content>
           <div className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-            <div className="flex items-center bg-background">
+            <div className="flex items-center bg-studio">
               {availableLanguages.map((language) => {
                 const isSelected = selectedLanguage.key === language.key
                 return (
@@ -173,7 +174,7 @@ const APIKeys = () => {
                     key={language.key}
                     className={[
                       'px-3 py-1 text-sm cursor-pointer transition',
-                      `${!isSelected ? 'bg-background text-foreground-light' : 'bg-surface-100'}`,
+                      `${!isSelected ? 'bg-studio text-foreground-light' : 'bg-surface-100'}`,
                     ].join(' ')}
                     onClick={() => setSelectedLanguage(language)}
                   >

@@ -1,5 +1,5 @@
 import Table from 'components/to-be-cleaned/Table'
-import { ColumnPrivilege } from 'data/privileges/column-privileges-query'
+import type { ColumnPrivilege } from 'data/privileges/column-privileges-query'
 import { Switch } from 'ui'
 import {
   ALL_PRIVILEGE_TYPES,

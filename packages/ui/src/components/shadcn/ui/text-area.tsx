@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { cn } from '@ui/lib/utils'
+import { cn } from '../../../lib/utils/cn'
 
 export interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 
@@ -23,6 +23,6 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
   }
 )
 
-TextArea.displayName = 'Input'
+TextArea.displayName = 'TextArea'
 
 export { TextArea }

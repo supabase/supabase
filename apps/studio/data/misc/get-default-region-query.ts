@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { miscKeys } from './keys'
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { getDistanceLatLonKM } from 'lib/helpers'
@@ -8,12 +8,13 @@ import {
   AWS_REGIONS_COORDINATES,
   FLY_REGIONS_COORDINATES,
 } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { AWS_REGIONS, FLY_REGIONS } from 'lib/constants'
+import type { CloudProvider } from 'shared-data'
+import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 
 const RESTRICTED_POOL = ['WEST_US', 'CENTRAL_EU', 'SOUTHEAST_ASIA']
 
 export type DefaultRegionVariables = {
-  cloudProvider?: 'AWS' | 'FLY'
+  cloudProvider?: CloudProvider
   useRestrictedPool?: boolean
 }
 
@@ -50,8 +51,8 @@ export async function getDefaultRegionOption({
     const closestRegion = Object.keys(locations)[distances.indexOf(shortestDistance)]
 
     return cloudProvider === 'AWS'
-      ? AWS_REGIONS[closestRegion as keyof typeof AWS_REGIONS]
-      : FLY_REGIONS[closestRegion as keyof typeof FLY_REGIONS]
+      ? AWS_REGIONS[closestRegion as keyof typeof AWS_REGIONS].displayName
+      : FLY_REGIONS[closestRegion as keyof typeof FLY_REGIONS].displayName
   } catch (error) {
     throw error
   }
@@ -67,5 +68,11 @@ export const useDefaultRegionQuery = <TData = DefaultRegionData>(
   useQuery<DefaultRegionData, DefaultRegionError, TData>(
     miscKeys.defaultRegion(cloudProvider, useRestrictedPool ?? true),
     () => getDefaultRegionOption({ cloudProvider, useRestrictedPool }),
-    { enabled: enabled && typeof cloudProvider !== 'undefined', ...options }
+    {
+      enabled: enabled && typeof cloudProvider !== 'undefined',
+      retry(failureCount) {
+        return failureCount < 1
+      },
+      ...options,
+    }
   )

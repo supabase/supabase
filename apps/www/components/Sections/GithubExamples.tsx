@@ -1,14 +1,15 @@
 import { useRef } from 'react'
 
-import { useRouter } from 'next/router'
-
 import { Swiper, SwiperSlide } from 'swiper/react'
 // import Swiper core and required modules
-import SwiperCore, { Navigation, Pagination } from 'swiper'
+import SwiperCore from 'swiper'
+import { Navigation, Pagination } from 'swiper/modules'
 
+import { Github } from 'lucide-react'
 import Link from 'next/link'
-import { Button, IconGitHub, IconArrowLeft, IconArrowRight, IconBookOpen } from 'ui'
+import { Button } from 'ui'
 
+import { ArrowLeft, ArrowRight, BookOpen } from 'lucide-react'
 import Examples from '~/data/Examples'
 import ExampleCard from '../ExampleCard'
 
@@ -16,9 +17,6 @@ import ExampleCard from '../ExampleCard'
 SwiperCore.use([Navigation, Pagination])
 
 function GithubExamples() {
-  // base path for images
-  const { basePath } = useRouter()
-
   const prevRef = useRef(null)
   const nextRef = useRef(null)
 
@@ -31,10 +29,10 @@ function GithubExamples() {
             Supported by a network of early advocates, contributors, and champions.
           </p>
           <div className="flex items-center justify-center gap-2 py-4">
-            <Button asChild size="small" type="default" icon={<IconBookOpen size={12} />}>
-              <Link href="/docs/guides/auth/overview">View guides</Link>
+            <Button asChild size="small" type="default" icon={<BookOpen size={12} />}>
+              <Link href="/docs/guides/resources/examples">View guides</Link>
             </Button>
-            <Button asChild size="small" type="default" icon={<IconGitHub size={12} />}>
+            <Button asChild size="small" type="default" icon={<Github size={12} />}>
               <Link
                 href="https://github.com/supabase/supabase/tree/master/examples"
                 as="https://github.com/supabase/supabase/tree/master/examples"
@@ -95,10 +93,10 @@ function GithubExamples() {
             })}
             <div className="container mx-auto mt-3 hidden flex-row justify-between md:flex">
               <div ref={prevRef} className="p ml-4 cursor-pointer">
-                <IconArrowLeft />
+                <ArrowLeft />
               </div>
               <div ref={nextRef} className="p mr-4 cursor-pointer">
-                <IconArrowRight />
+                <ArrowRight />
               </div>
             </div>
           </Swiper>

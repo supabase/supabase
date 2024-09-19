@@ -7,7 +7,7 @@ import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import {
   Badge,
@@ -17,10 +17,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconEdit3,
-  IconMoreVertical,
-  IconTrash,
 } from 'ui'
+import { MoreVertical, Edit3, Trash } from 'lucide-react'
 
 export interface HookListProps {
   schema: string
@@ -60,18 +58,23 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
           <Table.tr key={x.id}>
             <Table.td>
               <div className="flex items-center space-x-4">
-                <Image
-                  src={
-                    isEdgeFunction(url)
-                      ? `${BASE_PATH}/img/function-providers/supabase-severless-function.png`
-                      : `${BASE_PATH}/img/function-providers/http-request.png`
-                  }
-                  layout="fixed"
-                  width="20"
-                  height="20"
-                  title={isEdgeFunction(url) ? 'Supabase Edge Function' : 'HTTP Request'}
-                />
-                <p title={x.name}>{x.name}</p>
+                <div>
+                  <Image
+                    src={
+                      isEdgeFunction(url)
+                        ? `${BASE_PATH}/img/function-providers/supabase-severless-function.png`
+                        : `${BASE_PATH}/img/function-providers/http-request.png`
+                    }
+                    alt="hook-type"
+                    layout="fixed"
+                    width="20"
+                    height="20"
+                    title={isEdgeFunction(url) ? 'Supabase Edge Function' : 'HTTP Request'}
+                  />
+                </div>
+                <p title={x.name} className="truncate">
+                  {x.name}
+                </p>
               </div>
             </Table.td>
             <Table.td className="hidden space-x-2 lg:table-cell">
@@ -93,19 +96,19 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button type="default" className="px-1">
-                        <IconMoreVertical />
+                        <MoreVertical />
                       </Button>
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent side="left">
                       <>
                         <DropdownMenuItem className="space-x-2" onClick={() => editHook(x)}>
-                          <IconEdit3 size="tiny" />
+                          <Edit3 size="14" />
                           <p>Edit hook</p>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => deleteHook(x)}>
-                          <IconTrash stroke="red" size="tiny" />
+                          <Trash stroke="red" size="14" />
                           <p>Delete hook</p>
                         </DropdownMenuItem>
                       </>
@@ -114,7 +117,7 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                 ) : (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>
-                      <Button disabled type="default" icon={<IconMoreVertical />} />
+                      <Button disabled type="default" icon={<MoreVertical />} />
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content side="left">

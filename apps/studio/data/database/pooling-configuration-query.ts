@@ -1,21 +1,27 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
 export type PoolingConfigurationVariables = {
-  projectRef: string
+  projectRef?: string
 }
+
+export type PoolingConfiguration = components['schemas']['SupavisorConfigResponse']
 
 export async function getPoolingConfiguration(
   { projectRef }: PoolingConfigurationVariables,
   signal?: AbortSignal
 ) {
-  const { data, error } = await get(`/platform/projects/{ref}/config/pgbouncer`, {
+  if (!projectRef) throw new Error('Project ref is required')
+
+  const { data, error } = await get(`/platform/projects/{ref}/config/supavisor`, {
     params: { path: { ref: projectRef } },
     signal,
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

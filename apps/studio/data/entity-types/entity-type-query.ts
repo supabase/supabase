@@ -1,5 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { ENTITY_TYPE } from './entity-type-constants'
 
 type EntityTypeArgs = {
@@ -42,6 +42,7 @@ export type Entity = {
   name: string
   type: ENTITY_TYPE
   comment: string | null
+  rls_enabled: boolean
 }
 
 export type EntityType = Entity | null
@@ -52,7 +53,7 @@ export type EntityTypeVariables = EntityTypeArgs & {
 }
 
 export type EntityTypeData = EntityType
-export type EntityTypeError = unknown
+export type EntityTypeError = ExecuteSqlError
 
 export const useEntityTypeQuery = <TData extends EntityTypeData = EntityTypeData>(
   { projectRef, connectionString, id, ...args }: EntityTypeVariables,

@@ -1,33 +1,35 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { observer } from 'mobx-react-lite'
+import { Loader2, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import SVG from 'react-inlinesvg'
-import { Button, IconLoader, IconTool } from 'ui'
 
 import Success from 'components/interfaces/Support/Success'
-import SupportForm from 'components/interfaces/Support/SupportForm'
-import { LayoutWrapper } from 'components/layouts/LayoutWrapper'
+import { SupportFormV2 } from 'components/interfaces/Support/SupportFormV2'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
-import { withAuth } from 'hooks'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
+import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 const SupportPage = () => {
   const [sentCategory, setSentCategory] = useState<string>()
+  const [selectedProject, setSelectedProject] = useState<string>('no-project')
   const { data, isLoading } = usePlatformStatusQuery()
   const isHealthy = data?.isHealthy
 
+  const { data: projectsData, isLoading: isLoadingProjects } = useProjectsQuery()
+
   return (
-    <LayoutWrapper className="relative flex overflow-y-auto overflow-x-hidden">
-      <div className="mx-auto my-8 max-w-2xl px-4 lg:px-6">
+    <div className="relative flex overflow-y-auto overflow-x-hidden">
+      <div className="mx-auto my-8 max-w-2xl w-full px-4 lg:px-6">
         <div className="space-y-12 py-8">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2">
             <div className="flex items-center space-x-3">
               <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
               <h1 className="m-0 text-lg">Supabase support</h1>
             </div>
-            <div className="flex items-center space-x-3">
-              <Button asChild type="default" icon={<IconTool />}>
+            <div className="flex items-center gap-x-3">
+              <Button asChild type="default" icon={<Wrench />}>
                 <Link
                   href="https://supabase.com/docs/guides/platform/troubleshooting"
                   target="_blank"
@@ -36,14 +38,14 @@ const SupportPage = () => {
                   Troubleshooting
                 </Link>
               </Button>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
                   <Button
                     asChild
                     type="default"
                     icon={
                       isLoading ? (
-                        <IconLoader className="animate-spin" />
+                        <Loader2 className="animate-spin" />
                       ) : isHealthy ? (
                         <div className="h-2 w-2 bg-brand rounded-full" />
                       ) : (
@@ -55,44 +57,42 @@ const SupportPage = () => {
                       {isLoading
                         ? 'Checking status'
                         : isHealthy
-                        ? 'All systems operational'
-                        : 'Active incident ongoing'}
+                          ? 'All systems operational'
+                          : 'Active incident ongoing'}
                     </Link>
                   </Button>
-                </Tooltip.Trigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">Check Supabase status page</span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
+                </TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_ side="bottom" align="center">
+                  Check Supabase status page
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
             </div>
           </div>
+
           <div
             className={[
-              'min-w-full space-y-12 rounded border bg-panel-body-light shadow-md',
+              'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md',
               `${sentCategory === undefined ? 'py-8' : 'pt-8'}`,
               'border-default',
             ].join(' ')}
           >
             {sentCategory !== undefined ? (
-              <Success sentCategory={sentCategory} />
+              <Success
+                sentCategory={sentCategory}
+                selectedProject={selectedProject}
+                projects={projectsData}
+              />
             ) : (
-              <SupportForm setSentCategory={setSentCategory} />
+              <SupportFormV2
+                setSentCategory={setSentCategory}
+                setSelectedProject={setSelectedProject}
+              />
             )}
           </div>
         </div>
       </div>
-    </LayoutWrapper>
+    </div>
   )
 }
 
-export default withAuth(observer(SupportPage), { useHighestAAL: false })
+export default withAuth(SupportPage, { useHighestAAL: false })

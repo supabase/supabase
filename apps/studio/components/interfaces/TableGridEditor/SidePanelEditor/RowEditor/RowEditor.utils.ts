@@ -1,23 +1,26 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
-import { Dictionary } from 'types'
+import type { PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import dayjs from 'dayjs'
 import { compact, find, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
+import type { Dictionary } from 'types'
 
+import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { minifyJSON, tryParseJson } from 'lib/helpers'
 import {
   DATETIME_TYPES,
+  JSON_TYPES,
   TEXT_TYPES,
   TIMESTAMP_TYPES,
   TIME_TYPES,
 } from '../SidePanelEditor.constants'
-import { RowField } from './RowEditor.types'
+import type { RowField } from './RowEditor.types'
+import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
-  table: PostgresTable
+  table: PostgresTable,
+  foreignKeys: ForeignKey[]
 ): RowField[] => {
-  const { relationships, primary_keys } = table
-  // @ts-ignore
+  const { primary_keys } = table
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
   return table.columns!.map((column) => {
@@ -25,26 +28,35 @@ export const generateRowFields = (
       isUndefined(row) && TEXT_TYPES.includes(column.format)
         ? null
         : isUndefined(row) && column.format === 'bool' && !column.is_nullable
-        ? column.default_value
-        : isUndefined(row) && column.format === 'bool' && column.is_nullable
-        ? 'null'
-        : isUndefined(row)
-        ? ''
-        : DATETIME_TYPES.includes(column.format)
-        ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
-        : parseValue(row[column.name], column.format)
+          ? column.default_value
+          : isUndefined(row) && column.format === 'bool' && column.is_nullable
+            ? 'null'
+            : isUndefined(row)
+              ? ''
+              : DATETIME_TYPES.includes(column.format)
+                ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
+                : parseValue(row[column.name], column.format)
 
-    const foreignKey = find(relationships, (relationship) => {
-      return (
-        relationship.source_schema === column.schema &&
-        relationship.source_table_name === column.table &&
-        relationship.source_column_name === column.name
-      )
+    const foreignKey = foreignKeys.find((fk) => {
+      return fk.columns.map((x) => x.source).includes(column.name)
     })
 
     return {
       value,
-      foreignKey,
+      foreignKey:
+        foreignKey !== undefined
+          ? ({
+              id: foreignKey.id,
+              constraint_name: foreignKey.name,
+              source_schema: column.schema,
+              source_table_name: column.table,
+              source_column_name: column.name,
+              target_table_schema: foreignKey.schema,
+              target_table_name: foreignKey.table,
+              target_column_name:
+                foreignKey.columns.find((c) => c.source === column.name)?.target ?? '',
+            } as PostgresRelationship)
+          : undefined,
       id: column.id,
       name: column.name,
       comment: parseDescription(column.comment),
@@ -71,10 +83,14 @@ export const validateFields = (fields: RowField[]) => {
       }
     }
     if (field.format.includes('json') && (field.value?.length ?? 0) > 0) {
+      const isTruncated = isValueTruncated(field.value)
+      // don't validate if the value is truncated
+      if (isTruncated) return
+
       try {
         minifyJSON(field.value ?? '')
       } catch {
-        errors[field.name] = 'Value is an invalid JSON'
+        errors[field.name] = 'Value is invalid JSON'
       }
     }
     if (field.isIdentity || field.defaultValue) return
@@ -82,11 +98,10 @@ export const validateFields = (fields: RowField[]) => {
   return errors
 }
 
-const parseValue = (originalValue: any, format: string) => {
+export const parseValue = (originalValue: any, format: string) => {
   try {
     if (
       originalValue === null ||
-      (Array.isArray(originalValue) && originalValue.length === 0) ||
       (typeof originalValue === 'string' && originalValue.length === 0)
     ) {
       return originalValue
@@ -164,8 +179,8 @@ export const generateRowObjectFromFields = (
     const value = TEXT_TYPES.includes(field.format)
       ? field.value
       : (field?.value ?? '').length === 0
-      ? null
-      : field.value
+        ? null
+        : field.value
 
     if (isArray && value !== null) {
       rowObject[field.name] = tryParseJson(value)
@@ -191,19 +206,27 @@ export const generateRowObjectFromFields = (
   return includeNullProperties ? rowObject : omitBy(rowObject, isNull)
 }
 
-export const generateUpdateRowPayload = (originalRow: any, field: RowField[]) => {
+export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) => {
   const includeNullProperties = true
-  const rowObject = generateRowObjectFromFields(field, includeNullProperties) as any
+  const rowObject = generateRowObjectFromFields(fields, includeNullProperties) as any
 
   const payload = {} as any
   const properties = Object.keys(rowObject)
   properties.forEach((property) => {
-    const type = field.find((x) => x.name === property)?.format
+    const field = fields.find((x) => x.name === property)
+    const type = field?.format
     if (type !== undefined && DATETIME_TYPES.includes(type)) {
       // Just to ensure that the value are in the correct and consistent format for value comparison
       const originalFormatted = convertPostgresDatetimeToInputDatetime(type, originalRow[property])
       const originalFormattedOut = convertInputDatetimeToPostgresDatetime(type, originalFormatted)
       if (originalFormattedOut !== rowObject[property]) {
+        payload[property] = rowObject[property]
+      }
+    } else if (type !== undefined && JSON_TYPES.includes(type)) {
+      // don't update if the value is truncated. This is to enable the user to change cell values on rows which have
+      // truncated JSON values. If the user
+      const isTruncated = isValueTruncated(field?.value)
+      if (!isTruncated) {
         payload[property] = rowObject[property]
       }
     } else if (!isEqual(originalRow[property], rowObject[property])) {
@@ -212,4 +235,11 @@ export const generateUpdateRowPayload = (originalRow: any, field: RowField[]) =>
   })
 
   return payload
+}
+
+/**
+ * Checks if the value is truncated. The JSON types are usually truncated if they're too big to show in the editor.
+ */
+export const isValueTruncated = (value: string | null | undefined) => {
+  return value?.endsWith('...') && (value ?? '').length > MAX_CHARACTERS
 }

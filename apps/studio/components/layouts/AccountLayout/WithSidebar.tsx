@@ -1,12 +1,12 @@
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { ReactNode } from 'react'
-import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 
-import { useFlag } from 'hooks'
-import { LayoutWrapper } from '../LayoutWrapper'
-import LayoutHeader from '../ProjectLayout/LayoutHeader'
-import { SidebarLink, SidebarSection } from './AccountLayout.types'
+import { useFlag } from 'hooks/ui/useFlag'
+import { ArrowUpRight, LogOut } from 'lucide-react'
+import { Badge, cn, Menu } from 'ui'
+import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
+import type { SidebarLink, SidebarSection } from './AccountLayout.types'
 
 interface WithSidebarProps {
   title: string
@@ -35,12 +35,12 @@ const WithSidebar = ({
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
   return (
-    <div className="flex max-h-full">
+    <div className="flex h-full">
       {!hideSidebar && !noContent && (
-        <LayoutWrapper
+        <div
           id="with-sidebar"
           className={[
-            'h-full bg-background',
+            'h-full bg-dash-sidebar',
             'hide-scrollbar w-64 overflow-auto border-r border-default',
           ].join(' ')}
         >
@@ -77,11 +77,11 @@ const WithSidebar = ({
               })}
             </Menu>
           </div>
-        </LayoutWrapper>
+        </div>
       )}
       <div className="flex flex-1 flex-col">
         {!navLayoutV2 && <LayoutHeader breadcrumbs={breadcrumbs} />}
-        <div className="flex-1 flex-grow overflow-auto">{children}</div>
+        <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
     </div>
   )
@@ -99,7 +99,7 @@ const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWit
     {section.heading && <Menu.Group title={section.heading} />}
     {section.versionLabel && (
       <div className="mb-1 px-3">
-        <Badge color="yellow">{section.versionLabel}</Badge>
+        <Badge variant="warning">{section.versionLabel}</Badge>
       </div>
     )}
     {
@@ -133,6 +133,7 @@ const SidebarItem = ({ links, subitems, subitemsParentKey }: SidebarItemProps) =
             href={link.href}
             onClick={link.onClick}
             isExternal={link.isExternal || false}
+            icon={link.icon}
           />
         )
 
@@ -145,10 +146,12 @@ const SidebarItem = ({ links, subitems, subitemsParentKey }: SidebarItemProps) =
               label={y.label}
               onClick={y.onClick}
               isExternal={link.isExternal || false}
+              icon={link.icon}
             />
           ))
           render = [render, ...subItemsRender]
         }
+
         return render
       })}
     </ul>
@@ -168,15 +171,16 @@ const SidebarLinkItem = ({
   isSubitem,
   isExternal,
   onClick,
+  icon,
 }: SidebarLinkProps) => {
   if (isUndefined(href)) {
     let icon
     if (isExternal) {
-      icon = <IconArrowUpRight size={'tiny'} />
+      icon = <ArrowUpRight size={14} />
     }
 
-    if (label === 'Logout') {
-      icon = <IconLogOut size={'tiny'} />
+    if (label === 'Log out') {
+      icon = <LogOut size={14} />
     }
 
     return (
@@ -186,7 +190,7 @@ const SidebarLinkItem = ({
         style={{
           marginLeft: isSubitem ? '.5rem' : '0rem',
         }}
-        active={isActive ? true : false}
+        active={isActive}
         onClick={onClick || (() => {})}
         icon={icon}
       >
@@ -200,15 +204,21 @@ const SidebarLinkItem = ({
       <span className="group flex max-w-full cursor-pointer items-center space-x-2 border-default py-1 font-normal outline-none ring-foreground focus-visible:z-10 focus-visible:ring-1 group-hover:border-foreground-muted">
         {isExternal && (
           <span className="truncate text-sm text-foreground-lighter transition group-hover:text-foreground-light">
-            <IconArrowUpRight size={'tiny'} />
+            <ArrowUpRight size={14} />
           </span>
         )}
-        <span
-          title={label}
-          className="w-full truncate text-sm text-foreground-light transition group-hover:text-foreground"
-        >
-          {isSubitem ? <p>{label}</p> : label}
-        </span>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <span
+            title={label}
+            className={cn(
+              'w-full truncate text-sm transition',
+              isActive ? 'text-foreground' : 'text-foreground-light group-hover:text-foreground'
+            )}
+          >
+            {isSubitem ? <p>{label}</p> : label}
+          </span>
+          {icon}
+        </div>
       </span>
     </Link>
   )

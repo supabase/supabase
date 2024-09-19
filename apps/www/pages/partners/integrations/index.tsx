@@ -1,14 +1,15 @@
+import { Loader, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { IconLoader, IconSearch, Input } from 'ui'
+import { Input } from 'ui'
 import { useDebounce } from 'use-debounce'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import supabase from '~/lib/supabaseMisc'
-import { Partner } from '~/types/partners'
+import type { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
 export async function getStaticProps() {
@@ -25,7 +26,7 @@ export async function getStaticProps() {
       partners,
     },
     // TODO: consider using Next.js' On-demand Revalidation with Supabase Database Webhooks instead
-    revalidate: 18000, // In seconds - refresh every 5 hours
+    revalidate: 1800, // 30 minutes
   }
 }
 
@@ -117,7 +118,7 @@ function IntegrationPartnersPage(props: Props) {
 
                 <Input
                   size="small"
-                  icon={<IconSearch />}
+                  icon={<Search />}
                   placeholder="Search..."
                   type="text"
                   value={search}
@@ -125,7 +126,7 @@ function IntegrationPartnersPage(props: Props) {
                   actions={
                     isSearching && (
                       <span className="mr-1 animate-spin text-white">
-                        <IconLoader />
+                        <Loader />
                       </span>
                     )
                   }

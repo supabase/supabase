@@ -4,7 +4,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import supabase from '~/lib/supabaseMisc'
-import { Partner } from '~/types/partners'
+import type { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
 export async function getStaticProps() {
@@ -20,7 +20,7 @@ export async function getStaticProps() {
     props: {
       partners,
     },
-    revalidate: 18000, // In seconds - refresh every 5 hours
+    revalidate: 1800, // 30 minutes
   }
 }
 
@@ -92,6 +92,12 @@ function ExpertPartnersPage(props: Props) {
               </div>
             </div>
             <div className="lg:col-span-8 xl:col-span-9">
+              <div className="pb-8 mb-8 border-b">
+                <p className="text-foreground-lighter text-sm bg-surface-100 w-full rounded border p-4 shadow">
+                  We are no longer accepting applications for new experts at the moment.
+                </p>
+              </div>
+
               {/* Partner Tiles */}
               <div className="grid">
                 {partners.length ? (

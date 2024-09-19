@@ -1,11 +1,11 @@
-import { toast } from 'react-hot-toast'
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
-import { ResponseError } from 'types'
 
 export type DatabaseTriggerDeleteVariables = {
   id: number

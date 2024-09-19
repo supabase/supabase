@@ -5,8 +5,9 @@ import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useWindowSize } from 'react-use'
 
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Autoplay } from 'swiper'
-import 'swiper/swiper.min.css'
+import 'swiper/css'
+import SwiperCore from 'swiper'
+import { Autoplay } from 'swiper/modules'
 
 SwiperCore.use([Autoplay])
 

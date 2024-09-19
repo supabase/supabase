@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { IconStar } from 'ui'
+import { Star } from 'lucide-react'
+import Link from 'next/link'
 
 import Panel from '~/components/Panel'
 
@@ -10,10 +10,12 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
     initial={{ opacity: 0, y: 5 }}
     animate={{ opacity: 1, y: 0, transition: { delay: 0 + index / 25 } }}
     exit={{ opacity: 0, y: 5, transition: { duration: 0.05 } }}
+    className="h-full"
   >
-    <Link href={repo.html_url} target="_blank">
+    <Link href={repo.html_url} target="_blank" className="h-full">
       <Panel
-        innerClassName="relative group flex flex-col gap-2 p-4 min-h-[170px] md:!h-[200px]"
+        outerClassName="md:h-full"
+        innerClassName="relative group flex flex-col gap-2 p-4 min-h-[170px] flex-1 md:h-full"
         hasActiveOnHover
       >
         <div className="flex gap-1 items-center">
@@ -38,7 +40,7 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
           </p>
         </div>
         <p className="text-sm flex-1 text-foreground-lighter">{repo.description}</p>
-        <div className="text-sm w-full flex justify-between text-foreground-lighter mt-8">
+        <div className="text-sm w-full flex justify-between text-foreground-lighter mt-4">
           <p>{repo.full_name}</p>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
@@ -57,7 +59,7 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
             </div>
             <div className="flex items-center gap-1">
               <span>{repo.stargazers_count.toLocaleString()}</span>
-              <IconStar className="w-4 fill-foreground-lighter stroke-none" />
+              <Star className="w-4 fill-foreground-lighter stroke-none" />
             </div>
           </div>
         </div>

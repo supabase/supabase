@@ -31,7 +31,7 @@ Row Level Security needs to be defined only once to implement authentication and
 ```sql
 create policy "Users can only view their own documents."
 on docs for select
-using ( auth.uid() = user_id );
+using ( (select auth.uid()) = user_id );
 ```
 
 The RLS policy above will be enforced, no matter if you use the REST API, edge functions or other methods of accessing your data.
@@ -81,7 +81,7 @@ The pricing structures of the two platforms differ significantly:
 
 ### Cost comparison
 
-Overall, Supabase Auth has a more generous free plan quota, while also charge significant lesser per monthly active user (MAU).
+Overall, Supabase Auth has a more generous Free Plan quota, while also charge significant lesser per monthly active user (MAU).
 
 Read more: **[Good Tape migrates to Supabase Auth for a 60% cost reduction.](https://supabase.com/customers/good-tape)**
 

@@ -1,22 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { Button, Form, IconExternalLink, Input } from 'ui'
 import * as yup from 'yup'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button, Form, Input } from 'ui'
+import { ExternalLink } from 'lucide-react'
 
 const schema = yup.object({
   domain: yup.string().required('A value for your custom domain is required'),
@@ -78,7 +74,7 @@ const CustomDomainsConfigureHostname = () => {
                       !canConfigureCustomDomain ? (
                         "You need additional permissions to update your project's custom domain settings"
                       ) : (
-                        <Button asChild type="default" icon={<IconExternalLink />}>
+                        <Button asChild type="default" icon={<ExternalLink />}>
                           <Link
                             href="https://supabase.com/docs/guides/platform/custom-domains"
                             target="_blank"
@@ -131,4 +127,4 @@ const CustomDomainsConfigureHostname = () => {
   )
 }
 
-export default observer(CustomDomainsConfigureHostname)
+export default CustomDomainsConfigureHostname

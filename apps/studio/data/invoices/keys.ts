@@ -2,10 +2,9 @@ export const invoicesKeys = {
   overdueInvoices: () => ['invoices', 'overdue'] as const,
 
   invoice: (id: string | undefined) => ['invoice', id] as const,
-  list: (customerId: string | undefined, slug: string | undefined, offset: number | undefined) =>
-    ['invoices', customerId, slug, offset] as const,
-  count: (customerId: string | undefined, slug: string | undefined) =>
-    ['invoices', customerId, slug, 'count'] as const,
+  list: (slug: string | undefined, offset: number | undefined) =>
+    ['invoices', slug, offset] as const,
+  count: (slug: string | undefined) => ['invoices', slug, 'count'] as const,
 
   projectInvoices: (projectRef: string | undefined, offset: number | undefined) =>
     ['invoices', projectRef, offset] as const,

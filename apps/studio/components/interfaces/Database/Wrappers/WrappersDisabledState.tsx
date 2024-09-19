@@ -1,18 +1,18 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import { Button, IconExternalLink } from 'ui'
+import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
+import { Button } from 'ui'
+import { ExternalLink } from 'lucide-react'
 
 const WrappersDisabledState = () => {
   const { ref } = useParams()
@@ -68,14 +68,14 @@ const WrappersDisabledState = () => {
       }
     } finally {
       setIsEnabling(false)
-      if (!hasError) toast.success('Wrappers is now enabled!')
+      if (!hasError) toast.success('Wrappers are now enabled!')
     }
   }
 
   return (
     <div>
       <div
-        className="w-full px-12 py-12 bg-no-repeat border rounded bg-background border-default"
+        className="w-full px-12 py-12 bg-no-repeat border rounded-md bg-studio border-default"
         style={{
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',
@@ -117,7 +117,7 @@ const WrappersDisabledState = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 my-1 ml-[1px]">
-                <Button asChild type="default" icon={<IconExternalLink />}>
+                <Button asChild type="default" icon={<ExternalLink />}>
                   <Link
                     href="https://supabase.com/docs/guides/database/extensions/wrappers/overview"
                     target="_blank"
@@ -130,7 +130,7 @@ const WrappersDisabledState = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <Button asChild type="default" icon={<IconExternalLink />}>
+              <Button asChild type="default" icon={<ExternalLink />}>
                 <Link
                   href="https://supabase.com/docs/guides/database/extensions/wrappers/overview"
                   target="_blank"
@@ -176,4 +176,4 @@ const WrappersDisabledState = () => {
   )
 }
 
-export default observer(WrappersDisabledState)
+export default WrappersDisabledState

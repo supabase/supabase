@@ -1,0 +1,24 @@
+{
+  "name": "@supabase/build-icons",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.mjs",
+  "type": "module",
+  "bin": {
+    "build-icons": "src/main.mjs"
+  },
+  "engines": {
+    "node": ">= 16"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "minimist": "^1.2.7",
+    "node-fetch": "^3.2.10",
+    "prettier": "2.7.1",
+    "svgo": "^3.0.0",
+    "svgson": "^5.2.1"
+  }
+}

@@ -1,6 +1,7 @@
-import { Badge, Button, IconBookOpen, IconGitHub } from 'ui'
+import { Badge, Button } from 'ui'
 
 import { BASE_PATH } from 'lib/constants'
+import { BookOpen, Github } from 'lucide-react'
 
 interface ClientLibraryProps {
   language: string
@@ -29,19 +30,19 @@ const ClientLibrary = ({
       <div className="space-y-4">
         <div>
           <h5 className="flex items-center gap-2 text-base text-foreground">
-            {language} {!officialSupport && <Badge color="green">Community</Badge>}
+            {language} {!officialSupport && <Badge variant="brand">Community</Badge>}
           </h5>
         </div>
         <div className="flex gap-2">
           {docsUrl && (
             <a href={docsUrl} target="_blank" rel="noreferrer">
-              <Button icon={<IconBookOpen />} type="default">
+              <Button icon={<BookOpen />} type="default">
                 Docs
               </Button>
             </a>
           )}
           <a href={gitUrl} target="_blank" rel="noreferrer">
-            <Button icon={<IconGitHub />} type="default">
+            <Button icon={<Github />} type="default">
               See GitHub
             </Button>
           </a>

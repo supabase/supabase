@@ -1,11 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError, VaultSecret } from 'types'
-import { vaultSecretsKeys } from './keys'
 import { sqlKeys } from 'data/sql/keys'
+import type { ResponseError, VaultSecret } from 'types'
+import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretUpdateVariables = {
   projectRef: string

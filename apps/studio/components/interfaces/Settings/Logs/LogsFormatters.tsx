@@ -7,8 +7,8 @@
 import CopyButton from 'components/ui/CopyButton'
 import dayjs from 'dayjs'
 import React from 'react'
-import { IconAlertCircle, IconInfo } from 'ui'
-import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
+import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
+import { AlertCircle, Info } from 'lucide-react'
 
 export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
@@ -30,22 +30,23 @@ export const SelectionDetailedRow = ({
   valueRender?: React.ReactNode
 }) => {
   return (
-    <div className="grid grid-cols-12 group">
-      <span className="text-foreground-lighter text-sm col-span-4 whitespace-pre-wrap">
+    <div className="group flex items-center gap-2 flex-wrap relative">
+      <span className="text-foreground-lighter text-sm col-span-3 whitespace-pre-wrap">
         {label}
       </span>
-      <span className="text-foreground text-sm col-span-6 whitespace-pre-wrap break-all">
+      <span
+        title={value}
+        className="truncate font-mono text-foreground text-sm col-span-8 whitespace-pre-wrap break-all"
+      >
         {valueRender ?? value}
       </span>
       <CopyButton
-        bounceIconOnCopy
+        iconOnly
         text={value}
-        className="group-hover:opacity-100 opacity-0 my-auto transition col-span-2  h-4 w-4 px-0 py-0"
+        className="group-hover:opacity-100 opacity-0 p-0 h-6 w-6 col-span-1 absolute top-1 right-1"
         type="text"
         title="Copy to clipboard"
-      >
-        {''}
-      </CopyButton>
+      />
     </div>
   )
 }
@@ -164,7 +165,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-red-900">
-            <IconAlertCircle size={14} strokeWidth={2} />
+            <AlertCircle size={14} strokeWidth={2} />
           </div>
           <span className="!text-red-900 !block titlecase">{text}</span>
         </Layout>
@@ -177,7 +178,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
-            <IconAlertCircle size={14} strokeWidth={2} />
+            <AlertCircle size={14} strokeWidth={2} />
           </div>
           <span className="!text-blue-900 !block titlecase">{text}</span>
         </Layout>
@@ -188,7 +189,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
-            <IconInfo size={14} strokeWidth={2} />
+            <Info size={14} strokeWidth={2} />
           </div>
           <span className="!text-blue-900 !block titlecase">{text}</span>
         </Layout>
@@ -199,7 +200,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-amber-900">
-            <IconAlertCircle size={14} strokeWidth={2} />
+            <AlertCircle size={14} strokeWidth={2} />
           </div>
           <span className="!text-amber-900 !block titlecase">{text}</span>
         </Layout>

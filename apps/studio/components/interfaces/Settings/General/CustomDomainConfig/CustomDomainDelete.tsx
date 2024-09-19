@@ -1,13 +1,13 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, IconExternalLink, IconTrash } from 'ui'
+import { toast } from 'sonner'
 
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import Panel from 'components/ui/Panel'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
-import { useStore } from 'hooks'
+import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { Button } from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import { ExternalLink, Trash } from 'lucide-react'
 
 export type CustomDomainDeleteProps = {
   projectRef?: string
@@ -15,11 +15,10 @@ export type CustomDomainDeleteProps = {
 }
 
 const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProps) => {
-  const { ui } = useStore()
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false)
   const { mutate: deleteCustomDomain } = useCustomDomainDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({ category: 'success', message: `Successfully deleted custom domain` })
+      toast.success(`Successfully deleted custom domain`)
       setIsDeleteConfirmModalVisible(false)
     },
   })
@@ -50,7 +49,7 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
 
       <Panel.Content className="w-full">
         <div className="flex items-center justify-between">
-          <Button asChild type="default" icon={<IconExternalLink />}>
+          <Button asChild type="default" icon={<ExternalLink />}>
             <Link
               href="https://supabase.com/docs/guides/platform/custom-domains"
               target="_blank"
@@ -61,7 +60,7 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
           </Button>
           <Button
             type="danger"
-            icon={<IconTrash />}
+            icon={<Trash />}
             onClick={() => setIsDeleteConfirmModalVisible(true)}
           >
             Delete Custom Domain
@@ -89,4 +88,4 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
   )
 }
 
-export default observer(CustomDomainDelete)
+export default CustomDomainDelete

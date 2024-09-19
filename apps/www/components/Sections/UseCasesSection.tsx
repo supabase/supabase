@@ -1,11 +1,12 @@
-import Link from 'next/link'
-import React, { ReactNode, useRef } from 'react'
-import { Button, IconArrowUpRight } from 'ui'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
+import Link from 'next/link'
+import { ReactNode, useRef } from 'react'
+import { Button } from 'ui'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
+import { ArrowUpRight } from 'lucide-react'
 
 interface UseCase {
   img?: string
@@ -34,7 +35,7 @@ const UseCasesSection = ({ title, paragraph, useCases }: Props) => {
       <SectionContainer className="flex flex-col gap-12">
         <div className="flex flex-col text-center gap-4 items-center justify-center">
           <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl">{title}</h2>
-          <p className="mx-auto text-muted lg:w-1/2">{paragraph}</p>
+          <p className="mx-auto text-foreground-lighter lg:w-1/2">{paragraph}</p>
         </div>
         <div
           ref={ref}
@@ -86,7 +87,7 @@ const UseCase = ({
                 {useCase.cta.label ?? 'View example'}
               </Button>
             ) : (
-              <Button asChild size="tiny" type="default" iconRight={<IconArrowUpRight />}>
+              <Button asChild size="tiny" type="default" iconRight={<ArrowUpRight />}>
                 <Link href={useCase.cta.link} target="_blank">
                   {useCase.cta.label ?? 'View example'}
                 </Link>

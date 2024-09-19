@@ -1,7 +1,8 @@
-import { post } from 'lib/common/fetch'
-import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
-import { toast } from 'react-hot-toast'
-import { v4 as _uuidV4 } from 'uuid'
+import { noop } from 'lodash'
+import { toast } from 'sonner'
+
+export { default as passwordStrength } from './password-strength'
+export { default as uuidv4 } from './uuid'
 
 export const tryParseJson = (jsonString: any) => {
   try {
@@ -42,8 +43,12 @@ export const prettifyJSON = (minifiedJSON: string) => {
   }
 }
 
-export const uuidv4 = () => {
-  return _uuidV4()
+export const removeJSONTrailingComma = (jsonString: string) => {
+  /**
+   * Remove trailing commas: Delete any comma immediately preceding the closing brace '}' or
+   * bracket ']' using a regular expression.
+   */
+  return jsonString.replace(/,\s*(?=[\}\]])/g, '')
 }
 
 export const timeout = (ms: number) => {
@@ -55,8 +60,8 @@ export const getURL = () => {
     process?.env?.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL !== ''
       ? process.env.NEXT_PUBLIC_SITE_URL
       : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
-      ? process.env.VERCEL_URL
-      : 'https://supabase.com/dashboard'
+        ? process.env.VERCEL_URL
+        : 'https://supabase.com/dashboard'
   return url.includes('http') ? url : `https://${url}`
 }
 
@@ -133,68 +138,38 @@ export const snakeToCamel = (str: string) =>
   )
 
 /**
- * Copy text content (string or Promise<string>) into Clipboard.
- * Safari doesn't support write text into clipboard async, so if you need to load
- * text content async before coping, please use Promise<string> for the 1st arg.
+ * Copy text content (string or Promise<string>) into Clipboard. Safari doesn't support write text into clipboard async,
+ * so if you need to load text content async before coping, please use Promise<string> for the 1st arg.
+ *
+ * IF YOU NEED TO CHANGE THIS FUNCTION, PLEASE TEST IT IN SAFARI with a promised string. Expiring URL to a file in a
+ * private bucket will do.
+ *
+ * Copied code from https://wolfgangrittner.dev/how-to-use-clipboard-api-in-firefox/
  */
-export const copyToClipboard = async (str: string | Promise<string>, callback = () => {}) => {
+export const copyToClipboard = async (str: string | Promise<string>, callback = noop) => {
   const focused = window.document.hasFocus()
   if (focused) {
-    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-      const text = await Promise.resolve(str)
-      Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
-
-      return
-    }
-
-    Promise.resolve(str)
-      .then((text) => window.navigator?.clipboard?.writeText(text))
-      .then(callback)
-  } else {
-    console.warn('Unable to copy to clipboard')
-  }
-}
-
-export async function passwordStrength(value: string) {
-  let message: string = ''
-  let warning: string = ''
-  let strength: number = 0
-
-  if (value && value !== '') {
-    if (value.length > 99) {
-      message = `${PASSWORD_STRENGTH[0]} Maximum length of password exceeded`
-      warning = `Password should be less than 100 characters`
+    if (typeof ClipboardItem && navigator.clipboard?.write) {
+      // NOTE: Safari locks down the clipboard API to only work when triggered
+      // by a direct user interaction. You can't use it async in a promise.
+      // But! You can wrap the promise in a ClipboardItem, and give that to
+      // the clipboard API.
+      // Found this on https://developer.apple.com/forums/thread/691873
+      const text = new ClipboardItem({
+        'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
+      })
+      navigator.clipboard.write([text]).then(callback)
     } else {
-      // [Joshen] Unable to use RQ atm due to our Jest tests being in JS
-      const response = await post(`${API_URL}/profile/password-check`, { password: value })
-      if (!response.error) {
-        const { result } = response
-        const resultScore = result?.score ?? 0
-
-        const score = (PASSWORD_STRENGTH as any)[resultScore]
-        const suggestions = result.feedback?.suggestions
-          ? result.feedback.suggestions.join(' ')
-          : ''
-
-        message = `${score} ${suggestions}`
-        strength = resultScore
-
-        // warning message for anything below 4 strength :string
-        if (resultScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-          warning = `${
-            result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
-          } You need a stronger password.`
-        }
-      } else {
-        toast.error(`Failed to check password strength: ${response.error.message}`)
-      }
+      // NOTE: Firefox has support for ClipboardItem and navigator.clipboard.write,
+      // but those are behind `dom.events.asyncClipboard.clipboardItem` preference.
+      // Good news is that other than Safari, Firefox does not care about
+      // Clipboard API being used async in a Promise.
+      Promise.resolve(str)
+        .then((text) => navigator.clipboard?.writeText(text))
+        .then(callback)
     }
-  }
-
-  return {
-    message,
-    warning,
-    strength,
+  } else {
+    toast.error('Unable to copy to clipboard')
   }
 }
 
@@ -211,6 +186,7 @@ export const detectBrowser = () => {
 }
 
 export const detectOS = () => {
+  if (typeof window === 'undefined' || !window) return undefined
   if (typeof navigator === 'undefined' || !navigator) return undefined
 
   const userAgent = window.navigator.userAgent.toLowerCase()
@@ -297,4 +273,27 @@ export const getDistanceLatLonKM = (lat1: number, lon1: number, lat2: number, lo
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   const d = R * c // Distance in KM
   return d
+}
+
+const currencyFormatterDefault = Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
+const currencyFormatterSmallValues = Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 0,
+})
+
+export const formatCurrency = (amount: number | undefined | null): string | null => {
+  if (amount === undefined || amount === null) {
+    return null
+  } else if (amount < 0.01) {
+    return currencyFormatterSmallValues.format(amount)
+  } else {
+    return currencyFormatterDefault.format(amount)
+  }
 }

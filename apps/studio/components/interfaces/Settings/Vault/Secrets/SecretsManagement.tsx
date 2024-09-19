@@ -1,21 +1,20 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { sortBy } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
-import { Button, IconExternalLink, IconLoader, IconSearch, IconX, Input, Listbox } from 'ui'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Divider from 'components/ui/Divider'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
-import { useCheckPermissions } from 'hooks'
-import { VaultSecret } from 'types'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import type { VaultSecret } from 'types'
+import { Button, Input, Listbox, Separator } from 'ui'
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
 import EditSecretModal from './EditSecretModal'
 import SecretRow from './SecretRow'
+import { Search, X, ExternalLink, Loader } from 'lucide-react'
 
 const SecretsManagement = () => {
   const { search } = useParams()
@@ -66,7 +65,7 @@ const SecretsManagement = () => {
               placeholder="Search by name or key ID"
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
-              icon={<IconSearch strokeWidth={2} size={16} />}
+              icon={<Search strokeWidth={2} size={16} />}
               actions={
                 searchValue.length > 0
                   ? [
@@ -74,7 +73,7 @@ const SecretsManagement = () => {
                         key="clear"
                         size="tiny"
                         type="text"
-                        icon={<IconX />}
+                        icon={<X />}
                         className="px-1"
                         onClick={() => setSearchValue('')}
                       />,
@@ -112,7 +111,7 @@ const SecretsManagement = () => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
                 href="https://supabase.com/docs/guides/database/vault"
                 target="_blank"
@@ -156,11 +155,7 @@ const SecretsManagement = () => {
         <div className="border border-default rounded">
           {isLoading ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
-              <IconLoader
-                className="animate-spin text-foreground-light"
-                size={16}
-                strokeWidth={1.5}
-              />
+              <Loader className="animate-spin text-foreground-light" size={16} strokeWidth={1.5} />
               <p className="text-sm text-foreground">Loading secrets from the Vault</p>
             </div>
           ) : (
@@ -173,7 +168,7 @@ const SecretsManagement = () => {
                       onSelectEdit={setSelectedSecretToEdit}
                       onSelectRemove={setSelectedSecretToRemove}
                     />
-                    {idx !== secrets.length - 1 && <Divider light />}
+                    {idx !== secrets.length - 1 && <Separator />}
                   </Fragment>
                 )
               })}
@@ -217,4 +212,4 @@ const SecretsManagement = () => {
   )
 }
 
-export default observer(SecretsManagement)
+export default SecretsManagement

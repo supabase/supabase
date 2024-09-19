@@ -1,10 +1,15 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
-import { useParams } from 'common'
-import { useTheme } from 'next-themes'
-import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import {
+  getAddons,
+  subscriptionHasHipaaAddon,
+} from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
   useIsProjectActive,
@@ -18,44 +23,44 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useFlag, useProjectByRef } from 'hooks'
+import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
-import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconChevronRight,
-  IconExternalLink,
-} from 'ui'
-import Image from 'next/image'
+import { useAddonsPagePanel } from 'state/addons-page'
+import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { ComputeBadge } from 'ui-patterns'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
-import PITRSidePanel from './PITRSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
-import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import IPv4SidePanel from './IPv4SidePanel'
+import PITRSidePanel from './PITRSidePanel'
+import { AlertCircle, Info, ExternalLink, ChevronRight } from 'lucide-react'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
-  const { ref: projectRef, panel } = useParams()
-  const snap = useSubscriptionPageStateSnapshot()
-  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { project: selectedProject } = useProjectContext()
+  const { ref: projectRef } = useParams()
+  const { setPanel } = useAddonsPagePanel()
+  const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
+  const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
+  const selectedOrg = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
   const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
   const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
-  const allowedPanelValues = ['computeInstance', 'pitr', 'customDomain']
-  if (panel && typeof panel === 'string' && allowedPanelValues.includes(panel)) {
-    snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
-  }
+
+  const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
@@ -86,27 +91,30 @@ const Addons = () => {
     isSuccess,
   } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
-  const { computeInstance, pitr, customDomain } = getAddons(selectedAddons)
+  const { computeInstance, pitr, customDomain, ipv4 } = getAddons(selectedAddons)
 
-  const meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
+  const meta = useMemo(() => {
+    const computeMeta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
+
+    if (!computeMeta && selectedProject?.infra_compute_size === 'nano') {
+      return INSTANCE_NANO_SPECS
+    } else if (selectedProject?.infra_compute_size === 'micro') {
+      return INSTANCE_MICRO_SPECS
+    }
+
+    return computeMeta
+  }, [selectedProject, computeInstance])
+
+  const canUpdateIPv4 = projectSettings?.project.db_ip_addr_config === 'ipv6'
 
   return (
     <>
-      <ScaffoldContainer>
-        <div className="mx-auto flex flex-col gap-10 py-6">
-          <div>
-            <p className="text-xl">Add ons</p>
-            <p className="text-sm text-foreground-light">Level up your project with add-ons</p>
-          </div>
-        </div>
-      </ScaffoldContainer>
-
       <ScaffoldDivider />
 
       {isBranch && (
         <ScaffoldContainer>
           <Alert_Shadcn_ variant="default" className="mt-6">
-            <IconAlertCircle strokeWidth={2} />
+            <AlertCircle strokeWidth={2} />
             <AlertTitle_Shadcn_>
               You are currently on a preview branch of your project
             </AlertTitle_Shadcn_>
@@ -144,11 +152,23 @@ const Addons = () => {
 
       {isSuccess && (
         <>
+          {selectedProject?.infra_compute_size === 'nano' && subscription?.plan.id !== 'free' && (
+            <ScaffoldContainer className="mt-4">
+              <Alert_Shadcn_ variant="default">
+                <Info strokeWidth={2} />
+                <AlertTitle_Shadcn_>Free compute upgrade to Micro</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  Paid Plans include a free upgrade to Micro compute. Your project is ready to
+                  upgrade for no additional charges.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            </ScaffoldContainer>
+          )}
           <ScaffoldContainer>
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p className="m-0">Optimized compute</p>
+                  <p className="m-0">Compute Size</p>
                   <div className="space-y-2">
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
@@ -159,7 +179,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About compute add-ons</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -171,7 +191,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">Connection Pooler</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -181,35 +201,50 @@ const Addons = () => {
               <ScaffoldSectionContent>
                 <div className="flex space-x-6">
                   <div>
-                    <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
                       <Image
-                        alt="Optimized Compute"
+                        alt="Compute size"
                         width={160}
                         height={96}
                         src={
-                          computeInstance !== undefined
-                            ? `${BASE_PATH}/img/optimized-compute-on${
+                          ['nano', 'micro'].includes(selectedProject?.infra_compute_size || 'micro')
+                            ? `${BASE_PATH}/img/optimized-compute-off${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
-                            : `${BASE_PATH}/img/optimized-compute-off${
+                              }.svg`
+                            : `${BASE_PATH}/img/optimized-compute-on${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
+                              }.svg`
                         }
                       />
                     </div>
                   </div>
                   <div className="flex-grow">
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p>{computeInstance?.variant.name ?? 'Micro'}</p>
+                    {isLoading || (computeInstance === undefined && isLoadingProject) ? (
+                      <ShimmeringLoader className="w-32" />
+                    ) : (
+                      <div className="flex py-3">
+                        <ComputeBadge
+                          infraComputeSize={selectedProject?.infra_compute_size}
+                          size={'large'}
+                        />
+                      </div>
+                    )}
                     <ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled}
+                      projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}
                       projectNotActive={!isProjectActive}
+                      tooltip="Compute size changes are currently disabled. Our engineers are working on a fix."
                     >
                       <Button
                         type="default"
                         className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('computeInstance')}
-                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
+                        onClick={() => setPanel('computeInstance')}
+                        disabled={
+                          isBranch ||
+                          !isProjectActive ||
+                          projectUpdateDisabled ||
+                          computeSizeChangesDisabled
+                        }
                       >
                         Change compute size
                       </Button>
@@ -224,7 +259,7 @@ const Addons = () => {
                       >
                         <p>
                           Your workload is currently running at the baseline disk IO bandwidth at{' '}
-                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps and may suffer
+                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps and may suffer
                           degradation in performance.
                         </p>
                         <p className="mt-1">
@@ -242,7 +277,7 @@ const Addons = () => {
                         <p>
                           If the disk IO budget drops to zero, your workload will run at the
                           baseline disk IO bandwidth at{' '}
-                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps and may suffer
+                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps and may suffer
                           degradation in performance.
                         </p>
                         <p className="mt-1">
@@ -258,14 +293,14 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Memory
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
                           />
                         </div>
                       </Link>
-                      <p className="text-sm">{meta?.memory_gb ?? 1} GB</p>
+                      <p className="text-sm">{meta?.memory_gb ?? '-'} GB</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#cpu`}>
@@ -273,7 +308,7 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             CPU
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -281,17 +316,17 @@ const Addons = () => {
                         </div>
                       </Link>
                       <p className="text-sm">
-                        {meta?.cpu_cores ?? 2}-core {cpuArchitecture}{' '}
+                        {meta?.cpu_cores ?? '?'}-core {cpuArchitecture}{' '}
                         {meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <p className="text-sm text-foreground-light">No. of direct connections</p>
-                      <p className="text-sm">{meta?.connections_direct ?? 60}</p>
+                      <p className="text-sm">{meta?.connections_direct ?? '-'}</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <p className="text-sm text-foreground-light">No. of pooler connections</p>
-                      <p className="text-sm">{meta?.connections_pooler ?? 200}</p>
+                      <p className="text-sm">{meta?.connections_pooler ?? '-'}</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
@@ -299,7 +334,7 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Max Disk Throughput
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -307,7 +342,7 @@ const Addons = () => {
                         </div>
                       </Link>
                       <p className="text-sm">
-                        {meta?.max_disk_io_mbs?.toLocaleString() ?? '2,085'} Mbps
+                        {meta?.max_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between py-2">
@@ -316,7 +351,7 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Baseline Disk Throughput
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -324,9 +359,104 @@ const Addons = () => {
                         </div>
                       </Link>
                       <p className="text-sm">
-                        {meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps
+                        {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
                       </p>
                     </div>
+                  </div>
+                </div>
+              </ScaffoldSectionContent>
+            </ScaffoldSection>
+          </ScaffoldContainer>
+
+          <ScaffoldDivider />
+
+          <ScaffoldContainer>
+            <ScaffoldSection>
+              <ScaffoldSectionDetail>
+                <div className="space-y-6">
+                  <p className="m-0">Dedicated IPv4 address</p>
+                  <div className="space-y-2">
+                    <p className="text-sm text-foreground-light m-0">More information</p>
+                    <div>
+                      <Link
+                        href="https://supabase.com/docs/guides/platform/ipv4-address"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                          <p className="text-sm m-0">About IPv4 deprecation</p>
+                          <ExternalLink size={16} strokeWidth={1.5} />
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </ScaffoldSectionDetail>
+              <ScaffoldSectionContent>
+                <div className="flex space-x-6">
+                  <div>
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
+                      <img
+                        alt="IPv4"
+                        width={160}
+                        height={96}
+                        src={
+                          ipv4 !== undefined
+                            ? `${BASE_PATH}/img/ipv4-on${
+                                resolvedTheme?.includes('dark') ? '' : '--light'
+                              }.svg?v=2`
+                            : `${BASE_PATH}/img/ipv4-off${
+                                resolvedTheme?.includes('dark') ? '' : '--light'
+                              }.svg?v=2`
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm text-foreground-light">Current option:</p>
+                    <p>
+                      {ipv4 !== undefined
+                        ? 'Dedicated IPv4 address is enabled'
+                        : 'Dedicated IPv4 address is not enabled'}
+                    </p>
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger asChild>
+                        <div>
+                          <Button
+                            type="default"
+                            className="mt-2 pointer-events-auto"
+                            onClick={() => setPanel('ipv4')}
+                            disabled={
+                              isBranch ||
+                              !isProjectActive ||
+                              projectUpdateDisabled ||
+                              !(canUpdateIPv4 || ipv4)
+                            }
+                          >
+                            Change dedicated IPv4 address
+                          </Button>
+                        </div>
+                      </Tooltip.Trigger>
+                      <Tooltip.Portal>
+                        {/* Only show the tooltip if the user can't add the addon and ipv4 is not currently applied */}
+                        {!(canUpdateIPv4 || ipv4) && (
+                          <Tooltip.Content side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                'border border-background',
+                              ].join(' ')}
+                            >
+                              <span className="text-xs text-foreground">
+                                Temporarily disabled while we are migrating to IPv6, please check
+                                back later.
+                              </span>
+                            </div>
+                          </Tooltip.Content>
+                        )}
+                      </Tooltip.Portal>
+                    </Tooltip.Root>
                   </div>
                 </div>
               </ScaffoldSectionContent>
@@ -350,7 +480,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About PITR backups</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -358,9 +488,23 @@ const Addons = () => {
                 </div>
               </ScaffoldSectionDetail>
               <ScaffoldSectionContent>
+                {hasHipaaAddon && (
+                  <Alert_Shadcn_>
+                    <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      All projects should have PITR enabled by default and cannot be changed with
+                      HIPAA enabled. Contact support for further assistance.
+                    </AlertDescription_Shadcn_>
+                    <div className="mt-4">
+                      <Button type="default" asChild>
+                        <Link href="/support/new">Contact support</Link>
+                      </Button>
+                    </div>
+                  </Alert_Shadcn_>
+                )}
                 <div className="flex space-x-6">
                   <div>
-                    <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
                       <Image
                         alt="Point-In-Time-Recovery"
                         width={160}
@@ -369,10 +513,10 @@ const Addons = () => {
                           pitr !== undefined
                             ? `${BASE_PATH}/img/pitr-on${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png?v=2`
+                              }.svg`
                             : `${BASE_PATH}/img/pitr-off${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png?v=2`
+                              }.svg`
                         }
                       />
                     </div>
@@ -410,12 +554,13 @@ const Addons = () => {
                         <Button
                           type="default"
                           className="mt-2 pointer-events-auto"
-                          onClick={() => snap.setPanelKey('pitr')}
+                          onClick={() => setPanel('pitr')}
                           disabled={
                             isBranch ||
                             !isProjectActive ||
                             projectUpdateDisabled ||
-                            !sufficientPgVersion
+                            !sufficientPgVersion ||
+                            hasHipaaAddon
                           }
                         >
                           Change point in time recovery
@@ -445,7 +590,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About custom domains</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -455,7 +600,7 @@ const Addons = () => {
               <ScaffoldSectionContent>
                 <div className="flex space-x-6">
                   <div>
-                    <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
                       <img
                         alt="Custom Domain"
                         width={160}
@@ -464,10 +609,10 @@ const Addons = () => {
                           customDomain !== undefined
                             ? `${BASE_PATH}/img/custom-domain-on${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
+                              }.svg`
                             : `${BASE_PATH}/img/custom-domain-off${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
+                              }.svg`
                         }
                       />
                     </div>
@@ -486,7 +631,7 @@ const Addons = () => {
                       <Button
                         type="default"
                         className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('customDomain')}
+                        onClick={() => setPanel('customDomain')}
                         disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
                         Change custom domain
@@ -503,6 +648,7 @@ const Addons = () => {
       <ComputeInstanceSidePanel />
       <PITRSidePanel />
       <CustomDomainSidePanel />
+      <IPv4SidePanel />
     </>
   )
 }

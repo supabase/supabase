@@ -1,11 +1,11 @@
 import { useParams } from 'common'
 
-import { StorageLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 /**
  * PageLayout is used to setup layout - as usual it will requires inject global store

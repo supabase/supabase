@@ -35,7 +35,7 @@ create policy "Users can view private_posts if they have signed in via MFA"
   on public.private_posts
   for select
   to authenticated
-  using (auth.jwt()->>'aal' = 'aal2');
+  using ((select auth.jwt()->>'aal') = 'aal2');
 ```
 
 - Run the app and test the login flow 🚀

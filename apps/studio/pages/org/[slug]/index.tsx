@@ -1,5 +1,5 @@
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
-import { Button, IconPlus } from 'ui'
 
 import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import ProjectCard from 'components/interfaces/Home/ProjectList/ProjectCard'
@@ -7,10 +7,12 @@ import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCar
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import type { NextPageWithLayout } from 'types'
+import { Button } from 'ui'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const {
@@ -27,9 +29,23 @@ const ProjectsPage: NextPageWithLayout = () => {
     .sort((a, b) => a.name.localeCompare(b.name))
 
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
-  const githubConnections = integrations
-    ?.filter((integration) => integration.integration.name === 'GitHub')
-    .flatMap((integration) => integration.connections)
+  const { data: connections } = useGitHubConnectionsQuery({ organizationId: organization?.id })
+  const githubConnections = connections?.map((connection) => ({
+    id: String(connection.id),
+    added_by: {
+      id: String(connection.user?.id),
+      primary_email: connection.user?.primary_email ?? '',
+      username: connection.user?.username ?? '',
+    },
+    foreign_project_id: String(connection.repository.id),
+    supabase_project_ref: connection.project.ref,
+    organization_integration_id: 'unused',
+    inserted_at: connection.inserted_at,
+    updated_at: connection.updated_at,
+    metadata: {
+      name: connection.repository.name,
+    } as any,
+  }))
   const vercelConnections = integrations
     ?.filter((integration) => integration.integration.name === 'Vercel')
     .flatMap((integration) => integration.connections)
@@ -41,7 +57,7 @@ const ProjectsPage: NextPageWithLayout = () => {
           <NoProjectsOnPaidOrgInfo organization={organization} />
 
           <div>
-            <Button asChild size="medium" type="default" iconRight={<IconPlus />}>
+            <Button asChild size="medium" type="default" iconRight={<Plus />}>
               <Link href={`/new/${organization?.slug}`}>New project</Link>
             </Button>
           </div>
@@ -59,7 +75,7 @@ const ProjectsPage: NextPageWithLayout = () => {
             {isSuccessProjects && (
               <>
                 {(projects?.length ?? 0) === 0 ? (
-                  <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+                  <div className="col-span-4 space-y-4 rounded-lg border border-muted border-dashed p-6 text-center">
                     <div className="space-y-1">
                       <p>No projects</p>
                       <p className="text-sm text-foreground-light">
@@ -67,7 +83,7 @@ const ProjectsPage: NextPageWithLayout = () => {
                       </p>
                     </div>
                     <div>
-                      <Button asChild icon={<IconPlus />}>
+                      <Button asChild icon={<Plus />}>
                         <Link href={`/new/${organization?.slug}`}>New Project</Link>
                       </Button>
                     </div>

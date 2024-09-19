@@ -1,5 +1,5 @@
 export interface UserContent<
-  T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content
+  T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content,
 > {
   id?: string
   name: string
@@ -39,6 +39,15 @@ export namespace SqlSnippets {
     // show sql snippet as a favorite.
     // this could be problematic if sql snippets have visibility that is != 'user'
     favorite: boolean
+
+    chart?: {
+      type: 'bar'
+      cumulative: boolean
+      xKey: string
+      yKey: string
+      showLabels?: boolean
+      showGrid?: boolean
+    }
   }
 }
 
@@ -69,6 +78,7 @@ export namespace Dashboards {
     }
     interval: '1m' | '5m' | '1h' | '1d' | '1w' | '1M' | '1y' // this is the data interval
     layout: Chart[]
+    favorite?: boolean // not used yet
   }
 
   /**

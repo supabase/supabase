@@ -21,13 +21,13 @@
 
     &.rdg-row--focused .rdg-cell,
     &.rdg-row--focused .rdg-cell span {
-      @apply text-foreground font-semibold #{!important};
+      @apply text-foreground #{!important};
     }
   }
 }
 
 .data-grid--logs-explorer {
-  @apply transition-all overflow-hidden overflow-x-scroll;
+  @apply overflow-x-scroll pb-12;
 
   .rdg-cell,
   .rdg-cell span {

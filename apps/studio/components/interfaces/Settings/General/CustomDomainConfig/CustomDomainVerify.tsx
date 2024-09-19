@@ -1,24 +1,20 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
+
+import Panel from 'components/ui/Panel'
+import type { ProjectApiResponse } from 'data/config/project-api-query'
+import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
+import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconAlertCircle,
-  IconExternalLink,
-  IconHelpCircle,
-  IconRefreshCw,
+  WarningIcon,
 } from 'ui'
-
-import Panel from 'components/ui/Panel'
-import { ProjectApiResponse } from 'data/config/project-api-query'
-import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
-import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
 import DNSRecord from './DNSRecord'
+import { AlertCircle, HelpCircle, ExternalLink, RefreshCw } from 'lucide-react'
 
 export type CustomDomainVerifyProps = {
   projectRef?: string
@@ -62,7 +58,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           </h4>
           <p className="text-sm text-foreground-light">
             Set the following TXT record(s) in your DNS provider, then click verify to confirm your
-            control over the domain
+            control over the domain.
           </p>
           <p className="text-sm text-foreground-light">
             Records which have been successfully verified will be removed from this list below.
@@ -70,9 +66,9 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           <div className="mt-4 mb-2">
             <Alert_Shadcn_ variant="default">
               {isNotVerifiedYet ? (
-                <IconAlertCircle className="text-foreground-light" strokeWidth={1.5} />
+                <AlertCircle className="text-foreground-light" strokeWidth={1.5} />
               ) : (
-                <IconHelpCircle className="text-foreground-light" strokeWidth={1.5} />
+                <HelpCircle className="text-foreground-light" strokeWidth={1.5} />
               )}
               <AlertTitle_Shadcn_>
                 {isNotVerifiedYet
@@ -120,21 +116,27 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         </div>
 
         {hasCAAErrors && (
-          <Alert
-            withIcon
-            variant="warning"
-            title="Certificate Authority Authentication (CAA) error"
-          >
-            Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
-            <code className="text-xs">{customDomain.hostname}</code>. For example:{' '}
-            <code className="text-xs">0 issue "digicert.com"</code>
-          </Alert>
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Certificate Authority Authentication (CAA) error
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
+              <code className="text-xs">{customDomain.hostname}</code>. For example:{' '}
+              <code className="text-xs">0 issue "digicert.com"</code>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         )}
 
         {customDomain.ssl.status === 'validation_timed_out' ? (
-          <Alert withIcon variant="warning" title="Validation timed out">
-            Please click "Verify" again to retry the validation of the records
-          </Alert>
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>Validation timed out</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Please click "Verify" again to retry the validation of the records
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         ) : (
           <div className="space-y-2">
             <div className="flex gap-4">
@@ -181,7 +183,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
 
             {customDomain.ssl.status === 'pending_deployment' && (
               <div className="flex items-center justify-center space-x-2 py-8">
-                <IconAlertCircle size={16} strokeWidth={1.5} />
+                <AlertCircle size={16} strokeWidth={1.5} />
                 <p className="text-sm text-foreground-light">
                   SSL certificate is being deployed. Please wait a few minutes and try again.
                 </p>
@@ -207,7 +209,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
 
       <Panel.Content>
         <div className="flex items-center justify-between">
-          <Button asChild type="default" icon={<IconExternalLink />}>
+          <Button asChild type="default" icon={<ExternalLink />}>
             <Link
               href="https://supabase.com/docs/guides/platform/custom-domains"
               target="_blank"
@@ -227,7 +229,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
               Cancel
             </Button>
             <Button
-              icon={<IconRefreshCw />}
+              icon={<RefreshCw />}
               onClick={onReverifyCustomDomain}
               loading={isReverifyLoading}
               disabled={isDeleting || isReverifyLoading}
@@ -242,4 +244,4 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
   )
 }
 
-export default observer(CustomDomainVerify)
+export default CustomDomainVerify

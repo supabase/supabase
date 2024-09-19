@@ -1,10 +1,12 @@
 import { uuidv4 } from 'lib/helpers'
-import { ColumnField } from '../SidePanelEditor.types'
+import type { ColumnField } from '../SidePanelEditor.types'
 
 export const DEFAULT_COLUMNS: ColumnField[] = [
   {
     id: uuidv4(),
     name: 'id',
+    schema: '',
+    table: '',
     format: 'int8',
     defaultValue: null,
     check: null,
@@ -20,6 +22,8 @@ export const DEFAULT_COLUMNS: ColumnField[] = [
   {
     id: uuidv4(),
     name: 'created_at',
+    schema: '',
+    table: '',
     format: 'timestamptz',
     defaultValue: 'now()',
     check: null,
