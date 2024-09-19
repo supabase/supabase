@@ -29,6 +29,8 @@ export function EmailRateLimitsAlert() {
           custom SMTP server
         </Link>
         .<br />
+      </AlertDescription_Shadcn_>
+      <AlertDescription_Shadcn_ className="mt-2">
         <strong>
           You will not be able to modify the email templates unless you've set up a custom SMTP
           server or Send Email Hook server, except if you had changed it before this restriction
