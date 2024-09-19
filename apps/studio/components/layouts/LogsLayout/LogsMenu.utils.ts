@@ -86,6 +86,12 @@ export const generateLogsMenu = (
               items: [],
             }
           : null,
+        {
+          name: 'Workflow Run',
+          key: 'workflow-run-logs',
+          url: `/project/${ref}/logs/workflow-run-logs`,
+          items: [],
+        },
       ].filter((item) => item) as ProductMenuGroupItem[],
     },
   ]
