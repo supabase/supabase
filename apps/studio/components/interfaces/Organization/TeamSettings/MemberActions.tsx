@@ -232,7 +232,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
               icon={<MoreVertical />}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end">
+          <DropdownMenuContent side="bottom" align="end" className="w-52">
             <>
               {isPendingInviteAcceptance ? (
                 <>
@@ -281,17 +281,25 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       </div>
 
       <ConfirmationModal
+        size="medium"
         visible={isDeleteModalOpen}
         loading={isDeletingMember}
-        title="Confirm to remove"
+        title="Confirm to remove member"
         confirmLabel="Remove"
+        alert={{
+          title: 'All user content from this member will be permanently removed.',
+          description:
+            "Removing a member will delete all of the user's saved content, which includes SQL snippets, custom reports and Log Explorer queries.",
+        }}
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => {
           handleMemberDelete()
         }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove {member.primary_email}
+          Are you sure you want to remove{' '}
+          <span className="text-foreground">{member.primary_email}</span> from{' '}
+          <span className="text-foreground">{selectedOrganization?.name}</span>?
         </p>
       </ConfirmationModal>
 
