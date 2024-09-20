@@ -8,34 +8,50 @@ import { Globe, Trash } from 'lucide-react'
 interface RedirectUrlListProps {
   URI_ALLOW_LIST_ARRAY: string[]
   canUpdate: boolean
+  selectedUrls: string[]
+  onSelectUrl: (urls: string[]) => void
   onSelectUrlToDelete: (url: string) => void
 }
 
 const RedirectUrlList = ({
   URI_ALLOW_LIST_ARRAY,
   canUpdate,
+  selectedUrls,
+  onSelectUrl = noop,
   onSelectUrlToDelete = noop,
 }: RedirectUrlListProps) => {
   return (
     <div className="-space-y-px">
       {URI_ALLOW_LIST_ARRAY.length > 0 ? (
-        URI_ALLOW_LIST_ARRAY.map((url) => {
-          return (
-            <ValueContainer key={url}>
-              <div className="flex items-center gap-4 font-mono">
-                <span className="text-foreground-lighter">
-                  <Globe strokeWidth={2} size={14} />
-                </span>
-                <span className="text-sm">{url}</span>
-              </div>
-              {canUpdate && (
-                <Button type="default" icon={<Trash />} onClick={() => onSelectUrlToDelete(url)}>
-                  Remove
-                </Button>
-              )}
-            </ValueContainer>
-          )
-        })
+        <>
+          {URI_ALLOW_LIST_ARRAY.map((url) => {
+            const isSelected = selectedUrls.includes(url)
+            return (
+              <ValueContainer
+                key={url}
+                isSelected={isSelected}
+                onClick={() => {
+                  const newSelectedUrls = isSelected
+                    ? selectedUrls.filter((selectedUrl) => selectedUrl !== url)
+                    : [...selectedUrls, url]
+                  onSelectUrl(newSelectedUrls)
+                }}
+              >
+                <div className={`flex items-center gap-4 font-mono`}>
+                  <span className="text-foreground-lighter">
+                    <Globe strokeWidth={2} size={14} />
+                  </span>
+                  <span className="text-sm">{url}</span>
+                </div>
+                {canUpdate && (
+                  <Button type="default" icon={<Trash />} onClick={() => onSelectUrlToDelete(url)}>
+                    Remove
+                  </Button>
+                )}
+              </ValueContainer>
+            )
+          })}
+        </>
       ) : (
         <div
           className={[

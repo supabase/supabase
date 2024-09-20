@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -26,7 +26,7 @@ import {
 import { urlRegex } from '../Auth.constants'
 import RedirectUrlList from './RedirectUrlList'
 import ValueContainer from './ValueContainer'
-
+const MAX_URLS_LENGTH = 2 * 1024
 const RedirectUrls = () => {
   const { ref: projectRef } = useParams()
   const {
@@ -45,6 +45,8 @@ const RedirectUrls = () => {
   }, [authConfig?.URI_ALLOW_LIST])
 
   const [open, setOpen] = useState(false)
+  const [openRemoveSelected, setOpenRemoveSelected] = useState(false)
+  const [selectedUrls, setSelectedUrls] = useState<string[]>([])
   const [selectedUrlToDelete, setSelectedUrlToDelete] = useState<string>()
 
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
@@ -64,7 +66,7 @@ const RedirectUrls = () => {
 
     const payloadString = payload.toString()
 
-    if (payloadString.length > 2 * 1024) {
+    if (payloadString.length > MAX_URLS_LENGTH) {
       return toast.error('Too many redirect URLs, please remove some or try to use wildcards')
     }
 
@@ -82,21 +84,24 @@ const RedirectUrls = () => {
     )
   }
 
-  const onConfirmDeleteUrl = async (url?: string) => {
-    if (!url) return
+  const onConfirmDeleteUrl = async (urls?: string[]) => {
+    if (!urls || urls.length === 0) return
 
     // Remove selectedUrl from array and update
-    const payload = URI_ALLOW_LIST_ARRAY.filter((e: string) => e !== url)
-
+    const payload = URI_ALLOW_LIST_ARRAY.filter((url: string) => !selectedUrls.includes(url))
+    const payloadString = payload.join(',')
+    if (payloadString.length > MAX_URLS_LENGTH) {
+      return toast.error('Too many redirect URLs, please remove some or try to use wildcards')
+    }
     updateAuthConfig(
-      { projectRef: projectRef!, config: { URI_ALLOW_LIST: payload.toString() } },
+      { projectRef: projectRef!, config: { URI_ALLOW_LIST: payloadString } },
       {
         onError: (error) => {
-          toast.error(`Failed to remove URL: ${error?.message}`)
+          toast.error(`Failed to remove URL(s): ${error?.message}`)
         },
         onSuccess: () => {
           setSelectedUrlToDelete(undefined)
-          toast.success('Successfully removed URL')
+          toast.success('Successfully removed URL(s)')
         },
       }
     )
@@ -131,6 +136,11 @@ const RedirectUrls = () => {
           >
             Add URL
           </ButtonTooltip>
+          {selectedUrls.length > 0 && (
+            <Button type="default" icon={<Trash />} onClick={() => setOpenRemoveSelected(true)}>
+              Remove selected ({selectedUrls.length})
+            </Button>
+          )}
         </div>
       </div>
       {isLoading && (
@@ -153,6 +163,8 @@ const RedirectUrls = () => {
       {isSuccess && (
         <RedirectUrlList
           URI_ALLOW_LIST_ARRAY={URI_ALLOW_LIST_ARRAY}
+          selectedUrls={selectedUrls}
+          onSelectUrl={setSelectedUrls}
           canUpdate={canUpdateConfig}
           onSelectUrlToDelete={setSelectedUrlToDelete}
         />
@@ -227,7 +239,56 @@ const RedirectUrls = () => {
             size="medium"
             type="warning"
             loading={isUpdatingConfig}
-            onClick={() => onConfirmDeleteUrl(selectedUrlToDelete)}
+            onClick={() => onConfirmDeleteUrl(selectedUrlToDelete ? [selectedUrlToDelete] : [])}
+          >
+            {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
+          </Button>
+        </Modal.Content>
+      </Modal>
+      <Modal
+        hideFooter
+        size="large"
+        visible={openRemoveSelected}
+        header="Remove URLs"
+        onCancel={() => {
+          setSelectedUrls([])
+          setOpenRemoveSelected(false)
+        }}
+      >
+        <Modal.Content>
+          <p className="mb-2 text-sm text-foreground-light">
+            Are you sure you want to remove the following URLs?
+          </p>
+          <ul className="list-disc pl-4 mb-2">
+            {selectedUrls.map((url, index) => (
+              <li key={index} className="text-foreground-light text-sm">
+                {url}
+              </li>
+            ))}
+          </ul>
+          <p className="text-foreground-light text-sm">
+            These URLs will no longer work with your authentication configuration.
+          </p>
+        </Modal.Content>
+        <Modal.Separator />
+        <Modal.Content className="flex items-center gap-x-2">
+          <Button
+            block
+            type="default"
+            size="medium"
+            onClick={() => {
+              setSelectedUrls([])
+              setOpenRemoveSelected(false)
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            block
+            size="medium"
+            type="warning"
+            loading={isUpdatingConfig}
+            onClick={() => onConfirmDeleteUrl(selectedUrls)}
           >
             {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
           </Button>
