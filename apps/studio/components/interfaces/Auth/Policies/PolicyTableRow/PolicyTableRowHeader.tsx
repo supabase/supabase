@@ -39,7 +39,7 @@ const PolicyTableRowHeader = ({
         <Link href={`/project/${ref}/editor/${table.id}`} className="flex items-center gap-x-2">
           {table.rls_enabled ? (
             <div className="flex items-center gap-x-1 text-xs">
-              <Lock size={14} strokeWidth={2} className="text-brand-500" />
+              <Lock size={14} strokeWidth={2} className="text-brand" />
             </div>
           ) : (
             <div className="flex items-center gap-x-1 text-xs">

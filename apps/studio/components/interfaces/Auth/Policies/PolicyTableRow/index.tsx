@@ -5,7 +5,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import Panel from 'components/ui/Panel'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { Info } from 'lucide-react'
-import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 import PolicyRow from './PolicyRow'
 import PolicyTableRowHeader from './PolicyTableRowHeader'
 
@@ -48,7 +48,12 @@ const PolicyTableRow = ({
       }
     >
       {!table.rls_enabled && !isLocked && (
-        <div className="dark:bg-alternative-200 bg-surface-200 px-6 py-2 text-xs flex items-center gap-2 border-b">
+        <div
+          className={cn(
+            'dark:bg-alternative-200 bg-surface-200 px-6 py-2 text-xs flex items-center gap-2',
+            policies.length === 0 ? '' : 'border-b'
+          )}
+        >
           <div className="w-1.5 h-1.5 bg-warning-600 rounded-full" />
           <span className="font-bold text-warning-600">Warning:</span>{' '}
           <span className="text-foreground-light">
