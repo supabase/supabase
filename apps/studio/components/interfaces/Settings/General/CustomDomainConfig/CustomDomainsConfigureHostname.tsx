@@ -109,13 +109,13 @@ const CustomDomainsConfigureHostname = () => {
                   ) : (
                     'your custom domain'
                   )}
-                  , resolving to{' '}
+                  &nbsp;resolving to{' '}
                   {endpoint ? (
                     <code className="text-xs">{endpoint}</code>
                   ) : (
                     "your project's API URL"
                   )}
-                  , with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
+                  &nbsp;with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
                   disable the proxy option.
                 </p>
               </FormSection>

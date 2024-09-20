@@ -15,6 +15,7 @@ import {
 } from 'ui'
 import DNSRecord from './DNSRecord'
 import { AlertCircle, HelpCircle, ExternalLink, RefreshCw } from 'lucide-react'
+import DNSTableHeaders from './CustomDomainTableHeaders'
 
 export type CustomDomainVerifyProps = {
   projectRef?: string
@@ -139,39 +140,18 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           </Alert_Shadcn_>
         ) : (
           <div className="space-y-2">
-            <div className="flex gap-4">
-              <div className="w-[50px]">
-                <p className="text-foreground-light text-sm">Type</p>
-              </div>
-              <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4 input-mono flex-1">
-                <div className="flex flex-row space-x-2 justify-between col-span-12">
-                  <label className="block text-foreground-light text-sm break-all">Name</label>
-                </div>
-              </div>
-              <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4 input-mono flex-1">
-                <div className="flex flex-row space-x-2 justify-between col-span-12">
-                  <label className="block text-foreground-light text-sm break-all">Content</label>
-                </div>
-              </div>
-            </div>
+
+            <DNSTableHeaders display={customDomain.ssl.txt_name ?? ''} />
 
             {customDomain.verification_errors?.includes(
               'custom hostname does not CNAME to this zone.'
             ) && (
-              <DNSRecord
-                type="CNAME"
-                name={customDomain.hostname}
-                value={settings?.autoApiService.endpoint ?? 'Loading...'}
-              />
-            )}
-
-            {customDomain.ownership_verification && (
-              <DNSRecord
-                type={customDomain.ownership_verification.type}
-                name={customDomain.ownership_verification.name}
-                value={customDomain.ownership_verification.value}
-              />
-            )}
+                <DNSRecord
+                  type="CNAME"
+                  name={customDomain.hostname}
+                  value={settings?.autoApiService.endpoint ?? 'Loading...'}
+                />
+              )}
 
             {customDomain.ssl.status === 'pending_validation' && (
               <DNSRecord
@@ -191,18 +171,6 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
             )}
           </div>
         )}
-
-        <div className="!mt-4">
-          <p className="text-sm text-foreground-light">
-            One of the records requires you to{' '}
-            <span className="text-foreground-light">replace</span> the CNAME record set up in the
-            first step with a TXT record.
-          </p>
-          <p className="text-sm text-foreground-light">
-            You'll be able to restore it back to the CNAME after the verification process has been
-            completed.
-          </p>
-        </div>
       </Panel.Content>
 
       <div className="border-t border-muted" />
