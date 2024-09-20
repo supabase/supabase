@@ -5,7 +5,6 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
-import { Label } from '@ui/components/shadcn/ui/label'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -20,10 +19,10 @@ import {
   Button,
   DialogSectionSeparator,
   Form,
+  Input,
   Modal,
   WarningIcon,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import { urlRegex } from '../Auth.constants'
 import { RedirectUrlList } from './RedirectUrlList'
 import { ValueContainer } from './ValueContainer'
@@ -209,8 +208,7 @@ export const RedirectUrls = () => {
             return (
               <>
                 <Modal.Content className="flex flex-col gap-y-2">
-                  <Label htmlFor="url">URL</Label>
-                  <Input id="url" name="url" placeholder="https://mydomain.com" />
+                  <Input id="url" name="url" label="URL" placeholder="https://mydomain.com" />
                 </Modal.Content>
                 <DialogSectionSeparator />
                 <Modal.Content>
