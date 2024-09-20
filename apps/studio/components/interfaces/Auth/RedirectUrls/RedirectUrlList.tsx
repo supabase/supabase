@@ -1,6 +1,5 @@
 import { noop } from 'lodash'
-import { Button } from 'ui'
-
+import { Button, Checkbox } from 'ui'
 import { EmptyListState } from 'components/ui/States'
 import ValueContainer from './ValueContainer'
 import { Globe, Trash } from 'lucide-react'
@@ -37,10 +36,34 @@ const RedirectUrlList = ({
                   onSelectUrl(newSelectedUrls)
                 }}
               >
-                <div className={`flex items-center gap-4 font-mono`}>
-                  <span className="text-foreground-lighter">
-                    <Globe strokeWidth={2} size={14} />
-                  </span>
+                <div className={`flex items-center gap-4 font-mono group`}>
+                  <div className="w-5 h-5 flex items-center justify-center">
+                    {isSelected ? (
+                      <Checkbox
+                        checked={isSelected}
+                        onChange={() => {
+                          const newSelectedUrls = selectedUrls.filter(
+                            (selectedUrl) => selectedUrl !== url
+                          )
+                          onSelectUrl(newSelectedUrls)
+                        }}
+                      />
+                    ) : (
+                      <span className="text-foreground-lighter group-hover:hidden">
+                        <Globe strokeWidth={2} size={14} />
+                      </span>
+                    )}
+                    {!isSelected && (
+                      <div className="hidden group-hover:block">
+                        <Checkbox
+                          checked={isSelected}
+                          onChange={() => {
+                            onSelectUrl([...selectedUrls, url])
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
                   <span className="text-sm">{url}</span>
                 </div>
                 {canUpdate && (
