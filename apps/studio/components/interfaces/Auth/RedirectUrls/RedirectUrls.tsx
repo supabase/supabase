@@ -1,11 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
+import { Label } from '@ui/components/shadcn/ui/label'
+import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
@@ -19,15 +20,17 @@ import {
   Button,
   DialogSectionSeparator,
   Form,
-  Input,
   Modal,
   WarningIcon,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { urlRegex } from '../Auth.constants'
-import RedirectUrlList from './RedirectUrlList'
-import ValueContainer from './ValueContainer'
+import { RedirectUrlList } from './RedirectUrlList'
+import { ValueContainer } from './ValueContainer'
 
-const RedirectUrls = () => {
+const MAX_URLS_LENGTH = 2 * 1024
+
+export const RedirectUrls = () => {
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -45,7 +48,8 @@ const RedirectUrls = () => {
   }, [authConfig?.URI_ALLOW_LIST])
 
   const [open, setOpen] = useState(false)
-  const [selectedUrlToDelete, setSelectedUrlToDelete] = useState<string>()
+  const [openRemoveSelected, setOpenRemoveSelected] = useState(false)
+  const [selectedUrls, setSelectedUrls] = useState<string[]>([])
 
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
@@ -64,7 +68,7 @@ const RedirectUrls = () => {
 
     const payloadString = payload.toString()
 
-    if (payloadString.length > 2 * 1024) {
+    if (payloadString.length > MAX_URLS_LENGTH) {
       return toast.error('Too many redirect URLs, please remove some or try to use wildcards')
     }
 
@@ -82,21 +86,25 @@ const RedirectUrls = () => {
     )
   }
 
-  const onConfirmDeleteUrl = async (url?: string) => {
-    if (!url) return
+  const onConfirmDeleteUrl = async (urls?: string[]) => {
+    if (!urls || urls.length === 0) return
 
     // Remove selectedUrl from array and update
-    const payload = URI_ALLOW_LIST_ARRAY.filter((e: string) => e !== url)
-
+    const payload = URI_ALLOW_LIST_ARRAY.filter((url: string) => !selectedUrls.includes(url))
+    const payloadString = payload.join(',')
+    if (payloadString.length > MAX_URLS_LENGTH) {
+      return toast.error('Too many redirect URLs, please remove some or try to use wildcards')
+    }
     updateAuthConfig(
-      { projectRef: projectRef!, config: { URI_ALLOW_LIST: payload.toString() } },
+      { projectRef: projectRef!, config: { URI_ALLOW_LIST: payloadString } },
       {
         onError: (error) => {
-          toast.error(`Failed to remove URL: ${error?.message}`)
+          toast.error(`Failed to remove URL(s): ${error?.message}`)
         },
         onSuccess: () => {
-          setSelectedUrlToDelete(undefined)
-          toast.success('Successfully removed URL')
+          setSelectedUrls([])
+          setOpenRemoveSelected(false)
+          toast.success('Successfully removed URL(s)')
         },
       }
     )
@@ -110,27 +118,51 @@ const RedirectUrls = () => {
           description={`URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com`}
         />
         <div className="flex items-center gap-2 mb-6 ml-12">
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <Link
-              href="https://supabase.com/docs/guides/auth/concepts/redirect-urls"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Documentation
-            </Link>
-          </Button>
-          <ButtonTooltip
-            disabled={!canUpdateConfig}
-            onClick={() => setOpen(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: 'You need additional permissions to update redirect URLs',
-              },
-            }}
-          >
-            Add URL
-          </ButtonTooltip>
+          {selectedUrls.length > 0 ? (
+            <>
+              <Button type="default" onClick={() => setSelectedUrls([])}>
+                Clear selection
+              </Button>
+              <ButtonTooltip
+                type="default"
+                disabled={!canUpdateConfig}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to remove redirect URLs',
+                  },
+                }}
+                icon={<Trash />}
+                onClick={() => (selectedUrls.length > 0 ? setOpenRemoveSelected(true) : null)}
+              >
+                Remove ({selectedUrls.length})
+              </ButtonTooltip>
+            </>
+          ) : (
+            <>
+              <Button asChild type="default" icon={<ExternalLink />}>
+                <Link
+                  href="https://supabase.com/docs/guides/auth/concepts/redirect-urls"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Documentation
+                </Link>
+              </Button>
+              <ButtonTooltip
+                disabled={!canUpdateConfig}
+                onClick={() => setOpen(true)}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to update redirect URLs',
+                  },
+                }}
+              >
+                Add URL
+              </ButtonTooltip>
+            </>
+          )}
         </div>
       </div>
       {isLoading && (
@@ -152,9 +184,10 @@ const RedirectUrls = () => {
       )}
       {isSuccess && (
         <RedirectUrlList
-          URI_ALLOW_LIST_ARRAY={URI_ALLOW_LIST_ARRAY}
+          allowList={URI_ALLOW_LIST_ARRAY}
+          selectedUrls={selectedUrls}
+          onSelectUrl={setSelectedUrls}
           canUpdate={canUpdateConfig}
-          onSelectUrlToDelete={setSelectedUrlToDelete}
         />
       )}
       <Modal
@@ -175,8 +208,9 @@ const RedirectUrls = () => {
           {() => {
             return (
               <>
-                <Modal.Content>
-                  <Input id="url" name="url" label="URL" placeholder="https://mydomain.com" />
+                <Modal.Content className="flex flex-col gap-y-2">
+                  <Label htmlFor="url">URL</Label>
+                  <Input id="url" name="url" placeholder="https://mydomain.com" />
                 </Modal.Content>
                 <DialogSectionSeparator />
                 <Modal.Content>
@@ -198,18 +232,27 @@ const RedirectUrls = () => {
       </Modal>
       <Modal
         hideFooter
-        size="small"
-        visible={selectedUrlToDelete !== undefined}
-        header="Remove URL"
-        onCancel={() => setSelectedUrlToDelete(undefined)}
+        size="large"
+        visible={openRemoveSelected}
+        header="Remove URLs"
+        onCancel={() => {
+          setSelectedUrls([])
+          setOpenRemoveSelected(false)
+        }}
       >
         <Modal.Content>
           <p className="mb-2 text-sm text-foreground-light">
-            Are you sure you want to remove{' '}
-            <span className="text-foreground">{selectedUrlToDelete}</span>?
+            Are you sure you want to remove the following URLs?
           </p>
+          <ul className="list-disc pl-4 mb-2">
+            {selectedUrls.map((url, index) => (
+              <li key={index} className="text-foreground-light text-sm">
+                {url}
+              </li>
+            ))}
+          </ul>
           <p className="text-foreground-light text-sm">
-            This URL will no longer work with your authentication configuration.
+            These URLs will no longer work with your authentication configuration.
           </p>
         </Modal.Content>
         <Modal.Separator />
@@ -218,7 +261,10 @@ const RedirectUrls = () => {
             block
             type="default"
             size="medium"
-            onClick={() => setSelectedUrlToDelete(undefined)}
+            onClick={() => {
+              setSelectedUrls([])
+              setOpenRemoveSelected(false)
+            }}
           >
             Cancel
           </Button>
@@ -227,7 +273,7 @@ const RedirectUrls = () => {
             size="medium"
             type="warning"
             loading={isUpdatingConfig}
-            onClick={() => onConfirmDeleteUrl(selectedUrlToDelete)}
+            onClick={() => onConfirmDeleteUrl(selectedUrls)}
           >
             {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
           </Button>
@@ -236,5 +282,3 @@ const RedirectUrls = () => {
     </div>
   )
 }
-
-export default RedirectUrls
