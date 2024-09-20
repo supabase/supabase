@@ -1,15 +1,16 @@
 ---
-id: 'schema-migrations'
-title: 'Schema Migrations'
-description: 'How to manage schema migrations for your Supabase project.'
-subtitle: 'How to manage schema migrations for your Supabase project.'
+title: 'Local development with schema migrations'
+description: 'Develop locally with the Supabase CLI and schema migrations.'
+subtitle: 'Develop locally with the Supabase CLI and schema migrations.'
 video: 'https://www.youtube-nocookie.com/v/vyHyYpvjaks'
 tocVideo: 'vyHyYpvjaks'
 ---
 
 Supabase is a flexible platform that lets you decide how you want to build your projects. You can use the Dashboard directly to get up and running quickly, or use a proper local setup. We suggest you work locally and deploy your changes to a linked project on the [Supabase Platform](https://app.supabase.io/).
 
-Doing things directly on the platform via the [Dashboard](https://app.supabase.io/) is fine when you're getting started, but it's a good idea to move to a proper local workflow before you get too far. Working locally, generating migrations as you change your tables, and applying those migrations to a linked project on the [Platform](https://app.supabase.io/) keeps everything nicely organized as you grow.
+Develop locally using the CLI to run a local Supabase stack. You can use the integrated Studio Dashboard to make changes, then capture your changes in schema migration files, which can be saved in version control.
+
+Alternatively, if you're comfortable with migration files and SQL, you can write your own migrations and push them to the local database for testing before sharing your changes.
 
 ## Database migrations
 
