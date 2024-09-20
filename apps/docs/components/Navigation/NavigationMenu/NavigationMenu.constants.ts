@@ -1732,7 +1732,7 @@ export const local_development: NavMenuConstant = {
       name: 'Local development',
       url: undefined,
       items: [
-        { name: 'Schema migrations', url: '/guides/local-development/schema-migrations' },
+        { name: 'Getting started', url: '/guides/local-development/overview' },
         {
           name: 'Managing config and secrets',
           url: '/guides/local-development/managing-config',
