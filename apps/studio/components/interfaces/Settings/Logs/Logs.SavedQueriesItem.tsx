@@ -13,7 +13,14 @@ import { SqlEditor } from 'icons'
 import { LogsSidebarItem } from './SidebarV2/SidebarItem'
 
 interface SavedQueriesItemProps {
-  item: any
+  item: {
+    id: string
+    name: string
+    description: string | null
+    content: {
+      sql: string
+    }
+  }
 }
 
 const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
@@ -64,7 +71,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
       <LogsSidebarItem
         label={item.name}
         icon={<SqlEditor size="15" />}
-        href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(item.content.sql)}`}
+        href={`/project/${ref}/logs/explorer?queryId=${encodeURIComponent(item.id)}&q=${encodeURIComponent(item.content.sql)}`}
         isActive={isActive}
         dropdownItems={
           <>

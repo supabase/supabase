@@ -257,8 +257,8 @@ export function LogsSidebarMenuV2() {
       </SidebarCollapsible>
       <Separator className="my-4" />
       <SidebarCollapsible title="Queries" defaultOpen={true}>
-        {savedQueries.map((collection) => (
-          <SavedQueriesItem item={collection} key={collection.id} />
+        {savedQueries.map((query) => (
+          <SavedQueriesItem item={query} key={query.id} />
         ))}
       </SidebarCollapsible>
     </div>

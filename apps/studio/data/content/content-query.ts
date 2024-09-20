@@ -35,6 +35,8 @@ export type Content = ContentBase &
       }
   )
 
+export type ContentType = 'sql' | 'report' | 'log_sql'
+
 export async function getContent(
   projectRef: string | undefined,
   signal?: AbortSignal
