@@ -17,6 +17,7 @@ const ValueContainer = ({
       border px-6 
       py-4 text-sm
       first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl
+      hover:bg-surface-300
       ${isSelected ? 'bg-surface-300' : ''}
       ${onClick ? 'cursor-pointer' : ''}
     `}

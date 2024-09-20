@@ -100,7 +100,9 @@ const RedirectUrls = () => {
           toast.error(`Failed to remove URL(s): ${error?.message}`)
         },
         onSuccess: () => {
+          setSelectedUrls([])
           setSelectedUrlToDelete(undefined)
+          setOpenRemoveSelected(false)
           toast.success('Successfully removed URL(s)')
         },
       }
