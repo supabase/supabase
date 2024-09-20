@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { EditIcon, MoreHorizontal, TrashIcon } from 'lucide-react'
+import { Database, EditIcon, MoreHorizontal, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -31,6 +31,7 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { LogsSidebarItem } from '../Settings/Logs/SidebarV2/SidebarItem'
 
 type Props = {
   item: {
@@ -83,48 +84,22 @@ export const WarehouseMenuItem = ({ item }: Props) => {
 
   return (
     <>
-      <Link
-        className={cn(
-          'pr-1 h-7 pl-3 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
-          'flex items-center justify-between rounded-md group relative',
-          item.token === router.query.collectionToken
-            ? 'bg-surface-300 text-foreground'
-            : 'hover:bg-surface-200'
-        )}
-        key={item.token + '-collection-item'}
+      <LogsSidebarItem
+        isActive={item.token === collectionToken}
+        label={item.name}
+        icon={<Database size="14" className="text-foreground-light" />}
         href={`/project/${projectRef}/logs/collections/${item.token}`}
-      >
-        <div className="truncate">{item.name}</div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              onClick={(e) => {
-                e.preventDefault()
-              }}
-              loading={isLoading}
-              type="text"
-              className="px-1 opacity-50 hover:opacity-100 !bg-transparent"
-              icon={<MoreHorizontal />}
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            onClick={(e) => {
-              e.stopPropagation()
-            }}
-            align="start"
-            className="w-44 *:space-x-2"
-          >
+        dropdownItems={
+          <>
             <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   disabled={!canUpdateCollection}
-                  className="!pointer-events-auto"
                   onClick={() => {
-                    if (canUpdateCollection) setShowUpdateDialog(true)
+                    setShowUpdateDialog(true)
                   }}
                 >
-                  <EditIcon size={14} />
+                  <EditIcon className="mr-2" size={14} />
                   <div>Rename collection</div>
                 </DropdownMenuItem>
               </TooltipTrigger_Shadcn_>
@@ -139,12 +114,11 @@ export const WarehouseMenuItem = ({ item }: Props) => {
               <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   disabled={!canUpdateCollection}
-                  className="!pointer-events-auto"
-                  onClick={async () => {
-                    if (canUpdateCollection) setDeleteDialog(true)
+                  onClick={() => {
+                    setDeleteDialog(true)
                   }}
                 >
-                  <TrashIcon size={14} />
+                  <TrashIcon className="mr-2" size={14} />
                   <div>Delete collection</div>
                 </DropdownMenuItem>
               </TooltipTrigger_Shadcn_>
@@ -154,9 +128,9 @@ export const WarehouseMenuItem = ({ item }: Props) => {
                 </TooltipContent_Shadcn_>
               )}
             </Tooltip_Shadcn_>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </Link>
+          </>
+        }
+      ></LogsSidebarItem>
 
       <Modal
         size="medium"

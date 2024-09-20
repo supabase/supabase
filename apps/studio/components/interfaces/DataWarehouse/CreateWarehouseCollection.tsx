@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { PlusIcon } from 'lucide-react'
+import { Plus, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -62,9 +62,9 @@ export const CreateWarehouseCollectionModal = () => {
   return (
     <>
       <ButtonTooltip
-        type="default"
+        type="text"
         disabled={!canCreateCollection}
-        className="justify-start flex-grow w-full"
+        className="justify-start flex-grow w-full text-foreground-light"
         icon={<PlusIcon />}
         onClick={() => setIsOpen(!isOpen)}
         tooltip={{
@@ -74,7 +74,7 @@ export const CreateWarehouseCollectionModal = () => {
           },
         }}
       >
-        New collection
+        Create collection
       </ButtonTooltip>
       <Modal
         size="medium"

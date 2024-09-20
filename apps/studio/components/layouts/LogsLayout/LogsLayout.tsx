@@ -20,6 +20,7 @@ import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateLogsMenu } from './LogsMenu.utils'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
+import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
 interface LogsLayoutProps {
   title?: string
 }
@@ -28,6 +29,8 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   const router = useRouter()
   const pathArr = router.pathname.split('/')
   const page = pathArr[pathArr.length - 1]
+
+  const LogsSidebarV2 = true
 
   const {
     projectAuthAll: authEnabled,
@@ -61,6 +64,16 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
       <ProjectLayout>
         <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
           <NoPermission isFullPage resourceText="access your project's logs explorer" />
+        </main>
+      </ProjectLayout>
+    )
+  }
+
+  if (LogsSidebarV2) {
+    return (
+      <ProjectLayout title={title} product="Logs & Analytics" productMenu={<LogsSidebarMenuV2 />}>
+        <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
+          {children}
         </main>
       </ProjectLayout>
     )
