@@ -1,41 +1,77 @@
 import { noop } from 'lodash'
-import { Button } from 'ui'
+import { Globe } from 'lucide-react'
 
 import { EmptyListState } from 'components/ui/States'
-import ValueContainer from './ValueContainer'
-import { Globe, Trash } from 'lucide-react'
+import { Checkbox_Shadcn_ } from 'ui'
+import { ValueContainer } from './ValueContainer'
 
 interface RedirectUrlListProps {
-  URI_ALLOW_LIST_ARRAY: string[]
+  allowList: string[]
   canUpdate: boolean
-  onSelectUrlToDelete: (url: string) => void
+  selectedUrls: string[]
+  onSelectUrl: (urls: string[]) => void
 }
 
-const RedirectUrlList = ({
-  URI_ALLOW_LIST_ARRAY,
-  canUpdate,
-  onSelectUrlToDelete = noop,
+export const RedirectUrlList = ({
+  allowList,
+  selectedUrls,
+  onSelectUrl = noop,
 }: RedirectUrlListProps) => {
+  // [Joshen] One for next time: maybe shift this into a reusable logic since it
+  // seems like we can use this in multiple places for future
+  const onClickUrl = (event: any, url: string) => {
+    if (event.shiftKey) {
+      const urlIdx = allowList.indexOf(url)
+      const idxLatest = allowList.indexOf(selectedUrls[selectedUrls.length - 1])
+
+      const newSelectedUrls =
+        urlIdx > idxLatest
+          ? allowList.slice(idxLatest + 1, urlIdx + 1)
+          : allowList.slice(urlIdx, idxLatest)
+
+      const urlsNotSelectedYet = newSelectedUrls.filter((x) => !selectedUrls.includes(x))
+
+      if (urlsNotSelectedYet.length > 0) {
+        onSelectUrl([
+          ...selectedUrls,
+          ...(urlIdx > idxLatest ? newSelectedUrls : newSelectedUrls.reverse()),
+        ])
+      } else {
+        const urlsToRemove = newSelectedUrls.concat([selectedUrls[selectedUrls.length - 1]])
+        onSelectUrl(selectedUrls.filter((x) => !urlsToRemove.includes(x)))
+      }
+    } else {
+      const isSelected = selectedUrls.includes(url)
+      const newSelectedUrls = isSelected
+        ? selectedUrls.filter((selectedUrl) => selectedUrl !== url)
+        : [...selectedUrls, url]
+      onSelectUrl(newSelectedUrls)
+    }
+  }
+
   return (
     <div className="-space-y-px">
-      {URI_ALLOW_LIST_ARRAY.length > 0 ? (
-        URI_ALLOW_LIST_ARRAY.map((url) => {
-          return (
-            <ValueContainer key={url}>
-              <div className="flex items-center gap-4 font-mono">
-                <span className="text-foreground-lighter">
-                  <Globe strokeWidth={2} size={14} />
-                </span>
-                <span className="text-sm">{url}</span>
-              </div>
-              {canUpdate && (
-                <Button type="default" icon={<Trash />} onClick={() => onSelectUrlToDelete(url)}>
-                  Remove
-                </Button>
-              )}
-            </ValueContainer>
-          )
-        })
+      {allowList.length > 0 ? (
+        <>
+          {allowList.map((url) => {
+            const isSelected = selectedUrls.includes(url)
+            return (
+              <ValueContainer key={url} isSelected={isSelected} onClick={(e) => onClickUrl(e, url)}>
+                <div className={`flex items-center gap-4 font-mono group w-full`}>
+                  <div className="w-5 h-5 flex items-center justify-center">
+                    <span className="text-foreground-lighter">
+                      <Globe strokeWidth={2} size={14} />
+                    </span>
+                  </div>
+                  <span className="text-sm flex-grow">{url}</span>
+                  <div className="flex-shrink-0">
+                    <Checkbox_Shadcn_ checked={isSelected} onChange={(e) => onClickUrl(e, url)} />
+                  </div>
+                </div>
+              </ValueContainer>
+            )
+          })}
+        </>
       ) : (
         <div
           className={[
@@ -52,5 +88,3 @@ const RedirectUrlList = ({
     </div>
   )
 }
-
-export default RedirectUrlList
