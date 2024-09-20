@@ -639,6 +639,17 @@ const SQLEditor = () => {
         size="large"
         title={`Potential issue${queryHasDestructiveOperations && queryHasUpdateWithoutWhere ? 's' : ''} detected with your query`}
         confirmLabel="Run this query"
+        variant="warning"
+        alert={{
+          base: {
+            variant: 'warning',
+          },
+          title:
+            queryHasDestructiveOperations && queryHasUpdateWithoutWhere
+              ? 'The following potential issues have been detected:'
+              : 'The following potential issue has been detected:',
+          description: 'Ensure that these are intentional before executing this query',
+        }}
         onCancel={() => {
           setShowPotentialIssuesModal(false)
           setQueryHasDestructiveOperations(false)
@@ -650,36 +661,29 @@ const SQLEditor = () => {
           executeQuery(true)
         }}
       >
-        <div className="text-sm ">
-          <div className="flex items-center gap-2 ">
-            <AlertTriangle />
-            <span>
-              {queryHasDestructiveOperations && queryHasUpdateWithoutWhere
-                ? 'Issues detected:'
-                : 'Issue detected:'}
-            </span>
-          </div>
-          <ul className="ml-8 mt-3 grid gap-4 bg-surface-200 p-4">
+        <div className="text-sm">
+          <ul className="border rounded-md grid bg-surface-200">
             {queryHasDestructiveOperations && (
-              <li className="grid">
+              <li className="grid pt-3 pb-2 px-4">
                 <span className="font-bold">Query has destructive operation</span>
                 <span className="text-foreground-lighter">
-                  Make sure you are not accidentally dropping a table
+                  Make sure you are not accidentally removing something important.
                 </span>
               </li>
             )}
             {queryHasDestructiveOperations && queryHasUpdateWithoutWhere && <Separator />}
             {queryHasUpdateWithoutWhere && (
-              <li className="grid gap-1">
+              <li className="grid pt-2 pb-3 px-4 gap-1">
                 <span className="font-bold">Query uses update without a where clause</span>
                 <span className="text-foreground-lighter">
-                  Without a <code>where</code> clause, this could update all rows in the table.
+                  Without a <code className="text-xs">where</code> clause, this could update all
+                  rows in the table.
                 </span>
               </li>
             )}
           </ul>
         </div>
-        <p className="text-sm text-foreground-light mt-6 mb-4 ml-8 ">
+        <p className="mt-4 text-sm text-foreground-light">
           Please confirm that you would like to execute this query.
         </p>
       </ConfirmationModal>
