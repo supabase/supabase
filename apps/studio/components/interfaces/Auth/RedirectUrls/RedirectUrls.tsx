@@ -1,11 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { ExternalLink, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
+import { Label } from '@ui/components/shadcn/ui/label'
+import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
@@ -19,15 +20,17 @@ import {
   Button,
   DialogSectionSeparator,
   Form,
-  Input,
   Modal,
   WarningIcon,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { urlRegex } from '../Auth.constants'
-import RedirectUrlList from './RedirectUrlList'
-import ValueContainer from './ValueContainer'
+import { RedirectUrlList } from './RedirectUrlList'
+import { ValueContainer } from './ValueContainer'
+
 const MAX_URLS_LENGTH = 2 * 1024
-const RedirectUrls = () => {
+
+export const RedirectUrls = () => {
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -47,7 +50,6 @@ const RedirectUrls = () => {
   const [open, setOpen] = useState(false)
   const [openRemoveSelected, setOpenRemoveSelected] = useState(false)
   const [selectedUrls, setSelectedUrls] = useState<string[]>([])
-  const [selectedUrlToDelete, setSelectedUrlToDelete] = useState<string>()
 
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
@@ -101,7 +103,6 @@ const RedirectUrls = () => {
         },
         onSuccess: () => {
           setSelectedUrls([])
-          setSelectedUrlToDelete(undefined)
           setOpenRemoveSelected(false)
           toast.success('Successfully removed URL(s)')
         },
@@ -117,41 +118,51 @@ const RedirectUrls = () => {
           description={`URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com`}
         />
         <div className="flex items-center gap-2 mb-6 ml-12">
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <Link
-              href="https://supabase.com/docs/guides/auth/concepts/redirect-urls"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Documentation
-            </Link>
-          </Button>
-          <ButtonTooltip
-            type="default"
-            disabled={!canUpdateConfig}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: 'You need additional permissions to remove redirect URLs',
-              },
-            }}
-            icon={<Trash />}
-            onClick={() => (selectedUrls.length > 0 ? setOpenRemoveSelected(true) : null)}
-          >
-            Remove ({selectedUrls.length})
-          </ButtonTooltip>
-          <ButtonTooltip
-            disabled={!canUpdateConfig}
-            onClick={() => setOpen(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: 'You need additional permissions to update redirect URLs',
-              },
-            }}
-          >
-            Add URL
-          </ButtonTooltip>
+          {selectedUrls.length > 0 ? (
+            <>
+              <Button type="default" onClick={() => setSelectedUrls([])}>
+                Clear selection
+              </Button>
+              <ButtonTooltip
+                type="default"
+                disabled={!canUpdateConfig}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to remove redirect URLs',
+                  },
+                }}
+                icon={<Trash />}
+                onClick={() => (selectedUrls.length > 0 ? setOpenRemoveSelected(true) : null)}
+              >
+                Remove ({selectedUrls.length})
+              </ButtonTooltip>
+            </>
+          ) : (
+            <>
+              <Button asChild type="default" icon={<ExternalLink />}>
+                <Link
+                  href="https://supabase.com/docs/guides/auth/concepts/redirect-urls"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Documentation
+                </Link>
+              </Button>
+              <ButtonTooltip
+                disabled={!canUpdateConfig}
+                onClick={() => setOpen(true)}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to update redirect URLs',
+                  },
+                }}
+              >
+                Add URL
+              </ButtonTooltip>
+            </>
+          )}
         </div>
       </div>
       {isLoading && (
@@ -173,11 +184,10 @@ const RedirectUrls = () => {
       )}
       {isSuccess && (
         <RedirectUrlList
-          URI_ALLOW_LIST_ARRAY={URI_ALLOW_LIST_ARRAY}
+          allowList={URI_ALLOW_LIST_ARRAY}
           selectedUrls={selectedUrls}
           onSelectUrl={setSelectedUrls}
           canUpdate={canUpdateConfig}
-          onSelectUrlToDelete={setSelectedUrlToDelete}
         />
       )}
       <Modal
@@ -198,8 +208,9 @@ const RedirectUrls = () => {
           {() => {
             return (
               <>
-                <Modal.Content>
-                  <Input id="url" name="url" label="URL" placeholder="https://mydomain.com" />
+                <Modal.Content className="flex flex-col gap-y-2">
+                  <Label htmlFor="url">URL</Label>
+                  <Input id="url" name="url" placeholder="https://mydomain.com" />
                 </Modal.Content>
                 <DialogSectionSeparator />
                 <Modal.Content>
@@ -271,5 +282,3 @@ const RedirectUrls = () => {
     </div>
   )
 }
-
-export default RedirectUrls

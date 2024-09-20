@@ -1,30 +1,29 @@
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, MouseEvent } from 'react'
+
+import { cn } from 'ui'
 
 interface ValueContainerProps {
   isSelected?: boolean
-  onClick?: () => void
+  onClick?: (event: MouseEvent<HTMLElement>) => void
 }
 
-const ValueContainer = ({
+export const ValueContainer = ({
   children,
   isSelected = false,
   onClick,
 }: PropsWithChildren<ValueContainerProps>) => (
   <div
-    className={`
-      bg-surface-100 border-default text-foreground flex items-center 
-      justify-between gap-2
-      border px-6 
-      py-4 text-sm
-      first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl
-      hover:bg-surface-300
-      ${isSelected ? 'bg-surface-300' : ''}
-      ${onClick ? 'cursor-pointer' : ''}
-    `}
-    onClick={onClick}
+    className={cn(
+      'bg-surface-100 hover:bg-surface-200 border-default text-foreground flex items-center',
+      'transition justify-between gap-2 border px-6 py-4 text-sm',
+      'first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl',
+      isSelected ? 'bg-surface-300' : '',
+      onClick ? 'cursor-pointer' : ''
+    )}
+    onClick={(e) => {
+      if (onClick) onClick(e)
+    }}
   >
     {children}
   </div>
 )
-
-export default ValueContainer
