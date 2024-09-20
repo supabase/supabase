@@ -32,15 +32,22 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
   const FormSchema = z.object({
     urls: z
       .object({
-        value: z.string().min(1, 'Please provide a value').url('Please provide a valid URL'),
+        value: z
+          .string()
+          .min(1, 'Please provide a value')
+          .url('Please provide a valid URL')
+          .refine((value) => !allowList.includes(value), {
+            message: 'URL already exists in the allow list',
+          }),
       })
       .array()
       .default([]),
   })
 
+  const initialValues = { urls: [{ value: '' }] }
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { urls: [{ value: '' }] },
+    defaultValues: initialValues,
   })
 
   const { fields, append, remove } = useFieldArray({
@@ -64,6 +71,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
           },
           onSuccess: () => {
             toast.success(`Successfully added ${fields.length} URL${fields.length > 1 ? 's' : ''}`)
+            form.reset(initialValues)
             onClose()
           },
         }
@@ -77,7 +85,10 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
       size="medium"
       className="!max-w-[440px]"
       visible={visible}
-      onCancel={() => onClose()}
+      onCancel={() => {
+        form.reset(initialValues)
+        onClose()
+      }}
       header="Add new redirect URLs"
       description="This will add a URL to a list of allowed URLs that can interact with your Authentication services for this project."
     >
