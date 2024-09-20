@@ -1,29 +1,22 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink, Trash } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { object, string } from 'yup'
 
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  DialogSectionSeparator,
-  Form,
-  Input,
   Modal,
   WarningIcon,
 } from 'ui'
-import { urlRegex } from '../Auth.constants'
+import { AddNewURLModal } from './AddNewURLModal'
 import { RedirectUrlList } from './RedirectUrlList'
 import { ValueContainer } from './ValueContainer'
 
@@ -49,41 +42,6 @@ export const RedirectUrls = () => {
   const [open, setOpen] = useState(false)
   const [openRemoveSelected, setOpenRemoveSelected] = useState(false)
   const [selectedUrls, setSelectedUrls] = useState<string[]>([])
-
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
-
-  const newUrlSchema = object({
-    url: string().matches(urlRegex, 'URL is not valid').required(),
-  })
-
-  const onAddNewUrl = async (values: any) => {
-    if (!values.url) {
-      return
-    }
-
-    const payload = URI_ALLOW_LIST_ARRAY
-    // remove any trailing commas
-    payload.push(values.url.replace(/,\s*$/, ''))
-
-    const payloadString = payload.toString()
-
-    if (payloadString.length > MAX_URLS_LENGTH) {
-      return toast.error('Too many redirect URLs, please remove some or try to use wildcards')
-    }
-
-    updateAuthConfig(
-      { projectRef: projectRef!, config: { URI_ALLOW_LIST: payloadString } },
-      {
-        onError: (error) => {
-          toast.error(`Failed to update URL: ${error?.message}`)
-        },
-        onSuccess: () => {
-          setOpen(false)
-          toast.success('Successfully added URL')
-        },
-      }
-    )
-  }
 
   const onConfirmDeleteUrl = async (urls?: string[]) => {
     if (!urls || urls.length === 0) return
@@ -155,46 +113,13 @@ export const RedirectUrls = () => {
           onSelectRemoveURLs={() => setOpenRemoveSelected(true)}
         />
       )}
-      <Modal
-        hideFooter
-        size="medium"
-        className="!max-w-[440px]"
+
+      <AddNewURLModal
         visible={open}
-        onCancel={() => setOpen(!open)}
-        header="Add a new URL"
-        description="This will add a URL to a list of allowed URLs that can interact with your Authentication services for this project."
-      >
-        <Form
-          validateOnBlur
-          id="new-redirect-url-form"
-          initialValues={{ url: '' }}
-          validationSchema={newUrlSchema}
-          onSubmit={onAddNewUrl}
-        >
-          {() => {
-            return (
-              <>
-                <Modal.Content className="flex flex-col gap-y-2">
-                  <Input id="url" name="url" label="URL" placeholder="https://mydomain.com" />
-                </Modal.Content>
-                <DialogSectionSeparator />
-                <Modal.Content>
-                  <Button
-                    block
-                    form="new-redirect-url-form"
-                    htmlType="submit"
-                    size="small"
-                    disabled={isUpdatingConfig}
-                    loading={isUpdatingConfig}
-                  >
-                    Add URL
-                  </Button>
-                </Modal.Content>
-              </>
-            )
-          }}
-        </Form>
-      </Modal>
+        allowList={URI_ALLOW_LIST_ARRAY}
+        onClose={() => setOpen(false)}
+      />
+
       <Modal
         hideFooter
         size="large"

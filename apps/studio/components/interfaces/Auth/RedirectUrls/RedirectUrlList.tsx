@@ -1,12 +1,11 @@
-import { noop } from 'lodash'
-import { Globe, Trash } from 'lucide-react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Globe, Trash } from 'lucide-react'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EmptyListState } from 'components/ui/States'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, Checkbox_Shadcn_ } from 'ui'
 import { ValueContainer } from './ValueContainer'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface RedirectUrlListProps {
   allowList: string[]
@@ -20,10 +19,10 @@ interface RedirectUrlListProps {
 export const RedirectUrlList = ({
   allowList,
   selectedUrls,
-  onSelectUrl = noop,
-  onSelectAddURL = noop,
-  onSelectRemoveURLs = noop,
-  onSelectClearSelection = noop,
+  onSelectUrl,
+  onSelectAddURL,
+  onSelectRemoveURLs,
+  onSelectClearSelection,
 }: RedirectUrlListProps) => {
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
