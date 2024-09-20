@@ -70,7 +70,8 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
               </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 <p className="col-span-12 text-sm lg:col-span-7 leading-6">
-                  Your custom domain CNAME record for <code className="text-xs">{customDomain.hostname}</code>
+                  Your custom domain CNAME record for{' '}
+                  <code className="text-xs">{customDomain.hostname}</code>
                   should resolve to{' '}
                   {endpoint ? (
                     <code className="text-xs">{endpoint}</code>

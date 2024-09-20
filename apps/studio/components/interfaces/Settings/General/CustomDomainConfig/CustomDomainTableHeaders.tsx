@@ -1,10 +1,8 @@
-
 export type DNSTableHeaderProps = {
   display: string | undefined
 }
 
 const DNSTableHeaders = ({ display }: DNSTableHeaderProps) => {
-
   // Display the DNS table headers if we have something to show
   if (display !== '') {
     return (
@@ -34,7 +32,6 @@ const DNSTableHeaders = ({ display }: DNSTableHeaderProps) => {
       </p>
     </div>
   )
-
 }
 
 export default DNSTableHeaders

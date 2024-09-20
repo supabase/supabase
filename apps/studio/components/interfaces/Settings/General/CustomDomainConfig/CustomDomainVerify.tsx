@@ -140,18 +140,17 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           </Alert_Shadcn_>
         ) : (
           <div className="space-y-2">
-
             <DNSTableHeaders display={customDomain.ssl.txt_name ?? ''} />
 
             {customDomain.verification_errors?.includes(
               'custom hostname does not CNAME to this zone.'
             ) && (
-                <DNSRecord
-                  type="CNAME"
-                  name={customDomain.hostname}
-                  value={settings?.autoApiService.endpoint ?? 'Loading...'}
-                />
-              )}
+              <DNSRecord
+                type="CNAME"
+                name={customDomain.hostname}
+                value={settings?.autoApiService.endpoint ?? 'Loading...'}
+              />
+            )}
 
             {customDomain.ssl.status === 'pending_validation' && (
               <DNSRecord
