@@ -5,7 +5,6 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
-import { Label } from '@ui/components/shadcn/ui/label'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -118,51 +117,15 @@ export const RedirectUrls = () => {
           description={`URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com`}
         />
         <div className="flex items-center gap-2 mb-6 ml-12">
-          {selectedUrls.length > 0 ? (
-            <>
-              <Button type="default" onClick={() => setSelectedUrls([])}>
-                Clear selection
-              </Button>
-              <ButtonTooltip
-                type="default"
-                disabled={!canUpdateConfig}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: 'You need additional permissions to remove redirect URLs',
-                  },
-                }}
-                icon={<Trash />}
-                onClick={() => (selectedUrls.length > 0 ? setOpenRemoveSelected(true) : null)}
-              >
-                Remove ({selectedUrls.length})
-              </ButtonTooltip>
-            </>
-          ) : (
-            <>
-              <Button asChild type="default" icon={<ExternalLink />}>
-                <Link
-                  href="https://supabase.com/docs/guides/auth/concepts/redirect-urls"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Documentation
-                </Link>
-              </Button>
-              <ButtonTooltip
-                disabled={!canUpdateConfig}
-                onClick={() => setOpen(true)}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: 'You need additional permissions to update redirect URLs',
-                  },
-                }}
-              >
-                Add URL
-              </ButtonTooltip>
-            </>
-          )}
+          <Button asChild type="default" icon={<ExternalLink />}>
+            <Link
+              href="https://supabase.com/docs/guides/auth/concepts/redirect-urls"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Documentation
+            </Link>
+          </Button>
         </div>
       </div>
       {isLoading && (
@@ -187,12 +150,15 @@ export const RedirectUrls = () => {
           allowList={URI_ALLOW_LIST_ARRAY}
           selectedUrls={selectedUrls}
           onSelectUrl={setSelectedUrls}
-          canUpdate={canUpdateConfig}
+          onSelectAddURL={() => setOpen(true)}
+          onSelectClearSelection={() => setSelectedUrls([])}
+          onSelectRemoveURLs={() => setOpenRemoveSelected(true)}
         />
       )}
       <Modal
         hideFooter
-        size="small"
+        size="medium"
+        className="!max-w-[440px]"
         visible={open}
         onCancel={() => setOpen(!open)}
         header="Add a new URL"
@@ -209,7 +175,6 @@ export const RedirectUrls = () => {
             return (
               <>
                 <Modal.Content className="flex flex-col gap-y-2">
-                  <Label htmlFor="url">URL</Label>
                   <Input id="url" name="url" label="URL" placeholder="https://mydomain.com" />
                 </Modal.Content>
                 <DialogSectionSeparator />

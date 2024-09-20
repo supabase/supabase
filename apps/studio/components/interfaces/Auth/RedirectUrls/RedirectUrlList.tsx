@@ -1,22 +1,32 @@
 import { noop } from 'lodash'
-import { Globe } from 'lucide-react'
+import { Globe, Trash } from 'lucide-react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { EmptyListState } from 'components/ui/States'
-import { Checkbox_Shadcn_ } from 'ui'
+import { Button, Checkbox_Shadcn_ } from 'ui'
 import { ValueContainer } from './ValueContainer'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface RedirectUrlListProps {
   allowList: string[]
-  canUpdate: boolean
   selectedUrls: string[]
   onSelectUrl: (urls: string[]) => void
+  onSelectAddURL: () => void
+  onSelectRemoveURLs: () => void
+  onSelectClearSelection: () => void
 }
 
 export const RedirectUrlList = ({
   allowList,
   selectedUrls,
   onSelectUrl = noop,
+  onSelectAddURL = noop,
+  onSelectRemoveURLs = noop,
+  onSelectClearSelection = noop,
 }: RedirectUrlListProps) => {
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+
   // [Joshen] One for next time: maybe shift this into a reusable logic since it
   // seems like we can use this in multiple places for future
   const onClickUrl = (event: any, url: string) => {
@@ -51,6 +61,43 @@ export const RedirectUrlList = ({
 
   return (
     <div className="-space-y-px">
+      <ValueContainer className="py-3 flex items-center justify-between">
+        <p className="text-foreground-light text-sm">Total URLs: {allowList.length}</p>
+        {selectedUrls.length > 0 ? (
+          <div className="flex items-center gap-x-2">
+            <Button type="default" onClick={() => onSelectClearSelection()}>
+              Clear selection
+            </Button>
+            <ButtonTooltip
+              type="default"
+              disabled={!canUpdateConfig}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to remove redirect URLs',
+                },
+              }}
+              icon={<Trash />}
+              onClick={() => (selectedUrls.length > 0 ? onSelectRemoveURLs() : null)}
+            >
+              Remove ({selectedUrls.length})
+            </ButtonTooltip>
+          </div>
+        ) : (
+          <ButtonTooltip
+            disabled={!canUpdateConfig}
+            onClick={() => onSelectAddURL()}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to update redirect URLs',
+              },
+            }}
+          >
+            Add URL
+          </ButtonTooltip>
+        )}
+      </ValueContainer>
       {allowList.length > 0 ? (
         <>
           {allowList.map((url) => {
@@ -59,14 +106,10 @@ export const RedirectUrlList = ({
               <ValueContainer key={url} isSelected={isSelected} onClick={(e) => onClickUrl(e, url)}>
                 <div className={`flex items-center gap-4 font-mono group w-full`}>
                   <div className="w-5 h-5 flex items-center justify-center">
-                    <span className="text-foreground-lighter">
-                      <Globe strokeWidth={2} size={14} />
-                    </span>
-                  </div>
-                  <span className="text-sm flex-grow">{url}</span>
-                  <div className="flex-shrink-0">
                     <Checkbox_Shadcn_ checked={isSelected} onChange={(e) => onClickUrl(e, url)} />
                   </div>
+                  <Globe strokeWidth={2} size={14} className="text-foreground-lighter" />
+                  <span className="text-sm flex-grow">{url}</span>
                 </div>
               </ValueContainer>
             )
