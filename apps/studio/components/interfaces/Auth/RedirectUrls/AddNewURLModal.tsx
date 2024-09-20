@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Trash } from 'lucide-react'
+import { useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -78,6 +79,10 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
       )
     }
   }
+
+  useEffect(() => {
+    if (visible) form.reset(initialValues)
+  }, [visible])
 
   return (
     <Modal
