@@ -122,13 +122,17 @@ const TeamSettings = () => {
       </ScaffoldContainerLegacy>
 
       <ConfirmationModal
+        size="medium"
         visible={isLeaveTeamModalOpen}
-        title="Are you sure?"
+        title="Confirm to leave organization"
         confirmLabel="Leave"
-        onCancel={() => setIsLeaveTeamModalOpen(false)}
-        onConfirm={() => {
-          leaveTeam()
+        alert={{
+          title: 'All of your user content will be permanently removed.',
+          description:
+            'Leaving the organization will delete all of your saved content in the projects of the organization, which includes SQL snippets, custom reports and Log Explorer queries.',
         }}
+        onCancel={() => setIsLeaveTeamModalOpen(false)}
+        onConfirm={() => leaveTeam()}
       >
         <p className="text-sm text-foreground-light">
           Are you sure you want to leave this organization? This is permanent.

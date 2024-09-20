@@ -289,7 +289,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
         alert={{
           title: 'All user content from this member will be permanently removed.',
           description:
-            "Removing a member will delete all of the user's saved content, which includes SQL snippets, custom reports and Log Explorer queries.",
+            "Removing a member will delete all of the user's saved content in the projects of the organization, which includes SQL snippets, custom reports and Log Explorer queries.",
         }}
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => {
