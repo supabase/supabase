@@ -1,169 +1,17 @@
 ---
-id: 'local-development'
-title: 'Local Development'
-description: 'How to use Supabase on your local development machine.'
-subtitle: 'How to use Supabase on your local development machine.'
+id: 'overview'
+title: 'Local development with schema migrations'
+description: 'Develop locally with the Supabase CLI and schema migrations.'
+subtitle: 'Develop locally with the Supabase CLI and schema migrations.'
 video: 'https://www.youtube-nocookie.com/v/vyHyYpvjaks'
 tocVideo: 'vyHyYpvjaks'
 ---
 
 Supabase is a flexible platform that lets you decide how you want to build your projects. You can use the Dashboard directly to get up and running quickly, or use a proper local setup. We suggest you work locally and deploy your changes to a linked project on the [Supabase Platform](https://app.supabase.io/).
 
-Doing things directly on the platform via the [Dashboard](https://app.supabase.io/) is fine when you're getting started, but it's a good idea to move to a proper local workflow before you get too far. Working locally, generating migrations as you change your tables, and applying those migrations to a linked project on the [Platform](https://app.supabase.io/) keeps everything nicely organized as you grow.
+Develop locally using the CLI to run a local Supabase stack. You can use the integrated Studio Dashboard to make changes, then capture your changes in schema migration files, which can be saved in version control.
 
-## Why develop locally?
-
-The Dashboard provides a wide range of features for setting up your project: creating tables, adding columns, changing existing columns, creating views, setting up RLS policies, and more. Given all of the Dashboard's capabilities, you might question the need to work locally. Here's a few advantages to working this way:
-
-1. **Faster Development**: Developing locally allows you to work without any network latency or internet disruptions.
-
-2. **Easier Collaboration**: Developing locally can make it easier to collaborate with others on the same project.
-
-3. **Cost-Effective**: Supabase provides a generous Free Plan and gives you two free projects to get started. But what if you need more than two? When you develop locally, you can spin up unlimited local projects and link them with live projects when you're ready to launch.
-
-4. **Configuration in code**: If you directly change your tables via the Dashboard, none of that gets captured in code. If you follow these local development practices, you'll store all of your table schemas in code.
-
-5. **Work offline**: Need to work from a train? A plane? An automobile? No problem. Developing your project locally allows you to work offline.
-
-## Log in to the Supabase CLI
-
-Log in if you are planning to deploy your project to the Supabase Platform. This step is optional and is not required to use the Supabase CLI.
-
-<CH.Code>
-
-```bash Terminal
-supabase login
-```
-
-```bash NPX
-npx supabase login
-```
-
-</CH.Code>
-
-## Initialize your project
-
-Create a new folder for your project and start a new git repository:
-
-```bash
-# create your project folder
-mkdir your-project
-
-# move into the new folder
-cd your-project
-
-# start a new git repository — important, don't skip this step
-git init
-```
-
-## Start Supabase services
-
-[Initialize](/docs/reference/cli/usage#supabase-init) Supabase to set up the configuration for developing your project locally:
-
-```bash
-supabase init
-```
-
-Make sure Docker is running.
-
-<Admonition type="note">
-
-There are a number of different projects available to download Docker from:
-
-- [Docker Desktop](https://docs.docker.com/get-docker/) (macOS, Windows, Linux)
-- [Rancher Desktop](https://rancherdesktop.io/) (macOS, Windows, Linux)
-- [OrbStack](https://orbstack.dev/) (macOS)
-- [colima](https://github.com/abiosoft/colima) (macOS)
-
-</Admonition>
-
-The [start](/docs/reference/cli/usage#supabase-start) command uses Docker to start the Supabase [services](/docs/guides/getting-started/architecture).
-This command may take a while to run if this is the first time using the CLI.
-
-```bash
-supabase start
-```
-
-Once all of the Supabase services are running, you'll see output containing your local Supabase credentials. It should look like this, with urls and keys that you'll use in your local project:
-
-```
-
-Started supabase local development setup.
-
-         API URL: http://localhost:54321
-          DB URL: postgresql://postgres:postgres@localhost:54322/postgres
-      Studio URL: http://localhost:54323
-    Inbucket URL: http://localhost:54324
-        anon key: eyJh......
-service_role key: eyJh......
-
-```
-
-You can use the [`supabase stop`](/docs/reference/cli/usage#supabase-stop) command at any time to stop all services (without resetting your local database). Use `supabase stop --no-backup` to stop all services and reset your local database.
-
-## Access your project's services
-
-You can now visit your local Dashboard at [http://localhost:54323](http://localhost:54323), and access the database directly with any Postgres client via `postgresql://postgres:postgres@localhost:54322/postgres`.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="postgres"
-  queryGroup="access-method"
->
-<TabPanel id="postgres" label="Postgres">
-
-```sh
-# Default URL:
-postgresql://postgres:postgres@localhost:54322/postgres
-```
-
-The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html)
-or any other Postgres client, such as [pgadmin](https://www.pgadmin.org/).
-
-For example:
-
-```bash
-psql 'postgresql://postgres:postgres@localhost:54322/postgres'
-```
-
-<Admonition type="note">
-
-To access the database from an edge function in your local Supabase setup, replace `localhost` with `host.docker.internal`.
-
-</Admonition>
-
-</TabPanel>
-<TabPanel id="kong" label="API Gateway">
-
-```sh
-# Default URL:
-http://localhost:54321
-```
-
-If you are accessing these services without the client libraries, you may need to pass the client keys as an `Authorization` header.
-Learn more about [JWT headers](/docs/learn/auth-deep-dive/auth-deep-dive-jwts).
-
-```sh
-curl 'http://localhost:54321/rest/v1/' \
-    -H "apikey: <anon key>" \
-    -H "Authorization: Bearer <anon key>"
-
-http://localhost:54321/rest/v1/           # REST (PostgREST)
-http://localhost:54321/realtime/v1/       # Realtime
-http://localhost:54321/storage/v1/        # Storage
-http://localhost:54321/auth/v1/           # Auth (GoTrue)
-```
-
-<Admonition type="note">
-
-`<anon key>` is provided when you run the command `supabase start`.
-
-</Admonition>
-
-</TabPanel>
-</Tabs>
+Alternatively, if you're comfortable with migration files and SQL, you can write your own migrations and push them to the local database for testing before sharing your changes.
 
 ## Database migrations
 
@@ -372,6 +220,20 @@ The last step is deploying these changes to a live Supabase project.
 
 You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the Supabase Platform and start scaling up to millions of users! Head over to [Supabase](https://supabase.com/dashboard) and create a new project to deploy to.
 
+### Log in to the Supabase CLI
+
+<CH.Code>
+
+```bash Terminal
+supabase login
+```
+
+```bash npx
+npx supabase login
+```
+
+</CH.Code>
+
 ### Link your project
 
 Associate your project with your remote project using [`supabase link`](/docs/reference/cli/usage#supabase-link).
@@ -457,19 +319,21 @@ Your RLS policies on storage buckets can be pulled locally by specifying `storag
 supabase db pull --schema storage
 ```
 
-The buckets and objects themselves are rows in the storage schema so they won't be pulled automatically.
+The buckets and objects themselves are rows in the storage tables so they won't appear in your schema. You can instead define them via `supabase/config.toml` file. For example,
 
-### Local logging
+```bash supabase/config.toml
+[storage.buckets.images]
+public = false
+file_size_limit = "50MiB"
+allowed_mime_types = ["image/png", "image/jpeg"]
+objects_path = "./images"
+```
 
-Local logs rely on the Supabase Analytics Server which accesses the docker logging driver by either volume mounting `/var/run/docker.sock` domain socket on Linux and macOS, or exposing `tcp://localhost:2375` daemon socket on Windows. These settings must be configured manually after [installing](/docs/guides/cli/getting-started#installing-the-supabase-cli) the Supabase CLI.
+This will upload files from `supabase/images` directory to a bucket named `images` in your project with one command.
 
-<Admonition type="note">
-
-For advanced logs analysis using the Logs Explorer, it is advised to use the BigQuery backend instead of the default Postgres backend. Read about the steps [here](/docs/reference/self-hosting-analytics/introduction#bigquery).
-
-</Admonition>
-
-All logs will be stored in the local database under the `_analytics` schema.
+```bash
+supabase seed buckets
+```
 
 ## Limitations and considerations
 
