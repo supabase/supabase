@@ -3,7 +3,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
   const HUBSPOT_PORTAL_ID = process.env.HUBSPOT_PORTAL_ID
   const HUBSPOT_FORM_GUID = process.env.HUBSPOT_ENTERPRISE_FORM_GUID
 
@@ -34,7 +34,7 @@ export async function POST(req: Request, res: Response) {
           ],
           context: {
             pageUri: 'https://supabase.com/contact/sales',
-            pageName: 'Enterprise Form - www contact-sales',
+            pageName: 'Enterprise Demo Request Form',
           },
           legalConsentOptions: {
             consent: {
