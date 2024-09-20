@@ -14,7 +14,7 @@ Supabase provides several options for programmatically connecting to your Postgr
 
 ## Data APIs
 
-Supabase provides auto-updating Data APIs. These are the easiest way to get started if you are managing data (fetching, inserting, updating). We provide several types of API to suit your preferences:
+Supabase's Data APIs are the easiest way to get started if you are managing data (fetching, inserting, updating). We provide several types of API to suit your preferences:
 
 - [REST](/docs/guides/api): interact with your database through a REST interface.
 - [GraphQL](/docs/guides/graphql/api): interact with your database through a GraphQL interface.
@@ -22,7 +22,7 @@ Supabase provides auto-updating Data APIs. These are the easiest way to get star
 
 ## Client libraries
 
-Supabase offers [client libraries](https://supabase.com/docs#client-libraries) for popular programming languages. These libraries provide a convenient wrapper around the Data APIs, making it easier to interact with your database using your preferred language.
+Supabase offers [client libraries](https://supabase.com/docs/reference) for popular programming languages. These libraries provide a convenient wrapper around the Data APIs, making it easier to interact with your database using your preferred language.
 
 ## Connecting to external libraries and tools
 
@@ -32,12 +32,13 @@ You can find these connection strings in your [Database Settings](https://supaba
 
 ### Direct connections:
 
-It connects directly to your Postgres instance. It is ideal for persistent servers (AWS EC2, Fly.io VMs, DigitalOcean Droplets, etc).
+It connects directly to your Postgres instance. It is ideal for persistent servers, such as virtual machines (VMs) and long-lasting containers. Examples include AWS EC2 machines, Fly.io VMs, and DigitalOcean Droplets.
 
 <Admonition type="caution">
-  Direct connections use IPv6 addresses by default. If your environment isn't compatible or you're
-  unsure, you can check the [networking
-  guide](/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility)
+
+Direct connections use IPv6 addresses by default. If your environment isn't compatible or you're
+unsure, you can check the [networking guide](/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility)
+
 </Admonition>
 
 ```md
@@ -53,7 +54,7 @@ You can find the direct connection string in the [Database settings](https://sup
 
 ### Supavisor session mode (port 5432):
 
-Supabase's Supavisor pooler in Session mode acts as an IPv4 proxy. It offers a direct connection experience with default IPv4 support for developers in IPv4-only environments or without the IPv4 add-on.
+In Session mode, Supabase's Supavisor pooler acts as an IPv4 proxy, allowing developers in IPv4-only environments to connect directly without the IPv4 add-on.
 
 ```md
 // Example String
@@ -64,8 +65,9 @@ postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pool
 
 <Admonition type="caution">
   Transaction mode does not support [prepared
-  statements](https://postgresql.org/docs/current/sql-prepare.html). To avoid errors, disable
-  prepared statements in your connection library.
+  statements](https://postgresql.org/docs/current/sql-prepare.html). To avoid errors, [disable
+  prepared statements](https://github.com/orgs/supabase/discussions/28239) in your connection
+  library.
 </Admonition>
 
 Supavisor in transaction mode forms hot connections with the database and only allows clients to access them when a query is pending. It has amazing scaling capacity, and is best used with temporary servers, such as serverless/Edge Functions or auto-scaling servers.
@@ -83,7 +85,7 @@ Application-side poolers are built into connection libraries and API servers, su
 
 ### Serverside poolers
 
-Postgres connections are like WebSocket, once established, they are preserved until the client (application servers) disconnects. A server might only make a single 10 ms query, but needlessly reserve its database connection for seconds or longer.
+Postgres connections are like WebSocket, once established, they are preserved until the client (application server) disconnects. A server might only make a single 10 ms query, but needlessly reserve its database connection for seconds or longer.
 
 Serverside-poolers, such as Supabase's [Supavisor](https://github.com/supabase/supavisor) in transaction mode, sit between clients and the database and can be thought of as load balancers for Postgres connections.
 
@@ -119,8 +121,9 @@ You can obtain your connection info and Server root certificate from your applic
 ## Quickstart connection guides
 
 <Admonition type="tip">
-  If you'd like us to add a new quickstart guide, share your
-  [feedback](https://supabase.com/dashboard/support/new), and we'll try to add it going forwards.
+
+If you'd like us to add a new quickstart guide, share your [feedback](https://supabase.com/dashboard/support/new), and we'll try to add it going forwards.
+
 </Admonition>
 
 ### External libraries
