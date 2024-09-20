@@ -153,7 +153,7 @@ const ColumnEditor = ({
         break;
       case "json":
       case "jsonb":
-        setPlaceholder(`JSONB_TYPEOF(settings->'active') = 'boolean'`)
+        setPlaceholder(`JSONB_TYPEOF(${columnName}->'active') = 'boolean'`)
         break;
       case "bool":
         setPlaceholder(`${columnName} IN (TRUE, FALSE)`)
