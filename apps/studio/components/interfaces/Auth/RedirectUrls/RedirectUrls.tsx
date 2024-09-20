@@ -127,6 +127,20 @@ const RedirectUrls = () => {
             </Link>
           </Button>
           <ButtonTooltip
+            type="default"
+            disabled={!canUpdateConfig}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to remove redirect URLs',
+              },
+            }}
+            icon={<Trash />}
+            onClick={() => (selectedUrls.length > 0 ? setOpenRemoveSelected(true) : null)}
+          >
+            Remove ({selectedUrls.length})
+          </ButtonTooltip>
+          <ButtonTooltip
             disabled={!canUpdateConfig}
             onClick={() => setOpen(true)}
             tooltip={{
@@ -138,11 +152,6 @@ const RedirectUrls = () => {
           >
             Add URL
           </ButtonTooltip>
-          {selectedUrls.length > 0 && (
-            <Button type="default" icon={<Trash />} onClick={() => setOpenRemoveSelected(true)}>
-              Remove selected ({selectedUrls.length})
-            </Button>
-          )}
         </div>
       </div>
       {isLoading && (
@@ -209,43 +218,6 @@ const RedirectUrls = () => {
             )
           }}
         </Form>
-      </Modal>
-      <Modal
-        hideFooter
-        size="small"
-        visible={selectedUrlToDelete !== undefined}
-        header="Remove URL"
-        onCancel={() => setSelectedUrlToDelete(undefined)}
-      >
-        <Modal.Content>
-          <p className="mb-2 text-sm text-foreground-light">
-            Are you sure you want to remove{' '}
-            <span className="text-foreground">{selectedUrlToDelete}</span>?
-          </p>
-          <p className="text-foreground-light text-sm">
-            This URL will no longer work with your authentication configuration.
-          </p>
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content className="flex items-center gap-x-2">
-          <Button
-            block
-            type="default"
-            size="medium"
-            onClick={() => setSelectedUrlToDelete(undefined)}
-          >
-            Cancel
-          </Button>
-          <Button
-            block
-            size="medium"
-            type="warning"
-            loading={isUpdatingConfig}
-            onClick={() => onConfirmDeleteUrl(selectedUrlToDelete ? [selectedUrlToDelete] : [])}
-          >
-            {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
-          </Button>
-        </Modal.Content>
       </Modal>
       <Modal
         hideFooter

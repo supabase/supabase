@@ -1,8 +1,8 @@
 import { noop } from 'lodash'
-import { Button, Checkbox } from 'ui'
+import { Checkbox } from 'ui'
 import { EmptyListState } from 'components/ui/States'
 import ValueContainer from './ValueContainer'
-import { Globe, Trash } from 'lucide-react'
+import { Globe } from 'lucide-react'
 
 interface RedirectUrlListProps {
   URI_ALLOW_LIST_ARRAY: string[]
@@ -14,10 +14,8 @@ interface RedirectUrlListProps {
 
 const RedirectUrlList = ({
   URI_ALLOW_LIST_ARRAY,
-  canUpdate,
   selectedUrls,
   onSelectUrl = noop,
-  onSelectUrlToDelete = noop,
 }: RedirectUrlListProps) => {
   return (
     <div className="-space-y-px">
@@ -36,41 +34,22 @@ const RedirectUrlList = ({
                   onSelectUrl(newSelectedUrls)
                 }}
               >
-                <div className={`flex items-center gap-4 font-mono group`}>
+                <div className={`flex items-center gap-4 font-mono group w-full`}>
                   <div className="w-5 h-5 flex items-center justify-center">
-                    {isSelected ? (
-                      <Checkbox
-                        checked={isSelected}
-                        onChange={() => {
-                          const newSelectedUrls = selectedUrls.filter(
-                            (selectedUrl) => selectedUrl !== url
-                          )
-                          onSelectUrl(newSelectedUrls)
-                        }}
-                      />
-                    ) : (
-                      <span className="text-foreground-lighter group-hover:hidden">
-                        <Globe strokeWidth={2} size={14} />
-                      </span>
-                    )}
-                    {!isSelected && (
-                      <div className="hidden group-hover:block">
-                        <Checkbox
-                          checked={isSelected}
-                          onChange={() => {
-                            onSelectUrl([...selectedUrls, url])
-                          }}
-                        />
-                      </div>
-                    )}
+                    <span className="text-foreground-lighter">
+                      <Globe strokeWidth={2} size={14} />
+                    </span>
                   </div>
-                  <span className="text-sm">{url}</span>
+                  <span className="text-sm flex-grow">{url}</span>
+                  <div className="flex-shrink-0">
+                    <Checkbox
+                      checked={isSelected}
+                      onChange={() => {
+                        onSelectUrl([...selectedUrls, url])
+                      }}
+                    />
+                  </div>
                 </div>
-                {canUpdate && (
-                  <Button type="default" icon={<Trash />} onClick={() => onSelectUrlToDelete(url)}>
-                    Remove
-                  </Button>
-                )}
               </ValueContainer>
             )
           })}
