@@ -7,7 +7,7 @@ import '../styles/prism-okaidia.scss'
 import { genFaviconData } from 'common/MetaFavicons/app-router'
 import { type Metadata, type Viewport } from 'next'
 
-import { BASE_PATH } from '~/lib/constants'
+import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
 import { GlobalProviders } from '~/features/app.providers'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 
@@ -19,8 +19,8 @@ const metadata: Metadata = {
   metadataBase: new URL('https://supabase.com'),
   icons: genFaviconData(BASE_PATH),
   robots: {
-    index: true,
-    follow: true,
+    index: IS_PRODUCTION,
+    follow: IS_PRODUCTION,
   },
   openGraph: {
     type: 'article',

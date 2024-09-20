@@ -1,8 +1,12 @@
-import { MoreVertical, Trash } from 'lucide-react'
+import { Download, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
+import { useParams } from 'common'
 import DeleteProjectModal from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
+import { useDownloadableBackupQuery } from 'data/database/backup-query'
 import {
   Button,
   CriticalIcon,
@@ -14,8 +18,31 @@ import {
 import { useProjectContext } from './ProjectContext'
 
 const RestoreFailedState = () => {
+  const { ref } = useParams()
   const { project } = useProjectContext()
   const [visible, setVisible] = useState(false)
+
+  const { data } = useDownloadableBackupQuery({ projectRef: ref })
+  const backups = data?.backups ?? []
+
+  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+    onSuccess: (res) => {
+      const { fileUrl } = res
+
+      // Trigger browser download by create,trigger and remove tempLink
+      const tempLink = document.createElement('a')
+      tempLink.href = fileUrl
+      document.body.appendChild(tempLink)
+      tempLink.click()
+      document.body.removeChild(tempLink)
+    },
+  })
+
+  const onClickDownloadBackup = () => {
+    if (!ref) return console.error('Project ref is required')
+    if (backups.length === 0) return console.error('No available backups to download')
+    downloadBackup({ ref, backup: backups[0] })
+  }
 
   return (
     <>
@@ -43,6 +70,16 @@ const RestoreFailedState = () => {
                   Contact support
                 </Link>
               </Button>
+              <ButtonTooltip
+                type="default"
+                icon={<Download />}
+                loading={isDownloading}
+                disabled={backups.length === 0}
+                tooltip={{ content: { side: 'bottom', text: 'No available backups to download' } }}
+                onClick={onClickDownloadBackup}
+              >
+                Download backup
+              </ButtonTooltip>
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Button type="default" className="px-1.5" icon={<MoreVertical />} />

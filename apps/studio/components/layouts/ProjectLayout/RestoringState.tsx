@@ -1,14 +1,18 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { CheckCircle, Download, Loader } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { Button } from 'ui'
 
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
+import { useDownloadableBackupQuery } from 'data/database/backup-query'
 import { projectKeys } from 'data/projects/keys'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { Button } from 'ui'
 import { useProjectContext } from './ProjectContext'
-import { CheckCircle, Loader } from 'lucide-react'
 
 const RestoringState = () => {
   const { ref } = useParams()
@@ -19,10 +23,27 @@ const RestoringState = () => {
   const [loading, setLoading] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
 
-  useEffect(() => {
-    checkServerInterval.current = window.setInterval(checkServer, 4000)
-    return () => clearInterval(checkServerInterval.current)
-  }, [])
+  const { data } = useDownloadableBackupQuery({ projectRef: ref })
+  const backups = data?.backups ?? []
+
+  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+    onSuccess: (res) => {
+      const { fileUrl } = res
+
+      // Trigger browser download by create,trigger and remove tempLink
+      const tempLink = document.createElement('a')
+      tempLink.href = fileUrl
+      document.body.appendChild(tempLink)
+      tempLink.click()
+      document.body.removeChild(tempLink)
+    },
+  })
+
+  const onClickDownloadBackup = () => {
+    if (!ref) return console.error('Project ref is required')
+    if (backups.length === 0) return console.error('No available backups to download')
+    downloadBackup({ ref, backup: backups[0] })
+  }
 
   async function checkServer() {
     if (!project) return
@@ -47,6 +68,11 @@ const RestoringState = () => {
     setLoading(true)
     if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
+
+  useEffect(() => {
+    checkServerInterval.current = window.setInterval(checkServer, 4000)
+    return () => clearInterval(checkServerInterval.current)
+  }, [])
 
   return (
     <div className="flex items-center justify-center h-full">
@@ -86,6 +112,25 @@ const RestoringState = () => {
             </div>
           </div>
         )}
+        <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
+          <Button asChild type="default">
+            <Link
+              href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
+            >
+              Contact support
+            </Link>
+          </Button>
+          <ButtonTooltip
+            type="default"
+            icon={<Download />}
+            loading={isDownloading}
+            disabled={backups.length === 0}
+            tooltip={{ content: { side: 'bottom', text: 'No available backups to download' } }}
+            onClick={onClickDownloadBackup}
+          >
+            Download backup
+          </ButtonTooltip>
+        </div>
       </div>
     </div>
   )
