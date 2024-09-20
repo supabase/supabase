@@ -1,6 +1,20 @@
 const AFTER_26_09_2024 = Date.now() >= new Date('2024-09-26T00:00:00Z').getTime()
 
-export const RESOURCE_WARNING_MESSAGES = {
+interface ResourceWarningMessage {
+  bannerContent: {
+    warning: { title: string; description: string }
+    critical: { title?: string; description?: string }
+  }
+  cardContent: {
+    warning: { title: string; description: string }
+    critical: { title?: string; description?: string }
+  }
+  docsUrl?: string
+  buttonText?: string
+  metric: string | null
+}
+
+export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> = {
   is_readonly_mode_enabled: {
     bannerContent: {
       warning: {
@@ -220,7 +234,7 @@ export const RESOURCE_WARNING_MESSAGES = {
       warning: {
         title: AFTER_26_09_2024
           ? 'Auth emails are restricted'
-          : 'Soon: Auth emails to be restricted',
+          : 'Action required: Auth emails to be restricted',
         description: AFTER_26_09_2024
           ? "Your project can only send Auth emails to your organization's members. Set up a custom SMTP provider to send Auth emails to any user."
           : "On 26th September your project will only be able to send Auth emails to your organization's members. Set up a custom SMTP provider before then to avoid disruptions!",
@@ -228,14 +242,14 @@ export const RESOURCE_WARNING_MESSAGES = {
       critical: {
         title: AFTER_26_09_2024
           ? 'Auth emails are restricted'
-          : 'Soon: Auth emails to be restricted',
+          : 'Action required: Auth emails to be restricted',
         description: AFTER_26_09_2024
           ? "Your project can only send Auth emails to your organization's members. Set up a custom SMTP provider to send Auth emails to any user."
           : "On 26th September your project will only be able to send Auth emails to your organization's members. Set up a custom SMTP provider before then to avoid disruptions!",
       },
     },
-    docsUrl: undefined,
+    docsUrl: 'https://github.com/orgs/supabase/discussions/29370',
     buttonText: 'Set up custom SMTP now',
-    metric: null,
+    metric: 'auth_restricted_email_sending',
   },
 }
