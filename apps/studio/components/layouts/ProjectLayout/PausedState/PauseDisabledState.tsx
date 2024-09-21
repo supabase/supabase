@@ -29,7 +29,9 @@ export const PauseDisabledState = () => {
   const { project } = useProjectContext()
   const [toastId, setToastId] = useState<string | number>()
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
+
   const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
+  const allowStorageObjectsDownload = useFlag('enableNinetyDayStorageDownload')
 
   const { data: pauseStatus } = useProjectPauseStatusQuery(
     { ref },
@@ -157,10 +159,25 @@ export const PauseDisabledState = () => {
               <Database size={16} />
               Download database backup
             </DropdownMenuItemTooltip>
-            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDownloadStorageArchive()}>
+            <DropdownMenuItemTooltip
+              className="gap-x-2"
+              disabled={!allowStorageObjectsDownload}
+              onClick={() => onSelectDownloadStorageArchive()}
+              tooltip={{
+                content: {
+                  side: 'right',
+                  text: 'This feature is not available yet, please reach out to support for assistance',
+                },
+              }}
+            >
               <Storage size={16} />
               Download storage objects
-            </DropdownMenuItem>
+            </DropdownMenuItemTooltip>
+            {/* [Joshen] Once storage object download is supported, can just use the below component */}
+            {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDownloadStorageArchive()}>
+              <Storage size={16} />
+              Download storage objects
+            </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
       </AlertDescription_Shadcn_>
