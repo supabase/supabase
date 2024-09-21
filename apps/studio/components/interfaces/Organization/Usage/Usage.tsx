@@ -225,13 +225,15 @@ const Usage = () => {
         currentBillingCycleSelected={currentBillingCycleSelected}
       />
 
-      <Compute
-        orgSlug={slug as string}
-        projectRef={selectedProjectRef}
-        subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
-      />
+      {subscription?.plan.id !== 'free' && (
+        <Compute
+          orgSlug={slug as string}
+          projectRef={selectedProjectRef}
+          subscription={subscription}
+          startDate={startDate}
+          endDate={endDate}
+        />
+      )}
 
       <Bandwidth
         orgSlug={slug as string}

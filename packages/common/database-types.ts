@@ -58,6 +58,101 @@ export type Database = {
         }
         Relationships: []
       }
+      last_changed: {
+        Row: {
+          checksum: string
+          heading: string
+          id: number
+          last_checked: string
+          last_updated: string
+          parent_page: string
+        }
+        Insert: {
+          checksum: string
+          heading: string
+          id?: never
+          last_checked?: string
+          last_updated?: string
+          parent_page: string
+        }
+        Update: {
+          checksum?: string
+          heading?: string
+          id?: never
+          last_checked?: string
+          last_updated?: string
+          parent_page?: string
+        }
+        Relationships: []
+      }
+      launch_weeks: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          start_date: string | null
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id: string
+          start_date?: string | null
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          start_date?: string | null
+        }
+        Relationships: []
+      }
+      meetups: {
+        Row: {
+          country: string | null
+          created_at: string
+          display_info: string | null
+          id: string
+          is_live: boolean
+          is_published: boolean
+          launch_week: string
+          link: string | null
+          start_at: string | null
+          title: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          display_info?: string | null
+          id?: string
+          is_live?: boolean
+          is_published?: boolean
+          launch_week: string
+          link?: string | null
+          start_at?: string | null
+          title?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          display_info?: string | null
+          id?: string
+          is_live?: boolean
+          is_published?: boolean
+          launch_week?: string
+          link?: string | null
+          start_at?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetups_launch_week_fkey"
+            columns: ["launch_week"]
+            isOneToOne: false
+            referencedRelation: "launch_weeks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       page: {
         Row: {
           checksum: string | null
@@ -141,11 +236,175 @@ export type Database = {
           },
         ]
       }
+      tickets: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string | null
+          game_won_at: string | null
+          id: string
+          launch_week: string
+          location: string | null
+          metadata: Json | null
+          name: string | null
+          referred_by: string | null
+          role: string | null
+          shared_on_linkedin: string | null
+          shared_on_twitter: string | null
+          ticket_number: number
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          game_won_at?: string | null
+          id?: string
+          launch_week: string
+          location?: string | null
+          metadata?: Json | null
+          name?: string | null
+          referred_by?: string | null
+          role?: string | null
+          shared_on_linkedin?: string | null
+          shared_on_twitter?: string | null
+          ticket_number?: number
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          game_won_at?: string | null
+          id?: string
+          launch_week?: string
+          location?: string | null
+          metadata?: Json | null
+          name?: string | null
+          referred_by?: string | null
+          role?: string | null
+          shared_on_linkedin?: string | null
+          shared_on_twitter?: string | null
+          ticket_number?: number
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_tickets_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_launch_week_fkey"
+            columns: ["launch_week"]
+            isOneToOne: false
+            referencedRelation: "launch_weeks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      troubleshooting_entries: {
+        Row: {
+          api: Json | null
+          date_created: string
+          date_updated: string
+          errors: Json[] | null
+          github_url: string
+          id: string
+          keywords: string[] | null
+          title: string
+          topics: string[]
+        }
+        Insert: {
+          api?: Json | null
+          date_created?: string
+          date_updated?: string
+          errors?: Json[] | null
+          github_url: string
+          id?: string
+          keywords?: string[] | null
+          title: string
+          topics: string[]
+        }
+        Update: {
+          api?: Json | null
+          date_created?: string
+          date_updated?: string
+          errors?: Json[] | null
+          github_url?: string
+          id?: string
+          keywords?: string[] | null
+          title?: string
+          topics?: string[]
+        }
+        Relationships: []
+      }
+      validation_history: {
+        Row: {
+          created_at: string
+          id: number
+          tag: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          tag: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          tag?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      tickets_view: {
+        Row: {
+          company: string | null
+          created_at: string | null
+          id: string | null
+          launch_week: string | null
+          location: string | null
+          metadata: Json | null
+          name: string | null
+          platinum: boolean | null
+          referrals: number | null
+          role: string | null
+          secret: boolean | null
+          shared_on_linkedin: string | null
+          shared_on_twitter: string | null
+          ticket_number: number | null
+          username: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_launch_week_fkey"
+            columns: ["launch_week"]
+            isOneToOne: false
+            referencedRelation: "launch_weeks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      cleanup_last_changed_pages: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       docs_search_embeddings: {
         Args: {
           embedding: string
@@ -175,15 +434,13 @@ export type Database = {
           description: string
         }[]
       }
-      get_page_parents: {
+      get_last_revalidation_for_tags: {
         Args: {
-          page_id: number
+          tags: string[]
         }
         Returns: {
-          id: number
-          parent_page_id: number
-          path: string
-          meta: Json
+          tag: string
+          created_at: string
         }[]
       }
       hnswhandler: {
@@ -207,22 +464,6 @@ export type Database = {
         }
         Returns: unknown
       }
-      match_page_sections: {
-        Args: {
-          embedding: string
-          match_threshold: number
-          match_count: number
-          min_content_length: number
-        }
-        Returns: {
-          id: number
-          page_id: number
-          slug: string
-          heading: string
-          content: string
-          similarity: number
-        }[]
-      }
       match_page_sections_v2: {
         Args: {
           embedding: string
@@ -239,6 +480,16 @@ export type Database = {
           slug: string | null
           token_count: number | null
         }[]
+      }
+      update_last_changed_checksum: {
+        Args: {
+          new_parent_page: string
+          new_heading: string
+          new_checksum: string
+          git_update_time: string
+          check_time: string
+        }
+        Returns: string
       }
       vector_avg: {
         Args: {

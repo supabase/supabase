@@ -3,7 +3,7 @@
 import { Check, Copy } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Children, ReactNode, useState } from 'react'
-import * as CopyToClipboard from 'react-copy-to-clipboard'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter, SyntaxHighlighterProps } from 'react-syntax-highlighter'
 import { cn } from '../../lib/utils/cn'
 import { Button } from '../Button/Button'

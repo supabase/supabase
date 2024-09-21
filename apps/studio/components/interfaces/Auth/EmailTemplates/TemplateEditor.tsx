@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
@@ -21,7 +21,9 @@ interface TemplateEditorProps {
 
 const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+    onError: (error) => toast.error(`Failed to update email templates: ${error.message}`),
+  })
 
   const { id, properties } = template
 
@@ -38,6 +40,8 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT`
   const messageProperty = properties[messageSlug]
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
 
@@ -49,17 +53,32 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
-        onError: () => toast.error('Failed to update settings'),
         onSuccess: () => {
           toast.success('Successfully updated settings')
           resetForm({
             values: values,
             initialValues: values,
           })
+          setHasUnsavedChanges(false) // Reset the unsaved changes state
         },
       }
     )
   }
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        e.returnValue = '' // deprecated, but older browsers still require this
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [hasUnsavedChanges])
 
   return (
     <Form id={formId} className="!border-t-0" initialValues={INITIAL_VALUES} onSubmit={onSubmit}>
@@ -135,7 +154,12 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                             language="html"
                             isReadOnly={!canUpdateConfig}
                             className="!mb-0 h-96 overflow-hidden rounded border"
-                            onInputChange={(e: string | undefined) => setBodyValue(e ?? '')}
+                            onInputChange={(e: string | undefined) => {
+                              setBodyValue(e ?? '')
+                              if (bodyValue !== e) {
+                                setHasUnsavedChanges(true)
+                              }
+                            }}
                             options={{ wordWrap: 'off', contextmenu: false }}
                             value={bodyValue}
                           />

@@ -15,7 +15,6 @@ import {
   DialogTrigger,
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -24,6 +23,15 @@ import {
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskMangementCoolDownSection } from './DiskManagementCoolDownSection'
+import {
+  calculateDiskSizePrice,
+  calculateIOPSPrice,
+  calculateThroughputPrice,
+} from './DiskManagement.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { DiskType } from './DiskManagement.constants'
+import { formatCurrency } from 'lib/helpers'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -42,6 +50,7 @@ interface TableDataRowProps {
   beforePrice: number
   afterPrice: number
   hidePrice?: boolean
+  priceTooltip?: string
 }
 
 const TableDataRow = ({
@@ -52,6 +61,7 @@ const TableDataRow = ({
   beforePrice,
   afterPrice,
   hidePrice = false,
+  priceTooltip,
 }: TableDataRowProps) => (
   <TableRow>
     <TableCell className="pl-5">
@@ -80,9 +90,14 @@ const TableDataRow = ({
       {hidePrice ? (
         <span className="text-xs font-mono">-</span>
       ) : beforePrice !== afterPrice ? (
-        <BillingChangeBadge show={true} beforePrice={beforePrice} afterPrice={afterPrice} />
+        <BillingChangeBadge
+          show={true}
+          beforePrice={beforePrice}
+          afterPrice={afterPrice}
+          tooltip={priceTooltip}
+        />
       ) : (
-        <span className="text-xs font-mono">${beforePrice}</span>
+        <span className="text-xs font-mono">{formatCurrency(beforePrice)}</span>
       )}
     </TableCell>
   </TableRow>
@@ -91,9 +106,7 @@ const TableDataRow = ({
 interface DiskSizeMeterProps {
   loading: boolean
   form: UseFormReturn<DiskStorageSchemaType>
-  iopsPrice: { oldPrice: string; newPrice: string }
-  throughputPrice: { oldPrice: string; newPrice: string }
-  diskSizePrice: { oldPrice: string; newPrice: string }
+  numReplicas: number
   isDialogOpen: boolean
   isWithinCooldown: boolean
   setIsDialogOpen: (isOpen: boolean) => void
@@ -105,13 +118,41 @@ export const DiskManagementReviewAndSubmitDialog = ({
   setIsDialogOpen,
   isWithinCooldown,
   form,
+  numReplicas,
   loading,
   onSubmit,
-  iopsPrice,
-  throughputPrice,
-  diskSizePrice,
 }: DiskSizeMeterProps) => {
+  const org = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+
+  const planId = subscription?.plan.id ?? ''
   const isDirty = Object.keys(form.formState.dirtyFields).length > 0
+
+  const replicaTooltipText = `Price change includes primary database and ${numReplicas} replica${numReplicas > 1 ? 's' : ''}`
+
+  const diskSizePrice = calculateDiskSizePrice({
+    planId,
+    oldSize: form.formState.defaultValues?.totalSize || 0,
+    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
+    newSize: form.getValues('totalSize'),
+    newStorageType: form.getValues('storageType') as DiskType,
+    numReplicas,
+  })
+
+  const iopsPrice = calculateIOPSPrice({
+    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
+    oldProvisionedIOPS: form.formState.defaultValues?.provisionedIOPS || 0,
+    newStorageType: form.getValues('storageType') as DiskType,
+    newProvisionedIOPS: form.getValues('provisionedIOPS'),
+    numReplicas,
+  })
+
+  const throughputPrice = calculateThroughputPrice({
+    storageType: form.getValues('storageType') as DiskType,
+    newThroughput: form.getValues('throughput') || 0,
+    oldThroughput: form.formState.defaultValues?.throughput || 0,
+    numReplicas,
+  })
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -161,29 +202,23 @@ export const DiskManagementReviewAndSubmitDialog = ({
               afterPrice={0}
             />
             <TableDataRow
-              attribute="Disk size"
-              defaultValue={form.formState.defaultValues?.totalSize ?? 0}
-              newValue={form.getValues('totalSize')}
-              unit="GB"
-              beforePrice={Number(diskSizePrice.oldPrice)}
-              afterPrice={Number(diskSizePrice.newPrice)}
-            />
-            <TableDataRow
               attribute="IOPS"
-              defaultValue={form.formState.defaultValues?.provisionedIOPS ?? 0}
-              newValue={form.getValues('provisionedIOPS')}
+              defaultValue={form.formState.defaultValues?.provisionedIOPS?.toLocaleString() ?? 0}
+              newValue={form.getValues('provisionedIOPS')?.toLocaleString()}
               unit="IOPS"
               beforePrice={Number(iopsPrice.oldPrice)}
               afterPrice={Number(iopsPrice.newPrice)}
+              priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
             />
             {form.getValues('storageType') === 'gp3' ? (
               <TableDataRow
                 attribute="Throughput"
-                defaultValue={form.formState.defaultValues?.throughput ?? 0}
-                newValue={form.getValues('throughput') ?? 0}
+                defaultValue={form.formState.defaultValues?.throughput?.toLocaleString() ?? 0}
+                newValue={form.getValues('throughput')?.toLocaleString() ?? 0}
                 unit="MB/s"
                 beforePrice={Number(throughputPrice.oldPrice)}
                 afterPrice={Number(throughputPrice.newPrice)}
+                priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
               />
             ) : (
               <TableRow>
@@ -199,10 +234,16 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 </TableCell>
               </TableRow>
             )}
+            <TableDataRow
+              attribute="Disk size"
+              defaultValue={form.formState.defaultValues?.totalSize?.toLocaleString() ?? 0}
+              newValue={form.getValues('totalSize')?.toLocaleString()}
+              unit="GB"
+              beforePrice={Number(diskSizePrice.oldPrice)}
+              afterPrice={Number(diskSizePrice.newPrice)}
+              priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
+            />
           </TableBody>
-          <TableCaption className="mt-2 mb-2">
-            Please take note of the above billing changes
-          </TableCaption>
         </Table>
 
         <DialogSectionSeparator />

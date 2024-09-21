@@ -1101,6 +1101,16 @@ export interface paths {
     /** Gets the Vercel access token for the given code */
     get: operations['VercelAccessTokenController_getAccessToken']
   }
+  '/platform/workflow-runs': {
+    /** Get a list of workflow runs */
+    get: operations['WorkflowRunController_listWorkflowRuns']
+    /** Count the number of workflow runs for the given branch */
+    head: operations['WorkflowRunController_countWorkflowRuns']
+  }
+  '/platform/workflow-runs/{workflow_run_id}/logs': {
+    /** Get the logs of a workflow run */
+    get: operations['WorkflowRunController_getWorkflowRunLogs']
+  }
   '/system/auth/{ref}/templates/{template}': {
     /** Gets GoTrue template */
     get: operations['SystemAuthTemplateController_getTemplate']
@@ -2415,6 +2425,8 @@ export interface components {
       mfa_phone_verify_enabled: boolean | null
       mfa_totp_enroll_enabled: boolean | null
       mfa_totp_verify_enabled: boolean | null
+      mfa_web_authn_enroll_enabled: boolean | null
+      mfa_web_authn_verify_enabled: boolean | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       password_required_characters: string | null
@@ -3664,6 +3676,8 @@ export interface components {
       MFA_PHONE_VERIFY_ENABLED: boolean
       MFA_TOTP_ENROLL_ENABLED: boolean
       MFA_TOTP_VERIFY_ENABLED: boolean
+      MFA_WEB_AUTHN_ENROLL_ENABLED: boolean
+      MFA_WEB_AUTHN_VERIFY_ENABLED: boolean
       PASSWORD_HIBP_ENABLED: boolean
       PASSWORD_MIN_LENGTH: number
       PASSWORD_REQUIRED_CHARACTERS: string
@@ -3875,8 +3889,10 @@ export interface components {
       custom_event_message_keys: string | null
       favourite: boolean
       id: number
+      lock_schema: boolean
       name: string
       public_token: string | null
+      retention_days: number
       slack_hook_url: string | null
       token: string
       webhook_notification_url: string | null
@@ -4314,13 +4330,16 @@ export interface components {
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
+      max_slot_wal_keep_size?: string
       max_standby_archive_delay?: string
       max_standby_streaming_delay?: string
+      max_wal_size?: string
       max_worker_processes?: number
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
       statement_timeout?: string
+      wal_keep_size?: string
       work_mem?: string
     }
     PostgresExtension: {
@@ -4699,6 +4718,8 @@ export interface components {
     ProjectResourceWarningsResponse: {
       /** @enum {string|null} */
       auth_rate_limit_exhaustion: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      auth_restricted_email_sending: 'critical' | 'warning' | null
       /** @enum {string|null} */
       cpu_exhaustion: 'critical' | 'warning' | null
       /** @enum {string|null} */
@@ -5655,6 +5676,8 @@ export interface components {
       mfa_phone_verify_enabled?: boolean
       mfa_totp_enroll_enabled?: boolean
       mfa_totp_verify_enabled?: boolean
+      mfa_web_authn_enroll_enabled?: boolean
+      mfa_web_authn_verify_enabled?: boolean
       password_hibp_enabled?: boolean
       password_min_length?: number
       /** @enum {string} */
@@ -5910,6 +5933,8 @@ export interface components {
       MFA_PHONE_VERIFY_ENABLED?: boolean
       MFA_TOTP_ENROLL_ENABLED?: boolean
       MFA_TOTP_VERIFY_ENABLED?: boolean
+      MFA_WEB_AUTHN_ENROLL_ENABLED?: boolean
+      MFA_WEB_AUTHN_VERIFY_ENABLED?: boolean
       PASSWORD_HIBP_ENABLED?: boolean
       PASSWORD_MIN_LENGTH?: number
       /** @enum {string} */
@@ -6030,13 +6055,16 @@ export interface components {
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
+      max_slot_wal_keep_size?: string
       max_standby_archive_delay?: string
       max_standby_streaming_delay?: string
+      max_wal_size?: string
       max_worker_processes?: number
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
       statement_timeout?: string
+      wal_keep_size?: string
       work_mem?: string
     }
     UpdatePostgrestConfigBody: {
@@ -6533,6 +6561,17 @@ export interface components {
     WalVerificationReportBody: {
       reportingToken: string
       walVerification: Record<string, never>
+    }
+    WorkflowRunResponse: {
+      id: string
+      /** @enum {string} */
+      status:
+        | 'CREATING_PROJECT'
+        | 'RUNNING_MIGRATIONS'
+        | 'MIGRATIONS_PASSED'
+        | 'MIGRATIONS_FAILED'
+        | 'FUNCTIONS_DEPLOYED'
+        | 'FUNCTIONS_FAILED'
     }
   }
   responses: never
@@ -13551,7 +13590,7 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      /** @description Failed to get the environment variables */
+      /** @description Failed to create Vercel environment variables */
       500: {
         content: never
       }
@@ -13588,6 +13627,74 @@ export interface operations {
         content: never
       }
       /** @description Failed to get Vercel access token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get a list of workflow runs */
+  WorkflowRunController_listWorkflowRuns: {
+    parameters: {
+      query?: {
+        /** @description Branch ID */
+        branch_id?: string
+        /** @description Project ref */
+        project_ref?: string
+        offset?: number
+        limit?: number
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['WorkflowRunResponse'][]
+        }
+      }
+      /** @description Failed to list workflow runs */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Count the number of workflow runs for the given branch */
+  WorkflowRunController_countWorkflowRuns: {
+    parameters: {
+      query?: {
+        /** @description Branch ID */
+        branch_id?: string
+        /** @description Project ref */
+        project_ref?: string
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          /** @description total count value */
+          'X-Total-Count'?: number
+        }
+        content: never
+      }
+      /** @description Failed to count workflow runs */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get the logs of a workflow run */
+  WorkflowRunController_getWorkflowRunLogs: {
+    parameters: {
+      path: {
+        /** @description Workflow run ID */
+        workflow_run_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'text/plain': string
+        }
+      }
+      /** @description Failed to get workflow run logs */
       500: {
         content: never
       }

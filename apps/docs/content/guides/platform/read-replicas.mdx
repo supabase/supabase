@@ -199,3 +199,11 @@ Some common sources of high replication lag include:
 High replication lag can result in stale data being returned for queries being executed against the affected read replicas.
 
 You can [consult](https://cloud.google.com/sql/docs/postgres/replication/replication-lag) [additional](https://repost.aws/knowledge-center/rds-postgresql-replication-lag) [resources](https://severalnines.com/blog/what-look-if-your-postgresql-replication-lagging/) on the subject as well.
+
+## Misc
+
+### Restart or compute add-on change behaviour
+
+When a project that utilizes Read Replicas is restarted, or the compute add-on size is changed, the Primary database gets restarted first. During this period, the Read Replicas remain available.
+
+Once the Primary database has completed restarting (or resizing, in case of a compute add-on change) and become available for usage, all the Read Replicas are restarted (and resized, if needed) concurrently.
