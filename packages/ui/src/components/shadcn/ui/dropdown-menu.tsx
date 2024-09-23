@@ -5,6 +5,10 @@ import { Check, ChevronRight, Circle } from 'lucide-react'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import {
+  DropdownMenuCheckboxItemProps,
+  DropdownMenuTriggerProps,
+} from '@radix-ui/react-dropdown-menu'
 
 const DropdownMenu = (props: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Root>) => (
   <DropdownMenuPrimitive.Root modal={false} {...props} />
@@ -184,4 +188,6 @@ export {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  type DropdownMenuTriggerProps,
+  type DropdownMenuCheckboxItemProps,
 }

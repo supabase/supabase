@@ -33,14 +33,8 @@ importers:
   apps/design-system:
     dependencies:
       '@hookform/resolvers':
-        specifier: ^3.1.1
+        specifier: '*'
         version: 3.3.1(react-hook-form@7.47.0(react@18.2.0))
-      '@radix-ui/react-alert-dialog':
-        specifier: ^1.0.5
-        version: 1.0.5(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@radix-ui/react-dropdown-menu':
-        specifier: ^2.0.6
-        version: 2.0.6(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       clsx:
         specifier: ^1.2.1
         version: 1.2.1
@@ -50,15 +44,9 @@ importers:
       eslint-config-supabase:
         specifier: workspace:*
         version: link:../../packages/eslint-config-supabase
-      fs:
-        specifier: ^0.0.1-security
-        version: 0.0.1-security
       icons:
         specifier: workspace:*
         version: link:../../packages/icons
-      input-otp:
-        specifier: ^1.2.3
-        version: 1.2.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       jotai:
         specifier: ^2.8.0
         version: 2.8.1(@types/react@18.3.3)(react@18.2.0)
@@ -83,9 +71,6 @@ importers:
       react:
         specifier: ^18.2.0
         version: 18.2.0
-      react-accessible-treeview:
-        specifier: ^2.8.3
-        version: 2.8.3(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-docgen:
         specifier: ^7.0.3
         version: 7.0.3
@@ -93,7 +78,7 @@ importers:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
       react-hook-form:
-        specifier: ^7.45.0
+        specifier: '*'
         version: 7.47.0(react@18.2.0)
       react-inlinesvg:
         specifier: ^4.0.4
@@ -8428,9 +8413,6 @@ packages:
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
-
-  fs@0.0.1-security:
-    resolution: {integrity: sha512-3XY9e1pP0CVEUCdj5BmfIZxRBTSDycnbqhIOGec9QYtmVH2fbLpj86CFWkrNOkt/Fvty4KZG5lTglL9j/gJ87w==}
 
   fsevents@2.3.2:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
@@ -21864,8 +21846,6 @@ snapshots:
       minipass: 7.0.4
 
   fs.realpath@1.0.0: {}
-
-  fs@0.0.1-security: {}
 
   fsevents@2.3.2:
     optional: true

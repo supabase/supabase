@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { DialogProps } from '@radix-ui/react-alert-dialog'
 import { CircleIcon, LaptopIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
@@ -19,7 +18,7 @@ import {
   CommandSeparator_Shadcn_,
 } from 'ui'
 
-export function CommandMenu({ ...props }: DialogProps) {
+export function CommandMenu() {
   const router = useRouter()
   const [open, setOpen] = React.useState(false)
   const { setTheme } = useTheme()
@@ -60,7 +59,6 @@ export function CommandMenu({ ...props }: DialogProps) {
           `
         )}
         onClick={() => setOpen(true)}
-        {...props}
       >
         <span className="hidden lg:inline-flex">Search Design System...</span>
         <span className="inline-flex lg:hidden">Search...</span>

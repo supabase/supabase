@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { TreeView, TreeViewItem } from 'ui'
-import { flattenTree } from 'react-accessible-treeview'
+import { flattenTree, TreeView, TreeViewItem } from 'ui'
 import {
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
