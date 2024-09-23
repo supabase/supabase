@@ -112,9 +112,8 @@ export function DiskManagementPanelForm() {
     })
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const currentCompute = (addons?.selected_addons ?? []).find(
-    (x) => x.type === 'compute_instance'
-  )?.variant
+  const currentCompute = (addons?.selected_addons ?? []).find((x) => x.type === 'compute_instance')
+    ?.variant
   const maxIopsBasedOnCompute =
     COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
   const maxThroughputBasedOnCompute =
@@ -297,6 +296,7 @@ export function DiskManagementPanelForm() {
                             field.onChange(e)
                             // only trigger provisionedIOPS due to other input being hidden
                             await form.trigger('provisionedIOPS')
+                            await form.trigger('totalSize')
                           }}
                           defaultValue={field.value}
                           disabled={disableInput}
