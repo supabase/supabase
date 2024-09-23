@@ -1,5 +1,5 @@
 export type DNSTableHeaderProps = {
-  display: string | undefined
+  display: string
 }
 
 const DNSTableHeaders = ({ display }: DNSTableHeaderProps) => {
