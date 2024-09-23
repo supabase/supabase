@@ -281,7 +281,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       </div>
 
       <ConfirmationModal
-        size="medium"
+        size="large"
         visible={isDeleteModalOpen}
         loading={isDeletingMember}
         title="Confirm to remove member"
@@ -291,18 +291,22 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
           title: 'All user content from this member will be permanently removed.',
           description: (
             <div>
-              Removing a member will delete all of the user's saved content in the projects of the
+              Removing a member will delete all of the user's saved content in all projects of this
               organization, which includes:
-              <ul className="list-disc pl-4">
+              <ul className="list-disc pl-4 my-2">
                 <li>
-                  SQL snippets <span className="text-foreground">(both private and shared)</span>
+                  SQL snippets{' '}
+                  <span className="text-foreground">
+                    (both <span className="underline">private</span> and{' '}
+                    <span className="underline">shared</span> snippets)
+                  </span>
                 </li>
                 <li>Custom reports</li>
                 <li>Log Explorer queries</li>
               </ul>
-              <p className="mt-2">
-                If you'd like to retain the member's shared SQL snippets, make a copy of them via
-                the SQL Editor before removing this member
+              <p className="mt-4 text-foreground-lighter">
+                If you'd like to retain the member's shared SQL snippets, right click on them and
+                "Duplicate personal copy" in the SQL Editor before removing this member.
               </p>
             </div>
           ),
