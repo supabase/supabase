@@ -5,7 +5,6 @@ import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWareho
 import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
 import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import { useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -72,31 +71,6 @@ export function SidebarCollapsible({
       </CollapsibleTrigger_Shadcn_>
       <CollapsibleContent_Shadcn_>{children}</CollapsibleContent_Shadcn_>
     </Collapsible_Shadcn_>
-  )
-}
-
-function SidebarCollectionItem({
-  href,
-  isActive,
-  children,
-}: {
-  href: string
-  isActive: boolean
-  children: React.ReactNode
-}) {
-  return (
-    <Link
-      data-active={isActive}
-      className={cn(
-        'text-foreground-light flex gap-2 items-center hover:text-foreground px-4 py-1 hover:bg-foreground-lighter/10 truncate text-sm transition-all',
-        {
-          'bg-foreground-lighter/10 text-foreground': isActive,
-        }
-      )}
-      href={href}
-    >
-      {children}
-    </Link>
   )
 }
 
