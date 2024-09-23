@@ -102,10 +102,10 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
     >
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Modal.Content className="flex flex-col gap-y-2">
-            <Label>URL</Label>
+          <Modal.Content className="flex flex-col gap-y-2 px-0">
+            <Label className="px-5">URL</Label>
             <ScrollArea className={cn(fields.length > 4 ? 'h-[220px]' : '')}>
-              <div className="flex flex-col gap-y-2">
+              <div className="px-5 py-1 flex flex-col gap-y-2">
                 {fields.map((field, index) => (
                   <FormField_Shadcn_
                     control={form.control}
@@ -132,14 +132,16 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
                 ))}
               </div>
             </ScrollArea>
-            <Button
-              type="default"
-              className="w-min"
-              icon={<Plus strokeWidth={1.5} />}
-              onClick={() => append({ value: '' })}
-            >
-              Add URL
-            </Button>
+            <div className="px-5">
+              <Button
+                type="default"
+                className="w-min"
+                icon={<Plus strokeWidth={1.5} />}
+                onClick={() => append({ value: '' })}
+              >
+                Add URL
+              </Button>
+            </div>
           </Modal.Content>
           <DialogSectionSeparator />
           <Modal.Content>
