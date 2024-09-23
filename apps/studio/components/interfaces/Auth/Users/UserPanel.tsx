@@ -57,7 +57,7 @@ export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
             value="overview"
             className={cn('mt-0 flex-grow min-h-0 overflow-y-auto')}
           >
-            {selectedUser && <UserOverview user={selectedUser} />}
+            {selectedUser && <UserOverview user={selectedUser} onDeleteSuccess={onClose} />}
           </TabsContent_Shadcn_>
           <TabsContent_Shadcn_
             value="raw"
