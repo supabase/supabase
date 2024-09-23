@@ -14,7 +14,9 @@ import {
   Alert_Shadcn_,
   Button,
   Modal,
+  ScrollArea,
   WarningIcon,
+  cn,
 } from 'ui'
 import { AddNewURLModal } from './AddNewURLModal'
 import { RedirectUrlList } from './RedirectUrlList'
@@ -130,17 +132,22 @@ export const RedirectUrls = () => {
           setOpenRemoveSelected(false)
         }}
       >
-        <Modal.Content>
+        <Modal.Content className="flex flex-col gap-y-2">
           <p className="mb-2 text-sm text-foreground-light">
-            Are you sure you want to remove the following URLs?
+            Are you sure you want to remove the following {selectedUrls.length} URL
+            {selectedUrls.length > 1 ? 's' : ''}?
           </p>
-          <ul className="list-disc pl-4 mb-2">
-            {selectedUrls.map((url, index) => (
-              <li key={index} className="text-foreground-light text-sm">
-                {url}
-              </li>
-            ))}
-          </ul>
+          <ScrollArea className={cn(selectedUrls.length > 4 ? 'h-[250px]' : '')}>
+            <div className="flex flex-col -space-y-1">
+              {selectedUrls.map((url) => {
+                return (
+                  <ValueContainer key={url} className="px-4 py-3 hover:bg-surface-100">
+                    {url}
+                  </ValueContainer>
+                )
+              })}
+            </div>
+          </ScrollArea>
           <p className="text-foreground-light text-sm">
             These URLs will no longer work with your authentication configuration.
           </p>
