@@ -72,7 +72,7 @@ const PolicyTableRow = ({
       )}
       {policies.length === 0 && (
         <div className="px-6 py-4 flex flex-col gap-y-3">
-          <p className="text-foreground-light text-sm">No policies created yet</p>
+          <p className="text-foreground-lighter text-sm">No policies created yet</p>
         </div>
       )}
       {policies?.map((policy) => (
