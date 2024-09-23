@@ -989,6 +989,12 @@ export interface paths {
     /** Get infrastructure status */
     get: operations['StatusController_getStatus']
   }
+  '/platform/storage/{ref}/archive': {
+    /** Gets project storage archive */
+    get: operations['StorageArchiveController_getArchive']
+    /** Creates project storage archive */
+    post: operations['StorageArchiveController_createArchive']
+  }
   '/platform/storage/{ref}/buckets': {
     /** Gets list of buckets */
     get: operations['StorageBucketsController_getBuckets']
@@ -1094,6 +1100,16 @@ export interface paths {
   '/platform/vercel/token': {
     /** Gets the Vercel access token for the given code */
     get: operations['VercelAccessTokenController_getAccessToken']
+  }
+  '/platform/workflow-runs': {
+    /** Get a list of workflow runs */
+    get: operations['WorkflowRunController_listWorkflowRuns']
+    /** Count the number of workflow runs for the given branch */
+    head: operations['WorkflowRunController_countWorkflowRuns']
+  }
+  '/platform/workflow-runs/{workflow_run_id}/logs': {
+    /** Get the logs of a workflow run */
+    get: operations['WorkflowRunController_getWorkflowRunLogs']
   }
   '/system/auth/{ref}/templates/{template}': {
     /** Gets GoTrue template */
@@ -1794,6 +1810,12 @@ export interface paths {
     /** Get infrastructure status */
     get: operations['StatusController_getStatus']
   }
+  '/v0/storage/{ref}/archive': {
+    /** Gets project storage archive */
+    get: operations['StorageArchiveController_getArchive']
+    /** Creates project storage archive */
+    post: operations['StorageArchiveController_createArchive']
+  }
   '/v0/storage/{ref}/buckets': {
     /** Gets list of buckets */
     get: operations['StorageBucketsController_getBuckets']
@@ -1919,6 +1941,14 @@ export interface paths {
   '/v1/projects/{ref}/api-keys': {
     /** Get project api keys */
     get: operations['v1-get-project-api-keys']
+    /** [Alpha] Creates a new API key for the project */
+    post: operations['ApiKeysController_createApiKey']
+  }
+  '/v1/projects/{ref}/api-keys/{id}': {
+    /** [Alpha] Deletes an API key for the project */
+    delete: operations['ApiKeysController_deleteApiKey']
+    /** [Alpha] Updates an API key for the project */
+    patch: operations['ApiKeysController_updateApiKey']
   }
   '/v1/projects/{ref}/branches': {
     /**
@@ -2242,7 +2272,18 @@ export interface components {
     }
     ApiKeyResponse: {
       api_key: string
+      description?: string | null
+      hash?: string | null
+      id?: string | null
+      inserted_at?: string | null
       name: string
+      prefix?: string | null
+      secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+      type?: unknown
+      updated_at?: string | null
+    }
+    ApiKeySecretJWTTemplate: {
+      role: string
     }
     ApiResponse: {
       autoApiService: components['schemas']['AutoApiService']
@@ -2384,6 +2425,8 @@ export interface components {
       mfa_phone_verify_enabled: boolean | null
       mfa_totp_enroll_enabled: boolean | null
       mfa_totp_verify_enabled: boolean | null
+      mfa_web_authn_enroll_enabled: boolean | null
+      mfa_web_authn_verify_enabled: boolean | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       password_required_characters: string | null
@@ -2621,6 +2664,12 @@ export interface components {
       scope?: 'V0'
       token: string
       token_alias: string
+    }
+    CreateApiKeyBody: {
+      description?: string | null
+      secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+      /** @enum {string} */
+      type: 'publishable' | 'secret'
     }
     CreateAwsPartnerOrganizationBody: {
       name: string
@@ -3296,6 +3345,9 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }
+    GetArchiveResponse: {
+      fileUrl: string
+    }
     GetContentCountResponse: {
       count: number
     }
@@ -3624,6 +3676,8 @@ export interface components {
       MFA_PHONE_VERIFY_ENABLED: boolean
       MFA_TOTP_ENROLL_ENABLED: boolean
       MFA_TOTP_VERIFY_ENABLED: boolean
+      MFA_WEB_AUTHN_ENROLL_ENABLED: boolean
+      MFA_WEB_AUTHN_VERIFY_ENABLED: boolean
       PASSWORD_HIBP_ENABLED: boolean
       PASSWORD_MIN_LENGTH: number
       PASSWORD_REQUIRED_CHARACTERS: string
@@ -3835,8 +3889,10 @@ export interface components {
       custom_event_message_keys: string | null
       favourite: boolean
       id: number
+      lock_schema: boolean
       name: string
       public_token: string | null
+      retention_days: number
       slack_hook_url: string | null
       token: string
       webhook_notification_url: string | null
@@ -4274,13 +4330,16 @@ export interface components {
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
+      max_slot_wal_keep_size?: string
       max_standby_archive_delay?: string
       max_standby_streaming_delay?: string
+      max_wal_size?: string
       max_worker_processes?: number
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
       statement_timeout?: string
+      wal_keep_size?: string
       work_mem?: string
     }
     PostgresExtension: {
@@ -4659,6 +4718,8 @@ export interface components {
     ProjectResourceWarningsResponse: {
       /** @enum {string|null} */
       auth_rate_limit_exhaustion: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      auth_restricted_email_sending: 'critical' | 'warning' | null
       /** @enum {string|null} */
       cpu_exhaustion: 'critical' | 'warning' | null
       /** @enum {string|null} */
@@ -5496,6 +5557,10 @@ export interface components {
       addon_type: components['schemas']['ProjectAddonType']
       addon_variant: components['schemas']['AddonVariantId']
     }
+    UpdateApiKeyBody: {
+      description?: string | null
+      secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+    }
     UpdateAuthConfigBody: {
       api_max_request_duration?: number
       db_max_pool_size?: number
@@ -5611,6 +5676,8 @@ export interface components {
       mfa_phone_verify_enabled?: boolean
       mfa_totp_enroll_enabled?: boolean
       mfa_totp_verify_enabled?: boolean
+      mfa_web_authn_enroll_enabled?: boolean
+      mfa_web_authn_verify_enabled?: boolean
       password_hibp_enabled?: boolean
       password_min_length?: number
       /** @enum {string} */
@@ -5866,6 +5933,8 @@ export interface components {
       MFA_PHONE_VERIFY_ENABLED?: boolean
       MFA_TOTP_ENROLL_ENABLED?: boolean
       MFA_TOTP_VERIFY_ENABLED?: boolean
+      MFA_WEB_AUTHN_ENROLL_ENABLED?: boolean
+      MFA_WEB_AUTHN_VERIFY_ENABLED?: boolean
       PASSWORD_HIBP_ENABLED?: boolean
       PASSWORD_MIN_LENGTH?: number
       /** @enum {string} */
@@ -5986,13 +6055,16 @@ export interface components {
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
+      max_slot_wal_keep_size?: string
       max_standby_archive_delay?: string
       max_standby_streaming_delay?: string
+      max_wal_size?: string
       max_worker_processes?: number
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
       statement_timeout?: string
+      wal_keep_size?: string
       work_mem?: string
     }
     UpdatePostgrestConfigBody: {
@@ -6489,6 +6561,17 @@ export interface components {
     WalVerificationReportBody: {
       reportingToken: string
       walVerification: Record<string, never>
+    }
+    WorkflowRunResponse: {
+      id: string
+      /** @enum {string} */
+      status:
+        | 'CREATING_PROJECT'
+        | 'RUNNING_MIGRATIONS'
+        | 'MIGRATIONS_PASSED'
+        | 'MIGRATIONS_FAILED'
+        | 'FUNCTIONS_DEPLOYED'
+        | 'FUNCTIONS_FAILED'
     }
   }
   responses: never
@@ -12450,6 +12533,9 @@ export interface operations {
       201: {
         content: never
       }
+      403: {
+        content: never
+      }
       /** @description Failed to pause the project */
       500: {
         content: never
@@ -12557,6 +12643,9 @@ export interface operations {
         content: {
           'application/json': components['schemas']['RestoreCancellation']
         }
+      }
+      403: {
+        content: never
       }
       /** @description Failed to cancel project restoration */
       500: {
@@ -12811,6 +12900,44 @@ export interface operations {
         content: never
       }
       /** @description Failed to retrieve infrastructure status */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project storage archive */
+  StorageArchiveController_getArchive: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetArchiveResponse']
+        }
+      }
+      /** @description Failed to get project storage archive */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates project storage archive */
+  StorageArchiveController_createArchive: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create project storage archive */
       500: {
         content: never
       }
@@ -13463,7 +13590,7 @@ export interface operations {
           'application/json': Record<string, never>
         }
       }
-      /** @description Failed to get the environment variables */
+      /** @description Failed to create Vercel environment variables */
       500: {
         content: never
       }
@@ -13500,6 +13627,74 @@ export interface operations {
         content: never
       }
       /** @description Failed to get Vercel access token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get a list of workflow runs */
+  WorkflowRunController_listWorkflowRuns: {
+    parameters: {
+      query?: {
+        /** @description Branch ID */
+        branch_id?: string
+        /** @description Project ref */
+        project_ref?: string
+        offset?: number
+        limit?: number
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['WorkflowRunResponse'][]
+        }
+      }
+      /** @description Failed to list workflow runs */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Count the number of workflow runs for the given branch */
+  WorkflowRunController_countWorkflowRuns: {
+    parameters: {
+      query?: {
+        /** @description Branch ID */
+        branch_id?: string
+        /** @description Project ref */
+        project_ref?: string
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          /** @description total count value */
+          'X-Total-Count'?: number
+        }
+        content: never
+      }
+      /** @description Failed to count workflow runs */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get the logs of a workflow run */
+  WorkflowRunController_getWorkflowRunLogs: {
+    parameters: {
+      path: {
+        /** @description Workflow run ID */
+        workflow_run_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'text/plain': string
+        }
+      }
+      /** @description Failed to get workflow run logs */
       500: {
         content: never
       }
@@ -14531,8 +14726,68 @@ export interface operations {
           'application/json': components['schemas']['ApiKeyResponse'][]
         }
       }
+    }
+  }
+  /** [Alpha] Creates a new API key for the project */
+  ApiKeysController_createApiKey: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateApiKeyBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ApiKeyResponse']
+        }
+      }
+    }
+  }
+  /** [Alpha] Deletes an API key for the project */
+  ApiKeysController_deleteApiKey: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ApiKeyResponse']
+        }
+      }
       403: {
         content: never
+      }
+    }
+  }
+  /** [Alpha] Updates an API key for the project */
+  ApiKeysController_updateApiKey: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateApiKeyBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ApiKeyResponse']
+        }
       }
     }
   }

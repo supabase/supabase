@@ -68,6 +68,8 @@ const ResourceExhaustionWarningBanner = () => {
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.metric
 
+  console.log({ metric })
+
   const correctionUrl = (
     metric === undefined
       ? undefined
@@ -77,7 +79,9 @@ const ResourceExhaustionWarningBanner = () => {
           ? '/project/[ref]/settings/database'
           : metric === 'auth_email_rate_limit'
             ? '/project/[ref]/settings/auth'
-            : `/project/[ref]/settings/[infra-path]#${metric}`
+            : metric === 'auth_restricted_email_sending'
+              ? `/project/[ref]/settings/auth`
+              : `/project/[ref]/settings/[infra-path]#${metric}`
   )
     ?.replace('[ref]', ref ?? 'default')
     ?.replace('[infra-path]', 'infrastructure')

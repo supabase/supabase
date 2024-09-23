@@ -64,7 +64,11 @@ export const getReturnToPath = (fallback = '/projects') => {
     // if no error, returnTo is a valid URL and NOT an internal page
     validReturnTo = fallback
   } catch (_) {
-    validReturnTo = returnTo
+    // check returnTo doesn't try trick the browser to redirect
+    // don't try sanitize, it is a losing battle. Go to fallback
+    // disallow anything that starts with /non-word-char+/ or non-char+/
+    const pattern = /^\/?[\W]+\//
+    validReturnTo = pattern.test(returnTo) ? fallback : returnTo
   }
 
   return validReturnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')

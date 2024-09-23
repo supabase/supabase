@@ -54,15 +54,24 @@ const DatabaseVisual = () => {
       role="img"
       aria-label="Supabase Postgres database visual composition"
     >
-      <span className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 left-0 lg:left-auto top-24 md:top-24 lg:top-0 lg:bottom-0 my-auto">
+      <span className="absolute w-full md:w-auto h-full md:aspect-square flex items-end md:items-center justify-center md:justify-end right-0 left-0 md:left-auto xl:-right-12 2xl:right-0 top-12 md:top-0 md:bottom-0 my-auto">
         <Image
-          src="/images/index/products/database.png"
+          src="/images/index/products/database-dark.png"
           alt="Supabase Postgres database"
           fill
           priority
           quality={100}
           sizes="100%"
-          className="absolute antialiased inset-0 object-contain object-center z-0 w-full lg:w-auto h-full transition-opacity group-hover:opacity-80"
+          className="hidden dark:block absolute antialiased inset-0 object-contain object-center z-0 w-full md:w-auto h-full transition-opacity group-hover:opacity-80"
+        />
+        <Image
+          src="/images/index/products/database-light.png"
+          alt="Supabase Postgres database"
+          fill
+          priority
+          quality={100}
+          sizes="100%"
+          className="dark:hidden absolute antialiased inset-0 object-contain object-center z-0 w-full md:w-auto h-full transition-opacity group-hover:opacity-80"
         />
         <svg
           ref={ref}

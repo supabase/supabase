@@ -2,6 +2,7 @@ import { keyBy, isPlainObject } from 'lodash'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import slugify from 'slugify'
 import { parse } from 'yaml'
 
 import { REFERENCES, clientSdkIds } from '~/content/navigation.references'
@@ -9,15 +10,49 @@ import { parseTypeSpec } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { deepFilterRec } from '~/features/helpers.fn'
 import type { Json } from '~/features/helpers.types'
+import authSpec from '~/spec/auth_v1_openapi.json' assert { type: 'json' }
 import apiCommonSections from '~/spec/common-api-sections.json' assert { type: 'json' }
 import cliCommonSections from '~/spec/common-cli-sections.json' assert { type: 'json' }
 import commonClientLibSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
+import selfHostingAnalyticsCommonSections from '~/spec/common-self-hosting-analytics-sections.json' assert { type: 'json' }
+import selfHostingAuthCommonSections from '~/spec/common-self-hosting-auth-sections.json'
+import selfHostingFunctionsCommonSections from '~/spec/common-self-hosting-functions-sections.json' assert { type: 'json' }
+import selfHostingRealtimeCommonSections from '~/spec/common-self-hosting-realtime-sections.json' assert { type: 'json' }
+import selfHostingStorageCommonSections from '~/spec/common-self-hosting-storage-sections.json' assert { type: 'json' }
+import storageSpec from '~/spec/storage_v0_openapi.json' assert { type: 'json' }
+import analyticsSpec from '~/spec/transforms/analytics_v0_openapi_deparsed.json' assert { type: 'json' }
 import openApiSpec from '~/spec/transforms/api_v1_openapi_deparsed.json' assert { type: 'json' }
 import { IApiEndPoint } from './Reference.api.utils'
 
 const DOCS_DIRECTORY = join(dirname(fileURLToPath(import.meta.url)), '../..')
 const SPEC_DIRECTORY = join(DOCS_DIRECTORY, 'spec')
 const GENERATED_DIRECTORY = join(dirname(fileURLToPath(import.meta.url)), 'generated')
+
+const selfHostingSpecs = [
+  {
+    id: 'self-hosting-analytics',
+    sections: selfHostingAnalyticsCommonSections,
+    spec: analyticsSpec,
+  },
+  {
+    id: 'self-hosting-auth',
+    sections: selfHostingAuthCommonSections,
+    spec: authSpec,
+  },
+  {
+    id: 'self-hosting-functions',
+    sections: selfHostingFunctionsCommonSections,
+  },
+  {
+    id: 'self-hosting-realtime',
+    sections: selfHostingRealtimeCommonSections,
+  },
+  {
+    id: 'self-hosting-storage',
+    sections: selfHostingStorageCommonSections,
+    spec: storageSpec,
+  },
+]
 
 async function getSpec(specFile: string, { ext = 'yml' }: { ext?: string } = {}) {
   const specFullPath = join(SPEC_DIRECTORY, `${specFile}.${ext}`)
@@ -36,14 +71,17 @@ async function parseFnsList(rawSpec: Json): Promise<Array<{ id: unknown }>> {
   return []
 }
 
-function mapEndpointsById(spec: typeof openApiSpec): Map<string, IApiEndPoint> {
+function mapEndpointsById(
+  spec: any,
+  getId = (details: any) => details.operationId
+): Map<string, IApiEndPoint> {
   const endpoints = spec.paths
   const endpointsById = new Map<string, IApiEndPoint>()
 
   Object.entries(endpoints).forEach(([path, methods]) => {
     Object.entries(methods).forEach(([method, details]) => {
-      endpointsById.set(details.operationId, {
-        id: details.operationId,
+      endpointsById.set(getId(details), {
+        id: getId(details),
         path,
         method,
         ...details,
@@ -85,6 +123,16 @@ function genApiSectionTree(endpointsById: Map<string, IApiEndPoint>) {
     apiCommonSections as Array<AbbrevApiReferenceSection>,
     'items',
     (section) => (section.type === 'operation' ? endpointsById.has(section.id) : true)
+  )
+  return validSections
+}
+
+function genSelfHostedSectionTree(
+  spec: Array<AbbrevApiReferenceSection>,
+  endpointsById: Map<string, IApiEndPoint>
+) {
+  const validSections = deepFilterRec(spec, 'items', (section) =>
+    section.type === 'self-hosted-operation' ? endpointsById.has(section.id) : true
   )
   return validSections
 }
@@ -234,6 +282,61 @@ async function writeApiReferenceSections() {
   ])
 }
 
+async function writeSelfHostingReferenceSections() {
+  let id = 0
+
+  return Promise.all(
+    selfHostingSpecs.flatMap((service) => {
+      let tasks: Promise<any>[] = []
+
+      let endpointsById: Map<string, IApiEndPoint>
+      if (service.spec) {
+        endpointsById = mapEndpointsById(service.spec, (details) =>
+          slugify(details.summary || `dummy-id-${String(id++)}`, {
+            lower: true,
+            remove: /[^\w\s-]/g,
+          })
+        )
+        tasks.push(
+          writeFile(
+            join(GENERATED_DIRECTORY, `${service.id}.latest.endpointsById.json`),
+            JSON.stringify(Array.from(endpointsById.entries()))
+          )
+        )
+      }
+
+      const selfHostedSectionTree = genSelfHostedSectionTree(service.sections, endpointsById)
+      tasks.push(
+        writeFile(
+          join(GENERATED_DIRECTORY, `${service.id}.latest.sections.json`),
+          JSON.stringify(selfHostedSectionTree)
+        )
+      )
+
+      const flattenedSelfHostedSections = flattenCommonClientLibSections(selfHostedSectionTree)
+      tasks.push(
+        writeFile(
+          join(GENERATED_DIRECTORY, `${service.id}.latest.flat.json`),
+          JSON.stringify(flattenedSelfHostedSections)
+        )
+      )
+
+      const selfHostedSectionsBySlug = keyBy(
+        flattenedSelfHostedSections.filter(({ slug }) => !!slug),
+        (section) => section.slug
+      )
+      tasks.push(
+        writeFile(
+          join(GENERATED_DIRECTORY, `${service.id}.latest.bySlug.json`),
+          JSON.stringify(selfHostedSectionsBySlug)
+        )
+      )
+
+      return tasks
+    })
+  )
+}
+
 async function run() {
   try {
     await mkdir(GENERATED_DIRECTORY, { recursive: true })
@@ -243,6 +346,7 @@ async function run() {
       writeSdkReferenceSections(),
       writeCliReferenceSections(),
       writeApiReferenceSections(),
+      writeSelfHostingReferenceSections(),
     ])
   } catch (err) {
     console.error(err)

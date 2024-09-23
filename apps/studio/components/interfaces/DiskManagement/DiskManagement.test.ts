@@ -28,6 +28,18 @@ describe('DiskManagement.utils.ts:calculateDiskSizePrice', () => {
     expect(result.oldPrice).toBe('1.56')
     expect(result.newPrice).toBe('1.95')
   })
+  test('GP3 with 8GB to GP3 with 10GB, with 2 replicas', () => {
+    const result = calculateDiskSizePrice({
+      planId: 'pro',
+      oldSize: 8,
+      oldStorageType: DiskType.GP3,
+      newSize: 10,
+      newStorageType: DiskType.GP3,
+      numReplicas: 2,
+    })
+    expect(result.oldPrice).toBe('2.50')
+    expect(result.newPrice).toBe('3.38')
+  })
 })
 
 describe('DiskManagement.utils.ts:calculateIOPSPrice', () => {
@@ -64,7 +76,7 @@ describe('DiskManagement.utils.ts:calculateIOPSPrice', () => {
 })
 
 describe('DiskManagement.utils.ts:calculateThroughputPrice', () => {
-  test('GP3 with 125 MiBps 150 MiBps', () => {
+  test('GP3 with 125 MB/s 150 MB/s', () => {
     const result = calculateThroughputPrice({
       storageType: DiskType.GP3,
       oldThroughput: 125,
@@ -73,7 +85,7 @@ describe('DiskManagement.utils.ts:calculateThroughputPrice', () => {
     expect(result.oldPrice).toBe('0.00')
     expect(result.newPrice).toBe('2.38')
   })
-  test('IO1 with 125 MiBps 150 MiBps', () => {
+  test('IO1 with 125 MB/s 150 MB/s', () => {
     const result = calculateThroughputPrice({
       storageType: DiskType.IO2,
       oldThroughput: 125,
