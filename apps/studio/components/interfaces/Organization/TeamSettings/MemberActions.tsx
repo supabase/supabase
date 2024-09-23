@@ -290,12 +290,21 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
         alert={{
           title: 'All user content from this member will be permanently removed.',
           description: (
-            <>
+            <div>
               Removing a member will delete all of the user's saved content in the projects of the
-              organization, which includes SQL snippets{' '}
-              <span className="text-foreground">(both private and shared)</span>, custom reports and
-              Log Explorer queries.
-            </>
+              organization, which includes:
+              <ul className="list-disc pl-4">
+                <li>
+                  SQL snippets <span className="text-foreground">(both private and shared)</span>
+                </li>
+                <li>Custom reports</li>
+                <li>Log Explorer queries</li>
+              </ul>
+              <p className="mt-2">
+                If you'd like to retain the member's shared SQL snippets, make a copy of them via
+                the SQL Editor before removing this member
+              </p>
+            </div>
           ),
         }}
         onCancel={() => setIsDeleteModalOpen(false)}

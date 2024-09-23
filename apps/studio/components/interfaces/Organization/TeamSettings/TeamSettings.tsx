@@ -130,12 +130,19 @@ const TeamSettings = () => {
         alert={{
           title: 'All of your user content will be permanently removed.',
           description: (
-            <>
-              Leaving the organization will delete all of your saved content in the projects of the
-              organization, which includes SQL snippets{' '}
-              <span className="text-foreground">(both private and shared)</span>, custom reports and
-              Log Explorer queries.
-            </>
+            <div>
+              <p>
+                Leaving the organization will delete all of your saved content in the projects of
+                the organization, which includes:
+              </p>
+              <ul className="list-disc pl-4">
+                <li>
+                  SQL snippets <span className="text-foreground">(both private and shared)</span>
+                </li>
+                <li>Custom reports</li>
+                <li>Log Explorer queries</li>
+              </ul>
+            </div>
           ),
         }}
         onCancel={() => setIsLeaveTeamModalOpen(false)}
