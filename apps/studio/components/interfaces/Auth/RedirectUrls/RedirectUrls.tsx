@@ -148,14 +148,6 @@ export const RedirectUrls = () => {
               })}
             </div>
           </ScrollArea>
-
-          {/* <ul className="list-disc pl-4 mb-2">
-            {selectedUrls.map((url, index) => (
-              <li key={index} className="text-foreground-light text-sm">
-                {url}
-              </li>
-            ))}
-          </ul> */}
           <p className="text-foreground-light text-sm">
             These URLs will no longer work with your authentication configuration.
           </p>
