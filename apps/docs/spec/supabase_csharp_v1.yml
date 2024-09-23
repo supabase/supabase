@@ -1497,7 +1497,7 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Where(x => x.Name == null
+            .Where(x => x.Name == null)
             .Get();
           ```
 
