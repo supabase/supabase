@@ -126,10 +126,17 @@ const TeamSettings = () => {
         visible={isLeaveTeamModalOpen}
         title="Confirm to leave organization"
         confirmLabel="Leave"
+        variant="warning"
         alert={{
           title: 'All of your user content will be permanently removed.',
-          description:
-            'Leaving the organization will delete all of your saved content in the projects of the organization, which includes SQL snippets, custom reports and Log Explorer queries.',
+          description: (
+            <>
+              Leaving the organization will delete all of your saved content in the projects of the
+              organization, which includes SQL snippets{' '}
+              <span className="text-foreground">(both private and shared)</span>, custom reports and
+              Log Explorer queries.
+            </>
+          ),
         }}
         onCancel={() => setIsLeaveTeamModalOpen(false)}
         onConfirm={() => leaveTeam()}

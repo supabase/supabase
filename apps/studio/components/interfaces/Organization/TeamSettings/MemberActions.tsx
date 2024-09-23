@@ -286,10 +286,17 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
         loading={isDeletingMember}
         title="Confirm to remove member"
         confirmLabel="Remove"
+        variant="warning"
         alert={{
           title: 'All user content from this member will be permanently removed.',
-          description:
-            "Removing a member will delete all of the user's saved content in the projects of the organization, which includes SQL snippets, custom reports and Log Explorer queries.",
+          description: (
+            <>
+              Removing a member will delete all of the user's saved content in the projects of the
+              organization, which includes SQL snippets{' '}
+              <span className="text-foreground">(both private and shared)</span>, custom reports and
+              Log Explorer queries.
+            </>
+          ),
         }}
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => {
