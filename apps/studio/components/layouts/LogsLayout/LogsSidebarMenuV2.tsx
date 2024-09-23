@@ -100,16 +100,7 @@ function SidebarCollectionItem({
   )
 }
 
-export function LogsSidebarMenuV2({
-  features,
-}: {
-  features: {
-    warehouse: boolean
-    storage: boolean
-    auth: boolean
-    realtime: boolean
-  }
-}) {
+export function LogsSidebarMenuV2() {
   const [searchText, setSearchText] = useState('')
   const [createCollectionOpen, setCreateCollectionOpen] = useState(false)
   const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
