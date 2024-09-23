@@ -211,7 +211,9 @@ import { createClient } from '@supabase/supabase-js'
 
 const options = {
   realtime: {
-    log_level: 'info',
+    params: {
+      log_level: 'info',
+    },
   },
 }
 const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
