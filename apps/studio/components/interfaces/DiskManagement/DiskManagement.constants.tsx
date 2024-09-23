@@ -42,7 +42,7 @@ export const DISK_LIMITS = {
   },
   [DiskType.IO2]: {
     minStorage: 4,
-    maxStorage: 16384,
+    maxStorage: 61440,
     minIops: 100,
     maxIops: 256000,
     includedIops: 0,
