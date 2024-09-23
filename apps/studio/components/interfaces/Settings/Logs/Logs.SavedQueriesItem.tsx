@@ -61,10 +61,13 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
     description: string | null
   }) => {
     if (!ref || typeof ref !== 'string') return console.error('Invalid project reference')
-    updateContent({ projectRef: ref, payload: { ...item, name, description } })
+    updateContent({
+      projectRef: ref,
+      payload: { ...item, name, description: description || undefined },
+    })
   }
 
-  const isActive = router.query.q === encodeURIComponent(item.content.sql)
+  const isActive = router.query.queryId === item.id
 
   return (
     <>

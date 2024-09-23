@@ -1,10 +1,14 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 import { IS_PLATFORM, useParams } from 'common'
 import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWarehouse/CreateWarehouseCollection'
 import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
 import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import { useContentQuery } from 'data/content/content-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import { ArrowUpRight, ChevronRight, FilePlus, Plus } from 'lucide-react'
@@ -96,9 +100,20 @@ function SidebarCollectionItem({
   )
 }
 
-export function LogsSidebarMenuV2() {
+export function LogsSidebarMenuV2({
+  features,
+}: {
+  features: {
+    warehouse: boolean
+    storage: boolean
+    auth: boolean
+    realtime: boolean
+  }
+}) {
   const [searchText, setSearchText] = useState('')
-  const [order, setOrder] = useState('alphabetical')
+  const [createCollectionOpen, setCreateCollectionOpen] = useState(false)
+  const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
+
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
   const {
@@ -184,13 +199,13 @@ export function LogsSidebarMenuV2() {
   })
 
   return (
-    <div>
-      <div className="flex gap-2 p-4 items-center">
+    <div className="pb-12 relative">
+      <div className="flex gap-2 p-4 items-center sticky top-0 bg-background-200 z-10">
         <InnerSideBarFilters className="w-full p-0 gap-0">
           <InnerSideBarFilterSearchInput
-            name="search-queries"
-            placeholder="Search queries and collections"
-            aria-labelledby="Search queries"
+            name="search-collections"
+            placeholder="Search collections..."
+            aria-labelledby="Search collections"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
           ></InnerSideBarFilterSearchInput>
@@ -210,11 +225,31 @@ export function LogsSidebarMenuV2() {
                 Create query
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="gap-x-2" asChild>
-              <CreateWarehouseCollectionModal />
-            </DropdownMenuItem>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuItem className="gap-x-2" asChild>
+                  <button
+                    onClick={() => setCreateCollectionOpen(true)}
+                    className="w-full flex items-center text-xs px-2 py-1"
+                    disabled={!canCreateCollection}
+                  >
+                    <Plus size={14} />
+                    Create collection
+                  </button>
+                </DropdownMenuItem>
+              </TooltipTrigger>
+              {!canCreateCollection && (
+                <TooltipContent>
+                  You need additional permissions to create a collection
+                </TooltipContent>
+              )}
+            </Tooltip>
           </DropdownMenuContent>
         </DropdownMenu>
+        <CreateWarehouseCollectionModal
+          open={createCollectionOpen}
+          onOpenChange={setCreateCollectionOpen}
+        />
       </div>
       <div className="px-2">
         <InnerSideMenuItem
@@ -246,7 +281,9 @@ export function LogsSidebarMenuV2() {
           />
         ))}
         {whCollectionsLoading ? (
-          <GenericSkeletonLoader />
+          <div className="p-4">
+            <GenericSkeletonLoader />
+          </div>
         ) : filteredWarehouse?.length ? (
           <div>
             {filteredWarehouse.map((collection) => (
