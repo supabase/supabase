@@ -68,8 +68,6 @@ const ResourceExhaustionWarningBanner = () => {
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.metric
 
-  console.log({ metric })
-
   const correctionUrl = (
     metric === undefined
       ? undefined
