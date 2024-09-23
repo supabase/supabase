@@ -95,7 +95,8 @@ export const WarehouseMenuItem = ({ item }: Props) => {
               <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   disabled={!canUpdateCollection}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault()
                     setShowUpdateDialog(true)
                   }}
                 >
@@ -114,7 +115,8 @@ export const WarehouseMenuItem = ({ item }: Props) => {
               <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   disabled={!canUpdateCollection}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault()
                     setDeleteDialog(true)
                   }}
                 >
