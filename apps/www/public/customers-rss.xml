@@ -15,17 +15,17 @@
   <pubDate>Tue, 11 Jun 2024 22:00:00 GMT</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/customers/voypost</guid>
-  <title>Voypost uses Supabase’s strong relational model to overcome NoSQL challenges</title>
-  <link>https://supabase.com/customers/voypost</link>
-  <description>Learn how Voypost leveraged Supabase to avoid NoSQL workarounds, enhance scalability, and deliver a superior user experience for Inkly, an intelligent contract negotiation platform.</description>
-  <pubDate>Mon, 03 Jun 2024 22:00:00 GMT</pubDate>
-</item>
-<item>
   <guid>https://supabase.com/customers/tinloof</guid>
   <title>Streamlining Success: How Tinloof Scaled Seamlessly with Supabase</title>
   <link>https://supabase.com/customers/tinloof</link>
   <description>Discover Tinloof, how a full-stack development agency, managed and scaled backend services using Supabase, without having to dedicate resources to infrastructure management.</description>
+  <pubDate>Mon, 03 Jun 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/voypost</guid>
+  <title>Voypost uses Supabase’s strong relational model to overcome NoSQL challenges</title>
+  <link>https://supabase.com/customers/voypost</link>
+  <description>Learn how Voypost leveraged Supabase to avoid NoSQL workarounds, enhance scalability, and deliver a superior user experience for Inkly, an intelligent contract negotiation platform.</description>
   <pubDate>Mon, 03 Jun 2024 22:00:00 GMT</pubDate>
 </item>
 <item>
@@ -99,17 +99,10 @@
   <pubDate>Wed, 15 Feb 2023 23:00:00 GMT</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/customers/xendit</guid>
-  <title>Xendit use Supabase and create a full solution shipped to production in less than one week.</title>
-  <link>https://supabase.com/customers/xendit</link>
-  <description>As a payment processor, Xendit are responsible for verifying that all transactions are legal.</description>
-  <pubDate>Mon, 13 Feb 2023 23:00:00 GMT</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/customers/replenysh</guid>
-  <title>Replenysh uses Supabase to implement OTP in less than 24 hours.</title>
-  <link>https://supabase.com/customers/replenysh</link>
-  <description>With Supabase, Replenysh gets a slick auth experience, reduces DevOps overhead, and continues to scale with Postgres.</description>
+  <guid>https://supabase.com/customers/epsilon3</guid>
+  <title>Epsilon3 digitize paper-based procedures in the space industry using telemetry data, simplifying testing and operations.</title>
+  <link>https://supabase.com/customers/epsilon3</link>
+  <description>Epsilon3 uses Supabase to help teams execute secure and reliable operations in an industry where project spend runs into the billions.</description>
   <pubDate>Mon, 13 Feb 2023 23:00:00 GMT</pubDate>
 </item>
 <item>
@@ -120,10 +113,17 @@
   <pubDate>Mon, 13 Feb 2023 23:00:00 GMT</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/customers/epsilon3</guid>
-  <title>Epsilon3 digitize paper-based procedures in the space industry using telemetry data, simplifying testing and operations.</title>
-  <link>https://supabase.com/customers/epsilon3</link>
-  <description>Epsilon3 uses Supabase to help teams execute secure and reliable operations in an industry where project spend runs into the billions.</description>
+  <guid>https://supabase.com/customers/replenysh</guid>
+  <title>Replenysh uses Supabase to implement OTP in less than 24 hours.</title>
+  <link>https://supabase.com/customers/replenysh</link>
+  <description>With Supabase, Replenysh gets a slick auth experience, reduces DevOps overhead, and continues to scale with Postgres.</description>
+  <pubDate>Mon, 13 Feb 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/xendit</guid>
+  <title>Xendit use Supabase and create a full solution shipped to production in less than one week.</title>
+  <link>https://supabase.com/customers/xendit</link>
+  <description>As a payment processor, Xendit are responsible for verifying that all transactions are legal.</description>
   <pubDate>Mon, 13 Feb 2023 23:00:00 GMT</pubDate>
 </item>
 
