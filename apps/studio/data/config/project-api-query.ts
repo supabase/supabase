@@ -36,16 +36,12 @@ export const useProjectApiQuery = <TData = ProjectApiData>(
   { projectRef }: ProjectApiVariables,
   { enabled = true, ...options }: UseQueryOptions<ProjectApiData, ProjectApiError, TData> = {}
 ) => {
-  const project = useProjectByRef(projectRef)
   return useQuery<ProjectApiData, ProjectApiError, TData>(
     configKeys.api(projectRef),
     ({ signal }) => getProjectApi({ projectRef }, signal),
     {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        project?.status === PROJECT_STATUS.ACTIVE_HEALTHY,
-      refetchInterval(data, query) {
+      enabled: enabled && typeof projectRef !== 'undefined',
+      refetchInterval(data) {
         if (!data) {
           return false
         }
