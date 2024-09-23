@@ -19,7 +19,6 @@ export type ProjectApiResponse = {
 
 export async function getProjectApi({ projectRef }: ProjectApiVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
-  console.log('SSS')
 
   const { data, error } = await get('/platform/props/project/{ref}/api', {
     params: { path: { ref: projectRef } },

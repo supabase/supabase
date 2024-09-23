@@ -73,7 +73,7 @@ const providers = {
 // all the potential values for each provider is under user.raw_app_meta_data.provider
 // Will need to go through one by one to properly verify https://supabase.com/docs/guides/auth/social-login
 // But I've made the UI handle to not render any icon if nothing matches in this map
-const providerIconMap: { [key: string]: string } = Object.values([
+export const providerIconMap: { [key: string]: string } = Object.values([
   ...providers.social,
   ...providers.phone,
 ]).reduce((a, b) => {

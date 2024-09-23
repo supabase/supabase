@@ -17,9 +17,10 @@ import { timeout } from 'lib/helpers'
 import { Button, cn, Separator } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PANEL_PADDING } from './UserPanel'
-import { getDisplayName } from './Users.utils'
+import { getDisplayName, providerIconMap } from './Users.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { BASE_PATH } from 'lib/constants'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 const CONTAINER_CLASS = cn(
@@ -39,6 +40,18 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isEmailAuth = user.email !== null
   const isPhoneAuth = user.phone !== null
   const isAnonUser = user.is_anonymous
+
+  //user.raw_app_meta_data?.providers ?? []
+  const providers = ['google']
+    .filter((x) => x !== 'email')
+    .map((provider) => {
+      return {
+        name: provider,
+        icon: providerIconMap[provider]
+          ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
+          : undefined,
+      }
+    })
 
   const canSendMagicLink = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_magic_link')
   const canSendRecovery = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_recovery')
@@ -199,8 +212,40 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           <p className="text-sm text-foreground-light">The user has the following providers</p>
         </div>
 
-        <div className={cn('flex flex-col !pt-0', PANEL_PADDING)}>
-          <div className={CONTAINER_CLASS}>Hello</div>
+        <div className={cn('flex flex-col -space-y-1', PANEL_PADDING)}>
+          {providers.map((provider) => {
+            // [Joshen TODO] Need to figure out how to get the enabled status of the provider
+            const isActive = true
+
+            return (
+              <div key={provider.name} className={cn(CONTAINER_CLASS, 'items-start justify-start')}>
+                {provider.icon && (
+                  <img
+                    width={16}
+                    src={provider.icon}
+                    alt={`${provider.name} auth icon`}
+                    className="mt-1.5"
+                  />
+                )}
+                <div className="flex-grow mt-0.5">
+                  <p className="capitalize">{provider.name}</p>
+                  <p className="text-xs text-foreground-light">Some description here</p>
+                </div>
+                {isActive ? (
+                  <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
+                    <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
+                      <Check strokeWidth={2} size={12} />
+                    </span>
+                    <span className="px-1">Enabled</span>
+                  </div>
+                ) : (
+                  <div className="rounded-md border border-strong bg-surface-100 py-1 px-3 text-xs text-foreground-lighter">
+                    Disabled
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
 
         <div className={cn('flex flex-col', PANEL_PADDING)}>
