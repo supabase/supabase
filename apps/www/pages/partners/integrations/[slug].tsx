@@ -217,7 +217,7 @@ function Partner({
 
 const PartnerDetails = ({ partner }: { partner: Partner }) => {
   const videoThumbnail = partner.video
-    ? `http://img.youtube.com/vi/${partner.video}/0.jpg`
+    ? `https://img.youtube.com/vi/${partner.video}/0.jpg`
     : undefined
 
   return (

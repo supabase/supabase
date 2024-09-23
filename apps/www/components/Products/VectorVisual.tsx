@@ -49,19 +49,35 @@ const VectorVisual = () => {
 
   return (
     <figure
-      className="absolute inset-0 z-0"
+      className="
+        absolute inset-0
+        z-0 flex items-end
+        top-auto
+        aspect-[390/430]
+        w-full md:w-[calc(100%+4rem)] 2xl:w-full
+        md:-mx-8 2xl:mx-0
+        -bottom-0 sm:-bottom-28 md:bottom-0 lg:-bottom-28 xl:bottom-0
+        "
       ref={containerRef}
       role="img"
       aria-label="Supabase Vector uses pgvector to store, index, and access embeddings"
     >
-      <span className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 left-0 lg:left-auto top-24 md:top-24 lg:top-0 lg:bottom-0 my-auto lg:scale-110">
+      <span className="absolute w-full h-full lg:!aspect-[390/430] flex items-end justify-center inset-0 top-16 md:top-20 lg:top-0 bottom-auto mx-auto">
         <Image
-          src={`/images/index/products/vector.svg`}
+          src={`/images/index/products/vector-dark.svg`}
           alt="Supabase Vector graph"
           fill
           sizes="100%"
           quality={100}
-          className="absolute inset-0 z-0 object-contain object-center"
+          className="hidden dark:block absolute inset-0 z-0 object-contain object-center"
+        />
+        <Image
+          src={`/images/index/products/vector-light.svg`}
+          alt="Supabase Vector graph"
+          fill
+          sizes="100%"
+          quality={100}
+          className="dark:hidden absolute inset-0 z-0 object-contain object-center"
         />
         <svg
           ref={ref}
