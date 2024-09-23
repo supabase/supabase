@@ -63,7 +63,13 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
     if (!ref || typeof ref !== 'string') return console.error('Invalid project reference')
     updateContent({
       projectRef: ref,
-      payload: { ...item, name, description: description || undefined },
+      payload: {
+        ...item,
+        name,
+        description: description || undefined,
+        type: 'log_sql',
+        visibility: 'user',
+      },
     })
   }
 
