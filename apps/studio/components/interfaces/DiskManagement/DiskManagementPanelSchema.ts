@@ -45,7 +45,7 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
         path: ['throughput'],
       })
     }
-    if (totalSize >= DISK_LIMITS[DiskType.IO2].maxStorage) {
+    if (totalSize > DISK_LIMITS[DiskType.IO2].maxStorage) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Allocated disksize must not exceed 61,440 GB',
@@ -86,7 +86,7 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
         path: ['throughput'],
       })
     }
-    if (totalSize >= DISK_LIMITS[DiskType.GP3].maxStorage) {
+    if (totalSize > DISK_LIMITS[DiskType.GP3].maxStorage) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Allocated disksize must not exceed 16,384 GB',
