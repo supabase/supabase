@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { Download, PauseCircle } from 'lucide-react'
+import { PauseCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -9,7 +9,6 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
@@ -19,27 +18,18 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Modal,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-  WarningIcon,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Modal } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import { useProjectContext } from './ProjectContext'
-import { RestorePaidPlanProjectNotice } from './RestorePaidPlanProjectNotice'
+import { useProjectContext } from '../ProjectContext'
+import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
+import { PauseDisabledState } from './PauseDisabledState'
 
 export interface ProjectPausedStateProps {
   product?: string
 }
 
-const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
+export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
@@ -68,7 +58,6 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const isFreePlan = subscription?.plan?.id === 'free'
   const isRestoreDisabled = enforceNinetyDayUnpauseExpiry && isSuccess && !pauseStatus.can_restore
-  const latestBackup = pauseStatus?.latest_downloadable_backup_id
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug: orgSlug },
@@ -83,19 +72,6 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     onSuccess: (_, variables) => {
       setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
       toast.success('Restoring project')
-    },
-  })
-
-  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
-    onSuccess: (res) => {
-      const { fileUrl } = res
-
-      // Trigger browser download by create,trigger and remove tempLink
-      const tempLink = document.createElement('a')
-      tempLink.href = fileUrl
-      document.body.appendChild(tempLink)
-      tempLink.click()
-      document.body.removeChild(tempLink)
     },
   })
 
@@ -116,24 +92,6 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       return toast.error('Unable to restore: project is required')
     }
     restoreProject({ ref: project.ref })
-  }
-
-  const onSelectDownloadBackup = () => {
-    if (ref === undefined) return console.error('Project ref is required')
-    if (!latestBackup) return toast.error('No backups available for download')
-
-    downloadBackup({
-      ref,
-      backup: {
-        id: latestBackup,
-        // [Joshen] Just FYI these params aren't required for the download backup request
-        // API types need to be updated
-        project_id: -1,
-        inserted_at: '',
-        isPhysicalBackup: false,
-        status: {},
-      },
-    })
   }
 
   return (
@@ -177,42 +135,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     {isSuccess && (
                       <>
                         {isRestoreDisabled ? (
-                          <Alert_Shadcn_ variant="warning">
-                            <WarningIcon />
-                            <AlertTitle_Shadcn_>
-                              Project cannot be restored through the dashboard
-                            </AlertTitle_Shadcn_>
-                            <AlertDescription_Shadcn_>
-                              This project has been paused for over{' '}
-                              <span className="text-foreground">
-                                {pauseStatus?.max_days_till_restore_disabled ?? 90} days
-                              </span>{' '}
-                              and cannot be restored through the dashboard. However, your data
-                              remains intact and can be downloaded as a backup.
-                            </AlertDescription_Shadcn_>
-                            <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
-                              <Tooltip_Shadcn_>
-                                <TooltipTrigger_Shadcn_ asChild>
-                                  <Button
-                                    type="default"
-                                    icon={<Download />}
-                                    loading={isDownloading}
-                                    disabled={!latestBackup}
-                                    className="pointer-events-auto"
-                                    onClick={() => onSelectDownloadBackup()}
-                                  >
-                                    Download backup
-                                  </Button>
-                                </TooltipTrigger_Shadcn_>
-                                {!latestBackup && (
-                                  <TooltipContent_Shadcn_ side="bottom">
-                                    No backups available, please reach out via support for
-                                    assistance
-                                  </TooltipContent_Shadcn_>
-                                )}
-                              </Tooltip_Shadcn_>
-                            </AlertDescription_Shadcn_>
-                          </Alert_Shadcn_>
+                          <PauseDisabledState />
                         ) : isFreePlan ? (
                           <>
                             <p className="text-sm text-foreground-light text-center">
@@ -337,5 +260,3 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     </>
   )
 }
-
-export default ProjectPausedState

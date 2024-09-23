@@ -1,13 +1,14 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { ChevronUp, Loader2 } from 'lucide-react'
+import { AlertTriangle, ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { format } from 'sql-formatter'
 
+import { Separator } from '@ui/components/SidePanel/SidePanel'
 import { useParams, useTelemetryProps } from 'common'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
@@ -53,7 +54,7 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { AiAssistantPanel } from './AiAssistantPanel'
@@ -76,6 +77,7 @@ import {
   compareAsModification,
   compareAsNewSnippet,
   createSqlSnippetSkeleton,
+  isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
@@ -132,7 +134,10 @@ const SQLEditor = () => {
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const [isAiOpen, setIsAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+
+  const [showPotentialIssuesModal, setShowPotentialIssuesModal] = useState(false)
+  const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
+  const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
 
   const isOptedInToAI = useOrgOptedIntoAi()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
@@ -288,10 +293,23 @@ const SQLEditor = () => {
           ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
           : selectedValue || editorRef.current?.getValue()
 
-        const containsDestructiveOperations = checkDestructiveQuery(sql)
+        let queryHasIssues = false
 
-        if (!force && containsDestructiveOperations) {
-          setIsConfirmModalOpen(true)
+        const destructiveOperations = checkDestructiveQuery(sql)
+        if (!force && destructiveOperations) {
+          setShowPotentialIssuesModal(true)
+          setQueryHasDestructiveOperations(true)
+          queryHasIssues = true
+        }
+
+        const updateWithoutWhereClause = isUpdateWithoutWhere(sql)
+        if (!force && updateWithoutWhereClause) {
+          setShowPotentialIssuesModal(true)
+          setQueryHasUpdateWithoutWhere(true)
+          queryHasIssues = true
+        }
+
+        if (queryHasIssues) {
           return
         }
 
@@ -616,22 +634,59 @@ const SQLEditor = () => {
 
   return (
     <>
-      <ConfirmModal
-        visible={isConfirmModalOpen}
-        title="Destructive operation"
-        danger
-        description="We've detected a potentially destructive operation in the query. Please confirm that you would like to execute this query."
-        buttonLabel="Run destructive query"
-        onSelectCancel={() => {
-          setIsConfirmModalOpen(false)
-          // [Joshen] Somehow calling this immediately doesn't work, hence the timeout
+      <ConfirmationModal
+        visible={showPotentialIssuesModal}
+        size="large"
+        title={`Potential issue${queryHasDestructiveOperations && queryHasUpdateWithoutWhere ? 's' : ''} detected with your query`}
+        confirmLabel="Run this query"
+        variant="warning"
+        alert={{
+          base: {
+            variant: 'warning',
+          },
+          title:
+            queryHasDestructiveOperations && queryHasUpdateWithoutWhere
+              ? 'The following potential issues have been detected:'
+              : 'The following potential issue has been detected:',
+          description: 'Ensure that these are intentional before executing this query',
+        }}
+        onCancel={() => {
+          setShowPotentialIssuesModal(false)
+          setQueryHasDestructiveOperations(false)
+          setQueryHasUpdateWithoutWhere(false)
           setTimeout(() => editorRef.current?.focus(), 100)
         }}
-        onSelectConfirm={() => {
-          setIsConfirmModalOpen(false)
+        onConfirm={() => {
+          setShowPotentialIssuesModal(false)
           executeQuery(true)
         }}
-      />
+      >
+        <div className="text-sm">
+          <ul className="border rounded-md grid bg-surface-200">
+            {queryHasDestructiveOperations && (
+              <li className="grid pt-3 pb-2 px-4">
+                <span className="font-bold">Query has destructive operation</span>
+                <span className="text-foreground-lighter">
+                  Make sure you are not accidentally removing something important.
+                </span>
+              </li>
+            )}
+            {queryHasDestructiveOperations && queryHasUpdateWithoutWhere && <Separator />}
+            {queryHasUpdateWithoutWhere && (
+              <li className="grid pt-2 pb-3 px-4 gap-1">
+                <span className="font-bold">Query uses update without a where clause</span>
+                <span className="text-foreground-lighter">
+                  Without a <code className="text-xs">where</code> clause, this could update all
+                  rows in the table.
+                </span>
+              </li>
+            )}
+          </ul>
+        </div>
+        <p className="mt-4 text-sm text-foreground-light">
+          Please confirm that you would like to execute this query.
+        </p>
+      </ConfirmationModal>
 
       <ResizablePanelGroup
         className="flex h-full"

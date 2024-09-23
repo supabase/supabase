@@ -61,7 +61,9 @@
         "OPENAI_API_KEY",
         "npm_lifecycle_event",
         "LIVE_SUPABASE_COM_SERVICE_ROLE_KEY",
-        "VERCEL_URL"
+        "VERCEL_URL",
+        "HUBSPOT_PORTAL_ID",
+        "HUBSPOT_ENTERPRISE_FORM_GUID"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
