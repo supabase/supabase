@@ -1,7 +1,8 @@
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
+
 import TroubleshootingPage from '~/features/docs/Troubleshooting.page'
 import { getAllTroubleshootingEntries, getArticleSlug } from '~/features/docs/Troubleshooting.utils'
-import { notFoundLink } from '~/features/recommendations/NotFound.utils'
+import { PROD_URL } from '~/lib/constants'
 
 export default async function TroubleshootingEntryPage({
   params: { slug },
@@ -12,7 +13,7 @@ export default async function TroubleshootingEntryPage({
   const entry = allTroubleshootingEntries.find((entry) => getArticleSlug(entry.data) === slug)
 
   if (!entry) {
-    throw redirect(notFoundLink(`troubleshooting/${slug}`))
+    notFound()
   }
 
   return <TroubleshootingPage entry={entry} />
@@ -25,7 +26,7 @@ export const generateMetadata = async ({ params: { slug } }: { params: { slug: s
   return {
     title: 'Supabase Docs | Troubleshooting' + (entry ? ` | ${entry.data.title}` : ''),
     alternates: {
-      canonical: `/guides/troubleshooting/${slug}`,
+      canonical: `${PROD_URL}/guides/troubleshooting/${slug}`,
     },
   }
 }

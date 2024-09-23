@@ -159,25 +159,10 @@ const BreadcrumbsInternal = ({
 
 function useBreadcrumbs() {
   const pathname = usePathname()
-  const searchParams = useSearchParams()
 
   const isTroubleshootingPage = pathname.startsWith('/guides/troubleshooting')
-
   if (isTroubleshootingPage) {
-    const returnTo = searchParams?.get('returnTo')
-      ? decodeURIComponent(searchParams.get('returnTo')!)
-      : '/guides/troubleshooting'
-
-    const breadcrumbs = [{ name: 'Troubleshooting topics', url: returnTo }]
-
-    const [, , section] = pathname.split('/')
-    if (section !== 'troubleshooting') {
-      breadcrumbs.push({
-        name: section[0].toUpperCase() + section.slice(1),
-        url: `/guides/${section}/troubleshooting`,
-      })
-    }
-
+    const breadcrumbs = [{ name: 'Troubleshooting', url: '/guides/troubleshooting' }]
     return breadcrumbs
   }
 

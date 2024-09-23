@@ -1,17 +1,18 @@
 import matter from 'gray-matter'
+import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { readdir, readFile, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 import toml from 'toml'
+import { visit } from 'unist-util-visit'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 
 import { DOCS_DIRECTORY } from 'lib/docs'
-import { cache_fullProcess_withDevCacheBust } from '../helpers.fs'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { visit } from 'unist-util-visit'
+import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
+import { formatError } from './Troubleshooting.utils.shared'
 
 const TROUBLESHOOTING_DIRECTORY = join(DOCS_DIRECTORY, 'content/troubleshooting')
 
@@ -144,6 +145,44 @@ export async function getAllTroubleshootingKeywords() {
     }
   }
   return Array.from(keywords).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+}
+
+export async function getAllTroubleshootingProducts() {
+  const entries = await getAllTroubleshootingEntries()
+  const products = new Set<string>()
+  for (const entry of entries) {
+    for (const topic of entry.data.topics) {
+      products.add(topic)
+    }
+  }
+  return Array.from(products).sort((a, b) => a.localeCompare(b))
+}
+
+export async function getAllTroubleshootingErrors() {
+  const entries = await getAllTroubleshootingEntries()
+  const allErrors = new Set(
+    entries
+      .flatMap((entry) => entry.data.errors)
+      .filter((error) => error?.http_status_code || error?.code)
+  )
+
+  const seen = new Set<string>()
+  for (const error of allErrors) {
+    const key = formatError(error)
+    if (seen.has(key)) {
+      allErrors.delete(error)
+    }
+    seen.add(key)
+  }
+
+  function sortErrors(
+    a: ITroubleshootingMetadata['errors'][number],
+    b: ITroubleshootingMetadata['errors'][number]
+  ) {
+    return formatError(a).localeCompare(formatError(b))
+  }
+
+  return Array.from(allErrors).sort(sortErrors)
 }
 
 export function getArticleSlug(entry: ITroubleshootingMetadata) {

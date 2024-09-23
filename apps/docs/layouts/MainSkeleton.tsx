@@ -330,6 +330,7 @@ interface SkeletonProps extends PropsWithChildren {
   menuName?: string
   NavigationMenu?: ReactNode
   hideFooter?: boolean
+  className?: string
 }
 
 function TopNavSkeleton({ children }) {
@@ -349,12 +350,13 @@ function SidebarSkeleton({
   menuName,
   NavigationMenu,
   hideFooter = false,
+  className,
 }: SkeletonProps) {
   const mobileMenuOpen = useMenuMobileOpen()
   const hideSideNav = !menuId && !NavigationMenu
 
   return (
-    <div className="flex flex-row h-full relative">
+    <div className={cn('flex flex-row h-full relative', className)}>
       {!hideSideNav && (
         <NavContainer>{NavigationMenu ?? <DefaultNavigationMenu menuId={menuId} />}</NavContainer>
       )}

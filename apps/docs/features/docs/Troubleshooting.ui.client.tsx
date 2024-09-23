@@ -1,190 +1,234 @@
 'use client'
 
-import { CornerDownLeft, X } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { createSerializer, parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
-import { Fragment, useEffect, useMemo, useRef, useState, Suspense } from 'react'
+import { RotateCw, Search, X } from 'lucide-react'
+import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { useEffect, useRef, useState, Suspense, useCallback } from 'react'
 
 import {
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Input_Shadcn_,
-  cn,
-  Admonition,
-} from 'ui'
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorInput,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from '@ui-patterns/multi-select'
+import ShimmeringLoader from '@ui-patterns/ShimmeringLoader'
+import { Input_Shadcn_, cn, Admonition, Button_Shadcn_ } from 'ui'
 
-import { type ITroubleshootingEntry, type ITroubleshootingMetadata } from './Troubleshooting.utils'
+import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
 import {
-  TROUBLESHOOTING_DATA_ATTRIBUTE,
-  TROUBLESHOOTING_DATA_ATTRIBUTE_ENTRY,
-  TROUBLESHOOTING_DATA_ATTRIBUTE_PREVIEW,
-  TROUBLESHOOTING_ENTRIES_ID,
+  formatError,
+  TROUBLESHOOTING_CONTAINER_ID,
+  TROUBLESHOOTING_DATA_ATTRIBUTES,
+  troubleshootingSearchParams,
 } from './Troubleshooting.utils.shared'
 
 function useTroubleshootingSearchState() {
-  const [filterState, setFilterState] = useQueryState(
-    'keywords',
-    parseAsArrayOf(parseAsString).withDefault([])
-  )
-  const [searchState, setSearchState] = useQueryState('search', parseAsString.withDefault(''))
+  const [_state, _setState] = useQueryStates(troubleshootingSearchParams)
 
-  return { filterState, searchState, setFilterState, setSearchState }
+  const setSelectedProducts = useCallback(
+    (products: string[]) => {
+      _setState({
+        products: products.length === 0 ? null : products,
+      })
+    },
+    [_setState]
+  )
+  const setSelectedErrorCodes = useCallback(
+    (errorCodes: string[]) => {
+      _setState({
+        errorCodes: errorCodes.length === 0 ? null : errorCodes,
+      })
+    },
+    [_setState]
+  )
+  const setSelectedTags = useCallback(
+    (tags: string[]) => {
+      _setState({
+        tags: tags.length === 0 ? null : tags,
+      })
+    },
+    [_setState]
+  )
+  const setSearchState = useCallback(
+    (search: string) => {
+      _setState({
+        search: search.length === 0 ? null : search,
+      })
+    },
+    [_setState]
+  )
+
+  const reset = useCallback(() => {
+    setSearchState('')
+    setSelectedTags([])
+    setSelectedProducts([])
+    setSelectedErrorCodes([])
+  }, [setSearchState, setSelectedTags, setSelectedProducts, setSelectedErrorCodes])
+
+  return {
+    selectedProducts: _state.products,
+    selectedErrorCodes: _state.errorCodes,
+    selectedTags: _state.tags,
+    searchState: _state.search,
+    setSelectedProducts,
+    setSelectedErrorCodes,
+    setSelectedTags,
+    setSearchState,
+    reset,
+  }
 }
 
-function entryMatchesFilter(entry: HTMLElement, filterState: Array<string>, searchState: string) {
-  const dataKeywords = entry.getAttribute('data-keywords')?.split(',') ?? []
+function entryMatchesFilter(
+  entry: HTMLElement,
+  selectedProducts: string[],
+  selectedErrorCodes: string[],
+  selectedTags: string[],
+  searchState: string
+) {
   const content = entry.textContent ?? ''
+  const dataKeywords = entry.getAttribute(TROUBLESHOOTING_DATA_ATTRIBUTES.KEYWORDS_LIST_ATTRIBUTE)
+  const dataProducts = entry.getAttribute(TROUBLESHOOTING_DATA_ATTRIBUTES.PRODUCTS_LIST_ATTRIBUTE)
+  const dataErrors = entry.getAttribute('data-errors')?.split(',') ?? []
 
-  return (
-    (filterState.length === 0 || filterState.some((keyword) => dataKeywords.includes(keyword))) &&
-    (searchState === '' || content.toLowerCase().includes(searchState.toLowerCase()))
-  )
+  const productsMatch =
+    selectedProducts.length === 0 ||
+    selectedProducts.some((product) => dataProducts?.includes(product))
+  const tagsMatch =
+    selectedTags.length === 0 || selectedTags.some((tag) => dataKeywords?.includes(tag))
+  const errorsMatch =
+    selectedErrorCodes.length === 0 ||
+    selectedErrorCodes.some((error) => dataErrors.includes(error))
+  const searchMatch =
+    searchState === '' || content.toLowerCase().includes(searchState.toLowerCase())
+
+  return productsMatch && errorsMatch && tagsMatch && searchMatch
 }
 
 interface TroubleshootingFilterProps {
+  products: string[]
+  errors: ITroubleshootingMetadata['errors']
   keywords: string[]
+  className?: string
 }
 
 export function TroubleshootingFilter(props: TroubleshootingFilterProps) {
   return (
-    <Suspense>
+    <Suspense fallback={<ShimmeringLoader className="h-7 py-0" />}>
       <TroubleshootingFilterInternal {...props} />
     </Suspense>
   )
 }
 
-function TroubleshootingFilterInternal({ keywords }: TroubleshootingFilterProps) {
-  const { filterState, searchState, setFilterState, setSearchState } =
-    useTroubleshootingSearchState()
+function TroubleshootingFilterInternal({
+  keywords,
+  products,
+  errors,
+  className,
+}: TroubleshootingFilterProps) {
+  const {
+    selectedProducts,
+    selectedErrorCodes,
+    selectedTags,
+    searchState,
+    setSelectedProducts,
+    setSelectedErrorCodes,
+    setSelectedTags,
+    setSearchState,
+    reset,
+  } = useTroubleshootingSearchState()
 
   const searchInputRef = useRef<HTMLInputElement | null>(null)
-
-  const allTroubleshootingEntries = useRef<Array<HTMLElement>>([])
-
-  /* This is done with imperative DOM manipulation so the previews can be
-  rendered server-side with remote MDX. */
-  useEffect(() => {
-    allTroubleshootingEntries.current = Array.from(
-      document.querySelectorAll(
-        `#${TROUBLESHOOTING_ENTRIES_ID} [${TROUBLESHOOTING_DATA_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTE_ENTRY}"]`
-      )
-    )
-    allTroubleshootingEntries.current.forEach((entry) => {
-      const preview = entry.querySelector(
-        `[${TROUBLESHOOTING_DATA_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTE_PREVIEW}"]`
-      )
-
-      ;(preview as HTMLElement).style.pointerEvents = 'none'
-
-      preview
-        ?.querySelectorAll(
-          'a,area,input,button,select,textarea,form,details,iframe,audio,video,[contenteditable]'
-        )
-        .forEach((element) => {
-          ;(element as HTMLElement).inert = true
-        })
-    })
-  }, [])
-
-  useEffect(() => {
-    if (filterState.length === 0 && searchState === '') {
-      allTroubleshootingEntries.current.forEach((entry) => {
-        entry.hidden = false
-      })
-      return
-    }
-
-    allTroubleshootingEntries.current.forEach((entry) => {
-      if (entryMatchesFilter(entry, filterState, searchState)) {
-        entry.hidden = false
-      } else {
-        entry.hidden = true
-      }
-    })
-  }, [filterState, searchState])
 
   return (
     <>
       <h2 className="sr-only">Search and filter</h2>
-      <label htmlFor="troubleshooting-search" className="sr-only">
-        Filter by search term
-      </label>
-      <div className="relative">
-        <Input_Shadcn_
-          id="troubleshooting-search"
-          ref={searchInputRef}
-          type="text"
-          placeholder="Search"
-          className="pr-8"
-          value={searchState}
-          onChange={(e) => setSearchState(e.target.value || null)}
-        />
-        {searchState && (
-          <button
-            className="absolute right-1 top-1/2 -translate-y-1/2 text-foreground-light border hover:border-stronger rounded-md p-1 transition-colors"
-            onClick={() => {
-              setSearchState(null)
-              searchInputRef.current?.focus()
-            }}
-          >
-            <span className="sr-only">Clear search</span>
-            <X size={16} />
-          </button>
-        )}
-      </div>
-      <h3 className="sr-only">Filter by keyword</h3>
-      <h4 className="sr-only">Applied filters</h4>
-      <ul className="flex flex-wrap items-center gap-2">
-        {filterState.length === 0 ? (
-          <li className="border rounded-md px-2 py-1.5 text-foreground-lighter text-sm">
-            No filters applied
-          </li>
-        ) : (
-          filterState.map((keyword) => (
-            <li key={keyword}>
-              <button
-                className="group border rounded px-2 py-1.5 text-foreground-lighter hover:text-foreground text-sm flex items-center gap-1 transition-colors"
-                onClick={() => {
-                  const newFilterState = filterState.filter((k) => k !== keyword)
-                  setFilterState(newFilterState.length === 0 ? null : newFilterState)
-                }}
-              >
-                {keyword}
-                <X
-                  size={12}
-                  className="translate-y-px group-hover:scale-105 transition-transform"
-                  aria-label="Remove filter"
-                />
-              </button>
-            </li>
-          ))
-        )}
-      </ul>
-      <h4 className="sr-only">Available filters</h4>
-      <ul className="text-foreground-light">
-        {keywords.map((keyword) => (
-          <li key={keyword} className="hover:text-foreground transition-colors">
-            <input
-              type="checkbox"
-              id={keyword}
-              checked={filterState.includes(keyword)}
-              className="sr-only peer"
-              onChange={(e) => {
-                if (e.target.checked) {
-                  setFilterState([...filterState, keyword])
-                } else {
-                  const newFilterState = filterState.filter((k) => k !== keyword)
-                  setFilterState(newFilterState.length === 0 ? null : newFilterState)
-                }
-              }}
+      <div className={cn('flex flex-wrap gap-2 items-center', className)}>
+        <MultiSelector values={selectedProducts} onValuesChange={setSelectedProducts}>
+          <MultiSelectorTrigger>
+            <MultiSelectorInput
+              placeholder="Products"
+              className="placeholder:text-foreground-light"
             />
-            <label htmlFor={keyword} className="cursor-pointer peer-checked:text-foreground-muted">
-              {keyword}
-            </label>
-          </li>
-        ))}
-      </ul>
+          </MultiSelectorTrigger>
+          <MultiSelectorContent>
+            <MultiSelectorList>
+              {products.map((product) => (
+                <MultiSelectorItem key={product} value={product}>
+                  {product}
+                </MultiSelectorItem>
+              ))}
+            </MultiSelectorList>
+          </MultiSelectorContent>
+        </MultiSelector>
+        <MultiSelector values={selectedErrorCodes} onValuesChange={setSelectedErrorCodes}>
+          <MultiSelectorTrigger>
+            <MultiSelectorInput
+              placeholder="Error codes"
+              className="placeholder:text-foreground-light"
+            />
+          </MultiSelectorTrigger>
+          <MultiSelectorContent>
+            <MultiSelectorList>
+              {errors.map((error) => (
+                <MultiSelectorItem key={formatError(error)} value={formatError(error)}>
+                  {formatError(error)}
+                </MultiSelectorItem>
+              ))}
+            </MultiSelectorList>
+          </MultiSelectorContent>
+        </MultiSelector>
+        <MultiSelector values={selectedTags} onValuesChange={setSelectedTags}>
+          <MultiSelectorTrigger>
+            <MultiSelectorInput placeholder="Tags" className="placeholder:text-foreground-light" />
+          </MultiSelectorTrigger>
+          <MultiSelectorContent>
+            <MultiSelectorList>
+              {keywords.map((keyword) => (
+                <MultiSelectorItem key={keyword} value={keyword}>
+                  {keyword}
+                </MultiSelectorItem>
+              ))}
+            </MultiSelectorList>
+          </MultiSelectorContent>
+        </MultiSelector>
+        <div className="relative">
+          <Input_Shadcn_
+            id="troubleshooting-search"
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search by keyword"
+            className="pl-8 pr-8 h-[36px] w-60 rounded-lg border-control placeholder:text-foreground-light"
+            value={searchState}
+            onChange={(e) => setSearchState(e.target.value)}
+          />
+          <Search
+            aria-hidden
+            className="absolute left-2 top-1/2 -translate-y-1/2 text-foreground-light"
+            size={16}
+          />
+          {searchState && (
+            <button
+              className="absolute right-1 top-1/2 -translate-y-1/2 text-foreground-light border hover:border-stronger rounded-md p-1 transition-colors"
+              onClick={() => {
+                setSearchState('')
+                searchInputRef.current?.focus()
+              }}
+            >
+              <span className="sr-only">Clear search</span>
+              <X size={16} />
+            </button>
+          )}
+        </div>
+        <Button_Shadcn_
+          variant="outline"
+          className="rounded-lg text-foreground-light h-[36px] w-[36px] p-0"
+          onClick={reset}
+        >
+          <RotateCw size={16} />
+          <span className="sr-only">Reset filters</span>
+        </Button_Shadcn_>
+      </div>
     </>
   )
 }
@@ -198,234 +242,107 @@ export function TroubleshootingFilterEmptyState() {
 }
 
 function TroubleshootingFilterEmptyStateInternal() {
-  const { filterState, searchState } = useTroubleshootingSearchState()
-  const allTroubleshootingEntries = useRef<Array<HTMLElement>>([])
+  const allEntries = useRef<HTMLElement[] | undefined>(undefined)
+  const {
+    selectedProducts,
+    selectedErrorCodes,
+    selectedTags,
+    searchState,
+    setSearchState,
+    setSelectedTags,
+    setSelectedProducts,
+    setSelectedErrorCodes,
+    reset,
+  } = useTroubleshootingSearchState()
 
   const [numberResults, setNumberResults] = useState<number | undefined>(undefined)
 
   useEffect(() => {
-    allTroubleshootingEntries.current = Array.from(
-      document.querySelectorAll(
-        `#${TROUBLESHOOTING_ENTRIES_ID} [${TROUBLESHOOTING_DATA_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTE_ENTRY}"]`
+    const container = document.getElementById(TROUBLESHOOTING_CONTAINER_ID)
+    if (!container) return
+
+    const entries = Array.from(
+      container.querySelectorAll(
+        `[${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_VALUE_ENTRY}"]`
       )
-    )
+    ) as HTMLElement[]
+
+    allEntries.current = entries
   }, [])
 
   useEffect(() => {
-    const numberResults = allTroubleshootingEntries.current.filter((entry) => !entry.hidden).length
-    setNumberResults(numberResults)
-  }, [filterState, searchState])
+    if (!allEntries.current) return
+
+    const numberEntries = allEntries.current.filter((entry) => !entry.hidden).length
+    setNumberResults(numberEntries)
+  }, [searchState, selectedProducts, selectedErrorCodes, selectedTags])
 
   return numberResults === 0 ? (
-    <Admonition type="note">No results found</Admonition>
-  ) : numberResults > 0 ? (
-    <span className="sr-only">
-      {numberResults} {numberResults === 1 ? 'result' : 'results'}
+    <span className="flex items-center gap-4 text-foreground-light">
+      No results found.
+      <Button_Shadcn_ variant="outline" className="flex items-center gap-2" onClick={reset}>
+        <RotateCw size={16} /> Reset filters
+      </Button_Shadcn_>
     </span>
   ) : null
 }
 
-const searchSchema = { search: parseAsString }
-const serializeSearch = createSerializer(searchSchema)
-
-export function TroubleshootingGlobalSearch() {
-  const [searchValue, setSearchValue] = useState('')
-  const showSearchHint = searchValue !== ''
-
-  const router = useRouter()
-  const link = serializeSearch('/guides/troubleshooting', { search: searchValue })
-
-  return (
-    <>
-      <label htmlFor="troubleshooting-global-search" className="sr-only">
-        Search for more troubleshooting topics
-      </label>
-      <form
-        className="relative"
-        onSubmit={(e) => {
-          e.preventDefault()
-          router.push(link)
-        }}
-      >
-        <Input_Shadcn_
-          id="troubleshooting-global-search"
-          type="text"
-          placeholder="Search for more"
-          className="pr-8"
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
-        {showSearchHint && (
-          <button className="absolute right-1 top-1/2 -translate-y-1/2 text-foreground-light border hover:border-stronger rounded-md p-1 transition-colors">
-            <span className="sr-only">Submit search</span>
-            <CornerDownLeft size={16} />
-          </button>
-        )}
-      </form>
-    </>
-  )
-}
-
-interface TroubleshootingEntryAssociatedErrorsProps {
-  errors: ITroubleshootingMetadata['errors']
-}
-
-export function TroubleshootingEntryAssociatedErrors(
-  props: TroubleshootingEntryAssociatedErrorsProps
-) {
+/**
+ * This component is used to control the visibility of the list of
+ * troubleshooting entries.
+ *
+ * Filtering is done wth imperative DOM manipulation rather than mapping and
+ * filtering the target list in React, in order to opt the full troubleshooting
+ * list into server-side rendering.
+ */
+export function TroubleshootingListController() {
   return (
     <Suspense>
-      <TroubleshootingEntryAssociatedErrorsInternal {...props} />
+      <TroubleshootingListControllerInternal />
     </Suspense>
   )
 }
 
-function TroubleshootingEntryAssociatedErrorsInternal({
-  errors,
-}: TroubleshootingEntryAssociatedErrorsProps) {
-  const [expandedState, setExpandedState] = useState<
-    { expanded: false } | { agent: 'user' | 'app'; expanded: true }
-  >({ expanded: false })
-  const expansionTriggerredByUser = useRef(false)
-  const hiddenErrorsRef = useRef<HTMLDivElement | null>(null)
-  const firstExpandedItem = useRef<HTMLLIElement | null>(null)
+function TroubleshootingListControllerInternal() {
+  const allEntries = useRef<HTMLElement[]>([])
 
-  const { searchState } = useTroubleshootingSearchState()
+  const { selectedProducts, selectedErrorCodes, selectedTags, searchState } =
+    useTroubleshootingSearchState()
+
   useEffect(() => {
-    if (searchState !== '' && entryMatchesFilter(hiddenErrorsRef.current, [], searchState)) {
-      if (!expandedState.expanded) {
-        setExpandedState({ agent: 'app', expanded: true })
-      }
-    } else if (searchState === '' && expandedState.expanded && expandedState.agent === 'app') {
-      setExpandedState({ expanded: false })
+    const container = document.getElementById(TROUBLESHOOTING_CONTAINER_ID)
+    if (!container) return
+
+    const entries = Array.from(
+      container.querySelectorAll(
+        `[${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_VALUE_ENTRY}"]`
+      )
+    ) as HTMLElement[]
+    allEntries.current = entries
+  }, [])
+
+  useEffect(() => {
+    if (
+      !searchState &&
+      selectedProducts.length === 0 &&
+      selectedErrorCodes.length === 0 &&
+      selectedTags.length === 0
+    ) {
+      allEntries.current.forEach((entry) => {
+        entry.hidden = false
+      })
+    } else {
+      allEntries.current.forEach((entry) => {
+        entry.hidden = !entryMatchesFilter(
+          entry,
+          selectedProducts,
+          selectedErrorCodes,
+          selectedTags,
+          searchState
+        )
+      })
     }
-  }, [searchState, expandedState])
+  }, [searchState, selectedProducts, selectedErrorCodes, selectedTags])
 
-  const longErrorsList = errors.length > 2
-  const Wrapper = useMemo(() => {
-    return longErrorsList ? Collapsible_Shadcn_ : Fragment
-  }, [longErrorsList])
-
-  return (
-    <div className="p-[var(--local-padding)]">
-      <h3 className="m-0 pb-1 text-sm text-foreground-lighter italic">Related errors</h3>
-      <ul className="text-sm p-0 m-0">
-        <Wrapper
-          // @ts-expect-error: passing ignored props to Fragment
-          open={expandedState.expanded}
-          onOpenChange={(requestingExpand) => {
-            if (requestingExpand) {
-              setExpandedState({
-                agent: expansionTriggerredByUser.current ? 'user' : 'app',
-                expanded: true,
-              })
-              expansionTriggerredByUser.current = false
-            } else {
-              setExpandedState({ expanded: false })
-            }
-          }}
-        >
-          {errors.slice(0, 2).map((error, index) => (
-            <li key={index} className="line-clamp-1">
-              <span className="font-mono mr-2">{`${error.http_status_code} ${error.code}`}</span>
-              {error.message}
-            </li>
-          ))}
-          {longErrorsList && (
-            <>
-              {/* Force mount so the content is available in the DOM for search */}
-              <CollapsibleContent_Shadcn_
-                forceMount
-                className="data-[state=closed]:hidden"
-                ref={hiddenErrorsRef}
-              >
-                {errors.slice(2).map((error, index) => (
-                  <li
-                    key={index}
-                    ref={index === 0 ? firstExpandedItem : null}
-                    tabIndex={-1}
-                    className="line-clamp-1"
-                  >
-                    <span className="font-mono mr-2">{`${error.http_status_code} ${error.code}`}</span>
-                    {error.message}
-                  </li>
-                ))}
-              </CollapsibleContent_Shadcn_>
-              <CollapsibleTrigger_Shadcn_ asChild>
-                <button
-                  className="text-sm text-foreground-lighter"
-                  onClick={() => {
-                    expansionTriggerredByUser.current = true
-                    setTimeout(() => {
-                      firstExpandedItem.current?.focus()
-                    })
-                  }}
-                >
-                  {expandedState ? 'Show less' : 'Show more'}
-                </button>
-              </CollapsibleTrigger_Shadcn_>
-            </>
-          )}
-        </Wrapper>
-      </ul>
-    </div>
-  )
-}
-
-export function TroubleshootingErrorListDetailed({
-  errors,
-  className,
-}: {
-  errors: ITroubleshootingEntry['data']['errors']
-  className?: string
-}) {
-  const [isExpanded, setIsExpanded] = useState(false)
-
-  const longErrorsList = errors.length > 2
-  const expandedContentId = 'troubleshooting-error-list-detailed-expanded-content'
-
-  return (
-    <aside className={cn('not-prose', className)}>
-      <div className="flex items-center justify-between gap-2 mb-2">
-        <h2 className="uppercase tracking-wider text-xs text-foreground-light">Related errors</h2>
-        <button
-          className="text-sm text-foreground-lighter hover:text-foreground transition-colors"
-          onClick={() => setIsExpanded(!isExpanded)}
-          aria-controls={expandedContentId}
-          aria-expanded={isExpanded}
-        >
-          {isExpanded ? 'Show less' : 'Show more'}
-        </button>
-      </div>
-      <table className="[&_td]:pr-2 [&_td]:text-foreground-light [&_td]:text-sm">
-        <thead className="sr-only">
-          <tr>
-            <th>HTTP Status Code</th>
-            <th>Error Code</th>
-            <th>Message</th>
-          </tr>
-        </thead>
-        <tbody>
-          {errors.slice(0, 2).map((error, index) => (
-            <tr key={index}>
-              <td className="font-mono">{error.http_status_code}</td>
-              <td className="font-mono">{error.code}</td>
-              <td>{error.message}</td>
-            </tr>
-          ))}
-        </tbody>
-        {longErrorsList && isExpanded && (
-          <tbody id={expandedContentId}>
-            {errors.slice(2).map((error, index) => (
-              <tr key={index}>
-                <td className="font-mono">{error.http_status_code}</td>
-                <td className="font-mono">{error.code}</td>
-                <td>{error.message}</td>
-              </tr>
-            ))}
-          </tbody>
-        )}
-      </table>
-    </aside>
-  )
+  return null
 }
