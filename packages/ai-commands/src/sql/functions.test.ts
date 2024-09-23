@@ -63,7 +63,7 @@ describe('title', () => {
       `
     )
 
-    await expect(title).toMatchCriteria('relates to employees and departments')
-    await expect(description).toMatchCriteria('describes employees and departments')
+    expect(title).toEqual('relates to employees and departments')
+    expect(description).toEqual('describes employees and departments')
   })
 })

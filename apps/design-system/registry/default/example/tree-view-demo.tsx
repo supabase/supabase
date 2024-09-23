@@ -1,5 +1,4 @@
-import { TreeView, TreeViewItem } from 'ui'
-import { flattenTree } from 'react-accessible-treeview'
+import { flattenTree, TreeView, TreeViewItem } from 'ui'
 
 export default function TreeViewDemo() {
   const data = {

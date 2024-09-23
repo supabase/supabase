@@ -181,8 +181,8 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                               ` (${billingMetricUnit(fee.usage_metric)})`}
                           </span>
                           {(() => {
-                            const matchingTooltipData = feeTooltipData.find((it) =>
-                              fee.usage_metric?.startsWith(it.identifier)
+                            const matchingTooltipData = feeTooltipData.find(
+                              (it) => fee.usage_metric?.startsWith(it.identifier)
                             )
                             return matchingTooltipData ? (
                               <InvoiceTooltip

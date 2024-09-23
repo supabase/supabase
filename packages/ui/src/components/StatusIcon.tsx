@@ -1,5 +1,5 @@
 import { SVGProps, forwardRef } from 'react'
-import { cn } from 'ui'
+import { cn } from '../lib/utils/cn'
 
 export interface StatusIconProps {
   hideBackground?: boolean
@@ -101,4 +101,4 @@ const WarningIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
   )
 }
 
-export { WarningIcon, CriticalIcon, InfoIcon }
+export { CriticalIcon, InfoIcon, WarningIcon }

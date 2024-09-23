@@ -1,4 +1,5 @@
 import { stripIndent } from 'common-tags'
+import { describe, expect, it, test } from 'vitest'
 import {
   checkDestructiveQuery,
   checkIfAppendLimitRequired,

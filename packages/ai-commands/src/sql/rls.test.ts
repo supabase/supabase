@@ -305,9 +305,7 @@ describe('rls chat', () => {
 
     const responseText = await collectStream(responseStream)
 
-    await expect(responseText).toMatchCriteria(
-      'Discourages restrictive policies and provides reasons why'
-    )
+    expect(responseText).toEqual('Discourages restrictive policies and provides reasons why')
   })
 
   test.concurrent('user id is on joined table and joins are minimized', async () => {

@@ -112,9 +112,8 @@ export function DiskManagementPanelForm() {
     })
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const currentCompute = (addons?.selected_addons ?? []).find(
-    (x) => x.type === 'compute_instance'
-  )?.variant
+  const currentCompute = (addons?.selected_addons ?? []).find((x) => x.type === 'compute_instance')
+    ?.variant
   const maxIopsBasedOnCompute =
     COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
   const maxThroughputBasedOnCompute =

@@ -1,4 +1,3 @@
-import fs from 'fs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 // import { parse } from 'react-docgen'
 

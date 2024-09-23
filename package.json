@@ -5,8 +5,8 @@
   "author": "Supabase, Inc.",
   "license": "Apache-2.0",
   "private": true,
-  "workspaces": ["apps/*", "apps/docs/spec/parser", "tests", "playwright-tests", "packages/*"],
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
     "build:design-system": "turbo run build --filter=design-system",
@@ -29,13 +29,14 @@
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
-    "test:playwright": "npm --prefix playwright-tests run test",
+    "test:playwright": "pnpm --prefix playwright-tests run test",
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
-    "api:codegen": "cd packages/api-types && npm run codegen"
+    "api:codegen": "cd packages/api-types && pnpm run codegen"
   },
   "devDependencies": {
+    "@playwright/test": "^1.41.2",
     "eslint": "^8.57.0",
     "prettier": "^4.0.0-alpha.8",
     "prettier-plugin-sql-cst": "^0.11.0",
@@ -48,9 +49,16 @@
     "url": "git+https://github.com/supabase/supabase.git"
   },
   "engines": {
-    "npm": "^10.0.0",
+    "pnpm": "^9.0.0",
     "node": "^20.0.0"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "npm@10.7.0"
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
+  "packageManager": "pnpm@9.10.0"
 }

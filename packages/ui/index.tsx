@@ -4,7 +4,6 @@ export * from './src/lib/Markdown'
 
 // GENERAL
 
-export * from 'ui-patterns/admonition'
 export * from './src/components/Button'
 export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'

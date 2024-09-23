@@ -11,7 +11,7 @@
     "test:prod": "jest --detectOpenHandles",
     "allure:generate": "rm -rf allure-report && node_modules/allure-commandline/bin/allure generate",
     "allure:serve": "node_modules/allure-commandline/bin/allure serve",
-    "test:report": "npm run allure:generate && npm run allure:serve",
+    "test:report": "pnpm run allure:generate && pnpm run allure:serve",
     "format": "prettier --write \"./**/*.{js,jsx,ts,tsx,css,md}\""
   },
   "author": "Supabase, Inc.",
@@ -20,17 +20,18 @@
     "@faker-js/faker": "^6.1.2",
     "@supabase/supabase-js": "^2.44.3",
     "@testdeck/jest": "^0.3.3",
-    "@types/jest": "^29.5.4",
+    "@types/jest": "^29.5.13",
     "@types/node": "^20.11.16",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
     "allure-commandline": "^2.17.2",
     "allure-js-commons": "^2.0.0-beta.14",
     "cross-fetch": "^3.1.5",
-    "ts-jest": "^29.1.1",
+    "jest": "^29.7.0",
     "jest-allure2-adapter": "^0.3.12",
     "jest-environment-jsdom": "^29.7.0",
     "postgres": "^3.0.5",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.5.0"
   }
 }

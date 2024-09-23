@@ -4,12 +4,12 @@ on:
     branches: [master]
     paths:
       - 'apps/studio/**'
-      - 'package-lock.json'
+      - 'pnpm-lock.yaml'
   pull_request:
     branches: [master]
     paths:
       - 'apps/studio/**'
-      - 'package-lock.json'
+      - 'pnpm-lock.yaml'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
@@ -23,18 +23,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9.10.0
+          run_install: false
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
       - uses: supabase/setup-cli@v1
       - name: Install dependencies
-        run: npm ci
+        run: pnpm i
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: pnpm exec playwright install --with-deps
       - name: Run Playwright tests
-        run: npm run test:playwright
+        run: pnpm run test:playwright
         # mark the action as succeeded even if the tests failed. This is temporarily until we make the tests more stable.
         # continue-on-error: true
       - uses: actions/upload-artifact@v4

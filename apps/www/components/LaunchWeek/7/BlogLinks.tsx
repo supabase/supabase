@@ -12,17 +12,19 @@ const BlogLinks = () => {
   return (
     <div className="flex flex-col gap-3 lg:gap-4 border-t border-muted py-4 lg:py-8 mt-4 lg:mt-8">
       <h3 className="text-foreground text-xl mb-4">More Launch Week 7</h3>
-      {activeDays.map((day) =>
-        day.steps?.map((step, i) => {
-          return (
-            <>
-              {!step.hideInBlog && <StepCard step={step} key={i} />}
-              {step.steps?.map(
-                (nestedStep, i) => !nestedStep.hideInBlog && <StepCard step={nestedStep} key={i} />
-              )}
-            </>
-          )
-        })
+      {activeDays.map(
+        (day) =>
+          day.steps?.map((step, i) => {
+            return (
+              <>
+                {!step.hideInBlog && <StepCard step={step} key={i} />}
+                {step.steps?.map(
+                  (nestedStep, i) =>
+                    !nestedStep.hideInBlog && <StepCard step={nestedStep} key={i} />
+                )}
+              </>
+            )
+          })
       )}
     </div>
   )

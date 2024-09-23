@@ -14,10 +14,10 @@
     "@supabase/supabase-js": "*",
     "ai": "^2.2.29",
     "common-tags": "^1.8.2",
-    "config": "*",
+    "config": "workspace:*",
     "js-tiktoken": "^1.0.10",
     "jsonrepair": "^3.5.0",
-    "openai": "^4.26.1"
+    "openai": "^4.61.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.6",
@@ -33,7 +33,7 @@
     "mdast-util-from-markdown": "^2.0.0",
     "sql-formatter": "^15.0.2",
     "ts-jest": "^29.1.1",
-    "tsconfig": "*",
+    "tsconfig": "workspace:*",
     "typescript": "^5.5.0"
   }
 }

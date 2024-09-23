@@ -6,6 +6,6 @@
   },
   "dependencies": {
     "typescript": "^5.5.0",
-    "@supabase/build-icons": "*"
+    "@supabase/build-icons": "workspace:*"
   }
 }

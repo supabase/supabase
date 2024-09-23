@@ -26,20 +26,26 @@ jobs:
           sparse-checkout: |
             apps/docs
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9.10.0
+          run_install: false
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
 
       - name: Download dependencies
-        run: npm ci
+        run: pnpm i
 
       - name: Update last-changed dates
         working-directory: ./apps/docs
         if: ${{ !inputs.reset }}
-        run: npm run last-changed
+        run: pnpm run last-changed
 
       - name: Reset last-changed dates
         working-directory: ./apps/docs
         if: ${{ inputs.reset }}
-        run: npm run last-changed:reset
+        run: pnpm run last-changed:reset
