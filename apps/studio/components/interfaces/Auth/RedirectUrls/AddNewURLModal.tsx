@@ -9,14 +9,17 @@ import { useParams } from 'common'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import {
   Button,
+  cn,
   DialogSectionSeparator,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Modal,
+  ScrollArea,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Label } from '@ui/components/shadcn/ui/label'
 
 const MAX_URLS_LENGTH = 2 * 1024
 
@@ -100,30 +103,35 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Modal.Content className="flex flex-col gap-y-2">
-            {fields.map((field, index) => (
-              <FormField_Shadcn_
-                control={form.control}
-                key={field.id}
-                name={`urls.${index}.value`}
-                render={({ field: inputField }) => (
-                  <FormItemLayout label={index === 0 ? 'URL' : ''} className="[&>div>div]:mt-0">
-                    <FormControl_Shadcn_>
-                      <div className="flex items-center gap-x-2 [&>div]:w-full">
-                        <Input placeholder="https://mydomain.com" {...inputField} />
-                        <Button
-                          type="default"
-                          size="small"
-                          icon={<Trash />}
-                          className="px-2"
-                          disabled={fields.length === 1}
-                          onClick={() => remove(index)}
-                        />
-                      </div>
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            ))}
+            <Label>URL</Label>
+            <ScrollArea className={cn(fields.length > 4 ? 'h-[220px]' : '')}>
+              <div className="flex flex-col gap-y-2">
+                {fields.map((field, index) => (
+                  <FormField_Shadcn_
+                    control={form.control}
+                    key={field.id}
+                    name={`urls.${index}.value`}
+                    render={({ field: inputField }) => (
+                      <FormItemLayout className="[&>div>div]:mt-0">
+                        <FormControl_Shadcn_>
+                          <div className="flex items-center gap-x-2 [&>div]:w-full">
+                            <Input placeholder="https://mydomain.com" {...inputField} />
+                            <Button
+                              type="default"
+                              size="small"
+                              icon={<Trash />}
+                              className="px-2"
+                              disabled={fields.length === 1}
+                              onClick={() => remove(index)}
+                            />
+                          </div>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                ))}
+              </div>
+            </ScrollArea>
             <Button
               type="default"
               className="w-min"
