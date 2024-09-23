@@ -6,7 +6,7 @@ import type { Dashboards, LogSqlSnippets, Owner, SqlSnippets } from 'types'
 import { contentKeys } from './keys'
 
 export type ContentBase = {
-  id?: string
+  id: string
   name: string
   description?: string
   visibility: 'user' | 'project' | 'org' | 'public'

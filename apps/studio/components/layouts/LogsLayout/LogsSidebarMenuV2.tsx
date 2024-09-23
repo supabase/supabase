@@ -294,6 +294,11 @@ export function LogsSidebarMenuV2({
       </SidebarCollapsible>
       <Separator className="my-4" />
       <SidebarCollapsible title="Queries" defaultOpen={true}>
+        {savedQueriesLoading && (
+          <div className="p-4">
+            <GenericSkeletonLoader />
+          </div>
+        )}
         {savedQueries.map((query) => (
           <SavedQueriesItem item={query} key={query.id} />
         ))}

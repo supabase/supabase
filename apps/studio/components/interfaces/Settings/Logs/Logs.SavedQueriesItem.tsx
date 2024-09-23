@@ -16,7 +16,7 @@ interface SavedQueriesItemProps {
   item: {
     id: string
     name: string
-    description: string | null
+    description?: string
     content: {
       sql: string
     }
@@ -53,13 +53,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
     deleteContent({ projectRef: ref, ids: [item.id] })
   }
 
-  const onConfirmUpdate = async ({
-    name,
-    description,
-  }: {
-    name: string
-    description: string | null
-  }) => {
+  const onConfirmUpdate = async ({ name, description }: { name: string; description?: string }) => {
     if (!ref || typeof ref !== 'string') return console.error('Invalid project reference')
     updateContent({
       projectRef: ref,
