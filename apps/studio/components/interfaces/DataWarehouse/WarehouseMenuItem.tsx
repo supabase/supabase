@@ -32,6 +32,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { LogsSidebarItem } from '../Settings/Logs/SidebarV2/SidebarItem'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 type Props = {
   item: {
@@ -184,46 +185,23 @@ export const WarehouseMenuItem = ({ item }: Props) => {
           </form>
         </Form_Shadcn_>
       </Modal>
-      <Modal
+      <ConfirmationModal
+        variant="destructive"
         visible={showDeleteDialog}
         onCancel={() => setDeleteDialog(false)}
-        hideFooter
-        header={`Remove collection "${item.name}"`}
+        confirmLabel="Delete collection"
+        title={`Delete collection "${item.name}"`}
         size="small"
+        onConfirm={() => {
+          deleteCollection.mutate({ projectRef, collectionToken: item.token })
+        }}
       >
-        <Form_Shadcn_ {...deleteForm}>
-          <form
-            id="delete-collection-form"
-            onSubmit={deleteForm.handleSubmit(() => {
-              deleteCollection.mutate({ projectRef, collectionToken: item.token })
-            })}
-          >
-            <div className="p-3 px-6 space-y-4">
-              <p className="text-sm text-foreground-light">
-                All data in this collection will be deleted.
-                <br />
-                <div className="mt-2">This action cannot be undone.</div>
-              </p>
-            </div>
-
-            <div className="flex gap-2 justify-end p-3 border-t">
-              <Button
-                disabled={isLoading}
-                type="outline"
-                onClick={() => {
-                  setDeleteDialog(false)
-                }}
-                htmlType="reset"
-              >
-                Cancel
-              </Button>
-              <Button type="danger" htmlType="submit" loading={isLoading}>
-                Yes, delete
-              </Button>
-            </div>
-          </form>
-        </Form_Shadcn_>
-      </Modal>
+        <p className="text-sm text-foreground-light">
+          All data in this collection will be deleted.
+          <br />
+          <div className="mt-2">This action cannot be undone.</div>
+        </p>
+      </ConfirmationModal>
     </>
   )
 }

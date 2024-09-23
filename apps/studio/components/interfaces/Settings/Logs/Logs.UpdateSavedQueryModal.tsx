@@ -31,7 +31,7 @@ export const UpdateSavedQueryModal = ({
       onCancel={onCancel}
       hideFooter
       header="Update saved query"
-      size="small"
+      size="medium"
     >
       <Form
         onReset={onCancel}
