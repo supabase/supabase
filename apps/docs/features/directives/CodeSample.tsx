@@ -23,6 +23,7 @@
  */
 
 import { Root } from 'mdast'
+import { MdxJsxAttributeValueExpression } from 'mdast-util-mdx'
 import type {
   MdxJsxAttribute,
   MdxJsxExpressionAttribute,
@@ -40,7 +41,6 @@ import { visitParents } from 'unist-util-visit-parents'
 import { z, type SafeParseError } from 'zod'
 
 import { fetchWithNextOptions } from '~/features/helpers.fetch'
-import { GIT_COMMIT_SHA } from '~/lib/constants'
 import { EXAMPLES_DIRECTORY } from '~/lib/docs'
 
 export function CodeSampleWrapper({
@@ -101,7 +101,7 @@ interface Dependencies {
     repo: string
     path: string
     branch: string
-    options: { onError: (error: unknown) => void; fetch: (url: string) => Promise<string> }
+    options: { onError: (error: unknown) => void; fetch: (url: string) => Promise<Response> }
   }) => Promise<string>
 }
 
@@ -123,7 +123,7 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
   visitParents(tree, 'mdxJsxFlowElement', (node: MdxJsxFlowElement, ancestors) => {
     if (node.name !== '$CodeSample') return
 
-    const isExternal = getAttributeValue(node, 'external') === 'true'
+    const isExternal = getAttributeValueExpression(getAttributeValue(node, 'external')) === 'true'
 
     if (isExternal) {
       const org = getAttributeValue(node, 'org')
@@ -216,8 +216,8 @@ function getAttributeValue(
   )
 }
 
-function getAttributeValueExpression(node: mdxJsxAttribute | undefined) {
-  if (node?.type !== 'mdxJsxAttributeValueExpression') return undefined
+function getAttributeValueExpression(node: MdxJsxAttributeValueExpression | string | undefined) {
+  if (typeof node === 'string' || node?.type !== 'mdxJsxAttributeValueExpression') return undefined
   return node.value
 }
 
@@ -287,24 +287,24 @@ function redactLines(
   lines: [number, number, ...unknown[]][],
   lang: string | null
 ) {
-  const contentLines = content.trim().split('\n')
+  const contentLines = content.split('\n')
 
   const preservedLines = lines.reduce((acc, [start, end], index, arr) => {
-    if (
-      (index === 0 && start !== 1) ||
-      (index !== 0 && index !== arr.length - 1) ||
-      (index === arr.length - 1 && end !== -1 && end !== contentLines.length)
-    ) {
+    if (index !== 0 || start !== 1) {
       acc.push(createElidedLine(lang))
     }
 
     // Start and end are 1-indexed and inclusive
     acc.push(...contentLines.slice(start - 1, end === -1 ? contentLines.length : end))
 
+    if (index === arr.length - 1 && end !== -1 && end !== contentLines.length) {
+      acc.push(createElidedLine(lang))
+    }
+
     return acc
   }, [] as string[])
 
-  return preservedLines.join('\n')
+  return preservedLines.join('\n').trim()
 }
 
 function createElidedLine(lang: string | null) {

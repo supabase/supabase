@@ -52,6 +52,10 @@ export async function getGitHubFileContents({
     fetch?: (info: RequestInfo, init?: RequestInit) => Promise<Response>
   }
 }) {
+  if (path.startsWith('/')) {
+    path = path.slice(1)
+  }
+
   try {
     const response = await octokit().request('GET /repos/{owner}/{repo}/contents/{path}', {
       owner: org,
