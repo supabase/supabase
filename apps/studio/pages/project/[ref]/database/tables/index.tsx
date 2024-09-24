@@ -30,6 +30,10 @@ const DatabaseTables: NextPageWithLayout = () => {
                 setSelectedTableToEdit(table)
                 snap.onDeleteTable()
               }}
+              onDuplicateTable={(table) => {
+                setSelectedTableToEdit(table)
+                snap.onDuplicateTable()
+              }}
             />
           </div>
         </ScaffoldSection>
