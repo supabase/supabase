@@ -13,6 +13,7 @@ import { useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import {
   Button,
   cn,
+  LoadingLine,
   ResizablePanel,
   ResizablePanelGroup,
   Select_Shadcn_,
@@ -209,11 +210,17 @@ export const UsersV2 = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => {
-              if (e.code === 'Enter' && search.length > 0) setFilterKeywords(search)
+              if (e.code === 'Enter') setFilterKeywords(search)
             }}
             actions={[
               search && (
-                <Button size="tiny" type="text" icon={<X />} onClick={() => clearSearch()} />
+                <Button
+                  size="tiny"
+                  type="text"
+                  icon={<X />}
+                  onClick={() => clearSearch()}
+                  className="px-1"
+                />
               ),
             ]}
           />
@@ -245,6 +252,7 @@ export const UsersV2 = () => {
           <AddUserDropdown projectKpsVersion={project?.kpsVersion} />
         </div>
       </div>
+      <LoadingLine loading={isLoading || isRefetching} />
       <ResizablePanelGroup
         direction="horizontal"
         className="relative flex flex-grow bg-alternative min-h-0"
@@ -254,7 +262,7 @@ export const UsersV2 = () => {
           <div className="flex flex-col w-full h-full">
             <DataGrid
               ref={gridRef}
-              className="flex-grow"
+              className="flex-grow border-t-0"
               rowHeight={44}
               headerRowHeight={36}
               columns={usersTableColumns}
