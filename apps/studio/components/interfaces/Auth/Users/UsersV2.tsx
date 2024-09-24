@@ -41,9 +41,9 @@ const USERS_TABLE_COLUMNS = [
     width: 300,
     resizable: true,
   },
+  { id: 'phone', name: 'Phone', minWidth: undefined, resizable: true },
   { id: 'providers', name: 'Providers', minWidth: 150, resizable: true },
   { id: 'provider_type', name: 'Provider type', minWidth: 150, resizable: true },
-  { id: 'phone', name: 'Phone', minWidth: undefined, resizable: true },
   {
     id: 'created_at',
     name: 'Created at',

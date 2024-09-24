@@ -74,7 +74,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const mailerOtpExpiry = data?.MAILER_OTP_EXP ?? 0
   const minutes = Math.floor(mailerOtpExpiry / 60)
   const seconds = Math.floor(mailerOtpExpiry % 60)
-  const formattedExpiry = `${mailerOtpExpiry > 60 ? `${minutes} minutes ${seconds > 0 ? 'and' : ''} ` : ''}${seconds > 0 ? `${seconds} seconds` : ''}`
+  const formattedExpiry = `${mailerOtpExpiry > 60 ? `${minutes} minute${minutes > 1 ? 's' : ''} ${seconds > 0 ? 'and' : ''} ` : ''}${seconds > 0 ? `${seconds} second${seconds > 1 ? 's' : ''}` : ''}`
 
   const { mutate: resetPassword, isLoading: isResettingPassword } = useUserResetPasswordMutation({
     onSuccess: (_, vars) => {

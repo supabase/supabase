@@ -18,7 +18,6 @@ export const formatUsersData = (users: User[]) => {
       phone: user.phone,
       created_at: user.created_at,
       last_sign_in_at: user.last_sign_in_at,
-
       providers: user.is_anonymous ? '-' : providers,
       provider_icons: providers
         .map((p) => {
