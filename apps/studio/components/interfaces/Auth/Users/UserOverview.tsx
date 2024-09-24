@@ -367,7 +367,6 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             button={{
               icon: <ShieldOff />,
               text: 'Remove MFA factors',
-              isLoading: isResettingPassword,
               disabled: !canRemoveMFAFactors,
               onClick: () => setIsDeleteFactorsModalOpen(true),
             }}
@@ -380,7 +379,6 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
               icon: <Trash />,
               type: 'danger',
               text: 'Delete user',
-              isLoading: isSendingMagicLink,
               disabled: !canRemoveUser,
               onClick: () => setIsDeleteModalOpen(true),
             }}
@@ -403,13 +401,14 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
 
       <ConfirmationModal
         visible={isDeleteFactorsModalOpen}
-        title="Confirm to delete"
-        confirmLabel="Delete"
+        title="Confirm to remove MFA factors"
+        confirmLabel="Remove factors"
+        confirmLabelLoading="Removing"
         onCancel={() => setIsDeleteFactorsModalOpen(false)}
         onConfirm={() => handleDeleteFactors()}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to delete the user's MFA factors?
+          This is permanent! Are you sure you want to remove the user's MFA factors?
         </p>
       </ConfirmationModal>
     </>
@@ -462,7 +461,7 @@ const RowAction = ({
     type?: ComponentProps<typeof Button>['type']
     text: string
     disabled?: boolean
-    isLoading: boolean
+    isLoading?: boolean
     onClick: () => void
   }
   success?: {
@@ -483,7 +482,7 @@ const RowAction = ({
       <ButtonTooltip
         type={button?.type ?? 'default'}
         icon={success ? <Check className="text-brand" /> : button.icon}
-        loading={button.isLoading}
+        loading={button.isLoading ?? false}
         onClick={button.onClick}
         disabled={button?.disabled ?? false}
         tooltip={{
