@@ -2866,11 +2866,7 @@ export interface components {
       /** @deprecated */
       org_id?: number
       organization_slug?: string
-      /**
-       * @description Postgres engine version. If not provided, the latest version will be used.
-       * @enum {string}
-       */
-      postgres_engine?: '13' | '14' | '15'
+      postgres_engine?: components['schemas']['PostgresEngine']
       release_channel?: components['schemas']['ReleaseChannel']
     }
     CreateProjectResponse: {
