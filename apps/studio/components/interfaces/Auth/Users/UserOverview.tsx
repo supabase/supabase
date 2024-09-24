@@ -1,11 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { Check, Copy, Mail, ShieldOff, Trash, X } from 'lucide-react'
+import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CopyButton from 'components/ui/CopyButton'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
@@ -13,14 +16,13 @@ import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mut
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { User } from 'data/auth/users-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import { Button, cn, Separator } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { PANEL_PADDING } from './UserPanel'
 import { getDisplayName, providerIconMap } from './Users.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { BASE_PATH } from 'lib/constants'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 const CONTAINER_CLASS = cn(
@@ -41,8 +43,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isPhoneAuth = user.phone !== null
   const isAnonUser = user.is_anonymous
 
-  //user.raw_app_meta_data?.providers ?? []
-  const providers = ['google']
+  const providers = (user.raw_app_meta_data?.providers ?? [])
     .filter((x) => x !== 'email')
     .map((provider) => {
       return {
@@ -213,9 +214,48 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         </div>
 
         <div className={cn('flex flex-col -space-y-1', PANEL_PADDING)}>
+          {providers.length === 0 && isEmailAuth && (
+            <div className={cn(CONTAINER_CLASS, 'items-start justify-start')}>
+              <img
+                width={16}
+                src={`${BASE_PATH}/img/icons/email-icon2.svg`}
+                alt={`email auth icon`}
+                className="mt-1.5"
+              />
+              <div className="flex-grow mt-0.5">
+                <p className="capitalize">Email</p>
+                <p className="text-xs text-foreground-light">
+                  Signed in via email with no associated providers
+                </p>
+                <Button asChild type="default" className="mt-2">
+                  <Link href={`/project/${projectRef}/auth/providers`}>
+                    Configure email provider
+                  </Link>
+                </Button>
+              </div>
+              {data?.EXTERNAL_EMAIL_ENABLED ? (
+                <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
+                  <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
+                    <Check strokeWidth={2} size={12} />
+                  </span>
+                  <span className="px-1">Enabled</span>
+                </div>
+              ) : (
+                <div className="rounded-md border border-strong bg-surface-100 py-1 px-3 text-xs text-foreground-lighter">
+                  Disabled
+                </div>
+              )}
+            </div>
+          )}
           {providers.map((provider) => {
             // [Joshen TODO] Need to figure out how to get the enabled status of the provider
-            const isActive = true
+            const providerMeta = PROVIDERS_SCHEMAS.find(
+              (x) => x.title.toLowerCase() === provider.name
+            )
+            const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
+              x.toLowerCase().endsWith('_enabled')
+            )
+            const isActive = data?.[enabledProperty as keyof typeof data] ?? false
 
             return (
               <div key={provider.name} className={cn(CONTAINER_CLASS, 'items-start justify-start')}>
@@ -229,7 +269,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 )}
                 <div className="flex-grow mt-0.5">
                   <p className="capitalize">{provider.name}</p>
-                  <p className="text-xs text-foreground-light">Some description here</p>
+                  <p className="text-xs text-foreground-light">
+                    Signed in with a <span className="capitalize">{provider.name}</span> account via
+                    OAuth
+                  </p>
+                  <Button asChild type="default" className="mt-2">
+                    <Link href={`/project/${projectRef}/auth/providers`}>
+                      Configure <span className="capitalize">{provider.name}</span> provider
+                    </Link>
+                  </Button>
                 </div>
                 {isActive ? (
                   <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
@@ -330,13 +378,13 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         </div>
 
         <div className={cn('flex flex-col', PANEL_PADDING)}>
-          <p>DANGER ZONE</p>
+          <p>Danger zone</p>
           <p className="text-sm text-foreground-light">
-            Be wary with the following features as they cannot be undone.
+            Be wary of the following features as they cannot be undone.
           </p>
         </div>
 
-        <div className={cn('flex flex-col -space-y-1 !pt-0 !pb-5', PANEL_PADDING)}>
+        <div className={cn('flex flex-col -space-y-1 !pb-5', PANEL_PADDING)}>
           <RowAction
             title="Remove MFA factors"
             description="This will log the user out of all active sessions"
