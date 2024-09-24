@@ -2706,17 +2706,9 @@ export interface components {
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
       git_branch?: string
       persistent?: boolean
-      /**
-       * @description Postgres engine version. If not provided, the latest version will be used.
-       * @enum {string}
-       */
-      postgres_engine?: '13' | '14' | '15'
+      postgres_engine?: components['schemas']['PostgresEngine']
       region?: string
-      /**
-       * @description Release channel. If not provided, GA will be used.
-       * @enum {string}
-       */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      release_channel?: components['schemas']['ReleaseChannel']
     }
     CreateCliLoginSessionBody: {
       public_key: string
@@ -2879,11 +2871,7 @@ export interface components {
        * @enum {string}
        */
       postgres_engine?: '13' | '14' | '15'
-      /**
-       * @description Release channel. If not provided, GA will be used.
-       * @enum {string}
-       */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      release_channel?: components['schemas']['ReleaseChannel']
     }
     CreateProjectResponse: {
       anon_key: string
@@ -4387,6 +4375,8 @@ export interface components {
       wal_keep_size?: string
       work_mem?: string
     }
+    /** @enum {string} */
+    PostgresEngine: '15'
     PostgresExtension: {
       comment: string | null
       default_version: string
@@ -4638,10 +4628,8 @@ export interface components {
       endpoint: string
     }
     ProjectCreationVersionInfo: {
-      /** @enum {string} */
-      postgres_engine: '13' | '14' | '15'
-      /** @enum {string} */
-      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      postgres_engine: components['schemas']['PostgresEngine']
+      release_channel: components['schemas']['ReleaseChannel']
       version: string
     }
     ProjectDetailResponse: {
@@ -4827,16 +4815,13 @@ export interface components {
       status: string
     }
     ProjectUnpauseVersionInfo: {
-      /** @enum {string} */
-      postgres_engine: '13' | '14' | '15'
-      /** @enum {string} */
-      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      postgres_engine: components['schemas']['PostgresEngine']
+      release_channel: components['schemas']['ReleaseChannel']
       version: string
     }
     ProjectUpgradeEligibilityResponse: {
       current_app_version: string
-      /** @enum {string} */
-      current_app_version_release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      current_app_version_release_channel: components['schemas']['ReleaseChannel']
       duration_estimate_hours: number
       eligible: boolean
       extension_dependent_objects: string[]
@@ -4850,10 +4835,8 @@ export interface components {
     }
     ProjectVersion: {
       app_version: string
-      /** @enum {string} */
-      postgres_version: '13' | '14' | '15'
-      /** @enum {string} */
-      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      postgres_version: components['schemas']['PostgresEngine']
+      release_channel: components['schemas']['ReleaseChannel']
     }
     Provider: {
       created_at?: string
@@ -4900,6 +4883,8 @@ export interface components {
       target_table_name: string
       target_table_schema: string
     }
+    /** @enum {string} */
+    ReleaseChannel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
     RemoveNetworkBanRequest: {
       ipv4_addresses: string[]
     }
@@ -5603,16 +5588,8 @@ export interface components {
       available_versions: components['schemas']['ProjectUnpauseVersionInfo'][]
     }
     UnpauseProjectBody: {
-      /**
-       * @description Postgres engine version. If not provided, the latest version from the given release channel will be used.
-       * @enum {string}
-       */
-      postgres_engine?: '13' | '14' | '15'
-      /**
-       * @description Release channel version. If not provided, GeneralAvailability will be used.
-       * @enum {string}
-       */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      postgres_engine?: components['schemas']['PostgresEngine']
+      release_channel?: components['schemas']['ReleaseChannel']
     }
     UnpauseProjectInfo: {
       back_ups: components['schemas']['BackupId'][]
@@ -6463,11 +6440,7 @@ export interface components {
        * @enum {string}
        */
       plan?: 'free' | 'pro'
-      /**
-       * @description Postgres engine version. If not provided, the latest version will be used.
-       * @enum {string}
-       */
-      postgres_engine?: '13' | '14' | '15'
+      postgres_engine?: components['schemas']['PostgresEngine']
       /**
        * @description Region you want your server to reside in
        * @example us-east-1
@@ -6492,11 +6465,7 @@ export interface components {
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
-      /**
-       * @description Release channel. If not provided, GA will be used.
-       * @enum {string}
-       */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      release_channel?: components['schemas']['ReleaseChannel']
       /**
        * @description Template URL used to create the project from the CLI.
        * @example https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
@@ -6521,7 +6490,7 @@ export interface components {
       user_name: string
     }
     V1OrganizationSlugResponse: {
-      allowed_release_channels: ('internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn')[]
+      allowed_release_channels: components['schemas']['ReleaseChannel'][]
       id: string
       name: string
       opt_in_tags: 'AI_SQL_GENERATOR_OPT_IN'[]

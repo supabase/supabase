@@ -18,7 +18,7 @@ import {
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
-import { PostgresVersionSelector } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { extractPostgresVersionDetails, PostgresVersionSelector } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
@@ -293,11 +293,7 @@ const Wizard: NextPageWithLayout = () => {
       instanceSize: z.string(),
       dataApi: z.boolean(),
       useApiSchema: z.boolean(),
-      postgresVersionInfo: z.object({
-        version: z.string(),
-        releaseChannel: z.string(),
-        postgresEngine: z.string(),
-      }),
+      postgresVersionSelection: z.string(),
     })
     .superRefine(({ dbPassStrength }, refinementContext) => {
       if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
@@ -323,6 +319,7 @@ const Wizard: NextPageWithLayout = () => {
       instanceSize: sizes[0],
       dataApi: true,
       useApiSchema: false,
+      postgresVersionSelection: '',
     },
   })
 
@@ -365,7 +362,13 @@ const Wizard: NextPageWithLayout = () => {
       instanceSize,
       dataApi,
       useApiSchema,
+      postgresVersionSelection,
     } = values
+
+    const {
+      postgresEngine,
+      releaseChannel,
+    } = extractPostgresVersionDetails(postgresVersionSelection)
 
     const data: ProjectCreateVariables = {
       cloudProvider: cloudProvider,
@@ -380,6 +383,8 @@ const Wizard: NextPageWithLayout = () => {
         orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
+      postgresEngine: postgresEngine,
+      releaseChannel: releaseChannel,
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
@@ -913,7 +918,7 @@ const Wizard: NextPageWithLayout = () => {
                     {!projectVersionSelectionDisabled && <Panel.Content>
                       <FormField_Shadcn_
                         control={form.control}
-                        name="postgresVersionInfo"
+                        name="postgresVersionSelection"
                         render={({ field }) => (
                           <PostgresVersionSelector
                             field={field}
