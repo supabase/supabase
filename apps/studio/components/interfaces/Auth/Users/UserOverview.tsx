@@ -250,7 +250,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     Signed in with a {providerName} account via OAuth
                   </p>
                   <Button asChild type="default" className="mt-2">
-                    <Link href={`/project/${projectRef}/auth/providers`}>
+                    <Link href={`/project/${projectRef}/auth/providers?provider=${provider.name}`}>
                       Configure {providerName} provider
                     </Link>
                   </Button>
