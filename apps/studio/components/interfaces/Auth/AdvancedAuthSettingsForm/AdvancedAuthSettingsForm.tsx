@@ -51,6 +51,7 @@ const schema = object({
     .max(30, 'Must be a value no greater than 30'),
   MFA_TOTP: string().required(),
   MFA_PHONE: string().required(),
+  MFA_WEB_AUTHN: string().required(),
 })
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
@@ -135,6 +136,11 @@ const AdvancedAuthSettingsForm = () => {
         authConfig?.MFA_PHONE_VERIFY_ENABLED || false,
         authConfig?.MFA_PHONE_ENROLL_ENABLED || false
       ) || 'Disabled',
+    MFA_WEB_AUTHN:
+      determineMFAStatus(
+        authConfig?.MFA_WEB_AUTHN_VERIFY_ENABLED || false,
+        authConfig?.MFA_WEB_AUTHN_ENROLL_ENABLED || false
+      ) || 'Disabled',
   }
 
   // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
@@ -156,10 +162,18 @@ const AdvancedAuthSettingsForm = () => {
     if (isProPlanAndUp) {
       const { verifyEnabled: MFA_PHONE_VERIFY_ENABLED, enrollEnabled: MFA_PHONE_ENROLL_ENABLED } =
         MfaStatusToState(values.MFA_PHONE)
+
+      const {
+        verifyEnabled: MFA_WEB_AUTHN_VERIFY_ENABLED,
+        enrollEnabled: MFA_WEB_AUTHN_ENROLL_ENABLED,
+      } = MfaStatusToState(values.MFA_WEB_AUTHN)
+
       payload = {
         ...payload,
         MFA_PHONE_ENROLL_ENABLED,
         MFA_PHONE_VERIFY_ENABLED,
+        MFA_WEB_AUTHN_ENROLL_ENABLED,
+        MFA_WEB_AUTHN_VERIFY_ENABLED,
       }
     }
     payload = {
@@ -169,6 +183,7 @@ const AdvancedAuthSettingsForm = () => {
     }
     delete payload.MFA_TOTP
     delete payload.MFA_PHONE
+    delete payload.MFA_WEB_AUTHN
 
     if (!isTeamsEnterprisePlan) {
       delete payload.DB_MAX_POOL_SIZE
