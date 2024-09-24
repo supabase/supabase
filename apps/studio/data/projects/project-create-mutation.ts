@@ -13,6 +13,7 @@ const WHITELIST_ERRORS = [
   'db_pass must be longer than or equal to 4 characters',
   'There are overdue invoices in the organization(s)',
   'name should not contain a . string',
+  'Project creation in the Supabase dashboard is disabled for this Vercel-managed organization.',
 ]
 
 export type DbInstanceSize = components['schemas']['DesiredInstanceSize']
