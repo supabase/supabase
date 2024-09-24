@@ -9,15 +9,18 @@ import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
 import { ExternalLink, Download } from 'lucide-react'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 
 const Entities = ({ language }: ContentProps) => {
   const { ref } = useParams()
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
+  const { data: config } = useProjectPostgrestConfigQuery({ projectRef: ref })
+
   const onClickGenerateTypes = async () => {
     try {
       setIsGeneratingTypes(true)
-      const res = await generateTypes({ ref })
+      const res = await generateTypes({ ref, included_schemas: config?.db_schema })
       let element = document.createElement('a')
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(res.types))
       element.setAttribute('download', 'supabase.ts')
