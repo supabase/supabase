@@ -46,7 +46,7 @@ export function LogsSidebarItem({ label, icon, dropdownItems, href, isActive, on
               <div className="sr-only">Actions</div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48" align="start">
+          <DropdownMenuContent className="w-48" align="end">
             {dropdownItems}
           </DropdownMenuContent>
         </DropdownMenu>

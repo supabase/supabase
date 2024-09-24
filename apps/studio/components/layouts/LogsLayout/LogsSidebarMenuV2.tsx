@@ -165,7 +165,7 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-12 relative">
-      <div className="flex gap-2 p-4 items-center sticky top-0 bg-background-200 z-10">
+      <div className="flex gap-2 p-4 items-center sticky top-0 bg-background-200 z-[1]">
         <InnerSideBarFilters className="w-full p-0 gap-0">
           <InnerSideBarFilterSearchInput
             name="search-collections"
@@ -183,7 +183,7 @@ export function LogsSidebarMenuV2() {
               className="w-[26px]"
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
+          <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem className="gap-x-2" asChild>
               <Link href={`/project/${ref}/logs/explorer`}>
                 <FilePlus size={14} />
