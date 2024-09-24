@@ -106,6 +106,7 @@ export const UsersV2 = () => {
       sortable: false,
       width: col.width,
       minWidth: col.minWidth ?? 120,
+      headerCellClass: 'z-50',
       renderHeaderCell: () => {
         if (col.id === 'img') return undefined
         return (
