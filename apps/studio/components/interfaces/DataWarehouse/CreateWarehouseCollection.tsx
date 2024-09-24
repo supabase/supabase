@@ -15,11 +15,13 @@ import { useCreateCollection } from 'data/analytics/warehouse-collections-create
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 
 export const CreateWarehouseCollectionModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
   const { ref } = useParams()
+  const { plan, isLoading: planLoading } = useCurrentOrgPlan()
 
   const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
 
@@ -34,12 +36,27 @@ export const CreateWarehouseCollectionModal = () => {
     },
   })
 
+  function getMaxRetentionDays() {
+    if (planLoading) return 1
+    if (plan?.id === 'free') return 3
+    else return 90
+  }
   const FormSchema = z.object({
     name: z.string().min(1),
+    retention_days: z.coerce
+      .number()
+      .min(1)
+      .max(getMaxRetentionDays())
+      .multipleOf(1)
+      .positive()
+      .int(),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      retention_days: getMaxRetentionDays(),
+    },
   })
 
   useEffect(() => {
@@ -56,8 +73,15 @@ export const CreateWarehouseCollectionModal = () => {
     createCollection({
       projectRef: ref,
       name: vals.name,
+      retention_days: vals.retention_days,
     })
   })
+
+  const retentionDescription = () => {
+    if (planLoading) return 'Max 90 days'
+    if (plan?.id === 'free') return 'Max 3 days. Upgrade your plan to increase your retention.'
+    else return 'Max 90 days'
+  }
 
   return (
     <>
@@ -79,7 +103,7 @@ export const CreateWarehouseCollectionModal = () => {
       <Modal
         size="medium"
         onCancel={() => setIsOpen(!isOpen)}
-        header="Create an event collection"
+        header="Create collection"
         visible={isOpen}
         hideFooter
       >
@@ -99,6 +123,21 @@ export const CreateWarehouseCollectionModal = () => {
                   <FormItemLayout label="Collection name" layout="horizontal">
                     <FormControl_Shadcn_>
                       <Input placeholder="Events" {...field} />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+              <FormField_Shadcn_
+                control={form.control}
+                name="retention_days"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Retention days"
+                    layout="horizontal"
+                    description={retentionDescription()}
+                  >
+                    <FormControl_Shadcn_>
+                      <Input type="number" {...field} />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
