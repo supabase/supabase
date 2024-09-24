@@ -1,5 +1,6 @@
-import { AlertTriangle, Code, Loader2 } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { type PostgresColumn } from '@supabase/postgres-meta'
+import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
@@ -9,7 +10,14 @@ import { type SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
-import { cn, CodeBlock, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_ } from 'ui'
+import {
+  cn,
+  CodeBlock,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+} from 'ui'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import {
   Breadcrumb,
@@ -20,11 +28,15 @@ import {
   generateCommandClassNames,
   PageType,
   useCommandFilterState,
+  useCommandMenuOpen,
   useRegisterCommands,
   useRegisterPage,
   useSetCommandMenuSize,
   useSetPage,
 } from 'ui-patterns/CommandMenu'
+import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useEffect, useRef } from 'react'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -229,4 +241,134 @@ function snippetValue(snippet: SqlSnippet) {
   return escapeAttributeSelector(
     `${snippet.id}-${snippet.name}-${snippet.content.sql.slice(0, 30)}`
   ).toLowerCase()
+}
+
+const QUERY_TABLE_PAGE_NAME = 'Query a table'
+
+export function useQueryTableCommands(options?: CommandOptions) {
+  const project = useSelectedProject()
+  const setPage = useSetPage()
+
+  const commandMenuOpen = useCommandMenuOpen()
+  const commandMenuPreviouslyOpen = useRef(commandMenuOpen)
+  const commandMenuJustOpened = commandMenuOpen && !commandMenuPreviouslyOpen.current
+  commandMenuPreviouslyOpen.current = commandMenuOpen
+
+  const prefetchTables = usePrefetchTables({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  useEffect(() => {
+    if (project && commandMenuJustOpened) {
+      prefetchTables(undefined, true)
+    }
+  }, [project, prefetchTables, commandMenuJustOpened])
+
+  useRegisterPage(
+    QUERY_TABLE_PAGE_NAME,
+    {
+      type: PageType.Component,
+      component: TableSelector,
+    },
+    { enabled: !!project }
+  )
+
+  useRegisterCommands(
+    COMMAND_MENU_SECTIONS.ACTIONS,
+    [
+      {
+        id: 'query-table',
+        name: 'Query a table',
+        icon: () => <Table2 />,
+        action: () => setPage(QUERY_TABLE_PAGE_NAME),
+      },
+    ],
+    { ...options, enabled: (options?.enabled ?? true) && !!project }
+  )
+}
+
+function TableSelector() {
+  const router = useRouter()
+  const project = useSelectedProject()
+  const {
+    data: tables,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      includeColumns: true,
+    },
+    { select: excludeSupabaseControlledSchemas }
+  )
+
+  return (
+    <CommandWrapper>
+      <CommandHeader>
+        <Breadcrumb />
+        <CommandInput autoFocus />
+      </CommandHeader>
+      <CommandList_Shadcn_>
+        {isLoading && <LoadingState />}
+        {isError && <ErrorState />}
+        {isSuccess && (
+          <>
+            <CommandEmpty_Shadcn_ />
+            <CommandGroup_Shadcn_>
+              {tables?.map((table) => (
+                <CommandItem_Shadcn_
+                  key={table.id}
+                  className={generateCommandClassNames(false)}
+                  value={escapeAttributeSelector(`${table.schema}.${table.name}`)}
+                  onSelect={() => {
+                    router.push(
+                      `/project/${project?.ref ?? '_'}/sql/new?content=${encodeURIComponent(generateSelectStatement(table))}`
+                    )
+                  }}
+                >
+                  {`${table.schema}.${table.name}`}
+                </CommandItem_Shadcn_>
+              ))}
+            </CommandGroup_Shadcn_>
+          </>
+        )}
+      </CommandList_Shadcn_>
+    </CommandWrapper>
+  )
+}
+
+function generateSelectStatement(table: TablesData[number] & { columns?: Array<PostgresColumn> }) {
+  return `
+select ${
+    !table.columns
+      ? '*'
+      : `
+${table.columns.map((column, index, array) => `\t${column.name}`).join(',\n')}`
+  }
+from ${formatTableIdentifier(table)}
+-- where
+-- order by
+-- limit
+;
+  `.trim()
+}
+
+function excludeSupabaseControlledSchemas(tables: TablesData) {
+  return tables.filter((table) => !EXCLUDED_SCHEMAS.includes(table.schema))
+}
+
+// Not a perfectly spec-compliant regex , since Postgres also allows non-Latin
+// letters and letters with diacritical marks, but quoting them defensively
+// is easier than writing the regex. ¯\_(ツ)_/¯
+const VALID_UNQUOTED_IDENTIFIER_REGEX = /^[a-z_][a-z0-9_$]*$/
+function formatTableIdentifier(table: TablesData[number]) {
+  const schema = VALID_UNQUOTED_IDENTIFIER_REGEX.test(table.schema)
+    ? table.schema
+    : `"${table.schema}"`
+  const tableName = VALID_UNQUOTED_IDENTIFIER_REGEX.test(table.name)
+    ? table.name
+    : `"${table.name}"`
+  return `${schema}.${tableName}`
 }

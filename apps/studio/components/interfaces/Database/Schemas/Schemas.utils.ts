@@ -23,6 +23,9 @@ type TableNodeData = {
   }[]
 }
 
+const NODE_SEP = 25
+const RANK_SEP = 50
+
 export async function getGraphDataFromTables(
   ref: string,
   schema: PostgresSchema,
@@ -162,8 +165,8 @@ export const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
   dagreGraph.setGraph({
     rankdir: 'LR',
     align: 'UR',
-    nodesep: 25,
-    ranksep: 50,
+    nodesep: NODE_SEP,
+    ranksep: RANK_SEP,
   })
 
   nodes.forEach((node) => {
@@ -204,7 +207,12 @@ const getLayoutedElementsViaLocalStorage = (
   // [Joshen] Potentially look into auto fitting new nodes?
   // https://github.com/xyflow/xyflow/issues/1113
 
+  const nodesWithNoSavedPositons = nodes.filter((n) => !(n.id in positions))
   let newNodeCount = 0
+  let basePosition = {
+    x: 0,
+    y: -(NODE_SEP + TABLE_NODE_ROW_HEIGHT + nodesWithNoSavedPositons.length * 10),
+  }
 
   nodes.forEach((node) => {
     const existingPosition = positions?.[node.id]
@@ -215,7 +223,10 @@ const getLayoutedElementsViaLocalStorage = (
     if (existingPosition) {
       node.position = existingPosition
     } else {
-      node.position = { x: newNodeCount * 10, y: newNodeCount * 10 }
+      node.position = {
+        x: basePosition.x + newNodeCount * 10,
+        y: basePosition.y + newNodeCount * 10,
+      }
       newNodeCount += 1
     }
   })
