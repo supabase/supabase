@@ -40,7 +40,7 @@ const USERS_TABLE_COLUMNS = [
     width: 300,
     resizable: true,
   },
-  { id: 'provider', name: 'Provider', minWidth: 150, resizable: true },
+  { id: 'providers', name: 'Providers', minWidth: 150, resizable: true },
   { id: 'provider_type', name: 'Provider type', minWidth: 150, resizable: true },
   { id: 'phone', name: 'Phone', minWidth: undefined, resizable: true },
   {
@@ -121,7 +121,9 @@ export const UsersV2 = () => {
         const formattedValue =
           value !== null && ['created_at', 'last_sign_in_at'].includes(col.id)
             ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
-            : value
+            : Array.isArray(value)
+              ? value.join(', ')
+              : value
         const isConfirmed = user?.email_confirmed_at || user?.phone_confirmed_at
 
         if (col.id === 'img') {
@@ -143,17 +145,38 @@ export const UsersV2 = () => {
         return (
           <div
             className={cn(
-              'w-full flex items-center text-xs gap-x-2',
+              'w-full flex items-center text-xs',
               col.id.includes('provider') ? 'capitalize' : ''
             )}
           >
-            {col.id === 'provider' && row.provider_icon && (
-              <img width={16} src={row.provider_icon} alt={`${row.provider} auth icon`} />
-            )}
+            {/* [Joshen] Not convinced this is the ideal way to display the icons, but for now */}
+            {col.id === 'providers' &&
+              row.provider_icons.map((icon: string, idx: number) => {
+                const provider = row.providers[idx]
+                return (
+                  <div
+                    className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
+                    style={{
+                      marginLeft: idx === 0 ? 0 : `-8px`,
+                      zIndex: row.provider_icons.length - idx,
+                    }}
+                  >
+                    <img
+                      key={`${user?.id}-${provider}`}
+                      width={16}
+                      src={icon}
+                      alt={`${provider} auth icon`}
+                      className={cn(provider === 'github' && 'dark:invert')}
+                    />
+                  </div>
+                )
+              })}
             {col.id === 'last_sign_in_at' && !isConfirmed ? (
               <p className="text-foreground-lighter">Waiting for verification</p>
             ) : (
-              <p>{formattedValue === null ? '-' : formattedValue}</p>
+              <p className={cn(col.id === 'providers' && 'ml-1')}>
+                {formattedValue === null ? '-' : formattedValue}
+              </p>
             )}
           </div>
         )

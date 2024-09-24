@@ -43,16 +43,17 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isPhoneAuth = user.phone !== null
   const isAnonUser = user.is_anonymous
 
-  const providers = (user.raw_app_meta_data?.providers ?? [])
-    .filter((x) => x !== 'email')
-    .map((provider) => {
-      return {
-        name: provider,
-        icon: providerIconMap[provider]
-          ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
-          : undefined,
-      }
-    })
+  const providers = (user.raw_app_meta_data?.providers ?? []).map((provider) => {
+    return {
+      name: provider,
+      icon:
+        provider === 'email'
+          ? `${BASE_PATH}/img/icons/email-icon2.svg`
+          : providerIconMap[provider]
+            ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
+            : undefined,
+    }
+  })
 
   const canSendMagicLink = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_magic_link')
   const canSendRecovery = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_recovery')
@@ -222,47 +223,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         </div>
 
         <div className={cn('flex flex-col -space-y-1', PANEL_PADDING)}>
-          {providers.length === 0 && isEmailAuth && (
-            <div className={cn(CONTAINER_CLASS, 'items-start justify-start')}>
-              <img
-                width={16}
-                src={`${BASE_PATH}/img/icons/email-icon2.svg`}
-                alt={`email auth icon`}
-                className="mt-1.5"
-              />
-              <div className="flex-grow mt-0.5">
-                <p className="capitalize">Email</p>
-                <p className="text-xs text-foreground-light">
-                  Signed in via email with no associated providers
-                </p>
-                <Button asChild type="default" className="mt-2">
-                  <Link href={`/project/${projectRef}/auth/providers?provider=email`}>
-                    Configure email provider
-                  </Link>
-                </Button>
-              </div>
-              {data?.EXTERNAL_EMAIL_ENABLED ? (
-                <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
-                  <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
-                    <Check strokeWidth={2} size={12} />
-                  </span>
-                  <span className="px-1">Enabled</span>
-                </div>
-              ) : (
-                <div className="rounded-md border border-strong bg-surface-100 py-1 px-3 text-xs text-foreground-lighter">
-                  Disabled
-                </div>
-              )}
-            </div>
-          )}
           {providers.map((provider) => {
-            // [Joshen TODO] Need to figure out how to get the enabled status of the provider
             const providerMeta = PROVIDERS_SCHEMAS.find(
               (x) => x.title.toLowerCase() === provider.name
             )
             const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
               x.toLowerCase().endsWith('_enabled')
             )
+            const providerName =
+              provider.name === 'email' ? 'email' : providerMeta?.title ?? provider.name
             const isActive = data?.[enabledProperty as keyof typeof data] ?? false
 
             return (
@@ -272,18 +241,17 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     width={16}
                     src={provider.icon}
                     alt={`${provider.name} auth icon`}
-                    className="mt-1.5"
+                    className={cn('mt-1.5', provider.name === 'github' ? 'dark:invert' : '')}
                   />
                 )}
                 <div className="flex-grow mt-0.5">
                   <p className="capitalize">{provider.name}</p>
                   <p className="text-xs text-foreground-light">
-                    Signed in with a <span className="capitalize">{provider.name}</span> account via
-                    OAuth
+                    Signed in with a {providerName} account via OAuth
                   </p>
                   <Button asChild type="default" className="mt-2">
                     <Link href={`/project/${projectRef}/auth/providers`}>
-                      Configure <span className="capitalize">{provider.name}</span> provider
+                      Configure {providerName} provider
                     </Link>
                   </Button>
                 </div>

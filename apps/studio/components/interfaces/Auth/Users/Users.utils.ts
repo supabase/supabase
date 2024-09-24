@@ -10,6 +10,7 @@ export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean 
 export const formatUsersData = (users: User[]) => {
   return users.map((user) => {
     const provider: string = user.raw_app_meta_data?.provider ?? ''
+    const providers: string[] = user.raw_app_meta_data?.providers ?? []
 
     return {
       id: user.id,
@@ -17,7 +18,18 @@ export const formatUsersData = (users: User[]) => {
       phone: user.phone,
       created_at: user.created_at,
       last_sign_in_at: user.last_sign_in_at,
-      provider: user.is_anonymous ? '-' : provider,
+
+      providers: user.is_anonymous ? '-' : providers,
+      provider_icons: providers
+        .map((p) => {
+          return p === 'email'
+            ? `${BASE_PATH}/img/icons/email-icon2.svg`
+            : providerIconMap[p]
+              ? `${BASE_PATH}/img/icons/${providerIconMap[p]}.svg`
+              : undefined
+        })
+        .filter(Boolean),
+      // I think it's alright to just check via the main provider since email and phone should be mutually exclusive
       provider_type: user.is_anonymous
         ? 'Anonymous'
         : socialProviders.includes(provider)
@@ -25,13 +37,8 @@ export const formatUsersData = (users: User[]) => {
           : phoneProviders.includes(provider)
             ? 'Phone'
             : '-',
-      provider_icon:
-        provider === 'email'
-          ? `${BASE_PATH}/img/icons/email-icon2.svg`
-          : providerIconMap[provider]
-            ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
-            : undefined,
-      img: getAvatarUrl(user), // [Joshen] Note that the images might not load due to CSP issues
+      // [Joshen] Note that the images might not load due to CSP issues
+      img: getAvatarUrl(user),
       name: getDisplayName(user),
     }
   })
