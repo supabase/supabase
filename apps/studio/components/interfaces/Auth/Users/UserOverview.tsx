@@ -18,7 +18,7 @@ import { User } from 'data/auth/users-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
-import { Button, cn, Separator } from 'ui'
+import { Admonition, Button, cn, Separator } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { PANEL_PADDING } from './UserPanel'
@@ -187,7 +187,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           )}
         </div>
 
-        <Separator />
+        {!!user.banned_until ? (
+          <Admonition
+            type="warning"
+            label={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
+            className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5 mb-0"
+          />
+        ) : (
+          <Separator />
+        )}
 
         <div className={cn('flex flex-col', PANEL_PADDING)}>
           <RowData
