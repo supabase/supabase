@@ -19,7 +19,7 @@ interface UserPanelProps {
   onClose: () => void
 }
 
-export const PANEL_PADDING = 'px-5 py-3'
+export const PANEL_PADDING = 'px-5 py-5'
 
 export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
   const [view, setView] = useState<'overview' | 'raw'>('overview')

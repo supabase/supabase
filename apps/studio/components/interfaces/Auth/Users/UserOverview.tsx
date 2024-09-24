@@ -199,12 +199,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         )}
 
         <div className={cn('flex flex-col', PANEL_PADDING)}>
-          <RowData
-            property="Last signed in"
-            value={
-              user.last_sign_in_at ? dayjs(user.last_sign_in_at).format(DATE_FORMAT) : undefined
-            }
-          />
+          <RowData property="User UID" value={user.id} />
           <RowData
             property="Created at"
             value={user.created_at ? dayjs(user.created_at).format(DATE_FORMAT) : undefined}
@@ -213,16 +208,27 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             property="Updated at"
             value={user.updated_at ? dayjs(user.updated_at).format(DATE_FORMAT) : undefined}
           />
-          <RowData property="User UID" value={user.id} />
+          <RowData property="Invited at" value={user.invited_at} />
+          <RowData property="Confirmation sent at" value={user.confirmation_sent_at} />
+          <RowData
+            property="Confirmed at"
+            value={user.confirmed_at ? dayjs(user.confirmed_at).format(DATE_FORMAT) : undefined}
+          />
+          <RowData
+            property="Last signed in"
+            value={
+              user.last_sign_in_at ? dayjs(user.last_sign_in_at).format(DATE_FORMAT) : undefined
+            }
+          />
           <RowData property="SSO" value={user.is_sso_user} />
         </div>
 
-        <div className={cn('flex flex-col', PANEL_PADDING)}>
+        <div className={cn('flex flex-col !pt-0', PANEL_PADDING)}>
           <p>Provider Information</p>
           <p className="text-sm text-foreground-light">The user has the following providers</p>
         </div>
 
-        <div className={cn('flex flex-col -space-y-1', PANEL_PADDING)}>
+        <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
           {providers.map((provider) => {
             const providerMeta = PROVIDERS_SCHEMAS.find(
               (x) => x.title.toLowerCase() === provider.name
@@ -272,14 +278,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           })}
         </div>
 
-        <div className={cn('flex flex-col', PANEL_PADDING)}>
-          <RowData property="Invited at" value={user.invited_at} />
-          <RowData property="Confirmation sent at" value={user.confirmation_sent_at} />
-          <RowData
-            property="Confirmed at"
-            value={user.confirmed_at ? dayjs(user.confirmed_at).format(DATE_FORMAT) : undefined}
-          />
-        </div>
+        <Separator />
 
         <div className={cn('flex flex-col -space-y-1', PANEL_PADDING)}>
           {isEmailAuth && (
@@ -353,6 +352,8 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           )}
         </div>
 
+        <Separator />
+
         <div className={cn('flex flex-col', PANEL_PADDING)}>
           <p>Danger zone</p>
           <p className="text-sm text-foreground-light">
@@ -360,7 +361,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           </p>
         </div>
 
-        <div className={cn('flex flex-col -space-y-1 !pb-5', PANEL_PADDING)}>
+        <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
           <RowAction
             title="Remove MFA factors"
             description="This will log the user out of all active sessions"
