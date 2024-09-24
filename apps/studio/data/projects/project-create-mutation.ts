@@ -12,6 +12,9 @@ const WHITELIST_ERRORS = [
   'The following organization members have reached their maximum limits for the number of active free projects',
   'db_pass must be longer than or equal to 4 characters',
   'There are overdue invoices in the organization(s)',
+  'name should not contain a . string',
+  'Project creation in the Supabase dashboard is disabled for this Vercel-managed organization.',
+  'Your account, which is handled by the Fly Supabase extension, cannot access this endpoint.',
 ]
 
 export type DbInstanceSize = components['schemas']['DesiredInstanceSize']
