@@ -6,13 +6,16 @@ import { useProjectByRef } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants/infrastructure'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
+import { components } from 'api-types'
 
+export type ProjectUpgradeTargetVersions = components['schemas']['ProjectVersion']
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }
 export type ProjectUpgradeEligibilityResponse = {
   eligible: boolean
   current_app_version: string
+  current_app_version_release_channel: string
   latest_app_version: string
-  target_upgrade_versions: { postgres_version: number; app_version: string }[]
+  target_upgrade_versions: ProjectUpgradeTargetVersions[]
   requires_manual_intervention: string | null
   potential_breaking_changes: string[]
   duration_estimate_hours: number

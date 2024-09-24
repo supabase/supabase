@@ -18,6 +18,7 @@ import {
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
+import { PostgresVersionSelector } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
@@ -193,6 +194,7 @@ const Wizard: NextPageWithLayout = () => {
   const { slug, projectName } = useParams()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
+  const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
   const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheckQuery({ slug })
@@ -291,6 +293,11 @@ const Wizard: NextPageWithLayout = () => {
       instanceSize: z.string(),
       dataApi: z.boolean(),
       useApiSchema: z.boolean(),
+      postgresVersionInfo: z.object({
+        version: z.string(),
+        releaseChannel: z.string(),
+        postgresEngine: z.string(),
+      }),
     })
     .superRefine(({ dbPassStrength }, refinementContext) => {
       if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
@@ -543,7 +550,7 @@ const Wizard: NextPageWithLayout = () => {
                           name="postgresVersion"
                           render={({ field }) => (
                             <FormItemLayout
-                              label="Postgres version"
+                              label="Custom Postgres version"
                               layout="horizontal"
                               description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
                             >
@@ -902,6 +909,22 @@ const Wizard: NextPageWithLayout = () => {
                         )}
                       />
                     </Panel.Content>
+
+                    {!projectVersionSelectionDisabled && <Panel.Content>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="postgresVersionInfo"
+                        render={({ field }) => (
+                          <PostgresVersionSelector
+                            field={field}
+                            form={form}
+                            cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                            organizationSlug={slug}
+                            dbRegion={form.getValues('dbRegion')}
+                          />
+                        )}
+                      />
+                    </Panel.Content>}
 
                     <Panel.Content>
                       <Collapsible_Shadcn_>

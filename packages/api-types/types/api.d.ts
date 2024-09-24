@@ -302,6 +302,10 @@ export interface paths {
     /** Gets an organization's audit logs */
     get: operations['OrgAuditLogsController_getAuditLogs']
   }
+  '/platform/organizations/{slug}/available-versions': {
+    /** Retrieves a list of available Postgres versions available to the organization */
+    post: operations['OrganizationSlugController_getAvailableImageVersions']
+  }
   '/platform/organizations/{slug}/billing/invoices': {
     /** Gets invoices for the given organization */
     get: operations['OrgInvoicesController_getInvoices']
@@ -925,7 +929,11 @@ export interface paths {
   }
   '/platform/projects/{ref}/restore': {
     /** Cancels a failed restoration */
-    post: operations['RestoreController_cancelProjectRestoration']
+    post: operations['UnpauseController_cancelProjectRestoration']
+  }
+  '/platform/projects/{ref}/restore/versions': {
+    /** Retrieves versions to which a project can be restored */
+    get: operations['UnpauseController_getAvailableImageVersions']
   }
   '/platform/projects/{ref}/run-lints': {
     /** Run project lints */
@@ -1356,6 +1364,10 @@ export interface paths {
     /** Updates organization */
     patch: operations['OrganizationSlugController_updateOrganization']
   }
+  '/v0/organizations/{slug}/available-versions': {
+    /** Retrieves a list of available Postgres versions available to the organization */
+    post: operations['OrganizationSlugController_getAvailableImageVersions']
+  }
   '/v0/organizations/{slug}/members': {
     /** Gets organization's members */
     get: operations['MembersController_getMembers']
@@ -1784,7 +1796,11 @@ export interface paths {
   }
   '/v0/projects/{ref}/restore': {
     /** Cancels a failed restoration */
-    post: operations['RestoreController_cancelProjectRestoration']
+    post: operations['UnpauseController_cancelProjectRestoration']
+  }
+  '/v0/projects/{ref}/restore/versions': {
+    /** Retrieves versions to which a project can be restored */
+    get: operations['UnpauseController_getAvailableImageVersions']
   }
   '/v0/projects/{ref}/settings': {
     /** Gets project's settings */
@@ -2576,8 +2592,10 @@ export interface components {
       db_port: number
       db_user?: string
       jwt_secret?: string
+      postgres_engine: string
       postgres_version: string
       ref: string
+      release_channel: string
       /** @enum {string} */
       status:
         | 'ACTIVE_HEALTHY'
@@ -2688,7 +2706,17 @@ export interface components {
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
       git_branch?: string
       persistent?: boolean
+      /**
+       * @description Postgres engine version. If not provided, the latest version will be used.
+       * @enum {string}
+       */
+      postgres_engine?: '13' | '14' | '15'
       region?: string
+      /**
+       * @description Release channel. If not provided, GA will be used.
+       * @enum {string}
+       */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
     }
     CreateCliLoginSessionBody: {
       public_key: string
@@ -2846,6 +2874,16 @@ export interface components {
       /** @deprecated */
       org_id?: number
       organization_slug?: string
+      /**
+       * @description Postgres engine version. If not provided, the latest version will be used.
+       * @enum {string}
+       */
+      postgres_engine?: '13' | '14' | '15'
+      /**
+       * @description Release channel. If not provided, GA will be used.
+       * @enum {string}
+       */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
     }
     CreateProjectResponse: {
       anon_key: string
@@ -4145,6 +4183,13 @@ export interface components {
       name: string
       project_ids: number[] | null
     }
+    OrganizationSlugAvailableVersionsBody: {
+      provider: string
+      region: string
+    }
+    OrganizationSlugAvailableVersionsResponse: {
+      available_versions: components['schemas']['ProjectCreationVersionInfo'][]
+    }
     OrganizationSlugResponse: {
       billing_email?: string
       id: number
@@ -4592,6 +4637,13 @@ export interface components {
       db_schema: string
       endpoint: string
     }
+    ProjectCreationVersionInfo: {
+      /** @enum {string} */
+      postgres_engine: '13' | '14' | '15'
+      /** @enum {string} */
+      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      version: string
+    }
     ProjectDetailResponse: {
       cloud_provider: string
       connectionString: string
@@ -4774,8 +4826,17 @@ export interface components {
       ssl_enforced: boolean
       status: string
     }
+    ProjectUnpauseVersionInfo: {
+      /** @enum {string} */
+      postgres_engine: '13' | '14' | '15'
+      /** @enum {string} */
+      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      version: string
+    }
     ProjectUpgradeEligibilityResponse: {
       current_app_version: string
+      /** @enum {string} */
+      current_app_version_release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
       duration_estimate_hours: number
       eligible: boolean
       extension_dependent_objects: string[]
@@ -4789,7 +4850,10 @@ export interface components {
     }
     ProjectVersion: {
       app_version: string
-      postgres_version: number
+      /** @enum {string} */
+      postgres_version: '13' | '14' | '15'
+      /** @enum {string} */
+      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
     }
     Provider: {
       created_at?: string
@@ -5022,15 +5086,6 @@ export interface components {
     RestorePhysicalBackupBody: {
       id: number
       recovery_time_target: string
-    }
-    RestoreProjectInfo: {
-      back_ups: components['schemas']['BackupId'][]
-      cloud_provider: string
-      id: number
-      organization_id: number
-      region: string
-      status: string
-      subscription_id: string
     }
     RestrictionData: {
       grace_period_end?: string
@@ -5543,6 +5598,30 @@ export interface components {
     }
     TypescriptResponse: {
       types: string
+    }
+    UnpauseProjectAvailableVersionsResponse: {
+      available_versions: components['schemas']['ProjectUnpauseVersionInfo'][]
+    }
+    UnpauseProjectBody: {
+      /**
+       * @description Postgres engine version. If not provided, the latest version from the given release channel will be used.
+       * @enum {string}
+       */
+      postgres_engine?: '13' | '14' | '15'
+      /**
+       * @description Release channel version. If not provided, GeneralAvailability will be used.
+       * @enum {string}
+       */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+    }
+    UnpauseProjectInfo: {
+      back_ups: components['schemas']['BackupId'][]
+      cloud_provider: string
+      id: number
+      organization_id: number
+      region: string
+      status: string
+      subscription_id: string
     }
     UpcomingInvoice: Record<string, never>
     UpdateAddonAdminBody: {
@@ -6213,7 +6292,8 @@ export interface components {
       public_env_var_prefix?: string
     }
     UpgradeDatabaseBody: {
-      target_version: number
+      release_channel: string
+      target_version: string
     }
     UpsertContentBody: {
       content?: Record<string, never>
@@ -6384,6 +6464,11 @@ export interface components {
        */
       plan?: 'free' | 'pro'
       /**
+       * @description Postgres engine version. If not provided, the latest version will be used.
+       * @enum {string}
+       */
+      postgres_engine?: '13' | '14' | '15'
+      /**
        * @description Region you want your server to reside in
        * @example us-east-1
        * @enum {string}
@@ -6408,6 +6493,11 @@ export interface components {
         | 'ap-south-1'
         | 'sa-east-1'
       /**
+       * @description Release channel. If not provided, GA will be used.
+       * @enum {string}
+       */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      /**
        * @description Template URL used to create the project from the CLI.
        * @example https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
        */
@@ -6416,6 +6506,10 @@ export interface components {
     V1DatabaseResponse: {
       /** @description Database host */
       host: string
+      /** @description Database engine */
+      postgres_engine: string
+      /** @description Release channel */
+      release_channel: string
       /** @description Database version */
       version: string
     }
@@ -6427,6 +6521,7 @@ export interface components {
       user_name: string
     }
     V1OrganizationSlugResponse: {
+      allowed_release_channels: ('internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn')[]
       id: string
       name: string
       opt_in_tags: 'AI_SQL_GENERATOR_OPT_IN'[]
@@ -8024,6 +8119,34 @@ export interface operations {
       }
     }
   }
+  /** Retrieves a list of available Postgres versions available to the organization */
+  OrganizationSlugController_getAvailableImageVersions: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OrganizationSlugAvailableVersionsBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OrganizationSlugAvailableVersionsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to determine available Postgres versions */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets invoices for the given organization */
   OrgInvoicesController_getInvoices: {
     parameters: {
@@ -8063,7 +8186,7 @@ export interface operations {
       200: {
         headers: {
           /** @description total count value */
-          'X-Total-Count'?: unknown
+          'X-Total-Count'?: number
         }
         content: never
       }
@@ -12631,7 +12754,7 @@ export interface operations {
     }
   }
   /** Cancels a failed restoration */
-  RestoreController_cancelProjectRestoration: {
+  UnpauseController_cancelProjectRestoration: {
     parameters: {
       path: {
         /** @description Project ref */
@@ -12648,6 +12771,29 @@ export interface operations {
         content: never
       }
       /** @description Failed to cancel project restoration */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Retrieves versions to which a project can be restored */
+  UnpauseController_getAvailableImageVersions: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['UnpauseProjectAvailableVersionsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve available versions */
       500: {
         content: never
       }
