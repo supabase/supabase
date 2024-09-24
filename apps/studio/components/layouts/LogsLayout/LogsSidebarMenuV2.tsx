@@ -15,6 +15,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   cn,
   Collapsible_Shadcn_,
@@ -262,6 +265,16 @@ export function LogsSidebarMenuV2() {
         {savedQueriesLoading && (
           <div className="p-4">
             <GenericSkeletonLoader />
+          </div>
+        )}
+        {savedQueries.length === 0 && (
+          <div className="mx-4">
+            <Alert_Shadcn_ className="p-3">
+              <AlertTitle_Shadcn_ className="text-xs">No queries created yet</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_ className="text-xs">
+                You can create and save queries from the "Create query" button in the top right.
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
           </div>
         )}
         {savedQueries.map((query) => (
