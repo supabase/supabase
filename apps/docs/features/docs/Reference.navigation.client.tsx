@@ -177,6 +177,9 @@ export function RefLink({
       ) : (
         <Link
           ref={ref}
+          // We don't use these links because we never do real navigation, so
+          // prefetching just wastes bandwidth
+          prefetch={false}
           href={href}
           aria-current={isActive ? 'page' : false}
           className={getLinkStyles(isActive, className)}

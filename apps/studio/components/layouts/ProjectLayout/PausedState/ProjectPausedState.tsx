@@ -160,8 +160,8 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                                     .add(pauseStatus.max_days_till_restore_disabled ?? 0, 'day')
                                     .format('DD MMM YYYY')}
                                 </span>
-                                . However, your database backup will still be available for download
-                                thereafter.
+                                . However, your database backup and Storage objects will still be
+                                available for download thereafter.
                               </AlertDescription_Shadcn_>
                             </Alert_Shadcn_>
                           </>
