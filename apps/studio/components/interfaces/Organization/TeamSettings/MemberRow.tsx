@@ -36,6 +36,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
     slug: selectedOrganization?.slug,
   })
 
+  const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
   const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const isInvitedUser = Boolean(member.invited_id)
   const isEmailUser = member.username === member.primary_email
@@ -148,7 +149,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             return (
               <div key={`role-${id}`} className="flex items-center gap-x-2">
                 <p>{roleName}</p>
-                {isOptedIntoProjectLevelPermissions && (
+                {hasProjectScopedRoles && (
                   <>
                     <span>•</span>
                     {projectsApplied.length === 1 ? (
