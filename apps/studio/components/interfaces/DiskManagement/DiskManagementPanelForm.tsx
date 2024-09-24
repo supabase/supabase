@@ -297,6 +297,7 @@ export function DiskManagementPanelForm() {
                             field.onChange(e)
                             // only trigger provisionedIOPS due to other input being hidden
                             await form.trigger('provisionedIOPS')
+                            await form.trigger('totalSize')
                           }}
                           defaultValue={field.value}
                           disabled={disableInput}

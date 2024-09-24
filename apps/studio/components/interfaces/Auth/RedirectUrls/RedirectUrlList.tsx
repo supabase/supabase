@@ -60,8 +60,7 @@ export const RedirectUrlList = ({
 
   return (
     <div className="-space-y-px">
-      <ValueContainer className="py-3 flex items-center justify-between">
-        <p className="text-foreground-light text-sm">Total URLs: {allowList.length}</p>
+      <ValueContainer className="py-3 flex items-center justify-end">
         {selectedUrls.length > 0 ? (
           <div className="flex items-center gap-x-2">
             <Button type="default" onClick={() => onSelectClearSelection()}>
@@ -126,6 +125,11 @@ export const RedirectUrlList = ({
             description="Auth providers may need a URL to redirect back to"
           />
         </div>
+      )}
+      {allowList.length > 0 && (
+        <ValueContainer className="py-3 flex items-center justify-between">
+          <p className="pl-9 text-foreground-muted text-sm">Total URLs: {allowList.length}</p>
+        </ValueContainer>
       )}
     </div>
   )
