@@ -49,6 +49,13 @@ export const generateSettingsMenu = (
                 url: `/project/${ref}/settings/integrations`,
                 items: [],
               },
+              {
+                name: 'API Keys',
+                key: 'api-keys',
+                url: `/project/${ref}/settings/api-keys`,
+                items: [],
+                label: 'NEW',
+              },
             ]
           : []),
         ...[
@@ -78,7 +85,7 @@ export const generateSettingsMenu = (
           items: [],
         },
         {
-          name: 'API',
+          name: 'Data API',
           key: 'api',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
           items: [],
