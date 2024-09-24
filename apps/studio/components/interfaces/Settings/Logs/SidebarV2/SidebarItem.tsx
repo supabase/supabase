@@ -23,14 +23,10 @@ export function LogsSidebarItem({ label, icon, dropdownItems, href, isActive, on
       <Link
         onClick={onClick}
         href={href}
-        className={'flex-1 h-7 justify-between flex items-center text-sm px-4'}
+        className={'h-7 flex-1 text-sm px-4 flex items-center gap-2 truncate'}
       >
-        <div className="flex items-center gap-2 justify-between w-full">
-          <span className="flex items-center gap-2">
-            {icon}
-            {label}
-          </span>
-        </div>
+        <span>{icon}</span>
+        <span className="truncate">{label}</span>
       </Link>
       {dropdownItems && (
         <DropdownMenu>

@@ -81,8 +81,6 @@ export const WarehouseMenuItem = ({ item }: Props) => {
     resolver: zodResolver(UpdateFormSchema),
   })
 
-  const deleteForm = useForm()
-
   return (
     <>
       <LogsSidebarItem
