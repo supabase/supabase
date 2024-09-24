@@ -13,6 +13,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { components } from 'api-types'
+import { useEffect } from 'react'
 
 type ReleaseChannel = components['schemas']['ReleaseChannel']
 type PostgresEngine = components['schemas']['PostgresEngine']
@@ -35,7 +36,7 @@ const formatValue = ({ postgres_engine, release_channel }: ProjectCreationPostgr
 }
 
 export const extractPostgresVersionDetails = (value: string) : PostgresVersionDetails =>  {
-  if (!!value) {
+  if (!value) {
     return { postgresEngine: undefined, releaseChannel: undefined }
   }
 
@@ -43,7 +44,7 @@ export const extractPostgresVersionDetails = (value: string) : PostgresVersionDe
   return { postgresEngine, releaseChannel } as PostgresVersionDetails
 }
 
-export const PostgresVersionSelector = ({ cloudProvider, dbRegion, organizationSlug, field }: PostgresVersionSelectorProps) => {
+export const PostgresVersionSelector = ({ cloudProvider, dbRegion, organizationSlug, field, form }: PostgresVersionSelectorProps) => {
   const {
     data,
     isLoading: isLoadingProjectVersions,
@@ -53,7 +54,12 @@ export const PostgresVersionSelector = ({ cloudProvider, dbRegion, organizationS
     organizationSlug,
   })
 
-  const defaultValue = data?.available_versions?.[0] ? formatValue(data.available_versions[0]) : undefined
+
+  useEffect(() => {
+    const defaultValue = data?.available_versions?.[0] ? formatValue(data.available_versions[0]) : undefined
+    form.setValue('postgresVersionSelection', defaultValue)
+  }, [data, form])
+
   return (
     <FormItemLayout
       layout="horizontal"
@@ -61,7 +67,6 @@ export const PostgresVersionSelector = ({ cloudProvider, dbRegion, organizationS
     >
       <Select_Shadcn_
         value={field.value}
-        defaultValue={defaultValue}
         onValueChange={field.onChange}
         disabled={isLoadingProjectVersions}
       >
