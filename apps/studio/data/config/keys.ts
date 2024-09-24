@@ -15,6 +15,10 @@ export const configKeys = {
     ['projects', projectRef, 'disk-attributes'] as const,
   diskUtilization: (projectRef: string | undefined) =>
     ['projects', projectRef, 'disk-utilization'] as const,
-  projectCreationPostgresVersions: (organizationSlug: string | undefined, cloudProvider: string, dbRegion: string) =>
+  projectCreationPostgresVersions: (
+    organizationSlug: string | undefined,
+    cloudProvider: string,
+    dbRegion: string
+  ) =>
     ['projects', organizationSlug, cloudProvider, dbRegion, 'available-creation-versions'] as const,
 }

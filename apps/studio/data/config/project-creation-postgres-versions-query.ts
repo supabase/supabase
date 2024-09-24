@@ -33,7 +33,9 @@ export async function getPostgresCreationVersions(
   return data as ProjectCreationPostgresVersionsResponse
 }
 
-export type ProjectCreationPostgresVersionData = Awaited<ReturnType<typeof getPostgresCreationVersions>>
+export type ProjectCreationPostgresVersionData = Awaited<
+  ReturnType<typeof getPostgresCreationVersions>
+>
 export type ProjectCreationPostgresVersionError = ResponseError
 
 export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationPostgresVersionData>(
@@ -41,11 +43,16 @@ export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationP
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData> = {}
+  }: UseQueryOptions<
+    ProjectCreationPostgresVersionData,
+    ProjectCreationPostgresVersionError,
+    TData
+  > = {}
 ) => {
   return useQuery<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData>(
     configKeys.projectCreationPostgresVersions(organizationSlug, cloudProvider, dbRegion),
-    ({ signal }) => getPostgresCreationVersions({ organizationSlug, cloudProvider, dbRegion }, signal),
+    ({ signal }) =>
+      getPostgresCreationVersions({ organizationSlug, cloudProvider, dbRegion }, signal),
     {
       enabled: enabled && typeof organizationSlug !== 'undefined',
       ...options,

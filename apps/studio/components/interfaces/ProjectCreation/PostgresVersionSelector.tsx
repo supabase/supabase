@@ -1,6 +1,9 @@
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
-import { ProjectCreationPostgresVersion, useProjectCreationPostgresVersionsQuery } from 'data/config/project-creation-postgres-versions-query'
+import {
+  ProjectCreationPostgresVersion,
+  useProjectCreationPostgresVersionsQuery,
+} from 'data/config/project-creation-postgres-versions-query'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
@@ -35,7 +38,7 @@ const formatValue = ({ postgres_engine, release_channel }: ProjectCreationPostgr
   return `${postgres_engine}|${release_channel}`
 }
 
-export const extractPostgresVersionDetails = (value: string) : PostgresVersionDetails =>  {
+export const extractPostgresVersionDetails = (value: string): PostgresVersionDetails => {
   if (!value) {
     return { postgresEngine: undefined, releaseChannel: undefined }
   }
@@ -44,27 +47,28 @@ export const extractPostgresVersionDetails = (value: string) : PostgresVersionDe
   return { postgresEngine, releaseChannel } as PostgresVersionDetails
 }
 
-export const PostgresVersionSelector = ({ cloudProvider, dbRegion, organizationSlug, field, form }: PostgresVersionSelectorProps) => {
-  const {
-    data,
-    isLoading: isLoadingProjectVersions,
-  } = useProjectCreationPostgresVersionsQuery({
+export const PostgresVersionSelector = ({
+  cloudProvider,
+  dbRegion,
+  organizationSlug,
+  field,
+  form,
+}: PostgresVersionSelectorProps) => {
+  const { data, isLoading: isLoadingProjectVersions } = useProjectCreationPostgresVersionsQuery({
     cloudProvider,
     dbRegion,
     organizationSlug,
   })
 
-
   useEffect(() => {
-    const defaultValue = data?.available_versions?.[0] ? formatValue(data.available_versions[0]) : undefined
+    const defaultValue = data?.available_versions?.[0]
+      ? formatValue(data.available_versions[0])
+      : undefined
     form.setValue('postgresVersionSelection', defaultValue)
   }, [data, form])
 
   return (
-    <FormItemLayout
-      layout="horizontal"
-      label="Postgres Version"
-    >
+    <FormItemLayout layout="horizontal" label="Postgres Version">
       <Select_Shadcn_
         value={field.value}
         onValueChange={field.onChange}

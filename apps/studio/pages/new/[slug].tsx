@@ -18,7 +18,10 @@ import {
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
-import { extractPostgresVersionDetails, PostgresVersionSelector } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import {
+  extractPostgresVersionDetails,
+  PostgresVersionSelector,
+} from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
@@ -365,10 +368,8 @@ const Wizard: NextPageWithLayout = () => {
       postgresVersionSelection,
     } = values
 
-    const {
-      postgresEngine,
-      releaseChannel,
-    } = extractPostgresVersionDetails(postgresVersionSelection)
+    const { postgresEngine, releaseChannel } =
+      extractPostgresVersionDetails(postgresVersionSelection)
 
     const data: ProjectCreateVariables = {
       cloudProvider: cloudProvider,
@@ -915,21 +916,23 @@ const Wizard: NextPageWithLayout = () => {
                       />
                     </Panel.Content>
 
-                    {!projectVersionSelectionDisabled && <Panel.Content>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="postgresVersionSelection"
-                        render={({ field }) => (
-                          <PostgresVersionSelector
-                            field={field}
-                            form={form}
-                            cloudProvider={form.getValues('cloudProvider') as CloudProvider}
-                            organizationSlug={slug}
-                            dbRegion={form.getValues('dbRegion')}
-                          />
-                        )}
-                      />
-                    </Panel.Content>}
+                    {!projectVersionSelectionDisabled && (
+                      <Panel.Content>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="postgresVersionSelection"
+                          render={({ field }) => (
+                            <PostgresVersionSelector
+                              field={field}
+                              form={form}
+                              cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                              organizationSlug={slug}
+                              dbRegion={form.getValues('dbRegion')}
+                            />
+                          )}
+                        />
+                      </Panel.Content>
+                    )}
 
                     <Panel.Content>
                       <Collapsible_Shadcn_>

@@ -8,14 +8,14 @@ import type { ResponseError } from 'types'
 import { configKeys } from './keys'
 import { components } from 'api-types'
 
-export type ProjectUpgradeTargetVersions = components['schemas']['ProjectVersion']
+export type ProjectUpgradeTargetVersion = components['schemas']['ProjectVersion']
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }
 export type ProjectUpgradeEligibilityResponse = {
   eligible: boolean
   current_app_version: string
   current_app_version_release_channel: string
   latest_app_version: string
-  target_upgrade_versions: ProjectUpgradeTargetVersions[]
+  target_upgrade_versions: ProjectUpgradeTargetVersion[]
   requires_manual_intervention: string | null
   potential_breaking_changes: string[]
   duration_estimate_hours: number

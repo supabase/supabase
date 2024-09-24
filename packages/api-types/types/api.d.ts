@@ -928,6 +928,10 @@ export interface paths {
     post: operations['RestartServicesController_restartServices']
   }
   '/platform/projects/{ref}/restore': {
+    /** Unpauses project */
+    post: operations['UnpauseController_unpauseProject']
+  }
+  '/platform/projects/{ref}/restore/cancel': {
     /** Cancels a failed restoration */
     post: operations['UnpauseController_cancelProjectRestoration']
   }
@@ -1795,6 +1799,10 @@ export interface paths {
     post: operations['RestartServicesController_restartServices']
   }
   '/v0/projects/{ref}/restore': {
+    /** Unpauses project */
+    post: operations['UnpauseController_unpauseProject']
+  }
+  '/v0/projects/{ref}/restore/cancel': {
     /** Cancels a failed restoration */
     post: operations['UnpauseController_cancelProjectRestoration']
   }
@@ -6265,7 +6273,7 @@ export interface components {
       public_env_var_prefix?: string
     }
     UpgradeDatabaseBody: {
-      release_channel: string
+      release_channel: components['schemas']['ReleaseChannel']
       target_version: string
     }
     UpsertContentBody: {
@@ -12713,6 +12721,34 @@ export interface operations {
         content: never
       }
       /** @description Failed to restart given services */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Unpauses project */
+  UnpauseController_unpauseProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UnpauseProjectBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['UnpauseProjectInfo']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to unpause project */
       500: {
         content: never
       }
