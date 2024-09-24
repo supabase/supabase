@@ -128,7 +128,7 @@ const InfrastructureInfo = () => {
                             </TooltipTrigger_Shadcn_>
                             <TooltipContent_Shadcn_ side="bottom" className="w-52 text-center">
                               This project uses a {isOnNonGenerallyAvailableReleaseChannel} database
-                              version release
+                              database version release
                             </TooltipContent_Shadcn_>
                           </Tooltip_Shadcn_>
                         ),

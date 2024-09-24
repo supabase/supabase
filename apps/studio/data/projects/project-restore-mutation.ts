@@ -25,8 +25,6 @@ export async function restoreProject({
       postgres_engine: postgresEngine,
       release_channel: releaseChannel,
     },
-    // @ts-ignore
-    body: {},
   })
   if (error) handleError(error)
   return data

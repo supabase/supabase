@@ -86,8 +86,8 @@ export const PostgresVersionSelector = ({
                   <div className="flex items-center gap-3">
                     <span className="text-foreground">{postgresVersion}</span>
                     {value.release_channel !== 'ga' && (
-                      <Badge variant="warning" className="mr-1">
-                        {value.release_channel.toUpperCase()}
+                      <Badge variant="warning" className="mr-1 capitalize">
+                        {value.release_channel}
                       </Badge>
                     )}
                   </div>
