@@ -3,6 +3,8 @@ import { get, handleError } from 'data/fetchers'
 import { organizationKeys } from './keys'
 import type { ResponseError } from 'types'
 import { components } from 'api-types'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 export type OrganizationTaxIdVariables = {
   slug?: string
@@ -36,12 +38,14 @@ export const useOrganizationTaxIdQuery = <TData = OrganizationTaxIdData>(
     enabled = true,
     ...options
   }: UseQueryOptions<OrganizationTaxIdData, OrganizationTaxIdError, TData> = {}
-) =>
+) => {
+  const canReadSubscriptions = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
   useQuery<OrganizationTaxIdData, OrganizationTaxIdError, TData>(
     organizationKeys.taxId(slug),
     ({ signal }) => getOrganizationTaxId({ slug }, signal),
     {
-      enabled: enabled && typeof slug !== 'undefined',
+      enabled: enabled && typeof slug !== 'undefined' && canReadSubscriptions,
       ...options,
     }
   )
+}
