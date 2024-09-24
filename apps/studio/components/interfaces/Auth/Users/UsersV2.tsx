@@ -179,7 +179,8 @@ export const UsersV2 = () => {
         <div className="flex items-center gap-x-2">
           <Input
             size="tiny"
-            className="w-64"
+            className="w-64 pl-7"
+            iconContainerClassName="pl-2"
             icon={<Search size={14} className="text-foreground-lighter" />}
             placeholder="Search by email, phone number or UID"
             value={search}
