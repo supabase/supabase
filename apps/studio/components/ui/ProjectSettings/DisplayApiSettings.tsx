@@ -10,7 +10,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import { AlertCircle, BookOpen, Loader2 } from 'lucide-react'
 
-const DisplayApiSettings = () => {
+const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
   const { ref: projectRef } = useParams()
 
   const {
@@ -40,20 +40,22 @@ const DisplayApiSettings = () => {
   return (
     <Panel
       title={
-        <div className="space-y-3">
-          <h5 className="text-base">Project API keys</h5>
-          <p className="text-sm text-foreground-light">
-            Your API is secured behind an API gateway which requires an API Key for every request.
-            <br />
-            You can use the keys below in the Supabase client libraries.
-            <br />
-            <a href="https://supabase.com/docs#client-libraries" target="_blank" rel="noreferrer">
-              <Button icon={<BookOpen />} type="default" className="mt-4">
-                Client Docs
-              </Button>
-            </a>
-          </p>
-        </div>
+        !legacy && (
+          <div className="space-y-3">
+            <h5 className="text-base">Project API Keys</h5>
+            <p className="text-sm text-foreground-light">
+              Your API is secured behind an API gateway which requires an API Key for every request.
+              <br />
+              You can use the keys below in the Supabase client libraries.
+              <br />
+              <a href="https://supabase.com/docs#client-libraries" target="_blank" rel="noreferrer">
+                <Button icon={<BookOpen />} type="default" className="mt-4">
+                  Client Docs
+                </Button>
+              </a>
+            </p>
+          </div>
+        )
       }
     >
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
@@ -116,8 +118,10 @@ const DisplayApiSettings = () => {
               onChange={() => {}}
               descriptionText={
                 x.tags === 'service_role'
-                  ? 'This key has the ability to bypass Row Level Security. Never share it publicly.'
-                  : 'This key is safe to use in a browser if you have enabled Row Level Security for your tables and configured policies.'
+                  ? 'This key has the ability to bypass Row Level Security. Never share it publicly. ' +
+                    (legacy ? 'Prefer using Publishable API keys instead.' : '')
+                  : 'This key is safe to use in a browser if you have enabled Row Level Security for your tables and configured policies. ' +
+                    (legacy ? 'Prefer using Secret API keys instead.' : '')
               }
             />
           </Panel.Content>
