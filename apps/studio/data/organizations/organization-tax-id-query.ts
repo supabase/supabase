@@ -1,10 +1,11 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import { organizationKeys } from './keys'
-import type { ResponseError } from 'types'
-import { components } from 'api-types'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
+import { components } from 'api-types'
+import { get, handleError } from 'data/fetchers'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import type { ResponseError } from 'types'
+import { organizationKeys } from './keys'
 
 export type OrganizationTaxIdVariables = {
   slug?: string
@@ -40,7 +41,7 @@ export const useOrganizationTaxIdQuery = <TData = OrganizationTaxIdData>(
   }: UseQueryOptions<OrganizationTaxIdData, OrganizationTaxIdError, TData> = {}
 ) => {
   const canReadSubscriptions = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
-  useQuery<OrganizationTaxIdData, OrganizationTaxIdError, TData>(
+  return useQuery<OrganizationTaxIdData, OrganizationTaxIdError, TData>(
     organizationKeys.taxId(slug),
     ({ signal }) => getOrganizationTaxId({ slug }, signal),
     {
