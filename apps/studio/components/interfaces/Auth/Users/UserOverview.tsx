@@ -236,7 +236,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                   Signed in via email with no associated providers
                 </p>
                 <Button asChild type="default" className="mt-2">
-                  <Link href={`/project/${projectRef}/auth/providers`}>
+                  <Link href={`/project/${projectRef}/auth/providers?provider=email`}>
                     Configure email provider
                   </Link>
                 </Button>
