@@ -38,7 +38,7 @@ const defaults = {
     text: {
       tiny: 'text-xs',
       small: 'text-sm leading-4',
-      medium: 'text-sm',
+      medium: 'text-base',
       large: 'text-base',
       xlarge: 'text-base',
     },
