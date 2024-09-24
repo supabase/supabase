@@ -79,6 +79,7 @@
     "remark-emoji": "^3.1.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^6.0.0",
+    "server-only": "^0.0.1",
     "shared-data": "*",
     "toml": "^3.0.0",
     "ui": "*",
