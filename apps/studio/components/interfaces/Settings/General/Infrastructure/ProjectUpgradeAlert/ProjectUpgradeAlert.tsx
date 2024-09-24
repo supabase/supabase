@@ -13,10 +13,7 @@ import {
   ProjectUpgradeTargetVersion,
   useProjectUpgradeEligibilityQuery,
 } from 'data/config/project-upgrade-eligibility-query'
-import {
-  ReleaseChannel,
-  useProjectUpgradeMutation,
-} from 'data/projects/project-upgrade-mutation'
+import { ReleaseChannel, useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
