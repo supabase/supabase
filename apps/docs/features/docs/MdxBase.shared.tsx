@@ -34,6 +34,7 @@ import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
 import { RegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
+import { CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import * as CH from '~/features/ui/CodeHike'
 import { Tabs, TabPanel } from '~/features/ui/Tabs'
@@ -50,6 +51,7 @@ const components = {
   Button,
   ButtonCard,
   CH,
+  CodeSampleWrapper,
   CostWarning,
   CreateClientSnippet,
   DatabaseSetup,
