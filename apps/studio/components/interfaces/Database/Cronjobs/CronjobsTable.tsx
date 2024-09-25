@@ -11,9 +11,9 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { Cronjob, useCronjobsQuery } from 'data/database-cronjobs/database-cronjobs-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { Input, Sheet, SheetContent } from 'ui'
+import { Button, Input, Sheet, SheetContent } from 'ui'
+import { CreateCronjobSheet } from './CreateCronjobSheet'
 import { CronjobsList } from './CronjobsList'
-import { EditCronjobPanel } from './EditCronjobPanel'
 
 interface CronjobsTableProps {}
 
@@ -21,7 +21,8 @@ export const CronjobsTable = ({}: CronjobsTableProps) => {
   const { project } = useProjectContext()
   const router = useRouter()
   const { search } = useParams()
-  const [cronjobForEditing, setCronjobForEditing] = useState<Cronjob | undefined>()
+
+  const [addCronJobSheetShown, setAddCronJobSheetShownShown] = useState(false)
   const [cronjobForDeletion, setCronjobForDeletion] = useState<Cronjob | undefined>()
 
   const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
@@ -63,18 +64,17 @@ export const CronjobsTable = ({}: CronjobsTableProps) => {
       {(cronjobs ?? []).length == 0 ? (
         <div className="flex h-full w-full items-center justify-center">
           <ProductEmptyState
-            title="Functions"
+            title="Cron jobs"
             ctaButtonLabel="Create a new cron job"
-            onClickCta={() => createFunction()}
+            onClickCta={() => setAddCronJobSheetShownShown(true)}
             disabled={!canCreateCronjobs}
             disabledMessage="You need additional permissions to create functions"
           >
             <p className="text-sm text-foreground-light">
-              PostgreSQL functions, also known as stored procedures, is a set of SQL and procedural
-              commands such as declarations, assignments, loops, flow-of-control, etc.
-            </p>
-            <p className="text-sm text-foreground-light">
-              It's stored on the database server and can be invoked using the SQL interface.
+              pgcron jobs in PostgreSQL allow you to schedule and automate tasks such as running SQL
+              queries or maintenance routines at specified intervals. These jobs are managed using
+              cron-like syntax and are executed directly within the PostgreSQL server, making it
+              easy to schedule recurring tasks without needing an external scheduler.
             </p>
           </ProductEmptyState>
         </div>
@@ -91,6 +91,9 @@ export const CronjobsTable = ({}: CronjobsTableProps) => {
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
+            <Button type="primary" onClick={() => setAddCronJobSheetShownShown(true)}>
+              Create a new cron job
+            </Button>
           </div>
 
           {/* {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />} */}
@@ -115,7 +118,9 @@ export const CronjobsTable = ({}: CronjobsTableProps) => {
             body={
               <CronjobsList
                 filterString={filterString}
-                editCronjob={(job) => setCronjobForEditing(job)}
+                editCronjob={() => {
+                  throw new Error('Should not work')
+                }}
                 deleteCronjob={(job) => setCronjobForDeletion(job)}
               />
             }
@@ -123,11 +128,14 @@ export const CronjobsTable = ({}: CronjobsTableProps) => {
         </div>
       )}
       <>
-        <Sheet open={!!cronjobForEditing} onOpenChange={() => setCronjobForEditing(undefined)}>
+        <Sheet
+          open={!!addCronJobSheetShown}
+          onOpenChange={() => setAddCronJobSheetShownShown(false)}
+        >
           <SheetContent size="default">
-            <EditCronjobPanel
-              visible={!!cronjobForEditing}
-              onClose={() => setCronjobForEditing(undefined)}
+            <CreateCronjobSheet
+              visible={!!addCronJobSheetShown}
+              onClose={() => setAddCronJobSheetShownShown(false)}
             />
           </SheetContent>
         </Sheet>

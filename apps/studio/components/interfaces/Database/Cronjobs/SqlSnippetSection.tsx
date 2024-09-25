@@ -3,7 +3,7 @@ import { UseFormReturn } from 'react-hook-form'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { FormField_Shadcn_, SheetSection } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { CreateCronJobForm } from './EditCronjobPanel'
+import { CreateCronJobForm } from './CreateCronjobSheet'
 
 interface SqlSnippetSectionProps {
   form: UseFormReturn<CreateCronJobForm>
@@ -14,7 +14,7 @@ export const SqlSnippetSection = ({ form }: SqlSnippetSectionProps) => {
     <SheetSection>
       <FormField_Shadcn_
         control={form.control}
-        name="sqlSnippetValues.snippet"
+        name="values.snippet"
         render={({ field }) => (
           <FormItemLayout label="SQL Snippet">
             <CodeEditor

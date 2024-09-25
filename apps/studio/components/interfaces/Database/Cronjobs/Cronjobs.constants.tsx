@@ -35,3 +35,7 @@ export const CRONJOB_DEFINITIONS = [
     description: 'Write a SQL snippet to run.',
   },
 ]
+
+export type HTTPHeader = { name: string; value: string }
+
+export type HTTPParameter = { name: string; value: string }

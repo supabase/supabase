@@ -10,10 +10,10 @@ import {
   Input_Shadcn_,
   SheetSection,
 } from 'ui'
-import { CreateCronJobForm } from './EditCronjobPanel'
+import { CreateCronJobForm } from './CreateCronjobSheet'
 
 interface HTTPParameterFieldsSectionProps {
-  fieldName: 'edgeFunctionValues.httpParameters' | 'httpRequestValues.httpParameters'
+  fieldName: 'values.httpParameters' | 'values.httpParameters'
 }
 
 export const HTTPParameterFieldsSection = ({ fieldName }: HTTPParameterFieldsSectionProps) => {

@@ -4,20 +4,20 @@ import FunctionSelector from 'components/ui/FunctionSelector'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { FormField_Shadcn_, SheetSection } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { CreateCronJobForm } from './EditCronjobPanel'
+import { CreateCronJobForm } from './CreateCronjobSheet'
 
 interface SqlFunctionSectionProps {
   form: UseFormReturn<CreateCronJobForm>
 }
 
 export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
-  const schema = form.watch('sqlFunctionValues.schema')
+  const schema = form.watch('values.schema')
 
   return (
     <SheetSection className="flex flex-col gap-3">
       <FormField_Shadcn_
         control={form.control}
-        name="sqlFunctionValues.schema"
+        name="values.schema"
         render={({ field }) => (
           <FormItemLayout label="Schema" className="gap-1">
             <SchemaSelector
@@ -26,7 +26,7 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
               onSelectSchema={(name) => {
                 field.onChange(name)
                 // deselect the selected function when the schema is changed
-                form.resetField('sqlFunctionValues.functionName')
+                form.resetField('values.functionName')
               }}
             />
           </FormItemLayout>
@@ -35,7 +35,7 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
 
       <FormField_Shadcn_
         control={form.control}
-        name="sqlFunctionValues.functionName"
+        name="values.functionName"
         render={({ field }) => (
           <FormItemLayout label="Function name" className="gap-1">
             <FunctionSelector

@@ -15,7 +15,7 @@ import {
   SheetSection,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { CreateCronJobForm } from './EditCronjobPanel'
+import { CreateCronJobForm } from './CreateCronjobSheet'
 
 interface HttpRequestSectionProps {
   form: UseFormReturn<CreateCronJobForm>
@@ -26,11 +26,11 @@ export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
     <SheetSection className="flex flex-col gap-3">
       <FormField_Shadcn_
         control={form.control}
-        name="httpRequestValues.method"
+        name="values.method"
         render={({ field }) => (
           <FormItem_Shadcn_>
             <FormLabel_Shadcn_>Method</FormLabel_Shadcn_>
-            <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
+            <Select_Shadcn_ onValueChange={field.onChange} value={field.value}>
               <FormControl_Shadcn_>
                 <SelectTrigger_Shadcn_>
                   <SelectValue_Shadcn_ placeholder="Select a method for the HTTP request" />
@@ -48,7 +48,7 @@ export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
 
       <FormField_Shadcn_
         control={form.control}
-        name="httpRequestValues.endpoint"
+        name="values.endpoint"
         render={({ field }) => (
           <FormItemLayout label="Endpoint URL" className="gap-1">
             <Input {...field} placeholder="https://api.example.com/endpoint" />
@@ -58,7 +58,7 @@ export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
 
       <FormField_Shadcn_
         control={form.control}
-        name="httpRequestValues.timeoutMs"
+        name="values.timeoutMs"
         render={({ field }) => (
           <FormItemLayout label="Timeout" className="gap-1">
             <Input

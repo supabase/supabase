@@ -3,10 +3,10 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import pgMeta from '@supabase/pg-meta'
+import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError } from 'types'
-import type { DatabaseFunction } from './database-functions-query'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string

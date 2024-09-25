@@ -4,6 +4,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useEffect } from 'react'
 import {
   Button,
   FormControl_Shadcn_,
@@ -20,28 +21,46 @@ import {
   SheetSection,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { CreateCronJobForm } from './EditCronjobPanel'
+import { CreateCronJobForm } from './CreateCronjobSheet'
 
 interface HTTPRequestFieldsProps {
   form: UseFormReturn<CreateCronJobForm>
 }
 
+const buildFunctionUrl = (slug: string, projectRef: string, restUrl?: string) => {
+  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
+  const functionUrl = `https://${projectRef}.supabase.${restUrlTld}/functions/v1/${slug}`
+  return functionUrl
+}
+
 export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
   const { project: selectedProject } = useProjectContext()
   const { ref } = useParams()
-  const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
+  const { data: functions, isSuccess, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
 
   const edgeFunctions = functions ?? []
+
+  useEffect(() => {
+    if (isSuccess && edgeFunctions.length > 0) {
+      const fn = edgeFunctions[0]
+      const functionUrl = buildFunctionUrl(
+        fn.slug,
+        selectedProject?.ref || '',
+        selectedProject?.restUrl
+      )
+      form.setValue('values.edgeFunctionName', functionUrl)
+    }
+  }, [isSuccess])
 
   return (
     <SheetSection className="flex flex-col gap-3">
       <FormField_Shadcn_
         control={form.control}
-        name="edgeFunctionValues.method"
+        name="values.method"
         render={({ field }) => (
           <FormItem_Shadcn_>
             <FormLabel_Shadcn_>Method</FormLabel_Shadcn_>
-            <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
+            <Select_Shadcn_ onValueChange={field.onChange} value={field.value}>
               <FormControl_Shadcn_>
                 <SelectTrigger_Shadcn_>
                   <SelectValue_Shadcn_ placeholder="Select a method for the API call" />
@@ -70,38 +89,47 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
       ) : edgeFunctions.length > 0 ? (
         <FormField_Shadcn_
           control={form.control}
-          name="edgeFunctionValues.method"
-          render={({ field }) => (
-            <FormItem_Shadcn_>
-              <FormLabel_Shadcn_>Edge Function</FormLabel_Shadcn_>
-              <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl_Shadcn_>
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ placeholder="Select which edge function to trigger" />
-                  </SelectTrigger_Shadcn_>
-                </FormControl_Shadcn_>
-                <SelectContent_Shadcn_>
-                  {edgeFunctions.map((fn) => {
-                    const restUrl = selectedProject?.restUrl
-                    const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
-                    const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fn.slug}`
+          name="values.edgeFunctionName"
+          render={({ field }) => {
+            console.log(field.value)
+            return (
+              <FormItem_Shadcn_>
+                <FormLabel_Shadcn_>Edge Function</FormLabel_Shadcn_>
+                <Select_Shadcn_
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={isLoading}
+                >
+                  <FormControl_Shadcn_>
+                    <SelectTrigger_Shadcn_>
+                      <SelectValue_Shadcn_ placeholder="Select which edge function to trigger" />
+                    </SelectTrigger_Shadcn_>
+                  </FormControl_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    {edgeFunctions.map((fn) => {
+                      const functionUrl = buildFunctionUrl(
+                        fn.slug,
+                        selectedProject?.ref || '',
+                        selectedProject?.restUrl
+                      )
 
-                    return (
-                      <SelectItem_Shadcn_ key={fn.id} value={functionUrl}>
-                        {fn.name}
-                      </SelectItem_Shadcn_>
-                    )
-                  })}
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
-              <FormMessage_Shadcn_ />
-            </FormItem_Shadcn_>
-          )}
+                      return (
+                        <SelectItem_Shadcn_ key={fn.id} value={functionUrl}>
+                          {fn.name}
+                        </SelectItem_Shadcn_>
+                      )
+                    })}
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+                <FormMessage_Shadcn_ />
+              </FormItem_Shadcn_>
+            )
+          }}
         />
       ) : null}
       <FormField_Shadcn_
         control={form.control}
-        name="edgeFunctionValues.timeoutMs"
+        name="values.timeoutMs"
         render={({ field }) => (
           <FormItemLayout label="Timeout" layout="vertical" className="gap-1">
             <Input

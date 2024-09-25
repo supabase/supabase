@@ -19,12 +19,10 @@ import {
   Input_Shadcn_,
   SheetSection,
 } from 'ui'
-import { CreateCronJobForm } from './EditCronjobPanel'
-
-export type HTTPHeader = { id: string; name: string; value: string }
+import { CreateCronJobForm } from './CreateCronjobSheet'
 
 interface HTTPHeaderFieldsSectionProps {
-  fieldName: 'edgeFunctionValues.httpHeaders' | 'httpRequestValues.httpHeaders'
+  fieldName: 'values.httpHeaders' | 'values.httpHeaders'
 }
 
 export const HTTPHeaderFieldsSection = ({ fieldName }: HTTPHeaderFieldsSectionProps) => {
@@ -91,14 +89,12 @@ export const HTTPHeaderFieldsSection = ({ fieldName }: HTTPHeaderFieldsSectionPr
             type="default"
             size="tiny"
             icon={<Plus />}
-            className={clsx(
-              fieldName === 'edgeFunctionValues.httpHeaders' && 'rounded-r-none px-3'
-            )}
+            className={clsx(fieldName === 'values.httpHeaders' && 'rounded-r-none px-3')}
             onClick={() => append({ name: '', value: '' })}
           >
             Add a new header
           </Button>
-          {fieldName === 'edgeFunctionValues.httpHeaders' && (
+          {fieldName === 'values.httpHeaders' && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="default" className="rounded-l-none px-[4px] py-[5px]">
