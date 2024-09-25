@@ -20,6 +20,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Label } from '@ui/components/shadcn/ui/label'
+import { urlRegex } from '../Auth.constants'
 
 const MAX_URLS_LENGTH = 2 * 1024
 
@@ -39,7 +40,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
         value: z
           .string()
           .min(1, 'Please provide a value')
-          .url('Please provide a valid URL')
+          .regex(urlRegex, 'Please provide a valid URL')
           .refine((value) => !allowList.includes(value), {
             message: 'URL already exists in the allow list',
           }),
