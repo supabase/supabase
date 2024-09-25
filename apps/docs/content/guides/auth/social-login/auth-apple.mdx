@@ -258,9 +258,11 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     This method of signing in is web based, and will open a browser window to perform the sign in. For non-web platforms, the user is brought back to the app via [deep linking](/docs/guides/auth/native-mobile-deep-linking?platform=flutter).
 
     ```dart
-    supabase.auth.signInWithOAuth(
+    await supabase.auth.signInWithOAuth(
       OAuthProvider.apple,
-      redirectTo: 'my-scheme://login-callback',
+      redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+      authScreenLaunchMode:
+          kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
     );
     ```
 
