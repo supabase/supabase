@@ -77,10 +77,21 @@ export const CreateWarehouseCollectionModal = () => {
     })
   })
 
-  const retentionDescription = () => {
-    if (planLoading) return 'Max 90 days'
-    if (plan?.id === 'free') return 'Max 3 days. Upgrade your plan to increase your retention.'
-    else return 'Max 90 days'
+  const formatDays = (days: number) => {
+    if (days === 1) return `1 day`
+    return `${days} days`
+  }
+  const retentionDescription = (days: number) => {
+    const maxRetentionDays = getMaxRetentionDays()
+    if (planLoading) return ''
+    if (!Boolean(days) || days < 1)
+      return <>Your plan allows for a maximum of {formatDays(maxRetentionDays)}.</>
+    return (
+      <>
+        Your logs will be removed after {formatDays(days)}. <br />
+        Your plan allows for a maximum of {formatDays(maxRetentionDays)}.
+      </>
+    )
   }
 
   return (
@@ -122,7 +133,7 @@ export const CreateWarehouseCollectionModal = () => {
                   render={({ field }) => (
                     <FormItemLayout label="Collection name" layout="horizontal">
                       <FormControl_Shadcn_>
-                        <Input placeholder="Events" {...field} />
+                        <Input autoFocus placeholder="Events" {...field} />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -134,7 +145,7 @@ export const CreateWarehouseCollectionModal = () => {
                     <FormItemLayout
                       label="Retention"
                       layout="horizontal"
-                      description={retentionDescription()}
+                      description={retentionDescription(Number(field.value))}
                     >
                       <FormControl_Shadcn_>
                         <div className="relative flex items-center gap-2">
