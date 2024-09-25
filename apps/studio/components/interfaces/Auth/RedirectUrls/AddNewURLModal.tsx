@@ -61,9 +61,8 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
   })
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    const payload = allowList
-      .concat(data.urls.map((url) => url.value.replace(/,\s*$/, '')))
-      .toString()
+    const dedupedData = [...new Set(data.urls.map((url) => url.value))]
+    const payload = allowList.concat(dedupedData.map((url) => url.replace(/,\s*$/, ''))).toString()
 
     if (payload.length > MAX_URLS_LENGTH) {
       return toast.error('Too many redirect URLs, please remove some or try to use wildcards')

@@ -74,7 +74,7 @@ export const RedirectUrls = () => {
       <div className="flex items-center justify-between">
         <FormHeader
           title="Redirect URLs"
-          description={`URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com`}
+          description="URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com"
         />
         <div className="flex items-center gap-2 mb-6 ml-12">
           <Button asChild type="default" icon={<ExternalLink />}>
