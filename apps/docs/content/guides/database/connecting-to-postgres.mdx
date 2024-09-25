@@ -7,8 +7,8 @@ subtitle: 'Explore the options for connecting to your Postgres database.'
 
 Supabase provides several options for programmatically connecting to your Postgres database:
 
-1. Programmatic access using the Data APIs
-1. Using one of the many [Client Libraries](https://supabase.com/docs#client-libraries)
+1. The Data APIs
+1. Using one of the many [Client Libraries](/docs/reference)
 1. Direct connections using the built-in Postgres connection system
 1. Connection pooling for scalable connections
 
@@ -22,11 +22,11 @@ Supabase's Data APIs are the easiest way to get started if you are managing data
 
 ## Client libraries
 
-Supabase offers [client libraries](https://supabase.com/docs/reference) for popular programming languages. These libraries provide a convenient wrapper around the Data APIs, making it easier to interact with your database using your preferred language.
+Supabase offers [client libraries](/docs/reference) for popular programming languages. These libraries provide a convenient wrapper around the Data APIs, making it easier to interact with your database using your preferred language.
 
 ## Connecting to external libraries and tools
 
-Beyond the [Supabase client-libraries](https://supabase.com/docs/guides/api/rest/client-libs), Supabase provides three connection strings for direct database access, compatible with all postgres libraries, such as [Prisma](/docs/guides/database/prisma) and [Drizzle](/docs/guides/database/drizzle), as well as tools like [PSQL](/docs/guides/database/psql) and [pgAdmin](/docs/guides/database/pgadmin).
+Beyond the [Supabase client-libraries](/docs/guides/api/rest/client-libs), Supabase provides three connection strings for direct database access, compatible with all postgres libraries, such as [Prisma](/docs/guides/database/prisma) and [Drizzle](/docs/guides/database/drizzle), as well as tools like [PSQL](/docs/guides/database/psql) and [pgAdmin](/docs/guides/database/pgadmin).
 
 You can find these connection strings in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
 
@@ -36,8 +36,7 @@ It connects directly to your Postgres instance. It is ideal for persistent serve
 
 <Admonition type="caution">
 
-Direct connections use IPv6 addresses by default. If your environment isn't compatible or you're
-unsure, you can check the [networking guide](/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility)
+Direct connections use IPv6 by default. If your environment doesn't support IPv6 or you're unsure but still want to use a direct connection, check out the [networking guide](/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility) for more info.
 
 </Admonition>
 
@@ -54,7 +53,7 @@ You can find the direct connection string in the [Database settings](https://sup
 
 ### Supavisor session mode (port 5432):
 
-In Session mode, Supabase's Supavisor pooler acts as an IPv4 proxy, allowing developers in IPv4-only environments to connect directly without the IPv4 add-on.
+In Session mode, Supavisor acts as an IPv4 proxy. It allows developers in IPv4-only environments to access a direct-connection experience without needing the IPv4 add-on.
 
 ```md
 // Example String
@@ -64,10 +63,9 @@ postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pool
 ### Transaction mode (port 6543):
 
 <Admonition type="caution">
-  Transaction mode does not support [prepared
-  statements](https://postgresql.org/docs/current/sql-prepare.html). To avoid errors, [disable
-  prepared statements](https://github.com/orgs/supabase/discussions/28239) in your connection
-  library.
+
+  Transaction mode does not support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html). To avoid errors, [turn off prepared statements](https://github.com/orgs/supabase/discussions/28239) for your specific connection library.
+
 </Admonition>
 
 Supavisor in transaction mode forms hot connections with the database and only allows clients to access them when a query is pending. It has amazing scaling capacity, and is best used with temporary servers, such as serverless/Edge Functions or auto-scaling servers.
@@ -81,13 +79,13 @@ postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pool
 
 ### Application side poolers
 
-Application-side poolers are built into connection libraries and API servers, such as Prisma, SQLAlchemy, and PostgREST. They maintain several active connections with Postgres or a server-side pooler, reducing the overhead of establishing connections between queries.
+Application-side poolers are built into connection libraries and API servers, such as Prisma, SQLAlchemy, and PostgREST. They maintain several active connections with Postgres or a server-side pooler, reducing the overhead of establishing connections between queries. When deploying to static architecture, such as long-standing containers or VMs, application-side poolers are satisfactory on their own.
 
 ### Serverside poolers
 
 Postgres connections are like WebSocket, once established, they are preserved until the client (application server) disconnects. A server might only make a single 10 ms query, but needlessly reserve its database connection for seconds or longer.
 
-Serverside-poolers, such as Supabase's [Supavisor](https://github.com/supabase/supavisor) in transaction mode, sit between clients and the database and can be thought of as load balancers for Postgres connections.
+Serverside-poolers, such as Supabase's [Supavisor](https://github.com/supabase/supavisor) in transaction mode, sit between clients and the database and can be thought of as load balancers for Postgres connections. 
 
 <Image
   alt="New migration files trigger migrations on the preview instance."
@@ -100,7 +98,7 @@ Serverside-poolers, such as Supabase's [Supavisor](https://github.com/supabase/s
   zoomable
 />
 
-They maintain hot connections with the database and intelligently share them with clients only when needed, maximizing the amount of queries a single connection can service.
+They maintain hot connections with the database and intelligently share them with clients only when needed, maximizing the amount of queries a single connection can service. They're best used to manage queries from auto-scaling systems, such as edge and serverless functions.
 
 ## Connecting with SSL
 

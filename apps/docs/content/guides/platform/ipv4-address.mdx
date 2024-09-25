@@ -20,7 +20,7 @@ The Internet Protocol (IP) addresses devices on the internet. There are two main
 
 ## Enabling the IPv4 add-on
 
-You can enable the IPv4 add-on in your project add-on settings page. Your database might be briefly disabled to add the add-on.
+You can enable the IPv4 add-on in your project's [add-ons settings](/dashboard/project/_/settings/addons). Enabling the add-on may briefly disable your database during reconfiguration.
 
 ## Read replicas and IPv4 add-on
 
@@ -34,9 +34,9 @@ When using the add-on, each database (including read replicas) receives an IPv4 
 
 By default, Supabase Postgres use IPv6 addresses. If your system doesn't support IPv6, you have the following options:
 
-1. **Supavisor Connection String (in session mode / on port 5432?)**: Use this string (found in Supabase Dashboard) as a replacement for the direct connection string
-2. **Supabase Client Libraries**: These libraries are compatible with IPv4 (details in Supabase Docs).
-3. **Dedicated IPv4 Add-On (Pro Plans+)**: For a guaranteed IPv4 and static database address, enable this paid add-on.
+1. **Supavisor Connection Strings**: The Supavisor connection strings are IPv4-compatible alternatives to direct connections
+2. **Supabase Client Libraries**: These libraries are compatible with IPv4
+3. **Dedicated IPv4 Add-On (Pro Plans+)**: For a guaranteed IPv4 and static database address for the direct connection, enable this paid add-on.
 
 ### Checking your network IPv6 support
 
