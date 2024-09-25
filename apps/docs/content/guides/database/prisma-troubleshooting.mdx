@@ -15,7 +15,7 @@ A full list of errors can be found in [Prisma's official docs](https://www.prism
 
 ## Understanding connection string parameters: [#start]
 
-Unlike other libraries, Prisma lets you configure [its settings](https://www.prisma.io/docs/orm/overview/databases/postgresql#arguments) through special options appended to your connection string. 
+Unlike other libraries, Prisma lets you configure [its settings](https://www.prisma.io/docs/orm/overview/databases/postgresql#arguments) through special options appended to your connection string.
 
 These options, called "query parameters," can be used to address specific errors.
 
@@ -38,7 +38,6 @@ Supavisor in transaction mode (port 6543) does not support [prepared statements]
 ```md
 .../postgres?pgbouncer=true
 ```
-
 
 ---
 
@@ -128,7 +127,6 @@ Postgres or Supavisor rejected a request for more connections
 - **Disconnect appropriately**: Close Prisma connections when they are no longer needed.
 - **Decrease query time**: Reduce query complexity or add [strategic indexes](https://supabase.com/docs/guides/database/postgres/indexes) to your tables to speed up queries.
 - **Increase compute size**: Sometimes the best option is to increase your compute size, which also increases your max client size and query execution speed
-
 
 ---
 
