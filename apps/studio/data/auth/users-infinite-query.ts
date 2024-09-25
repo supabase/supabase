@@ -12,33 +12,50 @@ export type UsersVariables = {
   page?: number
   keywords?: string
   filter?: Filter
+  providers?: string[]
+  sort?: 'created_at' | 'email' | 'phone'
+  order?: 'asc' | 'desc'
+}
+
+type UsersQuery = {
+  limit: string
+  offset: string
+  keywords: string
+  verified?: Filter
+  providers?: string[]
+  sort?: 'created_at' | 'email' | 'phone'
+  order?: 'asc' | 'desc'
 }
 
 export const USERS_PAGE_LIMIT = 20
 export type User = components['schemas']['UserBody']
 
 export async function getUsers(
-  { projectRef, page = 0, keywords = '', filter }: UsersVariables,
+  {
+    projectRef,
+    page = 0,
+    keywords = '',
+    filter,
+    providers = [],
+    sort = 'created_at',
+    order = 'desc',
+  }: UsersVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('Project ref is required')
 
   const limit = USERS_PAGE_LIMIT
   const offset = page * USERS_PAGE_LIMIT
-  const query: {
-    limit: string
-    offset: string
-    keywords: string
-    verified?: Filter
-  } = {
+  const query: UsersQuery = {
     limit: limit.toString(),
     offset: offset.toString(),
     keywords,
+    sort,
+    order,
   }
 
-  if (filter) {
-    query.verified = filter
-  }
+  if (filter) query.verified = filter
+  if (providers.length > 0) query.providers = providers
 
   const { data, error } = await get(`/platform/auth/{ref}/users`, {
     params: {
@@ -56,12 +73,13 @@ export type UsersData = Awaited<ReturnType<typeof getUsers>>
 export type UsersError = ResponseError
 
 export const useUsersInfiniteQuery = <TData = UsersData>(
-  { projectRef, keywords, filter }: UsersVariables,
+  { projectRef, keywords, filter, providers, sort, order }: UsersVariables,
   { enabled = true, ...options }: UseInfiniteQueryOptions<UsersData, UsersError, TData> = {}
 ) =>
   useInfiniteQuery<UsersData, UsersError, TData>(
-    authKeys.usersInfinite(projectRef, { keywords, filter }),
-    ({ signal, pageParam }) => getUsers({ projectRef, keywords, filter, page: pageParam }, signal),
+    authKeys.usersInfinite(projectRef, { keywords, filter, providers, sort, order }),
+    ({ signal, pageParam }) =>
+      getUsers({ projectRef, keywords, filter, providers, sort, order, page: pageParam }, signal),
     {
       staleTime: 0,
       enabled: enabled && typeof projectRef !== 'undefined',

@@ -1,18 +1,28 @@
 import dayjs from 'dayjs'
-import { RefreshCw, Search, User as UserIcon, Users, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, RefreshCw, User as UserIcon, Users } from 'lucide-react'
 import { UIEvent, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { TextSearchPopover } from 'components/interfaces/QueryPerformance/TextSearchPopover'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import {
   Button,
   cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
   LoadingLine,
   ResizablePanel,
   ResizablePanelGroup,
@@ -24,9 +34,9 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import AddUserDropdown from './AddUserDropdown'
 import { UserPanel } from './UserPanel'
+import { PROVIDER_FILTER_OPTIONS } from './Users.constants'
 import { formatUsersData, isAtBottom } from './Users.utils'
 
 type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
@@ -68,10 +78,13 @@ export const UsersV2 = () => {
   const gridRef = useRef<DataGridHandle>(null)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
-  const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [filterKeywords, setFilterKeywords] = useState('')
+  const [selectedProviders, setSelectedProviders] = useState<string[]>([])
   const [selectedRow, setSelectedRow] = useState<number>()
+  const [sortByValue, setSortByValue] = useState<string>('created_at:desc')
+
+  const [sortColumn, sortOrder] = sortByValue.split(':')
 
   const {
     data,
@@ -79,7 +92,6 @@ export const UsersV2 = () => {
     isLoading,
     isRefetching,
     isError,
-    // hasNextPage,
     isFetchingNextPage,
     refetch,
     fetchNextPage,
@@ -88,6 +100,9 @@ export const UsersV2 = () => {
       projectRef,
       keywords: filterKeywords,
       filter: filter === 'all' ? undefined : filter,
+      providers: selectedProviders,
+      sort: sortColumn as 'created_at' | 'email' | 'phone',
+      order: sortOrder as 'asc' | 'desc',
     },
     {
       keepPreviousData: Boolean(filterKeywords),
@@ -192,53 +207,93 @@ export const UsersV2 = () => {
     fetchNextPage()
   }
 
-  const clearSearch = () => {
-    setSearch('')
-    setFilterKeywords('')
-  }
-
   return (
     <div className="h-full flex flex-col">
       <FormHeader className="py-4 px-6 !mb-0" title="Users" />
       <div className="bg-surface-200 py-3 px-6 flex items-center justify-between border-t">
         <div className="flex items-center gap-x-2">
-          <Input
-            size="tiny"
-            className="w-64 pl-7"
-            iconContainerClassName="pl-2"
-            icon={<Search size={14} className="text-foreground-lighter" />}
-            placeholder="Search by email, phone number or UID"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.code === 'Enter') setFilterKeywords(search)
-            }}
-            actions={[
-              search && (
-                <Button
-                  size="tiny"
-                  type="text"
-                  icon={<X />}
-                  onClick={() => clearSearch()}
-                  className="px-1"
-                />
-              ),
-            ]}
+          <p className="text-xs text-foreground-light">Filter by</p>
+
+          <TextSearchPopover
+            rows={1}
+            name="Search"
+            placeholder="Search by email, phone or UID"
+            value={filterKeywords}
+            onSaveText={setFilterKeywords}
           />
+
+          <FilterPopover
+            name="Provider"
+            options={PROVIDER_FILTER_OPTIONS}
+            labelKey="name"
+            valueKey="value"
+            iconKey="icon"
+            activeOptions={selectedProviders}
+            labelClass="text-xs"
+            maxHeightClass="h-[190px]"
+            onSaveFilters={setSelectedProviders}
+          />
+
           <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
-            <SelectTrigger_Shadcn_ size="tiny" className="w-[150px]">
+            <SelectTrigger_Shadcn_ size="tiny" className="w-[140px]">
               <SelectValue_Shadcn_ />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
               <SelectGroup_Shadcn_>
-                <SelectItem_Shadcn_ value="all">All users</SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="verified">Verified users</SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="unverified">Unverified users</SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="anonymous">Anonymous users</SelectItem_Shadcn_>
+                <SelectItem_Shadcn_ value="all" className="text-xs">
+                  All users
+                </SelectItem_Shadcn_>
+                <SelectItem_Shadcn_ value="verified" className="text-xs">
+                  Verified users
+                </SelectItem_Shadcn_>
+                <SelectItem_Shadcn_ value="unverified" className="text-xs">
+                  Unverified users
+                </SelectItem_Shadcn_>
+                <SelectItem_Shadcn_ value="anonymous" className="text-xs">
+                  Anonymous users
+                </SelectItem_Shadcn_>
               </SelectGroup_Shadcn_>
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
+
+          <div className="border-r border-strong h-6" />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button icon={sortOrder === 'desc' ? <ArrowDown /> : <ArrowUp />}>
+                Sorted by {sortColumn.replace('_', ' ')}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-44" align="start">
+              <DropdownMenuRadioGroup value={sortByValue} onValueChange={setSortByValue}>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Sort by created at</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioItem value="created_at:asc">Ascending</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="created_at:desc">
+                      Descending
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Sort by email</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioItem value="email:asc">Ascending</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="email:desc">Descending</DropdownMenuRadioItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Sort by phone</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioItem value="phone:asc">Ascending</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="phone:desc">Descending</DropdownMenuRadioItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
+
         <div className="flex items-center gap-2">
           {isNewAPIDocsEnabled && <APIDocsButton section={['user-management']} />}
           <Button

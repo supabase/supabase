@@ -177,7 +177,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
   })
 }
 
-const PROVIDER_PHONE = {
+export const PROVIDER_PHONE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Phone',

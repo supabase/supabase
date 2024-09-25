@@ -31,11 +31,13 @@ export const formatUsersData = (users: User[]) => {
       // I think it's alright to just check via the main provider since email and phone should be mutually exclusive
       provider_type: user.is_anonymous
         ? 'Anonymous'
-        : socialProviders.includes(provider)
-          ? 'Social'
-          : phoneProviders.includes(provider)
-            ? 'Phone'
-            : '-',
+        : provider === 'email'
+          ? '-'
+          : socialProviders.includes(provider)
+            ? 'Social'
+            : phoneProviders.includes(provider)
+              ? 'Phone'
+              : '-',
       // [Joshen] Note that the images might not load due to CSP issues
       img: getAvatarUrl(user),
       name: getDisplayName(user),
@@ -45,7 +47,7 @@ export const formatUsersData = (users: User[]) => {
 
 const providers = {
   social: [
-    // { email: 'email-icon2' },
+    { email: 'email-icon2' },
     { apple: 'apple-icon' },
     { azure: 'microsoft-icon' },
     { bitbucket: 'bitbucket-icon' },
