@@ -116,7 +116,7 @@ const InfrastructureInfo = () => {
                     <Input
                       readOnly
                       disabled
-                      value={`${currentPgVersion}`}
+                      value={currentPgVersion}
                       label="Postgres version"
                       actions={[
                         isOnNonGenerallyAvailableReleaseChannel && (
@@ -128,7 +128,7 @@ const InfrastructureInfo = () => {
                             </TooltipTrigger_Shadcn_>
                             <TooltipContent_Shadcn_ side="bottom" className="w-52 text-center">
                               This project uses a {isOnNonGenerallyAvailableReleaseChannel} database
-                              database version release
+                              version release
                             </TooltipContent_Shadcn_>
                           </Tooltip_Shadcn_>
                         ),
