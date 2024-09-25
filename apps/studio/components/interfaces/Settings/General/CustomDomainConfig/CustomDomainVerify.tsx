@@ -6,6 +6,8 @@ import type { ProjectApiResponse } from 'data/config/project-api-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
+import { useInterval } from 'hooks/misc/useInterval'
+import { AlertCircle, ExternalLink, HelpCircle, RefreshCw } from 'lucide-react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -13,9 +15,8 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import DNSRecord from './DNSRecord'
-import { AlertCircle, HelpCircle, ExternalLink, RefreshCw } from 'lucide-react'
 import DNSTableHeaders from './CustomDomainTableHeaders'
+import DNSRecord from './DNSRecord'
 
 export type CustomDomainVerifyProps = {
   projectRef?: string
@@ -32,6 +33,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         if (res.status === '2_initiated') setIsNotVerifiedYet(true)
       },
     })
+
   const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
 
   const hasCAAErrors = customDomain.ssl.validation_errors?.reduce(
@@ -43,6 +45,12 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
     if (!projectRef) return console.error('Project ref is required')
     reverifyCustomDomain({ projectRef })
   }
+
+  useInterval(
+    onReverifyCustomDomain,
+    // Poll every 5 seconds if the SSL certificate is being deployed
+    customDomain.ssl.status !== undefined && customDomain.ssl.txt_name === undefined ? 5000 : false
+  )
 
   const onCancelCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
