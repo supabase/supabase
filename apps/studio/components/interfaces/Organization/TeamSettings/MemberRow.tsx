@@ -1,20 +1,28 @@
-import { Check, Minus, User, X } from 'lucide-react'
+import { ArrowRight, Check, Minus, User, X } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useState } from 'react'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
+import PartnerIcon from 'components/ui/PartnerIcon'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
-import { Badge, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import {
+  Badge,
+  HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
+  HoverCard_Shadcn_,
+  ScrollArea,
+  cn,
+} from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
-import PartnerIcon from 'components/ui/PartnerIcon'
+import Link from 'next/link'
 
 interface MemberRowProps {
   member: OrganizationMember
@@ -25,17 +33,16 @@ const MEMBER_ORIGIN_TO_MANAGED_BY = {
 } as const
 
 export const MemberRow = ({ member }: MemberRowProps) => {
-  const { slug } = useParams()
   const { profile } = useProfile()
-  const { data: projects } = useProjectsQuery()
   const selectedOrganization = useSelectedOrganization()
   const [hasInvalidImg, setHasInvalidImg] = useState(false)
-  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
+  const { data: projects } = useProjectsQuery()
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
   })
 
+  const orgProjects = projects?.filter((p) => p.organization_id === selectedOrganization?.id)
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
   const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const isInvitedUser = Boolean(member.invited_id)
@@ -139,10 +146,10 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             const roleName = (role?.name ?? '').split('_')[0]
             const projectsApplied =
               role?.project_ids === null
-                ? projects?.map((p) => p.name) ?? []
+                ? orgProjects?.map((p) => p.name) ?? []
                 : (role?.project_ids ?? [])
                     .map((id) => {
-                      return projects?.find((p) => p.id === id)?.name ?? ''
+                      return orgProjects?.find((p) => p.id === id)?.name ?? ''
                     })
                     .filter((x) => x.length > 0)
 
@@ -157,28 +164,43 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                         {projectsApplied[0]}
                       </span>
                     ) : (
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
+                      <HoverCard_Shadcn_ openDelay={200}>
+                        <HoverCardTrigger_Shadcn_ asChild>
                           <span className="text-foreground">
                             {role?.project_ids === null
                               ? 'Organization'
                               : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
                           </span>
-                        </TooltipTrigger_Shadcn_>
-                        {role?.project_ids !== null && projectsApplied.length > 1 && (
-                          <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
-                            {projectsApplied
-                              ?.slice(0, 2)
-                              .map((name) => <span key={name}>{name}</span>)}
-                            {projectsApplied.length > 2 && (
-                              <span>
-                                And {projectsApplied.length - 2} other project
-                                {projectsApplied.length > 4 ? 's' : ''}
-                              </span>
-                            )}
-                          </TooltipContent_Shadcn_>
-                        )}
-                      </Tooltip_Shadcn_>
+                        </HoverCardTrigger_Shadcn_>
+                        <HoverCardContent_Shadcn_ className="p-0">
+                          <p className="p-2 text-xs">
+                            {roleName} role applies to {projectsApplied.length} project
+                            {projectsApplied.length > 1 ? 's' : ''}
+                          </p>
+                          <div className="border-t flex flex-col py-1">
+                            <ScrollArea
+                              className={cn(projectsApplied.length > 5 ? 'h-[130px]' : '')}
+                            >
+                              {projectsApplied.map((name) => {
+                                const ref = orgProjects?.find((p) => p.name === name)?.ref
+                                return (
+                                  <Link
+                                    key={name}
+                                    href={`/project/${ref}`}
+                                    className="px-2 py-1 group hover:bg-surface-300 hover:text-foreground transition flex items-center justify-between"
+                                  >
+                                    <span className="text-xs truncate max-w-[60%]">{name}</span>
+                                    <span className="text-xs text-foreground flex items-center gap-x-1 opacity-0 group-hover:opacity-100 transition">
+                                      Go to project
+                                      <ArrowRight size={14} />
+                                    </span>
+                                  </Link>
+                                )
+                              })}
+                            </ScrollArea>
+                          </div>
+                        </HoverCardContent_Shadcn_>
+                      </HoverCard_Shadcn_>
                     )}
                   </>
                 )}
