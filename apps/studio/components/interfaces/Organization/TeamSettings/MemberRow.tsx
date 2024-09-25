@@ -68,8 +68,6 @@ export const MemberRow = ({ member }: MemberRowProps) => {
       return appliedProjects.length === 0
     }).length > 0
 
-  console.log({ orgProjects })
-
   return (
     <Table.tr>
       <Table.td>
