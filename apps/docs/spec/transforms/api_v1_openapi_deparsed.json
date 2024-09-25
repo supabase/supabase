@@ -1269,6 +1269,50 @@
                       },
                       "api_key": {
                         "type": "string"
+                      },
+                      "id": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "type": {
+                        "nullable": true,
+                        "type": "object"
+                      },
+                      "prefix": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "description": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "hash": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "secret_jwt_template": {
+                        "nullable": true,
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "role": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "role"
+                            ]
+                          }
+                        ]
+                      },
+                      "inserted_at": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "nullable": true
                       }
                     },
                     "required": [
@@ -1276,6 +1320,377 @@
                       "api_key"
                     ]
                   }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Secrets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createApiKey",
+        "summary": "[Alpha] Creates a new API key for the project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "publishable",
+                      "secret"
+                    ],
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "secret_jwt_template": {
+                    "nullable": true,
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "role": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "role"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "api_key": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "type": {
+                      "nullable": true,
+                      "type": "object"
+                    },
+                    "prefix": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "hash": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "secret_jwt_template": {
+                      "nullable": true,
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "role": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "role"
+                          ]
+                        }
+                      ]
+                    },
+                    "inserted_at": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "api_key"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Secrets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/api-keys/{id}": {
+      "patch": {
+        "operationId": "updateApiKey",
+        "summary": "[Alpha] Updates an API key for the project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "secret_jwt_template": {
+                    "nullable": true,
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "role": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "role"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "api_key": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "type": {
+                      "nullable": true,
+                      "type": "object"
+                    },
+                    "prefix": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "hash": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "secret_jwt_template": {
+                      "nullable": true,
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "role": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "role"
+                          ]
+                        }
+                      ]
+                    },
+                    "inserted_at": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "api_key"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Secrets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteApiKey",
+        "summary": "[Alpha] Deletes an API key for the project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "api_key": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "type": {
+                      "nullable": true,
+                      "type": "object"
+                    },
+                    "prefix": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "hash": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "secret_jwt_template": {
+                      "nullable": true,
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "role": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "role"
+                          ]
+                        }
+                      ]
+                    },
+                    "inserted_at": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "api_key"
+                  ]
                 }
               }
             }
@@ -4419,10 +4834,16 @@
                       "minimum": 0,
                       "maximum": 1024
                     },
+                    "max_slot_wal_keep_size": {
+                      "type": "string"
+                    },
                     "max_standby_archive_delay": {
                       "type": "string"
                     },
                     "max_standby_streaming_delay": {
+                      "type": "string"
+                    },
+                    "max_wal_size": {
                       "type": "string"
                     },
                     "max_worker_processes": {
@@ -4431,6 +4852,9 @@
                       "maximum": 262143
                     },
                     "shared_buffers": {
+                      "type": "string"
+                    },
+                    "wal_keep_size": {
                       "type": "string"
                     },
                     "work_mem": {
@@ -4519,10 +4943,16 @@
                     "minimum": 0,
                     "maximum": 1024
                   },
+                  "max_slot_wal_keep_size": {
+                    "type": "string"
+                  },
                   "max_standby_archive_delay": {
                     "type": "string"
                   },
                   "max_standby_streaming_delay": {
+                    "type": "string"
+                  },
+                  "max_wal_size": {
                     "type": "string"
                   },
                   "max_worker_processes": {
@@ -4531,6 +4961,9 @@
                     "maximum": 262143
                   },
                   "shared_buffers": {
+                    "type": "string"
+                  },
+                  "wal_keep_size": {
                     "type": "string"
                   },
                   "work_mem": {
@@ -4591,10 +5024,16 @@
                       "minimum": 0,
                       "maximum": 1024
                     },
+                    "max_slot_wal_keep_size": {
+                      "type": "string"
+                    },
                     "max_standby_archive_delay": {
                       "type": "string"
                     },
                     "max_standby_streaming_delay": {
+                      "type": "string"
+                    },
+                    "max_wal_size": {
                       "type": "string"
                     },
                     "max_worker_processes": {
@@ -4603,6 +5042,9 @@
                       "maximum": 262143
                     },
                     "shared_buffers": {
+                      "type": "string"
+                    },
+                    "wal_keep_size": {
                       "type": "string"
                     },
                     "work_mem": {
@@ -5352,6 +5794,14 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "mfa_web_authn_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_web_authn_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "mfa_phone_otp_length": {
                       "type": "number"
                     },
@@ -5691,6 +6141,8 @@
                     "mfa_totp_verify_enabled",
                     "mfa_phone_enroll_enabled",
                     "mfa_phone_verify_enabled",
+                    "mfa_web_authn_enroll_enabled",
+                    "mfa_web_authn_verify_enabled",
                     "mfa_phone_otp_length",
                     "mfa_phone_template",
                     "mfa_phone_max_frequency",
@@ -6322,6 +6774,12 @@
                   "mfa_totp_verify_enabled": {
                     "type": "boolean"
                   },
+                  "mfa_web_authn_enroll_enabled": {
+                    "type": "boolean"
+                  },
+                  "mfa_web_authn_verify_enabled": {
+                    "type": "boolean"
+                  },
                   "mfa_phone_enroll_enabled": {
                     "type": "boolean"
                   },
@@ -6797,6 +7255,14 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "mfa_web_authn_enroll_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mfa_web_authn_verify_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "mfa_phone_otp_length": {
                       "type": "number"
                     },
@@ -7136,6 +7602,8 @@
                     "mfa_totp_verify_enabled",
                     "mfa_phone_enroll_enabled",
                     "mfa_phone_verify_enabled",
+                    "mfa_web_authn_enroll_enabled",
+                    "mfa_web_authn_verify_enabled",
                     "mfa_phone_otp_length",
                     "mfa_phone_template",
                     "mfa_phone_max_frequency",
@@ -10433,6 +10901,17 @@
           "content"
         ]
       },
+      "ApiKeySecretJWTTemplate": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
       "ApiKeyResponse": {
         "type": "object",
         "properties": {
@@ -10441,12 +10920,116 @@
           },
           "api_key": {
             "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "nullable": true,
+            "type": "object"
+          },
+          "prefix": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "hash": {
+            "type": "string",
+            "nullable": true
+          },
+          "secret_jwt_template": {
+            "nullable": true,
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "role"
+                ]
+              }
+            ]
+          },
+          "inserted_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "updated_at": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
           "name",
           "api_key"
         ]
+      },
+      "CreateApiKeyBody": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "enum": [
+              "publishable",
+              "secret"
+            ],
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "secret_jwt_template": {
+            "nullable": true,
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "role"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "UpdateApiKeyBody": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "secret_jwt_template": {
+            "nullable": true,
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "role"
+                ]
+              }
+            ]
+          }
+        }
       },
       "CreateBranchBody": {
         "type": "object",
@@ -11753,10 +12336,16 @@
             "minimum": 0,
             "maximum": 1024
           },
+          "max_slot_wal_keep_size": {
+            "type": "string"
+          },
           "max_standby_archive_delay": {
             "type": "string"
           },
           "max_standby_streaming_delay": {
+            "type": "string"
+          },
+          "max_wal_size": {
             "type": "string"
           },
           "max_worker_processes": {
@@ -11765,6 +12354,9 @@
             "maximum": 262143
           },
           "shared_buffers": {
+            "type": "string"
+          },
+          "wal_keep_size": {
             "type": "string"
           },
           "work_mem": {
@@ -11817,10 +12409,16 @@
             "minimum": 0,
             "maximum": 1024
           },
+          "max_slot_wal_keep_size": {
+            "type": "string"
+          },
           "max_standby_archive_delay": {
             "type": "string"
           },
           "max_standby_streaming_delay": {
+            "type": "string"
+          },
+          "max_wal_size": {
             "type": "string"
           },
           "max_worker_processes": {
@@ -11829,6 +12427,9 @@
             "maximum": 262143
           },
           "shared_buffers": {
+            "type": "string"
+          },
+          "wal_keep_size": {
             "type": "string"
           },
           "work_mem": {
@@ -12416,6 +13017,14 @@
             "type": "boolean",
             "nullable": true
           },
+          "mfa_web_authn_enroll_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mfa_web_authn_verify_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
           "mfa_phone_otp_length": {
             "type": "number"
           },
@@ -12755,6 +13364,8 @@
           "mfa_totp_verify_enabled",
           "mfa_phone_enroll_enabled",
           "mfa_phone_verify_enabled",
+          "mfa_web_authn_enroll_enabled",
+          "mfa_web_authn_verify_enabled",
           "mfa_phone_otp_length",
           "mfa_phone_template",
           "mfa_phone_max_frequency",
@@ -13345,6 +13956,12 @@
             "type": "boolean"
           },
           "mfa_totp_verify_enabled": {
+            "type": "boolean"
+          },
+          "mfa_web_authn_enroll_enabled": {
+            "type": "boolean"
+          },
+          "mfa_web_authn_verify_enabled": {
             "type": "boolean"
           },
           "mfa_phone_enroll_enabled": {

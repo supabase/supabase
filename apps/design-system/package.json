@@ -21,7 +21,7 @@
     "lodash.template": "4.5.0",
     "lucide-react": "*",
     "markdown-wasm": "^1.2.0",
-    "next": "^14.2.3",
+    "next": "^14.2.10",
     "next-contentlayer2": "0.4.6",
     "react": "^18.2.0",
     "react-docgen": "^7.0.3",
