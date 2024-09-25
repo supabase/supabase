@@ -157,7 +157,10 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                                 <span className="text-foreground">
                                   {dayjs()
                                     .utc()
-                                    .add(pauseStatus.max_days_till_restore_disabled ?? 0, 'day')
+                                    .add(
+                                      pauseStatus.remaining_days_till_restore_disabled ?? 0,
+                                      'day'
+                                    )
                                     .format('DD MMM YYYY')}
                                 </span>
                                 . However, your database backup and Storage objects will still be
