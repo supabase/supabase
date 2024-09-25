@@ -115,34 +115,39 @@ export const CreateWarehouseCollectionModal = () => {
                 analytics system. You can use SQL to analyze this data without affecting the
                 performance of your main database operations.
               </p>
-
-              <FormField_Shadcn_
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItemLayout label="Collection name" layout="horizontal">
-                    <FormControl_Shadcn_>
-                      <Input placeholder="Events" {...field} />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-              <FormField_Shadcn_
-                control={form.control}
-                name="retention_days"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Retention days"
-                    layout="horizontal"
-                    description={retentionDescription()}
-                  >
-                    <FormControl_Shadcn_>
-                      <Input type="number" {...field} />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-
+              <div className="space-y-3">
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItemLayout label="Collection name" layout="horizontal">
+                      <FormControl_Shadcn_>
+                        <Input placeholder="Events" {...field} />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="retention_days"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Retention"
+                      layout="horizontal"
+                      description={retentionDescription()}
+                    >
+                      <FormControl_Shadcn_>
+                        <div className="relative flex items-center gap-2">
+                          <Input type="number" {...field} />
+                          <span className="absolute right-3 text-foreground-lighter text-sm pointer-events-none">
+                            days
+                          </span>
+                        </div>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </div>
               <FormMessage />
             </Modal.Content>
 
