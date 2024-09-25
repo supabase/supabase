@@ -11,7 +11,7 @@ import { noop } from 'lodash'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 
 interface ConsentToastProps {
   onAccept: () => void
@@ -92,7 +92,12 @@ export const useConsent = () => {
           id: 'consent-toast',
           position: 'bottom-right',
           duration: Infinity,
-          closeButton: true,
+          closeButton: false,
+          dismissible: false,
+          className: cn(
+            '!w-screen !fixed !border-t !h-auto !left-0 !bottom-0 !top-auto !right-0 !rounded-none !max-w-none !bg-overlay !text',
+            'sm:!w-full sm:!max-w-[356px] sm:!left-auto sm:!right-8 sm:!bottom-8 sm:!rounded-lg sm:border'
+          ),
         }
       )
     }
@@ -110,7 +115,9 @@ export const useConsent = () => {
   }, [])
 
   useEffect(() => {
-    triggerConsentToast()
+    setTimeout(() => {
+      consentValue === null && triggerConsentToast()
+    }, 300)
   }, [consentValue])
 
   return {
