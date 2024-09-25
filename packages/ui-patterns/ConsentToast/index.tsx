@@ -116,7 +116,7 @@ export const useConsent = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      triggerConsentToast()
+      consentValue === null && triggerConsentToast()
     }, 300)
   }, [consentValue])
 
