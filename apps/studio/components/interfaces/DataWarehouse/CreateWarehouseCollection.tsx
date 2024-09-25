@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { PlusIcon } from 'lucide-react'
+import { Info, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -13,15 +13,29 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCreateCollection } from 'data/analytics/warehouse-collections-create-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Modal } from 'ui'
+import {
+  Admonition,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Form_Shadcn_,
+  Modal,
+  WarningIcon,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { Alert } from '@ui/components/shadcn/ui/alert'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export const CreateWarehouseCollectionModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
   const { ref } = useParams()
   const { plan, isLoading: planLoading } = useCurrentOrgPlan()
+  const currentOrg = useSelectedOrganization()
 
   const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
 
@@ -162,6 +176,30 @@ export const CreateWarehouseCollectionModal = () => {
               <FormMessage />
             </Modal.Content>
 
+            {plan?.id !== 'free' && (
+              <>
+                <Modal.Separator />
+                <Admonition
+                  className="border-none bg-transparent"
+                  type="default"
+                  title="Upgrade your plan to increase retention"
+                  description={
+                    <div>
+                      Upgrade to the pro plan to increase retention to 90 days.
+                      <Button
+                        className="mt-2"
+                        type="primary"
+                        onClick={() =>
+                          router.push(`/org/${currentOrg?.slug}/billing?panel=subscriptionPlan`)
+                        }
+                      >
+                        Upgrade plan
+                      </Button>
+                    </div>
+                  }
+                />
+              </>
+            )}
             <Modal.Content className="py-4 border-t flex items-center justify-end gap-2">
               <Button size="tiny" type="default" onClick={() => setIsOpen(!isOpen)}>
                 Cancel
