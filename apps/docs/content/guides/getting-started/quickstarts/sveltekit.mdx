@@ -53,7 +53,7 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Create the Supabase client">
 
-    Create a `/src/lib` directory in your SvelteKit app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your project URL and public API (anon) key:
+    Create a `/src/lib` directory in your SvelteKit app, create a file called `supabaseClient.ts` and add the following code to initialize the Supabase client with your project URL and public API (anon) key:
 
     <ProjectConfigVariables variable="url" />
     <ProjectConfigVariables variable="anonKey" />
@@ -62,7 +62,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```js src/lib/supabaseClient.js
+      ```js src/lib/supabaseClient.ts
         import { createClient } from '@supabase/supabase-js'
 
         export const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
@@ -77,13 +77,13 @@ hideToc: true
 
     Use `load` method to fetch the data server-side and display the query results as a simple list.
 
-    Create `+page.server.js` file in the `routes` directory with the following code.
+    Create `+page.server.ts` file in the `routes` directory with the following code.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
 
-      ```js src/routes/+page.server.js
+      ```js src/routes/+page.server.ts
         import { supabase } from "$lib/supabaseClient";
 
         export async function load() {
