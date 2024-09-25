@@ -176,7 +176,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                         </HoverCardTrigger_Shadcn_>
                         <HoverCardContent_Shadcn_ className="p-0">
                           <p className="p-2 text-xs">
-                            {roleName} role applied to {projectsApplied.length} project
+                            {roleName} role applies to {projectsApplied.length} project
                             {projectsApplied.length > 1 ? 's' : ''}
                           </p>
                           <div className="border-t flex flex-col py-1">
