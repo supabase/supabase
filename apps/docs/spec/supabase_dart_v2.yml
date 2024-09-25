@@ -1460,7 +1460,7 @@ functions:
           final AuthResponse response = await supabase.auth.setSession(refreshToken);
 
           final session = res.session;
-          ```  
+          ```
         response: |
           ```json
           AuthResponse(
