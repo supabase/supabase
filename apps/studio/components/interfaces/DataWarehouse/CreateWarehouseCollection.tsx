@@ -176,7 +176,7 @@ export const CreateWarehouseCollectionModal = () => {
               <FormMessage />
             </Modal.Content>
 
-            {plan?.id !== 'free' && (
+            {plan?.id === 'free' && (
               <>
                 <Modal.Separator />
                 <Admonition
