@@ -23,6 +23,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Input_Shadcn_,
   LoadingLine,
   ResizablePanel,
   ResizablePanelGroup,
@@ -38,6 +39,7 @@ import AddUserDropdown from './AddUserDropdown'
 import { UserPanel } from './UserPanel'
 import { PROVIDER_FILTER_OPTIONS } from './Users.constants'
 import { formatUsersData, isAtBottom } from './Users.utils'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 const USERS_TABLE_COLUMNS = [
@@ -235,7 +237,7 @@ export const UsersV2 = () => {
           />
 
           <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
-            <SelectTrigger_Shadcn_ size="tiny" className="w-[140px]">
+            <SelectTrigger_Shadcn_ size="tiny" className="w-[140px] !bg-transparent">
               <SelectValue_Shadcn_ />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
