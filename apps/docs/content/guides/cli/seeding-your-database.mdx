@@ -28,23 +28,22 @@ values
 
 If you want to manage multiple seed files or organize them across different folders, you can configure additional paths or glob patterns in your `config.toml` (see the [next section](#splitting-up-your-seed-data) for details).
 
-
 ### Splitting up your seed file
 
 For better modularity and maintainability, you can split your seed data into multiple files. For example, you can organize your seeds by table and include files such as `countries.sql` and `cities.sql`. Configure them in `config.toml` like so:
 
 ```toml supabase/config.toml
 [db.seed]
-enabled = true
-sql_paths = ['./countries.sql', './cities.sql']
+  enabled = true
+  sql_paths = ['./countries.sql', './cities.sql']
 ```
 
 Or to include all `.sql` files under a specific folder you can do:
 
 ```toml supabase/config.toml
 [db.seed]
-enabled = true
-sql_paths = ['./seeds/*.sql']
+  enabled = true
+  sql_paths = ['./seeds/*.sql']
 ```
 
 <Admonition type="tip">
@@ -56,7 +55,6 @@ The system processes the seed files in the order they are listed in the sql_path
 - If a pattern does not match any files, a warning will be logged to help you troubleshoot potential configuration issues.
 
 </Admonition>
-
 
 ## Generating seed data
 
