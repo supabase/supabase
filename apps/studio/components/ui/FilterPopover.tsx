@@ -29,7 +29,7 @@ export const FilterPopover = ({
   activeOptions = [],
   valueKey,
   labelKey,
-  iconKey,
+  iconKey = 'icon',
   name = 'default',
   variant = 'rectangular',
   onSaveFilters,
@@ -103,7 +103,13 @@ export const FilterPopover = ({
                     htmlFor={option[valueKey]}
                     className={cn('flex items-center gap-x-2', labelClass)}
                   >
-                    {icon && <img src={icon} alt={option[labelKey]} className="w-4 h-4" />}
+                    {icon && (
+                      <img
+                        src={icon}
+                        alt={option[labelKey]}
+                        className={cn('w-4 h-4', option.iconClass)}
+                      />
+                    )}
                     <span>{option[labelKey]}</span>
                   </Label_Shadcn_>
                 </div>
