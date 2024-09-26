@@ -34,8 +34,10 @@ const CopyButton = ({
         await copyToClipboard(text)
         onClick?.(e)
       }}
-      icon={showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Clipboard />}
       {...props}
+      icon={
+        showCopied ? <Check strokeWidth={2} className="text-brand" /> : props.icon ?? <Clipboard />
+      }
     >
       {!iconOnly && <>{children ?? (showCopied ? copiedLabel : copyLabel)}</>}
     </Button>

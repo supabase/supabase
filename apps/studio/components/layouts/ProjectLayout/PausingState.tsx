@@ -53,7 +53,7 @@ const PausingState = ({ project }: PausingStateProps) => {
           </div>
         </div>
         <div className="mx-auto mt-8 mb-16 w-full max-w-7xl">
-          <div className="mx-6 flex h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-8">
+          <div className="flex h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-8">
             <div className="grid w-[380px] gap-4">
               <div className="relative mx-auto max-w-[300px]">
                 <div className="absolute flex h-full w-full items-center justify-center">
@@ -62,7 +62,7 @@ const PausingState = ({ project }: PausingStateProps) => {
                 <Circle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
               </div>
               <p className="text-center">Pausing {project.name}</p>
-              <p className="mt-4 text-center text-sm text-foreground-light">
+              <p className="text-center text-sm text-foreground-light">
                 You may restore your project anytime thereafter, and your data will be restored to
                 when it was initially paused.
               </p>

@@ -58,7 +58,11 @@ const SSLConfiguration = () => {
       sslEnforcementConfiguration.currentConfig.database
     : false
 
-  const hasAccessToSSLEnforcement = !sslEnforcementConfiguration?.isNotAllowed
+  const hasAccessToSSLEnforcement = !(
+    sslEnforcementConfiguration !== undefined &&
+    'isNotAllowed' in sslEnforcementConfiguration &&
+    sslEnforcementConfiguration.isNotAllowed
+  )
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
   const hasSSLCertificate =
     projectSettings?.project !== undefined &&

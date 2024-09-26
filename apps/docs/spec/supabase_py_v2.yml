@@ -339,7 +339,7 @@ functions:
                 isOptional: true
                 type: string
                 description: Verification token received when the user completes the captcha on the site.
-  
+
     notes: |
       - Returns an anonymous user
       - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
@@ -710,7 +710,7 @@ functions:
             }
           })
           ```
-  
+
   - id: sign-in-with-id-token
     title: 'sign_in_with_id_token'
     params:
@@ -720,7 +720,7 @@ functions:
           - name: provider
             isOptional: false
             type: '"google" | "apple" | "azure" | "facebook" | "kakao" | string'
-            description: | 
+            description: |
               Provider name or OIDC `iss` value identifying which provider should be used to verify the provided token. Supported names: `google`, `apple`, `azure`, `facebook`, `kakao`, `keycloak` (deprecated).
           - name: token
             isOptional: false
@@ -1994,7 +1994,7 @@ functions:
           # Access auth admin api
           admin_auth_client = supabase.auth.admin
           ```
-  
+
   - id: get-user-by-id
     title: 'get_user_by_id()'
     params:
@@ -3277,11 +3277,11 @@ functions:
       - name: returning
         isOptional: true
         type: ReturnMethod
-        description:  Either 'minimal' or 'representation'. Defaults to 'representation'.
+        description: Either 'minimal' or 'representation'. Defaults to 'representation'.
       - name: default_to_null
         isOptional: true
         type: bool
-        description:  Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
+        description: Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
     examples:
       - id: create-a-record
         name: Create a record
@@ -3464,19 +3464,19 @@ functions:
       - name: returning
         isOptional: true
         type: ReturnMethod
-        description:  Either 'minimal' or 'representation'. Defaults to 'representation'.
+        description: Either 'minimal' or 'representation'. Defaults to 'representation'.
       - name: ignore_duplicates
         isOptional: true
         type: bool
-        description:  Whether duplicate rows should be ignored.
+        description: Whether duplicate rows should be ignored.
       - name: on_conflict
         isOptional: true
         type: string
-        description:  Specified columns to be made to work with UNIQUE constraint.
+        description: Specified columns to be made to work with UNIQUE constraint.
       - name: default_to_null
         isOptional: true
         type: bool
-        description:  Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
+        description: Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -3617,7 +3617,7 @@ functions:
       - name: returning
         isOptional: true
         type: ReturnMethod
-        description:  Either 'minimal' or 'representation'. Defaults to 'representation'.
+        description: Either 'minimal' or 'representation'. Defaults to 'representation'.
     examples:
       - id: delete-records
         name: Delete records
@@ -3709,15 +3709,15 @@ functions:
       - name: params
         isOptional: true
         type: dict of any
-        description:  Parameters passed into the stored procedure call.
+        description: Parameters passed into the stored procedure call.
       - name: get
         isOptional: true
         type: dict of any
-        description:  When set to `true`, `data` will not be returned. Useful if you only need the count.
+        description: When set to `true`, `data` will not be returned. Useful if you only need the count.
       - name: head
         isOptional: true
         type: dict of any
-        description:  When set to `true`, the function will be called with read-only access mode.
+        description: When set to `true`, the function will be called with read-only access mode.
       - name: count
         isOptional: true
         type: CountMethod
@@ -3850,7 +3850,6 @@ functions:
           }
           ```
         hideCodeBlock: true
-
 
   - id: using-filters
     title: Using Filters
@@ -5133,7 +5132,7 @@ functions:
           Postgres supports a number of [range types](https://www.postgresql.org/docs/current/rangetypes.html). You can filter on range columns using the string representation of range values.
         hideCodeBlock: true
         isSpotlight: true
-  
+
   - id: range-adjacent
     title: range_adjacent()
     description: |
@@ -5659,7 +5658,7 @@ functions:
           }
           ```
         hideCodeBlock: true
-  
+
   - id: filter
     title: filter()
     params:
@@ -6021,7 +6020,7 @@ functions:
         description: Set this to limit rows of foreign tables instead of the parent table.
     notes: |
       Limit the query result by starting at an offset (`from`) and ending at the offset (`from + to`). Only records within this range are returned. This respects the query order and if there is no order clause the range could behave unexpectedly.
-      
+
       The `from` and `to` values are 0-based and inclusive: `range(1, 3)` will include the second, third and fourth rows of the query.
     examples:
       - id: with-select
@@ -6627,7 +6626,6 @@ functions:
           ```python
           supabase.remove_all_channels()
           ```
-
 
   - id: list-buckets
     title: 'list_buckets()'
