@@ -6,9 +6,11 @@
 
 import CopyButton from 'components/ui/CopyButton'
 import dayjs from 'dayjs'
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
 import { AlertCircle, Info } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
+import { cn } from 'ui'
 
 export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
@@ -233,7 +235,74 @@ export const TimestampLocalFormatter = ({
   className?: string
   value: string | number
 }) => {
-  return <span className={`text-xs ${className}`}>{timestampLocalFormatter(value)}</span>
+  const local = timestampLocalFormatter(value)
+  const utc = timestampUtcFormatter(value)
+  const relative = timestampRelativeFormatter(value)
+  const [align, setAlign] = useState<'start' | 'end'>('start')
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+  // Calculate alignment based on trigger position
+  // Needed so that the tooltip isn't hidden behind the header on top rows
+  useEffect(() => {
+    const updateAlignment = () => {
+      if (triggerRef.current) {
+        const rect = triggerRef.current.getBoundingClientRect()
+        const windowHeight = window.innerHeight
+        setAlign(rect.top < windowHeight / 2 ? 'start' : 'end')
+      }
+    }
+
+    updateAlignment()
+    window.addEventListener('scroll', updateAlignment)
+    window.addEventListener('resize', updateAlignment)
+
+    return () => {
+      window.removeEventListener('scroll', updateAlignment)
+      window.removeEventListener('resize', updateAlignment)
+    }
+  }, [])
+
+  const TooltipRow = ({ label, value }: { label: string; value: string }) => {
+    const [copied, setCopied] = useState(false)
+
+    return (
+      <span
+        onClick={(e) => {
+          e.stopPropagation()
+          navigator.clipboard.writeText(value)
+          setCopied(true)
+
+          setTimeout(() => {
+            setCopied(false)
+          }, 1000)
+        }}
+        className={cn('grid grid-cols-2 gap-2 hover:bg-surface-100 px-2 py-1', {
+          'bg-surface-100': copied,
+        })}
+      >
+        <span className="text-right truncate">{label}:</span>
+        <span className={copied ? 'text-brand-600' : ''}>{copied ? 'Copied!' : value}</span>
+      </span>
+    )
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        ref={triggerRef}
+        className={`text-xs ${className} border-b border-transparent hover:border-dashed hover:border-foreground-light`}
+      >
+        <span>{timestampLocalFormatter(value)}</span>
+      </TooltipTrigger>
+      <TooltipContent align={align} side="right" className="font-mono p-0 py-1">
+        <TooltipRow label="UTC" value={utc} />
+        <TooltipRow label={`${localTimezone}`} value={local} />
+        <TooltipRow label="Relative" value={relative} />
+        <TooltipRow label="Timestamp" value={String(value)} />
+      </TooltipContent>
+    </Tooltip>
+  )
 }
 
 /**
@@ -245,6 +314,15 @@ export const timestampLocalFormatter = (value: string | number) => {
   return dayjs(timestamp).format('DD MMM  HH:mm:ss')
 }
 
+export const timestampUtcFormatter = (value: string | number) => {
+  const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
+  return dayjs(timestamp).utc().format('DD MMM  HH:mm:ss')
+}
+
+export const timestampRelativeFormatter = (value: string | number) => {
+  const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
+  return dayjs(timestamp).fromNow()
+}
 /*
  * JSON Syntax Highlighter
  *

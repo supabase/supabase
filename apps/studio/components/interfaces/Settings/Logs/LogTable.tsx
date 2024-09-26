@@ -35,6 +35,7 @@ import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
+import { TooltipProvider } from '@ui/components/shadcn/ui/tooltip'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -96,7 +97,7 @@ const LogTable = ({
 
   const firstRow: LogData | undefined = data?.[0] as LogData
 
-  // move timestamp to the first column
+  // move timestamp to the first column, if it exists
   function getFirstRow() {
     if (!firstRow) return {}
 
