@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
-import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
 import { CronjobsTable } from 'components/interfaces/Database/Cronjobs/CronjobsTable'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -20,7 +19,7 @@ const FunctionsPage: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
 
   if (isPermissionsLoaded && !canReadFunctions) {
-    return <NoPermission isFullPage resourceText="view database functions" />
+    return <NoPermission isFullPage resourceText="manage database cronjobs" />
   }
 
   return (
@@ -33,16 +32,6 @@ const FunctionsPage: NextPageWithLayout = () => {
           </div>
         </ScaffoldSection>
       </ScaffoldContainer>
-      <CreateFunction
-        func={selectedFunction}
-        visible={showCreateFunctionForm}
-        setVisible={setShowCreateFunctionForm}
-      />
-      <DeleteFunction
-        func={selectedFunction}
-        visible={showDeleteFunctionForm}
-        setVisible={setShowDeleteFunctionForm}
-      />
     </>
   )
 }

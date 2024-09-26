@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -10,10 +9,10 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { Cronjob, useCronjobsQuery } from 'data/database-cronjobs/database-cronjobs-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { Button, Input, Sheet, SheetContent } from 'ui'
 import { CreateCronjobSheet } from './CreateCronjobSheet'
 import { CronjobsList } from './CronjobsList'
+import DeleteCronjob from './DeleteCronjob'
 
 interface CronjobsTableProps {}
 
@@ -22,11 +21,12 @@ export const CronjobsTable = ({}: CronjobsTableProps) => {
   const router = useRouter()
   const { search } = useParams()
 
-  const [addCronJobSheetShown, setAddCronJobSheetShownShown] = useState(false)
+  // used for confirmation prompt in the Create Cronjob Sheet
+  const [isClosingCreateCronJobSheet, setIsClosingCreateCronJobSheet] = useState(false)
+  const [createCronJobSheetShown, setCreateCronJobSheetShown] = useState<
+    Pick<Cronjob, 'jobname' | 'schedule' | 'active' | 'command'> | undefined
+  >()
   const [cronjobForDeletion, setCronjobForDeletion] = useState<Cronjob | undefined>()
-
-  const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
-  const isPermissionsLoaded = usePermissionsLoaded()
 
   const filterString = search ?? ''
 
@@ -39,12 +39,6 @@ export const CronjobsTable = ({}: CronjobsTableProps) => {
     }
     router.push(url)
   }
-
-  const canCreateCronjobs = true
-  // const canCreateFunctions = useCheckPermissions(
-  //   PermissionAction.TENANT_SQL_ADMIN_WRITE,
-  //   'functions'
-  // )
 
   const {
     data: cronjobs,
@@ -66,9 +60,14 @@ export const CronjobsTable = ({}: CronjobsTableProps) => {
           <ProductEmptyState
             title="Cron jobs"
             ctaButtonLabel="Create a new cron job"
-            onClickCta={() => setAddCronJobSheetShownShown(true)}
-            disabled={!canCreateCronjobs}
-            disabledMessage="You need additional permissions to create functions"
+            onClickCta={() =>
+              setCreateCronJobSheetShown({
+                jobname: '',
+                schedule: '',
+                command: '',
+                active: true,
+              })
+            }
           >
             <p className="text-sm text-foreground-light">
               pgcron jobs in PostgreSQL allow you to schedule and automate tasks such as running SQL
@@ -91,7 +90,17 @@ export const CronjobsTable = ({}: CronjobsTableProps) => {
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
-            <Button type="primary" onClick={() => setAddCronJobSheetShownShown(true)}>
+            <Button
+              type="primary"
+              onClick={() =>
+                setCreateCronJobSheetShown({
+                  jobname: '',
+                  schedule: '',
+                  command: '',
+                  active: true,
+                })
+              }
+            >
               Create a new cron job
             </Button>
           </div>
@@ -118,28 +127,34 @@ export const CronjobsTable = ({}: CronjobsTableProps) => {
             body={
               <CronjobsList
                 filterString={filterString}
-                editCronjob={() => {
-                  throw new Error('Should not work')
-                }}
+                editCronjob={(job) => setCreateCronJobSheetShown(job)}
                 deleteCronjob={(job) => setCronjobForDeletion(job)}
               />
             }
           />
         </div>
       )}
-      <>
-        <Sheet
-          open={!!addCronJobSheetShown}
-          onOpenChange={() => setAddCronJobSheetShownShown(false)}
-        >
-          <SheetContent size="default">
-            <CreateCronjobSheet
-              visible={!!addCronJobSheetShown}
-              onClose={() => setAddCronJobSheetShownShown(false)}
-            />
-          </SheetContent>
-        </Sheet>
-      </>
+      <Sheet
+        open={!!createCronJobSheetShown}
+        onOpenChange={() => setIsClosingCreateCronJobSheet(true)}
+      >
+        <SheetContent size="default" tabIndex={undefined}>
+          <CreateCronjobSheet
+            selectedCronjob={createCronJobSheetShown}
+            onClose={() => {
+              setIsClosingCreateCronJobSheet(false)
+              setCreateCronJobSheetShown(undefined)
+            }}
+            isClosing={isClosingCreateCronJobSheet}
+            setIsClosing={setIsClosingCreateCronJobSheet}
+          />
+        </SheetContent>
+      </Sheet>
+      <DeleteCronjob
+        visible={!!cronjobForDeletion}
+        onClose={() => setCronjobForDeletion(undefined)}
+        cronjob={cronjobForDeletion!}
+      />
     </>
   )
 }

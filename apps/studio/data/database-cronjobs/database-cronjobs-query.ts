@@ -1,6 +1,5 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import type { ExecuteSqlData, ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { useExecuteSqlQuery } from 'data/sql/execute-sql-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { ResponseError } from 'types'
 import { databaseCronjobsKeys } from './keys'
 
@@ -23,25 +22,35 @@ export type Cronjob = {
 
 const cronJobSqlQuery = `select * from cron.job;`
 
+export async function getDatabaseCronjobs({
+  projectRef,
+  connectionString,
+}: DatabaseCronjobsVariables) {
+  if (!projectRef) throw new Error('Project ref is required')
+
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql: cronJobSqlQuery,
+  })
+  return result
+}
+
 export type DatabaseCronjobData = Cronjob[]
 export type DatabaseCronjobError = ResponseError
 
-export const useCronjobsQuery = (
+export const useCronjobsQuery = <TData = DatabaseCronjobData>(
   { projectRef, connectionString }: DatabaseCronjobsVariables,
-  options: UseQueryOptions<ExecuteSqlData, ExecuteSqlError, DatabaseCronjobData> = {}
-) => {
-  return useExecuteSqlQuery(
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<DatabaseCronjobData, DatabaseCronjobError, TData> = {}
+) =>
+  useQuery<DatabaseCronjobData, DatabaseCronjobError, TData>(
+    databaseCronjobsKeys.list(projectRef),
+    () => getDatabaseCronjobs({ projectRef, connectionString }),
     {
-      projectRef,
-      connectionString,
-      sql: cronJobSqlQuery,
-      queryKey: databaseCronjobsKeys.list(projectRef),
-    },
-    {
-      select(data) {
-        return (data as any)?.result ?? []
-      },
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
-}

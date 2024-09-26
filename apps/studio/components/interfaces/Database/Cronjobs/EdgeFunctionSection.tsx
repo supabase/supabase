@@ -91,7 +91,6 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
           control={form.control}
           name="values.edgeFunctionName"
           render={({ field }) => {
-            console.log(field.value)
             return (
               <FormItem_Shadcn_>
                 <FormLabel_Shadcn_>Edge Function</FormLabel_Shadcn_>
@@ -130,10 +129,10 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
       <FormField_Shadcn_
         control={form.control}
         name="values.timeoutMs"
-        render={({ field }) => (
+        render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Timeout" layout="vertical" className="gap-1">
             <Input
-              {...field}
+              {...rest}
               type="number"
               actions={<p className="text-foreground-light pr-2">ms</p>}
             />

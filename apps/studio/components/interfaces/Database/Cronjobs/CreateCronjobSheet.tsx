@@ -1,14 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { toString as CronToString } from 'cronstrue'
-import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import z from 'zod'
 
-import { useParams } from 'common'
+import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseCronjobCreateMutation } from 'data/database-cronjobs/database-cronjobs-create-mutation'
-import { isValidHttpUrl } from 'lib/helpers'
+import { Cronjob } from 'data/database-cronjobs/database-cronjobs-query'
 import {
   Button,
   Form_Shadcn_,
@@ -27,7 +26,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { CRONJOB_DEFINITIONS } from './Cronjobs.constants'
-import { buildCronQuery, buildHttpRequestCommand } from './Cronjobs.utils'
+import { buildCronQuery, buildHttpRequestCommand, parseCronjobCommand } from './Cronjobs.utils'
 import { CronjobScheduleSection } from './CronjobScheduleSection'
 import { EdgeFunctionSection } from './EdgeFunctionSection'
 import { HTTPHeaderFieldsSection } from './HttpHeaderFieldsSection'
@@ -37,15 +36,16 @@ import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
 
 export interface CreateCronjobSheetProps {
-  visible: boolean
-  selectedHook?: PostgresTrigger
+  selectedCronjob?: Pick<Cronjob, 'jobname' | 'schedule' | 'active' | 'command'>
+  isClosing: boolean
+  setIsClosing: (v: boolean) => void
   onClose: () => void
 }
 
 const edgeFunctionSchema = z.object({
   type: z.literal('edge_function'),
   method: z.enum(['GET', 'POST']),
-  edgeFunctionName: z.string().trim().min(1),
+  edgeFunctionName: z.string().trim().min(1, 'Please select one of the listed Edge Functions'),
   timeoutMs: z.number().default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
   httpParameters: z.array(z.object({ name: z.string(), value: z.string() })),
@@ -54,7 +54,12 @@ const edgeFunctionSchema = z.object({
 const httpRequestSchema = z.object({
   type: z.literal('http_request'),
   method: z.enum(['GET', 'POST']),
-  endpoint: z.string().trim().min(1),
+  endpoint: z
+    .string()
+    .trim()
+    .min(1, 'Please provide a URL')
+    .regex(urlRegex, 'Please provide a valid URL')
+    .refine((value) => value.startsWith('http'), 'Please include HTTP/HTTPs to your URL'),
   timeoutMs: z.number().default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
   httpParameters: z.array(z.object({ name: z.string(), value: z.string() })),
@@ -62,8 +67,8 @@ const httpRequestSchema = z.object({
 
 const sqlFunctionSchema = z.object({
   type: z.literal('sql_function'),
-  schema: z.string().trim().min(1),
-  functionName: z.string().trim().min(1),
+  schema: z.string().trim().min(1, 'Please select one of the listed database schemas'),
+  functionName: z.string().trim().min(1, 'Please select one of the listed database functions'),
 })
 const sqlSnippetSchema = z.object({
   type: z.literal('sql_snippet'),
@@ -71,7 +76,7 @@ const sqlSnippetSchema = z.object({
 })
 
 const FormSchema = z.object({
-  name: z.string().trim().min(1),
+  name: z.string().trim().min(1, 'Please provide a name for your cronjob'),
   schedule: z
     .string()
     .trim()
@@ -94,102 +99,45 @@ const FormSchema = z.object({
 })
 
 export type CreateCronJobForm = z.infer<typeof FormSchema>
+export type CronjobType = CreateCronJobForm['values']
 
 const FORM_ID = 'create-cronjob-sidepanel'
 
-export const CreateCronjobSheet = ({ onClose }: CreateCronjobSheetProps) => {
-  const { ref } = useParams()
-  const submitRef = useRef<any>(null)
-  const [isClosingPanel, setIsClosingPanel] = useState(false)
+export const CreateCronjobSheet = ({
+  selectedCronjob,
+  isClosing,
+  setIsClosing,
+  onClose,
+}: CreateCronjobSheetProps) => {
+  const isEditing = !!selectedCronjob
+  const { mutate: upsertCronjob, isLoading } = useDatabaseCronjobCreateMutation()
 
-  const { mutate, isLoading } = useDatabaseCronjobCreateMutation()
+  const cronjobValues = parseCronjobCommand(selectedCronjob?.command || '')
 
   const form = useForm<CreateCronJobForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: '',
-      schedule: '',
-      active: true,
-      values: {
-        type: 'edge_function',
-        method: 'GET',
-        edgeFunctionName: '',
-        timeoutMs: 1000,
-        httpHeaders: [],
-        httpParameters: [],
-      },
+      name: selectedCronjob?.jobname || '',
+      schedule: selectedCronjob?.schedule || '',
+      active: selectedCronjob?.active || true,
+      values: cronjobValues,
     },
   })
 
+  const { project } = useProjectContext()
   const isEdited = form.formState.isDirty
 
-  const { project } = useProjectContext()
-
-  // useEffect(() => {
-  //   if (visible) {
-  //     setIsClosingPanel(false)
-
-  //     // Reset form fields outside of the Form context
-  //     if (selectedHook !== undefined) {
-  //       setEvents(selectedHook.events)
-
-  //       const [url, method, headers, parameters] = selectedHook.function_args
-  //       const formattedHeaders = tryParseJson(headers) || {}
-  //       setHttpHeaders(
-  //         Object.keys(formattedHeaders).map((key) => {
-  //           return { id: uuidv4(), name: key, value: formattedHeaders[key] }
-  //         })
-  //       )
-  //       const formattedParameters = tryParseJson(parameters) || {}
-  //       setHttpParameters(
-  //         Object.keys(formattedParameters).map((key) => {
-  //           return { id: uuidv4(), name: key, value: formattedParameters[key] }
-  //         })
-  //       )
-  //     } else {
-  //       setEvents([])
-  //       setHttpHeaders([{ id: uuidv4(), name: 'Content-type', value: 'application/json' }])
-  //       setHttpParameters([{ id: uuidv4(), name: '', value: '' }])
-  //     }
-  //   }
-  // }, [visible, selectedHook])
-
-  const onClosePanel = () => {
-    if (isEdited) setIsClosingPanel(true)
-    else onClose()
+  // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
+  if (!isEdited && isClosing) {
+    onClose()
   }
 
-  const validate = (values: any) => {
-    const errors: any = {}
-
-    if (!values.name) {
-      errors['name'] = 'Please provide a name for your webhook'
+  const onClosePanel = () => {
+    if (isEdited) {
+      setIsClosing(true)
+    } else {
+      onClose()
     }
-    if (!values.table_id) {
-      errors['table_id'] = 'Please select a table for which your webhook will trigger from'
-    }
-
-    if (values.function_type === 'http_request') {
-      // For HTTP requests
-      if (!values.http_url) {
-        errors['http_url'] = 'Please provide a URL'
-      } else if (!values.http_url.startsWith('http')) {
-        errors['http_url'] = 'Please include HTTP/HTTPs to your URL'
-      } else if (!isValidHttpUrl(values.http_url)) {
-        errors['http_url'] = 'Please provide a valid URL'
-      }
-    } else if (values.function_type === 'supabase_function') {
-      // For Supabase Edge Functions
-      if (values.http_url.includes('undefined')) {
-        errors['http_url'] = 'No edge functions available for selection'
-      }
-    }
-
-    if (values.timeout_ms < 1000 || values.timeout_ms > 5000) {
-      errors['timeout_ms'] = 'Timeout should be between 1000ms and 5000ms'
-    }
-
-    return errors
   }
 
   const onSubmit: SubmitHandler<CreateCronJobForm> = async ({ name, schedule, values }) => {
@@ -218,21 +166,34 @@ export const CreateCronjobSheet = ({ onClose }: CreateCronjobSheetProps) => {
 
     const query = buildCronQuery(name, schedule, command)
 
-    console.log(query)
-    mutate({
-      projectRef: project!.ref,
-      connectionString: project?.connectionString,
-      query,
-    })
+    upsertCronjob(
+      {
+        projectRef: project!.ref,
+        connectionString: project?.connectionString,
+        query,
+      },
+      {
+        onSuccess: () => {
+          if (isEditing) {
+            toast.success(`Successfully updatedzz cronjob ${name}`)
+          } else {
+            toast.success(`Successfully created cronjob ${name}`)
+          }
+          onClose()
+        },
+      }
+    )
   }
 
   const cronType = form.watch('values.type')
 
   return (
     <>
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full" tabIndex={-1}>
         <SheetHeader>
-          <SheetTitle>Create a new cronjob</SheetTitle>
+          <SheetTitle>
+            {isEditing ? `Edit ${selectedCronjob.jobname}` : `Create a new cronjob`}
+          </SheetTitle>
         </SheetHeader>
 
         <div className="overflow-auto flex-grow">
@@ -361,19 +322,16 @@ export const CreateCronjobSheet = ({ onClose }: CreateCronjobSheetProps) => {
             disabled={isLoading}
             loading={isLoading}
           >
-            Create cronjob
+            {isEditing ? `Save cronjob` : 'Create cronjob'}
           </Button>
         </SheetFooter>
       </div>
       <ConfirmationModal
-        visible={isClosingPanel}
+        visible={isClosing}
         title="Discard changes"
         confirmLabel="Discard"
-        onCancel={() => setIsClosingPanel(false)}
-        onConfirm={() => {
-          setIsClosingPanel(false)
-          onClose()
-        }}
+        onCancel={() => setIsClosing(false)}
+        onConfirm={() => onClose()}
       >
         <p className="text-sm text-foreground-light">
           There are unsaved changes. Are you sure you want to close the panel? Your changes will be

@@ -31,7 +31,13 @@ const schedules = [
 ] as const
 
 export const CronjobScheduleSection = ({ form }: CronjobScheduleSectionProps) => {
-  const [presetValue, setPresetValue] = useState<string>(schedules[0].expression)
+  let initialValue = schedules[0].expression as string
+  const scheduleValue = form.getValues('schedule')
+  if (scheduleValue && scheduleValue.length > 0) {
+    initialValue = 'custom'
+  }
+
+  const [presetValue, setPresetValue] = useState<string>(initialValue)
 
   const onChangeSelectValue = (v: string) => {
     setPresetValue(v)
@@ -68,7 +74,7 @@ export const CronjobScheduleSection = ({ form }: CronjobScheduleSectionProps) =>
                     <SelectContent_Shadcn_>
                       {schedules.map((schedule) => {
                         return (
-                          <SelectItem_Shadcn_ value={schedule.expression}>
+                          <SelectItem_Shadcn_ key={schedule.name} value={schedule.expression}>
                             {schedule.name}
                           </SelectItem_Shadcn_>
                         )

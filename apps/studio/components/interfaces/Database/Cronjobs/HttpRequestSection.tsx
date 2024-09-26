@@ -49,9 +49,9 @@ export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
       <FormField_Shadcn_
         control={form.control}
         name="values.endpoint"
-        render={({ field }) => (
+        render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Endpoint URL" className="gap-1">
-            <Input {...field} placeholder="https://api.example.com/endpoint" />
+            <Input {...rest} placeholder="https://api.example.com/endpoint" />
           </FormItemLayout>
         )}
       />
@@ -59,10 +59,10 @@ export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
       <FormField_Shadcn_
         control={form.control}
         name="values.timeoutMs"
-        render={({ field }) => (
+        render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Timeout" className="gap-1">
             <Input
-              {...field}
+              {...rest}
               type="number"
               min={1000}
               max={5000}
