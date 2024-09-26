@@ -38,6 +38,7 @@ test.describe('Table Editor page', () => {
     await page.getByRole('textbox', { name: 'column_name' }).click()
     await page.getByRole('textbox', { name: 'column_name' }).fill('defaultValueColumn')
     // await page.getByRole('button', { name: 'Choose a column type...' }).click()
+    await page.locator('#column-type-button').waitFor({ state: 'visible' })
     await page.locator('#column-type-button').click()
     await page.getByText('Signed two-byte integer').click()
     await page.getByTestId('defaultValueColumn-default-value').click()
