@@ -5,6 +5,14 @@ import { ComponentPropsWithoutRef, ReactNode, forwardRef, useEffect, useRef, use
 import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
+import {
+  HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
+  HoverCard_Shadcn_,
+  ScrollArea,
+  HoverCardContent,
+  SimpleCodeBlock,
+} from 'ui'
 
 const TreeView = TreeViewPrimitive
 
@@ -33,6 +41,8 @@ const TreeViewItem = forwardRef<
     onEditSubmit?: (value: string) => void
     /** For asynchronous loading */
     isLoading?: boolean
+    /** For hovercard content */
+    content?: ReactNode
   }
 >(
   (
@@ -48,6 +58,7 @@ const TreeViewItem = forwardRef<
       icon,
       isEditing = false,
       onEditSubmit,
+      content,
       ...props
     },
     ref
@@ -87,119 +98,152 @@ const TreeViewItem = forwardRef<
     }
 
     return (
-      <div
-        ref={ref}
-        aria-selected={isSelected}
-        aria-expanded={!isEditing && isExpanded}
-        {...props}
-        className={cn(
-          'group relative',
-          'transition-colors',
-          'h-[28px]',
-          'flex items-center gap-3',
-          'text-sm',
-          'cursor-pointer select-none',
-          'text-foreground-light',
-          'hover:bg-control',
-          'aria-expanded:bg-control',
-          isSelected ? 'text-foreground' : '', // [Joshen Temp]: aria-selected:text-foreground not working as aria-selected property not rendered in DOM,
-          isSelected ? '!bg-selection' : '', // [Joshen Temp]: aria-selected:!bg-selection not working as aria-selected property not rendered in DOM
-          'data-[state=open]:bg-control' // bg state for context menu open
-        )}
-        style={{
-          paddingLeft:
-            level === 1 && !isBranch
-              ? xPadding
-              : level
-                ? levelPadding * (level - 1) + xPadding + (!isBranch ? 0 : 0)
-                : levelPadding,
-          ...props.style,
-        }}
-        data-treeview-is-branch={isBranch}
-        data-treeview-level={level}
-      >
-        {level && level > 1 && (
+      <HoverCard_Shadcn_ openDelay={200}>
+        <HoverCardTrigger_Shadcn_ asChild>
           <div
-            style={{
-              left: (levelPadding / 2 + 4) * (level - 1) + xPadding,
-            }}
-            className={
-              'absolute h-full w-px group-data-[treeview-is-branch=false]:bg-border-strong'
-            }
-          ></div>
-        )}
-        {/* [Joshen] Temp fix as the white border on the left was not showing up via group-aria-selected */}
-        {isSelected && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
-        {/* <div className="absolute left-0 h-full w-0.5 group-aria-selected:bg-foreground" /> */}
-        {isBranch ? (
-          <>
-            {isLoading ? (
-              <Loader2 className={cn('text-foreground-muted animate-spin')} size={14} />
-            ) : (
-              <ChevronRight
-                className={cn(
-                  'text-foreground-muted',
-                  'group-aria-selected:text-foreground-light',
-                  'group-aria-expanded:text-foreground-light',
-                  'transition-transform duration-200',
-                  'group-aria-expanded:rotate-90'
-                )}
-                size={14}
-              />
+            ref={ref}
+            aria-selected={isSelected}
+            aria-expanded={!isEditing && isExpanded}
+            {...props}
+            className={cn(
+              'bg-red-200',
+              'group relative',
+              'transition-colors',
+              'h-[28px]',
+              'flex items-center gap-3',
+              'text-sm',
+              'cursor-pointer select-none',
+              'text-foreground-light',
+              'hover:bg-control',
+              'aria-expanded:bg-control',
+              isSelected ? 'text-foreground' : '', // [Joshen Temp]: aria-selected:text-foreground not working as aria-selected property not rendered in DOM,
+              isSelected ? '!bg-selection' : '', // [Joshen Temp]: aria-selected:!bg-selection not working as aria-selected property not rendered in DOM
+              'data-[state=open]:bg-control' // bg state for context menu open
             )}
-            <TreeViewFolderIcon
-              className={cn(
-                'transition-colors',
-                ' text-foreground-muted',
-                'group-aria-selected:text-foreground-light',
-                'group-aria-expanded:text-foreground-light'
-              )}
-              isOpen={isExpanded}
-              size={16}
-              strokeWidth={1.5}
-            />
-          </>
-        ) : (
-          icon || (
-            <SQL_ICON
-              className={cn(
-                'transition-colors',
-                'fill-foreground-muted',
-                'group-aria-selected:fill-foreground',
-                'w-5 h-5 shrink-0',
-                '-ml-0.5'
-              )}
-              size={16}
-              strokeWidth={1.5}
-            />
-          )
-        )}
-        <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
-          {name}
-        </span>
-        <form autoFocus onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
-          <Input
-            ref={inputRef}
-            onChange={(e) => {
-              setLocalValueState(e.target.value)
+            style={{
+              paddingLeft:
+                level === 1 && !isBranch
+                  ? xPadding
+                  : level
+                    ? levelPadding * (level - 1) + xPadding + (!isBranch ? 0 : 0)
+                    : levelPadding,
+              ...props.style,
             }}
-            onKeyDownCapture={(e) => {
-              // stop keyboard down bubbling up to TreeView.root
-              // on enter key, send onEditSubmit callback
-              if (e.key === 'Enter') {
-                onEditSubmit?.(localValueState)
-              } else if (e.key === 'Escape') {
-                setLocalValueState(name)
-                onEditSubmit?.(name)
-              } else {
-                e.stopPropagation()
-              }
-            }}
-            className="block w-full text-sm px-2 py-1 h-7 w"
-            value={localValueState}
-          />
-        </form>
-      </div>
+            data-treeview-is-branch={isBranch}
+            data-treeview-level={level}
+          >
+            {level && level > 1 && (
+              <div
+                style={{
+                  left: (levelPadding / 2 + 4) * (level - 1) + xPadding,
+                }}
+                className={
+                  'absolute h-full w-px group-data-[treeview-is-branch=false]:bg-border-strong'
+                }
+              ></div>
+            )}
+            {/* [Joshen] Temp fix as the white border on the left was not showing up via group-aria-selected */}
+            {isSelected && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
+            {/* <div className="absolute left-0 h-full w-0.5 group-aria-selected:bg-foreground" /> */}
+            {isBranch ? (
+              <>
+                {isLoading ? (
+                  <Loader2 className={cn('text-foreground-muted animate-spin')} size={14} />
+                ) : (
+                  <ChevronRight
+                    className={cn(
+                      'text-foreground-muted',
+                      'group-aria-selected:text-foreground-light',
+                      'group-aria-expanded:text-foreground-light',
+                      'transition-transform duration-200',
+                      'group-aria-expanded:rotate-90'
+                    )}
+                    size={14}
+                  />
+                )}
+                <TreeViewFolderIcon
+                  className={cn(
+                    'transition-colors',
+                    ' text-foreground-muted',
+                    'group-aria-selected:text-foreground-light',
+                    'group-aria-expanded:text-foreground-light'
+                  )}
+                  isOpen={isExpanded}
+                  size={16}
+                  strokeWidth={1.5}
+                />
+              </>
+            ) : (
+              icon || (
+                <SQL_ICON
+                  className={cn(
+                    'transition-colors',
+                    'fill-foreground-muted',
+                    'group-aria-selected:fill-foreground',
+                    'w-5 h-5 shrink-0',
+                    '-ml-0.5'
+                  )}
+                  size={16}
+                  strokeWidth={1.5}
+                />
+              )
+            )}
+            <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
+              {name}
+            </span>
+            <form autoFocus onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
+              <Input
+                ref={inputRef}
+                onChange={(e) => {
+                  setLocalValueState(e.target.value)
+                }}
+                onKeyDownCapture={(e) => {
+                  // stop keyboard down bubbling up to TreeView.root
+                  // on enter key, send onEditSubmit callback
+                  if (e.key === 'Enter') {
+                    onEditSubmit?.(localValueState)
+                  } else if (e.key === 'Escape') {
+                    setLocalValueState(name)
+                    onEditSubmit?.(name)
+                  } else {
+                    e.stopPropagation()
+                  }
+                }}
+                className="block w-full text-sm px-2 py-1 h-7 w"
+                value={localValueState}
+              />
+            </form>
+          </div>
+        </HoverCardTrigger_Shadcn_>
+
+        <HoverCardContent_Shadcn_ className="p-0">
+          <HoverCardContent
+            hideWhenDetached
+            side="left"
+            align="center"
+            className="w-[500px] flex"
+            animate="slide-in"
+          >
+            <ScrollArea className="h-[240px]">
+              <SimpleCodeBlock
+                showCopy={false}
+                className="sql"
+                parentClassName="!p-0 [&>div>span]:text-xs"
+              >
+                {content}
+              </SimpleCodeBlock>
+            </ScrollArea>
+            {/* <CopyButton
+              iconOnly
+              type="default"
+              className="px-1 absolute top-1.5 right-1.5"
+              text={content}
+            /> */}
+          </HoverCardContent>
+          {/* <ScrollArea className="h-[240px]">
+            {content}</ScrollArea> */}
+        </HoverCardContent_Shadcn_>
+      </HoverCard_Shadcn_>
     )
   }
 )

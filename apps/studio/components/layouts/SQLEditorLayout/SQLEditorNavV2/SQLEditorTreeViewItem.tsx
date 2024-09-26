@@ -19,6 +19,8 @@ import {
   ContextMenu_Shadcn_,
   TreeViewItem,
 } from 'ui'
+import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { SqlSnippet } from '../../../../data/content/sql-snippets-query'
 
 interface SQLEditorTreeViewItemProps {
   element: any
@@ -70,6 +72,12 @@ export const SQLEditorTreeViewItem = ({
 
   const [isFetching, setIsFetching] = useState(false)
 
+  const snippets = useSqlSnippetsQuery(ref)
+
+  // prettier-ignore
+  // @ts-ignore -- someone please why is .sql not right here?
+  const snippetContent = snippets.data?.snippets?.find((snippet: SqlSnippet) => snippet.id === element.id)?.content?.sql ?? ''
+
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
 
@@ -106,6 +114,7 @@ export const SQLEditorTreeViewItem = ({
             level={level}
             xPadding={16}
             name={element.name}
+            content={snippetContent}
             className={className}
             isExpanded={isExpanded}
             isBranch={isBranch}
