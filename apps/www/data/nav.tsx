@@ -33,5 +33,9 @@ export const getMenu = (latestBlogPosts: BlogPost[]) => ({
       title: 'Blog',
       url: '/blog',
     },
+    {
+      title: 'Enterprise',
+      url: '/enterprise',
+    },
   ],
 })
