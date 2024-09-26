@@ -35,7 +35,6 @@ import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
-import { TooltipProvider } from '@ui/components/shadcn/ui/tooltip'
 
 interface Props {
   data?: Array<LogData | Object>
