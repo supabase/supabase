@@ -183,7 +183,7 @@ const ColumnType = ({
   }
 
   return (
-    <div className="space-y-2">
+    <div>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
