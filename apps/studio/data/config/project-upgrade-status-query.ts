@@ -4,9 +4,9 @@ import {
   DatabaseUpgradeStatus,
   DatabaseUpgradeProgress,
 } from '@supabase/shared-types/out/events'
-import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL, PROJECT_STATUS } from 'lib/constants'
+import { PROJECT_STATUS } from 'lib/constants'
 import { configKeys } from './keys'
+import { get, handleError } from 'data/fetchers'
 
 export type ProjectUpgradingStatusVariables = {
   projectRef?: string
@@ -29,10 +29,13 @@ export async function getProjectUpgradingStatus(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await get(`${API_ADMIN_URL}/projects/${projectRef}/upgrade/status`, { signal })
-  if (response.error) throw response.error
+  const { data, error } = await get(`/v1/projects/{ref}/upgrade/status`, {
+    params: { path: { ref: projectRef } },
+    signal,
+  })
+  if (error) handleError(error)
 
-  return response as ProjectUpgradingStatusResponse
+  return data as ProjectUpgradingStatusResponse
 }
 
 export type ProjectUpgradingStatusData = Awaited<ReturnType<typeof getProjectUpgradingStatus>>
