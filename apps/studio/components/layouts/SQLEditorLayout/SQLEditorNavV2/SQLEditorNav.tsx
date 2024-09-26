@@ -1,4 +1,12 @@
-import { ChevronRight, Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
+import {
+  ArrowDownAz,
+  ChevronRight,
+  ClockArrowDown,
+  Eye,
+  EyeOffIcon,
+  Heart,
+  Unlock,
+} from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -35,11 +43,21 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  Button,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   Separator,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   TreeView,
+  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -339,6 +357,52 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
 
   return (
     <>
+      <div className="relative mt-4">
+        <DropdownMenu modal={false}>
+          <Tooltip_Shadcn_ delayDuration={0}>
+            <DropdownMenuTrigger
+              asChild
+              className={cn(
+                'absolute right-1 -top-4',
+                'text-foreground-muted transition-colors hover:text-foreground data-[state=open]:text-foreground'
+              )}
+            >
+              <TooltipTrigger_Shadcn_ asChild>
+                <Button
+                  type="text"
+                  className="text-light"
+                  iconRight={
+                    snapV2.order === 'name' ? (
+                      <ArrowDownAz size={18} strokeWidth={1.5} />
+                    ) : (
+                      <ClockArrowDown size={18} strokeWidth={1.5} />
+                    )
+                  }
+                >
+                  Sort
+                </Button>
+              </TooltipTrigger_Shadcn_>
+            </DropdownMenuTrigger>
+            <TooltipContent_Shadcn_ side="bottom">Sort By</TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
+          <DropdownMenuContent side="bottom" align="end" className={cn('w-48')}>
+            <DropdownMenuRadioGroup
+              value={snapV2.order}
+              onValueChange={(value: any) => snapV2.setOrder(value)}
+            >
+              <DropdownMenuRadioItem value="name" defaultChecked={snapV2.order === 'name'}>
+                Alphabetical
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem
+                value="inserted_at"
+                defaultChecked={snapV2.order === 'inserted_at'}
+              >
+                Created at
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <Separator />
 
       {((numFavoriteSnippets === 0 && searchText.length === 0) || numFavoriteSnippets > 0) && (

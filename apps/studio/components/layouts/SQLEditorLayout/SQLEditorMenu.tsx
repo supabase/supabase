@@ -29,8 +29,6 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   InnerSideBarFilterSearchInput,
-  InnerSideBarFilterSortDropdown,
-  InnerSideBarFilterSortDropdownItem,
   InnerSideBarFilters,
   InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
@@ -147,19 +145,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
                     aria-labelledby="Search queries"
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
-                  >
-                    <InnerSideBarFilterSortDropdown
-                      value={snapV2.order}
-                      onValueChange={(value: any) => snapV2.setOrder(value)}
-                    >
-                      <InnerSideBarFilterSortDropdownItem key="name" value="name">
-                        Alphabetical
-                      </InnerSideBarFilterSortDropdownItem>
-                      <InnerSideBarFilterSortDropdownItem key="inserted_at" value="inserted_at">
-                        Created At
-                      </InnerSideBarFilterSortDropdownItem>
-                    </InnerSideBarFilterSortDropdown>
-                  </InnerSideBarFilterSearchInput>
+                  ></InnerSideBarFilterSearchInput>
                 </InnerSideBarFilters>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
