@@ -21,7 +21,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
         Add dependency to your build file using the BOM.
 
         The available modules are:
-        - [**auth-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Auth)
+        - [**gotrue-kt**](https://github.com/supabase-community/supabase-kt/tree/master/GoTrue)
         - [**realtime-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Realtime)
         - [**storage-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Storage)
         - [**functions-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Functions)
@@ -41,7 +41,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
                 ```kotlin
                 implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
                 implementation("io.github.jan-tennert.supabase:postgrest-kt")
-                implementation("io.github.jan-tennert.supabase:auth-kt")
+                implementation("io.github.jan-tennert.supabase:gotrue-kt")
                 implementation("io.github.jan-tennert.supabase:realtime-kt")
                 ```
 
@@ -51,7 +51,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
                 ```groovy
                 implementation platform("io.github.jan-tennert.supabase:bom:VERSION")
                 implementation 'io.github.jan-tennert.supabase:postgrest-kt'
-                implementation 'io.github.jan-tennert.supabase:auth-kt'
+                implementation 'io.github.jan-tennert.supabase:gotrue-kt'
                 implementation 'io.github.jan-tennert.supabase:realtime-kt'
                 ```
 
@@ -72,7 +72,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
                 </dependency>
                 <dependency>
                     <groupId>io.github.jan-tennert.supabase</groupId>
-                    <artifactId>auth-kt</artifactId>
+                    <artifactId>gotrue-kt</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>io.github.jan-tennert.supabase</groupId>
@@ -93,7 +93,6 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
 
         You can find a list of engines [here](https://ktor.io/docs/http-client-engines.html)
         Note that not all Ktor engines support Websockets. So if you plan to use the Realtime module, make sure to use an engine that supports Websockets. Checkout the [engine limitations](https://ktor.io/docs/client-engines.html#limitations) for more information.
-        If using `supabase-kt` 3.0.0 and above, you need to use Ktor version 3.0.0-rc-1 and above.
 
     </RefSubLayout.Details>
     <RefSubLayout.Examples>
