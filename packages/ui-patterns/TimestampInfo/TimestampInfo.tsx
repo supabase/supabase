@@ -1,3 +1,4 @@
+'use client'
 import { useEffect, useRef, useState } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui/src/components/shadcn/ui/tooltip'
 import { cn } from 'ui/src/lib/utils'
