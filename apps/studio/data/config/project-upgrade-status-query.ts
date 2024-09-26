@@ -1,26 +1,12 @@
+import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import {
-  DatabaseUpgradeError,
-  DatabaseUpgradeStatus,
-  DatabaseUpgradeProgress,
-} from '@supabase/shared-types/out/events'
+import { get, handleError } from 'data/fetchers'
 import { PROJECT_STATUS } from 'lib/constants'
 import { configKeys } from './keys'
-import { get, handleError } from 'data/fetchers'
 
 export type ProjectUpgradingStatusVariables = {
   projectRef?: string
   projectStatus?: string
-}
-
-export type ProjectUpgradingStatusResponse = {
-  databaseUpgradeStatus: {
-    error?: DatabaseUpgradeError
-    progress?: DatabaseUpgradeProgress
-    status: DatabaseUpgradeStatus
-    initiated_at: string
-    target_version: number
-  } | null
 }
 
 export async function getProjectUpgradingStatus(
@@ -35,7 +21,7 @@ export async function getProjectUpgradingStatus(
   })
   if (error) handleError(error)
 
-  return data as ProjectUpgradingStatusResponse
+  return data
 }
 
 export type ProjectUpgradingStatusData = Awaited<ReturnType<typeof getProjectUpgradingStatus>>
@@ -56,7 +42,7 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       refetchInterval(data) {
-        const response = data as unknown as ProjectUpgradingStatusResponse
+        const response = data as unknown as ProjectUpgradingStatusData
         if (!response) return false
 
         const interval =
@@ -71,7 +57,7 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
         return interval
       },
       onSuccess(data) {
-        const response = data as unknown as ProjectUpgradingStatusResponse
+        const response = data as unknown as ProjectUpgradingStatusData
         if (response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgraded) {
           client.invalidateQueries(configKeys.upgradeEligibility(projectRef))
         }

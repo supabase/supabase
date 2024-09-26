@@ -1,15 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { sslEnforcementKeys } from './keys'
 import { get, handleError } from 'data/fetchers'
+import { sslEnforcementKeys } from './keys'
 
 export type SSLEnforcementVariables = { projectRef?: string }
-
-export type SSLEnforcementResponse = {
-  appliedSuccessfully: boolean
-  currentConfig: { database: boolean }
-  error?: any
-  isNotAllowed?: boolean
-}
 
 export async function getSSLEnforcementConfiguration(
   { projectRef }: SSLEnforcementVariables,
@@ -34,13 +27,13 @@ export async function getSSLEnforcementConfiguration(
         appliedSuccessfully: false,
         currentConfig: { database: false },
         isNotAllowed: true,
-      } as SSLEnforcementResponse
+      } as const
     } else {
       handleError(error)
     }
   }
 
-  return data as SSLEnforcementResponse
+  return data
 }
 
 export type SSLEnforcementData = Awaited<ReturnType<typeof getSSLEnforcementConfiguration>>
