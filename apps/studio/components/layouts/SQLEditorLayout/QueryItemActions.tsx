@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { Copy, Download, Edit, MoreHorizontal, Share, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,
@@ -14,7 +14,8 @@ import {
 
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useSelectedProject } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -45,7 +46,8 @@ export const QueryItemActions = ({
   const snap = useSqlEditorStateSnapshot()
   const project = useSelectedProject()
 
-  const { id, name, visibility, content } = tabInfo || {}
+  const { id, name, visibility, content, type } = tabInfo || {}
+  const isSQLSnippet = type === 'sql'
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -76,6 +78,7 @@ export const QueryItemActions = ({
   }
 
   const createPersonalCopy = async () => {
+    if (!isSQLSnippet) return console.error('Snippet is not SQL')
     if (!ref) return console.error('Project ref is required')
     if (!id) return console.error('Snippet ID is required')
     try {
@@ -106,7 +109,7 @@ export const QueryItemActions = ({
             <Button
               type="text"
               className="px-1 text-lighter data-[state=open]:text-foreground"
-              icon={<MoreHorizontal size={14} strokeWidth={2} />}
+              icon={<MoreHorizontal strokeWidth={2} />}
               onClick={(e) => e.preventDefault()}
             />
           </DropdownMenuTrigger>

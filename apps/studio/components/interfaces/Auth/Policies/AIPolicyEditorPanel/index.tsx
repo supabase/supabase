@@ -2,14 +2,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
-import { useParams, useTelemetryProps } from 'common'
+import { IS_PLATFORM, useParams, useTelemetryProps } from 'common'
 import { isEqual, uniqBy } from 'lodash'
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -28,20 +28,26 @@ import {
 import * as z from 'zod'
 
 import { Monaco } from '@monaco-editor/react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import {
   IStandaloneCodeEditor,
   IStandaloneDiffEditor,
 } from 'components/interfaces/SQLEditor/SQLEditor.types'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -73,6 +79,7 @@ interface AIPolicyEditorPanelProps {
   selectedTable?: string
   selectedPolicy?: PostgresPolicy
   onSelectCancel: () => void
+  authContext: 'database' | 'realtime'
 }
 
 /**
@@ -85,6 +92,7 @@ export const AIPolicyEditorPanel = memo(function ({
   selectedTable,
   selectedPolicy,
   onSelectCancel,
+  authContext,
 }: AIPolicyEditorPanelProps) {
   const router = useRouter()
   const { ref } = useParams()
@@ -94,12 +102,13 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const telemetryProps = useTelemetryProps()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
+  const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
   const [using, setUsing] = useState('')
   const [check, setCheck] = useState('')
   const [fieldError, setFieldError] = useState<string>()
-  const [showCheckBlock, setShowCheckBlock] = useState(false)
+  const [showCheckBlock, setShowCheckBlock] = useState(true)
 
   const monacoOneRef = useRef<Monaco | null>(null)
   const editorOneRef = useRef<IStandaloneCodeEditor | null>(null)
@@ -117,7 +126,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const placeholder = generatePlaceholder(selectedPolicy)
-  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const isOptedInToAI = useOrgOptedIntoAi()
 
   const [error, setError] = useState<QueryResponseError>()
   const [errorPanelOpen, setErrorPanelOpen] = useState<boolean>(true)
@@ -126,7 +135,6 @@ export const AIPolicyEditorPanel = memo(function ({
   // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
   const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
   const [assistantVisible, setAssistantPanel] = useState<boolean>(false)
-  const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState<boolean>(true)
   const [incomingChange, setIncomingChange] = useState<string>()
   // Used for confirmation when closing the panel with unsaved changes
   const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState<boolean>(false)
@@ -157,8 +165,10 @@ export const AIPolicyEditorPanel = memo(function ({
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
+  const [selectedSchemas] = useSchemasForAi(selectedProject?.ref!)
   const { data: entities } = useEntityDefinitionsQuery(
     {
+      schemas: selectedSchemas,
       projectRef: selectedProject?.ref,
       connectionString: selectedProject?.connectionString,
     },
@@ -178,7 +188,7 @@ export const AIPolicyEditorPanel = memo(function ({
     id: chatId,
     api: `${BASE_PATH}/api/ai/sql/suggest`,
     body: {
-      entityDefinitions: isOptedInToAI ? entityDefinitions : undefined,
+      entityDefinitions: isOptedInToAI || !IS_PLATFORM ? entityDefinitions : undefined,
       policyDefinition:
         selectedPolicy !== undefined ? generatePolicyDefinition(selectedPolicy) : undefined,
     },
@@ -195,9 +205,9 @@ export const AIPolicyEditorPanel = memo(function ({
   }, [chatMessages, debugThread])
 
   const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       // refresh all policies
-      queryClient.invalidateQueries(databasePoliciesKeys.list(ref))
+      await queryClient.invalidateQueries(databasePoliciesKeys.list(ref))
       toast.success('Successfully created new policy')
       onSelectCancel()
     },
@@ -250,12 +260,7 @@ export const AIPolicyEditorPanel = memo(function ({
           })
         : false
 
-    if (
-      policyCreateUnsaved ||
-      policyUpdateUnsaved ||
-      messages.length > 0 ||
-      !isAssistantChatInputEmpty
-    ) {
+    if (policyCreateUnsaved || policyUpdateUnsaved || messages.length > 0) {
       setIsClosingPolicyEditorPanel(true)
     } else {
       onSelectCancel()
@@ -402,7 +407,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
       form.reset(defaultValues)
     } else {
-      setAssistantPanel(true)
+      if (canUpdatePolicies) setAssistantPanel(true)
       if (selectedPolicy !== undefined) {
         const { name, action, table, command, roles } = selectedPolicy
         form.reset({
@@ -544,8 +549,13 @@ export const AIPolicyEditorPanel = memo(function ({
                         form={form}
                         onUpdateCommand={(command: string) => {
                           setFieldError(undefined)
-                          if (!['update', 'all'].includes(command)) setShowCheckBlock(false)
+                          if (!['update', 'all'].includes(command)) {
+                            setShowCheckBlock(false)
+                          } else {
+                            setShowCheckBlock(true)
+                          }
                         }}
+                        authContext={authContext}
                       />
                       <div className="h-full">
                         <LockedCreateQuerySection
@@ -565,6 +575,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         >
                           <RLSCodeEditor
                             disableTabToUsePlaceholder
+                            readOnly={!canUpdatePolicies}
                             id="rls-exp-one-editor"
                             placeholder={
                               command === 'insert'
@@ -620,7 +631,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         {showCheckBlock && (
                           <>
                             <div
-                              className={`mt-1 relative ${incomingChange ? 'hidden' : 'block'}`}
+                              className={`mt-1 min-h-[28px] relative ${incomingChange ? 'hidden' : 'block'}`}
                               style={{
                                 height:
                                   expTwoContentHeight <= 100
@@ -630,6 +641,7 @@ export const AIPolicyEditorPanel = memo(function ({
                             >
                               <RLSCodeEditor
                                 disableTabToUsePlaceholder
+                                readOnly={!canUpdatePolicies}
                                 id="rls-exp-two-editor"
                                 placeholder="-- Provide a SQL expression for the with check statement"
                                 defaultValue={check}
@@ -728,11 +740,17 @@ export const AIPolicyEditorPanel = memo(function ({
                       >
                         Cancel
                       </Button>
-                      <Button
+
+                      <ButtonTooltip
                         form={formId}
                         htmlType="submit"
                         loading={isExecuting || isUpdating}
-                        disabled={isExecuting || isUpdating || incomingChange !== undefined}
+                        disabled={
+                          !canUpdatePolicies ||
+                          isExecuting ||
+                          isUpdating ||
+                          incomingChange !== undefined
+                        }
                         onClick={() => {
                           if (isAiAssistantEnabled) {
                             const sql = editorOneRef.current?.getValue().trim()
@@ -747,9 +765,15 @@ export const AIPolicyEditorPanel = memo(function ({
                             })
                           }
                         }}
+                        tooltip={{
+                          content: {
+                            side: 'top',
+                            text: 'You need additional permissions to update policies',
+                          },
+                        }}
                       >
                         Save policy
-                      </Button>
+                      </ButtonTooltip>
                     </SheetFooter>
                   </div>
                 </div>
@@ -845,7 +869,6 @@ export const AIPolicyEditorPanel = memo(function ({
                           })
                         }
                         onDiff={updateEditorWithCheckForDiff}
-                        onChange={setIsAssistantChatInputEmpty}
                         loading={isLoading || isDebugSqlLoading}
                       />
                     </TabsContent_Shadcn_>

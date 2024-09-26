@@ -1,11 +1,11 @@
 import type { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
 import Image from 'next/legacy/image'
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
 import {
@@ -15,7 +15,7 @@ import {
 import { getTable } from 'data/tables/table-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { isValidHttpUrl, tryParseJson, uuidv4 } from 'lib/helpers'
-import { Button, Checkbox, Form, Input, Listbox, Modal, Radio, SidePanel } from 'ui'
+import { Button, Checkbox, Form, Input, Listbox, Radio, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import HTTPRequestFields from './HTTPRequestFields'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'

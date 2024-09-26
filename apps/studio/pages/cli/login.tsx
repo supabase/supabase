@@ -1,15 +1,15 @@
-import { NextPage } from 'next'
-import toast from 'react-hot-toast'
-import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
-import { createCliLoginSession } from 'data/cli/login'
 import { useIsLoggedIn, useParams } from 'common'
-import { useRouter } from 'next/router'
-import { withAuth } from 'hooks'
+import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
 import { Loading } from 'components/ui/Loading'
-import { useEffect, useState } from 'react'
+import { createCliLoginSession } from 'data/cli/login'
+import { withAuth } from 'hooks/misc/withAuth'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { NextPageWithLayout } from 'types'
 
-const CliLoginPage: NextPage = () => {
+const CliLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { session_id, public_key, token_name, success } = useParams()
   const [isSuccessfulLogin, setSuccessfulLogin] = useState(false)

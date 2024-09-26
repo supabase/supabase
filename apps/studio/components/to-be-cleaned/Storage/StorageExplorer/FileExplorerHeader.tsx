@@ -2,6 +2,26 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { compact, debounce, isEqual, noop } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import APIDocsButton from 'components/ui/APIDocsButton'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Columns,
+  Edit2,
+  FolderPlus,
+  List,
+  Loader,
+  RefreshCw,
+  Search,
+  Upload,
+  X,
+} from 'lucide-react'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
   DropdownMenu,
@@ -12,26 +32,8 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-  IconCheck,
-  IconChevronLeft,
-  IconChevronRight,
-  IconColumns,
-  IconEdit2,
-  IconFolderPlus,
-  IconList,
-  IconLoader,
-  IconRefreshCw,
-  IconSearch,
-  IconUpload,
-  IconX,
   Input,
 } from 'ui'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import APIDocsButton from 'components/ui/APIDocsButton'
-import { useCheckPermissions } from 'hooks'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 
 const VIEW_OPTIONS = [
@@ -59,7 +61,7 @@ const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: a
     >
       {loading.isLoading ? (
         <div className="ml-2 flex items-center">
-          <IconLoader size={16} strokeWidth={2} className="animate-spin" />
+          <Loader size={16} strokeWidth={2} className="animate-spin" />
           <p className="ml-3 text-sm">{loading.message}</p>
         </div>
       ) : (
@@ -67,7 +69,7 @@ const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: a
           <p className="ml-3 text-sm truncate">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
           {!isSearching && (
             <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
-              <Button type="text" icon={<IconEdit2 />}>
+              <Button type="text" icon={<Edit2 />}>
                 Navigate
               </Button>
             </div>
@@ -111,14 +113,14 @@ const HeaderBreadcrumbs = ({
 
   return loading.isLoading ? (
     <div className="ml-2 flex items-center">
-      <IconLoader size={16} strokeWidth={2} className="animate-spin" />
+      <Loader size={16} strokeWidth={2} className="animate-spin" />
       <p className="ml-3 text-sm">{loading.message}</p>
     </div>
   ) : (
     <div className={`ml-3 flex items-center ${isSearching && 'max-w-[140px] overflow-x-auto'}`}>
       {formattedBreadcrumbs.map((crumb, idx: number) => (
         <div className="flex items-center" key={crumb.name}>
-          {idx !== 0 && <IconChevronRight size={10} strokeWidth={2} className="mx-3" />}
+          {idx !== 0 && <ChevronRight size={10} strokeWidth={2} className="mx-3" />}
           <p
             key={crumb.name}
             className={`truncate text-sm ${crumb.name !== ellipsis ? 'cursor-pointer' : ''}`}
@@ -290,7 +292,7 @@ const FileExplorerHeader = ({
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
         {breadcrumbs.length > 0 && (
           <Button
-            icon={<IconChevronLeft size={16} strokeWidth={2} />}
+            icon={<ChevronLeft size={16} strokeWidth={2} />}
             size="tiny"
             type="text"
             className={`${breadcrumbs.length > 1 ? 'opacity-100' : 'opacity-25'} px-1`}
@@ -353,7 +355,7 @@ const FileExplorerHeader = ({
         <div className="flex items-center space-x-1 px-2">
           <Button
             size="tiny"
-            icon={<IconRefreshCw />}
+            icon={<RefreshCw />}
             type="text"
             loading={isRefreshing}
             onClick={refreshData}
@@ -367,9 +369,9 @@ const FileExplorerHeader = ({
                 type="text"
                 icon={
                   view === 'LIST' ? (
-                    <IconList size={16} strokeWidth={2} />
+                    <List size={16} strokeWidth={2} />
                   ) : (
-                    <IconColumns size={16} strokeWidth={2} />
+                    <Columns size={16} strokeWidth={2} />
                   )
                 }
               >
@@ -381,7 +383,7 @@ const FileExplorerHeader = ({
                 <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
                   <div className="flex items-center justify-between w-full">
                     <p>{option.name}</p>
-                    {view === option.key && <IconCheck className="text-brand" strokeWidth={2} />}
+                    {view === option.key && <Check className="text-brand" strokeWidth={2} />}
                   </div>
                 </DropdownMenuItem>
               ))}
@@ -393,9 +395,7 @@ const FileExplorerHeader = ({
                     <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
-                        {sortBy === option.key && (
-                          <IconCheck className="text-brand" strokeWidth={2} />
-                        )}
+                        {sortBy === option.key && <Check className="text-brand" strokeWidth={2} />}
                       </div>
                     </DropdownMenuItem>
                   ))}
@@ -409,7 +409,7 @@ const FileExplorerHeader = ({
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
                         {sortByOrder === option.key && (
-                          <IconCheck className="text-brand" strokeWidth={2} />
+                          <Check className="text-brand" strokeWidth={2} />
                         )}
                       </div>
                     </DropdownMenuItem>
@@ -429,7 +429,7 @@ const FileExplorerHeader = ({
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger className="w-full">
               <Button
-                icon={<IconUpload size={16} strokeWidth={2} />}
+                icon={<Upload size={16} strokeWidth={2} />}
                 type="text"
                 disabled={!canUpdateStorage || breadcrumbs.length === 0}
                 onClick={onSelectUpload}
@@ -458,7 +458,7 @@ const FileExplorerHeader = ({
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger className="w-full">
               <Button
-                icon={<IconFolderPlus size={16} strokeWidth={2} />}
+                icon={<FolderPlus size={16} strokeWidth={2} />}
                 type="text"
                 disabled={!canUpdateStorage || breadcrumbs.length === 0}
                 onClick={() => addNewFolderPlaceholder(-1)}
@@ -493,12 +493,12 @@ const FileExplorerHeader = ({
               size="tiny"
               autoFocus
               className="w-52"
-              icon={<IconSearch size={'tiny'} strokeWidth={2} />}
+              icon={<Search size={14} strokeWidth={2} />}
               actions={[
-                <IconX
+                <X
                   key="close"
                   className="mx-2 cursor-pointer text-foreground"
-                  size="tiny"
+                  size={14}
                   strokeWidth={2}
                   onClick={onCancelSearch}
                 />,
@@ -510,7 +510,7 @@ const FileExplorerHeader = ({
             />
           ) : (
             <Button
-              icon={<IconSearch size={16} strokeWidth={2} />}
+              icon={<Search size={16} strokeWidth={2} />}
               size="tiny"
               type="text"
               className="px-1"

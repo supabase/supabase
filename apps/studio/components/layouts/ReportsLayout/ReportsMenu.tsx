@@ -1,36 +1,35 @@
-import { ChevronDown, Edit2, Plus, Trash } from 'lucide-react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/Reports.UpdateModal'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
-import { useIsFeatureEnabled } from 'hooks'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Menu,
-  cn,
-} from 'ui'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useProfile } from 'lib/profile'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Menu, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ReportMenuItem } from './ReportMenuItem'
 
 const ReportsMenu = () => {
   const router = useRouter()
+  const { profile } = useProfile()
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4]) as string
   const storageEnabled = useIsFeatureEnabled('project_storage:all')
+
+  const canCreateCustomReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'report', owner_id: profile?.id },
+    subject: { id: profile?.id },
+  })
 
   const { data: content, isLoading } = useContentQuery(ref)
   const { mutate: deleteReport, isLoading: isDeleting } = useContentDeleteMutation({
@@ -124,17 +123,25 @@ const ReportsMenu = () => {
         </div>
       ) : (
         <div className="flex flex-col px-2 gap-y-6">
-          <div className="flex px-2">
-            <Button
+          <div className="px-2">
+            <ButtonTooltip
+              block
               type="default"
+              icon={<Plus />}
+              disabled={!canCreateCustomReport}
               className="justify-start flex-grow"
               onClick={() => {
                 setShowNewReportModal(true)
               }}
-              icon={<Plus size={12} />}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to create custom reports',
+                },
+              }}
             >
               New custom report
-            </Button>
+            </ButtonTooltip>
           </div>
 
           {reportMenuItems.length > 0 ? (
@@ -142,50 +149,19 @@ const ReportsMenu = () => {
               <Menu.Group
                 title={<span className="uppercase font-mono">Your custom reports</span>}
               />
-              {reportMenuItems.map((item, idx) => (
-                <Link
-                  className={cn(
-                    'pr-2 h-7 pl-3 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
-                    'flex items-center justify-between rounded-md group relative',
-                    item.key === pageKey ? 'bg-surface-300 text-foreground' : 'hover:bg-surface-200'
-                  )}
-                  key={item.key + '-menukey'}
-                  href={item.url}
-                >
-                  <div>{item.name}</div>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Button
-                        type="text"
-                        className="px-1 opacity-50 hover:opacity-100"
-                        icon={<ChevronDown size={12} strokeWidth={2} />}
-                      />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-52 *:space-x-2">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          if (!item.id) return
-                          setSelectedReportToUpdate(item.report)
-                        }}
-                      >
-                        <Edit2 size={12} />
-                        <div>Rename</div>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={async () => {
-                          if (!item.id) return
-                          setSelectedReportToDelete(item.report)
-                          setDeleteModalOpen(true)
-                        }}
-                      >
-                        <Trash size={12} />
-                        <div>Delete</div>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </Link>
+              {reportMenuItems.map((item) => (
+                <ReportMenuItem
+                  key={item.id}
+                  item={item}
+                  pageKey={pageKey}
+                  onSelectEdit={() => {
+                    setSelectedReportToUpdate(item.report)
+                  }}
+                  onSelectDelete={() => {
+                    setSelectedReportToDelete(item.report)
+                    setDeleteModalOpen(true)
+                  }}
+                />
               ))}
             </div>
           ) : null}

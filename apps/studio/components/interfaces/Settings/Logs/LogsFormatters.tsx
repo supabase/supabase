@@ -7,8 +7,8 @@
 import CopyButton from 'components/ui/CopyButton'
 import dayjs from 'dayjs'
 import React from 'react'
-import { IconAlertCircle, IconInfo } from 'ui'
-import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
+import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
+import { AlertCircle, Info } from 'lucide-react'
 
 export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
@@ -165,7 +165,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-red-900">
-            <IconAlertCircle size={14} strokeWidth={2} />
+            <AlertCircle size={14} strokeWidth={2} />
           </div>
           <span className="!text-red-900 !block titlecase">{text}</span>
         </Layout>
@@ -178,7 +178,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
-            <IconAlertCircle size={14} strokeWidth={2} />
+            <AlertCircle size={14} strokeWidth={2} />
           </div>
           <span className="!text-blue-900 !block titlecase">{text}</span>
         </Layout>
@@ -189,7 +189,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
-            <IconInfo size={14} strokeWidth={2} />
+            <Info size={14} strokeWidth={2} />
           </div>
           <span className="!text-blue-900 !block titlecase">{text}</span>
         </Layout>
@@ -200,7 +200,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-amber-900">
-            <IconAlertCircle size={14} strokeWidth={2} />
+            <AlertCircle size={14} strokeWidth={2} />
           </div>
           <span className="!text-amber-900 !block titlecase">{text}</span>
         </Layout>

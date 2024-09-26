@@ -1,13 +1,16 @@
 import dayjs from 'dayjs'
-import { RefreshCcw, RefreshCw, StopCircle } from 'lucide-react'
+import { RefreshCw, StopCircle } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import AlertError from 'components/ui/AlertError'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useQueryAbortMutation } from 'data/sql/abort-query-mutation'
 import { useOngoingQueriesQuery } from 'data/sql/ongoing-queries-query'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { ResponseError } from 'types'
 import {
   Button,
   CodeBlock,
@@ -23,9 +26,6 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import AlertError from 'components/ui/AlertError'
-import { ResponseError } from 'types'
-import { IS_PLATFORM } from 'lib/constants'
 
 interface OngoingQueriesPanel {
   visible: boolean

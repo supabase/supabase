@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'

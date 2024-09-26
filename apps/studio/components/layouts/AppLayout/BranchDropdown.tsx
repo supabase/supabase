@@ -1,4 +1,4 @@
-import { ListTree, MessageCircle } from 'lucide-react'
+import { AlertCircle, Check, ChevronsUpDown, ListTree, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   Badge,
   Button,
@@ -17,9 +17,6 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
-  IconAlertCircle,
-  IconCheck,
-  IconCode,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -57,7 +54,7 @@ const BranchLink = ({
         <p className="truncate w-60" title={branch.name}>
           {branch.name}
         </p>
-        {isSelected && <IconCheck />}
+        {isSelected && <Check />}
       </CommandItem_Shadcn_>
     </Link>
   )
@@ -88,7 +85,7 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
 
       {isError && (
         <div className="flex items-center space-x-2 text-amber-900">
-          <IconAlertCircle size={16} strokeWidth={2} />
+          <AlertCircle size={16} strokeWidth={2} />
           <p className="text-sm">Failed to load branches</p>
         </div>
       )}
@@ -97,13 +94,7 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
         <div className="flex items-center px-2">
           <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
-              <Button
-                type="text"
-                className="pr-2"
-                iconRight={
-                  <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
-                }
-              >
+              <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
                 <div className="flex items-center space-x-2">
                   <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedBranch?.name}</p>
                   {selectedBranch?.is_default ? (

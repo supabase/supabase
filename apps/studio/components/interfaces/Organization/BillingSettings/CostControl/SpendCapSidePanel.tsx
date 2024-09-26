@@ -2,20 +2,19 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
 import { pricing } from 'shared-data/pricing'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel, cn } from 'ui'
+import { Alert, Button, Collapsible, SidePanel, cn } from 'ui'
+import { ExternalLink, ChevronRight } from 'lucide-react'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -38,7 +37,6 @@ const SPEND_CAP_OPTIONS: {
 ]
 
 const SpendCapSidePanel = () => {
-  const router = useRouter()
   const { slug } = useParams()
   const { resolvedTheme } = useTheme()
 
@@ -75,18 +73,6 @@ const SpendCapSidePanel = () => {
   useEffect(() => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Spend cap',
-            section: 'Cost Control',
-          },
-          ...(slug && { orgSlug: slug }),
-        },
-        router
-      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, isLoading, subscription, isSpendCapOn])
@@ -120,7 +106,7 @@ const SpendCapSidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Spend cap</h4>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://supabase.com/docs/guides/platform/spend-cap"
               target="_blank"
@@ -143,7 +129,7 @@ const SpendCapSidePanel = () => {
           <Collapsible open={showUsageCosts} onOpenChange={setShowUsageCosts}>
             <Collapsible.Trigger asChild>
               <div className="flex items-center space-x-2 cursor-pointer">
-                <IconChevronRight
+                <ChevronRight
                   strokeWidth={1.5}
                   size={16}
                   className={showUsageCosts ? 'rotate-90' : ''}
@@ -201,7 +187,7 @@ const SpendCapSidePanel = () => {
             <Alert
               withIcon
               variant="info"
-              title="Toggling of the spend cap is only available on the Pro plan"
+              title="Toggling of the spend cap is only available on the Pro Plan"
               actions={
                 <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
                   View available plans
@@ -221,22 +207,7 @@ const SpendCapSidePanel = () => {
                   <div
                     key={option.value}
                     className={cn('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
-                    onClick={() => {
-                      !isFreePlan && setSelectedOption(option.value)
-                      Telemetry.sendActivity(
-                        {
-                          activity: 'Option Selected',
-                          source: 'Dashboard',
-                          data: {
-                            title: 'Spend cap',
-                            section: 'Cost Control',
-                            option: option.name,
-                          },
-                          ...(slug && { orgSlug: slug }),
-                        },
-                        router
-                      )
-                    }}
+                    onClick={() => !isFreePlan && setSelectedOption(option.value)}
                   >
                     <Image
                       alt="Spend Cap"

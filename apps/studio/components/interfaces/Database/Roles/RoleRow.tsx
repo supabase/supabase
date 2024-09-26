@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import {
   Button,
   Collapsible,
@@ -9,17 +9,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Form,
-  IconChevronUp,
-  IconHelpCircle,
-  IconMoreVertical,
-  IconTrash,
   Toggle,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { PgRole } from 'data/database-roles/database-roles-query'
 import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
+import { PgRole } from 'data/database-roles/database-roles-query'
 import { ROLE_PERMISSIONS } from './Roles.constants'
+import { ChevronUp, MoreVertical, Trash, HelpCircle } from 'lucide-react'
 
 interface RoleRowProps {
   role: PgRole
@@ -99,7 +96,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                 }}
               >
                 <div className="flex items-start space-x-3">
-                  <IconChevronUp
+                  <ChevronUp
                     id="collapsible-trigger"
                     className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                     strokeWidth={2}
@@ -135,7 +132,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button type="default" className="px-1">
-                          <IconMoreVertical />
+                          <MoreVertical />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="bottom" className="w-[120px]">
@@ -146,7 +143,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                             onSelectDelete(role)
                           }}
                         >
-                          <IconTrash className="text-red-800" size="tiny" strokeWidth={2} />
+                          <Trash className="text-red-800" size="14" strokeWidth={2} />
                           <p>Delete</p>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -175,8 +172,8 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                           !disabled && ROLE_PERMISSIONS[permission].disabled ? (
                             <Tooltip.Root delayDuration={0}>
                               <Tooltip.Trigger type="button">
-                                <IconHelpCircle
-                                  size="tiny"
+                                <HelpCircle
+                                  size="14"
                                   strokeWidth={2}
                                   className="ml-2 relative top-[3px]"
                                 />

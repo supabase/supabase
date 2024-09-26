@@ -3,28 +3,21 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import {
-  Filters,
-  LogEventChart,
-  LogSearchCallback,
-  LogTable,
-  LogTemplate,
-  LogsTableName,
-  QueryType,
-  ensureNoTimestampConflict,
-  maybeShowUpgradePrompt,
-} from 'components/interfaces/Settings/Logs'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Button } from 'ui'
-import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT } from './Logs.constants'
+import { Button, cn } from 'ui'
+import LogEventChart from './LogEventChart'
+import LogTable from './LogTable'
+import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
+import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
+import { ensureNoTimestampConflict, maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
 
 /**
@@ -85,14 +78,14 @@ export const LogsPreviewer = ({
   useEffect(() => {
     setFilters((prev) => ({
       ...prev,
-      search_query: s as string,
-      database: db as string,
+      search_query: s,
+      database: db,
     }))
     if (ite || its) {
       setParams((prev) => ({
         ...prev,
-        iso_timestamp_start: (its || '') as string,
-        iso_timestamp_end: (ite || '') as string,
+        iso_timestamp_start: its || '',
+        iso_timestamp_end: ite || '',
       }))
     }
   }, [db, s, ite, its])
@@ -187,8 +180,14 @@ export const LogsPreviewer = ({
     }
   }
 
+  const footerHeight = '48px'
+  const navBarHeight = '48px'
+  const filterPanelHeight = '54px'
+  const chartHeight = showChart ? '114px' : '0px'
+  const maxHeight = `calc(100vh - ${navBarHeight} - ${filterPanelHeight} - ${footerHeight} - ${chartHeight})`
+
   return (
-    <div className="flex flex-col flex-grow h-full">
+    <div>
       <PreviewFilterPanel
         csvData={logData}
         isLoading={isLoading}
@@ -226,14 +225,15 @@ export const LogsPreviewer = ({
       <div
         className={
           'transition-all duration-500 ' +
-          (showChart && !isLoading && logData.length > 0
-            ? 'mb-4 h-24 pt-4 opacity-100'
-            : 'h-0 opacity-0')
+          (showChart && logData.length > 0 ? 'mb-4 h-24 pt-4 opacity-100' : 'h-0 opacity-0')
         }
       >
         <div className={condensedLayout ? 'px-4' : ''}>
-          {!isLoading && showChart && (
+          {showChart && (
             <LogEventChart
+              className={cn({
+                'opacity-40': isLoading,
+              })}
               data={eventChartData}
               onBarClick={(isoTimestamp) => {
                 handleSearch('event-chart-bar-click', {
@@ -250,6 +250,7 @@ export const LogsPreviewer = ({
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
+            maxHeight={maxHeight}
             projectRef={projectRef}
             isLoading={isLoading}
             data={logData}
@@ -260,23 +261,26 @@ export const LogsPreviewer = ({
             error={error}
           />
         </LoadingOpacity>
-        {!error && (
-          <div className="border-t flex flex-row justify-between p-2">
-            <Button
-              onClick={loadOlder}
-              icon={<Rewind />}
-              type="default"
-              loading={isLoadingOlder}
-              disabled={isLoadingOlder}
-            >
-              Load older
-            </Button>
-            <div className="flex flex-row justify-end mt-2">
-              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
-            </div>
-          </div>
-        )}
       </div>
+      {!error && logData.length > 0 && (
+        <div className="border-t flex flex-row justify-between p-2">
+          <Button
+            className={cn({
+              'opacity-0': isLoadingOlder || isLoading,
+            })}
+            onClick={loadOlder}
+            icon={<Rewind />}
+            type="default"
+            loading={isLoadingOlder}
+            disabled={isLoadingOlder}
+          >
+            Load older
+          </Button>
+          <div className="flex flex-row justify-end mt-2">
+            <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

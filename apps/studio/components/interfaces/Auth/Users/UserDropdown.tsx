@@ -1,8 +1,8 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams } from 'common'
+import { Mail, MoreHorizontal, ShieldOff, Trash, User as UserIcon } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
@@ -12,38 +12,42 @@ import type { User } from 'data/auth/users-query'
 import { timeout } from 'lib/helpers'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconMail,
-  IconMoreVertical,
-  IconShieldOff,
-  IconTrash,
-  IconUser,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface UserDropdownProps {
   user: User
-  canRemoveUser: boolean
-  canRemoveMFAFactors: boolean
+  permissions: {
+    canRemoveUser: boolean
+    canRemoveMFAFactors: boolean
+    canSendMagicLink: boolean
+    canSendRecovery: boolean
+    canSendOtp: boolean
+  }
   setSelectedUser: (user: User) => void
   setUserSidePanelOpen: (open: boolean) => void
 }
 
 const UserDropdown = ({
   user,
-  canRemoveUser,
-  canRemoveMFAFactors,
+  permissions,
   setSelectedUser,
   setUserSidePanelOpen,
 }: UserDropdownProps) => {
   const { ref } = useParams()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isDeleteFactorsModalOpen, setIsDeleteFactorsModalOpen] = useState(false)
+
+  const { canRemoveUser, canRemoveMFAFactors, canSendMagicLink, canSendRecovery, canSendOtp } =
+    permissions
 
   const { mutate: resetPassword, isLoading: isResetting } = useUserResetPasswordMutation({
     onSuccess: () => {
@@ -113,103 +117,119 @@ const UserDropdown = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="text" loading={isLoading} className="hover:border-muted flex">
-            <IconMoreVertical />
-          </Button>
+          <Button type="text" loading={isLoading} className="px-1.5" icon={<MoreHorizontal />} />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <>
             <DropdownMenuItem className="space-x-2" onClick={handleViewUserInfo}>
-              <IconUser size="tiny" />
+              <UserIcon size={14} />
               <p>View user info</p>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {user.email !== null ? (
               <>
-                <DropdownMenuItem className="space-x-2" onClick={handleResetPassword}>
-                  <IconMail size="tiny" />
-                  <p>Send password recovery</p>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="space-x-2" onClick={handleSendMagicLink}>
-                  <IconMail size="tiny" />
-                  <p>Send magic link</p>
-                </DropdownMenuItem>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <DropdownMenuItem
+                      className="space-x-2 !pointer-events-auto"
+                      disabled={!canSendRecovery}
+                      onClick={() => {
+                        if (canSendRecovery) handleResetPassword()
+                      }}
+                    >
+                      <Mail size={14} />
+                      <p>Send password recovery</p>
+                    </DropdownMenuItem>
+                  </TooltipTrigger_Shadcn_>
+                  {!canSendRecovery && (
+                    <TooltipContent_Shadcn_ side="left">
+                      You need additional permissions to send password recovery.
+                    </TooltipContent_Shadcn_>
+                  )}
+                </Tooltip_Shadcn_>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <DropdownMenuItem
+                      disabled={!canSendMagicLink}
+                      className="space-x-2 !pointer-events-auto"
+                      onClick={() => {
+                        if (canSendMagicLink) handleSendMagicLink()
+                      }}
+                    >
+                      <Mail size={14} />
+                      <p>Send magic link</p>
+                    </DropdownMenuItem>
+                  </TooltipTrigger_Shadcn_>
+                  {!canSendMagicLink && (
+                    <TooltipContent_Shadcn_ side="left">
+                      You need additional permissions to send magic link
+                    </TooltipContent_Shadcn_>
+                  )}
+                </Tooltip_Shadcn_>
               </>
             ) : null}
             {user.phone !== null ? (
-              <DropdownMenuItem className="space-x-2" onClick={handleSendOtp}>
-                <IconMail size="tiny" />
-                <p>Send OTP</p>
-              </DropdownMenuItem>
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
+                  <DropdownMenuItem
+                    disabled={!canSendOtp}
+                    className="space-x-2 !pointer-events-auto"
+                    onClick={() => {
+                      if (canSendOtp) handleSendOtp()
+                    }}
+                  >
+                    <Mail size={14} />
+                    <p>Send OTP</p>
+                  </DropdownMenuItem>
+                </TooltipTrigger_Shadcn_>
+                {!canSendOtp && (
+                  <TooltipContent_Shadcn_ side="left">
+                    You need additional permissions to send OTP
+                  </TooltipContent_Shadcn_>
+                )}
+              </Tooltip_Shadcn_>
             ) : null}
             <DropdownMenuSeparator />
 
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   onClick={() => {
-                    setIsDeleteFactorsModalOpen(true)
+                    if (canRemoveMFAFactors) setIsDeleteFactorsModalOpen(true)
                   }}
                   disabled={!canRemoveMFAFactors}
-                  className="space-x-2"
+                  className="space-x-2 !pointer-events-auto"
                 >
-                  <IconShieldOff size="tiny" />
+                  <ShieldOff size={14} />
                   <p>Remove MFA factors</p>
                 </DropdownMenuItem>
-              </Tooltip.Trigger>
-              {/*
-                [Joshen] Deleting MFA factors should be different ABAC perms i think
-                 need to double check with KM / anyone familiar with ABAC
-              */}
+              </TooltipTrigger_Shadcn_>
               {!canRemoveMFAFactors && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to remove a user's authentication factors.
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
+                <TooltipContent_Shadcn_ side="left">
+                  You need additional permissions to remove a user's authentication factors
+                </TooltipContent_Shadcn_>
               )}
-            </Tooltip.Root>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
+            </Tooltip_Shadcn_>
+
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
-                  onClick={() => {
-                    setIsDeleteModalOpen(true)
-                  }}
                   disabled={!canRemoveUser}
-                  className="space-x-2"
+                  onClick={() => {
+                    if (canRemoveUser) setIsDeleteModalOpen(true)
+                  }}
+                  className="space-x-2 !pointer-events-auto"
                 >
-                  <IconTrash size="tiny" />
+                  <Trash size={14} />
                   <p>Delete user</p>
                 </DropdownMenuItem>
-              </Tooltip.Trigger>
+              </TooltipTrigger_Shadcn_>
               {!canRemoveUser && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={cn([
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ])}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to delete users
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
+                <TooltipContent_Shadcn_ side="left">
+                  You need additional permissions to delete users
+                </TooltipContent_Shadcn_>
               )}
-            </Tooltip.Root>
+            </Tooltip_Shadcn_>
           </>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -1,7 +1,7 @@
 import type { PostgresExtension } from '@supabase/postgres-meta'
-import { ExternalLinkIcon } from 'lucide-react'
+import { Database, ExternalLinkIcon, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -14,12 +14,10 @@ import {
   Alert_Shadcn_,
   Button,
   Form,
-  IconAlertTriangle,
-  IconDatabase,
-  IconPlus,
   Input,
   Listbox,
   Modal,
+  WarningIcon,
 } from 'ui'
 
 interface EnableExtensionModalProps {
@@ -159,7 +157,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       id="custom"
                       label={`Create a new schema "${extension.name}"`}
                       value="custom"
-                      addOnBefore={() => <IconPlus size={16} strokeWidth={1.5} />}
+                      addOnBefore={() => <Plus size={16} strokeWidth={1.5} />}
                     >
                       Create a new schema "{extension.name}"
                     </Listbox.Option>
@@ -171,7 +169,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                           id={schema.name}
                           label={schema.name}
                           value={schema.name}
-                          addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
+                          addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
                         >
                           {schema.name}
                         </Listbox.Option>
@@ -190,7 +188,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
               {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
                 <Modal.Content>
                   <Alert_Shadcn_ variant="warning">
-                    <IconAlertTriangle strokeWidth={2} />
+                    <WarningIcon />
                     <AlertTitle_Shadcn_>
                       The pg_cron extension is not fully supported for Fly projects
                     </AlertTitle_Shadcn_>

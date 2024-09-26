@@ -37,6 +37,8 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
 
     Behind the scenes, Supabase Auth uses the [REST APIs](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api) provided by Apple.
 
+    <CreateClientSnippet />
+
     To initiate sign in, you can use the `signInWithOAuth()` method from the Supabase JavaScript library:
 
     ```ts
@@ -209,6 +211,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     ```dart
     import 'package:sign_in_with_apple/sign_in_with_apple.dart';
     import 'package:supabase_flutter/supabase_flutter.dart';
+    import 'package:crypto/crypto.dart';
 
     /// Performs Apple sign in on iOS or macOS
     Future<AuthResponse> signInWithApple() async {
@@ -255,9 +258,11 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     This method of signing in is web based, and will open a browser window to perform the sign in. For non-web platforms, the user is brought back to the app via [deep linking](/docs/guides/auth/native-mobile-deep-linking?platform=flutter).
 
     ```dart
-    supabase.auth.signInWithOAuth(
+    await supabase.auth.signInWithOAuth(
       OAuthProvider.apple,
-      redirectTo: 'my-scheme://login-callback',
+      redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+      authScreenLaunchMode:
+          kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
     );
     ```
 
@@ -295,7 +300,6 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     import SwiftUI
     import AuthenticationServices
     import Supabase
-    import GoTrue
 
     struct SignInView: View {
         let client = SupabaseClient(supabaseURL: URL(string: "your url")!, supabaseKey: "your anon key")

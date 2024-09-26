@@ -1,15 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCheckPermissions } from 'hooks'
+
+import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Key } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconKey,
 } from 'ui'
-
-import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
@@ -63,7 +63,7 @@ const LangSelector = ({
         {selectedLang == 'bash' && (
           <div className="flex">
             <div className="flex items-center gap-2 p-1 pl-2 text-xs text-foreground-lighter">
-              <IconKey size={12} strokeWidth={1.5} />
+              <Key size={12} strokeWidth={1.5} />
               <span>Project API key :</span>
             </div>
             <DropdownMenu>

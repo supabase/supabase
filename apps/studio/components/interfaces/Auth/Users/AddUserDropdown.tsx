@@ -1,22 +1,22 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ChevronDown, Mail, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import semver from 'semver'
+
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconMail,
-  IconUserPlus,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
-
-import { useCheckPermissions } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import InviteUserModal from './InviteUserModal'
 import CreateUserModal from './CreateUserModal'
+import InviteUserModal from './InviteUserModal'
 
 export type AddUserDropdownProps = {
   projectKpsVersion?: string
@@ -41,73 +41,52 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="primary" iconRight={<IconChevronDown strokeWidth={1.5} />}>
+          <Button type="primary" iconRight={<ChevronDown size={14} strokeWidth={1.5} />}>
             Add user
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="end">
+        <DropdownMenuContent side="bottom" align="end" className="w-40">
           {inviteEnabled && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger className="w-full">
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
-                  className="space-x-2"
+                  className="space-x-2 !pointer-events-auto"
                   disabled={!canInviteUsers}
-                  onClick={() => setInviteVisible(true)}
+                  onClick={() => {
+                    if (canInviteUsers) setInviteVisible(true)
+                  }}
                 >
-                  <IconMail size="small" />
+                  <Mail size={14} />
                   <p>Send invitation</p>
                 </DropdownMenuItem>
-              </Tooltip.Trigger>
+              </TooltipTrigger_Shadcn_>
               {!canInviteUsers && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to invite users
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
+                <TooltipContent_Shadcn_ side="left">
+                  You need additional permissions to invite users
+                </TooltipContent_Shadcn_>
               )}
-            </Tooltip.Root>
+            </Tooltip_Shadcn_>
           )}
 
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="w-full text-left">
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
               <DropdownMenuItem
-                className="space-x-2"
+                className="space-x-2 !pointer-events-auto"
                 disabled={!canCreateUsers}
-                onClick={() => setCreateVisible(true)}
+                onClick={() => {
+                  if (canCreateUsers) setCreateVisible(true)
+                }}
               >
-                <IconUserPlus size="small" />
+                <UserPlus size={14} />
                 <p>Create new user</p>
               </DropdownMenuItem>
-            </Tooltip.Trigger>
-
+            </TooltipTrigger_Shadcn_>
             {!canCreateUsers && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to create users
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
+              <TooltipContent_Shadcn_ side="left">
+                You need additional permissions to create users
+              </TooltipContent_Shadcn_>
             )}
-          </Tooltip.Root>
+          </Tooltip_Shadcn_>
         </DropdownMenuContent>
       </DropdownMenu>
 

@@ -1,27 +1,17 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-import {
-  Alert,
-  Button,
-  IconAlertCircle,
-  IconInfo,
-  IconLoader,
-  IconShield,
-  IconTool,
-  IconUsers,
-  Listbox,
-  Loading,
-  Modal,
-} from 'ui'
+import { toast } from 'sonner'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useCheckPermissions, useFlag, useSelectedProject } from 'hooks'
-import { InfoIcon } from 'ui-patterns/Icons/StatusIcons'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Loader, Shield, Users, Wrench } from 'lucide-react'
+import { Alert, Button, InfoIcon, Listbox, Loading, Modal } from 'ui'
 
 const TransferProjectButton = () => {
   const project = useSelectedProject()
@@ -80,39 +70,23 @@ const TransferProjectButton = () => {
 
   return (
     <>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger asChild>
-          <Button
-            onClick={toggle}
-            type="default"
-            disabled={!canTransferProject || disableProjectTransfer}
-          >
-            Transfer project
-          </Button>
-        </Tooltip.Trigger>
-        {(!canTransferProject || disableProjectTransfer) && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                  'border border-background', //border
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  {!canTransferProject
-                    ? 'You need additional permissions to transfer this project'
-                    : 'Project transfers are temporarily disabled, please try again later.'}
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        )}
-      </Tooltip.Root>
+      <ButtonTooltip
+        type="default"
+        onClick={toggle}
+        disabled={!canTransferProject || disableProjectTransfer}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: !canTransferProject
+              ? 'You need additional permissions to transfer this project'
+              : 'Project transfers are temporarily disabled, please try again later.',
+          },
+        }}
+      >
+        Transfer project
+      </ButtonTooltip>
 
       <Modal
-        closable
         onCancel={() => toggle()}
         visible={isOpen}
         loading={isTransferring}
@@ -154,7 +128,7 @@ const TransferProjectButton = () => {
           <ul className="mt-4 space-y-5 text-sm">
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <IconLoader />
+                <Loader />
               </span>
               <div>
                 <p className="font-bold">Possible downtime</p>
@@ -167,7 +141,7 @@ const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <IconShield />
+                <Shield />
               </span>
               <div>
                 <p className="font-bold">Permissions</p>
@@ -180,7 +154,7 @@ const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <IconTool w={14} className="flex-shrink-0" />
+                <Wrench size={14} className="flex-shrink-0" />
               </span>
               <div>
                 <p className="font-bold">Features</p>
@@ -217,7 +191,7 @@ const TransferProjectButton = () => {
                       key={x.id}
                       label={x.name}
                       value={x.slug}
-                      addOnBefore={() => <IconUsers />}
+                      addOnBefore={() => <Users />}
                     >
                       {x.name}
                     </Listbox.Option>
@@ -230,60 +204,63 @@ const TransferProjectButton = () => {
 
         <Loading active={selectedOrg !== undefined && transferPreviewIsLoading}>
           <Modal.Content>
-            {transferPreviewData && transferPreviewData.warnings.length > 0 && (
-              <Alert
-                withIcon
-                variant="warning"
-                title="Warnings for project transfer"
-                className="mt-3"
-              >
-                <div className="space-y-1">
-                  {transferPreviewData.warnings.map((warning) => (
-                    <p key={warning.key}>{warning.message}</p>
-                  ))}
-                </div>
-              </Alert>
-            )}
-            {transferPreviewData && transferPreviewData.errors.length > 0 && (
-              <Alert withIcon variant="danger" title="Project cannot be transferred">
-                <div className="space-y-1">
-                  {transferPreviewData.errors.map((error) => (
-                    <p key={error.key}>{error.message}</p>
-                  ))}
-                </div>
-                {transferPreviewData.members_exceeding_free_project_limit.length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-foreground-light">
-                      These members have reached their maximum limits for the number of active Free
-                      plan projects within organizations where they are an administrator or owner:
-                    </p>
-                    <ul className="pl-5 text-sm list-disc text-foreground-light">
-                      {(transferPreviewData.members_exceeding_free_project_limit || []).map(
-                        (member, idx: number) => (
-                          <li key={`member-${idx}`}>
-                            {member.name} (Limit: {member.limit} free projects)
-                          </li>
-                        )
-                      )}
-                    </ul>
-                    <p className="text-sm text-foreground-light">
-                      These members will need to either delete, pause, or upgrade one or more of
-                      their projects before you can downgrade this project.
-                    </p>
+            <div className="space-y-2">
+              {transferPreviewData && transferPreviewData.warnings.length > 0 && (
+                <Alert
+                  withIcon
+                  variant="warning"
+                  title="Warnings for project transfer"
+                  className="mt-3"
+                >
+                  <div className="space-y-1">
+                    {transferPreviewData.warnings.map((warning) => (
+                      <p key={warning.key}>{warning.message}</p>
+                    ))}
                   </div>
-                )}
-              </Alert>
-            )}
-            {transferPreviewError && !transferError && (
-              <Alert withIcon variant="danger" title="Project cannot be transferred">
-                <p>{transferPreviewError.message}</p>
-              </Alert>
-            )}
-            {transferError && (
-              <Alert withIcon variant="danger" title="Project cannot be transferred">
-                <p>{transferError.message}</p>
-              </Alert>
-            )}
+                </Alert>
+              )}
+              {transferPreviewData && transferPreviewData.errors.length > 0 && (
+                <Alert withIcon variant="danger" title="Project cannot be transferred">
+                  <div className="space-y-1">
+                    {transferPreviewData.errors.map((error) => (
+                      <p key={error.key}>{error.message}</p>
+                    ))}
+                  </div>
+                  {transferPreviewData.members_exceeding_free_project_limit.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm text-foreground-light">
+                        These members have reached their maximum limits for the number of active
+                        Free plan projects within organizations where they are an administrator or
+                        owner:
+                      </p>
+                      <ul className="pl-5 text-sm list-disc text-foreground-light">
+                        {(transferPreviewData.members_exceeding_free_project_limit || []).map(
+                          (member, idx: number) => (
+                            <li key={`member-${idx}`}>
+                              {member.name} (Limit: {member.limit} free projects)
+                            </li>
+                          )
+                        )}
+                      </ul>
+                      <p className="text-sm text-foreground-light">
+                        These members will need to either delete, pause, or upgrade one or more of
+                        their projects before you can downgrade this project.
+                      </p>
+                    </div>
+                  )}
+                </Alert>
+              )}
+              {transferPreviewError && !transferError && (
+                <Alert withIcon variant="danger" title="Project cannot be transferred">
+                  <p>{transferPreviewError.message}</p>
+                </Alert>
+              )}
+              {transferError && (
+                <Alert withIcon variant="danger" title="Project cannot be transferred">
+                  <p>{transferError.message}</p>
+                </Alert>
+              )}
+            </div>
           </Modal.Content>
         </Loading>
       </Modal>

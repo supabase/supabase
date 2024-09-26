@@ -3,7 +3,7 @@ import { ExternalLink } from 'lucide-react'
 
 import { Wrappers } from 'components/interfaces/Database'
 import WrappersDropdown from 'components/interfaces/Database/Wrappers/WrappersDropdown'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
@@ -11,11 +11,11 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -45,15 +45,15 @@ const DatabaseWrappers: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer>
       <ScaffoldSection>
-        <ScaffoldSectionContent>
+        <ScaffoldSectionContent className="xl:!col-span-8">
           <FormHeader
             className="!mb-0"
             title="Foreign Data Wrappers"
             description="Query your data warehouse directly from your database, or third-party APIs using SQL"
           />
         </ScaffoldSectionContent>
-        <ScaffoldSectionDetail className="flex items-center justify-end gap-x-2">
-          <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+        <ScaffoldSectionDetail className="xl:!col-span-4 flex items-center justify-end gap-x-2">
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <a
               target="_blank"
               rel="noreferrer"

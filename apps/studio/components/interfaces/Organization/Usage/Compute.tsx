@@ -1,15 +1,16 @@
+import { BarChart2 } from 'lucide-react'
+import { useMemo } from 'react'
+
+import AlertError from 'components/ui/AlertError'
+import Panel from 'components/ui/Panel'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
+import { useOrgDailyComputeStatsQuery } from 'data/analytics/org-daily-compute-stats-query'
 import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import SectionContent from './SectionContent'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import AlertError from 'components/ui/AlertError'
-import Panel from 'components/ui/Panel'
-import { IconBarChart2 } from 'ui'
-import UsageBarChart from './UsageBarChart'
 import { Attribute, AttributeColor } from './Usage.constants'
-import { useMemo } from 'react'
-import { useOrgDailyComputeStatsQuery } from 'data/analytics/org-daily-compute-stats-query'
+import UsageBarChart from './UsageBarChart'
 
 export interface ComputeProps {
   orgSlug: string
@@ -77,7 +78,7 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
             },
             {
               name: 'Usage-billing for Compute',
-              url: 'https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute',
+              url: 'https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
             },
           ],
         }}
@@ -134,7 +135,7 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
               <Panel>
                 <Panel.Content>
                   <div className="flex flex-col items-center justify-center">
-                    <IconBarChart2 className="text-foreground-light mb-2" />
+                    <BarChart2 className="text-foreground-light mb-2" />
                     <p className="text-sm">No data in period</p>
                     <p className="text-sm text-foreground-light">May take up to one hour to show</p>
                   </div>

@@ -1,5 +1,5 @@
 import { NextSeo } from 'next-seo'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 
 function RefSEO({ title }) {
   const router = useRouter()

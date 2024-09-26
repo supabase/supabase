@@ -7,9 +7,13 @@ import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
 import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
-import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
+import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
@@ -17,13 +21,15 @@ import ConnectingState from './ConnectingState'
 import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
+import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
 import { ProjectContextProvider } from './ProjectContext'
-import ProjectPausedState from './ProjectPausedState'
+import { ProjectPausedState } from './PausedState/ProjectPausedState'
+import RestartingState from './RestartingState'
+import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { ResizableHandle, ResizablePanelGroup, ResizablePanel, cn } from 'ui'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -38,6 +44,7 @@ const routesToIgnoreProjectDetailsRequest = [
 const routesToIgnoreDBConnection = [
   '/project/[ref]/branches',
   '/project/[ref]/database/backups/scheduled',
+  '/project/[ref]/database/backups/pitr',
   '/project/[ref]/settings/addons',
 ]
 
@@ -83,6 +90,11 @@ const ProjectLayout = ({
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
+  const showProductMenu = selectedProject
+    ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+      (selectedProject.status === PROJECT_STATUS.COMING_UP &&
+        router.pathname.includes('/project/[ref]/settings'))
+    : true
   const ignorePausedState =
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
@@ -113,11 +125,11 @@ const ProjectLayout = ({
             direction="horizontal"
             autoSaveId="project-layout"
           >
-            {!showPausedState && productMenu && (
+            {showProductMenu && productMenu && (
               <>
                 <ResizablePanel
                   className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64')}
-                  defaultSize={1} // forces panel to smallest width possible, at w-64
+                  defaultSize={0} // forces panel to smallest width possible, at w-64
                 >
                   <MenuBarWrapper
                     isLoading={isLoading}
@@ -215,20 +227,24 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
+  const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
 
   const requiresDbConnection: boolean =
     (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
+  const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
   const isProjectUpgrading = selectedProject?.status === PROJECT_STATUS.UPGRADING
   const isProjectRestoring = selectedProject?.status === PROJECT_STATUS.RESTORING
+  const isProjectRestoreFailed = selectedProject?.status === PROJECT_STATUS.RESTORE_FAILED
   const isProjectBuilding =
     selectedProject?.status === PROJECT_STATUS.COMING_UP ||
     selectedProject?.status === PROJECT_STATUS.UNKNOWN
   const isProjectPausing =
     selectedProject?.status === PROJECT_STATUS.GOING_DOWN ||
     selectedProject?.status === PROJECT_STATUS.PAUSING
+  const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
   useEffect(() => {
@@ -239,12 +255,20 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Loading />
   }
 
-  if (isProjectUpgrading) {
+  if (isRestarting && !isBackupsPage) {
+    return <RestartingState />
+  }
+
+  if (isProjectUpgrading && !isBackupsPage) {
     return <UpgradingState />
   }
 
   if (isProjectPausing) {
     return <PausingState project={selectedProject} />
+  }
+
+  if (isProjectPauseFailed) {
+    return <PauseFailedState />
   }
 
   if (requiresPostgrestConnection && isProjectOffline) {
@@ -253,6 +277,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   if (requiresDbConnection && isProjectRestoring) {
     return <RestoringState />
+  }
+
+  if (isProjectRestoreFailed && !isBackupsPage) {
+    return <RestoreFailedState />
   }
 
   if (requiresDbConnection && isProjectBuilding) {

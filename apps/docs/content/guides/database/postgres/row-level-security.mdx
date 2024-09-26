@@ -127,7 +127,7 @@ Let's say you have a table called `profiles` in the public schema and you only w
 -- 1. Create table
 create table profiles (
   id uuid primary key,
-  user_id references auth.users,
+  user_id uuid references auth.users,
   avatar_url text
 );
 
@@ -155,7 +155,7 @@ You can create a policy where the `using` clause checks if the user owns the pro
 -- 1. Create table
 create table profiles (
   id uuid primary key,
-  user_id references auth.users,
+  user_id uuid references auth.users,
   avatar_url text
 );
 
@@ -172,6 +172,12 @@ with check ( (select auth.uid()) = user_id ); -- checks if the new row complies 
 
 If no `with check` expression is defined, then the `using` expression will be used both to determine which rows are visible (normal USING case) and which new rows will be allowed to be added (WITH CHECK case).
 
+<Admonition type="caution">
+
+To perform an `UPDATE` operation, a corresponding [`SELECT` policy](#select-policies) is required. Without a `SELECT` policy, the `UPDATE` operation will not work as expected.
+
+</Admonition>
+
 ### DELETE policies
 
 You can specify delete policies with the `using` clause.
@@ -182,7 +188,7 @@ Let's say you have a table called `profiles` in the public schema and you only w
 -- 1. Create table
 create table profiles (
   id uuid primary key,
-  user_id references auth.users,
+  user_id uuid references auth.users,
   avatar_url text
 );
 
@@ -219,6 +225,12 @@ Supabase provides some helper functions that make it easier to write Policies.
 Returns the ID of the user making the request.
 
 ### `auth.jwt()`
+
+<Admonition type="caution">
+
+Not all information present in the JWT should be used in RLS policies. For instance, creating an RLS policy that relies on the `user_metadata` claim can create security issues in your application as this information can be modified by authenticated end users.
+
+</Admonition>
 
 Returns the JWT of the user making the request. Anything that you store in the user's `raw_app_meta_data` column or the `raw_user_meta_data` column will be accessible using this function. It's important to know the distinction between these two:
 
@@ -269,7 +281,7 @@ Supabase will adhere to the RLS policy of the signed-in user, even if the client
 You can also create new [Postgres Roles](/docs/guides/database/postgres/roles) which can bypass Row Level Security using the "bypass RLS" privilege:
 
 ```sql
-grant bypassrls on "table_name" to "role_name";
+alter role "role_name" with bypassrls;
 ```
 
 This can be useful for system-level access. You should _never_ share login credentials for any Postgres Role with this privilege.
@@ -484,7 +496,9 @@ This prevents the policy `( (select auth.uid()) = user_id )` from running for an
 | --------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | [test6-To-role](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test6-To-role) | 170         | < 0.1      | 99.78%        | <details className="cursor-pointer">Before:<br/>No `TO` policy<br/><br/>After:<br/>`TO authenticated` (anon accessing)</details> |
 
-## Resources
+## More resources
 
 - [Testing your database](/docs/guides/database/testing)
+- [Row Level Security and Supabase Auth](/docs/guides/database/postgres/row-level-security)
+- [RLS Guide and Best Practices](https://github.com/orgs/supabase/discussions/14576)
 - Community repo on testing RLS using [pgTAP and dbdev](https://github.com/usebasejump/supabase-test-helpers/tree/main)

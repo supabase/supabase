@@ -2,7 +2,7 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import type { Filter } from 'components/grid/types'
 import { compact } from 'lodash'
 import type { Dictionary } from 'types'
-import { FilterOperatorOptions } from './components/header/filter'
+import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import { InitialStateType } from './store/reducers'
 import type { Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
@@ -115,10 +115,12 @@ export function parseSupaTable(
   })
 
   return {
+    id: table.id,
     name: table.name,
     comment: table.comment,
     schema: table.schema,
     columns: supaColumns,
+    estimateRowCount: table.live_rows_estimate,
   }
 }
 

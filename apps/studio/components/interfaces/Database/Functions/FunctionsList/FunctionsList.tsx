@@ -1,22 +1,23 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
+import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { Button, IconSearch, Input } from 'ui'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useEffect } from 'react'
+import { Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 
@@ -33,16 +34,10 @@ const FunctionsList = ({
 }: FunctionsListProps) => {
   const { project } = useProjectContext()
   const router = useRouter()
-  const { schema, search } = useParams()
-  const selectedSchema = schema ?? 'public'
+  const { search } = useParams()
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const filterString = search ?? ''
 
-  const setSelectedSchema = (s: string) => {
-    const url = new URL(document.URL)
-    url.searchParams.delete('search')
-    url.searchParams.set('schema', s)
-    router.push(url)
-  }
   const setFilterString = (str: string) => {
     const url = new URL(document.URL)
     if (str === '') {
@@ -52,13 +47,6 @@ const FunctionsList = ({
     }
     router.push(url)
   }
-
-  // update the url to point to public schema
-  useEffect(() => {
-    if (schema !== selectedSchema) {
-      setSelectedSchema(selectedSchema)
-    }
-  }, [])
 
   const canCreateFunctions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -110,19 +98,24 @@ const FunctionsList = ({
         </div>
       ) : (
         <div className="w-full space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             <div className="flex items-center space-x-4">
               <SchemaSelector
                 className="w-[260px]"
                 size="small"
                 showError={false}
                 selectedSchemaName={selectedSchema}
-                onSelectSchema={setSelectedSchema}
+                onSelectSchema={(schema) => {
+                  const url = new URL(document.URL)
+                  url.searchParams.delete('search')
+                  router.push(url)
+                  setSelectedSchema(schema)
+                }}
               />
               <Input
                 placeholder="Search for a function"
                 size="small"
-                icon={<IconSearch size="tiny" />}
+                icon={<Search size={14} />}
                 value={filterString}
                 className="w-64"
                 onChange={(e) => setFilterString(e.target.value)}
@@ -130,49 +123,35 @@ const FunctionsList = ({
             </div>
 
             {!isLocked && (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button disabled={!canCreateFunctions} onClick={() => createFunction()}>
-                    Create a new function
-                  </Button>
-                </Tooltip.Trigger>
-                {!canCreateFunctions && (
-                  <Tooltip.Portal>
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            You need additional permissions to create functions
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
+              <ButtonTooltip
+                disabled={!canCreateFunctions}
+                onClick={() => createFunction()}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to create functions',
+                  },
+                }}
+              >
+                Create a new function
+              </ButtonTooltip>
             )}
           </div>
 
           {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
 
           <Table
-            className="table-fixed"
+            className="table-fixed overflow-x-auto"
             head={
               <>
                 <Table.th key="name">Name</Table.th>
-                <Table.th key="arguments" className="hidden md:table-cell">
+                <Table.th key="arguments" className="table-cell">
                   Arguments
                 </Table.th>
-                <Table.th key="return_type" className="hidden lg:table-cell">
+                <Table.th key="return_type" className="table-cell">
                   Return type
                 </Table.th>
-                <Table.th key="security" className="hidden lg:table-cell w-[100px]">
+                <Table.th key="security" className="table-cell w-[100px]">
                   Security
                 </Table.th>
                 <Table.th key="buttons" className="w-1/6"></Table.th>

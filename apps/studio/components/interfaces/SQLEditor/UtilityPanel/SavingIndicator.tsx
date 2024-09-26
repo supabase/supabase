@@ -1,23 +1,28 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useUser } from 'common'
-import { usePrevious } from 'hooks'
 import { AlertCircle, Check, Loader2, RefreshCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
+
+import { usePrevious } from 'hooks/deprecated'
+import { useFlag } from 'hooks/ui/useFlag'
+import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, IconCheck, IconRefreshCcw } from 'ui'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ReadOnlyBadge from './ReadOnlyBadge'
 
 export type SavingIndicatorProps = { id: string }
 
 const SavingIndicator = ({ id }: SavingIndicatorProps) => {
+  const { profile } = useProfile()
   const snap = useSqlEditorStateSnapshot()
-  const savingState = snap.savingStates[id]
-  const user = useUser()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
 
+  const savingState = enableFolders ? snapV2.savingStates[id] : snap.savingStates[id]
   const previousState = usePrevious(savingState)
   const [showSavedText, setShowSavedText] = useState(false)
-  const snippet = snap.snippets[id]
-  const isSnippetOwner = user?.user_metadata?.user_name === snippet?.snippet?.owner?.username
+
+  const snippet = enableFolders ? snapV2.snippets[id] : snap.snippets[id]
+  const isSnippetOwner = profile?.id === snippet?.snippet.owner_id
 
   useEffect(() => {
     let cancel = false
@@ -26,7 +31,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
       setShowSavedText(true)
       setTimeout(() => {
         if (!cancel) setShowSavedText(false)
-      }, 3000)
+      }, 5000)
     }
 
     return () => {
@@ -34,9 +39,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
     }
   }, [savingState])
 
-  const retry = () => {
-    snap.addNeedsSaving(id)
-  }
+  const retry = () => (enableFolders ? snapV2.addNeedsSaving(id) : snap.addNeedsSaving(id))
 
   return (
     <>
@@ -45,64 +48,34 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
           <Button
             type="text"
             size="tiny"
-            icon={<RefreshCcw className="text-gray-1100" size="tiny" strokeWidth={2} />}
+            icon={<RefreshCcw className="text-gray-1100" strokeWidth={2} />}
             onClick={retry}
           >
             Retry
           </Button>
         )}
         {showSavedText ? (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_>
               <Check className="text-brand" size={14} strokeWidth={3} />
-            </Tooltip.Trigger>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'bg-alternative rounded py-1 px-2 leading-none shadow',
-                  'border-background border ',
-                ].join(' ')}
-              >
-                <span className="text-foreground text-xs">All changes saved</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Root>
-        ) : isSnippetOwner && savingState === 'UPDATING' ? (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom">All changes saved</TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
+        ) : savingState === 'UPDATING' ? (
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_>
               <Loader2 className="animate-spin" size={14} strokeWidth={2} />
-            </Tooltip.Trigger>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'bg-alternative rounded py-1 px-2 leading-none shadow',
-                  'border-background border',
-                ].join(' ')}
-              >
-                <span className="text-foreground text-xs">Saving changes...</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Root>
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_>Saving changes...</TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
         ) : savingState === 'UPDATING_FAILED' ? (
           isSnippetOwner ? (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_>
                 <AlertCircle className="text-red-900" size={14} strokeWidth={2} />
-              </Tooltip.Trigger>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'bg-alternative rounded py-1 px-2 leading-none shadow',
-                    'border-background border ',
-                  ].join(' ')}
-                >
-                  <span className="text-foreground text-xs">Failed to save changes</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Root>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_>Failed to save changes</TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           ) : (
             <ReadOnlyBadge id={id} />
           )

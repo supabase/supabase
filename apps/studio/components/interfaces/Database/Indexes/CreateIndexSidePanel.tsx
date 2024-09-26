@@ -1,16 +1,16 @@
+import { Check, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { CodeEditor } from 'components/ui/CodeEditor'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { Check, ChevronsUpDown } from 'lucide-react'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -93,15 +93,21 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     () => entities?.pages.flatMap((page) => page.data.entities) || [],
     [entities?.pages]
   )
+
   const columns = tableColumns?.result[0]?.columns ?? []
-  const columnOptions: MultiSelectOption[] = columns.map((column) => {
-    return { id: column.attname, value: column.attname, name: column.attname, disabled: false }
-  })
+  const columnOptions: MultiSelectOption[] = columns
+    .filter((column): column is NonNullable<typeof column> => column !== null)
+    .map((column) => ({
+      id: column.attname,
+      value: column.attname,
+      name: column.attname,
+      disabled: false,
+    }))
 
   const generatedSQL = `
-CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexType} (${selectedColumns.join(
-    ', '
-  )});
+CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexType} (${selectedColumns
+    .map((column) => `"${column}"`)
+    .join(', ')});
 `.trim()
 
   const onSaveIndex = () => {

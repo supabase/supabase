@@ -5,25 +5,26 @@ import { useParams } from 'common'
 import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+import { toast } from 'sonner'
 
+import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import useEntityType from 'hooks/misc/useEntityType'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
-import useEntityType from 'hooks/misc/useEntityType'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { TableLike } from 'hooks/misc/useTable'
-import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 
 export interface GridHeaderActionsProps {
   table: TableLike
@@ -214,9 +215,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                       >
                         <div className="text-xs text-foreground p-1 leading-relaxed">
                           <p>RLS is enabled for this table, but no policies are set. </p>
-                          <p>
-                            Select queries will return an <u>empty array</u> of results.
-                          </p>
+                          <p>Select queries may return 0 results.</p>
                         </div>
                       </div>
                     </Tooltip.Content>
@@ -229,9 +228,17 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                   className="group"
                   icon={
                     isLocked || policies.length > 0 ? (
-                      <span className="text-right text-xs rounded-xl px-[6px] bg-foreground-lighter/30 text-brand-1100">
-                        {policies.length}
-                      </span>
+                      <div
+                        className={cn(
+                          'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
+                          policies.length > 9 ? ' px-1' : 'w-[16px]',
+                          ''
+                        )}
+                      >
+                        <span className="text-[11px] text-foreground font-mono text-center">
+                          {policies.length}
+                        </span>
+                      </div>
                     ) : (
                       <PlusCircle strokeWidth={1.5} />
                     )

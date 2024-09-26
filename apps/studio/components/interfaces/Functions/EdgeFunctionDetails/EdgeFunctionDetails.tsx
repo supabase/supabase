@@ -1,30 +1,35 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import Panel from 'components/ui/Panel'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
-import { useCheckPermissions } from 'hooks'
-import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
-import { Alert, Button, Form, Input, Modal, Toggle } from 'ui'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  CriticalIcon,
+  Form,
+  Input,
+  Modal,
+  Toggle,
+} from 'ui'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
 
@@ -136,7 +141,7 @@ const EdgeFunctionDetails = () => {
                 >
                   <FormSection header={<FormSectionLabel>Function Details</FormSectionLabel>}>
                     <FormSectionContent loading={selectedFunction === undefined}>
-                      <Input id="name" name="name" label="Name" />
+                      <Input id="name" name="name" label="Name" disabled={!canUpdateEdgeFunction} />
                       <Input
                         disabled
                         id="slug"
@@ -168,6 +173,7 @@ const EdgeFunctionDetails = () => {
                       <Toggle
                         id="verify_jwt"
                         name="verify_jwt"
+                        disabled={!canUpdateEdgeFunction}
                         label="Enforce JWT Verification"
                         descriptionText="Require a valid JWT in the authorization header when invoking the function"
                       />
@@ -235,48 +241,31 @@ const EdgeFunctionDetails = () => {
 
         <div className="!mt-8">
           <FormHeader title="Delete Edge Function" description="" />
-          <Panel>
-            <Panel.Content>
-              <Alert
-                withIcon
-                variant="danger"
-                title="Once your function is deleted, it can no longer be restored"
+          <Alert_Shadcn_ variant="destructive">
+            <CriticalIcon />
+            <AlertTitle_Shadcn_>
+              Once your function is deleted, it can no longer be restored
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Make sure you have made a backup if you want to restore your edge function
+            </AlertDescription_Shadcn_>
+            <AlertDescription_Shadcn_ className="mt-3">
+              <ButtonTooltip
+                type="danger"
+                disabled={!canUpdateEdgeFunction}
+                loading={selectedFunction?.id === undefined}
+                onClick={() => setShowDeleteModal(true)}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to delete edge functions',
+                  },
+                }}
               >
-                <p className="mb-3">
-                  Make sure you have made a backup if you want to restore your edge function
-                </p>
-                <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger asChild>
-                    <Button
-                      type="danger"
-                      disabled={!canUpdateEdgeFunction}
-                      loading={selectedFunction?.id === undefined}
-                      onClick={() => setShowDeleteModal(true)}
-                    >
-                      Delete edge function
-                    </Button>
-                  </Tooltip.Trigger>
-                  {!canUpdateEdgeFunction && (
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            You need additional permissions to delete an edge function
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  )}
-                </Tooltip.Root>
-              </Alert>
-            </Panel.Content>
-          </Panel>
+                Delete edge function
+              </ButtonTooltip>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         </div>
       </div>
 
@@ -290,9 +279,13 @@ const EdgeFunctionDetails = () => {
         onConfirm={onConfirmDelete}
       >
         <Modal.Content>
-          <Alert withIcon variant="warning" title="This action cannot be undone">
-            Ensure that you have made a backup if you want to restore your edge function
-          </Alert>
+          <Alert_Shadcn_ variant="warning">
+            <CriticalIcon />
+            <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Ensure that you have made a backup if you want to restore your edge function
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         </Modal.Content>
       </Modal>
     </>

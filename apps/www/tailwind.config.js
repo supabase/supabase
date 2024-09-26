@@ -34,6 +34,14 @@ module.exports = config({
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-100%)' },
         },
+        'marquee-reverse': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0%)' },
+        },
+        'marquee-vertical': {
+          '0%': { transform: 'translateY(0%)' },
+          '100%': { transform: 'translateY(-100%)' },
+        },
         'pulse-radar': {
           '0%': { transform: 'scale(0)', opacity: 0 },
           '50%': { opacity: 0.8 },
@@ -45,6 +53,7 @@ module.exports = config({
         'flash-code-slow': 'flash-code 2s forwards',
         spinner: 'spinner 1s both infinite',
         marquee: 'marquee 35s linear infinite',
+        'marquee-vertical': 'marquee-vertical 180s linear infinite both',
         'pulse-radar': 'pulse-radar 3s linear infinite',
         'slide-in': 'slideIn 250ms ease-in both',
       },

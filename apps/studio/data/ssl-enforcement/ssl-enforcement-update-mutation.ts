@@ -1,10 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { put } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { sslEnforcementKeys } from './keys'
+import { handleError, put } from 'data/fetchers'
 
 export type SSLEnforcementUpdateVariables = {
   projectRef: string
@@ -23,12 +22,13 @@ export async function updateSSLEnforcement({
 }: SSLEnforcementUpdateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = (await put(`${API_ADMIN_URL}/projects/${projectRef}/ssl-enforcement`, {
-    requestedConfig,
-  })) as SSLEnforcementUpdateResponse
-  if (response.error) throw response.error
+  const { data, error } = await put(`/v1/projects/{ref}/ssl-enforcement`, {
+    params: { path: { ref: projectRef } },
+    body: { requestedConfig },
+  })
 
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type SSLEnforcementUpdateData = Awaited<ReturnType<typeof updateSSLEnforcement>>

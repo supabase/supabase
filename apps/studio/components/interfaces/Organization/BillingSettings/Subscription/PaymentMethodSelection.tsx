@@ -1,14 +1,16 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-import { Button, IconAlertCircle, IconCreditCard, IconLoader, IconPlus, Listbox } from 'ui'
+import { toast } from 'sonner'
 
 import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
+import { Button, Listbox } from 'ui'
+import { Loader, AlertCircle, CreditCard, Plus } from 'lucide-react'
 
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string
@@ -58,13 +60,13 @@ const PaymentMethodSelection = ({
       <div>
         {isLoading ? (
           <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-strong bg-surface-200">
-            <IconLoader className="animate-spin" size={14} />
+            <Loader className="animate-spin" size={14} />
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
         ) : paymentMethods?.data.length === 0 ? (
           <div className="flex items-center justify-between px-4 py-2 border border-dashed rounded-md bg-alternative">
             <div className="flex items-center space-x-4 text-foreground-light">
-              <IconAlertCircle size={16} strokeWidth={1.5} />
+              <AlertCircle size={16} strokeWidth={1.5} />
               <p className="text-sm">No saved payment methods</p>
             </div>
 
@@ -73,7 +75,7 @@ const PaymentMethodSelection = ({
                 <Button
                   type="default"
                   disabled={!canUpdatePaymentMethods}
-                  icon={<IconCreditCard />}
+                  icon={<CreditCard />}
                   onClick={() => setShowAddNewPaymentMethodModal(true)}
                   htmlType="button"
                 >
@@ -135,7 +137,7 @@ const PaymentMethodSelection = ({
               className="flex items-center px-3 py-2 space-x-2 transition cursor-pointer group hover:bg-surface-300"
               onClick={() => setShowAddNewPaymentMethodModal(true)}
             >
-              <IconPlus size={16} />
+              <Plus size={16} />
               <p className="transition text-foreground-light group-hover:text-foreground">
                 Add new payment method
               </p>

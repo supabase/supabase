@@ -8,7 +8,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
 ### Add one or more modules to your project
 
 <RefSubLayout.EducationRow>
-    <RefSubLayout.Examples>
+    <RefSubLayout.Details>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}>
                 <img src="https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable" alt="latest stable supabase-kt version"/>
@@ -17,39 +17,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
                 <img src="https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental" alt="latest supabase-kt version"/>
             </a>
         </div>
-        Add dependency to your build file:
-        <Tabs
-            size="small"
-            type="underlined"
-            defaultActiveId="kotlin"
-            queryGroup="build-file"
-        >
-            <TabPanel id="kotlin" label="build.gradle.kts">
 
-                ```kotlin
-                implementation("io.github.jan-tennert.supabase:[module]:VERSION")
-                ```
-
-            </TabPanel>
-            <TabPanel id="groovy" label="build.gradle">
-
-                ```groovy
-                implementation 'io.github.jan-tennert.supabase:[module]:VERSION'
-                ```
-
-            </TabPanel>
-            <TabPanel id="xml" label="pom.xml">
-
-                ```xml
-                <dependency>
-                    <groupId>io.github.jan-tennert.supabase</groupId>
-                    <artifactId>[module]</artifactId>
-                    <version>VERSION</version>
-                </dependency>
-                ```
-
-            </TabPanel>
-        </Tabs>
+        Add dependency to your build file using the BOM.
 
         The available modules are:
         - [**gotrue-kt**](https://github.com/supabase-community/supabase-kt/tree/master/GoTrue)
@@ -57,14 +26,10 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
         - [**storage-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Storage)
         - [**functions-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Functions)
         - [**postgrest-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Postgrest)
-        - [apollo-graphql](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
-        - [compose-auth](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
-        - [compose-auth-ui](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
-        - [coil-integration](https://github.com/supabase-community/supabase-kt/tree/master/plugins/CoilIntegration) - Provides a [Coil](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage.
-        - [imageloader-integration](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ImageLoaderIntegration) - Provides a [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) Integration for displaying images stored in Supabase Storage.
+        - Other plugins also available [here](https://github.com/supabase-community/supabase-kt/tree/master/plugins)
 
-        When using multiple modules, you can also use the BOM dependency to ensure that all modules use the same version:
-
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
         <Tabs
             size="small"
             type="underlined"
@@ -76,6 +41,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
                 ```kotlin
                 implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
                 implementation("io.github.jan-tennert.supabase:postgrest-kt")
+                implementation("io.github.jan-tennert.supabase:gotrue-kt")
                 implementation("io.github.jan-tennert.supabase:realtime-kt")
                 ```
 
@@ -85,6 +51,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
                 ```groovy
                 implementation platform("io.github.jan-tennert.supabase:bom:VERSION")
                 implementation 'io.github.jan-tennert.supabase:postgrest-kt'
+                implementation 'io.github.jan-tennert.supabase:gotrue-kt'
                 implementation 'io.github.jan-tennert.supabase:realtime-kt'
                 ```
 
@@ -105,13 +72,16 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
                 </dependency>
                 <dependency>
                     <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>gotrue-kt</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
                     <artifactId>realtime-kt</artifactId>
                 </dependency>
                 ```
 
             </TabPanel>
         </Tabs>
-
     </RefSubLayout.Examples>
 
 </RefSubLayout.EducationRow>
@@ -119,10 +89,13 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
 ### Add Ktor Client Engine to each of your Kotlin targets (required)
 
 <RefSubLayout.EducationRow>
-    <RefSubLayout.Examples>
+    <RefSubLayout.Details>
 
         You can find a list of engines [here](https://ktor.io/docs/http-client-engines.html)
+        Note that not all Ktor engines support Websockets. So if you plan to use the Realtime module, make sure to use an engine that supports Websockets. Checkout the [engine limitations](https://ktor.io/docs/client-engines.html#limitations) for more information.
 
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
         <Tabs
             size="small"
             type="underlined"
@@ -155,8 +128,14 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
 
             </TabPanel>
         </Tabs>
+    </RefSubLayout.Examples>
+
+    <RefSubLayout.Details>
 
         Multiplatform example:
+
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
 
         <Tabs
             size="small"

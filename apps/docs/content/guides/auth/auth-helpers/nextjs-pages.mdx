@@ -3,6 +3,7 @@ id: 'nextjs-pages'
 title: 'Supabase Auth with Next.js Pages Directory'
 description: 'Authentication helpers for Next.js API routes, middleware, and SSR in the Pages Directory.'
 sidebar_label: 'Next.js (pages)'
+sitemapPriority: 0.5
 ---
 
 <Admonition type="caution">
@@ -20,7 +21,7 @@ The `auth-helpers` package has been replaced with the `@supabase/ssr` package. W
   className="text-foreground-light border-b mt-8 pb-2"
   >
   
-  <Accordion.Item
+  <AccordionItem
         header="See legacy docs"
         id="legacy-docs"
       >
@@ -97,7 +98,7 @@ function MyApp({ Component, pageProps }) {
 
 Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
 
-```tsx mark=2,8 pages/_app.tsx
+```tsx
 import { type AppProps } from 'next/app'
 import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
@@ -238,7 +239,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
 For [row level security](/docs/learn/auth-deep-dive/auth-row-level-security) to work properly when fetching data client-side, you need to make sure to use the `supabaseClient` from the `useSupabaseClient` hook and only run your query once the user is defined client-side in the `useUser()` hook:
 
-```jsx mark=10:17
+```jsx
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
@@ -933,6 +934,6 @@ import { Database } from '../database.types'
 const supabaseClient = useSupabaseClient<Database>()
 ```
 
-</Accordion.Item>
+</AccordionItem>
 
 </Accordion>

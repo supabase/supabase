@@ -1,10 +1,10 @@
-import type { NextPageWithLayout } from 'types'
-import { Badge, cn, Collapsible, IconSmartphone } from 'ui'
-
 import { TOTPFactors } from 'components/interfaces/Account'
-import { AccountLayout } from 'components/layouts'
-import { FormHeader } from 'components/ui/Forms'
+import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
+import { Smartphone } from 'lucide-react'
+import type { NextPageWithLayout } from 'types'
+import { Badge, cn, Collapsible } from 'ui'
 
 const collapsibleClasses = [
   'bg-surface-100',
@@ -37,7 +37,7 @@ const Security: NextPageWithLayout = () => {
             className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
           >
             <div className="flex flex-row gap-4 items-center py-1">
-              <IconSmartphone strokeWidth={1.5} />
+              <Smartphone strokeWidth={1.5} />
               <span className="text-sm">Authenticator app</span>
             </div>
 

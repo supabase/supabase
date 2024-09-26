@@ -10,20 +10,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconEdit3,
-  IconEye,
-  IconEyeOff,
-  IconKey,
-  IconLoader,
-  IconMoreVertical,
-  IconTrash,
   Input,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { VaultSecret } from 'types'
+import { Key, Loader, Eye, EyeOff, MoreVertical, Edit3, Trash } from 'lucide-react'
 
 interface SecretRowProps {
   secret: VaultSecret
@@ -65,7 +59,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           )}
         </div>
         <div className="flex items-center space-x-2 group">
-          <IconKey
+          <Key
             size={14}
             strokeWidth={2}
             className="text-foreground-light transition group-hover:text-brand"
@@ -85,11 +79,11 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           className="px-1.5"
           icon={
             isFetching && revealedValue === undefined ? (
-              <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
+              <Loader className="animate-spin" size={16} strokeWidth={1.5} />
             ) : !revealSecret ? (
-              <IconEye size={16} strokeWidth={1.5} />
+              <Eye size={16} strokeWidth={1.5} />
             ) : (
-              <IconEyeOff size={16} strokeWidth={1.5} />
+              <EyeOff size={16} strokeWidth={1.5} />
             )
           }
           onClick={() => setRevealSecret(!revealSecret)}
@@ -110,7 +104,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="text" className="px-1">
-              <IconMoreVertical />
+              <MoreVertical />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom">
@@ -121,7 +115,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                   disabled={!canManageSecrets}
                   onClick={() => onSelectEdit(secret)}
                 >
-                  <IconEdit3 size="tiny" />
+                  <Edit3 size="14" />
                   <p>Edit</p>
                 </DropdownMenuItem>
               </Tooltip.Trigger>
@@ -151,7 +145,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                   disabled={!canManageSecrets}
                   onClick={() => onSelectRemove(secret)}
                 >
-                  <IconTrash stroke="red" size="tiny" />
+                  <Trash stroke="red" size="14" />
                   <p className="text-foreground-light">Delete</p>
                 </DropdownMenuItem>
               </Tooltip.Trigger>

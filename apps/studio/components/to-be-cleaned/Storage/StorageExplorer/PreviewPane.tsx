@@ -1,28 +1,23 @@
 import { Transition } from '@headlessui/react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { isEmpty } from 'lodash'
+import { AlertCircle, ChevronDown, Clipboard, Download, Loader, Trash2, X } from 'lucide-react'
+import SVG from 'react-inlinesvg'
+
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import { isEmpty } from 'lodash'
-import SVG from 'react-inlinesvg'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconAlertCircle,
-  IconChevronDown,
-  IconClipboard,
-  IconDownload,
-  IconLoader,
-  IconTrash2,
-  IconX,
 } from 'ui'
-
-import { useCheckPermissions } from 'hooks'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
+import { useCopyUrl } from './useCopyUrl'
 
 const PreviewFile = ({ mimeType, previewUrl }: { mimeType?: string; previewUrl?: string }) => {
   if (!mimeType || !previewUrl) {
@@ -38,7 +33,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType?: string; previewUrl?:
   if (previewUrl === 'loading') {
     return (
       <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
-        <IconLoader size={14} strokeWidth={2} className="animate-spin" />
+        <Loader size={14} strokeWidth={2} className="animate-spin" />
       </div>
     )
   }
@@ -99,11 +94,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType?: string; previewUrl?:
   )
 }
 
-export interface PreviewPaneProps {
-  onCopyUrl: (name: string, url: string) => void
-}
-
-const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
+const PreviewPane = () => {
   const storageExplorerStore = useStorageStore()
   const {
     getFileUrl,
@@ -114,6 +105,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
     setSelectedItemsToDelete,
     setSelectedFileCustomExpiry,
   } = storageExplorerStore
+  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
 
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
@@ -147,7 +139,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
         >
           {/* Preview Header */}
           <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
-            <IconX
+            <X
               className="cursor-pointer"
               size={14}
               strokeWidth={2}
@@ -168,7 +160,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
               <h5 className="break-words text-base text-foreground">{file.name}</h5>
               {file.isCorrupted && (
                 <div className="flex items-center space-x-2">
-                  <IconAlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
+                  <AlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
                   <p className="text-sm text-foreground-light">
                     File is corrupted, please delete and reupload this file again
                   </p>
@@ -198,7 +190,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
             <div className="flex space-x-2 border-b border-overlay pb-4">
               <Button
                 type="default"
-                icon={<IconDownload size={16} strokeWidth={2} />}
+                icon={<Download size={16} strokeWidth={2} />}
                 disabled={file.isCorrupted}
                 onClick={async () => await downloadFile(file)}
               >
@@ -207,8 +199,8 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
               {selectedBucket.public ? (
                 <Button
                   type="outline"
-                  icon={<IconClipboard size={16} strokeWidth={2} />}
-                  onClick={async () => onCopyUrl(file.name, await getFileUrl(file))}
+                  icon={<Clipboard size={16} strokeWidth={2} />}
+                  onClick={() => onCopyUrl(file.name, getFileUrl(file))}
                   disabled={file.isCorrupted}
                 >
                   Get URL
@@ -218,8 +210,8 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       type="outline"
-                      icon={<IconClipboard size={16} strokeWidth={2} />}
-                      iconRight={<IconChevronDown />}
+                      icon={<Clipboard size={16} strokeWidth={2} />}
+                      iconRight={<ChevronDown />}
                       disabled={file.isCorrupted}
                     >
                       Get URL
@@ -228,24 +220,24 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                   <DropdownMenuContent side="bottom" align="center">
                     <DropdownMenuItem
                       key="expires-one-week"
-                      onClick={async () =>
-                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
+                      onClick={() =>
+                        onCopyUrl(file.name, getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
                       }
                     >
                       Expire in 1 week
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       key="expires-one-month"
-                      onClick={async () =>
-                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
+                      onClick={() =>
+                        onCopyUrl(file.name, getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
                       }
                     >
                       Expire in 1 month
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       key="expires-one-year"
-                      onClick={async () =>
-                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
+                      onClick={() =>
+                        onCopyUrl(file.name, getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
                       }
                     >
                       Expire in 1 year
@@ -266,7 +258,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                   type="outline"
                   disabled={!canUpdateFiles}
                   size="tiny"
-                  icon={<IconTrash2 size={16} strokeWidth={2} />}
+                  icon={<Trash2 strokeWidth={2} />}
                   onClick={() => setSelectedItemsToDelete([file])}
                 >
                   Delete file

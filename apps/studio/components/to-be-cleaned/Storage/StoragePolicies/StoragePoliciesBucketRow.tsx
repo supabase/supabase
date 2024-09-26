@@ -1,5 +1,6 @@
 import Panel from 'components/ui/Panel'
 import { isEmpty } from 'lodash'
+import { Archive, Edit, MoreVertical, Trash } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -8,10 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconArchive,
-  IconEdit,
-  IconMoreVertical,
-  IconTrash,
 } from 'ui'
 
 interface PolicyRowProps {
@@ -41,23 +38,19 @@ const PolicyRow = ({
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <Button
-              type="default"
-              style={{ paddingLeft: 4, paddingRight: 4 }}
-              icon={<IconMoreVertical />}
-            />
+            <Button type="default" className="px-1.5" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end">
             <DropdownMenuItem
-              className="space-x-2"
+              className="gap-x-2"
               onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
             >
-              <IconEdit size={14} />
+              <Edit size={14} />
               <p>Edit</p>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="space-x-2" onClick={() => onSelectPolicyDelete(policy)}>
-              <IconTrash size={14} />
+            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectPolicyDelete(policy)}>
+              <Trash size={14} />
               <p>Delete</p>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -91,7 +84,7 @@ const StoragePoliciesBucketRow = ({
       title={[
         <div key={label} className="flex w-full items-center justify-between">
           <div className="flex items-center space-x-4">
-            <IconArchive className="text-foreground-light" size="small" />
+            <Archive className="text-foreground-light" size={14} />
             <h4 className="m-0 text-lg">
               <span>{label}</span>
             </h4>

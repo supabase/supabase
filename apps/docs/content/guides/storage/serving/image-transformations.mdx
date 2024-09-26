@@ -11,11 +11,13 @@ Supabase Storage offers the functionality to optimize and resize images on the f
 
 <Admonition type="note">
 
-Image Resizing is currently enabled for [Pro plan and above](https://supabase.com/pricing).
+Image Resizing is currently enabled for [Pro Plan and above](https://supabase.com/pricing).
 
 </Admonition>
 
 ## Get a public URL for a transformed image
+
+Our client libraries methods like `getPublicUrl` and `createSignedUrl` support the `transform` option. This returns the URL that serves the transformed image.
 
 <Tabs
   scrollable
@@ -26,8 +28,6 @@ Image Resizing is currently enabled for [Pro plan and above](https://supabase.co
 >
 <TabPanel id="js" label="JavaScript">
 
-Our client libraries methods like `getPublicUrl` and `createSignedUrl` support the `transform` option. This returns the URL that serves the transformed image.
-
 ```ts
 supabase.storage.from('bucket').getPublicUrl('image.jpg', {
   transform: {
@@ -35,6 +35,19 @@ supabase.storage.from('bucket').getPublicUrl('image.jpg', {
     height: 600,
   },
 })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final url = supabase.storage.from('bucket').getPublicUrl(
+      'image.jpg',
+      transform: const TransformOptions(
+        width: 500,
+        height: 600,
+      ),
+    );
 ```
 
 </TabPanel>
@@ -58,11 +71,28 @@ val url = supabase.storage.from("bucket").publicRenderUrl("image.jpg") {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+url = supabase.storage.from_('avatars').get_public_url(
+  'image.jpg',
+  {
+    'transform': {
+      'width': 500,
+      'height': 500,
+    },
+  }
+)
+```
+
+</TabPanel>
 </Tabs>
 
 An example URL could look like this:
 
-`https://project_id.supabase.co/storage/v1/render/image/public/bucket/image.jpg?width=500&height=600`
+```
+https://project_id.supabase.co/storage/v1/render/image/public/bucket/image.jpg?width=500&height=600`
+```
 
 ## Signing URLs with transformation options
 
@@ -84,6 +114,20 @@ supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
     height: 200,
   },
 })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final url = await supabase.storage.from('bucket').createSignedUrl(
+      'image.jpg',
+      60000,
+      transform: const TransformOptions(
+        width: 200,
+        height: 200,
+      ),
+    );
 ```
 
 </TabPanel>
@@ -138,6 +182,19 @@ supabase.storage.from('bucket').download('image.jpg', {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.storage.from('bucket').download(
+      'image.jpg',
+      transform: const TransformOptions(
+        width: 800,
+        height: 300,
+      ),
+    );
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -164,6 +221,19 @@ val file = File("image.jpg")
 supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
     size(800, 300)
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket').download(
+  'image.jpg',
+  {
+    'width': 800,
+    'height': 300,
+  },
+)
 ```
 
 </TabPanel>
@@ -195,13 +265,27 @@ In case you'd like to return the original format of the image and **opt-out** fr
 <TabPanel id="js" label="JavaScript">
 
 ```ts
-await storage.from('bucket').download('image.jpeg', {
+await supabase.storage.from('bucket').download('image.jpeg', {
   transform: {
     width: 200,
     height: 200,
     format: 'origin',
   },
 })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.storage.from('bucket').download(
+      'image.jpeg',
+      transform: const TransformOptions(
+        width: 200,
+        height: 200,
+        format: RequestImageFormat.origin,
+      ),
+    );
 ```
 
 </TabPanel>
@@ -237,6 +321,22 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket').download(
+  'image.jpeg',
+  {
+    'transform': {
+      'width': 200,
+      'height': 200,
+      'format': 'origin',
+    },
+  }
+)
+```
+
+</TabPanel>
 </Tabs>
 
 ## Next.js loader
@@ -249,7 +349,7 @@ To get started, create a `supabase-image-loader.js` file in your Next.js project
 const projectId = '' // your supabase project id
 
 export default function supabaseLoader({ src, width, quality }) {
-  return `https://${projectId}.supabase.co/storage/v1/object/public/${src}?width=${width}&quality=${quality || 75}`
+  return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&quality=${quality || 75}`
 }
 ```
 
@@ -302,6 +402,18 @@ supabase.storage.from('bucket').download('image.jpg', {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.storage.from('bucket').download(
+      'image.jpg',
+      transform: const TransformOptions(
+        quality: 50,
+      ),
+    );
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -327,6 +439,20 @@ val file = File("image.jpg")
 supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
     quality = 50
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket').download(
+  'image.jpg',
+  {
+    'transform': {
+      'quality': 50,
+    },
+  }
+)
 ```
 
 </TabPanel>
@@ -370,6 +496,20 @@ supabase.storage.from('bucket').download('image.jpg', {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = supabase.storage.from('bucket').download(
+      'image.jpg',
+      transform: const TransformOptions(
+        width: 800,
+        height: 300,
+        resize: ResizeMode.contain, // 'cover' | 'fill'
+      ),
+    );
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -399,6 +539,22 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
     size(800, 300)
     resize = ImageTransformation.Resize.CONTAIN
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket').download(
+  'image.jpg',
+  {
+    'transform': {
+      'width': 800,
+      'height': 300,
+      'resize': 'contain', # 'cover' | 'fill'
+    }
+  }
+)
 ```
 
 </TabPanel>

@@ -65,6 +65,15 @@ supabase.auth.signInWith(OTP) {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.auth.sign_in_with_otp({
+  'phone': '+13334445555',
+})
+```
+
+</TabPanel>
 <TabPanel id="http" label="HTTP">
 
 ```bash
@@ -101,7 +110,7 @@ const {
   data: { session },
   error,
 } = await supabase.auth.verifyOtp({
-  phone: '+13334445555',
+  phone: '13334445555',
   token: '123456',
   type: 'sms',
 })
@@ -131,6 +140,19 @@ supabase.auth.verifyPhoneOtp(
     phone = "+13334445555",
     token = "123456"
 )
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verify_otp`:
+
+```python
+response = supabase.auth.verify_otp({
+  'phone': '13334445555',
+  'token': '123456',
+  'type': 'sms',
+})
 ```
 
 </TabPanel>
@@ -194,6 +216,16 @@ try await supabase.auth.updateUser(
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.auth.update_user({
+  'phone': '123456789',
+})
+```
+
+</TabPanel>
 </Tabs>
 
 The user receives an SMS with a 6-digit pin that you must [verify](#verifying-a-phone-otp) within 60 seconds.
+Use the `phone_change` type when calling `verifyOTP` to update a user’s phone number.

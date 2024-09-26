@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { organizationKeys } from './keys'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
+import { organizationKeys } from './keys'
 
 export type OrganizationMemberUpdateVariables = {
   slug: string

@@ -1,22 +1,27 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
-import { extractMethod, isValidHook } from './hooks.utils'
+import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import { cn } from 'ui'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
+  const { project } = useProjectContext()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
 
   const [selectedHook, setSelectedHook] = useState<HOOK_DEFINITION_TITLE | null>(null)
@@ -103,6 +108,7 @@ export const HooksListing = () => {
 
       <ConfirmationModal
         visible={!!selectedHookForDeletion}
+        size="large"
         variant="destructive"
         title="Confirm to delete"
         confirmLabel="Delete"
@@ -112,6 +118,7 @@ export const HooksListing = () => {
           if (!selectedHookForDeletion) {
             return
           }
+
           await updateAuthConfig({
             projectRef: projectRef!,
             config: {
@@ -120,14 +127,48 @@ export const HooksListing = () => {
               [selectedHookForDeletion.secretsKey]: null,
             },
           })
+
+          const { method } = selectedHookForDeletion
+
+          if (method.type === 'postgres') {
+            const revokeStatements = getRevokePermissionStatements(
+              method.schema,
+              method.functionName
+            )
+            await executeSql({
+              projectRef,
+              connectionString: project!.connectionString,
+              sql: revokeStatements.join('\n'),
+            })
+          }
           toast.success(`${selectedHookForDeletion.title} has been deleted.`)
           setSelectedHookForDeletion(null)
           setSelectedHook(null)
         }}
       >
-        <p className="py-4 text-sm text-foreground-light">
-          {`Are you sure you want to delete the ${selectedHookForDeletion?.title}?`}
-        </p>
+        <div>
+          <p className="py-4 text-sm text-foreground-light">
+            {`Are you sure you want to delete the ${selectedHookForDeletion?.title}?`}
+          </p>
+          {selectedHookForDeletion?.method.type === 'postgres' && (
+            <>
+              <p className="py-4 text-sm text-foreground-light">
+                {`The following statements will be executed on the ${selectedHookForDeletion?.method.schema}.${selectedHookForDeletion?.method.functionName} function:`}
+              </p>
+              <div className={cn('h-72')}>
+                <CodeEditor
+                  id="deletion-hook-editor"
+                  isReadOnly={true}
+                  language="pgsql"
+                  value={getRevokePermissionStatements(
+                    selectedHookForDeletion?.method.schema,
+                    selectedHookForDeletion?.method.functionName
+                  ).join('\n\n')}
+                />
+              </div>
+            </>
+          )}
+        </div>
       </ConfirmationModal>
     </div>
   )

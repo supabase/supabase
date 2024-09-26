@@ -1067,6 +1067,112 @@ functions:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+      - id: query-nested-foreign-tables-through-a-join-table
+        name: Query nested foreign tables through a join table
+        code: |
+          ```ts
+            const { data, error } = await supabase
+              .from('games')
+              .select(`
+                game_id:id,
+                away_team:teams!games_away_team_fkey (
+                  users (
+                    id,
+                    name
+                  )
+                )
+              `)
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text
+              );
+            create table
+              teams (
+                id int8 primary key,
+                name text
+              );
+            -- join table
+            create table
+              users_teams (
+                user_id int8 not null references users,
+                team_id int8 not null references teams,
+
+                primary key (user_id, team_id)
+              );
+            create table
+              games (
+                id int8 primary key,
+                home_team int8 not null references teams,
+                away_team int8 not null references teams,
+                name text
+              );
+
+            insert into users (id, name)
+            values
+              (1, 'Kiran'),
+              (2, 'Evan');
+            insert into
+              teams (id, name)
+            values
+              (1, 'Green'),
+              (2, 'Blue');
+            insert into
+              users_teams (user_id, team_id)
+            values
+              (1, 1),
+              (1, 2),
+              (2, 2);
+            insert into
+              games (id, home_team, away_team, name)
+            values
+              (1, 1, 2, 'Green vs Blue'),
+              (2, 2, 1, 'Blue vs Green');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "game_id": 1,
+                  "away_team": {
+                    "users": [
+                      {
+                        "id": 1,
+                        "name": "Kiran"
+                      },
+                      {
+                        "id": 2,
+                        "name": "Evan"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "game_id": 2,
+                  "away_team": {
+                    "users": [
+                      {
+                        "id": 1,
+                        "name": "Kiran"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          You can use the result of a joined table to gather data in
+          another foreign table. With multiple references to the same foreign
+          table you must specify the column on which to conduct the join.
+        hideCodeBlock: true
       - id: filtering-through-foreign-tables
         name: Filtering through referenced tables
         description: |
@@ -3752,7 +3858,7 @@ functions:
           with advanced operators.
 
           - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
-          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by `<->` operators, as if processed by phraseto_tsquery.
           - `OR`: the word “or” will be converted to the | operator.
           - `-`: a dash will be converted to the ! operator.
 

@@ -42,12 +42,6 @@
     "img_url": "/images/twitter-profiles/9l9Td-Fz_400x400.jpg"
   },
   {
-    "text": "Over the course of a few weeks, we migrated 125.000 users (email/pw, Gmail, Facebook, Apple logins) from Auth0 to @supabase and have now completed the migration. I'm just glad the migration is done 😅 Went well, besides a few edge cases (duplicate emails/linked accounts)",
-    "url": "https://twitter.com/kevcodez/status/1518548401587204096",
-    "handle": "kevcodez",
-    "img_url": "/images/twitter-profiles/t6lpcRcn_400x400.jpg"
-  },
-  {
     "text": "Using @supabase I'm really pleased on the power of postgres (and sql in general). Despite being a bit dubious about the whole backend as a service thing I have to say I really don't miss anything. The whole experience feel very robust and secure.",
     "url": "https://twitter.com/paoloricciuti/status/1497691838597066752",
     "handle": "PaoloRicciuti",

@@ -1,27 +1,56 @@
-import { ExternalLink } from 'lucide-react'
+import { ChevronDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import {
+  DISK_LIMITS,
+  DISK_PRICING,
+  DiskType,
+} from 'components/interfaces/DiskManagement/DiskManagement.constants'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import {
+  MAX_REPLICAS_ABOVE_XL,
+  MAX_REPLICAS_BELOW_XL,
+  useReadReplicasQuery,
+} from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
+import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
+import type { AWS_REGIONS_KEYS } from 'shared-data'
+import { AWS_REGIONS } from 'shared-data'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   Listbox,
   SidePanel,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  WarningIcon,
+  cn,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
-import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
+import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
+import {
+  calculateIOPSPrice,
+  calculateThroughputPrice,
+} from 'components/interfaces/DiskManagement/DiskManagement.utils'
+import { formatCurrency } from 'lib/helpers'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -41,11 +70,50 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
-  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
+  const diskManagementV2 = useFlag('diskManagementV2')
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
+
+  // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
+  const [defaultRegion] = Object.entries(AWS_REGIONS).find(
+    ([_, name]) => name === AWS_REGIONS_DEFAULT
+  ) ?? ['ap-southeast-1']
+  // Will be following the primary's compute size for the time being
+  const defaultCompute =
+    addons?.selected_addons.find((addon) => addon.type === 'compute_instance')?.variant
+      .identifier ?? 'ci_micro'
+
+  // @ts-ignore
+  const { size_gb, type, throughput_mbps, iops } = diskConfiguration?.attributes ?? {}
+  const showNewDiskManagementUI =
+    diskManagementV2 &&
+    subscription?.usage_based_billing_project_addons &&
+    project?.cloud_provider === 'AWS'
+  const readReplicaDiskSizes = (size_gb ?? 0) * 1.25
+  const additionalCostDiskSize = readReplicaDiskSizes * DISK_PRICING[type as DiskType]?.storage ?? 0
+  const additionalCostIOPS = calculateIOPSPrice({
+    oldStorageType: type as DiskType,
+    newStorageType: type as DiskType,
+    oldProvisionedIOPS: 0,
+    newProvisionedIOPS: iops ?? 0,
+    numReplicas: 0,
+  }).newPrice
+  const additionalCostThroughput =
+    type === 'gp3'
+      ? calculateThroughputPrice({
+          storageType: type as DiskType,
+          newThroughput: throughput_mbps ?? 0,
+          oldThroughput: 0,
+          numReplicas: 0,
+        }).newPrice
+      : 0
+
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
+  const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
+  const [selectedCompute, setSelectedCompute] = useState(defaultCompute)
 
   useProjectDetailQuery(
     { ref: projectRef },
@@ -82,7 +150,13 @@ const DeployNewReplicaPanel = ({
     (project?.dbVersion ?? '').split('supabase-postgres-')[1]?.split('.')[0]
   )
 
-  const reachedMaxReplicas = (data ?? []).filter((db) => db.identifier !== projectRef).length >= 2
+  const maxNumberOfReplicas = ['ci_micro', 'ci_small', 'ci_medium', 'ci_large'].includes(
+    selectedCompute
+  )
+    ? MAX_REPLICAS_BELOW_XL
+    : MAX_REPLICAS_ABOVE_XL
+  const reachedMaxReplicas =
+    (data ?? []).filter((db) => db.identifier !== projectRef).length >= maxNumberOfReplicas
   const isFreePlan = subscription?.plan.id === 'free'
   const isAWSProvider = project?.cloud_provider === 'AWS'
   const isWalgEnabled = project?.is_physical_backups_enabled
@@ -102,19 +176,8 @@ const DeployNewReplicaPanel = ({
 
   const computeAddons =
     addons?.available_addons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
-
-  // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
-  const [defaultRegion] = Object.entries(AWS_REGIONS).find(
-    ([_, name]) => name === AWS_REGIONS_DEFAULT
-  ) ?? ['ap-southeast-1']
-  // Will be following the primary's instance size for the time being
-  const defaultCompute =
-    addons?.selected_addons.find((addon) => addon.type === 'compute_instance')?.variant
-      .identifier ?? 'ci_micro'
-
-  const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
-  const [selectedCompute, setSelectedCompute] = useState(defaultCompute)
   const selectedComputeMeta = computeAddons.find((addon) => addon.identifier === selectedCompute)
+  const estComputeMonthlyCost = Math.floor((selectedComputeMeta?.price ?? 0) * 730) // 730 hours in a month
 
   const availableRegions =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
@@ -122,7 +185,7 @@ const DeployNewReplicaPanel = ({
       : AVAILABLE_REPLICA_REGIONS
 
   const onSubmit = async () => {
-    const regionKey = AWS_REGIONS_VALUES[selectedRegion]
+    const regionKey = AWS_REGIONS[selectedRegion as AWS_REGIONS_KEYS].code
     if (!projectRef) return console.error('Project is required')
     if (!regionKey) return toast.error('Unable to deploy replica: Unsupported region selected')
 
@@ -147,29 +210,10 @@ const DeployNewReplicaPanel = ({
       onCancel={onClose}
       loading={isSettingUp}
       disabled={!canDeployReplica}
+      className={cn(showNewDiskManagementUI ? 'max-w-[500px]' : '')}
       header="Deploy a new read replica"
       onConfirm={() => onSubmit()}
       confirmText="Deploy replica"
-      // [Joshen] Refer to EnablePhysicalBackupsModal as to why this is commented out for now
-      // customFooter={
-      //   <div className="border-t p-2 flex items-center justify-end space-x-2">
-      //     <Button type="default" disabled={false} onClick={onClose}>
-      //       Cancel
-      //     </Button>
-      //     {isMinimallyOnSmallCompute && !isWalgEnabled ? (
-      //       <EnablePhysicalBackupsModal selectedRegion={selectedRegion} />
-      //     ) : (
-      //       <Button
-      //         type="primary"
-      //         disabled={!canDeployReplica}
-      //         loading={isSettingUp}
-      //         onClick={onSubmit}
-      //       >
-      //         Deploy replica
-      //       </Button>
-      //     )}
-      //   </div>
-      // }
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-4">
         {!isAWSProvider ? (
@@ -184,7 +228,7 @@ const DeployNewReplicaPanel = ({
                 replicas
               </span>
               <div className="mt-3">
-                <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                <Button asChild type="default" icon={<ExternalLink />}>
                   <a
                     href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
                     target="_blank"
@@ -242,7 +286,7 @@ const DeployNewReplicaPanel = ({
                         {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
                       </Link>
                     </Button>
-                    <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                    <Button asChild type="default" icon={<ExternalLink />}>
                       <a
                         href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
                         target="_blank"
@@ -291,7 +335,7 @@ const DeployNewReplicaPanel = ({
                     >
                       Enable physical backups
                     </Button>
-                    <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                    <Button asChild type="default" icon={<ExternalLink />}>
                       <a
                         href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
                         target="_blank"
@@ -309,12 +353,36 @@ const DeployNewReplicaPanel = ({
               <Alert_Shadcn_>
                 <WarningIcon />
                 <AlertTitle_Shadcn_>
-                  You can only deploy up to 2 read replicas at once
+                  You can only deploy up to {maxNumberOfReplicas} read replicas at once
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   If you'd like to spin up another read replica, please drop an existing replica
                   first.
                 </AlertDescription_Shadcn_>
+                {maxNumberOfReplicas === MAX_REPLICAS_BELOW_XL && (
+                  <>
+                    <AlertDescription_Shadcn_>
+                      <span>
+                        Alternatively, you may deploy up to{' '}
+                        <span className="text-foreground">{MAX_REPLICAS_ABOVE_XL}</span> replicas if
+                        your project is on an XL compute or higher.
+                      </span>
+                      <div className="flex items-center gap-x-2 mt-3">
+                        <Button asChild type="default">
+                          <Link
+                            href={
+                              isFreePlan
+                                ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                                : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                            }
+                          >
+                            Upgrade compute size
+                          </Link>
+                        </Button>
+                      </div>
+                    </AlertDescription_Shadcn_>
+                  </>
+                )}
               </Alert_Shadcn_>
             )}
           </>
@@ -349,23 +417,97 @@ const DeployNewReplicaPanel = ({
           </Listbox>
 
           <div className="flex flex-col gap-y-2">
-            <p className="text-foreground-light text-sm">
-              Read replicas will be on the same compute size as your primary database. Deploying a
-              read replica on the {selectedComputeMeta?.name} size incurs additional{' '}
-              <span className="text-foreground">{selectedComputeMeta?.price_description}</span>.
-            </p>
+            {showNewDiskManagementUI ? (
+              <>
+                <Collapsible_Shadcn_>
+                  <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
+                    <p className="text-sm text-left">
+                      New replica will cost an additional{' '}
+                      {formatCurrency(
+                        estComputeMonthlyCost +
+                          additionalCostDiskSize +
+                          Number(additionalCostIOPS) +
+                          Number(additionalCostThroughput)
+                      )}
+                      /month
+                    </p>
+                    <ChevronDown size={14} className="transition" />
+                  </CollapsibleTrigger_Shadcn_>
+                  <CollapsibleContent_Shadcn_ className="flex flex-col gap-y-1 mt-1">
+                    <p className="text-foreground-light text-sm">
+                      Read replicas will match the compute size of your primary database and will
+                      include 25% more disk size than the primary database to accommodate WAL files.
+                    </p>
+                    <p className="text-foreground-light text-sm">
+                      The additional cost for the replica breaks down to:
+                    </p>
+                    <Table>
+                      <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:pb-2 [&_th]:pt-4">
+                        <TableRow>
+                          <TableHead className="w-[140px] pl-0">Item</TableHead>
+                          <TableHead>Description</TableHead>
+                          <TableHead className="text-right pr-0">Cost (/month)</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
+                        <TableRow>
+                          <TableCell className="pl-0">Compute size</TableCell>
+                          <TableCell>{selectedComputeMeta?.name}</TableCell>
+                          <TableCell className="text-right font-mono pr-0">
+                            {formatCurrency(estComputeMonthlyCost)}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="pl-0">Disk size</TableCell>
+                          <TableCell>
+                            {((size_gb ?? 0) * 1.25).toLocaleString()} GB ({type})
+                          </TableCell>
+                          <TableCell className="text-right font-mono pr-0">
+                            {formatCurrency(additionalCostDiskSize)}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="pl-0">IOPS</TableCell>
+                          <TableCell>{iops?.toLocaleString()} IOPS</TableCell>
+                          <TableCell className="text-right font-mono pr-0">
+                            {formatCurrency(+additionalCostIOPS)}
+                          </TableCell>
+                        </TableRow>
+                        {type === 'gp3' && (
+                          <TableRow>
+                            <TableCell className="pl-0">Throughput</TableCell>
+                            <TableCell>{throughput_mbps?.toLocaleString()} MB/s</TableCell>
+                            <TableCell className="text-right font-mono pr-0">
+                              {formatCurrency(+additionalCostThroughput)}
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </CollapsibleContent_Shadcn_>
+                </Collapsible_Shadcn_>
+              </>
+            ) : (
+              <p className="text-foreground-light text-sm">
+                Read replicas will be on the same compute size as your primary database. Deploying a
+                read replica on the{' '}
+                <span className="text-foreground">{selectedComputeMeta?.name}</span> size incurs
+                additional{' '}
+                <span className="text-foreground">{selectedComputeMeta?.price_description}</span>.
+              </p>
+            )}
 
             <p className="text-foreground-light text-sm">
               Read more about{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                href="https://supabase.com/docs/guides/platform/org-based-billing#read-replicas"
                 target="_blank"
                 rel="noreferrer"
                 className="underline hover:text-foreground transition"
               >
-                usage-based billing
+                billing
               </Link>{' '}
-              for compute.
+              for read replicas.
             </p>
           </div>
         </div>

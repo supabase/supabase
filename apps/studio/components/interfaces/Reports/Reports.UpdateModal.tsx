@@ -1,7 +1,8 @@
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
 import { Content } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import toast from 'react-hot-toast'
 import { Button, Form, Input, Modal } from 'ui'
 
 type CustomReport = { name: string; description?: string }
@@ -18,7 +19,7 @@ export const UpdateCustomReportModal = ({
   onCancel,
 }: UpdateCustomReportProps) => {
   const { ref } = useParams()
-  const { mutate: updateReport } = useContentUpsertMutation({
+  const { mutate: updateReport, isLoading: isUpdating } = useContentUpsertMutation({
     onSuccess: () => {
       toast.success('Successfully updated report')
       onCancel()
@@ -67,7 +68,7 @@ export const UpdateCustomReportModal = ({
         validate={validate}
         onSubmit={onConfirmUpdateReport}
       >
-        {({ isSubmitting }: { isSubmitting: boolean }) => (
+        {() => (
           <>
             <Modal.Content>
               <Input label="Name" id="name" name="name" />
@@ -83,10 +84,10 @@ export const UpdateCustomReportModal = ({
             </Modal.Content>
             <Modal.Separator />
             <Modal.Content className="flex items-center justify-end gap-2">
-              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
+              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isUpdating}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+              <Button htmlType="submit" loading={isUpdating} disabled={isUpdating}>
                 Save custom report
               </Button>
             </Modal.Content>

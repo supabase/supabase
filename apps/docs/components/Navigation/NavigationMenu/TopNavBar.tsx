@@ -1,108 +1,143 @@
-import { useTheme } from 'next-themes'
-import Image from 'next/legacy/image'
+import { Command, Search, Menu } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import Link from 'next/link'
-import { FC } from 'react'
-import { Button, IconCommand, IconGitHub, IconSearch } from 'ui'
-import { SearchButton } from 'ui-patterns/Cmdk'
+import type { FC } from 'react'
+import { memo, useState } from 'react'
+
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { ThemeToggle } from 'ui-patterns/ThemeToggle'
+import { Button, buttonVariants, cn } from 'ui'
+import { CommandMenuTrigger } from 'ui-patterns/CommandMenu'
+
+import GlobalNavigationMenu from './GlobalNavigationMenu'
+const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
+const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
-  const { resolvedTheme } = useTheme()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <nav
-      aria-label="top bar"
-      className="h-[var(--header-height,60px)] border-b backdrop-blur backdrop-filter bg bg-opacity-75"
-    >
-      <div className="px-5 max-w-7xl mx-auto flex gap-3 justify-between items-center h-full">
-        <div className="lg:hidden">
-          <Link href="/" className=" flex items-center gap-2">
-            <Image
-              className="cursor-pointer"
-              src={
-                resolvedTheme?.includes('dark')
-                  ? '/docs/supabase-dark.svg'
-                  : '/docs/supabase-light.svg'
-              }
-              width={96}
-              height={24}
-              alt="Supabase Logo"
-            />
-            <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
-          </Link>
-        </div>
-
-        <div className="flex items-center gap-6">
-          <SearchButton className="md:w-full lg:w-96 order-2 lg:order-1">
-            <div
-              className="
-              flex
-              group
-              items-center
-              justify-between
-              bg-surface-100
-              bg-opacity-75
-              hover:bg-surface-200
-              hover:bg-opacity-100
-              border
-              transition
-              pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded
-              text-foreground-lighter
-              "
-            >
-              <div className="flex items-center space-x-2">
-                <IconSearch size={18} strokeWidth={2} />
-                <p className="hidden md:flex text-sm">Search docs...</p>
-              </div>
-              <div className="hidden md:flex items-center space-x-1">
-                <div
-                  aria-hidden="true"
-                  className="md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 gap-1"
-                >
-                  <IconCommand size={12} strokeWidth={1.5} />
-                  <span className="text-[12px]">K</span>
-                </div>
-              </div>
+    <>
+      <nav
+        aria-label="top bar"
+        className="w-full z-40 flex flex-col border-b backdrop-blur backdrop-filter bg bg-opacity-75"
+      >
+        <div className="w-full px-5 lg:pl-10 flex justify-between h-[var(--header-height)] gap-3">
+          <div className="hidden lg:flex h-full items-center justify-center gap-2">
+            <HeaderLogo />
+            <GlobalNavigationMenu />
+          </div>
+          <div className="w-full grow lg:w-auto flex gap-3 justify-between lg:justify-end items-center h-full">
+            <div className="lg:hidden">
+              <HeaderLogo />
             </div>
-          </SearchButton>
+
+            <div className="flex gap-2 items-center">
+              <CommandMenuTrigger>
+                <button
+                  className={cn(
+                    'group',
+                    'flex-grow md:w-44 xl:w-56 h-[30px] rounded-md',
+                    'pl-1.5 md:pl-2 pr-1',
+                    'flex items-center justify-between',
+                    'bg-surface-100/75 text-foreground-lighter border',
+                    'hover:bg-opacity-100 hover:border-strong',
+                    'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
+                    'transition'
+                  )}
+                >
+                  <div className="flex items-center space-x-2 text-foreground-muted">
+                    <Search size={18} strokeWidth={2} />
+                    <p className="flex text-sm pr-2">
+                      Search<span className="hidden xl:inline ml-1"> docs...</span>
+                    </p>
+                  </div>
+                  <div className="hidden md:flex items-center space-x-1">
+                    <div
+                      aria-hidden="true"
+                      className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
+                    >
+                      <Command size={12} strokeWidth={1.5} />
+                      <span className="text-[12px]">K</span>
+                    </div>
+                  </div>
+                </button>
+              </CommandMenuTrigger>
+              <button
+                title="Menu dropdown button"
+                className={cn(
+                  buttonVariants({ type: 'default' }),
+                  'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
+                )}
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                <Menu size={18} strokeWidth={1} />
+              </button>
+            </div>
+          </div>
+          <div className="hidden lg:flex items-center justify-end gap-3">
+            {!isUserLoading && (
+              <Button asChild>
+                <a
+                  href="https://supabase.com/dashboard"
+                  className="h-[30px]"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  {isLoggedIn ? 'Dashboard' : 'Sign up'}
+                </a>
+              </Button>
+            )}
+            {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
+              <Button asChild>
+                <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>
+              </Button>
+            )}
+            <TopNavDropdown />
+          </div>
         </div>
-        <div className="hidden lg:flex grow items-center justify-end gap-3">
-          <Button type="text" asChild>
-            <a href="https://supabase.com" target="_blank" rel="noreferrer noopener">
-              Supabase.com
-            </a>
-          </Button>
-          {!isUserLoading && (
-            <Button asChild>
-              <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer noopener">
-                {isLoggedIn ? 'Dashboard' : 'Sign up'}
-              </a>
-            </Button>
-          )}
-          {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
-            <Button asChild>
-              <Link href="/__dev-secret-auth">Dev-only secret sign-in</Link>
-            </Button>
-          )}
-          <Link
-            href="https://github.com/supabase/supabase"
-            target="_blank"
-            rel="noreferrer noopener"
-            className="px-2.5 py-1"
-          >
-            <span className="sr-only">GitHub</span>
-            <IconGitHub
-              size={16}
-              className="text-foreground-light hover:text-foreground transition"
-            />
-          </Link>
-          <ThemeToggle />
-        </div>
-      </div>
-    </nav>
+      </nav>
+      <GlobalMobileMenu open={mobileMenuOpen} setOpen={setMobileMenuOpen} />
+    </>
   )
 }
+
+const HeaderLogo = memo(() => {
+  return (
+    <Link
+      href="/"
+      className={cn(
+        buttonVariants({ type: 'default' }),
+        'flex shrink-0 items-center w-fit !bg-transparent !border-none !shadow-none'
+      )}
+    >
+      <Image
+        className="hidden dark:block !m-0"
+        src="/docs/supabase-dark.svg"
+        priority={true}
+        loading="eager"
+        width={96}
+        height={18}
+        alt="Supabase wordmark"
+      />
+      <Image
+        className="block dark:hidden !m-0"
+        src="/docs/supabase-light.svg"
+        priority={true}
+        loading="eager"
+        width={96}
+        height={18}
+        alt="Supabase wordmark"
+      />
+      <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
+    </Link>
+  )
+})
+
+HeaderLogo.displayName = 'HeaderLogo'
+
+TopNavBar.displayName = 'TopNavBar'
+
 export default TopNavBar

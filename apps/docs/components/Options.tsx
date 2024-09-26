@@ -1,5 +1,5 @@
+import { XCircle } from 'lucide-react'
 import { FC, PropsWithChildren, useState } from 'react'
-import { IconXCircle } from '~/../../packages/ui'
 
 interface IOptions {
   name?: string
@@ -28,7 +28,7 @@ const Options: FC<PropsWithChildren<IOptions>> & OptionsSubComponents = (props) 
       >
         <div>
           <div className={[!open ? 'rotate-45' : 'rotate-0'].join(' ')}>
-            <IconXCircle size={14} />
+            <XCircle size={14} />
           </div>
         </div>
         {`${!open ? `Open` : `Close`} ${props.name ?? 'accepted values'}`}
@@ -50,7 +50,7 @@ const Option: FC<IOption> = (props) => {
         flex flex-col gap-3
       "
     >
-      <div className="flex gap-3 items-center">
+      <div className="flex flex-wrap gap-3 items-center">
         <span className="text-sm text-foreground font-mono font-medium">
           {props.name ?? 'no-name'}
         </span>

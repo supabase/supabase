@@ -1,6 +1,6 @@
 import { ExternalLink, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -8,6 +8,8 @@ import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import type { AWS_REGIONS_KEYS } from 'shared-data'
+import { AWS_REGIONS } from 'shared-data'
 import {
   Button,
   Dialog,
@@ -20,7 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
+import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 
 interface EnablePhysicalBackupsModalProps {
   selectedRegion: string
@@ -46,7 +48,7 @@ export const EnablePhysicalBackupsModal = ({ selectedRegion }: EnablePhysicalBac
       onSuccess: (data) => {
         if (data.is_physical_backups_enabled) {
           setRefetchInterval(false)
-          const regionKey = AWS_REGIONS_VALUES[selectedRegion]
+          const regionKey = AWS_REGIONS[selectedRegion as AWS_REGIONS_KEYS].code
 
           if (ref === undefined) return toast.error('Project ref is required')
           if (!regionKey)
@@ -121,7 +123,7 @@ export const EnablePhysicalBackupsModal = ({ selectedRegion }: EnablePhysicalBac
         </DialogSection>
         {!enabling && (
           <DialogFooter>
-            <Button asChild type="default" icon={<ExternalLink size={14} />}>
+            <Button asChild type="default" icon={<ExternalLink />}>
               <a
                 target="_blank"
                 rel="noreferrer"

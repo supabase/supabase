@@ -2,8 +2,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { AlertTriangle, Info, RefreshCcw } from 'lucide-react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, cn, IconPauseCircle } from 'ui'
+import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
 import { InferredProjectStatus } from './ProjectCard.utils'
 
 export interface ProjectCardWarningsProps {
@@ -39,8 +39,12 @@ export const ProjectCardStatus = ({
   const getTitle = () => {
     if (projectStatus === 'isPaused') return 'Project is paused'
     if (projectStatus === 'isPausing') return 'Project is pausing'
+    if (projectStatus === 'isRestarting') return 'Project is restarting'
     if (projectStatus === 'isComingUp') return 'Project is coming up'
     if (projectStatus === 'isRestoring') return 'Project is restoring'
+    if (projectStatus === 'isUpgrading') return 'Project is upgrading'
+    if (projectStatus === 'isRestoreFailed') return 'Project restore failed'
+    if (projectStatus === 'isPauseFailed') return 'Project pause failed'
 
     if (!resourceWarnings) return undefined
 
@@ -55,8 +59,12 @@ export const ProjectCardStatus = ({
   const getDescription = () => {
     if (projectStatus === 'isPaused') return 'This project will not accept requests until resumed'
     if (projectStatus === 'isPausing') return 'The pause process will complete in a few minutes'
+    if (projectStatus === 'isRestarting') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isComingUp') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isRestoring') return 'Your project will be ready in a few minutes'
+    if (projectStatus === 'isUpgrading') return 'Your project will be ready in a few minutes'
+    if (projectStatus === 'isRestoreFailed') return 'Please contact support for assistance'
+    if (projectStatus === 'isPauseFailed') return 'Please contact support for assistance'
 
     if (!resourceWarnings) return undefined
 
@@ -94,8 +102,10 @@ export const ProjectCardStatus = ({
       )}
     >
       {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
-        <IconPauseCircle strokeWidth={1.5} size={12} />
-      ) : projectStatus === 'isRestoring' || projectStatus === 'isComingUp' ? (
+        <PauseCircle strokeWidth={1.5} size={12} />
+      ) : projectStatus === 'isRestoring' ||
+        projectStatus === 'isComingUp' ||
+        projectStatus === 'isRestarting' ? (
         <RefreshCcw strokeWidth={1.5} size={12} />
       ) : (
         <AlertTriangle strokeWidth={1.5} size={12} />

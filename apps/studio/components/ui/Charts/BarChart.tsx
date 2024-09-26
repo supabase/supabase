@@ -1,9 +1,19 @@
 import dayjs from 'dayjs'
-import { useState } from 'react'
-import { Bar, Cell, Legend, BarChart as RechartBarChart, Tooltip, XAxis } from 'recharts'
+import { ComponentProps, useState } from 'react'
+import {
+  Bar,
+  Cell,
+  Legend,
+  BarChart as RechartBarChart,
+  Tooltip,
+  XAxis,
+  Label,
+  YAxis,
+  CartesianGrid,
+} from 'recharts'
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
-import type { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
+import type { CategoricalChartState } from 'recharts/types/chart/types'
 import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
@@ -18,6 +28,9 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   emptyStateMessage?: string
   showLegend?: boolean
   xAxisIsDate?: boolean
+  XAxisProps?: ComponentProps<typeof XAxis>
+  YAxisProps?: ComponentProps<typeof YAxis>
+  showGrid?: boolean
 }
 
 const BarChart = ({
@@ -38,9 +51,25 @@ const BarChart = ({
   onBarClick,
   showLegend = false,
   xAxisIsDate = true,
+  XAxisProps,
+  YAxisProps,
+  showGrid = false,
 }: BarChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+
+  // Default props
+  const _XAxisProps = XAxisProps || {
+    interval: data.length - 2,
+    angle: 0,
+    tick: false,
+  }
+
+  const _YAxisProps = YAxisProps || {
+    tickFormatter: (value) => numberFormatter(value, valuePrecision),
+    tick: false,
+    width: 0,
+  }
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
@@ -77,7 +106,7 @@ const BarChart = ({
   }
 
   return (
-    <div className={['flex flex-col gap-3', className].join(' ')}>
+    <div className={['flex flex-col gap-y-3', className].join(' ')}>
       <ChartHeader
         title={title}
         format={format}
@@ -93,12 +122,6 @@ const BarChart = ({
       <Container>
         <RechartBarChart
           data={data}
-          margin={{
-            top: 0,
-            right: 0,
-            left: 0,
-            bottom: 0,
-          }}
           className="overflow-visible"
           //   mouse hover focusing logic
           onMouseMove={(e: any) => {
@@ -114,15 +137,18 @@ const BarChart = ({
           }}
         >
           {showLegend && <Legend />}
-          <XAxis
-            dataKey={xAxisKey}
-            interval={data.length - 2}
-            angle={0}
-            // hide the tick
-            tick={false}
-            // color the axis
+          {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
+          <YAxis
+            {..._YAxisProps}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
+            key={yAxisKey}
+          />
+          <XAxis
+            {..._XAxisProps}
+            axisLine={{ stroke: CHART_COLORS.AXIS }}
+            tickLine={{ stroke: CHART_COLORS.AXIS }}
+            key={xAxisKey}
           />
           <Tooltip content={() => null} />
           <Bar

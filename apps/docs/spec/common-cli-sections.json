@@ -18,6 +18,12 @@
     "title": "General",
     "items": [
       {
+        "id": "supabase-bootstrap",
+        "title": "Launch a quick start template",
+        "slug": "supabase-bootstrap",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-init",
         "title": "Initialize a local project",
         "slug": "supabase-init",
@@ -100,12 +106,6 @@
         "title": "Generate types (Postgres schema)",
         "slug": "supabase-gen-types",
         "type": "cli-command"
-      },
-      {
-        "id": "supabase-gen-types-typescript",
-        "title": "Generate types (TypeScript)",
-        "slug": "supabase-gen-types-typescript",
-        "type": "cli-command"
       }
     ]
   },
@@ -186,6 +186,12 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-migration-fetch",
+        "title": "Fetch migration files from history table",
+        "slug": "supabase-migration-fetch",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-migration-repair",
         "title": "Repair migration history table",
         "slug": "supabase-migration-repair",
@@ -199,8 +205,26 @@
       },
       {
         "id": "supabase-migration-up",
-        "title": "Apply pending migrations locally",
+        "title": "Apply pending migration files",
         "slug": "supabase-migration-up",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Seed",
+    "items": [
+      {
+        "id": "supabase-seed",
+        "title": "Seed a Supabase project",
+        "slug": "supabase-seed",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-seed-buckets",
+        "title": "Seed storage buckets from config file",
+        "slug": "supabase-seed-buckets",
         "type": "cli-command"
       }
     ]

@@ -1,34 +1,29 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { isEqual } from 'lodash'
+import { ChevronDown, Clipboard, Download, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import CSVButton from 'components/ui/CSVButton'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { copyToClipboard } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { Item, Menu, useContextMenu } from 'react-contexify'
+import { createPortal } from 'react-dom'
 import {
-  Alert,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconClipboard,
-  IconDownload,
-  IconEye,
-  IconEyeOff,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
   cn,
 } from 'ui'
-
-import CSVButton from 'components/ui/CSVButton'
-import { useCheckPermissions } from 'hooks'
-import { copyToClipboard } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { Play } from 'lucide-react'
-import { LogQueryError, isDefaultLogPreviewFormat } from '.'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
@@ -36,8 +31,9 @@ import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewCol
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import LogSelection, { LogSelectionProps } from './LogSelection'
-import type { LogData, QueryType } from './Logs.types'
-import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
+import type { LogData, LogQueryError, QueryType } from './Logs.types'
+import { isDefaultLogPreviewFormat } from './Logs.utils'
+import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 
 interface Props {
@@ -47,7 +43,6 @@ interface Props {
   isLoading?: boolean
   error?: LogQueryError | null
   showDownload?: boolean
-  // TODO: move all common params to a context to avoid prop drilling
   queryType?: QueryType
   projectRef: string
   params: LogSelectionProps['params']
@@ -57,6 +52,7 @@ interface Props {
   maxHeight?: string
   className?: string
   collectionName?: string // Used for warehouse queries
+  warehouseError?: string
   emptyState?: ReactNode
   showHeader?: boolean
   showHistogramToggle?: boolean
@@ -87,13 +83,18 @@ const LogTable = ({
   showHeader = true,
   showHistogramToggle = true,
 }: Props) => {
-  const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
-  const firstRow: LogData | undefined = data?.[0] as LogData
   const { profile } = useProfile()
+  const { show: showContextMenu } = useContextMenu()
+
+  const [cellPosition, setCellPosition] = useState<any>()
+  const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
+
   const canCreateLogQuery = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'log_sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
+
+  const firstRow: LogData | undefined = data?.[0] as LogData
 
   // move timestamp to the first column
   function getFirstRow() {
@@ -110,26 +111,24 @@ const LogTable = ({
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
+  const LOGS_EXPLORER_CONTEXT_MENU_ID = 'logs-explorer-context-menu'
   const DEFAULT_COLUMNS = columnNames.map((v: keyof LogData, idx) => {
+    const column = `logs-column-${idx}`
     const result: Column<LogData> = {
-      key: `logs-column-${idx}`,
+      key: column,
       name: v as string,
       resizable: true,
-      renderCell: (props) => {
-        const value = props.row?.[v]
-        if (value && typeof value === 'object') {
-          return JSON.stringify(value)
-        } else if (value === null) {
-          return 'NULL'
-        } else {
-          return String(value)
-        }
+      renderCell: ({ row }: any) => {
+        return (
+          <span onContextMenu={(e) => showContextMenu(e, { id: LOGS_EXPLORER_CONTEXT_MENU_ID })}>
+            {formatCellValue(row?.[v])}
+          </span>
+        )
       },
       renderHeaderCell: (props) => {
         return <div className="flex items-center">{v}</div>
       },
       minWidth: 128,
-      maxWidth: v === 'timestamp' ? 240 : 2400, // Without this, the column flickers on first render
     }
 
     return result
@@ -212,6 +211,23 @@ const LogTable = ({
     []
   )
 
+  const formatCellValue = (value: any) => {
+    return value && typeof value === 'object'
+      ? JSON.stringify(value)
+      : value === null
+        ? 'NULL'
+        : String(value)
+  }
+
+  const onCopyCell = () => {
+    if (cellPosition) {
+      const { row, column } = cellPosition
+      const cellValue = row?.[column.name] ?? ''
+      const value = formatCellValue(cellValue)
+      copyToClipboard(value)
+    }
+  }
+
   const copyResultsToClipboard = () => {
     copyToClipboard(stringData, () => {
       toast.success('Results copied to clipboard')
@@ -234,17 +250,17 @@ const LogTable = ({
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" iconRight={<IconChevronDown />}>
+            <Button type="text" iconRight={<ChevronDown size={14} />}>
               Results {data && data.length ? `(${data.length})` : ''}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
             <DropdownMenuItem onClick={downloadCSV} className="space-x-2">
-              <IconDownload size="tiny" />
+              <Download size={14} />
               <div>Download CSV</div>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={copyResultsToClipboard} className="space-x-2">
-              <IconClipboard size="tiny" />
+              <Clipboard size={14} />
               <div>Copy to clipboard</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -262,7 +278,7 @@ const LogTable = ({
         <div className="flex items-center gap-2">
           <Button
             type="default"
-            icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
+            icon={isHistogramShowing ? <Eye /> : <EyeOff />}
             onClick={onHistogramToggle}
           >
             Histogram
@@ -272,34 +288,21 @@ const LogTable = ({
 
       <div className="space-x-2">
         {IS_PLATFORM && (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
-              <Button
-                type="default"
-                onClick={onSave}
-                disabled={!canCreateLogQuery || !hasEditorValue}
-              >
-                Save query
-              </Button>
-            </Tooltip.Trigger>
-            {!canCreateLogQuery && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to save your query
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            )}
-          </Tooltip.Root>
+          <ButtonTooltip
+            type="default"
+            onClick={onSave}
+            disabled={!canCreateLogQuery || !hasEditorValue}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canCreateLogQuery
+                  ? 'You need additional permissions to save your query'
+                  : undefined,
+              },
+            }}
+          >
+            Save query
+          </ButtonTooltip>
         )}
         <Button
           title="run-logs-query"
@@ -315,34 +318,33 @@ const LogTable = ({
     </div>
   )
 
-  const renderErrorAlert = () => {
+  const RenderErrorAlert = () => {
     if (!error) return null
+
     const childProps = {
       isCustomQuery: queryType ? false : true,
       error: error!,
     }
-    let Renderer = DefaultErrorRenderer
+
     if (
       typeof error === 'object' &&
       error.error?.errors.find((err) => err.reason === 'resourcesExceeded')
     ) {
-      Renderer = ResourcesExceededErrorRenderer
+      return <ResourcesExceededErrorRenderer {...childProps} />
     }
 
     return (
-      <div className="flex w-1/2 justify-center px-5">
-        <Alert variant="danger" title="Sorry! An error occurred when fetching data." withIcon>
-          <Renderer {...childProps} />
-        </Alert>
+      <div className="text-foreground flex gap-2 font-mono px-6">
+        <DefaultErrorRenderer {...childProps} />
       </div>
     )
   }
 
-  const renderNoResultAlert = () => {
+  const RenderNoResultAlert = () => {
     if (emptyState) return emptyState
     else
       return (
-        <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
+        <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100 h-full">
           <div className="flex flex-col gap-1">
             <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
             <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
@@ -360,66 +362,75 @@ const LogTable = ({
   if (!data) return null
 
   return (
-    <section className={'flex w-full flex-col h-full'} style={{ maxHeight }}>
+    <section className={'flex w-full flex-col h-screen'} style={{ maxHeight }}>
       {!queryType && <LogsExplorerTableHeader />}
-      <div className={`flex h-full flex-row overflow-x-auto`}>
-        <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={focusedLog ? 60 : 100}>
-            <DataGrid
-              role="table"
-              style={{ height: '100%' }}
-              className={cn('flex-1 flex-grow h-full', {
-                'data-grid--simple-logs': queryType,
-                'data-grid--logs-explorer': !queryType,
-              })}
-              rowHeight={40}
-              headerRowHeight={queryType ? 0 : 28}
-              onSelectedCellChange={(row) => {
-                console.log('row', row)
-                setFocusedLog(row.row as LogData)
-              }}
-              selectedRows={new Set([])}
-              columns={columns}
-              rowClass={(row: LogData) =>
-                [
-                  'font-mono tracking-tight',
-                  isEqual(row, focusedLog)
-                    ? '!bg-surface-300 rdg-row--focused'
-                    : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
-                ].join(' ')
-              }
-              rows={logDataRows}
-              rowKeyGetter={(r) => {
-                if (!hasId) return JSON.stringify(r)
-                const row = r as LogData
-                return row.id
-              }}
-              renderers={{
-                renderRow: RowRenderer,
-                noRowsFallback: !isLoading ? (
-                  <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
-                    {!error && renderNoResultAlert()}
-                    {error && renderErrorAlert()}
-                  </div>
-                ) : null,
-              }}
+
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel defaultSize={focusedLog ? 60 : 100}>
+          <DataGrid
+            role="table"
+            style={{ height: '100%' }}
+            className={cn('flex-1 flex-grow h-full', {
+              'data-grid--simple-logs': queryType,
+              'data-grid--logs-explorer': !queryType,
+            })}
+            rowHeight={40}
+            headerRowHeight={queryType ? 0 : 28}
+            onSelectedCellChange={(row) => {
+              setFocusedLog(row.row as LogData)
+              setCellPosition(row)
+            }}
+            selectedRows={new Set([])}
+            columns={columns}
+            rowClass={(row: LogData) =>
+              [
+                'font-mono tracking-tight',
+                isEqual(row, focusedLog)
+                  ? '!bg-surface-300 rdg-row--focused'
+                  : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
+              ].join(' ')
+            }
+            rows={logDataRows}
+            rowKeyGetter={(r) => {
+              if (!hasId) return JSON.stringify(r)
+              const row = r as LogData
+              return row.id
+            }}
+            renderers={{
+              renderRow: RowRenderer,
+              noRowsFallback: !isLoading ? (
+                <div className="">
+                  {logDataRows.length === 0 && !error && <RenderNoResultAlert />}
+                  {error && <RenderErrorAlert />}
+                </div>
+              ) : null,
+            }}
+          />
+          {typeof window !== 'undefined' &&
+            createPortal(
+              <Menu id={LOGS_EXPLORER_CONTEXT_MENU_ID} animation={false}>
+                <Item onClick={onCopyCell}>
+                  <Clipboard size={14} />
+                  <span className="ml-2 text-xs">Copy cell content</span>
+                </Item>
+              </Menu>,
+              document.body
+            )}
+        </ResizablePanel>
+        <ResizableHandle />
+        {focusedLog && (
+          <ResizablePanel defaultSize={40}>
+            <LogSelection
+              projectRef={projectRef}
+              onClose={() => setFocusedLog(null)}
+              log={focusedLog}
+              queryType={queryType}
+              params={params}
+              collectionName={collectionName}
             />
           </ResizablePanel>
-          <ResizableHandle />
-          {focusedLog && (
-            <ResizablePanel defaultSize={40}>
-              <LogSelection
-                projectRef={projectRef}
-                onClose={() => setFocusedLog(null)}
-                log={focusedLog}
-                queryType={queryType}
-                params={params}
-                collectionName={collectionName}
-              />
-            </ResizablePanel>
-          )}
-        </ResizablePanelGroup>
-      </div>
+        )}
+      </ResizablePanelGroup>
     </section>
   )
 }

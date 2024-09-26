@@ -1,10 +1,10 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import type { FDW } from 'data/fdw/fdws-query'
-import { WRAPPERS } from './Wrappers.constants'
+import { getWrapperMetaForWrapper } from './Wrappers.utils'
 
 interface DeleteWrapperModalProps {
   selectedWrapper?: FDW
@@ -19,7 +19,7 @@ const DeleteWrapperModal = ({ selectedWrapper, onClose }: DeleteWrapperModalProp
       onClose()
     },
   })
-  const wrapperMeta = WRAPPERS.find((meta) => meta.handlerName === selectedWrapper?.handler)
+  const wrapperMeta = getWrapperMetaForWrapper(selectedWrapper)
 
   const onConfirmDelete = async () => {
     if (!project?.ref) return console.error('Project ref is required')

@@ -1,19 +1,23 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
+import { ExternalLink, Info } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import AlertError from 'components/ui/AlertError'
 import InformationBox from 'components/ui/InformationBox'
+import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import Link from 'next/link'
-import { Button, IconExternalLink, IconInfo, Listbox } from 'ui'
+import { Button, Listbox } from 'ui'
 import { Restriction } from '../BillingSettings/Restriction'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
@@ -25,6 +29,11 @@ const Usage = () => {
   const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()
   const [selectedProjectRef, setSelectedProjectRef] = useState<string>()
+
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
 
   const organization = useSelectedOrganization()
   const { data: projects, isSuccess } = useProjectsQuery()
@@ -91,6 +100,14 @@ const Usage = () => {
   const selectedProject = selectedProjectRef
     ? orgProjects?.find((it) => it.ref === selectedProjectRef)
     : undefined
+
+  if (!canReadSubscriptions) {
+    return (
+      <ScaffoldContainerLegacy>
+        <NoPermission resourceText="view organization usage" />
+      </ScaffoldContainerLegacy>
+    )
+  }
 
   return (
     <>
@@ -176,7 +193,7 @@ const Usage = () => {
                   "All Projects".
                 </p>
                 <div>
-                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <Link
                       href="https://supabase.com/docs/guides/platform/org-based-billing"
                       target="_blank"
@@ -190,7 +207,7 @@ const Usage = () => {
             }
             defaultVisibility
             hideCollapse
-            icon={<IconInfo />}
+            icon={<Info />}
           />
         </ScaffoldContainer>
       ) : (
@@ -208,13 +225,15 @@ const Usage = () => {
         currentBillingCycleSelected={currentBillingCycleSelected}
       />
 
-      <Compute
-        orgSlug={slug as string}
-        projectRef={selectedProjectRef}
-        subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
-      />
+      {subscription?.plan.id !== 'free' && (
+        <Compute
+          orgSlug={slug as string}
+          projectRef={selectedProjectRef}
+          subscription={subscription}
+          startDate={startDate}
+          endDate={endDate}
+        />
+      )}
 
       <Bandwidth
         orgSlug={slug as string}

@@ -1,12 +1,16 @@
-import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
-import { generateSettingsMenu } from './SettingsMenu.utils'
 
 import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
-import { ProjectLayout } from '..'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { generateSettingsMenu } from './SettingsMenu.utils'
+import { useFlag } from 'hooks/ui/useFlag'
 
 interface SettingsLayoutProps {
   title?: string
@@ -42,11 +46,16 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     'billing:invoices',
   ])
 
+  const warehouseEnabled = useFlag('warehouse')
+  const logDrainsEnabled = useFlag('logdrains')
+
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     invoices: invoicesEnabled,
+    warehouse: warehouseEnabled,
+    logDrains: logDrainsEnabled,
   })
 
   return (

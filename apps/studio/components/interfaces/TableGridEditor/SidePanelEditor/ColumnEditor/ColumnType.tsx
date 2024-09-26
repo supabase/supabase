@@ -13,6 +13,7 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
+  CriticalIcon,
   Input,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -32,7 +33,7 @@ import {
   ToggleRight,
   Type,
 } from 'lucide-react'
-import { CriticalIcon } from 'ui-patterns/Icons/StatusIcons'
+
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,

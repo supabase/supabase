@@ -1,14 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { AlertCircle, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useFlag } from 'hooks'
+import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -16,8 +17,6 @@ import {
   Alert_Shadcn_,
   Button,
   Form,
-  IconAlertCircle,
-  IconAlertTriangle,
   Listbox,
   Modal,
   TooltipContent_Shadcn_,
@@ -106,7 +105,7 @@ const ProjectUpgradeAlert = () => {
                       You will not be able to downgrade back to Postgres {currentPgVersion}.
                     </p>
                     <Alert_Shadcn_ title="Your project will be offline while the upgrade is in progress">
-                      <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
+                      <AlertCircle className="h-4 w-4" strokeWidth={2} />
                       <AlertTitle_Shadcn_>
                         Your project will be offline for up to {durationEstimateHours} hour
                         {durationEstimateHours === 1 ? '' : 's'}
@@ -120,7 +119,7 @@ const ProjectUpgradeAlert = () => {
                     </Alert_Shadcn_>
                     {(data?.potential_breaking_changes ?? []).length > 0 && (
                       <Alert_Shadcn_ variant="destructive" title="Breaking changes">
-                        <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
+                        <AlertCircle className="h-4 w-4" strokeWidth={2} />
                         <AlertTitle_Shadcn_>Breaking changes</AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_ className="flex flex-col gap-3">
                           <p>
@@ -147,7 +146,7 @@ const ProjectUpgradeAlert = () => {
                         variant="warning"
                         title="Custom Postgres roles using md5 authentication have been detected"
                       >
-                        <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
+                        <AlertTriangle className="h-4 w-4" strokeWidth={2} />
                         <AlertTitle_Shadcn_>
                           Custom Postgres roles will not work automatically after upgrade
                         </AlertTitle_Shadcn_>

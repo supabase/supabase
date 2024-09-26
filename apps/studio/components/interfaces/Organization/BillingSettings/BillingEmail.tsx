@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
@@ -9,10 +9,13 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Form, Input } from 'ui'
 
 const BillingEmail = () => {
@@ -25,7 +28,10 @@ const BillingEmail = () => {
   const initialValues = { billing_email: billing_email ?? '' }
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const canReadBillingEmail = useCheckPermissions(PermissionAction.READ, 'organizations')
+  const canReadBillingEmail = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const onUpdateOrganizationEmail = async (values: any, { resetForm }: any) => {
@@ -50,6 +56,8 @@ const BillingEmail = () => {
       }
     )
   }
+
+  if (!canReadBillingEmail) return null
 
   return (
     <ScaffoldSection>
@@ -99,7 +107,7 @@ const BillingEmail = () => {
                       id="billing_email"
                       size="small"
                       label="Email address"
-                      type={canReadBillingEmail ? 'text' : 'password'}
+                      type="text"
                       disabled={!canUpdateOrganization}
                     />
                   </FormSectionContent>

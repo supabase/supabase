@@ -1,9 +1,8 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import {
   useIsProjectActive,
@@ -11,15 +10,19 @@ import {
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
-import { setProjectPostgrestStatus } from 'data/projects/projects-query'
-import { useCheckPermissions, useFlag } from 'hooks'
+import { setProjectStatus } from 'data/projects/projects-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
+import { ChevronDown } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
@@ -76,7 +79,7 @@ const RestartServerButton = () => {
   }
 
   const onRestartSuccess = () => {
-    setProjectPostgrestStatus(queryClient, projectRef, 'OFFLINE')
+    setProjectStatus(queryClient, projectRef, 'RESTARTING')
     toast.success('Restarting server...')
     router.push(`/project/${projectRef}`)
     setServiceToRestart(undefined)
@@ -84,8 +87,8 @@ const RestartServerButton = () => {
 
   return (
     <>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger asChild>
+      <Tooltip_Shadcn_>
+        <TooltipTrigger_Shadcn_ asChild>
           <div className="flex items-center">
             <Button
               type="default"
@@ -106,7 +109,7 @@ const RestartServerButton = () => {
                   <Button
                     type="default"
                     className="rounded-l-none px-[4px] py-[5px]"
-                    icon={<IconChevronDown />}
+                    icon={<ChevronDown />}
                     disabled={!canRestartProject}
                   />
                 </DropdownMenuTrigger>
@@ -130,46 +133,21 @@ const RestartServerButton = () => {
               </DropdownMenu>
             )}
           </div>
-        </Tooltip.Trigger>
-        {project !== undefined && (!canRestartProject || !isProjectActive) && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                  'border border-background', //border
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  {!canRestartProject
-                    ? 'You need additional permissions to restart this project'
-                    : !isProjectActive
-                      ? 'Unable to restart project as project is not active'
-                      : ''}
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
+        </TooltipTrigger_Shadcn_>
+        {((project !== undefined && (!canRestartProject || !isProjectActive)) ||
+          projectRestartDisabled) && (
+          <TooltipContent_Shadcn_ side="bottom">
+            {projectRestartDisabled
+              ? 'Project restart is currently disabled'
+              : !canRestartProject
+                ? 'You need additional permissions to restart this project'
+                : !isProjectActive
+                  ? 'Unable to restart project as project is not active'
+                  : ''}
+          </TooltipContent_Shadcn_>
         )}
-        {projectRestartDisabled && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                  'border border-background', //border
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  Project restart is currently disabled
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        )}
-      </Tooltip.Root>
+      </Tooltip_Shadcn_>
+
       <ConfirmModal
         danger
         visible={serviceToRestart !== undefined}

@@ -1,11 +1,17 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import { get, handleError } from 'data/fetchers'
-import { subscriptionKeys } from './keys'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ResponseError } from 'types'
+import { subscriptionKeys } from './keys'
+import { components } from 'api-types'
 
 export type OrgSubscriptionVariables = {
   orgSlug?: string
 }
+
+export type PlanType = components['schemas']['BillingPlanId']
 
 export async function getOrgSubscription(
   { orgSlug }: OrgSubscriptionVariables,
@@ -31,12 +37,33 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
     enabled = true,
     ...options
   }: UseQueryOptions<OrgSubscriptionData, OrgSubscriptionError, TData> = {}
-) =>
-  useQuery<OrgSubscriptionData, OrgSubscriptionError, TData>(
+) => {
+  // [Joshen] Thinking it makes sense to add this check at the RQ level - prevent
+  // unnecessary requests, although this behaviour still needs handling on the UI
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+
+  return useQuery<OrgSubscriptionData, OrgSubscriptionError, TData>(
     subscriptionKeys.orgSubscription(orgSlug),
     ({ signal }) => getOrgSubscription({ orgSlug }, signal),
     {
-      enabled: enabled && typeof orgSlug !== 'undefined',
+      enabled: enabled && canReadSubscriptions && typeof orgSlug !== 'undefined',
       ...options,
     }
   )
+}
+
+export const useHasAccessToProjectLevelPermissions = (slug: string) => {
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+  const { data: subscription } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: canReadSubscriptions }
+  )
+
+  return subscription?.plan.id === 'enterprise'
+}

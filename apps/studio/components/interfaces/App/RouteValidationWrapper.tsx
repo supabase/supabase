@@ -1,11 +1,12 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useFlag, useLatest } from 'hooks'
+import useLatest from 'hooks/misc/useLatest'
+import { useFlag } from 'hooks/ui/useFlag'
 import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 

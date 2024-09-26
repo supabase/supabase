@@ -6,6 +6,9 @@ import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
 
+export const MAX_REPLICAS_BELOW_XL = 2
+export const MAX_REPLICAS_ABOVE_XL = 5
+
 export type ReadReplicasVariables = {
   projectRef?: string
 }

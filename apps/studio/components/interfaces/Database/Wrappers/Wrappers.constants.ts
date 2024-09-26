@@ -13,6 +13,8 @@ export const WRAPPER_HANDLERS = {
   COGNITO: 'cognito_fdw_handler',
   MSSQL: 'mssql_fdw_handler',
   REDIS: 'redis_fdw_handler',
+  PADDLE: 'wasm_fdw_handler',
+  SNOWFLAKE: 'wasm_fdw_handler',
 }
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -31,7 +33,7 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'Stripe Secret Key',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
           urlHelper: 'https://stripe.com/docs/keys',
         },
         {
@@ -40,7 +42,7 @@ export const WRAPPERS: WrapperMeta[] = [
           defaultValue: 'https://api.stripe.com/v1',
           required: false,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
         },
       ],
     },
@@ -238,6 +240,50 @@ export const WRAPPERS: WrapperMeta[] = [
         ],
       },
       {
+        label: 'Checkout Sessions',
+        description:
+          "Customer's session as they pay for one-time purchases or subscriptions through Checkout or Payment Links",
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'customer',
+            type: 'text',
+          },
+          {
+            name: 'payment_intent',
+            type: 'text',
+          },
+          {
+            name: 'subscription',
+            type: 'text',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'checkout/sessions',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
         label: 'Customers',
         description: 'Customers on your Stripe account',
         availableColumns: [
@@ -279,6 +325,191 @@ export const WRAPPERS: WrapperMeta[] = [
             label: 'Row ID Column',
             defaultValue: 'id',
             editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Disputes',
+        description: 'When a customer questions your charge with their card issuer',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'amount',
+            type: 'bigint',
+          },
+          {
+            name: 'currency',
+            type: 'text',
+          },
+          {
+            name: 'charge',
+            type: 'text',
+          },
+          {
+            name: 'payment_intent',
+            type: 'text',
+          },
+          {
+            name: 'reason',
+            type: 'text',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'disputes',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Events',
+        description:
+          "Stripe's way of letting you know when something interesting happens in your account",
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'type',
+            type: 'text',
+          },
+          {
+            name: 'api_version',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'events',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Files',
+        description: "Files that are hosted on Stripe's servers",
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'filename',
+            type: 'text',
+          },
+          {
+            name: 'purpose',
+            type: 'text',
+          },
+          {
+            name: 'title',
+            type: 'text',
+          },
+          {
+            name: 'size',
+            type: 'bigint',
+          },
+          {
+            name: 'type',
+            type: 'text',
+          },
+          {
+            name: 'url',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'expires_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'files',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'File Links',
+        description: 'For sharing contents of a File object with non-Stripe users',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'file',
+            type: 'text',
+          },
+          {
+            name: 'url',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'expired',
+            type: 'bool',
+          },
+          {
+            name: 'expires_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'file_links',
+            editable: false,
             required: true,
             type: 'text',
           },
@@ -336,6 +567,42 @@ export const WRAPPERS: WrapperMeta[] = [
         ],
       },
       {
+        label: 'Mandates',
+        description:
+          'Records of the permission a customer has given you to debit their payment method',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'payment_method',
+            type: 'text',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+          {
+            name: 'type',
+            type: 'text',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'mandates',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
         label: 'Payment Intents',
         description: 'Payment Intents on your Stripe account',
         availableColumns: [
@@ -372,6 +639,106 @@ export const WRAPPERS: WrapperMeta[] = [
           {
             name: 'object',
             defaultValue: 'payment_intents',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Payouts',
+        description:
+          'Created when you receive funds from Stripe, or when you initiate a payout to either a bank account or debit card',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'amount',
+            type: 'bigint',
+          },
+          {
+            name: 'currency',
+            type: 'text',
+          },
+          {
+            name: 'arrival_date',
+            type: 'timestamp',
+          },
+          {
+            name: 'description',
+            type: 'text',
+          },
+          {
+            name: 'statement_descriptor',
+            type: 'text',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'payouts',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Prices',
+        description:
+          'A Price object is needed for all your products to facilitate multiple currencies and pricing options',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'active',
+            type: 'bool',
+          },
+          {
+            name: 'currency',
+            type: 'text',
+          },
+          {
+            name: 'product',
+            type: 'text',
+          },
+          {
+            name: 'unit_amount',
+            type: 'bigint',
+          },
+          {
+            name: 'type',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'prices',
             editable: false,
             required: true,
             type: 'text',
@@ -434,6 +801,165 @@ export const WRAPPERS: WrapperMeta[] = [
         ],
       },
       {
+        label: 'Refunds',
+        description:
+          'Allows you to refund a charge that has previously been created but not yet refunded',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'amount',
+            type: 'bigint',
+          },
+          {
+            name: 'currency',
+            type: 'text',
+          },
+          {
+            name: 'charge',
+            type: 'text',
+          },
+          {
+            name: 'payment_intent',
+            type: 'text',
+          },
+          {
+            name: 'reason',
+            type: 'text',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'refunds',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Setup Attempts',
+        description: 'Attempted confirmations of a SetupIntent, either successful or unsuccessful',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'application',
+            type: 'text',
+          },
+          {
+            name: 'customer',
+            type: 'text',
+          },
+          {
+            name: 'on_behalf_of',
+            type: 'text',
+          },
+          {
+            name: 'payment_method',
+            type: 'text',
+          },
+          {
+            name: 'setup_intent',
+            type: 'text',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+          {
+            name: 'usage',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'setup_attempts',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Setup Intents',
+        description:
+          "Guides you through the process of setting up and saving a customer's payment credentials for future payments",
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'client_secret',
+            type: 'text',
+          },
+          {
+            name: 'customer',
+            type: 'text',
+          },
+          {
+            name: 'description',
+            type: 'text',
+          },
+          {
+            name: 'payment_method',
+            type: 'text',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+          {
+            name: 'usage',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'setup_intents',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
         label: 'Subscriptions',
         description: 'Subscriptions on your Stripe account',
         availableColumns: [
@@ -480,6 +1006,132 @@ export const WRAPPERS: WrapperMeta[] = [
           },
         ],
       },
+      {
+        label: 'Tokens',
+        description:
+          'Tokenization is the process Stripe uses to collect sensitive card or bank account details in a secure manner',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'customer',
+            type: 'text',
+          },
+          {
+            name: 'currency',
+            type: 'text',
+          },
+          {
+            name: 'current_period_start',
+            type: 'timestamp',
+          },
+          {
+            name: 'current_period_end',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'tokens',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Top-ups',
+        description: 'To top up your Stripe balance',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'amount',
+            type: 'bigint',
+          },
+          {
+            name: 'currency',
+            type: 'text',
+          },
+          {
+            name: 'description',
+            type: 'text',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'topups',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Transfers',
+        description: 'When moving funds between Stripe accounts as part of Connect',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'amount',
+            type: 'bigint',
+          },
+          {
+            name: 'currency',
+            type: 'text',
+          },
+          {
+            name: 'description',
+            type: 'text',
+          },
+          {
+            name: 'destination',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'transfers',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
     ],
   },
   {
@@ -497,14 +1149,14 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'Project ID',
           required: true,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
         },
         {
           name: 'sa_key_id',
           label: 'Service Account Key',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
           isTextArea: true,
           urlHelper: 'https://firebase.google.com/docs/admin/setup#initialize-sdk',
         },
@@ -623,21 +1275,21 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'Access Key ID',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
         {
           name: 'vault_secret_access_key',
           label: 'Access Key Secret',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
         {
           name: 'aws_region',
           label: 'AWS Region',
           required: true,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
           defaultValue: 'us-east-1',
         },
       ],
@@ -706,7 +1358,7 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'ClickHouse Connection String',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
       ],
     },
@@ -750,21 +1402,21 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'Service Account Key',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
         {
           name: 'project_id',
           label: 'Project ID',
           required: true,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
         },
         {
           name: 'dataset_id',
           label: 'Dataset ID',
           required: true,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
         },
       ],
     },
@@ -824,7 +1476,7 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'API Key ID',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
       ],
     },
@@ -866,7 +1518,7 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'API Key ID',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
       ],
     },
@@ -902,7 +1554,7 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'Auth0 API key or PAT',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
         {
           name: 'url',
@@ -910,7 +1562,7 @@ export const WRAPPERS: WrapperMeta[] = [
           defaultValue: 'https://dev-<tenant-id>.us.auth0.com/api/v2/users',
           required: false,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
         },
       ],
     },
@@ -1032,28 +1684,28 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'AWS Access Key ID',
           required: true,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
         },
         {
           name: 'api_key_id',
           label: 'AWS Secret Key',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
         {
           name: 'region',
           label: 'Region',
           required: true,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
         },
         {
           name: 'user_pool_id',
           label: 'User Pool ID',
           required: true,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
         },
       ],
     },
@@ -1115,7 +1767,7 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'Connection String',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
       ],
     },
@@ -1151,7 +1803,7 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'Connection URL',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
       ],
     },
@@ -1211,6 +1863,208 @@ export const WRAPPERS: WrapperMeta[] = [
             label: 'Source Key',
             editable: true,
             required: false,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'paddle_wrapper',
+    handlerName: WRAPPER_HANDLERS.PADDLE,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/paddle-icon.svg`,
+    extensionName: 'paddleFdw',
+    label: 'Paddle',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/paddle',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_paddle_fdw_v0.1.1/paddle_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:paddle-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.1',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'c5ac70bb2eef33693787b7d4efce9a83cde8d4fa40889d2037403a51263ba657',
+          hidden: true,
+        },
+        {
+          name: 'api_url',
+          label: 'Paddle API URL',
+          defaultValue: 'https://api.paddle.com',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'api_key_id',
+          label: 'Paddle API Key',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Paddle Object',
+        description: 'Map to an Paddle Object',
+        options: [
+          {
+            name: 'object',
+            label: 'Object',
+            editable: true,
+            required: true,
+            type: 'select',
+            defaultValue: 'products',
+            options: [
+              { label: 'Products', value: 'products' },
+              { label: 'Prices', value: 'prices' },
+              { label: 'Discounts', value: 'discounts' },
+              { label: 'Customers', value: 'customers' },
+              { label: 'Transactions', value: 'transactions' },
+              { label: 'Reports', value: 'reports' },
+              { label: 'Notification Settings', value: 'notification-settings' },
+              { label: 'notifications', value: 'notifications' },
+            ],
+          },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'snowflake_wrapper',
+    handlerName: WRAPPER_HANDLERS.SNOWFLAKE,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/snowflake-icon.svg`,
+    extensionName: 'snowflakeFdw',
+    label: 'Snowflake',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/snowflake',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_snowflake_fdw_v0.1.1/snowflake_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:snowflake-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.1',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '7aaafc7edc1726bc93ddc04452d41bda9e1a264a1df2ea9bf1b00b267543b860',
+          hidden: true,
+        },
+        {
+          name: 'account_identifier',
+          label: 'Account Identifier',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'user',
+          label: 'User',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'public_key_fingerprint',
+          label: 'Public Key Fingerprint',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'private_key_id',
+          label: 'Private Key',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Snowflake Table',
+        description: 'Map to an Snowflake Table',
+        options: [
+          {
+            name: 'table',
+            label: 'Table',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
+            required: true,
             type: 'text',
           },
         ],

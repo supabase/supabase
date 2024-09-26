@@ -4,17 +4,17 @@
 
 // Basic UI things
 import Link from 'next/link'
-import { Accordion, Admonition, Alert, Button, CodeBlock, markdownComponents } from 'ui'
+import { Accordion, Admonition, Alert, Button, CodeBlock, Image, markdownComponents } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
-import { TabPanel, Tabs } from '~/components/Tabs'
+import { TabPanel, Tabs } from '~/features/ui/Tabs'
 
 // Common components
 import { CH } from '@code-hike/mdx/components'
+import { ArrowDown, Check } from 'lucide-react'
+import { Heading } from 'ui'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import ButtonCard from './ButtonCard'
-import { Heading } from 'ui'
 
 // Reference guide specific
 // [Charis] I think we can factor these out so they aren't in the bundle for absolutely everything
@@ -28,6 +28,7 @@ import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderC
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
+import Table from '~/components/Table'
 
 // Data wrappers
 import { NavData } from './NavData'
@@ -35,6 +36,7 @@ import { SharedData } from './SharedData'
 
 // Partials
 import HuggingFaceDeployment from './MDX/ai/quickstart_hf_deployment.mdx'
+import AuthErrorCodesTable from './MDX/auth_error_codes_table.mdx'
 import AuthRateLimits from './MDX/auth_rate_limits.mdx'
 import DatabaseSetup from './MDX/database_setup.mdx'
 import GetSessionWarning from './MDX/get_session_warning.mdx'
@@ -47,7 +49,6 @@ import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supab
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
 
 // Icons
-import { IconArrowDown, IconCheck } from 'ui'
 import {
   IconMenuApi,
   IconMenuAuth,
@@ -69,7 +70,7 @@ import {
   IconMenuSelfHosting,
   IconMenuStorage,
   IconMenuSwift,
-} from './Navigation/NavigationMenu/HomeMenuIcons'
+} from './Navigation/NavigationMenu/MenuIcons'
 
 // Heavy/rare (lazy-loaded)
 import SqlToRest from '@ui-patterns/SqlToRest'
@@ -77,7 +78,6 @@ import { AppleSecretGenerator } from './AppleSecretGenerator'
 import { AuthSmsProviderConfig } from './AuthSmsProviderConfig'
 import { Extensions } from './Extensions'
 import { JwtGenerator } from './JwtGenerator'
-import { Mermaid } from './Mermaid'
 import { RealtimeLimitsEstimator } from './RealtimeLimitsEstimator'
 
 const components = {
@@ -91,6 +91,7 @@ const components = {
   ),
   AppleSecretGenerator,
   AuthProviders,
+  AuthErrorCodesTable,
   AuthRateLimits,
   AuthSmsProviderConfig,
   Button,
@@ -119,9 +120,9 @@ const components = {
     </Heading>
   ),
   HuggingFaceDeployment,
-  IconCheck,
+  IconCheck: Check,
   IconMenuApi,
-  IconArrowDown,
+  IconArrowDown: ArrowDown,
   IconMenuAuth,
   IconMenuCli,
   IconMenuCsharp,
@@ -142,11 +143,10 @@ const components = {
   IconMenuStorage,
   IconMenuSwift,
   IconPanel,
-  Image: (props: any) => <ThemeImage fill className="object-contain" {...props} />,
+  Image: (props: any) => <Image fill className="object-contain" {...props} />,
   JwtGenerator,
   KotlinProjectSetup,
   Link,
-  Mermaid,
   MigrationWarnings,
   NavData,
   OAuthPkceFlow,
@@ -163,6 +163,7 @@ const components = {
   SocialProviderSetup,
   SqlToRest,
   StepHikeCompact,
+  table: Table,
   TabPanel,
   Tabs,
 }

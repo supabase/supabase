@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Mail } from 'lucide-react'
-import toast from 'react-hot-toast'
-import { Button, Form, Input, Modal } from 'ui'
+import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button, Form, Input, Modal } from 'ui'
 
 export type InviteUserModalProps = {
   visible: boolean

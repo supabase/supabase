@@ -10,21 +10,12 @@ Read Replicas are additional databases that are kept in sync with your Primary d
 - **Improved latency:** For projects with a global user base, additional databases can be deployed closer to users to reduce latency.
 - **Redundancy:** Read Replicas provide data redundancy.
 
-<figure className="max-w-[700px] mx-auto">
-
-    <Image
-        className="hidden dark:block"
-        alt="Map view of all project databases"
-        src="/docs/img/guides/platform/read-replicas/map-view.png?v=1"
-    />
-
-    <Image
-        className="dark:hidden"
-        alt="Map view of all project databases."
-        src="/docs/img/guides/platform/read-replicas/map-view.png?v=1"
-    />
-
-</figure>
+<Image
+  alt="Map view of all project databases."
+  src="/docs/img/guides/platform/read-replicas/map-view.png?v=1"
+  containerClassName="max-w-[700px] !mx-auto"
+  zoomable
+/>
 
 ## About Read Replicas
 
@@ -59,7 +50,9 @@ Projects must meet these requirements to use Read Replicas:
 
 ## Getting started
 
-To add a Read Replica, go to the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure) in your dashboard. Each project can deploy up to two Read Replicas and all Read Replicas inherit the compute size of their Primary database.
+To add a Read Replica, go to the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure) in your dashboard.
+
+Projects on an XL compute add-on or larger can create up to five Read Replicas. Projects on compute add-ons smaller than XL can create up to two Read Replicas. All Read Replicas inherit the compute size of their Primary database.
 
 ### Deploying a Read Replica
 
@@ -83,14 +76,6 @@ It is safe to drop this failed Read Replica, and in the event of a transient iss
 Read Replicas offer the following features:
 
 ### Dedicated endpoints
-
-<Admonition type="note" label="Known bug in PostgREST schema reloading">
-
-For Read Replicas deployed before May 24, 2024, there is a known bug that results in the [PostgREST schema cache](https://postgrest.org/en/v12/references/schema_cache.html) on Read Replicas not being reloaded correctly on DDL changes. A stale schema cache can result in PostgREST on Read Replicas not knowing about newly created functions, tables, changes to their structure, etc.
-
-A fix for this issue has already been deployed for newer Read Replicas but not fully applied for older ones as it requires a restart of the API service. You can perform a one-time restart of the service by [saving any trivial configuration change](https://supabase.com/dashboard/project/_/settings/api) to your PostgREST configuration (For example, changing the `Max Rows` by 1), which will result in the service being restarted.
-
-</Admonition>
 
 Each Read Replica has its own dedicated database and API endpoints.
 
@@ -127,21 +112,12 @@ If you use a [custom domain](/docs/guides/platform/custom-domains), requests wil
 
 In the SQL editor, you can choose if you want to run the query on a particular Read Replica.
 
-<figure className="max-w-[700px] mx-auto">
-
-    <Image
-        className="hidden dark:block"
-        alt="SQL editor view."
-        src="/docs/img/guides/platform/read-replicas/sql-editor.png?v=1"
-    />
-
-    <Image
-        className="dark:hidden"
-        alt="SQL editor view."
-        src="/docs/img/guides/platform/read-replicas/sql-editor.png?v=1"
-    />
-
-</figure>
+<Image
+  alt="SQL editor view."
+  src="/docs/img/guides/platform/read-replicas/sql-editor.png?v=1"
+  containerClassName="max-w-[700px]"
+  zoomable
+/>
 
 ### Logging
 
@@ -195,13 +171,13 @@ In this replication method, the Primary continuously buffers WAL changes to a lo
 
 ### File-based log shipping 🤝 streaming replication
 
-<figure className="max-w-[700px] mx-auto">
-  <Image
-    alt="Map view of Primary and Read Replica databases"
-    src="/docs/img/guides/platform/read-replicas/streaming-replication-dark.png?v=1"
-  />
-  <figcaption>Map view of Primary and Read Replica databases</figcaption>
-</figure>
+<Image
+  alt="Map view of Primary and Read Replica databases"
+  caption="Map view of Primary and Read Replica databases"
+  src="/docs/img/guides/platform/read-replicas/streaming-replication-dark.png?v=1"
+  containerClassName="max-w-[700px] mx-auto"
+  zoomable
+/>
 
 We bring these two methods together to achieve quick, stable, and reliable replication. Each method addresses the limitations of the other. Streaming replication minimizes replication lag, while file-based log shipping provides a fallback. For file-based log shipping, we use our existing Point In Time Recovery (PITR) infrastructure. We regularly archive files from the Primary using [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, and ship the WAL files to S3.
 
@@ -212,3 +188,24 @@ We combine it with streaming replication to reduce replication lag. Once WAL-G f
 Replication lag for a specific Read Replica can be monitored through the dashboard. On the [Database Reports page](/dashboard/project/_/reports/database) Read Replicas will have an additional chart under `Replica Information` displaying historical replication lag in seconds. Realtime replication lag in seconds can be observed on the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure). This is the value on top of the Read Replica. Do note that there is no single threshold to indicate when replication lag should be addressed. It would be fully dependent on the requirements of your project.
 
 If you are already ingesting your [project's metrics](/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment, you can also keep track of replication lag and set alarms accordingly with the metric: `physical_replication_lag_physical_replica_lag_seconds`.
+
+Some common sources of high replication lag include:
+
+1. Exclusive locks on tables on the Primary.
+   Operations such as `drop table`, `reindex` (amongst others) take an Access Exclusive lock on the table. This can result in increasing replication lag for the duration of the lock.
+1. Resource Constraints on the database
+   Heavy utilization on the primary or the replica, if run on an under-resourced project, can result in high replication lag. This includes the characteristics of the disk being utilized (IOPS, Throughput).
+1. Long-running transactions on the Primary.
+   Transactions that run for a long-time on the primary can also result in high replication lag. You can use the `pg_stat_activity` view to identify and terminate such transactions if needed. `pg_stat_activity` is a live view, and does not offer historical data on transactions that might have been active for a long time in the past.
+
+High replication lag can result in stale data being returned for queries being executed against the affected read replicas.
+
+You can [consult](https://cloud.google.com/sql/docs/postgres/replication/replication-lag) [additional](https://repost.aws/knowledge-center/rds-postgresql-replication-lag) [resources](https://severalnines.com/blog/what-look-if-your-postgresql-replication-lagging/) on the subject as well.
+
+## Misc
+
+### Restart or compute add-on change behaviour
+
+When a project that utilizes Read Replicas is restarted, or the compute add-on size is changed, the Primary database gets restarted first. During this period, the Read Replicas remain available.
+
+Once the Primary database has completed restarting (or resizing, in case of a compute add-on change) and become available for usage, all the Read Replicas are restarted (and resized, if needed) concurrently.

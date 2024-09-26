@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -10,7 +10,7 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import type { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
@@ -36,7 +36,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
 
   const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
-    useGitHubAuthorizationQuery()
+    useGitHubAuthorizationQuery({ enabled: sidePanelStateSnapshot.githubConnectionsOpen })
 
   // [Alaister]: temp override with <any> until the typegen is fixed
   const { data: githubReposData, isLoading: isLoadingGitHubRepos } = useGitHubRepositoriesQuery<
@@ -54,8 +54,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     () =>
       supabaseProjectsData
         ?.filter((project) => project.organization_id === selectedOrganization?.id)
-        .map((project) => ({ id: project.id.toString(), name: project.name, ref: project.ref })) ??
-      EMPTY_ARR,
+        .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
     [selectedOrganization?.id, supabaseProjectsData]
   )
 

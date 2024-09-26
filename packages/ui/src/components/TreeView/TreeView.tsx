@@ -1,8 +1,8 @@
 'use client'
 
-import { ChevronRight, FolderClosed, FolderOpen } from 'lucide-react'
-import { ComponentPropsWithoutRef, forwardRef, useEffect, useRef, useState } from 'react'
-import TreeViewPrimitive from 'react-accessible-treeview'
+import { ChevronRight, FolderClosed, FolderOpen, Loader2 } from 'lucide-react'
+import { ComponentPropsWithoutRef, ReactNode, forwardRef, useEffect, useRef, useState } from 'react'
+import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
 
@@ -25,21 +25,27 @@ const TreeViewItem = forwardRef<
     xPadding: number
     /** name of entity */
     name: string
+    /** icon of entity */
+    icon?: ReactNode
     /** Specifies if the item is being edited, shows an input */
     isEditing?: boolean
     /** Callback for when the item is edited */
     onEditSubmit?: (value: string) => void
+    /** For asynchronous loading */
+    isLoading?: boolean
   }
 >(
   (
     {
       level = 1,
+      levelPadding = 56,
       isExpanded = false,
       isBranch = false,
-      levelPadding = 56,
       isSelected = false,
+      isLoading = false,
       xPadding = 16,
       name = '',
+      icon,
       isEditing = false,
       onEditSubmit,
       ...props
@@ -51,24 +57,29 @@ const TreeViewItem = forwardRef<
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
-        console.log('handleClickOutside')
         if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
           onEditSubmit?.(localValueState)
         }
       }
-
-      document.addEventListener('mousedown', handleClickOutside)
-
+      if (isEditing) document.addEventListener('mousedown', handleClickOutside)
       return () => {
-        document.removeEventListener('mousedown', handleClickOutside)
+        if (isEditing) document.removeEventListener('mousedown', handleClickOutside)
       }
-    }, [localValueState])
+    }, [isEditing])
 
     useEffect(() => {
       if (isEditing) {
         inputRef.current?.focus()
+      } else {
+        setLocalValueState(name)
       }
     }, [isEditing])
+
+    useEffect(() => {
+      if (!isLoading) {
+        setLocalValueState(name)
+      }
+    }, [isLoading])
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
@@ -79,28 +90,26 @@ const TreeViewItem = forwardRef<
       <div
         ref={ref}
         aria-selected={isSelected}
-        aria-expanded={isExpanded}
+        aria-expanded={!isEditing && isExpanded}
         {...props}
         className={cn(
-          'relative',
+          'group relative',
           'transition-colors',
+          'h-[28px]',
           'flex items-center gap-3',
           'text-sm',
-          'cursor-pointer',
-          'select-none',
+          'cursor-pointer select-none',
           'text-foreground-light',
-          'aria-selected:text-foreground',
+          'hover:bg-control',
           'aria-expanded:bg-control',
-          'aria-selected:!bg-selection',
-          'data-[state=open]:bg-control', // bg state for context menu open
-          'group',
-          'h-[28px]',
-          'hover:bg-control'
+          isSelected ? 'text-foreground' : '', // [Joshen Temp]: aria-selected:text-foreground not working as aria-selected property not rendered in DOM,
+          isSelected ? '!bg-selection' : '', // [Joshen Temp]: aria-selected:!bg-selection not working as aria-selected property not rendered in DOM
+          'data-[state=open]:bg-control' // bg state for context menu open
         )}
         style={{
           paddingLeft:
             level === 1 && !isBranch
-              ? xPadding + levelPadding / 2 - 2
+              ? xPadding
               : level
                 ? levelPadding * (level - 1) + xPadding + (!isBranch ? 0 : 0)
                 : levelPadding,
@@ -119,19 +128,25 @@ const TreeViewItem = forwardRef<
             }
           ></div>
         )}
-        <div className="absolute left-0 h-full w-0.5 group-aria-selected:bg-foreground"></div>
+        {/* [Joshen] Temp fix as the white border on the left was not showing up via group-aria-selected */}
+        {isSelected && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
+        {/* <div className="absolute left-0 h-full w-0.5 group-aria-selected:bg-foreground" /> */}
         {isBranch ? (
           <>
-            <ChevronRight
-              className={cn(
-                'text-foreground-muted',
-                'group-aria-selected:text-foreground-light',
-                'group-aria-expanded:text-foreground-light',
-                'transition-transform duration-200',
-                'group-aria-expanded:rotate-90'
-              )}
-              size={14}
-            />
+            {isLoading ? (
+              <Loader2 className={cn('text-foreground-muted animate-spin')} size={14} />
+            ) : (
+              <ChevronRight
+                className={cn(
+                  'text-foreground-muted',
+                  'group-aria-selected:text-foreground-light',
+                  'group-aria-expanded:text-foreground-light',
+                  'transition-transform duration-200',
+                  'group-aria-expanded:rotate-90'
+                )}
+                size={14}
+              />
+            )}
             <TreeViewFolderIcon
               className={cn(
                 'transition-colors',
@@ -145,19 +160,23 @@ const TreeViewItem = forwardRef<
             />
           </>
         ) : (
-          <SQL_ICON
-            className={cn(
-              'transition-colors',
-              'fill-foreground-muted',
-              'group-aria-selected:fill-foreground',
-              'w-5 h-5',
-              '-ml-0.5'
-            )}
-            size={16}
-            strokeWidth={1.5}
-          />
+          icon || (
+            <SQL_ICON
+              className={cn(
+                'transition-colors',
+                'fill-foreground-muted',
+                'group-aria-selected:fill-foreground',
+                'w-5 h-5 shrink-0',
+                '-ml-0.5'
+              )}
+              size={16}
+              strokeWidth={1.5}
+            />
+          )
         )}
-        <span className={cn(isEditing && 'hidden')}>{name}</span>
+        <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
+          {name}
+        </span>
         <form autoFocus onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
           <Input
             ref={inputRef}
@@ -218,4 +237,4 @@ const TreeViewFolderIcon = forwardRef<SVGSVGElement, LucideSVGProps & { isOpen?:
   }
 )
 
-export { TreeView, TreeViewFolderIcon, TreeViewItem }
+export { TreeView, TreeViewFolderIcon, TreeViewItem, flattenTree }

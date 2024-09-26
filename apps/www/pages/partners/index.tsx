@@ -1,18 +1,18 @@
-import React from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
-import { NextSeo } from 'next-seo'
 import { range } from 'lodash'
+import { NextSeo } from 'next-seo'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import { useBreakpoint } from 'common'
-import { Badge, Button, IconCode, TextLink } from 'ui'
+import { Badge, Button, TextLink } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
-import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
+import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 
 import pageData from '~/data/partners'
+import { Code } from 'lucide-react'
 
 const Partners = () => {
   const router = useRouter()
@@ -40,7 +40,7 @@ const Partners = () => {
             <ProductHeaderCentered {...pageData.heroSection} />
           </SectionContainer>
           <div className="relative z-20 w-full flex py-16 mb-16 -mt-10 md:mb-24 md:-mt-20 justify-center gap-2 overflow-hidden mx-auto max-w-4xl before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,hsl(var(--background-alternative-default))_0%,transparent_10%,transparent_90%,hsl(var(--background-alternative-default))_100%)] before:z-10">
-            <div className="absolute w-32 h-32 md:w-40 md:h-40 rounded-full bg-alternative/90 backdrop-blur-2xl backdrop-filter from-background to-background-alternative border-4 border-background-alternative shadow-xl top-1/2 -translate-x-1/2 left-1/2 -translate-y-1/2 flex items-center justify-center z-30">
+            <div className="absolute w-32 h-32 md:w-40 md:h-40 rounded-full bg-alternative/90 backdrop-blur-2xl backdrop-filter bg-gradient-to-t from-background to-background-alternative border-4 border-background-alternative shadow-xl top-1/2 -translate-x-1/2 left-1/2 -translate-y-1/2 flex items-center justify-center z-30">
               <div className="absolute inset-0 w-full h-full transform">
                 <svg
                   className="absolute inset-[-2px] transform animate-[transformSpin_3s_both_cubic-bezier(.5,.2,.5,.8)_infinite] opacity-90"
@@ -63,9 +63,9 @@ const Partners = () => {
                       y2="21.5"
                       gradientUnits="userSpaceOnUse"
                     >
-                      <stop stopColor="#1CF7C3" stopOpacity="0" />
-                      <stop offset="0.510417" stopColor="#1CF7C3" />
-                      <stop offset="1" stopColor="#1CF7C3" stopOpacity="0" />
+                      <stop stopColor="hsl(var(--brand-600))" stopOpacity="0" />
+                      <stop offset="0.510417" stopColor="hsl(var(--brand-600))" />
+                      <stop offset="1" stopColor="hsl(var(--brand-600))" stopOpacity="0" />
                     </linearGradient>
                   </defs>
                 </svg>
@@ -81,7 +81,7 @@ const Partners = () => {
             {range(0, 3).map((_) => (
               <div className="flex gap-2 animate-marquee will-change-transform">
                 {pageData.featuredApps.map((app) => (
-                  <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl bg-gradient-to-t from-background to-background-alternative border border-background flex items-center justify-center shadow-xl">
+                  <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl bg-gradient-to-t from-background to-background-alternative border border-muted flex items-center justify-center shadow-xl">
                     <Image
                       src={app.logo}
                       alt={app.name}
@@ -135,7 +135,9 @@ const Partners = () => {
 
                 <div>
                   <h3 className="text-foreground text-lg">Experts</h3>
-                  <p className="text-muted text-sm">Find an expert to help build your next idea.</p>
+                  <p className="text-foreground-lighter text-sm">
+                    Find an expert to help build your next idea.
+                  </p>
                 </div>
 
                 <Link href="/partners/experts" className="absolute inset-0" />
@@ -164,7 +166,9 @@ const Partners = () => {
 
                 <div>
                   <h3 className="text-foreground text-lg">Integrations</h3>
-                  <p className="text-muted text-sm">Use your favorite tools with Supabase.</p>
+                  <p className="text-foreground-lighter text-sm">
+                    Use your favorite tools with Supabase.
+                  </p>
                 </div>
                 <Link href="/partners/integrations" className="absolute inset-0" />
               </Panel>
@@ -186,12 +190,12 @@ const Partners = () => {
                   key={i}
                 >
                   <div className="bg-brand-300 [[data-theme*=dark]_&]:bg-brand-500 text-brand-1200 group-hover:text-brand-800 [[data-theme*=dark]_&]:group-hover:text-brand-1000 flex h-12 w-12 items-center justify-center rounded-md border border-brand transition-all group-hover:scale-105">
-                    {item.icon ? item.icon : <IconCode strokeWidth={2} />}
+                    {item.icon ? item.icon : <Code strokeWidth={2} />}
                   </div>
 
                   <div>
                     <h3 className="text-foreground text-lg">{item.title}</h3>
-                    <p className="text-muted text-sm">{item.description}</p>
+                    <p className="text-foreground-lighter text-sm">{item.description}</p>
                   </div>
                 </div>
               )
@@ -206,7 +210,7 @@ const Partners = () => {
                 <h2 className="text-3xl xl:text-4xl mt-2 max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
                   Publish an OAuth App
                 </h2>
-                <p className="text-muted mb-4 max-w-sm">
+                <p className="text-foreground-lighter mb-4 max-w-sm">
                   Supabase lets you build a third-party app that can control organizations or
                   projects programmatically.
                 </p>

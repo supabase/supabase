@@ -1,14 +1,15 @@
 import clsx from 'clsx'
 
+import * as Tooltip from '@radix-ui/react-tooltip'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgUpcomingInvoiceQuery } from 'data/invoices/org-invoice-upcoming-query'
-import React, { useMemo, useState } from 'react'
-import { Button, Collapsible, IconChevronRight, IconInfo } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { billingMetricUnit, formatUsage } from '../helpers'
-import Link from 'next/link'
 import { formatCurrency } from 'lib/helpers'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
+import { Button, Collapsible } from 'ui'
+import { billingMetricUnit, formatUsage } from '../helpers'
+import { ChevronRight, Info } from 'lucide-react'
 
 export interface UpcomingInvoiceProps {
   slug?: string
@@ -23,9 +24,9 @@ interface TooltipData {
 const feeTooltipData: TooltipData[] = [
   {
     identifier: 'COMPUTE',
-    text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the instance size of your project. Paused projects do not incur compute costs.',
+    text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the compute size of your project. Paused projects do not incur compute costs.',
     linkRef:
-      'https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute',
+      'https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
   },
 ]
 
@@ -48,7 +49,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const fixedFees = useMemo(() => {
     return (upcomingInvoice?.lines || [])
-      .filter((item) => item !== computeCredits && !item.breakdown)
+      .filter((item) => item !== computeCredits && (!item.breakdown || !item.breakdown.length))
       .sort((a, b) => {
         // Prorations should be below regular usage fees
         return Number(a.proration) - Number(b.proration)
@@ -165,7 +166,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                             type="text"
                             className="!px-1"
                             icon={
-                              <IconChevronRight
+                              <ChevronRight
                                 className={clsx(
                                   'transition',
                                   usageFeesExpanded.includes(fee.description) && 'rotate-90'
@@ -193,7 +194,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                         </td>
                         <td className="py-2 pr-4 text-sm text-right tabular-nums max-w-[100px]">
                           {fee.usage_original
-                            ? `${formatUsage(fee.usage_metric!, fee.usage_original)}`
+                            ? `${formatUsage(fee.usage_metric!, { usage: fee.usage_original })}`
                             : fee.quantity
                               ? fee.quantity
                               : null}
@@ -223,7 +224,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                               {breakdown.project_name}
                             </td>
                             <td className="pb-1 text-xs tabular-nums text-right pr-4">
-                              {formatUsage(fee.usage_metric!, breakdown.usage)}
+                              {formatUsage(fee.usage_metric!, breakdown)}
                             </td>
                             <td />
                             <td />
@@ -265,7 +266,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
               <tr>
                 <td className="text-sm font-medium">
                   <span className="mr-2">Projected Costs</span>
-                  <InvoiceTooltip text="Estimated costs at the end of the billing cycle. Final amounts may vary depending on your usage." />
+                  <InvoiceTooltip text="Projected costs at the end of the billing cycle. Includes predictable costs for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no costs for metrics like MAU, storage or function invocations. Final amounts may vary depending on your usage." />
                 </td>
                 <td className="text-sm text-right font-medium" colSpan={3}>
                   {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}
@@ -283,7 +284,7 @@ const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) =
   return (
     <Tooltip.Root delayDuration={0}>
       <Tooltip.Trigger>
-        <IconInfo size={12} strokeWidth={2} />
+        <Info size={12} strokeWidth={2} />
       </Tooltip.Trigger>
       <Tooltip.Portal>
         <Tooltip.Content side="bottom">

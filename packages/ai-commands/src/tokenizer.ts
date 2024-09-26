@@ -1,5 +1,5 @@
 import { getEncoding } from 'js-tiktoken'
-import OpenAI from 'openai'
+import type OpenAI from 'openai'
 
 export const tokenizer = getEncoding('cl100k_base')
 
@@ -8,7 +8,7 @@ export const tokenizer = getEncoding('cl100k_base')
  */
 export function getChatRequestTokenCount(
   messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-  model = 'gpt-3.5-turbo-0301'
+  model = 'gpt-4o-mini-2024-07-18'
 ): number {
   const tokensPerRequest = 3 // every reply is primed with <|im_start|>assistant<|im_sep|>
   const numTokens = messages.reduce((acc, message) => acc + getMessageTokenCount(message, model), 0)
@@ -24,7 +24,7 @@ export function getChatRequestTokenCount(
  */
 export function getMessageTokenCount(
   message: OpenAI.Chat.Completions.ChatCompletionMessageParam,
-  model = 'gpt-3.5-turbo-0301'
+  model = 'gpt-4o-mini-2024-07-18'
 ): number {
   let tokensPerMessage: number
   let tokensPerName: number
@@ -41,6 +41,10 @@ export function getMessageTokenCount(
     case 'gpt-3.5-turbo-0301':
       tokensPerMessage = 4 // every message follows <|start|>{role/name}\n{content}<|end|>\n
       tokensPerName = -1 // if there's a name, the role is omitted
+      break
+    case 'gpt-4o-mini-2024-07-18':
+      tokensPerMessage = 3
+      tokensPerName = 1
       break
     case 'gpt-4-0314':
       tokensPerMessage = 3
@@ -81,6 +85,8 @@ export function getMaxTokenCount(model: string): number {
     case 'gpt-3.5-turbo-0301':
       return 4097
     case 'gpt-4-0314':
+      return 4097
+    case 'gpt-4o-mini-2024-07-18':
       return 4097
     default:
       throw new Error(`Unknown model '${model}'`)

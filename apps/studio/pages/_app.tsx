@@ -1,3 +1,4 @@
+import 'react-data-grid/lib/styles.css'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
 import 'styles/date-picker.scss'
@@ -23,7 +24,7 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider, useThemeSandbox, useUser } from 'common'
+import { ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -32,19 +33,15 @@ import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { ErrorInfo, useEffect, useMemo, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import toast from 'react-hot-toast'
-import { PortalToast, Toaster } from 'ui'
-import { ConsentToast } from 'ui-patterns/ConsentToast'
+import { toast } from 'sonner'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import {
-  AppBannerWrapper,
-  CommandMenuWrapper,
-  RouteValidationWrapper,
-} from 'components/interfaces/App'
+import { AppBannerWrapper, RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
+import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
 import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
@@ -52,10 +49,12 @@ import { useRootQueryClient } from 'data/query-client'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
-import { getAnonId } from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
+import { SonnerToaster } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { ConsentToast } from 'ui-patterns/ConsentToast'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -83,7 +82,7 @@ loader.config({
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const snap = useAppStateSnapshot()
   const queryClient = useRootQueryClient()
-  const consentToastId = useRef<string>()
+  const consentToastId = useRef<string | number>()
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
   const [supabase] = useState(() =>
@@ -135,39 +134,20 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
       const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       if (IS_PLATFORM && hasAcknowledgedConsent === null) {
-        consentToastId.current = toast(
-          <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
-          {
-            id: 'consent-toast',
-            position: 'bottom-right',
-            duration: Infinity,
-          }
-        )
+        setTimeout(() => {
+          consentToastId.current = toast(
+            <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
+            {
+              id: 'consent-toast',
+              position: 'bottom-right',
+              duration: Infinity,
+            }
+          )
+        }, 300)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const user = useUser()
-  useEffect(() => {
-    // don't set the sentry user id if the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)
-    if (!user?.id) {
-      return
-    }
-
-    const setSentryId = async () => {
-      let sentryUserId = localStorage.getItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID)
-
-      if (!sentryUserId) {
-        sentryUserId = await getAnonId(user?.id)
-        localStorage.setItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID, sentryUserId)
-      }
-      Sentry.setUser({ id: sentryUserId })
-    }
-
-    // if an error happens, continue without setting a sentry id
-    setSentryId().catch((e) => console.error(e))
-  }, [user?.id])
 
   useThemeSandbox()
 
@@ -188,16 +168,24 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <PageTelemetry>
                   <TooltipProvider>
                     <RouteValidationWrapper>
-                      <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+                      <ThemeProvider
+                        defaultTheme="system"
+                        themes={['dark', 'light', 'classic-dark']}
+                        enableSystem
+                        disableTransitionOnChange
+                      >
                         <AppBannerContextProvider>
-                          <CommandMenuWrapper>
+                          <CommandProvider>
                             <AppBannerWrapper>
                               <FeaturePreviewContextProvider>
                                 {getLayout(<Component {...pageProps} />)}
+                                <StudioCommandMenu />
+                                <GenerateSql />
                                 <FeaturePreviewModal />
                               </FeaturePreviewContextProvider>
                             </AppBannerWrapper>
-                          </CommandMenuWrapper>
+                            <SonnerToaster position="top-right" />
+                          </CommandProvider>
                         </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
@@ -205,8 +193,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 </PageTelemetry>
 
                 {!isTestEnv && <HCaptchaLoadedStore />}
-                {!isTestEnv && <Toaster />}
-                <PortalToast />
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </FlagProvider>
             </ProfileProvider>

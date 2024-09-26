@@ -87,6 +87,62 @@ Edge Function log messages have a max length of 10,000 characters. If you try to
 
 ---
 
+## Working with API logs
+
+[API logs](https://supabase.com/dashboard/project/_/logs/edge-logs) run through the Cloudflare edge servers and will have attached Cloudflare metadata under the `metadata.request.cf.*` fields.
+
+### Allowed headers
+
+A strict list of request and response headers are permitted in the API logs. Request and response headers will still be received by the server(s) and client(s), but will not be attached to the API logs generated.
+
+Request headers:
+
+- `accept`
+- `cf-connecting-ip`
+- `cf-ipcountry`
+- `host`
+- `user-agent`
+- `x-forwarded-proto`
+- `referer`
+- `content-length`
+- `x-real-ip`
+- `x-client-info`
+- `x-forwarded-user-agent`
+- `range`
+- `prefer`
+
+Response headers:
+
+- `cf-cache-status`
+- `cf-ray`
+- `content-location`
+- `content-range`
+- `content-type`
+- `content-length`
+- `date`
+- `transfer-encoding`
+- `x-kong-proxy-latency`
+- `x-kong-upstream-latency`
+- `sb-gateway-mode`
+- `sb-gateway-version`
+
+### Additional request metadata
+
+To attach additional metadata to a request, it is recommended to use the `User-Agent` header for purposes such as device or version identification.
+
+For example:
+
+```
+node MyApp/1.2.3 (device-id:abc123)
+Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0 MyApp/1.2.3 (Foo v1.3.2; Bar v2.2.2)
+```
+
+<Admonition type="note">
+
+Do not log Personal Identifiable Information (PII) within the `User-Agent` header, to avoid infringing data protection privacy laws. Overly fine-grained and detailed user agents may allow fingerprinting and identification of the end user through PII.
+
+</Admonition>
+
 ## Logging Postgres queries
 
 To enable query logs for other categories of statements:
@@ -155,7 +211,9 @@ import { createClient } from '@supabase/supabase-js'
 
 const options = {
   realtime: {
-    log_level: 'info',
+    params: {
+      log_level: 'info',
+    },
   },
 }
 const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
@@ -285,7 +343,7 @@ from
 where h.x_real_ip is not null and r.method = "GET";
 ```
 
-### Log source reference
+### Logs field reference
 
 Refer to the full field reference for each available source below. Do note that in order to access each nested key, you would need to perform the [necessary unnesting joins](#unnesting-arrays)
 
@@ -293,11 +351,13 @@ Refer to the full field reference for each available source below. Do note that 
   {(logConstants) => (
     <Tabs scrollable size="small" type="underlined" defaultActiveId="edge_logs" queryGroup="source">
       {logConstants.schemas.map((schema) => (
-        <TabPanel id={schema.reference} label={schema.name}>
+        <TabPanel id={schema.reference} key={schema.reference} label={schema.name}>
           <table>
             <thead>
-              <td className="font-bold">Path</td>
-              <td className="font-bold">Type</td>
+              <tr>
+                <th className="font-bold">Path</th>
+                <th className="font-bold">Type</th>
+              </tr>
             </thead>
             <tbody>
               {schema.fields

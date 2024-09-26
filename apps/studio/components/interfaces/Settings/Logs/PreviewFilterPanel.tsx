@@ -8,9 +8,14 @@ import { useParams } from 'common'
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import DatePickers from './Logs.DatePickers'
-import { FILTER_OPTIONS, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
+import {
+  FILTER_OPTIONS,
+  LOG_ROUTES_WITH_REPLICA_SUPPORT,
+  LogsTableName,
+  PREVIEWER_DATEPICKER_HELPERS,
+} from './Logs.constants'
+import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
 import LogsFilterPopover from './LogsFilterPopover'
 
 interface PreviewFilterPanelProps {
@@ -209,7 +214,7 @@ const PreviewFilterPanel = ({
         <div className="flex items-center justify-center gap-x-2">
           <Tooltip_Shadcn_ delayDuration={100}>
             <TooltipTrigger_Shadcn_ asChild>
-              <Button asChild className="px-1" type="default" icon={<Terminal />}>
+              <Button asChild className="px-1.5" type="default" icon={<Terminal />}>
                 <Link href={queryUrl} />
               </Button>
             </TooltipTrigger_Shadcn_>

@@ -5,6 +5,7 @@ import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
 import redirects from './lib/redirects.js'
+import remotePatterns from './lib/remotePatterns.js'
 import rewrites from './lib/rewrites.js'
 
 import { remarkCodeHike } from '@code-hike/mdx'
@@ -48,23 +49,7 @@ const nextConfig = {
   swcMinify: true,
   images: {
     dangerouslyAllowSVG: true,
-    domains: [
-      'api.producthunt.com',
-      'avatars.githubusercontent.com',
-      'ca.slack-edge.com',
-      'colab.research.google.com',
-      'github.com',
-      'https://s3-us-west-2.amazonaws.com',
-      'images.unsplash.com',
-      'img.youtube.com',
-      'vercel.com',
-      'obuldanrptloktxcffvn.supabase.co',
-      'pbs.twimg.com',
-      'res.cloudinary.com',
-      's3-us-west-2.amazonaws.com',
-      'supabase.com',
-      'user-images.githubusercontent.com',
-    ],
+    remotePatterns,
   },
   async headers() {
     return [
@@ -92,6 +77,15 @@ const nextConfig = {
   },
   async redirects() {
     return redirects
+  },
+  typescript: {
+    // WARNING: production builds can successfully complete even there are type errors
+    // Typechecking is checked separately via .github/workflows/typecheck.yml
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    ignoreDuringBuilds: true,
   },
 }
 

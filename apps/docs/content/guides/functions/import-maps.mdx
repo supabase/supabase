@@ -13,9 +13,9 @@ Developing with Edge Functions is similar to developing with Node.js, but with a
 Supabase Edge Functions support:
 
 - The Deno [standard library](https://deno.land/std)
-- Third party [modules](https://deno.land/x)
+- JavaScript modules from npm (https://docs.deno.com/examples/npm/)
 - Built-in [Node APIs](https://docs.deno.com/runtime/manual/node/compatibility)
-- Node.js modules published to npm
+- Third party modules published to [JSR](https://jsr.io/) or [deno.land/x](https://deno.land/x)
 
 You can import npm modules using the `npm:` specifier or via CDNs like [esm.sh](https://esm.sh). For example, to import the `supabase-js` package:
 
@@ -92,7 +92,21 @@ In order for vscode to understand the imports correctly, you need to specify the
 ```json settings.json
 {
   "deno.enable": true,
-  "deno.unstable": true,
+  "deno.unstable": [
+    "bare-node-builtins",
+    "byonm",
+    "sloppy-imports",
+    "unsafe-proto",
+    "webgpu",
+    "broadcast-channel",
+    "worker-options",
+    "cron",
+    "kv",
+    "ffi",
+    "fs",
+    "http",
+    "net"
+  ],
   "deno.importMap": "./supabase/functions/import_map.json"
 }
 ```

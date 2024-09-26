@@ -3,6 +3,26 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
 import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
+
+import type { ItemRenderer } from 'components/ui/InfiniteList'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import {
+  AlertCircle,
+  Clipboard,
+  Download,
+  Edit,
+  File,
+  Film,
+  Image,
+  Loader,
+  MoreVertical,
+  Move,
+  Music,
+  Trash2,
+} from 'lucide-react'
 import {
   Checkbox,
   DropdownMenu,
@@ -14,25 +34,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-  IconAlertCircle,
-  IconClipboard,
-  IconDownload,
-  IconEdit,
-  IconFile,
-  IconFilm,
-  IconImage,
-  IconLoader,
-  IconMoreVertical,
-  IconMove,
-  IconMusic,
-  IconTrash2,
 } from 'ui'
-
-import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { useCheckPermissions } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   CONTEXT_MENU_KEYS,
   STORAGE_ROW_STATUS,
@@ -43,6 +45,7 @@ import {
 import { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import FileExplorerRowEditing from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
+import { useCopyUrl } from './useCopyUrl'
 
 export const RowIcon = ({
   view,
@@ -56,7 +59,7 @@ export const RowIcon = ({
   mimeType: string | undefined
 }) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
-    return <IconLoader size={16} strokeWidth={2} className="animate-spin" />
+    return <Loader size={16} strokeWidth={2} className="animate-spin" />
   }
 
   if (fileType === STORAGE_ROW_TYPES.BUCKET || fileType === STORAGE_ROW_TYPES.FOLDER) {
@@ -77,18 +80,18 @@ export const RowIcon = ({
   }
 
   if (mimeType?.includes('image')) {
-    return <IconImage size={16} strokeWidth={2} />
+    return <Image size={16} strokeWidth={2} />
   }
 
   if (mimeType?.includes('audio')) {
-    return <IconMusic size={16} strokeWidth={2} />
+    return <Music size={16} strokeWidth={2} />
   }
 
   if (mimeType?.includes('video')) {
-    return <IconFilm size={16} strokeWidth={2} />
+    return <Film size={16} strokeWidth={2} />
   }
 
-  return <IconFile size={16} strokeWidth={2} />
+  return <File size={16} strokeWidth={2} />
 }
 
 export interface FileExplorerRowProps {
@@ -97,7 +100,6 @@ export interface FileExplorerRowProps {
   selectedItems: StorageItemWithColumn[]
   openedFolders: StorageItem[]
   selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
-  onCopyUrl: (name: string, url: string) => void
 }
 
 const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
@@ -108,7 +110,6 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   selectedItems = [],
   openedFolders = [],
   selectedFilePreview,
-  onCopyUrl,
 }) => {
   const storageExplorerStore = useStorageStore()
   const {
@@ -130,6 +131,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     downloadFolder,
     selectRangeItems,
   } = storageExplorerStore
+  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
@@ -179,19 +181,19 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
             ? [
                 {
                   name: 'Rename',
-                  icon: <IconEdit size="tiny" />,
+                  icon: <Edit size={14} strokeWidth={1} />,
                   onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                 },
               ]
             : []),
           {
             name: 'Download',
-            icon: <IconDownload size="tiny" />,
+            icon: <Download size={14} strokeWidth={1} />,
             onClick: () => downloadFolder(itemWithColumnIndex),
           },
           {
             name: 'Copy path to folder',
-            icon: <IconClipboard size="tiny" />,
+            icon: <Clipboard size={14} strokeWidth={1} />,
             onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
           },
           ...(canUpdateFiles
@@ -199,7 +201,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                 { name: 'Separator', icon: undefined, onClick: undefined },
                 {
                   name: 'Delete',
-                  icon: <IconTrash2 size="tiny" />,
+                  icon: <Trash2 size={14} strokeWidth={1} />,
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
               ]
@@ -212,41 +214,38 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                   ? [
                       {
                         name: 'Get URL',
-                        icon: <IconClipboard size="tiny" />,
-                        onClick: async () =>
-                          onCopyUrl(
-                            itemWithColumnIndex.name,
-                            await getFileUrl(itemWithColumnIndex)
-                          ),
+                        icon: <Clipboard size={14} strokeWidth={1} />,
+                        onClick: () =>
+                          onCopyUrl(itemWithColumnIndex.name, getFileUrl(itemWithColumnIndex)),
                       },
                     ]
                   : [
                       {
                         name: 'Get URL',
-                        icon: <IconClipboard size="tiny" />,
+                        icon: <Clipboard size={14} strokeWidth={1} />,
                         children: [
                           {
                             name: 'Expire in 1 week',
-                            onClick: async () =>
+                            onClick: () =>
                               onCopyUrl(
                                 itemWithColumnIndex.name,
-                                await getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK)
+                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK)
                               ),
                           },
                           {
                             name: 'Expire in 1 month',
-                            onClick: async () =>
+                            onClick: () =>
                               onCopyUrl(
                                 itemWithColumnIndex.name,
-                                await getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.MONTH)
+                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.MONTH)
                               ),
                           },
                           {
                             name: 'Expire in 1 year',
-                            onClick: async () =>
+                            onClick: () =>
                               onCopyUrl(
                                 itemWithColumnIndex.name,
-                                await getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR)
+                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR)
                               ),
                           },
                           {
@@ -260,17 +259,17 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                   ? [
                       {
                         name: 'Rename',
-                        icon: <IconEdit size="tiny" />,
+                        icon: <Edit size={14} strokeWidth={1} />,
                         onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                       },
                       {
                         name: 'Move',
-                        icon: <IconMove size="tiny" />,
+                        icon: <Move size={14} strokeWidth={1} />,
                         onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
                       },
                       {
                         name: 'Download',
-                        icon: <IconDownload size="tiny" />,
+                        icon: <Download size={14} strokeWidth={1} />,
                         onClick: async () => await downloadFile(itemWithColumnIndex),
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
@@ -282,7 +281,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
             ? [
                 {
                   name: 'Delete',
-                  icon: <IconTrash2 size="tiny" />,
+                  icon: <Trash2 size={14} strokeWidth={1} />,
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
               ]
@@ -385,7 +384,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
           {item.isCorrupted && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
-                <IconAlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
+                <AlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
               </Tooltip.Trigger>
               <Tooltip.Portal>
                 <Tooltip.Content side="bottom">
@@ -425,7 +424,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
           }
         >
           {item.status === STORAGE_ROW_STATUS.LOADING ? (
-            <IconLoader
+            <Loader
               className={`animate-spin ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
               size={16}
               strokeWidth={2}
@@ -434,7 +433,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger>
                 <div className="storage-row-menu opacity-0">
-                  <IconMoreVertical size={16} strokeWidth={2} />
+                  <MoreVertical size={16} strokeWidth={2} />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="end">

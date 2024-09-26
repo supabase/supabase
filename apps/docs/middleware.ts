@@ -1,34 +1,61 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 import { isbot } from 'isbot'
+import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
+
+import { clientSdkIds } from '~/content/navigation.references'
+import { BASE_PATH } from '~/lib/constants'
+
+const REFERENCE_PATH = `${(BASE_PATH ?? '') + '/'}reference`
 
 export function middleware(request: NextRequest) {
-  const specs = ['javascript', 'dart', 'csharp']
+  const url = new URL(request.url)
 
-  let version = ''
-  if (request.url.includes('/v1/')) {
-    version = 'v1'
-  }
-  if (request.url.includes('/v0/')) {
-    version = 'v0'
+  if (!url.pathname.startsWith(REFERENCE_PATH)) {
+    return NextResponse.next()
   }
 
   if (isbot(request.headers.get('user-agent'))) {
-    for (const lib of specs) {
-      if (request.url.includes(`reference/${lib}`)) {
-        const requestSlug = request.url.split('/').pop()
+    let [, lib, maybeVersion, ...slug] = url.pathname.replace(REFERENCE_PATH, '').split('/')
 
-        return NextResponse.rewrite(
-          new URL(
-            `/docs/reference/${lib}/${version ? version + '/' : ''}crawlers/${requestSlug}`,
-            request.url
-          ).toString()
-        )
+    if (clientSdkIds.includes(lib)) {
+      const version = /v\d+/.test(maybeVersion) ? maybeVersion : undefined
+      if (!version) {
+        slug = [maybeVersion, ...slug]
+      }
+
+      if (slug.length > 0) {
+        const rewriteUrl = new URL(url)
+        rewriteUrl.pathname = (BASE_PATH ?? '') + '/api/crawlers'
+
+        return NextResponse.rewrite(rewriteUrl)
       }
     }
   } else {
-    return NextResponse.next()
+    const [, lib, maybeVersion] = url.pathname.replace(REFERENCE_PATH, '').split('/')
+
+    if (lib === 'cli') {
+      const rewritePath = [REFERENCE_PATH, 'cli'].join('/')
+      return NextResponse.rewrite(new URL(rewritePath, request.url))
+    }
+
+    if (lib === 'api') {
+      const rewritePath = [REFERENCE_PATH, 'api'].join('/')
+      return NextResponse.rewrite(new URL(rewritePath, request.url))
+    }
+
+    if (lib?.startsWith('self-hosting-')) {
+      const rewritePath = [REFERENCE_PATH, lib].join('/')
+      return NextResponse.rewrite(new URL(rewritePath, request.url))
+    }
+
+    if (clientSdkIds.includes(lib)) {
+      const version = /v\d+/.test(maybeVersion) ? maybeVersion : null
+      const rewritePath = [REFERENCE_PATH, lib, version].filter(Boolean).join('/')
+      return NextResponse.rewrite(new URL(rewritePath, request.url))
+    }
   }
+
+  return NextResponse.next()
 }
 
 export const config = {

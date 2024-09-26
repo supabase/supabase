@@ -1,7 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { Filter, Query, SupaTable } from 'components/grid'
+import { Query } from 'components/grid/query/Query'
+import type { Filter, SupaTable } from 'components/grid/types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'

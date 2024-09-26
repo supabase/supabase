@@ -1,14 +1,20 @@
-import { EllipsisHorizontalIcon } from '@heroicons/react/16/solid'
-import { useParams } from 'common'
-import { useDeleteCollectionMutation, useUpdateCollection } from 'data/analytics'
-import { EditIcon, TrashIcon } from 'lucide-react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { EditIcon, MoreHorizontal, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { FormMessage } from '@ui/components/shadcn/ui/form'
+import { useParams } from 'common'
+import { useDeleteCollectionMutation } from 'data/analytics/warehouse-collections-delete-mutation'
+import { useUpdateCollection } from 'data/analytics/warehouse-collections-update-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
-  Checkbox_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -16,16 +22,14 @@ import {
   DropdownMenuTrigger,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormLabel_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   Modal,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { FormMessage } from '@ui/components/shadcn/ui/form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 type Props = {
@@ -43,6 +47,8 @@ export const WarehouseMenuItem = ({ item }: Props) => {
 
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const [showDeleteDialog, setDeleteDialog] = useState(false)
+
+  const canUpdateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
 
   const updateCollection = useUpdateCollection({
     onSuccess: () => {
@@ -73,13 +79,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
     resolver: zodResolver(UpdateFormSchema),
   })
 
-  const DeleteFormSchema = z.object({
-    confirm: z.boolean(),
-  })
-
-  const deleteForm = useForm<z.infer<typeof DeleteFormSchema>>({
-    resolver: zodResolver(DeleteFormSchema),
-  })
+  const deleteForm = useForm()
 
   return (
     <>
@@ -94,15 +94,18 @@ export const WarehouseMenuItem = ({ item }: Props) => {
         key={item.token + '-collection-item'}
         href={`/project/${projectRef}/logs/collections/${item.token}`}
       >
-        <div>{item.name}</div>
+        <div className="truncate">{item.name}</div>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
+              onClick={(e) => {
+                e.preventDefault()
+              }}
               loading={isLoading}
               type="text"
               className="px-1 opacity-50 hover:opacity-100 !bg-transparent"
-              icon={<EllipsisHorizontalIcon />}
+              icon={<MoreHorizontal />}
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -110,25 +113,47 @@ export const WarehouseMenuItem = ({ item }: Props) => {
               e.stopPropagation()
             }}
             align="start"
-            className="w-52 *:space-x-2"
+            className="w-44 *:space-x-2"
           >
-            <DropdownMenuItem
-              onClick={() => {
-                setShowUpdateDialog(true)
-              }}
-            >
-              <EditIcon size="14" />
-              <div>Rename</div>
-            </DropdownMenuItem>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <DropdownMenuItem
+                  disabled={!canUpdateCollection}
+                  className="!pointer-events-auto"
+                  onClick={() => {
+                    if (canUpdateCollection) setShowUpdateDialog(true)
+                  }}
+                >
+                  <EditIcon size={14} />
+                  <div>Rename collection</div>
+                </DropdownMenuItem>
+              </TooltipTrigger_Shadcn_>
+              {!canUpdateCollection && (
+                <TooltipContent_Shadcn_ side="right">
+                  You need additional permissions to rename collections
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={async () => {
-                setDeleteDialog(true)
-              }}
-            >
-              <TrashIcon size="14" />
-              <div>Delete</div>
-            </DropdownMenuItem>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <DropdownMenuItem
+                  disabled={!canUpdateCollection}
+                  className="!pointer-events-auto"
+                  onClick={async () => {
+                    if (canUpdateCollection) setDeleteDialog(true)
+                  }}
+                >
+                  <TrashIcon size={14} />
+                  <div>Delete collection</div>
+                </DropdownMenuItem>
+              </TooltipTrigger_Shadcn_>
+              {!canUpdateCollection && (
+                <TooltipContent_Shadcn_ side="right">
+                  You need additional permissions to delete collections
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
           </DropdownMenuContent>
         </DropdownMenu>
       </Link>
@@ -158,7 +183,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
                 render={({ field }) => (
                   <FormItemLayout label="Collection name">
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ type="text" {...field} />
+                      <Input_Shadcn_ defaultValue={item.name} type="text" {...field} />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
@@ -197,28 +222,12 @@ export const WarehouseMenuItem = ({ item }: Props) => {
               deleteCollection.mutate({ projectRef, collectionToken: item.token })
             })}
           >
-            <div className="p-3 space-y-4">
+            <div className="p-3 px-6 space-y-4">
               <p className="text-sm text-foreground-light">
-                Are you sure you want to delete the selected collection?
-                <br /> This action cannot be undone.
+                All data in this collection will be deleted.
+                <br />
+                <div className="mt-2">This action cannot be undone.</div>
               </p>
-              <div className="flex items-center my-2">
-                <FormField_Shadcn_
-                  control={deleteForm.control}
-                  name="confirm"
-                  render={({ field }) => (
-                    <FormItemLayout>
-                      <FormControl_Shadcn_>
-                        <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl_Shadcn_>
-                      <FormLabel_Shadcn_ className="p-2">
-                        Yes, I want to delete <span className="font-medium">{item.name}</span>.
-                      </FormLabel_Shadcn_>
-                      <FormMessage />
-                    </FormItemLayout>
-                  )}
-                />
-              </div>
             </div>
 
             <div className="flex gap-2 justify-end p-3 border-t">
@@ -232,8 +241,8 @@ export const WarehouseMenuItem = ({ item }: Props) => {
               >
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit" loading={isLoading}>
-                Delete
+              <Button type="danger" htmlType="submit" loading={isLoading}>
+                Yes, delete
               </Button>
             </div>
           </form>

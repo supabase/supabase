@@ -1,6 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
+import z from 'zod'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { useDatabaseRoleCreateMutation } from 'data/database-roles/database-role-create-mutation'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -12,11 +17,6 @@ import {
   SidePanel,
   Switch,
 } from 'ui'
-import z from 'zod'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormActions } from 'components/ui/Forms'
-import { useDatabaseRoleCreateMutation } from 'data/database-roles/database-role-create-mutation'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface CreateRolePanelProps {

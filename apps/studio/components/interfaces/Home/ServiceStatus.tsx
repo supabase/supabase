@@ -1,12 +1,13 @@
-import { useParams } from 'common'
 import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 
+import { useParams } from 'common'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
 import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
-import { useIsFeatureEnabled, useSelectedProject } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 
 const ServiceStatus = () => {
   const { ref } = useParams()
@@ -132,7 +133,7 @@ const ServiceStatus = () => {
           {isBranch ? 'Preview Branch' : 'Project'} Status
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
           <div
             key={service.name}

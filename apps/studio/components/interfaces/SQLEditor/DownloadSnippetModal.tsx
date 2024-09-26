@@ -1,11 +1,14 @@
-import type { ModalProps } from '@ui/components/Modal/Modal'
 import { snakeCase } from 'lodash'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, CodeBlock, IconExternalLink, Modal, Tabs } from 'ui'
 
+import type { ModalProps } from '@ui/components/Modal/Modal'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { Button, CodeBlock, Modal, Tabs } from 'ui'
 import { Markdown } from '../Markdown'
 import {
   generateFileCliCommand,
@@ -19,8 +22,11 @@ export interface DownloadSnippetModalProps extends ModalProps {
 
 const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
   const snap = useSqlEditorStateSnapshot()
-  const snippet = snap.snippets[id].snippet
-  const migrationName = snakeCase(snippet.name)
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
+
+  const snippet = enableFolders ? snapV2.snippets[id]?.snippet : snap.snippets[id].snippet
+  const migrationName = snakeCase(snippet?.name)
 
   const [selectedView, setSelectedView] = useState<'CLI' | 'NPM'>('CLI')
 
@@ -60,7 +66,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
       header={<p>Download snippet as local migration file via the Supabase CLI.</p>}
       {...props}
     >
-      <div className="flex flex-col items-start justify-between gap-4 relative">
+      <div className="flex flex-col items-start justify-between gap-4 relative pt-2">
         <Tabs type="underlined" listClassNames="pl-5">
           {SNIPPETS.map((snippet) => {
             return (
@@ -75,7 +81,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
                       />
                     </div>
                     <TwoOptionToggle
-                      width={75}
+                      width={50}
                       options={['CLI', 'NPM']}
                       activeOption={selectedView}
                       borderOverride="border-muted"
@@ -100,7 +106,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
         <Modal.Content className="w-full flex items-center justify-between pt-0">
           <p className="text-xs text-lighter">Run this command from your project directory</p>
           <div className="flex justify-between items-center gap-x-2">
-            <Button asChild type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
                 href="https://supabase.com/docs/guides/cli/local-development#database-migrations"
                 target="_blank"
@@ -110,7 +116,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
               </Link>
             </Button>
 
-            <Button asChild type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
                 href="https://supabase.com/docs/guides/cli/local-development"
                 target="_blank"

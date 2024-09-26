@@ -3,6 +3,7 @@ import Image from 'next/legacy/image'
 import React from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type {
   Integration,
   IntegrationProjectConnection,
@@ -10,8 +11,9 @@ import type {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
+import { ArrowRight, ExternalLink, Github } from 'lucide-react'
 import Link from 'next/link'
-import { Badge, Button, cn, IconArrowRight, IconExternalLink, IconGitHub } from 'ui'
+import { Badge, Button, cn } from 'ui'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -27,10 +29,10 @@ type HandleIconType = Integration['integration']['name'] | 'Supabase'
 const HandleIcon = ({ type, className }: { type: HandleIconType; className?: string }) => {
   switch (type) {
     case 'GitHub':
-      return <IconGitHub strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
+      return <Github strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
     // case 'Netlify':
-    //   return <IconSquare strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
+    //   return <Square strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
     //   break
     case 'Vercel':
       return (
@@ -116,7 +118,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
           </div>
         </div>
 
-        <Button asChild disabled={disabled} type="default" iconRight={<IconExternalLink />}>
+        <Button asChild disabled={disabled} type="default" iconRight={<ExternalLink />}>
           {disabled ? (
             <p>Manage</p>
           ) : (
@@ -178,7 +180,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
                 </span>
               </div>
 
-              <IconArrowRight
+              <ArrowRight
                 size={14}
                 className="flex-shrink-0 text-foreground-lighter"
                 strokeWidth={1.5}
@@ -250,7 +252,7 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
           <div className="flex gap-2 items-center">
             <HandleIcon type={'Supabase'} />
             <span className="text-sm">{project?.name}</span>
-            <IconArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
+            <ArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
             <HandleIcon type={type} />
             <span className="text-sm">{connection.metadata.name}</span>
           </div>
@@ -272,34 +274,40 @@ const EmptyIntegrationConnection = React.forwardRef<
     showNode?: boolean
     orgSlug?: string
     onClick: () => void
+    disabled?: boolean
   }
->(({ className, showNode = true, onClick, ...props }, ref) => {
+>(({ className, showNode = true, onClick, disabled, ...props }, ref) => {
   return (
     <div
       ref={ref}
       {...props}
       className={cn(
-        showNode && 'ml-6 pl-8  border-l',
-        'pb-2 ',
+        showNode && 'ml-6 pl-8 mt-4 border-l',
+        'relative pb-2',
         'last:border-l-transparent',
-        'relative',
         className
       )}
     >
       {showNode && (
-        <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-10 -left-px"></div>
+        <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-14 -top-4 -left-px"></div>
       )}
       <div
         className={cn(
           'w-full',
           'border border-dashed bg-surface-100 border-overlay',
-          '',
           'flex h-20 px-10 rounded-lg justify-center items-center'
         )}
       >
-        <Button type="default" onClick={() => onClick()}>
+        <ButtonTooltip
+          type="default"
+          disabled={disabled}
+          onClick={() => onClick()}
+          tooltip={{
+            content: { side: 'bottom', text: 'Additional permissions required to add connection' },
+          }}
+        >
           Add new project connection
-        </Button>
+        </ButtonTooltip>
       </div>
     </div>
   )
@@ -319,8 +327,7 @@ const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, Integration
         ref={ref}
         className={cn(
           showNode && 'border-l border-muted ml-6 pl-8',
-          'pt-6 pb-3',
-          'prose text-sm',
+          'py-4 prose text-sm',
           className
         )}
       >

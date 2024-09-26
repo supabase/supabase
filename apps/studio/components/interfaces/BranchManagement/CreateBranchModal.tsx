@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { AlertCircle, Check, ExternalLink, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import AlertError from 'components/ui/AlertError'
@@ -12,7 +13,8 @@ import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -23,10 +25,6 @@ import {
   FormItem_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconAlertCircle,
-  IconCheck,
-  IconExternalLink,
-  IconLoader,
   Input_Shadcn_,
   Modal,
 } from 'ui'
@@ -145,7 +143,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
           header="Create a new preview branch"
           confirmText="Create Preview Branch"
         >
-          <Modal.Content className="">
+          <Modal.Content>
             {isLoadingConnections && <GenericSkeletonLoader />}
             {isErrorConnections && (
               <AlertError
@@ -165,7 +163,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <IconExternalLink size={14} strokeWidth={1.5} />
+                    <ExternalLink size={14} strokeWidth={1.5} />
                   </Link>
                 </div>
               </div>
@@ -183,7 +181,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
               control={form.control}
               name="branchName"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="relative">
+                <FormItem_Shadcn_ className="relative flex flex-col gap-y-1">
                   <label className="text-sm text-foreground-light">
                     Choose your branch to create a preview from
                   </label>
@@ -192,9 +190,9 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
                   </FormControl_Shadcn_>
                   <div className="absolute top-9 right-3">
                     {isChecking ? (
-                      <IconLoader className="animate-spin" />
+                      <Loader2 size={14} className="animate-spin" />
                     ) : isValid ? (
-                      <IconCheck className="text-brand" strokeWidth={2} />
+                      <Check size={14} className="text-brand" strokeWidth={2} />
                     ) : null}
                   </div>
 
@@ -208,7 +206,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
           <Modal.Content className="py-2">
             <Alert_Shadcn_ variant="warning">
-              <IconAlertCircle strokeWidth={1.5} />
+              <AlertCircle strokeWidth={1.5} />
               <AlertTitle_Shadcn_>Each Preview branch costs $0.32 per day</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 Each preview branch costs $0.32 per day until it is removed. This pricing is for

@@ -1,8 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import { Button, IconAlertCircle, IconSearch, Input, Toggle } from 'ui'
+import { toast } from 'sonner'
+import { Button, Input, Toggle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -11,8 +11,9 @@ import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import PublicationSkeleton from './PublicationSkeleton'
+import { Search, AlertCircle } from 'lucide-react'
 
 interface PublicationEvent {
   event: string
@@ -81,7 +82,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
           <div className="flex items-center">
             <Input
               size="small"
-              icon={<IconSearch size="tiny" />}
+              icon={<Search size="14" />}
               placeholder={'Filter'}
               value={filterString}
               onChange={(e) => setFilterString(e.target.value)}
@@ -90,7 +91,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
           {isPermissionsLoaded && !canUpdatePublications && (
             <div className="w-[500px]">
               <InformationBox
-                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
+                icon={<AlertCircle className="text-foreground-light" strokeWidth={2} />}
                 title="You need additional permissions to update database publications"
               />
             </div>
@@ -98,78 +99,68 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
         </div>
       </div>
 
-      <div className="overflow-hidden rounded">
-        <Table
-          head={[
-            <Table.th key="header.name" style={{ width: '25%' }}>
-              Name
-            </Table.th>,
-            <Table.th key="header.id" className="hidden lg:table-cell" style={{ width: '25%' }}>
-              System ID
-            </Table.th>,
-            <Table.th key="header.insert">Insert</Table.th>,
-            <Table.th key="header.update">Update</Table.th>,
-            <Table.th key="header.delete">Delete</Table.th>,
-            <Table.th key="header.truncate">Truncate</Table.th>,
-            <Table.th key="header.source" className="text-right">
-              Source
-            </Table.th>,
-          ]}
-          body={
-            isLoading
-              ? Array.from({ length: 5 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)
-              : publications.map((x) => (
-                  <Table.tr className="border-t" key={x.name}>
-                    <Table.td className="px-4 py-3" style={{ width: '25%' }}>
-                      {x.name}
+      <Table
+        head={[
+          <Table.th key="header.name">Name</Table.th>,
+          <Table.th key="header.id">System ID</Table.th>,
+          <Table.th key="header.insert">Insert</Table.th>,
+          <Table.th key="header.update">Update</Table.th>,
+          <Table.th key="header.delete">Delete</Table.th>,
+          <Table.th key="header.truncate">Truncate</Table.th>,
+          <Table.th key="header.source" className="text-right">
+            Source
+          </Table.th>,
+        ]}
+        body={
+          isLoading
+            ? Array.from({ length: 5 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)
+            : publications.map((x) => (
+                <Table.tr className="border-t" key={x.name}>
+                  <Table.td className="px-4 py-3">{x.name}</Table.td>
+                  <Table.td>{x.id}</Table.td>
+                  {publicationEvents.map((event) => (
+                    <Table.td key={event.key}>
+                      <Toggle
+                        size="tiny"
+                        checked={(x as any)[event.key]}
+                        disabled={!canUpdatePublications}
+                        onChange={() => {
+                          setToggleListenEventValue({
+                            publication: x,
+                            event,
+                            currentStatus: (x as any)[event.key],
+                          })
+                        }}
+                      />
                     </Table.td>
-                    <Table.td className="hidden lg:table-cell" style={{ width: '25%' }}>
-                      {x.id}
-                    </Table.td>
-                    {publicationEvents.map((event) => (
-                      <Table.td key={event.key}>
-                        <Toggle
-                          size="tiny"
-                          checked={(x as any)[event.key]}
-                          disabled={!canUpdatePublications}
-                          onChange={() => {
-                            setToggleListenEventValue({
-                              publication: x,
-                              event,
-                              currentStatus: (x as any)[event.key],
-                            })
-                          }}
-                        />
-                      </Table.td>
-                    ))}
-                    <Table.td className="px-4 py-3 pr-2">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          type="default"
-                          style={{ paddingTop: 3, paddingBottom: 3 }}
-                          onClick={() => onSelectPublication(x.id)}
-                        >
-                          {x.tables == null
-                            ? 'All tables'
-                            : `${x.tables.length} ${
-                                x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
-                              }`}
-                        </Button>
-                      </div>
-                    </Table.td>
-                  </Table.tr>
-                ))
-          }
-        />
+                  ))}
+                  <Table.td className="px-4 py-3 pr-2">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        type="default"
+                        style={{ paddingTop: 3, paddingBottom: 3 }}
+                        onClick={() => onSelectPublication(x.id)}
+                      >
+                        {x.tables == null
+                          ? 'All tables'
+                          : `${x.tables.length} ${
+                              x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
+                            }`}
+                      </Button>
+                    </div>
+                  </Table.td>
+                </Table.tr>
+              ))
+        }
+      />
 
-        {!isLoading && publications.length === 0 && (
-          <NoSearchResults
-            searchString={filterString}
-            onResetFilter={() => setFilterString('')}
-            className="rounded-t-none border-t-0"
-          />
-        )}
-      </div>
+      {!isLoading && publications.length === 0 && (
+        <NoSearchResults
+          searchString={filterString}
+          onResetFilter={() => setFilterString('')}
+          className="rounded-t-none border-t-0"
+        />
+      )}
 
       <ConfirmationModal
         visible={toggleListenEventValue !== null}

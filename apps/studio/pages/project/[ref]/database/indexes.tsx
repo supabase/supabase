@@ -1,14 +1,14 @@
 import { ExternalLink } from 'lucide-react'
 
 import Indexes from 'components/interfaces/Database/Indexes/Indexes'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 
@@ -23,8 +23,8 @@ const IndexesPage: NextPageWithLayout = () => {
             description="Improve query performance against your database"
           />
         </ScaffoldSectionContent>
-        <ScaffoldSectionDetail className="flex items-center justify-end gap-x-2">
-          <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+        <ScaffoldSectionDetail className="flex items-center justify-end gap-2 flex-wrap">
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <a
               target="_blank"
               rel="noreferrer"
@@ -34,7 +34,7 @@ const IndexesPage: NextPageWithLayout = () => {
               Documentation
             </a>
           </Button>
-          <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <a
               target="_blank"
               rel="noreferrer"
