@@ -23,7 +23,7 @@ For example, if your project's organization has these member accounts `person-a@
 
 **Significant rate-limits that can change over time.**
 
-To maintain the health and reputation of the default SMTP sending service, the number of messages your project can send is limited and can change without notice. Currently this value is set to 2 messages per hour.
+To maintain the health and reputation of the default SMTP sending service, the number of messages your project can send is limited and can change without notice. Currently this value is set to <SharedData data="config">auth.rate_limits.email.inbuilt_smtp_per_hour</SharedData> messages per hour.
 
 **No SLA guarantee on message delivery or uptime for the default SMTP service.**
 
@@ -68,7 +68,7 @@ Usually the goal for this behavior is:
 
 Mitigation strategies:
 
-- [Configure CAPTCHA protection](https://supabase.com/docs/guides/auth/auth-captcha) for your project, which is the most effective way to control bots in this scenario. You can use CAPTCHA services which provide inisible challenges where real users won't be asked to solve puzzles most of the time.
+- [Configure CAPTCHA protection](https://supabase.com/docs/guides/auth/auth-captcha) for your project, which is the most effective way to control bots in this scenario. You can use CAPTCHA services which provide invisible challenges where real users won't be asked to solve puzzles most of the time.
 - Prefer social login (OAuth) or SSO with SAML instead of email-based authentication flows in your apps.
 - Prefer passwordless authentication (one-time password) as this limits the attacker's value to gain from this behavior.
 - Do not disable email confirmations under pressure.
