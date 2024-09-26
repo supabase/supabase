@@ -1,3 +1,4 @@
+import { AlertCircle, ExternalLink, HelpCircle, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -7,7 +8,6 @@ import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domain
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
 import { useInterval } from 'hooks/misc/useInterval'
-import { AlertCircle, ExternalLink, HelpCircle, RefreshCw } from 'lucide-react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -15,8 +15,8 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import DNSTableHeaders from './CustomDomainTableHeaders'
 import DNSRecord from './DNSRecord'
+import { DNSTableHeaders } from './DNSTableHeaders'
 
 export type CustomDomainVerifyProps = {
   projectRef?: string
@@ -40,6 +40,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
     (acc, error) => acc || error.message.includes('caa_error'),
     false
   )
+  const isValidating = (customDomain.ssl.txt_name ?? '') === ''
 
   const onReverifyCustomDomain = () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -72,28 +73,32 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           <p className="text-sm text-foreground-light">
             Records which have been successfully verified will be removed from this list below.
           </p>
-          <div className="mt-4 mb-2">
-            <Alert_Shadcn_ variant="default">
-              {isNotVerifiedYet ? (
-                <AlertCircle className="text-foreground-light" strokeWidth={1.5} />
-              ) : (
-                <HelpCircle className="text-foreground-light" strokeWidth={1.5} />
-              )}
-              <AlertTitle_Shadcn_>
-                {isNotVerifiedYet
-                  ? 'Unable to verify records from DNS provider yet.'
-                  : 'Please note that it may take up to 24 hours for the DNS records to propagate.'}
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+          {!isValidating && (
+            <div className="mt-4 mb-2">
+              <Alert_Shadcn_ variant="default">
                 {isNotVerifiedYet ? (
-                  <div className="mt-2">
-                    <p>
-                      Please check again soon. Note that it may take up to 24 hours for changes in
-                      DNS records to propagate.
-                    </p>
+                  <AlertCircle className="text-foreground-light" strokeWidth={1.5} />
+                ) : (
+                  <HelpCircle className="text-foreground-light" strokeWidth={1.5} />
+                )}
+                <AlertTitle_Shadcn_>
+                  {isNotVerifiedYet
+                    ? 'Unable to verify records from DNS provider yet.'
+                    : 'Please note that it may take up to 24 hours for the DNS records to propagate.'}
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  <div>
+                    {isNotVerifiedYet && (
+                      <p>
+                        Please check again soon. Note that it may take up to 24 hours for changes in
+                        DNS records to propagate.
+                      </p>
+                    )}
                     <p>
                       You may also visit{' '}
                       <Link
+                        target="_blank"
+                        rel="noreferrer"
                         href={`https://whatsmydns.net/#TXT/${customDomain.hostname}`}
                         className="text-brand"
                       >
@@ -101,27 +106,18 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
                       </Link>{' '}
                       to check if your DNS has been propagated successfully before clicking verify.
                     </p>
-                    <p>
-                      Some registrars will require you to remove the domain name when creating DNS
-                      records. As an example, to create a record for `foo.app.example.com`, you
-                      would need to create an entry for `foo.app`.
-                    </p>
+                    {isNotVerifiedYet && (
+                      <p className="mt-1 text-foreground-lighter">
+                        Some registrars will require you to remove the domain name when creating DNS
+                        records. As an example, to create a record for `foo.app.example.com`, you
+                        would need to create an entry for `foo.app`.
+                      </p>
+                    )}
                   </div>
-                ) : (
-                  <p>
-                    You may also visit{' '}
-                    <Link
-                      href={`https://whatsmydns.net/#TXT/${customDomain.hostname}`}
-                      className="text-brand"
-                    >
-                      here
-                    </Link>{' '}
-                    to check if your DNS has been propagated successfully before clicking verify.
-                  </p>
-                )}
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </div>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            </div>
+          )}
         </div>
 
         {hasCAAErrors && (
@@ -160,7 +156,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
               />
             )}
 
-            {customDomain.ssl.status === 'pending_validation' && (
+            {!isValidating && customDomain.ssl.status === 'pending_validation' && (
               <DNSRecord
                 type="TXT"
                 name={customDomain.ssl.txt_name ?? 'Loading...'}
@@ -197,8 +193,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
             <Button
               type="default"
               onClick={onCancelCustomDomain}
-              loading={isDeleting}
-              disabled={isDeleting || isReverifyLoading}
+              disabled={isDeleting || isReverifyLoading || isValidating}
               className="self-end"
             >
               Cancel
@@ -206,8 +201,8 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
             <Button
               icon={<RefreshCw />}
               onClick={onReverifyCustomDomain}
-              loading={isReverifyLoading}
-              disabled={isDeleting || isReverifyLoading}
+              loading={!isValidating && isReverifyLoading}
+              disabled={isDeleting || isReverifyLoading || isValidating}
               className="self-end"
             >
               Verify

@@ -93,7 +93,7 @@ const CustomDomainsConfigureHostname = () => {
                 <FormSectionContent loading={false}>
                   <Input
                     id="domain"
-                    disabled={!canConfigureCustomDomain}
+                    disabled={!canConfigureCustomDomain || isCheckingRecord || isCreating}
                     className="w-full"
                     type="text"
                     name="domain"
