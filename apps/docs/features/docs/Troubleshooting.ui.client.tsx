@@ -1,20 +1,13 @@
 'use client'
 
 import { RotateCw, Search, X } from 'lucide-react'
-import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { useQueryStates } from 'nuqs'
 import { useEffect, useRef, useState, Suspense, useCallback } from 'react'
 
-import {
-  MultiSelector,
-  MultiSelectorContent,
-  MultiSelectorInput,
-  MultiSelectorItem,
-  MultiSelectorList,
-  MultiSelectorTrigger,
-} from '@ui-patterns/multi-select'
 import ShimmeringLoader from '@ui-patterns/ShimmeringLoader'
-import { Input_Shadcn_, cn, Admonition, Button_Shadcn_ } from 'ui'
+import { Input_Shadcn_, cn, Button_Shadcn_ } from 'ui'
 
+import { MultiSelect } from '~/components/MultiSelect.client'
 import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
 import {
   formatError,
@@ -138,67 +131,137 @@ function TroubleshootingFilterInternal({
     reset,
   } = useTroubleshootingSearchState()
 
+  const [productsOpen, _setProductsOpen] = useState(false)
+  const [errorsOpen, _setErrorsOpen] = useState(false)
+  const [tagsOpen, _setTagsOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement | null>(null)
+
+  const allEntries = useRef<HTMLElement[]>([])
+  useEffect(() => {
+    const container = document.getElementById(TROUBLESHOOTING_CONTAINER_ID)
+    if (!container) return
+
+    const entries = Array.from(
+      container.querySelectorAll(
+        `[${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_VALUE_ENTRY}"]`
+      )
+    ) as HTMLElement[]
+    allEntries.current = entries
+  }, [])
+
+  const setProductsOpen = useCallback(
+    (open: boolean) => {
+      _setProductsOpen(open)
+      if (open) {
+        allEntries.current?.forEach((entry) => (entry.inert = true))
+      } else {
+        allEntries.current?.forEach((entry) => (entry.inert = false))
+      }
+    },
+    [_setProductsOpen]
+  )
+  const setErrorsOpen = useCallback(
+    (open: boolean) => {
+      _setErrorsOpen(open)
+      if (open) {
+        allEntries.current?.forEach((entry) => (entry.inert = true))
+      } else {
+        allEntries.current?.forEach((entry) => (entry.inert = false))
+      }
+    },
+    [_setErrorsOpen]
+  )
+  const setTagsOpen = useCallback(
+    (open: boolean) => {
+      _setTagsOpen(open)
+      if (open) {
+        allEntries.current?.forEach((entry) => (entry.inert = true))
+      } else {
+        allEntries.current?.forEach((entry) => (entry.inert = false))
+      }
+    },
+    [_setTagsOpen]
+  )
+
+  const convertToItem = useCallback(
+    (arr: string[], { capitalize = false }: { capitalize?: boolean } = {}) =>
+      arr.map((item) => ({
+        value: item,
+        label: capitalize ? item[0].toUpperCase() + item.slice(1) : item,
+      })),
+    []
+  )
 
   return (
     <>
       <h2 className="sr-only">Search and filter</h2>
       <div className={cn('flex flex-wrap gap-2 items-center', className)}>
-        <MultiSelector values={selectedProducts} onValuesChange={setSelectedProducts}>
-          <MultiSelectorTrigger>
-            <MultiSelectorInput
-              placeholder="Products"
-              className="placeholder:text-foreground-light"
-            />
-          </MultiSelectorTrigger>
-          <MultiSelectorContent>
-            <MultiSelectorList>
-              {products.map((product) => (
-                <MultiSelectorItem key={product} value={product}>
-                  {product}
-                </MultiSelectorItem>
-              ))}
-            </MultiSelectorList>
-          </MultiSelectorContent>
-        </MultiSelector>
-        <MultiSelector values={selectedErrorCodes} onValuesChange={setSelectedErrorCodes}>
-          <MultiSelectorTrigger>
-            <MultiSelectorInput
-              placeholder="Error codes"
-              className="placeholder:text-foreground-light"
-            />
-          </MultiSelectorTrigger>
-          <MultiSelectorContent>
-            <MultiSelectorList>
-              {errors.map((error) => (
-                <MultiSelectorItem key={formatError(error)} value={formatError(error)}>
-                  {formatError(error)}
-                </MultiSelectorItem>
-              ))}
-            </MultiSelectorList>
-          </MultiSelectorContent>
-        </MultiSelector>
-        <MultiSelector values={selectedTags} onValuesChange={setSelectedTags}>
-          <MultiSelectorTrigger>
-            <MultiSelectorInput placeholder="Tags" className="placeholder:text-foreground-light" />
-          </MultiSelectorTrigger>
-          <MultiSelectorContent>
-            <MultiSelectorList>
-              {keywords.map((keyword) => (
-                <MultiSelectorItem key={keyword} value={keyword}>
-                  {keyword}
-                </MultiSelectorItem>
-              ))}
-            </MultiSelectorList>
-          </MultiSelectorContent>
-        </MultiSelector>
+        <MultiSelect
+          open={productsOpen}
+          onOpenChange={setProductsOpen}
+          selected={convertToItem(selectedProducts, { capitalize: true })}
+          onSelectedChange={(newItemsOrCreateNewItems) => {
+            const newItems =
+              typeof newItemsOrCreateNewItems === 'function'
+                ? newItemsOrCreateNewItems(convertToItem(selectedProducts, { capitalize: true }))
+                : newItemsOrCreateNewItems
+            setSelectedProducts(newItems.map((item) => item.value))
+          }}
+        >
+          <MultiSelect.Trigger className="w-48" label="Products" />
+          <MultiSelect.Content sameWidthAsTrigger>
+            {products.map((product) => (
+              <MultiSelect.Item
+                item={{ value: product, label: product[0].toUpperCase() + product.slice(1) }}
+              />
+            ))}
+          </MultiSelect.Content>
+        </MultiSelect>
+        <MultiSelect
+          open={errorsOpen}
+          onOpenChange={setErrorsOpen}
+          selected={convertToItem(selectedErrorCodes, { capitalize: true })}
+          onSelectedChange={(newItemsOrCreateNewItems) => {
+            const newItems =
+              typeof newItemsOrCreateNewItems === 'function'
+                ? newItemsOrCreateNewItems(convertToItem(selectedErrorCodes, { capitalize: true }))
+                : newItemsOrCreateNewItems
+            setSelectedErrorCodes(newItems.map((item) => item.value))
+          }}
+        >
+          <MultiSelect.Trigger className="w-48" label="Error codes" />
+          <MultiSelect.Content sameWidthAsTrigger>
+            {errors.map((error) => (
+              <MultiSelect.Item item={{ value: formatError(error), label: formatError(error) }} />
+            ))}
+          </MultiSelect.Content>
+        </MultiSelect>
+        <MultiSelect
+          open={tagsOpen}
+          onOpenChange={setTagsOpen}
+          selected={convertToItem(selectedTags, { capitalize: true })}
+          onSelectedChange={(newItemsOrCreateNewItems) => {
+            const newItems =
+              typeof newItemsOrCreateNewItems === 'function'
+                ? newItemsOrCreateNewItems(convertToItem(selectedTags, { capitalize: true }))
+                : newItemsOrCreateNewItems
+            setSelectedTags(newItems.map((item) => item.value))
+          }}
+        >
+          <MultiSelect.Trigger className="w-48" label="Tags" />
+          <MultiSelect.Content sameWidthAsTrigger>
+            {keywords.map((keyword) => (
+              <MultiSelect.Item item={{ value: keyword, label: keyword }} />
+            ))}
+          </MultiSelect.Content>
+        </MultiSelect>
         <div className="relative">
           <Input_Shadcn_
             id="troubleshooting-search"
             ref={searchInputRef}
             type="text"
             placeholder="Search by keyword"
-            className="pl-8 pr-8 h-[36px] w-60 rounded-lg border-control placeholder:text-foreground-light"
+            className="pl-8 pr-8 h-[40px] w-60 rounded-md border-alternative placeholder:text-foreground-light"
             value={searchState}
             onChange={(e) => setSearchState(e.target.value)}
           />
@@ -209,7 +272,7 @@ function TroubleshootingFilterInternal({
           />
           {searchState && (
             <button
-              className="absolute right-1 top-1/2 -translate-y-1/2 text-foreground-light border hover:border-stronger rounded-md p-1 transition-colors"
+              className="absolute right-1 top-1/2 -translate-y-1/2 text-foreground-light border-alternative hover:border-stronger rounded-md p-1 transition-colors"
               onClick={() => {
                 setSearchState('')
                 searchInputRef.current?.focus()
@@ -222,7 +285,7 @@ function TroubleshootingFilterInternal({
         </div>
         <Button_Shadcn_
           variant="outline"
-          className="rounded-lg text-foreground-light h-[36px] w-[36px] p-0"
+          className="rounded-md text-foreground-light h-[40px] w-[40px] p-0"
           onClick={reset}
         >
           <RotateCw size={16} />
@@ -243,17 +306,8 @@ export function TroubleshootingFilterEmptyState() {
 
 function TroubleshootingFilterEmptyStateInternal() {
   const allEntries = useRef<HTMLElement[] | undefined>(undefined)
-  const {
-    selectedProducts,
-    selectedErrorCodes,
-    selectedTags,
-    searchState,
-    setSearchState,
-    setSelectedTags,
-    setSelectedProducts,
-    setSelectedErrorCodes,
-    reset,
-  } = useTroubleshootingSearchState()
+  const { selectedProducts, selectedErrorCodes, selectedTags, searchState, reset } =
+    useTroubleshootingSearchState()
 
   const [numberResults, setNumberResults] = useState<number | undefined>(undefined)
 
