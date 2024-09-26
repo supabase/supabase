@@ -25,6 +25,7 @@ export async function getPostgresUnpauseVersions(
 
   const { data, error } = await get('/platform/projects/{ref}/restore/versions', {
     params: { path: { ref: projectRef } },
+    signal,
   })
 
   if (error) handleError(error)

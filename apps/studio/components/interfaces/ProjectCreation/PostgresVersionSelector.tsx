@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
+import { components } from 'api-types'
 import {
   ProjectCreationPostgresVersion,
   useProjectCreationPostgresVersionsQuery,
@@ -15,8 +17,6 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { components } from 'api-types'
-import { useEffect } from 'react'
 
 type ReleaseChannel = components['schemas']['ReleaseChannel']
 type PostgresEngine = components['schemas']['PostgresEngine']

@@ -1,11 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
@@ -18,6 +18,7 @@ import { setProjectStatus } from 'data/projects/projects-query'
 import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
+  Admonition,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -146,31 +147,25 @@ const ProjectUpgradeAlert = () => {
 
       <Modal
         hideFooter
+        size="small"
         visible={showUpgradeModal}
         onCancel={() => setShowUpgradeModal(false)}
-        header={'Upgrade Postgres'}
+        header="Confirm to upgrade Postgres version"
       >
         <Form_Shadcn_ {...form}>
           <form onSubmit={form.handleSubmit(onConfirmUpgrade)}>
+            <Admonition
+              type="warning"
+              className="border-x-0 border-t-0 rounded-none"
+              title={`Your project will be offline for up to ${durationEstimateHours} hour${durationEstimateHours === 1 ? '' : 's'}`}
+              description="It is advised to upgrade at a time when there will be minimal impact for your application."
+            />
             <Modal.Content>
               <div className="space-y-4">
-                <p className="text-sm">All services are going offline.</p>
                 <p className="text-sm">
-                  You will not be able to downgrade back to Postgres {currentPgVersion}.
+                  All services will be offline and you will not be able to downgrade back to
+                  Postgres {currentPgVersion}.
                 </p>
-                <Alert_Shadcn_ title="Your project will be offline while the upgrade is in progress">
-                  <AlertCircle className="h-4 w-4" strokeWidth={2} />
-                  <AlertTitle_Shadcn_>
-                    Your project will be offline for up to {durationEstimateHours} hour
-                    {durationEstimateHours === 1 ? '' : 's'}
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    <p>
-                      It is advised to upgrade at a time when there will be minimal impact for your
-                      application.
-                    </p>
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
                 {(data?.potential_breaking_changes ?? []).length > 0 && (
                   <Alert_Shadcn_ variant="destructive" title="Breaking changes">
                     <AlertCircle className="h-4 w-4" strokeWidth={2} />

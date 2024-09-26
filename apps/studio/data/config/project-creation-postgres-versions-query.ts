@@ -1,10 +1,10 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get, handleError, post } from 'data/fetchers'
+import { components } from 'api-types'
+import { handleError, post } from 'data/fetchers'
+import { CloudProvider } from 'shared-data'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
-import { CloudProvider } from 'shared-data'
-import { components } from 'api-types'
 
 export type ProjectCreationPostgresVersionsVariables = {
   cloudProvider: CloudProvider
@@ -27,6 +27,7 @@ export async function getPostgresCreationVersions(
   const { data, error } = await post('/platform/organizations/{slug}/available-versions', {
     params: { path: { slug: organizationSlug } },
     body: { provider: cloudProvider, region: dbRegion },
+    signal,
   })
 
   if (error) handleError(error)

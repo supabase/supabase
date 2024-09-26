@@ -17,11 +17,11 @@ import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
-import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import {
-  extractPostgresVersionDetails,
   PostgresVersionSelector,
+  extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
@@ -549,30 +549,6 @@ const Wizard: NextPageWithLayout = () => {
                       />
                     </Panel.Content>
 
-                    {showNonProdFields && (
-                      <Panel.Content>
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="postgresVersion"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="Custom Postgres version"
-                              layout="horizontal"
-                              description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  placeholder="Postgres version"
-                                  {...field}
-                                  autoComplete="off"
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </Panel.Content>
-                    )}
-
                     {cloudProviderEnabled && showNonProdFields && (
                       <Panel.Content>
                         <FormField_Shadcn_
@@ -626,16 +602,27 @@ const Wizard: NextPageWithLayout = () => {
                             <FormItemLayout
                               layout="horizontal"
                               label={
-                                <div className="space-y-4">
+                                <div className="flex flex-col gap-y-4">
                                   <span>Compute Size</span>
 
-                                  <div className="flex flex-col space-y-2">
+                                  <div className="flex flex-col gap-y-2">
                                     <Link
-                                      href="https://supabase.com/docs/guides/platform/compute-add-ons"
                                       target="_blank"
+                                      rel="noopener noreferrer"
+                                      href="https://supabase.com/docs/guides/platform/compute-add-ons"
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                         <p className="text-sm m-0">Compute Add-Ons</p>
+                                        <ExternalLink size={16} strokeWidth={1.5} />
+                                      </div>
+                                    </Link>
+                                    <Link
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                                    >
+                                      <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                                        <p className="text-sm m-0">Compute Billing</p>
                                         <ExternalLink size={16} strokeWidth={1.5} />
                                       </div>
                                     </Link>
@@ -701,26 +688,7 @@ const Wizard: NextPageWithLayout = () => {
                             </FormItemLayout>
                           )}
                         />
-                        <FormItemLayout
-                          className="pt-4"
-                          label={
-                            <div className="space-y-4">
-                              <span>Compute Billing</span>
-                              <div className="flex flex-col space-y-2">
-                                <Link
-                                  href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
-                                  target="_blank"
-                                >
-                                  <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                    <p className="text-sm m-0">Docs</p>
-                                    <ExternalLink size={16} strokeWidth={1.5} />
-                                  </div>
-                                </Link>
-                              </div>
-                            </div>
-                          }
-                          layout="horizontal"
-                        >
+                        <FormItemLayout layout="horizontal">
                           <div className="flex justify-between mr-2">
                             <span>Additional Monthly Compute Costs</span>
                             <div className="text-brand flex gap-1 items-center">
@@ -785,7 +753,7 @@ const Wizard: NextPageWithLayout = () => {
                                   </TableBody>
                                 </Table>
                                 <PopoverSeparator />
-                                <Table className="mt-3">
+                                <Table>
                                   <TableHeader className="[&_th]:h-7">
                                     <TableRow>
                                       <TableHead colSpan={2}>Compute Credits</TableHead>
@@ -816,7 +784,7 @@ const Wizard: NextPageWithLayout = () => {
                                   </TableBody>
                                 </Table>
 
-                                <div className="p-4 text-xs text-foreground-light mt-2 space-y-1">
+                                <div className="p-4 text-xs text-foreground-light space-y-1">
                                   <p>
                                     Compute is charged usage-based whenever your billing cycle
                                     resets. Given compute charges are hourly, your invoice will
@@ -929,6 +897,30 @@ const Wizard: NextPageWithLayout = () => {
                               organizationSlug={slug}
                               dbRegion={form.getValues('dbRegion')}
                             />
+                          )}
+                        />
+                      </Panel.Content>
+                    )}
+
+                    {showNonProdFields && (
+                      <Panel.Content>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="postgresVersion"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label="Custom Postgres version"
+                              layout="horizontal"
+                              description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
+                            >
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  placeholder="Postgres version"
+                                  {...field}
+                                  autoComplete="off"
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
                           )}
                         />
                       </Panel.Content>

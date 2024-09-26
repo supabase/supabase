@@ -126,7 +126,7 @@ const InfrastructureInfo = () => {
                                 {isOnNonGenerallyAvailableReleaseChannel}
                               </Badge>
                             </TooltipTrigger_Shadcn_>
-                            <TooltipContent_Shadcn_ side="bottom" className="w-52 text-center">
+                            <TooltipContent_Shadcn_ side="bottom" className="w-44 text-center">
                               This project uses a {isOnNonGenerallyAvailableReleaseChannel} database
                               version release
                             </TooltipContent_Shadcn_>

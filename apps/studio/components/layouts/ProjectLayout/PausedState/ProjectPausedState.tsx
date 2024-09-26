@@ -1,17 +1,23 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { PauseCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import {
+  PostgresEngine,
+  ProjectUnpausePostgresVersion,
+  ReleaseChannel,
+  useProjectUnpausePostgresVersionsQuery,
+} from 'data/config/project-unpause-postgres-versions-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
@@ -25,6 +31,7 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  Badge,
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -36,20 +43,12 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
-  Badge,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useProjectContext } from '../ProjectContext'
 import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
 import { PauseDisabledState } from './PauseDisabledState'
-import {
-  PostgresEngine,
-  ProjectUnpausePostgresVersion,
-  ReleaseChannel,
-  useProjectUnpausePostgresVersionsQuery,
-} from 'data/config/project-unpause-postgres-versions-query'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -113,7 +112,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
 
-  const { mutate: restoreProject } = useProjectRestoreMutation({
+  const { mutate: restoreProject, isLoading: isRestoring } = useProjectRestoreMutation({
     onSuccess: (_, variables) => {
       setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
       toast.success('Restoring project')
@@ -348,10 +347,16 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
               </Modal.Content>
             )}
             <Modal.Content className="flex items-center space-x-2 justify-end">
-              <Button type="default" onClick={() => setShowConfirmRestore(false)}>
+              <Button
+                type="default"
+                disabled={isRestoring}
+                onClick={() => setShowConfirmRestore(false)}
+              >
                 Cancel
               </Button>
-              <Button htmlType="submit">Confirm upgrade</Button>
+              <Button htmlType="submit" loading={isRestoring}>
+                Confirm upgrade
+              </Button>
             </Modal.Content>
           </form>
         </Form_Shadcn_>
