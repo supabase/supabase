@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 import { Button, Form, Modal } from 'ui'
 
@@ -15,6 +17,7 @@ interface ConfirmModalProps {
   onSelectConfirm: () => void
 }
 
+// @deprecated use ConfirmationModal instead
 const ConfirmModal = ({
   visible = false,
   danger = false,

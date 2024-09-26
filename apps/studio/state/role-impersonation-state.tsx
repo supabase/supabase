@@ -2,7 +2,7 @@ import { PropsWithChildren, createContext, useCallback, useContext, useEffect } 
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { useConstant } from 'common'
-import { useLatest } from 'hooks'
+import useLatest from 'hooks/misc/useLatest'
 import { ImpersonationRole } from 'lib/role-impersonation'
 
 export function createRoleImpersonationState() {

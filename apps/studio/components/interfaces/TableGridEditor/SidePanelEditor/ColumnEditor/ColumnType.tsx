@@ -19,6 +19,7 @@ import {
   Popover_Shadcn_,
   ScrollArea,
   cn,
+  IconAlertCircle,
 } from 'ui'
 
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
@@ -33,7 +34,7 @@ import {
   ToggleRight,
   Type,
 } from 'lucide-react'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
@@ -263,7 +264,7 @@ const ColumnType = ({
 
       {showRecommendation && recommendation !== undefined && (
         <Alert_Shadcn_ variant="warning">
-          <WarningIcon />
+          <IconAlertCircle />
           <AlertTitle_Shadcn_>
             {' '}
             It is recommended to use <code className="text-xs">

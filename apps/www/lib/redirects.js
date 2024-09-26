@@ -567,6 +567,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/platform/custom-postgres-config',
+    destination: '/docs/guides/database/custom-postgres-config',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/hosting/platform/access-control',
     destination: '/docs/guides/platform/access-control',
   },
@@ -1175,6 +1180,11 @@ module.exports = [
     source: '/blog/2022/08/03/supabase-beta-update-july-2022',
     destination: '/blog/supabase-beta-update-july-2022',
   },
+  {
+    permanent: true,
+    source: '/blog/supabase-aquires-oriole',
+    destination: '/blog/supabase-acquires-oriole',
+  },
 
   //  DOCS
   {
@@ -1236,6 +1246,11 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-commit',
     destination: '/docs/reference/supabase-db-pull',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/supabase-gen-types-typescript',
+    destination: '/docs/reference/supabase-gen-types',
   },
 
   {
@@ -1558,11 +1573,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/reference',
-    destination: '/docs#reference-documentation',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/auth/passwordless-login',
     destination: '/docs/guides/auth/phone-login',
   },
@@ -1806,6 +1816,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/resources/supabase-cli/managing-environments',
     destination: '/docs/guides/cli/managing-environments',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/migrations/auth0',
+    destination: '/docs/guides/resources/migrating-to-supabase/auth0',
   },
   {
     permanent: true,
@@ -2410,18 +2425,8 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/launch-week',
-    destination: '/ga-week',
-  },
-  {
-    permanent: false,
     source: '/special-announcement',
     destination: '/ga-week',
-  },
-  {
-    permanent: false,
-    source: '/launch-week/tickets/:path*',
-    destination: '/ga-week/tickets/:path*',
   },
   {
     permanent: false,
@@ -2540,6 +2545,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/log-drains',
+    destination: '/docs/platform/log-drains',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/functions/functions-headers',
     destination: '/docs/functions/logging',
   },
@@ -2563,5 +2573,23 @@ module.exports = [
     source: '/docs/guides/auth/phone-login/textlocal',
     destination:
       '/docs/guides/auth/phone-login?showSmsProvider=Textlocal%2520%28Community%2520Supported%29',
+  },
+  {
+    permanent: true,
+    source: '/launchweek',
+    destination: '/launch-week',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/enterprise-billing',
+    destination: '/docs/guides/platform/org-based-billing',
+  },
+
+  // marketing
+
+  {
+    permanent: true,
+    source: '/changelogpod',
+    destination: 'https://forms.supabase.com/changelog-podcast-sponsorship',
   },
 ]

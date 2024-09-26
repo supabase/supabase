@@ -3,9 +3,8 @@ import { observer, useLocalObservable } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, createContext, useContext, useEffect, useState } from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import type { Dictionary } from 'types'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,
@@ -16,7 +15,7 @@ import {
 import { databaseIcon, vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { Loading } from 'components/ui/Loading'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import {
@@ -24,7 +23,9 @@ import {
   VERCEL_DEFAULT_EXTERNAL_ID,
   VERCEL_INTEGRATION_CONFIGS,
 } from 'lib/vercelConfigs'
-import { Button, IconChevronRight, IconPlusCircle, IconX, Listbox, Select, Separator } from 'ui'
+import type { Dictionary } from 'types'
+import { Button, Listbox, Select, Separator } from 'ui'
+import { PlusCircle, ChevronRight, X } from 'lucide-react'
 
 interface IVercelIntegrationStore {
   code: string
@@ -488,7 +489,7 @@ const ProjectLinkList = observer(() => {
         ) : (
           <div className="flex items-center space-x-2">
             <Button
-              icon={<IconPlusCircle />}
+              icon={<PlusCircle />}
               type="default"
               onClick={addProjectLink}
               disabled={_store.projectLinkRemaining == 0 || _store.waitingIntegration}
@@ -575,7 +576,7 @@ const ProjectLinkItem = observer(
             </Listbox>
           </div>
           <div className="flex flex-shrink items-center">
-            <IconChevronRight className="text-foreground-light" />
+            <ChevronRight className="text-foreground-light" />
           </div>
           <div className="w-1/2 flex-grow">
             <Listbox
@@ -601,7 +602,7 @@ const ProjectLinkItem = observer(
             <div className="absolute top-[3px] right-[-50px]">
               <Button
                 type="text"
-                icon={<IconX size="small" strokeWidth={2} />}
+                icon={<X size="18" strokeWidth={2} />}
                 onClick={onRemove}
                 disabled={_store.waitingIntegration}
               />

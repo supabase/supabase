@@ -1,6 +1,6 @@
 import { Redis } from 'https://deno.land/x/upstash_redis@v1.19.3/mod.ts'
 import { Ratelimit } from 'https://cdn.skypack.dev/@upstash/ratelimit@0.4.4'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 console.log(`Function "upstash-redis-counter" up and running!`)
 

@@ -1,14 +1,10 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "ui": "stream",
+  "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"]
-    },
-    "database-design#build": {
-      "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_*", "OPENAI_API_KEY", "VERCEL_URL"],
-      "outputs": [".next/**", "!.next/cache/**"]
     },
     "design-system#build": {
       "dependsOn": ["^build"],
@@ -17,12 +13,21 @@
     },
     "docs#build": {
       "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_*", "NODE_ENV", "OPENAI_API_KEY", "SKIP_BUILD_STATIC_GENERATION"],
+      "env": [
+        "ANALYZE",
+        "DOCS_REVALIDATION_KEYS",
+        "DOCS_REVALIDATION_OVERRIDE_KEYS",
+        "NEXT_PUBLIC_*",
+        "NODE_ENV",
+        "OPENAI_API_KEY",
+        "SUPABASE_SECRET_KEY"
+      ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "studio#build": {
       "dependsOn": ["^build"],
       "env": [
+        "ANALYZE",
         "AUTH_JWT_SECRET",
         "DEFAULT_ORGANIZATION_NAME",
         "DEFAULT_PROJECT_NAME",
@@ -39,19 +44,26 @@
         "SUPABASE_SERVICE_KEY",
         "SUPABASE_URL",
         "VERCEL_GIT_COMMIT_SHA",
+        "VERCEL_ENV",
         "VERCEL_URL"
       ],
+      "passThroughEnv": ["SENTRY_ORG", "SENTRY_PROJECT", "SENTRY_AUTH_TOKEN"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "www#build": {
       "dependsOn": ["^build"],
       "env": [
+        "ANALYZE",
         "GITHUB_CHANGELOG_APP_*",
         "MISC_USE_SERVICE_ROLE_KEY",
         "NEXT_PUBLIC_*",
         "NODE_ENV",
         "OPENAI_API_KEY",
-        "npm_lifecycle_event"
+        "npm_lifecycle_event",
+        "LIVE_SUPABASE_COM_SERVICE_ROLE_KEY",
+        "VERCEL_URL",
+        "HUBSPOT_PORTAL_ID",
+        "HUBSPOT_ENTERPRISE_FORM_GUID"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },

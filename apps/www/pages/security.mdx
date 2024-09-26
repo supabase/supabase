@@ -1,15 +1,13 @@
 import {
   KeyIcon,
-  LinkIcon,
   UserGroupIcon,
   ShieldCheckIcon,
   RewindIcon,
   CreditCardIcon,
   ClipboardCheckIcon,
 } from '@heroicons/react/outline'
-import { Button, IconGitHub, IconActivity } from 'ui'
+import { Activity, Lock } from 'lucide-react'
 import Layout from '../layouts/Layout'
-import Link from 'next/link'
 
 export const meta = {
   type: 'lp',
@@ -22,7 +20,7 @@ export const Section = ({ children, icon, img }) => (
   <div>
     {icon && (
       <div className="border shadow-background-surface-300 not-prose bg-surface-100 -mb-4 flex h-10 w-10 items-center justify-center rounded-full">
-        <figure className="w-5">{icon}</figure>
+        <figure className="w-5 h-5 flex items-center justify-center">{icon}</figure>
       </div>
     )}
     {img && <div className="-mb-4 flex h-12 w-12 items-center justify-center">{img}</div>}
@@ -30,14 +28,14 @@ export const Section = ({ children, icon, img }) => (
   </div>
 )
 
-<div className="container mx-auto px-8 sm:px-16 xl:px-20 grid grid-cols-12 items-center my-16">
+<div className="container mx-auto px-8 sm:px-16 xl:px-20 grid grid-cols-12 items-center my-8">
   <div className="col-span-12 lg:col-span-6">
-    <h1>Security at Supabase</h1>
-    <h2 className="text-xl text-foreground-light max-w-xl">
+    <h1 className="xl:text-5xl mb-4 [&_p]:m-0">Security at Supabase</h1>
+    <h2 className="text-xl text-foreground-light max-w-xl m-0 [&_p]:m-0">
       Supabase is trusted by thousands of developers for building and deploying secure applications.
     </h2>
   </div>
-  <div className="col-span-12 lg:col-span-5 lg:col-start-8">
+  <div className="col-span-12 lg:col-span-5 lg:col-start-8 m-0 [&_p]:m-0">
 
 ![Supabase security](/images/security/security-hero.png)
 
@@ -48,26 +46,36 @@ export const Section = ({ children, icon, img }) => (
 
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-16">
 
+<Section icon={<Lock strokeWidth={1}/>}>
+
+### Multi-factor Authentication
+
+Supabase allows users to enable Multi-factor authentication (MFA) on their account.
+MFA adds an additional layer of security to your user account, by requiring a second factor to verify your user identity.
+
+</Section>
+
 <Section icon={<ShieldCheckIcon strokeWidth={1}/>}>
 
 ### SOC 2
 
 Supabase is SOC2 Type 2 compliant. This is an important security policy when handling sensitive customer data.
 
-Enterprise and Teams customers can access our SOC2 report [on the dashboard](/dashboard/org/_/documents).
+Enterprise and Team customers can access our SOC2 report [on the dashboard](/dashboard/org/_/documents).
 
 <div className="w-32">
   <img src="/images/security/soc2-type2.svg" />
 </div>
 
 </Section>
-<Section icon={<IconActivity strokeWidth={1}/>}>
+
+<Section icon={<Activity strokeWidth={1}/>}>
 
 ### HIPAA
 
 Supabase is HIPAA compliant. You can store Protected Health Information (PHI) on our hosted platform once you enter into a Business Associate Agreement (BAA) with us and fulfill your HIPAA obligations under our [shared responsibility model](/docs/guides/platform/shared-responsibility-model#managing-healthcare-data).
 
-Enterprise and Teams customers can request to sign our BAA [on the dashboard](/dashboard/org/_/documents).
+Enterprise and Team customers can request to sign our BAA [on the dashboard](/dashboard/org/_/documents).
 
 <div className="w-32">
   <img src="/images/security/HIPAA.svg" />
@@ -100,7 +108,7 @@ Read more about [fine grained access controls](/docs/guides/platform/access-cont
 
 All paid customer databases are backed up every day.
 
-Point in Time Recovery allows restoring the database to any point in time. Customers from the Pro plan have access to this feature as an add-on.
+Point in Time Recovery allows restoring the database to any point in time. Customers from the Pro Plan have access to this feature as an add-on.
 
 </Section>
 

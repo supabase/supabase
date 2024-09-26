@@ -1,25 +1,34 @@
 import dayjs from 'dayjs'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, IconExternalLink } from 'ui'
+import { toast } from 'sonner'
+import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { ReportsLayout } from 'components/layouts'
+import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Table from 'components/to-be-cleaned/Table'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
+import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -34,12 +43,21 @@ DatabaseReport.getLayout = (page) => <ReportsLayout title="Database">{page}</Rep
 export default DatabaseReport
 
 const DatabaseUsage = () => {
-  const { db, chart } = useParams()
+  const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
-  const [dateRange, setDateRange] = useState<any>(undefined)
+  const diskManagementV2 = useFlag('diskManagementV2')
+
+  const org = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
+  const [dateRange, setDateRange] = useState<any>(undefined)
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const showNewDiskManagementUI =
+    subscription?.usage_based_billing_project_addons &&
+    diskManagementV2 &&
+    project?.cloud_provider === 'AWS'
 
   const report = useDatabaseReport()
   const { data } = useDatabaseSizeQuery({
@@ -47,6 +65,21 @@ const DatabaseUsage = () => {
     connectionString: project?.connectionString,
   })
   const databaseSizeBytes = data?.result[0].db_size ?? 0
+  const currentDiskSize = project?.volumeSizeGb ?? 0
+
+  const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
+  const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
+
+  const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
+    onSuccess: (res, variables) => {
+      toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
+      setshowIncreaseDiskSizeModal(false)
+    },
+  })
 
   // [Joshen] Empty dependency array as we only want this running once
   useEffect(() => {
@@ -169,20 +202,56 @@ const DatabaseUsage = () => {
             </Panel.Content>
           </Panel>
         )}
-
+      </section>
+      <section id="database-size-report">
         <ReportWidget
           isLoading={report.isLoading}
           params={report.params.largeObjects}
-          title="Database Size - Large Objects"
+          title="Database Size"
           data={report.data.largeObjects || []}
           queryType={'db'}
           resolvedSql={report.largeObjectsSql}
           renderer={(props) => {
             return (
               <div>
-                <header className="text-sm">Database Size used</header>
-                <p className="text-xl tracking-wide">{formatBytes(databaseSizeBytes)}</p>
+                <div className="col-span-4 inline-grid grid-cols-12 gap-12 w-full">
+                  <div className="grid gap-2 col-span-2">
+                    <h5 className="text-sm">Space used</h5>
+                    <span className="text-lg">{formatBytes(databaseSizeBytes, 2, 'GB')}</span>
+                  </div>
+                  <div className="grid gap-2 col-span-2">
+                    <h5 className="text-sm">Total size</h5>
+                    <span className="text-lg">{currentDiskSize} GB</span>
+                  </div>
 
+                  <div className="col-span-8 text-right">
+                    {showNewDiskManagementUI ? (
+                      <Button asChild type="default">
+                        <Link href={`/project/${ref}/settings/database#disk-management`}>
+                          Increase disk size
+                        </Link>
+                      </Button>
+                    ) : (
+                      <ButtonTooltip
+                        type="default"
+                        disabled={!canUpdateDiskSizeConfig}
+                        onClick={() => setshowIncreaseDiskSizeModal(true)}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canUpdateDiskSizeConfig
+                              ? 'You need additional permissions to increase the disk size'
+                              : undefined,
+                          },
+                        }}
+                      >
+                        Increase disk size
+                      </ButtonTooltip>
+                    )}
+                  </div>
+                </div>
+
+                <h3 className="mt-8 text-sm">Large Objects</h3>
                 {!props.isLoading && props.data.length === 0 && <span>No large objects found</span>}
                 {!props.isLoading && props.data.length > 0 && (
                   <Table
@@ -229,7 +298,7 @@ const DatabaseUsage = () => {
                       inactive.
                     </p>
 
-                    <Button asChild type="default" icon={<IconExternalLink />}>
+                    <Button asChild type="default" icon={<ExternalLink />}>
                       <Link
                         href="https://supabase.com/docs/guides/platform/database-size#database-space-management"
                         target="_blank"
@@ -243,6 +312,11 @@ const DatabaseUsage = () => {
               </Alert_Shadcn_>
             </div>
           )}
+        />
+        <DiskSizeConfigurationModal
+          visible={showIncreaseDiskSizeModal}
+          loading={isUpdatingDiskSize}
+          hideModal={setshowIncreaseDiskSizeModal}
         />
       </section>
     </>

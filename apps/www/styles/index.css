@@ -5,8 +5,7 @@
 @import url(../pages/launch-week/launchWeek.css);
 
 @import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/dark.css';
-@import './../../../packages/ui/build/css/themes/deep-dark.css';
+@import './../../../packages/ui/build/css/themes/dark-combined.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
 @layer utilities {
@@ -43,7 +42,7 @@ html {
 }
 
 body {
-  @apply bg-background text-foreground;
+  @apply bg text-foreground;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -73,7 +72,7 @@ h6 { */
 }
 
 .h2:not(.prose *):not(.overwrite) {
-  @apply text-3xl;
+  @apply text-4xl;
 }
 
 .h3:not(.prose *):not(.overwrite) {

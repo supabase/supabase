@@ -6,6 +6,7 @@ ChatGPT
 Clippy
 Colab
 [Cc]omposable
+[Cc]onfigs?
 CPUs?
 CTEs?
 [Dd]eclarative(ly)?
@@ -18,11 +19,13 @@ Deno
 [Dd]otenv
 [Ee]nv
 [Ee]nums?
+event_message
 Firestore
 Hashicorp
 [Gg]eospatial
 GPUs?
 Gradle
+Grafana
 GraphQL
 Groonga
 href
@@ -36,6 +39,7 @@ Markprompt
 [Mm]iddleware
 [Nn]amespace(d|s)?
 Next.js
+npm
 Nuxt
 OAuth
 OpenAI
@@ -43,6 +47,7 @@ OpenAI
 [Pp]asscodes?
 [Pp]asswordless
 [Pp]erformant
+pg_plan_filter
 PGAudit
 PGroonga
 pgvector
@@ -55,6 +60,7 @@ plpgsql
 Prisma
 [Rr]ealtime
 Refine's
+regexp_contains
 [Rr]eindex(ed|es|ing)?
 repo
 RESTful
@@ -67,11 +73,17 @@ Roboflow
 [Ss]ignouts?
 [Ss]ignups?
 SQLAlchemy
+subquery
+subqueries
 [Ss]upabase
+Snaplet
 Supavisor
+[Ss]upautils
 [Ss]upersets?
 Terraform
 [Tt]odos?
+unnesting
+unnested
 [Uu]npaus(e|es|ed|ing)
 [Uu]psert(s|ed|ing)?
 [Uu]pvot(es|ed|ing)

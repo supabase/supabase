@@ -1,24 +1,20 @@
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import { useSearchParams } from 'next/navigation'
+import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { startCase } from 'lodash'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import { useKey } from 'react-use'
-import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
-import type PostTypes from '~/types/post'
 import type { BlogView } from '~/pages/blog'
+import type PostTypes from '~/types/post'
 
+import { AlignJustify, ChevronDown, Grid, Search, X } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconAlignJustify,
-  IconChevronDown,
-  IconGrid,
-  IconSearch,
-  IconX,
   Input,
   cn,
 } from 'ui'
@@ -47,8 +43,8 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const q = searchParams.get('q')
-  const activeCategory = searchParams.get('category')
+  const q = searchParams?.get('q')
+  const activeCategory = searchParams?.get('category')
   const isMobile = useBreakpoint(1023)
   const is2XL = useBreakpoint(1535)
 
@@ -119,7 +115,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
 
   const handleSearchByText = (text: string) => {
     setSearchTerm(text)
-    searchParams.has('q') && router.replace('/blog', undefined, { shallow: true, scroll: false })
+    searchParams?.has('q') && router.replace('/blog', undefined, { shallow: true, scroll: false })
     router.replace(`/blog?q=${text}`, undefined, { shallow: true, scroll: false })
     if (text.length < 1) router.replace('/blog', undefined, { shallow: true, scroll: false })
 
@@ -174,7 +170,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
               <DropdownMenuTrigger asChild>
                 <Button
                   type="outline"
-                  iconRight={<IconChevronDown />}
+                  iconRight={<ChevronDown />}
                   className="w-full min-w-[200px] flex justify-between items-center py-2"
                 >
                   {!activeCategory ? 'All Posts' : startCase(activeCategory?.replaceAll('-', ' '))}
@@ -204,13 +200,14 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
               key={category}
               type={
                 category === 'all' && !searchTerm && !activeCategory
-                  ? 'alternative'
+                  ? 'default'
                   : category === activeCategory
-                    ? 'alternative'
+                    ? 'default'
                     : 'outline'
               }
               onClick={() => handleSetCategory(category)}
               size={is2XL ? 'tiny' : 'small'}
+              className="rounded-full"
             >
               {category === 'all' ? 'All' : startCase(category.replaceAll('-', ' '))}
             </Button>
@@ -230,7 +227,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
               type="default"
               onClick={() => setShowSearchInput(true)}
             >
-              <IconSearch size="tiny" />
+              <Search size="14" />
             </Button>
           </motion.div>
         )}
@@ -243,7 +240,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
             className="w-full h-auto flex justify-end gap-2 items-stretch lg:max-w-[240px] xl:max-w-[280px]"
           >
             <Input
-              icon={<IconSearch size="tiny" />}
+              icon={<Search size="14" />}
               size="small"
               layout="vertical"
               autoComplete="off"
@@ -262,7 +259,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
                     }}
                     className="text-foreground-light hover:text-foreground hover:bg-selection"
                   >
-                    <IconX size="tiny" />
+                    <X size="14" />
                   </Button>
                 )
               }
@@ -276,7 +273,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
         onClick={handleViewSelection}
         className="h-full p-1.5"
       >
-        {isList ? <IconGrid /> : <IconAlignJustify />}
+        {isList ? <Grid /> : <AlignJustify />}
       </Button>
     </div>
   )

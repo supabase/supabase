@@ -1,16 +1,17 @@
 import matter from 'gray-matter'
+import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button, IconChevronRight, IconExternalLink, IconChevronLeft } from 'ui'
+import { Button } from 'ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+import { SITE_ORIGIN } from '~/lib/constants'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-import { SITE_ORIGIN } from '~/lib/constants'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -125,7 +126,7 @@ function CaseStudyPage(props: any) {
                 href="/customers"
                 className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
               >
-                <IconChevronLeft style={{ padding: 0 }} />
+                <ChevronLeft style={{ padding: 0 }} />
                 Back
               </Link>
             </div>
@@ -174,16 +175,18 @@ function CaseStudyPage(props: any) {
                         <div className="flex flex-col space-y-2">
                           <span className="text-foreground-lighter">About</span>
                           <p>{about}</p>
-                          <span className="not-prose ">
-                            <a
-                              href={company_url}
-                              className="flex cursor-pointer items-center space-x-1 transition-opacity text-foreground-lightround-ligtext-foreground-light:text-foreground-light"
-                              target="_blank"
-                            >
-                              <span>{company_url}</span>
-                              <IconExternalLink size={14} />
-                            </a>
-                          </span>
+                          {company_url && (
+                            <span className="not-prose ">
+                              <a
+                                href={company_url}
+                                className="flex cursor-pointer items-center space-x-1 transition-opacity text-foreground-lightround-ligtext-foreground-light:text-foreground-light"
+                                target="_blank"
+                              >
+                                <span>{company_url}</span>
+                                <ExternalLink size={14} />
+                              </a>
+                            </span>
+                          )}
                         </div>
 
                         {misc?.map((x: any) => {
@@ -198,7 +201,7 @@ function CaseStudyPage(props: any) {
                         <div>
                           <p>Ready to get started?</p>
                           <div>
-                            <Button asChild type="default" iconRight={<IconChevronRight />}>
+                            <Button asChild type="default" iconRight={<ChevronRight />}>
                               <Link
                                 href="https://supabase.com/contact/enterprise"
                                 className="no-underline"
