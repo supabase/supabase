@@ -5,12 +5,12 @@
  */
 
 import CopyButton from 'components/ui/CopyButton'
-import dayjs from 'dayjs'
 import React, { useEffect, useRef, useState } from 'react'
 import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
 import { AlertCircle, Info } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 import { cn } from 'ui'
+import dayjs from 'dayjs'
 
 export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
