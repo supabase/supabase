@@ -33,54 +33,62 @@ type Highlight = {
 
 const UseCases: FC<Props> = (props) => {
   return (
-    <SectionContainer id={props.id} className="flex flex-col gap-4 md:gap-8 overflow-visible">
-      <div className="flex flex-col gap-2">
-        <span className="label">{props.label}</span>
-        <h2 className="h2">{props.heading}</h2>
+    <>
+      <SectionContainer id={props.id} className="flex flex-col gap-4 md:gap-8 !pb-0">
+        <div className="flex flex-col gap-2">
+          <span className="label">{props.label}</span>
+          <h2 className="h2">{props.heading}</h2>
+        </div>
+      </SectionContainer>
+      <div className="overflow-hidden">
+        <SectionContainer className="!py-4">
+          <ul className="hidden xl:flex flex-col gap-4 md:flex-row items-stretch w-full h-auto min-h-[300px]">
+            {props.stories.map((story) => (
+              <li key={story.heading} className="w-full">
+                <StoryCard story={story} />
+              </li>
+            ))}
+          </ul>
+          <div className="xl:hidden">
+            <Swiper
+              style={{ zIndex: 0, marginRight: '1px' }}
+              initialSlide={0}
+              spaceBetween={12}
+              slidesPerView={1.2}
+              speed={300}
+              watchOverflow
+              threshold={2}
+              updateOnWindowResize
+              className="h-[300px] w-full !overflow-visible"
+              breakpoints={{
+                320: {
+                  slidesPerView: 1.2,
+                },
+                540: {
+                  slidesPerView: 1.5,
+                },
+                900: {
+                  slidesPerView: 2.5,
+                },
+              }}
+            >
+              {props.stories.map((story: Story, i: number) => (
+                <SwiperSlide key={`${story.heading}-mobile`}>
+                  <StoryCard story={story} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        </SectionContainer>
       </div>
-      <ul className="hidden xl:flex flex-col gap-4 md:flex-row items-stretch w-full h-auto min-h-[300px]">
-        {props.stories.map((story) => (
-          <li key={story.heading} className="w-full">
-            <StoryCard story={story} />
-          </li>
-        ))}
-      </ul>
-      <div className="xl:hidden">
-        <Swiper
-          style={{ zIndex: 0, marginRight: '1px' }}
-          initialSlide={0}
-          spaceBetween={12}
-          slidesPerView={1.2}
-          speed={300}
-          watchOverflow
-          threshold={2}
-          updateOnWindowResize
-          className="h-[300px] w-full !overflow-visible"
-          breakpoints={{
-            320: {
-              slidesPerView: 1.2,
-            },
-            540: {
-              slidesPerView: 1.5,
-            },
-            900: {
-              slidesPerView: 2.5,
-            },
-          }}
-        >
-          {props.stories.map((story: Story, i: number) => (
-            <SwiperSlide key={`${story.heading}-mobile`}>
-              <StoryCard story={story} />
-            </SwiperSlide>
+      <SectionContainer id={props.id} className="!pt-0">
+        <ul className="grid grid-cols-2 gap-4 sm:gap-10 gap-y-10 lg:grid-cols-4 md:gap-12 lg:gap-x-8 mt-8">
+          {props.highlights.map((highlight) => (
+            <HighlightCard highlight={highlight} key={highlight.heading} />
           ))}
-        </Swiper>
-      </div>
-      <ul className="grid grid-cols-2 gap-4 lg:grid-cols-4 md:gap-12 mt-8">
-        {props.highlights.map((highlight) => (
-          <HighlightCard highlight={highlight} key={highlight.heading} />
-        ))}
-      </ul>
-    </SectionContainer>
+        </ul>
+      </SectionContainer>
+    </>
   )
 }
 
@@ -109,11 +117,11 @@ const HighlightCard: FC<HighlightCardProps> = ({ highlight }) => {
   const Icon: LucideIcon = highlight.icon
 
   return (
-    <li className="text-foreground text-sm">
+    <li className="text-foreground text-sm max-w-[250px]">
       <Icon className="stroke-1 mb-2" />
       <h4 className="text-foreground text-xl lg:text-2xl">{highlight.heading}</h4>
       <p className="text-foreground-lighter text-sm">{highlight.subheading}</p>
-      <TextLink hasChevron label="Read story" url={highlight.url} className="mt-8" />
+      <TextLink hasChevron label="Read story" url={highlight.url} className="mt-4" />
     </li>
   )
 }

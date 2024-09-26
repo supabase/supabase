@@ -9,7 +9,7 @@ interface Props {
 
 const SectionContainer = forwardRef(
   ({ children, className, id }: Props, ref: Ref<HTMLDivElement>) => (
-    <section
+    <div
       ref={ref}
       id={id}
       className={classNames(
@@ -18,7 +18,7 @@ const SectionContainer = forwardRef(
       )}
     >
       {children}
-    </section>
+    </div>
   )
 )
 

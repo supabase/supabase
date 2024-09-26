@@ -6,6 +6,7 @@ import Layout from '~/components/Layouts/Default'
 import ProductHeader from '~/components/Sections/ProductHeader2'
 
 const EnterpriseUseCases = dynamic(() => import('components/Enterprise/UseCases'))
+const EnterpriseSecurity = dynamic(() => import('components/Enterprise/Security'))
 const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
 const Enterprise = () => {
@@ -28,6 +29,7 @@ const Enterprise = () => {
       <Layout className="overflow-visible">
         <ProductHeader {...content.heroSection} footer={<span>logos</span>} />
         <EnterpriseUseCases {...content['use-cases']} />
+        <EnterpriseSecurity {...content.security} />
         <ReactTooltip
           effect="solid"
           place="bottom"
