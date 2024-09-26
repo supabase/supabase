@@ -44,6 +44,12 @@ Error objects are split in a few classes. `AuthApiException` is an exception whi
 Errors originating from the server API classed as `AuthApiException` always have a `code` property that can be used to identify the error returned by the server. The `statusCode` property is also present, encoding the HTTP status code received in the response.
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+All errors originating from the `supabase.auth` namespace of the client library will be a case of the `AuthError` enum.
+
+The `api(message:errorCode:underlyingData:underlyingResponse:)` case is a special case for errors which originates from the Supabase Auth API, this error always have an `errorCode` property that can be used to identify the error returned by the server.
+
+</TabPanel>
 <TabPanel id="python" label="Python">
 All errors originating from the `supabase.auth` namespace of the client library will be wrapped by the `AuthError` class.
 

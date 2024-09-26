@@ -1,23 +1,29 @@
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
-import Solutions from 'data/Solutions'
-import { ArrowUpRight, Briefcase, Eye, Link as IconLink, Link, Shield } from 'lucide-react'
+import { ArrowUpRight, Briefcase, Eye, Link as IconLink, Shield } from 'lucide-react'
 import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 import NextImage from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PRODUCT_NAMES } from 'shared-data/products'
 import { Button, Image } from 'ui'
-import AuthWidgetSection from '~/components/AuthWidget/AuthWidgetSection'
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
-import CTABanner from '~/components/CTABanner'
-import FeatureColumn from '~/components/FeatureColumn'
+
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductsNav from '~/components/Products/ProductsNav'
-import APISection from '~/components/Sections/APISection'
-import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
+
+import Solutions from 'data/Solutions'
+import { PRODUCT_NAMES } from 'shared-data/products'
 import AuthProviders from '~/data/auth.json'
+
+const SplitCodeBlockCarousel = dynamic(
+  () => import('~/components/Carousels/SplitCodeBlockCarousel')
+)
+const CTABanner = dynamic(() => import('~/components/CTABanner'))
+const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
+const APISection = dynamic(() => import('~/components/Sections/APISection'))
+const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
 function AuthPage() {
   // base path for images
@@ -143,16 +149,9 @@ function AuthPage() {
             content={ApiExamples}
             size="large"
             text={[
-              <p key={0}>
-                <p className="text-base lg:text-lg">
-                  APIs that you can understand. With powerful libraries that work on client and
-                  server-side applications.
-                </p>
-                {/* I think less is more here ... */}
-                {/* <p>
-                  With powerful client libraries that work on both client and server-side
-                  applications.
-                </p> */}
+              <p key={0} className="text-base lg:text-lg">
+                APIs that you can understand. With powerful libraries that work on client and
+                server-side applications.
               </p>,
             ]}
             footer={[
@@ -205,7 +204,9 @@ function AuthPage() {
               <p className="p">Policies can be written in SQL or using the dashboard online.</p>
 
               <Button asChild size="small" type="default" className="mt-4" icon={<ArrowUpRight />}>
-                <Link href="/docs/guides/auth#policy-examples">Explore documentation</Link>
+                <Link href="/docs/guides/database/postgres/row-level-security">
+                  Explore documentation
+                </Link>
               </Button>
             </div>
             <div className="col-span-12 lg:col-span-6 lg:col-start-7">
@@ -216,8 +217,6 @@ function AuthPage() {
             </div>
           </div>
         </SectionContainer>
-
-        <AuthWidgetSection />
 
         <CTABanner />
       </DefaultLayout>

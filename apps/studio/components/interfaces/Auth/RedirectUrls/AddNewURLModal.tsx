@@ -20,6 +20,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Label } from '@ui/components/shadcn/ui/label'
+import { urlRegex } from '../Auth.constants'
 
 const MAX_URLS_LENGTH = 2 * 1024
 
@@ -39,7 +40,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
         value: z
           .string()
           .min(1, 'Please provide a value')
-          .url('Please provide a valid URL')
+          .regex(urlRegex, 'Please provide a valid URL')
           .refine((value) => !allowList.includes(value), {
             message: 'URL already exists in the allow list',
           }),
@@ -60,9 +61,8 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
   })
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    const payload = allowList
-      .concat(data.urls.map((url) => url.value.replace(/,\s*$/, '')))
-      .toString()
+    const dedupedData = [...new Set(data.urls.map((url) => url.value))]
+    const payload = allowList.concat(dedupedData.map((url) => url.replace(/,\s*$/, ''))).toString()
 
     if (payload.length > MAX_URLS_LENGTH) {
       return toast.error('Too many redirect URLs, please remove some or try to use wildcards')

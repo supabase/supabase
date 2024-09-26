@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Check, ChevronUp, ExternalLink } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
@@ -12,6 +12,7 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
+import Link from 'next/link'
 import {
   Alert,
   Alert_Shadcn_,
@@ -26,7 +27,6 @@ import {
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
-import Link from 'next/link'
 
 export interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -34,8 +34,9 @@ export interface ProviderFormProps {
 }
 
 const ProviderForm = ({ config, provider }: ProviderFormProps) => {
+  const ref = useRef<HTMLButtonElement>(null)
   const [open, setOpen] = useState(false)
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, provider: urlProvider } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
@@ -182,6 +183,14 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
     )
   }
 
+  useEffect(() => {
+    if (urlProvider === provider.title.toLowerCase()) {
+      setOpen(true)
+      ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlProvider])
+
   return (
     <Collapsible
       open={open}
@@ -190,6 +199,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
     >
       <Collapsible.Trigger asChild>
         <button
+          ref={ref}
           type="button"
           className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
         >
