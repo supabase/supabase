@@ -79,7 +79,7 @@ Sentry.init({
 function standardiseRouterUrl(url: string) {
   let finalUrl = url
 
-  const orgMatch = match('/org/:slug/(.*)', { decode: decodeURIComponent })
+  const orgMatch = match('/org/:slug{/*path}', { decode: decodeURIComponent })
   const orgMatchResult = orgMatch(finalUrl)
   if (orgMatchResult) {
     finalUrl = finalUrl.replace((orgMatchResult.params as any).slug, '[slug]')
@@ -91,7 +91,7 @@ function standardiseRouterUrl(url: string) {
     finalUrl = finalUrl.replace((newOrgMatchResult.params as any).slug, '[slug]')
   }
 
-  const projectMatch = match('/project/:ref/(.*)', { decode: decodeURIComponent })
+  const projectMatch = match('/project/:ref{/*path}', { decode: decodeURIComponent })
   const projectMatchResult = projectMatch(finalUrl)
   if (projectMatchResult) {
     finalUrl = finalUrl.replace((projectMatchResult.params as any).ref, '[ref]')

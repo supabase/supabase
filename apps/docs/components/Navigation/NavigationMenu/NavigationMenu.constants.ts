@@ -504,6 +504,7 @@ export const auth = {
         },
       ],
     },
+
     {
       name: 'Concepts',
       items: [
@@ -582,6 +583,10 @@ export const auth = {
           url: '/guides/auth/signout',
         },
       ],
+    },
+    {
+      name: 'Debugging',
+      items: [{ name: 'Error Codes', url: '/guides/auth/debugging/error-codes' }],
     },
     {
       name: 'Third-party auth',
@@ -797,6 +802,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/database-advisors',
         },
         { name: 'Testing your database', url: '/guides/database/testing' },
+        {
+          name: 'Customizing Postgres config',
+          url: '/guides/database/custom-postgres-config',
+        },
       ],
     },
     {
@@ -875,6 +884,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg_net',
         },
         {
+          name: 'pg_partman: Partition Maintenance',
+          url: '/guides/database/extensions/pg_partman',
+        },
+        {
           name: 'pg_plan_filter: Restrict Total Cost',
           url: '/guides/database/extensions/pg_plan_filter',
         },
@@ -893,6 +906,10 @@ export const database: NavMenuConstant = {
         {
           name: 'PostGIS: Geo queries',
           url: '/guides/database/extensions/postgis',
+        },
+        {
+          name: 'pgmq: Queues',
+          url: '/guides/database/extensions/pgmq',
         },
         {
           name: 'pgsodium (pending deprecation): Encryption Features',
@@ -1666,6 +1683,10 @@ export const ai = {
           name: 'Amazon Bedrock',
           url: '/guides/ai/integrations/amazon-bedrock',
         },
+        {
+          name: 'Mixpeek',
+          url: '/guides/ai/examples/mixpeek-video-search',
+        },
       ],
     },
   ],
@@ -1765,10 +1786,6 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Regions', url: '/guides/platform/regions' },
-        {
-          name: 'Custom Postgres Config',
-          url: '/guides/platform/custom-postgres-config',
-        },
         { name: 'Database Size', url: '/guides/platform/database-size' },
         { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
         { name: 'Vercel Marketplace', url: '/guides/platform/vercel-marketplace' },
@@ -2248,6 +2265,10 @@ export const reference_cli = {
   title: 'Supabase CLI',
   url: '/guides/reference/cli',
   parent: '/',
+  pkg: {
+    name: 'supabase',
+    repo: 'https://github.com/supabase/cli',
+  },
 }
 export const reference_api = {
   icon: 'reference-api',

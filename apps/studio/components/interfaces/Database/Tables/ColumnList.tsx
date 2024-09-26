@@ -53,12 +53,7 @@ const ColumnList = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            asChild
-            type="outline"
-            icon={<ChevronLeft size={14} />}
-            style={{ padding: '5px' }}
-          >
+          <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
             <Link href={`/project/${ref}/database/tables`} />
           </Button>
           <Input

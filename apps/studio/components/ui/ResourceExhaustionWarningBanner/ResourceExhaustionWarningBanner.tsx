@@ -1,16 +1,10 @@
-import { useParams } from 'common'
+import { AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-} from 'ui'
 
+import { useParams } from 'common'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
 
@@ -83,7 +77,9 @@ const ResourceExhaustionWarningBanner = () => {
           ? '/project/[ref]/settings/database'
           : metric === 'auth_email_rate_limit'
             ? '/project/[ref]/settings/auth'
-            : `/project/[ref]/settings/[infra-path]#${metric}`
+            : metric === 'auth_restricted_email_sending'
+              ? `/project/[ref]/settings/auth`
+              : `/project/[ref]/settings/[infra-path]#${metric}`
   )
     ?.replace('[ref]', ref ?? 'default')
     ?.replace('[infra-path]', 'infrastructure')
@@ -102,21 +98,26 @@ const ResourceExhaustionWarningBanner = () => {
       !activeWarnings.includes('is_readonly_mode_enabled')) ||
     (activeWarnings.includes('is_readonly_mode_enabled') &&
       router.pathname.endsWith('settings/database'))
-  )
+  ) {
     return null
+  }
 
   return (
     <Alert_Shadcn_
       variant={isCritical ? 'destructive' : 'warning'}
-      className="border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px]
-[&>svg]:h-[26px]"
+      className={cn(
+        'flex items-center justify-between',
+        'border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px] [&>svg]:h-[26px]'
+      )}
     >
-      <IconAlertTriangle />
-      <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
-      <div className="absolute top-5 right-5 flex items-center space-x-2">
+      <AlertTriangle />
+      <div className="">
+        <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
+      </div>
+      <div className="flex items-center gap-x-2">
         {learnMoreUrl !== undefined && (
-          <Button asChild type="default" icon={<IconExternalLink />}>
+          <Button asChild type="default" icon={<ExternalLink />}>
             <a href={learnMoreUrl} target="_blank" rel="noreferrer">
               Learn more
             </a>

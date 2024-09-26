@@ -234,12 +234,7 @@ const ColumnEditor = ({
             className="lg:!col-span-4"
             description={
               <div className="space-y-2">
-                <Button
-                  asChild
-                  type="default"
-                  size="tiny"
-                  icon={<Plus size={14} strokeWidth={2} />}
-                >
+                <Button asChild type="default" size="tiny" icon={<Plus strokeWidth={2} />}>
                   <Link href={`/project/${ref}/database/types`} target="_blank" rel="noreferrer">
                     Create enum types
                   </Link>

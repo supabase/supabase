@@ -1,3 +1,4 @@
+import { CheckIcon, ChevronsUpDown, Globe } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -7,7 +8,6 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  IconGlobe,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -15,7 +15,6 @@ import {
   cn,
 } from 'ui'
 
-import { CheckIcon, ChevronsUpDown } from 'lucide-react'
 import { ALL_TIMEZONES } from './PITR.constants'
 import type { Timezone } from './PITR.types'
 
@@ -41,7 +40,7 @@ export const TimezoneSelection = ({
             aria-expanded={open}
             className="w-[350px] justify-between"
             size="small"
-            icon={<IconGlobe />}
+            icon={<Globe />}
             iconRight={<ChevronsUpDown size={14} strokeWidth={1.5} />}
           >
             {selectedTimezone

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import { ArrowDownIcon } from '@heroicons/react/outline'
+import { ArrowUpRight } from 'lucide-react'
+import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { NextSeo } from 'next-seo'
-import { Button, IconArrowUpRight } from 'ui'
-import { ArrowDownIcon } from '@heroicons/react/outline'
+import { useEffect, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
+import { Button } from 'ui'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import PricingPlans from '~/components/Pricing/PricingPlans'
@@ -98,12 +99,7 @@ export default function IndexPage() {
               Compare Plans
             </Button>
           </a>
-          <Button
-            size="tiny"
-            type="default"
-            asChild
-            iconRight={<IconArrowUpRight className="w-4" />}
-          >
+          <Button size="tiny" type="default" asChild iconRight={<ArrowUpRight className="w-4" />}>
             <a href="/docs/guides/platform/org-based-billing" target="_blank">
               Learn how billing works
             </a>

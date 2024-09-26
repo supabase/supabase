@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import { useSearchParams } from 'next/navigation'
+import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { startCase } from 'lodash'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import { useKey } from 'react-use'
-import { useBreakpoint } from 'common'
 import type PostTypes from '~/types/post'
 
 import {
@@ -13,9 +13,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
   cn,
 } from 'ui'
+import { ChevronDown } from 'lucide-react'
 
 interface Props {
   allEvents: PostTypes[]
@@ -132,7 +132,7 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
                 <Button
                   type="outline"
                   size="medium"
-                  iconRight={<IconChevronDown />}
+                  iconRight={<ChevronDown />}
                   className="w-full min-w-[200px] flex [&_span]:flex [&_span]:items-center [&_span]:gap-2 justify-between items-center py-2"
                 >
                   {!activeCategory ? (

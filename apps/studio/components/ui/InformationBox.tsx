@@ -1,6 +1,8 @@
+import { ExternalLink, Maximize2, Minimize2 } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useState } from 'react'
-import { Button, IconExternalLink, IconMaximize2, IconMinimize2 } from 'ui'
+
+import { Button } from 'ui'
 
 interface InformationBoxProps {
   icon?: ReactNode
@@ -48,9 +50,9 @@ const InformationBox = ({
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (
-                <IconMinimize2 size={14} strokeWidth={1.5} />
+                <Minimize2 size={14} strokeWidth={1.5} />
               ) : (
-                <IconMaximize2 size={14} strokeWidth={1.5} />
+                <Maximize2 size={14} strokeWidth={1.5} />
               )}
             </div>
           ) : null}
@@ -66,7 +68,7 @@ const InformationBox = ({
 
             {url && (
               <div>
-                <Button asChild type="default" icon={<IconExternalLink />}>
+                <Button asChild type="default" icon={<ExternalLink />}>
                   <Link href={url} target="_blank" rel="noreferrer">
                     {urlLabel}
                   </Link>

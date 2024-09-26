@@ -116,7 +116,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
               </Link>
             </Button>
 
-            <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
                 href="https://supabase.com/docs/guides/cli/local-development"
                 target="_blank"
