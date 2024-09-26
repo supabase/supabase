@@ -8,7 +8,7 @@ If you're using Supabase Auth with the following configuration:
 
 - Email and password accounts
 - Passwordless accounts using one-time passwords or links sent over email (OTP, magic link, invites)
-- Email-based account invitations from the Supabase dashboard or from the Auth admin APIs
+- Email-based user invitations from the [Users page](https://supabase.com/dashboard/project/_/auth/users) or from the Auth admin APIs
 - Social login with email confirmation
 
 You will need to set up a custom SMTP server to handle the delivery of messages to your users.
@@ -48,13 +48,13 @@ A non-exhaustive list of services that work with Supabase Auth is:
 - [ZeptoMail](https://www.zoho.com/zeptomail/help/smtp-home.html)
 - [Brevo](https://help.brevo.com/hc/en-us/articles/7924908994450-Send-transactional-emails-using-Brevo-SMTP)
 
-Once you've set up your account with an email sending service, head to the [Authentication settings page](https://supabase.com/dashboard/project/_/settings/auth) to enable and configure custom SMTP. 
+Once you've set up your account with an email sending service, head to the [Authentication settings page](https://supabase.com/dashboard/project/_/settings/auth) to enable and configure custom SMTP.
 
 Once you save these settings, your project's Auth server will send messages to all addresses. To protect the reputation of your newly set up service a low rate-limit of 30 messages per hour is imposed. To adjust this to an acceptable value for your use case head to the [Rate Limits configuration page](https://supabase.com/dashboard/project/_/auth/rate-limits).
 
 ## Dealing with abuse: How to maintain the sending reputation of your SMTP server?
 
-As you make your application known to the public and it grows in popularity, you can expect to see a few types of abuse that can negatively impact the reputation of your sending domain. 
+As you make your application known to the public and it grows in popularity, you can expect to see a few types of abuse that can negatively impact the reputation of your sending domain.
 
 A common source of abuse is bots or attackers signing up users to your application.
 
@@ -114,7 +114,7 @@ Make sure you've separated out authentication messages from marketing messages.
 
 **Prepare for large surges ahead of time.**
 
-If you are planning on having a large surge of users coming at a specific time, work with your email sending service to adjust the rate limits and their expectations accordingly. Most email sending services dislike spikes in the number of messages being sent, and this may affect your sending reputation. 
+If you are planning on having a large surge of users coming at a specific time, work with your email sending service to adjust the rate limits and their expectations accordingly. Most email sending services dislike spikes in the number of messages being sent, and this may affect your sending reputation.
 
 Consider implementing additional protections for such events:
 
