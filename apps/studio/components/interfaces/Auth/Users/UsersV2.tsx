@@ -1,11 +1,10 @@
 import dayjs from 'dayjs'
-import { ArrowDown, ArrowUp, RefreshCw, User as UserIcon, Users } from 'lucide-react'
+import { ArrowDown, ArrowUp, RefreshCw, Search, User as UserIcon, Users, X } from 'lucide-react'
 import { UIEvent, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { TextSearchPopover } from 'components/interfaces/QueryPerformance/TextSearchPopover'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import APIDocsButton from 'components/ui/APIDocsButton'
@@ -23,7 +22,6 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-  Input_Shadcn_,
   LoadingLine,
   ResizablePanel,
   ResizablePanelGroup,
@@ -35,17 +33,18 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import AddUserDropdown from './AddUserDropdown'
 import { UserPanel } from './UserPanel'
 import { PROVIDER_FILTER_OPTIONS } from './Users.constants'
 import { formatUsersData, isAtBottom } from './Users.utils'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { HeaderCell } from './UsersGridComponents'
 
 type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 const USERS_TABLE_COLUMNS = [
   { id: 'img', name: '', minWidth: 65, width: 65, resizable: false },
   { id: 'id', name: 'UID', minWidth: undefined, width: 280, resizable: true },
-  { id: 'name', name: 'Display name', minWidth: 0, width: 150, resizable: false },
+  { id: 'name', name: 'Display name', minWidth: 0, width: 150, resizable: true },
   {
     id: 'email',
     name: 'Email',
@@ -80,6 +79,7 @@ export const UsersV2 = () => {
   const gridRef = useRef<DataGridHandle>(null)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
+  const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [filterKeywords, setFilterKeywords] = useState('')
   const [selectedProviders, setSelectedProviders] = useState<string[]>([])
@@ -123,16 +123,10 @@ export const UsersV2 = () => {
       sortable: false,
       width: col.width,
       minWidth: col.minWidth ?? 120,
-      headerCellClass: 'z-50',
+      headerCellClass: 'z-50 outline-none !shadow-none',
       renderHeaderCell: () => {
         if (col.id === 'img') return undefined
-        return (
-          <div className="flex items-center justify-between font-normal text-xs w-full">
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">{col.name}</p>
-            </div>
-          </div>
-        )
+        return <HeaderCell col={col} setSortByValue={setSortByValue} />
       },
       renderCell: ({ row }) => {
         const value = row?.[col.id]
@@ -209,6 +203,11 @@ export const UsersV2 = () => {
     fetchNextPage()
   }
 
+  const clearSearch = () => {
+    setSearch('')
+    setFilterKeywords('')
+  }
+
   return (
     <div className="h-full flex flex-col">
       <FormHeader className="py-4 px-6 !mb-0" title="Users" />
@@ -216,28 +215,35 @@ export const UsersV2 = () => {
         <div className="flex items-center gap-x-2">
           <p className="text-xs text-foreground-light">Filter by</p>
 
-          <TextSearchPopover
-            rows={1}
-            name="Search"
-            placeholder="Search by email, phone or UID"
-            value={filterKeywords}
-            onSaveText={setFilterKeywords}
-          />
-
-          <FilterPopover
-            name="Provider"
-            options={PROVIDER_FILTER_OPTIONS}
-            labelKey="name"
-            valueKey="value"
-            iconKey="icon"
-            activeOptions={selectedProviders}
-            labelClass="text-xs"
-            maxHeightClass="h-[190px]"
-            onSaveFilters={setSelectedProviders}
+          <Input
+            size="tiny"
+            className="w-52 pl-7 bg-transparent"
+            iconContainerClassName="pl-2"
+            icon={<Search size={14} className="text-foreground-lighter" />}
+            placeholder="Search email, phone or UID"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.code === 'Enter') setFilterKeywords(search)
+            }}
+            actions={[
+              search && (
+                <Button
+                  size="tiny"
+                  type="text"
+                  icon={<X />}
+                  onClick={() => clearSearch()}
+                  className="p-0 h-5 w-5"
+                />
+              ),
+            ]}
           />
 
           <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
-            <SelectTrigger_Shadcn_ size="tiny" className="w-[140px] !bg-transparent">
+            <SelectTrigger_Shadcn_
+              size="tiny"
+              className={cn('w-[140px] !bg-transparent', filter === 'all' && 'border-dashed')}
+            >
               <SelectValue_Shadcn_ />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
@@ -257,6 +263,18 @@ export const UsersV2 = () => {
               </SelectGroup_Shadcn_>
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
+
+          <FilterPopover
+            name="Provider"
+            options={PROVIDER_FILTER_OPTIONS}
+            labelKey="name"
+            valueKey="value"
+            iconKey="icon"
+            activeOptions={selectedProviders}
+            labelClass="text-xs"
+            maxHeightClass="h-[190px]"
+            onSaveFilters={setSelectedProviders}
+          />
 
           <div className="border-r border-strong h-6" />
 
