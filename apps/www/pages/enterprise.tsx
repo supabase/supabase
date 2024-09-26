@@ -7,6 +7,7 @@ import ProductHeader from '~/components/Sections/ProductHeader2'
 
 const EnterpriseUseCases = dynamic(() => import('components/Enterprise/UseCases'))
 const EnterpriseSecurity = dynamic(() => import('components/Enterprise/Security'))
+const CTAForm = dynamic(() => import('components/Enterprise/CTAForm'))
 const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
 const Enterprise = () => {
@@ -30,6 +31,7 @@ const Enterprise = () => {
         <ProductHeader {...content.heroSection} footer={<span>logos</span>} />
         <EnterpriseUseCases {...content['use-cases']} />
         <EnterpriseSecurity {...content.security} />
+        <CTAForm />
         <ReactTooltip
           effect="solid"
           place="bottom"
