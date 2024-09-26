@@ -8,7 +8,7 @@ If you're using Supabase Auth with the following configuration:
 
 - Email and password accounts
 - Passwordless accounts using one-time passwords or links sent over email (OTP, magic link, invites)
-- Email-based user invitations from the [Users page](https://supabase.com/dashboard/project/_/auth/users) or from the Auth admin APIs
+- Email-based user invitations from the [Users page](/dashboard/project/_/auth/users) or from the Auth admin APIs
 - Social login with email confirmation
 
 You will need to set up a custom SMTP server to handle the delivery of messages to your users.
@@ -17,7 +17,7 @@ To get you started and let you explore and set up email message templates for yo
 
 **Send messages only to pre-authorized addresses.**
 
-Unless you configure a custom SMTP server for your project, Supabase Auth will refuse to deliver messages to addresses that are not part of the project's team. You can manage this in the [Team tab](https://supabase.com/dashboard/org/_/team) of the organization's settings.
+Unless you configure a custom SMTP server for your project, Supabase Auth will refuse to deliver messages to addresses that are not part of the project's team. You can manage this in the [Team tab](/dashboard/org/_/team) of the organization's settings.
 
 For example, if your project's organization has these member accounts `person-a@example.com`, `person-b@example.com` and `person-c@example.com` then Supabase Auth will only send messages to these addresses. All other addresses will fail with the error message _Email address not authorized._
 
@@ -48,9 +48,9 @@ A non-exhaustive list of services that work with Supabase Auth is:
 - [ZeptoMail](https://www.zoho.com/zeptomail/help/smtp-home.html)
 - [Brevo](https://help.brevo.com/hc/en-us/articles/7924908994450-Send-transactional-emails-using-Brevo-SMTP)
 
-Once you've set up your account with an email sending service, head to the [Authentication settings page](https://supabase.com/dashboard/project/_/settings/auth) to enable and configure custom SMTP.
+Once you've set up your account with an email sending service, head to the [Authentication settings page](/dashboard/project/_/settings/auth) to enable and configure custom SMTP.
 
-Once you save these settings, your project's Auth server will send messages to all addresses. To protect the reputation of your newly set up service a low rate-limit of 30 messages per hour is imposed. To adjust this to an acceptable value for your use case head to the [Rate Limits configuration page](https://supabase.com/dashboard/project/_/auth/rate-limits).
+Once you save these settings, your project's Auth server will send messages to all addresses. To protect the reputation of your newly set up service a low rate-limit of 30 messages per hour is imposed. To adjust this to an acceptable value for your use case head to the [Rate Limits configuration page](/dashboard/project/_/auth/rate-limits).
 
 ## Dealing with abuse: How to maintain the sending reputation of your SMTP server?
 
@@ -68,7 +68,7 @@ Usually the goal for this behavior is:
 
 Mitigation strategies:
 
-- [Configure CAPTCHA protection](https://supabase.com/docs/guides/auth/auth-captcha) for your project, which is the most effective way to control bots in this scenario. You can use CAPTCHA services which provide invisible challenges where real users won't be asked to solve puzzles most of the time.
+- [Configure CAPTCHA protection](/docs/guides/auth/auth-captcha) for your project, which is the most effective way to control bots in this scenario. You can use CAPTCHA services which provide invisible challenges where real users won't be asked to solve puzzles most of the time.
 - Prefer social login (OAuth) or SSO with SAML instead of email-based authentication flows in your apps.
 - Prefer passwordless authentication (one-time password) as this limits the attacker's value to gain from this behavior.
 - Do not disable email confirmations under pressure.
@@ -81,7 +81,7 @@ Work with your email sending service to configure [DKIM, DMARC and SPF](https://
 
 **Set up a custom domain.**
 
-Authentication messages often contain links to your project's Auth server. [Setting up a custom domain](https://supabase.com/docs/guides/platform/custom-domains) will reduce the likelihood of your messages being picked up as spam due to another Supabase project's bad reputation.
+Authentication messages often contain links to your project's Auth server. [Setting up a custom domain](/docs/guides/platform/custom-domains) will reduce the likelihood of your messages being picked up as spam due to another Supabase project's bad reputation.
 
 **Don't mix Auth emails with marketing emails.**
 
@@ -123,7 +123,7 @@ Consider implementing additional protections for such events:
 
 **Use the Send Email Auth Hook for more control.**
 
-If you need more control over the sending process, instead of using a SMTP server you can use the [Send Email Auth Hook](https://supabase.com/docs/guides/auth/auth-hooks/send-email-hook). This can be useful in advanced scenarios such as:
+If you need more control over the sending process, instead of using a SMTP server you can use the [Send Email Auth Hook](/docs/guides/auth/auth-hooks/send-email-hook). This can be useful in advanced scenarios such as:
 
 - You want to use React or a different email templating engine.
 - You want to use an email sending service that does not provide an SMTP service, or the non-SMTP API is more powerful.
@@ -134,3 +134,9 @@ If you need more control over the sending process, instead of using a SMTP serve
 - You want to add attachments to the messages (generally not recommended).
 - You want to add [S/MIME signatures](https://en.wikipedia.org/wiki/S/MIME) to messages.
 - You want to use an email server not open to the Internet, such as some corporate or government mail servers.
+
+**Increase the duration of user sessions.**
+
+Having short lived [user sessions](/docs/guides/auth/sessions) can be problematic for email sending, as it forces active users to sign-in frequently, increasing the number of messages needed to be sent. Consider increasing the maximum duration of user sessions. If you do see an unnecessary increase in logins without a clear cause, check your frontend application for bugs.
+
+If you are using a [SSR](/docs/guides/auth/server-side) framework on the frontend and are seeing an increased number of user logins without a clear cause, check your set up. Make sure to keep the `@supabase/ssr` package up to date and closely follow the guides we publish. Make sure that the middleware components of your SSR frontend works as intended and matches the guides we've published. Sometimes a misplaced `return` or conditional can cause early session termination.
