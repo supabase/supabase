@@ -39,7 +39,7 @@ module.exports = [
     protocol: 'https',
     hostname: 'img.youtube.com',
     port: '',
-    pathname: '/vi/*',
+    pathname: '/vi/**',
   },
   {
     protocol: 'https',

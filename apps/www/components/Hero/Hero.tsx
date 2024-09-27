@@ -43,13 +43,13 @@ const Hero = () => {
                       Start your project
                     </Link>
                   </Button>
-                  <Button asChild size="medium" type="default" icon={<BookOpen />}>
+                  <Button asChild size="medium" type="default">
                     <Link
-                      href="/docs"
-                      as="/docs"
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}
+                      href="/contact/sales"
+                      as="/contact/sales"
+                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_requestDemo'])}
                     >
-                      Documentation
+                      Request a demo
                     </Link>
                   </Button>
                 </div>
