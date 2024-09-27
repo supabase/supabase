@@ -1,7 +1,9 @@
 import { type Root } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
+import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
+import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 
 import { getGitHubFileContents } from '~/lib/octokit'
@@ -11,15 +13,15 @@ type Transformer = (ast: Root) => Root | Promise<Root>
 
 export async function preprocessMdx<T>(mdx: string, transformers: Transformer[]) {
   let mdast = fromMarkdown(mdx, {
-    mdastExtensions: [mdxFromMarkdown()],
-    extensions: [mdxjs()],
+    mdastExtensions: [mdxFromMarkdown(), gfmFromMarkdown()],
+    extensions: [mdxjs(), gfm()],
   })
 
   for (const transform of transformers) {
     mdast = await transform(mdast)
   }
 
-  const output = toMarkdown(mdast, { extensions: [mdxToMarkdown()] })
+  const output = toMarkdown(mdast, { extensions: [mdxToMarkdown(), gfmToMarkdown()] })
   return output
 }
 
