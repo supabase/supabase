@@ -21,6 +21,8 @@ describe('parseCronjobCommand', () => {
     expect(parseCronjobCommand(command)).toBe({
       edgeFunctionName: 'https://_.supabase.co/functions/v1/_',
       method: 'POST',
+      httpHeaders: [],
+      httpParameters: [],
       timeoutMs: 5000,
       type: 'edge_function',
     })
