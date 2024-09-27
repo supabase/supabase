@@ -63,19 +63,19 @@ Performance Limits:
 
 Disk throughput is capped at 19,000 Mbps and IOPS is capped at 80,000 IOPS for all compute add-ons.
 
-| Compute add-on | Max Disk Throughput | Baseline Disk Throughput | Max IOPS    | Baseline IOPS |
-| -------------- | ------------------- | ------------------------ | ----------- | ------------- |
-| Nano (free)    | 2,085 Mbps          | 43 Mbps                  | 11,800 IOPS | 250 IOPS      |
-| Micro          | 2,085 Mbps          | 87 Mbps                  | 11,800 IOPS | 500 IOPS      |
-| Small          | 2,085 Mbps          | 174 Mbps                 | 11,800 IOPS | 1,000 IOPS    |
-| Medium         | 2,085 Mbps          | 347 Mbps                 | 11,800 IOPS | 2,000 IOPS    |
-| Large          | 4,750 Mbps          | 630 Mbps                 | 20,000 IOPS | 3,600 IOPS    |
-| XL             | 4,750 Mbps          | 1,188 Mbps               | 20,000 IOPS | 6,000 IOPS    |
-| 2XL            | 4,750 Mbps          | 2,375 Mbps               | 20,000 IOPS | 12,000 IOPS   |
-| 4XL            | 4,750 Mbps          | 4,750 Mbps               | 20,000 IOPS | 20,000 IOPS   |
-| 8XL            | 9,500 Mbps          | 9,500 Mbps               | 40,000 IOPS | 40,000 IOPS   |
-| 12XL           | 14,250 Mbps         | 14,250 Mbps              | 50,000 IOPS | 50,000 IOPS   |
-| 16XL           | 19,000 Mbps         | 19,000 Mbps              | 80,000 IOPS | 80,000 IOPS   |
+| Compute size | Max Disk Throughput | Baseline Disk Throughput | Max IOPS    | Baseline IOPS |
+| ------------ | ------------------- | ------------------------ | ----------- | ------------- |
+| Nano (free)  | 2,085 Mbps          | 43 Mbps                  | 11,800 IOPS | 250 IOPS      |
+| Micro        | 2,085 Mbps          | 87 Mbps                  | 11,800 IOPS | 500 IOPS      |
+| Small        | 2,085 Mbps          | 174 Mbps                 | 11,800 IOPS | 1,000 IOPS    |
+| Medium       | 2,085 Mbps          | 347 Mbps                 | 11,800 IOPS | 2,000 IOPS    |
+| Large        | 4,750 Mbps          | 630 Mbps                 | 20,000 IOPS | 3,000 IOPS    |
+| XL           | 4,750 Mbps          | 1,048 Mbps               | 20,000 IOPS | 3,000 IOPS    |
+| 2XL          | 4,750 Mbps          | 1,048 Mbps               | 20,000 IOPS | 3,000 IOPS    |
+| 4XL          | 4,750 Mbps          | 1,048 Mbps               | 20,000 IOPS | 3,000 IOPS    |
+| 8XL          | 9,500 Mbps          | 1,048 Mbps               | 40,000 IOPS | 3,000 IOPS    |
+| 12XL         | 14,250 Mbps         | 1,048 Mbps               | 50,000 IOPS | 3,000 IOPS    |
+| 16XL         | 19,000 Mbps         | 1,048 Mbps               | 80,000 IOPS | 3,000 IOPS    |
 
 ### Self-Serve Configurability
 
@@ -142,21 +142,21 @@ Compute add-on changes will not cause you to lose your disk attributes.
 
 [Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/replication).
 
-The maximum number of replication slots and WAL senders depends on your compute add-on size, as follows:
+The maximum number of replication slots and WAL senders depends on your compute size, as follows:
 
-| Compute add-on | Max Replication Slots | Max WAL Senders |
-| -------------- | --------------------- | --------------- |
-| Nano (free)    | 5                     | 5               |
-| Micro          | 5                     | 5               |
-| Small          | 5                     | 5               |
-| Medium         | 5                     | 5               |
-| Large          | 8                     | 8               |
-| XL             | 24                    | 24              |
-| 2XL            | 80                    | 80              |
-| 4XL            | 80                    | 80              |
-| 8XL            | 80                    | 80              |
-| 12XL           | 80                    | 80              |
-| 16XL           | 80                    | 80              |
+| Compute size | Max Replication Slots | Max WAL Senders |
+| ------------ | --------------------- | --------------- |
+| Nano (free)  | 5                     | 5               |
+| Micro        | 5                     | 5               |
+| Small        | 5                     | 5               |
+| Medium       | 5                     | 5               |
+| Large        | 8                     | 8               |
+| XL           | 24                    | 24              |
+| 2XL          | 80                    | 80              |
+| 4XL          | 80                    | 80              |
+| 8XL          | 80                    | 80              |
+| 12XL         | 80                    | 80              |
+| 16XL         | 80                    | 80              |
 
 <Admonition type="caution">
 
