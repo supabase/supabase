@@ -102,8 +102,8 @@ export const CreateWarehouseCollectionModal = () => {
       return <>Your plan allows for a maximum of {formatDays(maxRetentionDays)}.</>
     return (
       <>
-        Logs will be deleted after {formatDays(days)}, as your current plan allows up to{' '}
-        {formatDays(maxRetentionDays)} of log retention.
+        Your logs will be removed after {formatDays(days)}. <br />
+        Your plan allows for a maximum of {formatDays(maxRetentionDays)}.
       </>
     )
   }
