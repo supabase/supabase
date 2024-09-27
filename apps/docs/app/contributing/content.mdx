@@ -157,6 +157,46 @@ Additional helpful information.
 
 </Admonition>
 
+### Code Samples
+
+You can include code samples as normal in Markdown:
+
+````mdx
+```js
+const PI = 3.14
+```
+````
+
+Of, you can use the `<$CodeSample />` component to include code samples from a source code file.
+
+If the file is within the `supabase/supabase` repo's `examples` directory:
+
+```mdx
+<$CodeSample
+path="/relative/path/from/examples/directory.js"
+{/_ Array of [start, end] line numbers to include.
+Line numbers are 1-indexed and inclusive.
+-1 indicates the final line. _/}
+lines={[[1, 3], [5, -1]]}
+{/* Optional, displays as a file name on the code block */}
+meta="display/path.js"
+/>
+```
+
+If the file is within some other GitHub repo (note that the repo must be public):
+
+```mdx
+<$CodeSample
+external={true}
+org="supabase"
+repo="cli"
+commit="1623aa9b95ec90e21c5bae5a0d50dcf272abe92f"
+path="/relative/path/from/root.js"
+lines={[[1, 3], [5, -1]]}
+meta="display/path.js"
+/>
+```
+
 ### Icons
 
 The following icons are available. They can be styled with [Tailwind](https://tailwindcss.com/) classes:
