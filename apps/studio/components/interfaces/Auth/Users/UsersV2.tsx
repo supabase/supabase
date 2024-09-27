@@ -192,7 +192,10 @@ export const UsersV2 = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => {
-              if (e.code === 'Enter') setFilterKeywords(search)
+              if (e.code === 'Enter') {
+                setSearch(search.trim())
+                setFilterKeywords(search.trim())
+              }
             }}
             actions={[
               search && (
