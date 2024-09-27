@@ -312,8 +312,8 @@ let data = try await supabase.storage.from("bucket")
 
 ```kotlin
 val data = supabase.storage.from("bucket").downloadAuthenticated("image.jpg") {
-	transform {
-	    size(200, 200)
+    transform {
+        size(200, 200)
         format = ImageTransformation.Format.ORIGIN
     }
 }
@@ -321,8 +321,8 @@ val data = supabase.storage.from("bucket").downloadAuthenticated("image.jpg") {
 //Or on JVM stream directly to a file
 val file = File("image.jpg")
 supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
-	transform {
-	    size(200, 200)
+    transform {
+        size(200, 200)
         format = ImageTransformation.Format.ORIGIN
     }
 }
@@ -439,16 +439,16 @@ let data = try await supabase.storage.from("bucket")
 
 ```kotlin
 val data = supabase.storage["bucket"].downloadAuthenticated("image.jpg") {
-	transform {
-	    quality = 50
+    transform {
+        quality = 50
     }
 }
 
 //Or on JVM stream directly to a file
 val file = File("image.jpg")
 supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
-	transform {
-	    quality = 50
+    transform {
+        quality = 50
     }
 }
 ```
