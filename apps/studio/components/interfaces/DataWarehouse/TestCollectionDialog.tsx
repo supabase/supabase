@@ -1,15 +1,13 @@
+import { CopyButton } from '@ui/components/CopyButton'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
-import CopyButton from 'components/ui/CopyButton'
 import type { WarehouseAccessTokensData } from 'data/analytics/warehouse-access-tokens-query'
 import type { WarehouseCollectionsData } from 'data/analytics/warehouse-collections-query'
-import { Code } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
   Button,
   Checkbox_Shadcn_,
   CodeBlock,
-  DialogSectionSeparator,
   Input_Shadcn_,
   Label_Shadcn_,
   Separator,

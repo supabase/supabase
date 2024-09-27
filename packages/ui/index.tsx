@@ -21,6 +21,7 @@ export * from './src/components/Collapsible'
 export * from './src/components/CodeBlock'
 export * from './src/components/SimpleCodeBlock'
 export * from './src/components/TreeView/TreeView'
+export * from './src/components/CopyButton/CopyButton'
 
 // NAV
 

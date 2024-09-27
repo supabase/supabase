@@ -1,8 +1,7 @@
 import { Check, Clipboard } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { copyToClipboard } from 'lib/helpers'
-import { Button, ButtonProps } from 'ui'
+import { Button, ButtonProps, copyToClipboard } from 'ui'
 
 export interface CopyButtonProps extends ButtonProps {
   text: string
@@ -10,7 +9,7 @@ export interface CopyButtonProps extends ButtonProps {
   copyLabel?: string
   copiedLabel?: string
 }
-const CopyButton = ({
+export const CopyButton = ({
   text,
   iconOnly = false,
   children,
@@ -43,4 +42,3 @@ const CopyButton = ({
     </Button>
   )
 }
-export default CopyButton

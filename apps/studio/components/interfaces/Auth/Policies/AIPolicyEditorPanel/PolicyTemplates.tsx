@@ -5,8 +5,8 @@ import { Badge, HoverCard, HoverCardContent, HoverCardTrigger, Input, cn } from 
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { CopyButton } from '@ui/components/CopyButton'
 import CardButton from 'components/ui/CardButton'
-import CopyButton from 'components/ui/CopyButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import {
   getGeneralPolicyTemplates,

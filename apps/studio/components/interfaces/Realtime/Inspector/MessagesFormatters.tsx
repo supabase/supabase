@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react'
 
-import CopyButton from 'components/ui/CopyButton'
+import { CopyButton } from '@ui/components/CopyButton'
 import { unixMicroToIsoTimestamp } from './Messages.utils'
 
 export const RowLayout = ({ children }: PropsWithChildren<{}>) => (

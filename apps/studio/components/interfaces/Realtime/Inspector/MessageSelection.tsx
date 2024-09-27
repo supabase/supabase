@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { Button, cn } from 'ui'
 
-import CopyButton from 'components/ui/CopyButton'
+import { CopyButton } from '@ui/components/CopyButton'
 import Telemetry from 'lib/telemetry'
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'

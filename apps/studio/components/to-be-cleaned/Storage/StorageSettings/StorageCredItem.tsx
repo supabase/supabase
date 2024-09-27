@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { differenceInDays } from 'date-fns'
 import { MoreVertical, TrashIcon } from 'lucide-react'
 
-import CopyButton from 'components/ui/CopyButton'
+import { CopyButton } from '@ui/components/CopyButton'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,

@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CopyButton from 'components/ui/CopyButton'
+import { CopyButton } from '@ui/components/CopyButton'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'

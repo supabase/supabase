@@ -4,7 +4,7 @@
  * for http response codes
  */
 
-import CopyButton from 'components/ui/CopyButton'
+import { CopyButton } from '@ui/components/CopyButton'
 import React from 'react'
 import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
 import { AlertCircle, Info } from 'lucide-react'
