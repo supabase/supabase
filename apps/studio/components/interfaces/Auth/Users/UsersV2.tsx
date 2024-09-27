@@ -1,5 +1,5 @@
-import dayjs from 'dayjs'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
+import dayjs from 'dayjs'
 import { ArrowDown, ArrowUp, RefreshCw, Search, User as UserIcon, Users, X } from 'lucide-react'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -12,6 +12,8 @@ import APIDocsButton from 'components/ui/APIDocsButton'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
   Button,
   cn,
@@ -40,9 +42,6 @@ import { UserPanel } from './UserPanel'
 import { PROVIDER_FILTER_OPTIONS } from './Users.constants'
 import { formatUsersData, isAtBottom } from './Users.utils'
 import { HeaderCell } from './UsersGridComponents'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { createClient } from '@supabase/supabase-js'
 
 type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 const USERS_TABLE_COLUMNS = [
@@ -248,19 +247,6 @@ export const UsersV2 = () => {
   return (
     <div className="h-full flex flex-col">
       <FormHeader className="py-4 px-6 !mb-0" title="Users" />
-      <Button
-        onClick={() => {
-          const supabase = createClient(
-            'https://smlvmbxrcgkbknntprdw.supabase.red',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtbHZtYnhyY2drYmtubnRwcmR3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNDM4NTQwOSwiZXhwIjoyMDM5OTYxNDA5fQ.7yQEPTtvBiEzK5l1Q3_Z7KhiF1xyJQvnCOjx43pxvoE'
-          )
-          supabase.auth.signInWithOAuth({
-            provider: 'google',
-          })
-        }}
-      >
-        Test
-      </Button>
       <div className="bg-surface-200 py-3 px-6 flex items-center justify-between border-t">
         <div className="flex items-center gap-x-2">
           <p className="text-xs text-foreground-light">Filter by</p>
