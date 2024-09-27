@@ -20,7 +20,7 @@ export type Cronjob = {
   jobname: string
 }
 
-const cronJobSqlQuery = `select * from cron.job;`
+const cronJobSqlQuery = `select * from cron.job order by jobid;`
 
 export async function getDatabaseCronjobs({
   projectRef,
