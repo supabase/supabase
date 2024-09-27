@@ -29,8 +29,8 @@ export const buildHttpRequestCommand = (
 }
 
 export const DEFAULT_CRONJOB_COMMAND = {
-  type: 'http_request',
-  method: 'GET',
+  type: 'http_request' as const,
+  method: 'GET' as const,
   endpoint: '',
   httpHeaders: [],
   httpParameters: [],
