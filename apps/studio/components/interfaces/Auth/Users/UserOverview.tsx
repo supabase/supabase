@@ -417,7 +417,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             }
             button={{
               icon: <Ban />,
-              text: isBanned ? 'Revoke ban' : 'Ban user',
+              text: isBanned ? 'Unban user' : 'Ban user',
               disabled: !canRemoveMFAFactors,
               onClick: () => {
                 if (isBanned) {
