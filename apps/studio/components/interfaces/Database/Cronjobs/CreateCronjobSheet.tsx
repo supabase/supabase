@@ -109,7 +109,7 @@ export const CreateCronjobSheet = ({
   setIsClosing,
   onClose,
 }: CreateCronjobSheetProps) => {
-  const isEditing = !!selectedCronjob
+  const isEditing = !!selectedCronjob?.jobname
   const { mutate: upsertCronjob, isLoading } = useDatabaseCronjobCreateMutation()
 
   const cronjobValues = parseCronjobCommand(selectedCronjob?.command || '')
