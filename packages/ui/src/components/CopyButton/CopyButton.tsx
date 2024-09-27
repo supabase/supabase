@@ -1,3 +1,5 @@
+'use client'
+
 import { Check, Clipboard } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
