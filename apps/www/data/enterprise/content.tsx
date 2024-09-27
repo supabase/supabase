@@ -133,6 +133,16 @@ export default {
     ),
     subheading:
       "Supabase ensures optimal database performance at any scale, so you can focus on innovating and growing without worrying about infrastructure limitations—whether you're handling high-traffic applications, complex queries, or massive data volumes.",
+    highlights: [
+      {
+        heading: 'Databases managed',
+        subheading: '1,000,000+',
+      },
+      {
+        heading: 'Databases launched daily',
+        subheading: '2,500+',
+      },
+    ],
   },
   security: {
     id: 'security',
