@@ -20,6 +20,7 @@ interface Props {
 
 export type Story = {
   url: string
+  target?: '_blank' | string
   heading: string
   subheading: string | JSX.Element
 }
@@ -33,8 +34,8 @@ type Highlight = {
 
 const UseCases: FC<Props> = (props) => {
   return (
-    <>
-      <SectionContainer id={props.id} className="flex flex-col gap-4 md:gap-8 !pb-0">
+    <section id={props.id}>
+      <SectionContainer className="flex flex-col gap-4 md:gap-8 !pb-0">
         <div className="flex flex-col gap-2">
           <span className="label">{props.label}</span>
           <h2 className="h2">{props.heading}</h2>
@@ -81,14 +82,14 @@ const UseCases: FC<Props> = (props) => {
           </div>
         </SectionContainer>
       </div>
-      <SectionContainer id={props.id} className="!pt-0">
+      <SectionContainer className="!pt-0">
         <ul className="grid grid-cols-2 gap-4 sm:gap-10 gap-y-10 lg:grid-cols-4 md:gap-12 lg:gap-x-8 mt-8">
           {props.highlights.map((highlight) => (
             <HighlightCard highlight={highlight} key={highlight.heading} />
           ))}
         </ul>
       </SectionContainer>
-    </>
+    </section>
   )
 }
 
@@ -97,14 +98,14 @@ interface StoryCardProps {
 }
 
 const StoryCard: FC<StoryCardProps> = ({ story }) => (
-  <Link href={story.url} className="w-full h-full">
+  <Link href={story.url} target={story.target ?? undefined} className="w-full h-full">
     <Panel
       outerClassName="w-full h-full"
       hasActiveOnHover
       innerClassName="flex flex-col justify-between text-foreground-lighter p-4 xl:p-6"
     >
       <h3 className="text-foreground">{story.heading}</h3>
-      <p className="text-sm">&quot;{story.subheading}&quot;</p>
+      <q className="text-sm">{story.subheading}</q>
     </Panel>
   </Link>
 )

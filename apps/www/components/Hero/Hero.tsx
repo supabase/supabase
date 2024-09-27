@@ -16,7 +16,7 @@ const Hero = () => {
 
   return (
     <div className="relative -mt-[65px]">
-      <SectionContainer className="pt-8 md:pt-16 overflow-hidden">
+      <SectionContainer className="pt-8 pb-10 md:pt-16 overflow-hidden">
         <div className="relative">
           <div className="mx-auto">
             <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">

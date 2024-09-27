@@ -170,7 +170,7 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
         className
       )}
     >
-      <div className="border rounded-xl bg-surface-75 p-4 md:p-6 w-full md:max-w-lg min-h-[200px] md:min-h-[400px]">
+      <div className="border rounded-xl bg-surface-75 p-4 md:p-6 w-full lg:max-w-lg min-h-[200px] md:min-h-[400px]">
         {success ? (
           <div className="flex flex-col h-full w-full min-w-[300px] gap-4 items-center justify-center opacity-0 transition-opacity animate-fade-in scale-1">
             <p className="text-center text-sm">{success}</p>

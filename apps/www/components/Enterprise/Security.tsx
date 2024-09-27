@@ -1,15 +1,8 @@
-import 'swiper/css'
-
 import React, { FC } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import Link from 'next/link'
-
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import Panel from '~/components/Panel'
-
 import type { LucideIcon } from 'lucide-react'
-import { highlight } from '@code-hike/mdx'
+
 import { TextLink } from 'ui'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 interface Props {
   id: string
@@ -43,7 +36,7 @@ const EnterpriseSecurity: FC<Props> = (props) => {
       <div className="flex flex-col gap-2 max-w-xl">
         <span className="label">{props.label}</span>
         <h2 className="h2 !m-0">{props.heading}</h2>
-        <p className="p">{props.subheading}</p>
+        <p className="p !text-foreground-lighter">{props.subheading}</p>
         <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
       </div>
       <ul className="grid grid-cols-2 sm:grid-cols-2 gap-4 md:gap-x-20 h-fit xl:grid-cols-2 mt-4 xl:mt-8">

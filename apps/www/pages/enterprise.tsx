@@ -1,48 +1,51 @@
+import { NextPage } from 'next'
 import dynamic from 'next/dynamic'
-import content from '~/data/enterprise/content'
 import { NextSeo } from 'next-seo'
 
 import Layout from '~/components/Layouts/Default'
 import ProductHeader from '~/components/Sections/ProductHeader2'
 
-const EnterpriseUseCases = dynamic(() => import('components/Enterprise/UseCases'))
-const EnterpriseSecurity = dynamic(() => import('components/Enterprise/Security'))
-const CTAForm = dynamic(() => import('components/Enterprise/CTAForm'))
-const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
+import content from '~/data/enterprise/content'
+import Logos from '../components/logos'
 
-const Enterprise = () => {
-  return (
-    <>
-      <NextSeo
-        title={content.metadata.metaTitle}
-        description={content.metadata.metaDescription}
-        openGraph={{
-          title: content.metadata.metaTitle,
-          description: content.metadata.metaDescription,
-          url: `https://supabase.com/enterprise`,
-          images: [
-            {
-              url: `https://supabase.com/images/enterprise/og.png`,
-            },
-          ],
-        }}
+const EnterpriseUseCases = dynamic(() => import('components/Enterprise/UseCases'))
+// const EnterprisePerformance = dynamic(() => import('components/Enterprise/Performance'))
+const EnterpriseSecurity = dynamic(() => import('components/Enterprise/Security'))
+const EnterpriseSupport = dynamic(() => import('components/Enterprise/Support'))
+const EnterpriseQuote = dynamic(() => import('components/Enterprise/SingleQuote'))
+const CTAForm = dynamic(() => import('components/Enterprise/CTAForm'))
+
+const Enterprise: NextPage = () => (
+  <>
+    <NextSeo
+      title={content.metadata.metaTitle}
+      description={content.metadata.metaDescription}
+      openGraph={{
+        title: content.metadata.metaTitle,
+        description: content.metadata.metaDescription,
+        url: `https://supabase.com/enterprise`,
+        images: [
+          {
+            url: `https://supabase.com/images/enterprise/og.png`,
+          },
+        ],
+      }}
+    />
+    <Layout className="overflow-visible">
+      <ProductHeader
+        {...content.heroSection}
+        className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8"
+        footer={<Logos className="!pb-0" showHeading={false} align="left" />}
+        footerPosition="left"
       />
-      <Layout className="overflow-visible">
-        <ProductHeader {...content.heroSection} footer={<span>logos</span>} />
-        <EnterpriseUseCases {...content['use-cases']} />
-        <EnterpriseSecurity {...content.security} />
-        <CTAForm />
-        <ReactTooltip
-          effect="solid"
-          place="bottom"
-          backgroundColor="hsl(var(--background-alternative-default))"
-          textColor="hsl(var(--foreground-light))"
-          className="!max-w-[320px] !px-3 whitespace-pre-line"
-          uuid="homepage-tt"
-        />
-      </Layout>
-    </>
-  )
-}
+      <EnterpriseUseCases {...content['use-cases']} />
+      {/* <EnterprisePerformance {...content.performance} /> */}
+      <EnterpriseSecurity {...content.security} />
+      <EnterpriseSupport {...content.support} />
+      <EnterpriseQuote {...content.quote} />
+      <CTAForm />
+    </Layout>
+  </>
+)
 
 export default Enterprise
