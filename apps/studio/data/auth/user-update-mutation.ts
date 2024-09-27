@@ -24,10 +24,18 @@ export async function updateUser({
   userId,
   banDuration,
 }: UserUpdateVariables) {
+  // [Joshen] This is probably the only endpoint that needs the put method from lib/common/fetch
+  // as it's not our internal API.
   const response = await put(
     `${protocol}://${endpoint}/auth/v1/admin/users/${userId}`,
     { ban_duration: typeof banDuration === 'number' ? `${banDuration}h` : banDuration },
-    { headers: { apikey: serviceApiKey, Authorization: `Bearer ${serviceApiKey}` } }
+    {
+      headers: {
+        apikey: serviceApiKey,
+        Authorization: `Bearer ${serviceApiKey}`,
+      },
+      credentials: undefined,
+    }
   )
 
   if (response.error) throw response.error

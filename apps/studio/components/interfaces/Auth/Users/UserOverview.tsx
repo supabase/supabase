@@ -150,7 +150,14 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     }
 
     const { protocol, endpoint, serviceApiKey } = apiData.autoApiService
-    updateUser({ protocol, endpoint, serviceApiKey, userId: user.id, banDuration: 'none' })
+    updateUser({
+      projectRef,
+      protocol,
+      endpoint,
+      serviceApiKey,
+      userId: user.id,
+      banDuration: 'none',
+    })
   }
 
   useEffect(() => {

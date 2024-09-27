@@ -70,7 +70,14 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
 
     const durationHours = data.unit === 'hours' ? Number(data.value) : Number(data.value) * 24
     const { protocol, endpoint, serviceApiKey } = apiData.autoApiService
-    updateUser({ protocol, endpoint, serviceApiKey, userId: user.id, banDuration: durationHours })
+    updateUser({
+      projectRef,
+      protocol,
+      endpoint,
+      serviceApiKey,
+      userId: user.id,
+      banDuration: durationHours,
+    })
   }
 
   useEffect(() => {
