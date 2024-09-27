@@ -96,7 +96,7 @@ const LogTable = ({
 
   const firstRow: LogData | undefined = data?.[0] as LogData
 
-  // move timestamp to the first column
+  // move timestamp to the first column, if it exists
   function getFirstRow() {
     if (!firstRow) return {}
 

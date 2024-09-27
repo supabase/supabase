@@ -4,6 +4,15 @@ import { waitFor, screen, prettyDOM } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
 import { render } from '../../helpers'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+dayjs.extend(customParseFormat)
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(relativeTime)
 
 beforeAll(() => {
   vi.mock('next/router', () => require('next-router-mock'))
