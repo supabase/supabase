@@ -6,6 +6,8 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 
+import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
+import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 import { getGitHubFileContents } from '~/lib/octokit'
 import { codeSampleRemark } from './CodeSample'
 
@@ -26,5 +28,9 @@ export async function preprocessMdx<T>(mdx: string, transformers: Transformer[])
 }
 
 export function preprocessMdxWithDefaults(mdx: string) {
-  return preprocessMdx(mdx, [codeSampleRemark({ fetchFromGitHub: getGitHubFileContents })])
+  return preprocessMdx(mdx, [
+    remarkMkDocsAdmonition(),
+    remarkPyMdownTabs(),
+    codeSampleRemark({ fetchFromGitHub: getGitHubFileContents }),
+  ])
 }
