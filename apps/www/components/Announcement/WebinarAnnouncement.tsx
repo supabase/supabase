@@ -5,7 +5,7 @@ const WebinarAnnouncement = () => {
   return (
     <div className="z-40 w-full flex flex-col gap-4 items-center justify-center -mt-4 md:-mt-8 mb-8 lg:mb-8">
       <AnnouncementBadge
-        url="/events/scale-to-billions-generative-ai-humata"
+        url="/events/scale-to-millions-generative-ai-humata"
         badge={
           <>
             Webinar <span className="hidden sm:inline ml-1">/ Aug 21</span>
@@ -13,7 +13,7 @@ const WebinarAnnouncement = () => {
         }
         announcement={
           <>
-            Scale to Billions: Generative AI
+            Scale to Millions: Generative AI
             <span className="hidden sm:inline">/Humata</span>
           </>
         }
