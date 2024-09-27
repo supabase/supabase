@@ -21,8 +21,8 @@ export const buildHttpRequestCommand = (
     select
       net.${method === 'GET' ? 'http_get' : 'http_post'}(
           url:='${url}',
-          headers:=jsonb_build_object(${headers.map((v) => `'${v.name}, ${v.value}'`).join(', ')}),
-          body:=jsonb_build_object(${body.map((v) => `'${v.name}, ${v.value}'`).join(', ')}),
+          headers:=jsonb_build_object(${headers.map((v) => `'${v.name}', '${v.value}'`).join(', ')}),
+          body:=jsonb_build_object(${body.map((v) => `'${v.name}', '${v.value}'`).join(', ')}),
           timeout_milliseconds:=${timeout}
       );
     $$`
@@ -37,8 +37,12 @@ export const DEFAULT_CRONJOB_COMMAND = {
   timeoutMs: 1000,
 }
 
-export const parseCronjobCommand = (c: string): CronjobType => {
-  const command = c.replaceAll('$$', '').replaceAll(/\n/g, '').replaceAll(/\s+/g, ' ').trim()
+export const parseCronjobCommand = (originalCommand: string): CronjobType => {
+  const command = originalCommand
+    .replaceAll('$$', ' ')
+    .replaceAll(/\n/g, ' ')
+    .replaceAll(/\s+/g, ' ')
+    .trim()
   if (command.toLocaleLowerCase().startsWith('select net.')) {
     const matches =
       command.match(
@@ -97,7 +101,7 @@ export const parseCronjobCommand = (c: string): CronjobType => {
   if (command.length > 0) {
     return {
       type: 'sql_snippet',
-      snippet: command,
+      snippet: originalCommand,
     }
   }
 

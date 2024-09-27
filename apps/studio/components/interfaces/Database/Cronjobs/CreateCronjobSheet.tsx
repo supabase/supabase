@@ -21,7 +21,6 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  Switch,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -89,7 +88,6 @@ const FormSchema = z.object({
       }
       return true
     }, 'The schedule needs to be in a Cron format.'),
-  active: z.boolean(),
   values: z.discriminatedUnion('type', [
     edgeFunctionSchema,
     httpRequestSchema,
@@ -119,7 +117,6 @@ export const CreateCronjobSheet = ({
     defaultValues: {
       name: selectedCronjob?.jobname || '',
       schedule: selectedCronjob?.schedule || '',
-      active: selectedCronjob?.active || true,
       values: cronjobValues,
     },
   })
@@ -175,7 +172,7 @@ export const CreateCronjobSheet = ({
       {
         onSuccess: () => {
           if (isEditing) {
-            toast.success(`Successfully updatedzz cronjob ${name}`)
+            toast.success(`Successfully updated cronjob ${name}`)
           } else {
             toast.success(`Successfully created cronjob ${name}`)
           }
@@ -218,28 +215,6 @@ export const CreateCronjobSheet = ({
               </SheetSection>
               <Separator />
               <CronjobScheduleSection form={form} />
-              <Separator />
-              <SheetSection>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="active"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex"
-                      label={`Active`}
-                      description={'Is the cronjob active?'}
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={field.disabled}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </SheetSection>
               <Separator />
               <SheetSection>
                 <FormField_Shadcn_
