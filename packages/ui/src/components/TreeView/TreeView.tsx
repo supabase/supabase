@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronRight, FolderClosed, FolderOpen, Loader2 } from 'lucide-react'
+import { ChevronRight, FolderClosed, FolderOpen, Loader2, Copy } from 'lucide-react'
 import { ComponentPropsWithoutRef, ReactNode, forwardRef, useEffect, useRef, useState } from 'react'
 import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
 import { cn } from '../../lib/utils'
@@ -13,6 +13,7 @@ import {
   HoverCardContent,
   SimpleCodeBlock,
 } from 'ui'
+import CopyButton from 'components/ui/CopyButton'
 
 const TreeView = TreeViewPrimitive
 
@@ -98,7 +99,7 @@ const TreeViewItem = forwardRef<
     }
 
     return (
-      <HoverCard_Shadcn_ openDelay={200}>
+      <HoverCard_Shadcn_ openDelay={300}>
         <HoverCardTrigger_Shadcn_ asChild>
           <div
             ref={ref}
@@ -106,7 +107,6 @@ const TreeViewItem = forwardRef<
             aria-expanded={!isEditing && isExpanded}
             {...props}
             className={cn(
-              'bg-red-200',
               'group relative',
               'transition-colors',
               'h-[28px]',
@@ -224,7 +224,7 @@ const TreeViewItem = forwardRef<
             className="w-[500px] flex"
             animate="slide-in"
           >
-            <ScrollArea className="h-[240px]">
+            <ScrollArea className="h-[240px] relative">
               <SimpleCodeBlock
                 showCopy={false}
                 className="sql"
@@ -232,16 +232,14 @@ const TreeViewItem = forwardRef<
               >
                 {content}
               </SimpleCodeBlock>
+              <CopyButton
+                iconOnly
+                type="text"
+                icon={<Copy />}
+                className="px-1 absolute right-0 top-0"
+              />
             </ScrollArea>
-            {/* <CopyButton
-              iconOnly
-              type="default"
-              className="px-1 absolute top-1.5 right-1.5"
-              text={content}
-            /> */}
           </HoverCardContent>
-          {/* <ScrollArea className="h-[240px]">
-            {content}</ScrollArea> */}
         </HoverCardContent_Shadcn_>
       </HoverCard_Shadcn_>
     )
