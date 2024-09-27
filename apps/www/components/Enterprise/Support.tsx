@@ -1,12 +1,7 @@
-import 'swiper/css'
-
 import React, { FC } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import Link from 'next/link'
 
-import { cn, TextLink } from 'ui'
+import { cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import Panel from '~/components/Panel'
 
 import type { LucideIcon } from 'lucide-react'
 

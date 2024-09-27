@@ -9,7 +9,7 @@ import content from '~/data/enterprise/content'
 import Logos from '../components/logos'
 
 const EnterpriseUseCases = dynamic(() => import('components/Enterprise/UseCases'))
-// const EnterprisePerformance = dynamic(() => import('components/Enterprise/Performance'))
+const EnterprisePerformance = dynamic(() => import('components/Enterprise/Performance'))
 const EnterpriseSecurity = dynamic(() => import('components/Enterprise/Security'))
 const EnterpriseSupport = dynamic(() => import('components/Enterprise/Support'))
 const EnterpriseQuote = dynamic(() => import('components/Enterprise/SingleQuote'))
@@ -39,7 +39,7 @@ const Enterprise: NextPage = () => (
         footerPosition="left"
       />
       <EnterpriseUseCases {...content['use-cases']} />
-      {/* <EnterprisePerformance {...content.performance} /> */}
+      <EnterprisePerformance {...content.performance} />
       <EnterpriseSecurity {...content.security} />
       <EnterpriseSupport {...content.support} />
       <EnterpriseQuote {...content.quote} />
