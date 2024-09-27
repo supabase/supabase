@@ -26,7 +26,7 @@ export default {
   },
   heroSection: {
     id: 'hero',
-    label: 'Supabase for Enterprise',
+    title: 'Supabase for Enterprise',
     h1: (
       <>
         Innovative Enterprises

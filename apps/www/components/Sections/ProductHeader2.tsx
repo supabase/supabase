@@ -41,7 +41,6 @@ const ProductHeader = (props: Props) => (
               )}
             </div>
           )}
-          {props.label && <span className="label !text-brand mb-2 block">{props.label}</span>}
           <h1 className="h1 text-3xl md:!text-4xl lg:!text-4xl 2xl:!text-6xl tracking-[-.15px]">
             {props.h1}
           </h1>
