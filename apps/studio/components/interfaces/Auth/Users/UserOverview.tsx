@@ -123,7 +123,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       setIsDeleteFactorsModalOpen(false)
     },
   })
-  const { mutate: updateUser } = useUserUpdateMutation({
+  const { mutate: updateUser, isLoading: isUpdatingUser } = useUserUpdateMutation({
     onSuccess: () => {
       toast.success('Successfully unbanned user')
       setIsUnbanModalOpen(false)
@@ -470,6 +470,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         variant="warning"
         visible={isUnbanModalOpen}
         title="Confirm to unban user"
+        loading={isUpdatingUser}
         confirmLabel="Unban user"
         confirmLabelLoading="Unbanning"
         onCancel={() => setIsUnbanModalOpen(false)}
