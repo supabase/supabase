@@ -24,11 +24,11 @@ const Enterprise: NextPage = () => (
         title: content.metadata.metaTitle,
         description: content.metadata.metaDescription,
         url: `https://supabase.com/enterprise`,
-        images: [
-          {
-            url: `https://supabase.com/images/enterprise/og.png`,
-          },
-        ],
+        // images: [
+        //   {
+        //     url: `https://supabase.com/images/enterprise/og.png`,
+        //   },
+        // ],
       }}
     />
     <Layout className="overflow-visible">
