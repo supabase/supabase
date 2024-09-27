@@ -14,12 +14,12 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
+import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
 import { Badge, Menu } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateLogsMenu } from './LogsMenu.utils'
-import Link from 'next/link'
-import { ArrowUpRight } from 'lucide-react'
 interface LogsLayoutProps {
   title?: string
 }
@@ -59,9 +59,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   if (!canUseLogsExplorer) {
     return (
       <ProjectLayout>
-        <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-          <NoPermission isFullPage resourceText="access your project's logs explorer" />
-        </main>
+        <NoPermission isFullPage resourceText="access your project's logs explorer" />
       </ProjectLayout>
     )
   }
@@ -131,9 +129,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
         </>
       }
     >
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+      {children}
     </ProjectLayout>
   )
 }
