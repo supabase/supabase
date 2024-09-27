@@ -35,7 +35,7 @@ export async function getGitHubFileContents({
   repo,
   path,
   branch,
-  options: { onError },
+  options: { onError, fetch },
 }: {
   org: string
   repo: string
@@ -63,7 +63,7 @@ export async function getGitHubFileContents({
       path: path,
       ref: branch,
       options: {
-        fetch: fetchRevalidatePerDay,
+        fetch: fetch ?? fetchRevalidatePerDay,
       },
     })
     if (response.status !== 200 || !response.data) {
@@ -77,5 +77,82 @@ export async function getGitHubFileContents({
   } catch (err) {
     console.error('Error fetching GitHub file: %o', err)
     onError?.(err)
+  }
+}
+
+export async function getGitHubFileContentsImmutableOnly({
+  org,
+  repo,
+  branch,
+  path,
+  options: { onError, fetch },
+}: {
+  org: string
+  repo: string
+  branch: string
+  path: string
+  options: {
+    onError: (err?: unknown) => void
+    fetch?: (info: RequestInfo, init?: RequestInit) => Promise<Response>
+  }
+}) {
+  const isImmutableCommit = await checkForImmutableCommit({
+    org,
+    repo,
+    branch,
+  })
+  if (!isImmutableCommit) {
+    throw Error('The commit is not an immutable commit SHA. Tags and branch names are not allowed.')
+  }
+
+  return getGitHubFileContents({
+    org,
+    repo,
+    branch,
+    path,
+    options: { onError, fetch },
+  })
+}
+
+async function checkForImmutableCommit({
+  org,
+  repo,
+  branch,
+  options: { fetch: _fetch = fetch } = {},
+}: {
+  org: string
+  repo: string
+  branch: string
+  options?: {
+    /**
+     *
+     * A custom fetch implementation to control Next.js caching.
+     */
+    fetch?: (info: RequestInfo, init?: RequestInit) => Promise<Response>
+  }
+}) {
+  try {
+    const response = await octokit().request('GET /repos/{owner}/{repo}/git/commits/{commit_sha}', {
+      owner: org,
+      repo: repo,
+      commit_sha: branch,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+      options: {
+        fetch: _fetch,
+      },
+    })
+    if (response.status === 200) {
+      return true
+    } else {
+      throw Error(
+        "Checking for an immutable commit didn't throw an error, but it also didn't return a 200. Erring on the side of safety, assuming this is not an immutable commit.",
+        { cause: response }
+      )
+    }
+  } catch (err) {
+    console.error('Not an immutable commit: %o', err)
+    return false
   }
 }

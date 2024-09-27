@@ -6,7 +6,7 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 
-import { getGitHubFileContents } from '~/lib/octokit'
+import { getGitHubFileContentsImmutableOnly } from '~/lib/octokit'
 import { codeSampleRemark } from './CodeSample'
 
 type Transformer = (ast: Root) => Root | Promise<Root>
@@ -26,5 +26,9 @@ export async function preprocessMdx<T>(mdx: string, transformers: Transformer[])
 }
 
 export function preprocessMdxWithDefaults(mdx: string) {
-  return preprocessMdx(mdx, [codeSampleRemark({ fetchFromGitHub: getGitHubFileContents })])
+  return preprocessMdx(mdx, [
+    codeSampleRemark({
+      fetchFromGitHub: getGitHubFileContentsImmutableOnly,
+    }),
+  ])
 }
