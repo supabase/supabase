@@ -1,7 +1,13 @@
+import dayjs from 'dayjs'
 import { UIEvent } from 'react'
+import { Column } from 'react-data-grid'
+import { UserIcon } from 'lucide-react'
 
 import { User } from 'data/auth/users-query'
 import { BASE_PATH } from 'lib/constants'
+import { ColumnConfiguration, USERS_TABLE_COLUMNS, UsersTableColumn } from './UsersV2'
+import { HeaderCell } from './UsersGridComponents'
+import { cn } from 'ui'
 
 export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean => {
   return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
@@ -157,4 +163,115 @@ export function getAvatarUrl(user: User): string | undefined {
     profileImageURL ||
     profile_image_url
   )
+}
+
+export const formatUserColumns = ({
+  config,
+  users,
+  visibleColumns = [],
+  setSortByValue,
+}: {
+  config: ColumnConfiguration[]
+  users: User[]
+  visibleColumns?: string[]
+  setSortByValue: (val: string) => void
+}) => {
+  const columnOrder = config.map((c) => c.id) ?? USERS_TABLE_COLUMNS.map((c) => c.id)
+
+  const gridColumns = USERS_TABLE_COLUMNS.filter((col) => columnOrder.includes(col.id))
+    .map((col) => {
+      const savedConfig = config.find((c) => c.id === col.id)
+      const res: Column<any> = {
+        key: col.id,
+        name: col.name,
+        resizable: col.resizable ?? true,
+        sortable: false,
+        draggable: true,
+        width: savedConfig?.width ?? col.width,
+        minWidth: col.minWidth ?? 120,
+        headerCellClass: 'z-50 outline-none !shadow-none',
+        renderHeaderCell: () => {
+          if (col.id === 'img') return undefined
+          return <HeaderCell col={col} setSortByValue={setSortByValue} />
+        },
+        renderCell: ({ row }) => {
+          const value = row?.[col.id]
+          const user = users?.find((u) => u.id === row.id)
+          const formattedValue =
+            value !== null && ['created_at', 'last_sign_in_at'].includes(col.id)
+              ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
+              : Array.isArray(value)
+                ? value.join(', ')
+                : value
+          const isConfirmed = user?.email_confirmed_at || user?.phone_confirmed_at
+
+          if (col.id === 'img') {
+            return (
+              <div className="flex items-center justify-center">
+                <div
+                  className={cn(
+                    'flex items-center justify-center w-6 h-6 rounded-full bg-center bg-cover bg-no-repeat',
+                    !row.img ? 'bg-selection' : 'border'
+                  )}
+                  style={{ backgroundImage: row.img ? `url('${row.img}')` : 'none' }}
+                >
+                  {!row.img && <UserIcon size={12} />}
+                </div>
+              </div>
+            )
+          }
+
+          return (
+            <div
+              className={cn(
+                'w-full flex items-center text-xs',
+                col.id.includes('provider') ? 'capitalize' : ''
+              )}
+            >
+              {/* [Joshen] Not convinced this is the ideal way to display the icons, but for now */}
+              {col.id === 'providers' &&
+                row.provider_icons.map((icon: string, idx: number) => {
+                  const provider = row.providers[idx]
+                  return (
+                    <div
+                      className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
+                      style={{
+                        marginLeft: idx === 0 ? 0 : `-8px`,
+                        zIndex: row.provider_icons.length - idx,
+                      }}
+                    >
+                      <img
+                        key={`${user?.id}-${provider}`}
+                        width={16}
+                        src={icon}
+                        alt={`${provider} auth icon`}
+                        className={cn(provider === 'github' && 'dark:invert')}
+                      />
+                    </div>
+                  )
+                })}
+              {col.id === 'last_sign_in_at' && !isConfirmed ? (
+                <p className="text-foreground-lighter">Waiting for verification</p>
+              ) : (
+                <p className={cn(col.id === 'providers' && 'ml-1')}>
+                  {formattedValue === null ? '-' : formattedValue}
+                </p>
+              )}
+            </div>
+          )
+        },
+      }
+      return res
+    })
+    .sort((a: any, b: any) => {
+      return columnOrder.indexOf(a.key) - columnOrder.indexOf(b.key)
+    })
+
+  const profileImageColumn = gridColumns.find((col) => col.key === 'img')
+
+  return visibleColumns.length === 0
+    ? gridColumns
+    : ([profileImageColumn].concat(
+        gridColumns.filter((col) => visibleColumns.includes(col.key))
+      ) as Column<any>[])
 }

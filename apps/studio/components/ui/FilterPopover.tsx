@@ -11,6 +11,7 @@ import {
 } from 'ui'
 
 interface FilterPopoverProps {
+  title?: string
   options: any[]
   activeOptions: any[]
   valueKey: string
@@ -18,13 +19,16 @@ interface FilterPopoverProps {
   iconKey?: string
   name: string
   variant?: 'rectangular' | 'rounded'
-  onSaveFilters: (options: string[]) => void
+  buttonType?: 'default' | 'dashed'
   disabled?: boolean
   labelClass?: string
   maxHeightClass?: string
+  clearButtonText?: string
+  onSaveFilters: (options: string[]) => void
 }
 
 export const FilterPopover = ({
+  title,
   options = [],
   activeOptions = [],
   valueKey,
@@ -32,10 +36,12 @@ export const FilterPopover = ({
   iconKey = 'icon',
   name = 'default',
   variant = 'rectangular',
-  onSaveFilters,
+  buttonType,
   disabled,
   labelClass,
   maxHeightClass = 'h-[205px]',
+  clearButtonText = 'Clear',
+  onSaveFilters,
 }: FilterPopoverProps) => {
   const [open, setOpen] = useState(false)
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
@@ -49,9 +55,8 @@ export const FilterPopover = ({
   })
 
   useEffect(() => {
-    if (!open) setSelectedOptions(activeOptions)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
+    if (!open && activeOptions.length > 0) setSelectedOptions(activeOptions)
+  }, [open, activeOptions])
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
@@ -59,7 +64,7 @@ export const FilterPopover = ({
         <Button
           asChild
           disabled={disabled}
-          type={activeOptions.length > 0 ? 'default' : 'dashed'}
+          type={buttonType ?? (activeOptions.length > 0 ? 'default' : 'dashed')}
           onClick={() => setOpen(false)}
           className={variant === 'rounded' ? 'rounded-full' : ''}
         >
@@ -78,7 +83,9 @@ export const FilterPopover = ({
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-44" align="start">
         <div className="border-b border-overlay bg-surface-200 rounded-t pb-1 px-3">
-          <span className="text-xs text-foreground-light">Select {name.toLowerCase()}</span>
+          <span className="text-xs text-foreground-light">
+            {title ?? `Select ${name.toLowerCase()}`}
+          </span>
         </div>
         <ScrollArea className={options.length > 7 ? maxHeightClass : ''}>
           <div className="p-3 flex flex-col gap-y-2">
@@ -127,7 +134,7 @@ export const FilterPopover = ({
               setOpen(false)
             }}
           >
-            Clear
+            {clearButtonText}
           </Button>
           <Button
             type="primary"

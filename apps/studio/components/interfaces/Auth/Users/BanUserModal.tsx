@@ -141,7 +141,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
           </Modal.Content>
           <Separator />
           <Modal.Content className="flex justify-end gap-2">
-            <Button type="default" disabled={isBanningUser}>
+            <Button type="default" disabled={isBanningUser} onClick={() => onClose()}>
               Cancel
             </Button>
             <Button type="warning" htmlType="submit" loading={isBanningUser}>

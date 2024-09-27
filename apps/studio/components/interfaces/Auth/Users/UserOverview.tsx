@@ -398,7 +398,11 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             className="!bg border-destructive-400"
           />
           <RowAction
-            title={isBanned ? 'User is banned until ...' : 'Ban user'}
+            title={
+              isBanned
+                ? `User is banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`
+                : 'Ban user'
+            }
             description={
               isBanned
                 ? 'User has no access to the project until after this date'
@@ -410,7 +414,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
               disabled: !canRemoveMFAFactors,
               onClick: () => {
                 if (isBanned) {
-                  // Set up unban modal
+                  setIsUnbanModalOpen(true)
                 } else {
                   setIsBanModalOpen(true)
                 }
@@ -463,6 +467,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       <BanUserModal visible={isBanModalOpen} user={user} onClose={() => setIsBanModalOpen(false)} />
 
       <ConfirmationModal
+        variant="warning"
         visible={isUnbanModalOpen}
         title="Confirm to unban user"
         confirmLabel="Unban user"

@@ -1,6 +1,5 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import dayjs from 'dayjs'
-import { ArrowDown, ArrowUp, RefreshCw, Search, User as UserIcon, Users, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, RefreshCw, Search, Users, X } from 'lucide-react'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
@@ -40,16 +39,23 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import AddUserDropdown from './AddUserDropdown'
 import { UserPanel } from './UserPanel'
 import { PROVIDER_FILTER_OPTIONS } from './Users.constants'
-import { formatUsersData, isAtBottom } from './Users.utils'
-import { HeaderCell } from './UsersGridComponents'
+import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
 
 type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
-const USERS_TABLE_COLUMNS = [
+export type UsersTableColumn = {
+  id: string
+  name: string
+  minWidth?: number
+  width?: number
+  resizable?: boolean
+}
+export type ColumnConfiguration = { id: string; width?: number }
+export const USERS_TABLE_COLUMNS: UsersTableColumn[] = [
   { id: 'img', name: '', minWidth: 65, width: 65, resizable: false },
   { id: 'id', name: 'UID', width: 280 },
   { id: 'name', name: 'Display name', minWidth: 0, width: 150 },
   { id: 'email', name: 'Email', width: 300 },
-  { id: 'phone', name: 'Phone', minWidth: undefined },
+  { id: 'phone', name: 'Phone' },
   { id: 'providers', name: 'Providers', minWidth: 150 },
   { id: 'provider_type', name: 'Provider type', minWidth: 150 },
   { id: 'created_at', name: 'Created at', width: 260 },
@@ -68,6 +74,7 @@ export const UsersV2 = () => {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [filterKeywords, setFilterKeywords] = useState('')
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedProviders, setSelectedProviders] = useState<string[]>([])
   const [selectedRow, setSelectedRow] = useState<number>()
   const [sortByValue, setSortByValue] = useState<string>('created_at:desc')
@@ -77,7 +84,7 @@ export const UsersV2 = () => {
     { isSuccess: isSuccessStorage, isError: isErrorStorage, error: errorStorage },
   ] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AUTH_USERS_COLUMNS_CONFIGURATION(projectRef ?? ''),
-    undefined as { id: string; width: number; visible: boolean }[] | undefined
+    undefined as ColumnConfiguration[] | undefined
   )
 
   const [sortColumn, sortOrder] = sortByValue.split(':')
@@ -126,120 +133,47 @@ export const UsersV2 = () => {
     return updatedColumns
   }
 
-  const saveColumnConfiguration = AwesomeDebouncePromise((event: 'resize' | 'reorder', value) => {
-    if (event === 'resize') {
-      const columnConfig = columns.map((col, idx) => ({
-        id: col.key,
-        width: idx === value.idx ? value.width : col.width,
-        visible: true,
-      }))
-      setColumnConfiguration(columnConfig)
-    } else if (event === 'reorder') {
-      const columnConfig = swapColumns(columns, value.sourceIdx, value.targetIdx).map((col) => ({
-        id: col.key,
-        width: col.width,
-        visible: true,
-      }))
-      setColumnConfiguration(columnConfig)
-    }
-  }, 500)
+  // [Joshen] Left off here - it's tricky trying to do both column toggling and re-ordering
+  const saveColumnConfiguration = AwesomeDebouncePromise(
+    (event: 'resize' | 'reorder' | 'toggle', value) => {
+      if (event === 'toggle') {
+        const columnConfig = value.columns.map((col: any) => ({
+          id: col.key,
+          width: col.width,
+        }))
+        setColumnConfiguration(columnConfig)
+      } else if (event === 'resize') {
+        const columnConfig = columns.map((col, idx) => ({
+          id: col.key,
+          width: idx === value.idx ? value.width : col.width,
+        }))
+        setColumnConfiguration(columnConfig)
+      } else if (event === 'reorder') {
+        const columnConfig = value.columns.map((col: any) => ({
+          id: col.key,
+          width: col.width,
+        }))
+        setColumnConfiguration(columnConfig)
+      }
+    },
+    500
+  )
 
   useEffect(() => {
     if (
       isSuccessStorage ||
       (isErrorStorage && (errorStorage as Error).message.includes('data is undefined'))
     ) {
-      const columnOrder =
-        columnConfiguration?.map((c) => c.id) ?? USERS_TABLE_COLUMNS.map((c) => c.id)
-      const columns = USERS_TABLE_COLUMNS.map((col) => {
-        const savedConfig = columnConfiguration?.find((c) => c.id === col.id)
-
-        const res: Column<any> = {
-          key: col.id,
-          name: col.name,
-          resizable: col.resizable ?? true,
-          sortable: false,
-          draggable: true,
-          width: savedConfig?.width ?? col.width,
-          minWidth: col.minWidth ?? 120,
-          headerCellClass: 'z-50 outline-none !shadow-none',
-          renderHeaderCell: () => {
-            if (col.id === 'img') return undefined
-            return <HeaderCell col={col} setSortByValue={setSortByValue} />
-          },
-          renderCell: ({ row }) => {
-            const value = row?.[col.id]
-            const user = users?.find((u) => u.id === row.id)
-            const formattedValue =
-              value !== null && ['created_at', 'last_sign_in_at'].includes(col.id)
-                ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
-                : Array.isArray(value)
-                  ? value.join(', ')
-                  : value
-            const isConfirmed = user?.email_confirmed_at || user?.phone_confirmed_at
-
-            if (col.id === 'img') {
-              return (
-                <div className="flex items-center justify-center">
-                  <div
-                    className={cn(
-                      'flex items-center justify-center w-6 h-6 rounded-full bg-center bg-cover bg-no-repeat',
-                      !row.img ? 'bg-selection' : 'border'
-                    )}
-                    style={{ backgroundImage: row.img ? `url('${row.img}')` : 'none' }}
-                  >
-                    {!row.img && <UserIcon size={12} />}
-                  </div>
-                </div>
-              )
-            }
-
-            return (
-              <div
-                className={cn(
-                  'w-full flex items-center text-xs',
-                  col.id.includes('provider') ? 'capitalize' : ''
-                )}
-              >
-                {/* [Joshen] Not convinced this is the ideal way to display the icons, but for now */}
-                {col.id === 'providers' &&
-                  row.provider_icons.map((icon: string, idx: number) => {
-                    const provider = row.providers[idx]
-                    return (
-                      <div
-                        className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
-                        style={{
-                          marginLeft: idx === 0 ? 0 : `-8px`,
-                          zIndex: row.provider_icons.length - idx,
-                        }}
-                      >
-                        <img
-                          key={`${user?.id}-${provider}`}
-                          width={16}
-                          src={icon}
-                          alt={`${provider} auth icon`}
-                          className={cn(provider === 'github' && 'dark:invert')}
-                        />
-                      </div>
-                    )
-                  })}
-                {col.id === 'last_sign_in_at' && !isConfirmed ? (
-                  <p className="text-foreground-lighter">Waiting for verification</p>
-                ) : (
-                  <p className={cn(col.id === 'providers' && 'ml-1')}>
-                    {formattedValue === null ? '-' : formattedValue}
-                  </p>
-                )}
-              </div>
-            )
-          },
-        }
-        return res
-      }).sort((a: any, b: any) => {
-        return columnOrder.indexOf(a.key) - columnOrder.indexOf(b.key)
+      const columns = formatUserColumns({
+        config: columnConfiguration ?? [],
+        users: users ?? [],
+        visibleColumns: selectedColumns,
+        setSortByValue,
       })
-
       setColumns(columns)
+      if (columns.length < USERS_TABLE_COLUMNS.length) {
+        setSelectedColumns(columns.filter((col) => col.key !== 'img').map((col) => col.key))
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessStorage, isErrorStorage, errorStorage])
@@ -249,8 +183,6 @@ export const UsersV2 = () => {
       <FormHeader className="py-4 px-6 !mb-0" title="Users" />
       <div className="bg-surface-200 py-3 px-6 flex items-center justify-between border-t">
         <div className="flex items-center gap-x-2">
-          <p className="text-xs text-foreground-light">Filter by</p>
-
           <Input
             size="tiny"
             className="w-52 pl-7 bg-transparent"
@@ -313,6 +245,49 @@ export const UsersV2 = () => {
           />
 
           <div className="border-r border-strong h-6" />
+
+          <FilterPopover
+            name={selectedColumns.length === 0 ? 'All columns' : 'Columns'}
+            title="Select columns to show"
+            buttonType={selectedColumns.length === 0 ? 'dashed' : 'default'}
+            options={USERS_TABLE_COLUMNS.slice(1)} // Ignore user image column
+            labelKey="name"
+            valueKey="id"
+            labelClass="text-xs"
+            maxHeightClass="h-[190px]"
+            clearButtonText="Reset"
+            activeOptions={selectedColumns}
+            onSaveFilters={(value) => {
+              // When adding back hidden columns:
+              // (1) width set to default value if any
+              // (2) they will just get appended to the end
+              // (3) If "clearing", reset order of the columns to original
+
+              let updatedConfig = (columnConfiguration ?? []).slice()
+              if (value.length === 0) {
+                updatedConfig = USERS_TABLE_COLUMNS.map((c) => ({ id: c.id, width: c.width }))
+              } else {
+                value.forEach((col) => {
+                  const hasExisting = updatedConfig.find((c) => c.id === col)
+                  if (!hasExisting)
+                    updatedConfig.push({
+                      id: col,
+                      width: USERS_TABLE_COLUMNS.find((c) => c.id === col)?.width,
+                    })
+                })
+              }
+
+              const updatedColumns = formatUserColumns({
+                config: updatedConfig,
+                users: users ?? [],
+                visibleColumns: value,
+                setSortByValue,
+              })
+              setSelectedColumns(value)
+              setColumns(updatedColumns)
+              saveColumnConfiguration('toggle', { columns: updatedColumns })
+            }}
+          />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -396,7 +371,7 @@ export const UsersV2 = () => {
                 const updatedColumns = swapColumns(columns, sourceIdx, targetIdx)
                 setColumns(updatedColumns)
 
-                saveColumnConfiguration('reorder', { sourceIdx, targetIdx })
+                saveColumnConfiguration('reorder', { columns: updatedColumns })
               }}
               renderers={{
                 renderRow(idx, props) {
