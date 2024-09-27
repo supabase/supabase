@@ -22,6 +22,10 @@ export const getMenu = (latestBlogPosts: BlogPost[]) => ({
       subMenu: DevelopersData,
     },
     {
+      title: 'Enterprise',
+      url: '/enterprise',
+    },
+    {
       title: 'Pricing',
       url: '/pricing',
     },
@@ -32,10 +36,6 @@ export const getMenu = (latestBlogPosts: BlogPost[]) => ({
     {
       title: 'Blog',
       url: '/blog',
-    },
-    {
-      title: 'Enterprise',
-      url: '/enterprise',
     },
   ],
 })

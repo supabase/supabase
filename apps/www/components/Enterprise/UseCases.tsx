@@ -9,6 +9,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
 
 import type { LucideIcon } from 'lucide-react'
+import Image from 'next/image'
 
 interface Props {
   id: string
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export type Story = {
+  icon: string
   url: string
   target?: '_blank' | string
   heading: string
@@ -32,66 +34,64 @@ type Highlight = {
   url: string
 }
 
-const UseCases: FC<Props> = (props) => {
-  return (
-    <section id={props.id}>
-      <SectionContainer className="flex flex-col gap-4 md:gap-8 !pb-0">
-        <div className="flex flex-col gap-2">
-          <span className="label">{props.label}</span>
-          <h2 className="h2">{props.heading}</h2>
-        </div>
-      </SectionContainer>
-      <div className="overflow-hidden">
-        <SectionContainer className="!py-4">
-          <ul className="hidden xl:flex flex-col gap-4 md:flex-row items-stretch w-full h-auto min-h-[300px]">
-            {props.stories.map((story) => (
-              <li key={story.heading} className="w-full">
-                <StoryCard story={story} />
-              </li>
-            ))}
-          </ul>
-          <div className="xl:hidden">
-            <Swiper
-              style={{ zIndex: 0, marginRight: '1px' }}
-              initialSlide={0}
-              spaceBetween={12}
-              slidesPerView={1.2}
-              speed={300}
-              watchOverflow
-              threshold={2}
-              updateOnWindowResize
-              className="h-[300px] w-full !overflow-visible"
-              breakpoints={{
-                320: {
-                  slidesPerView: 1.2,
-                },
-                540: {
-                  slidesPerView: 1.5,
-                },
-                900: {
-                  slidesPerView: 2.5,
-                },
-              }}
-            >
-              {props.stories.map((story: Story, i: number) => (
-                <SwiperSlide key={`${story.heading}-mobile`}>
-                  <StoryCard story={story} />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-        </SectionContainer>
+const UseCases: FC<Props> = (props) => (
+  <section id={props.id}>
+    <SectionContainer className="flex flex-col gap-4 md:gap-8 !pb-0">
+      <div className="flex flex-col gap-2">
+        <span className="label">{props.label}</span>
+        <h2 className="h2">{props.heading}</h2>
       </div>
-      <SectionContainer className="!pt-0">
-        <ul className="grid grid-cols-2 gap-4 sm:gap-10 gap-y-10 lg:grid-cols-4 md:gap-12 lg:gap-x-8 mt-8">
-          {props.highlights.map((highlight) => (
-            <HighlightCard highlight={highlight} key={highlight.heading} />
+    </SectionContainer>
+    <div className="overflow-hidden">
+      <SectionContainer className="!py-4">
+        <ul className="hidden xl:flex flex-col gap-4 md:flex-row items-stretch w-full h-auto min-h-[300px]">
+          {props.stories.map((story) => (
+            <li key={story.heading} className="w-full">
+              <StoryCard story={story} />
+            </li>
           ))}
         </ul>
+        <div className="xl:hidden">
+          <Swiper
+            style={{ zIndex: 0, marginRight: '1px' }}
+            initialSlide={0}
+            spaceBetween={12}
+            slidesPerView={1.2}
+            speed={300}
+            watchOverflow
+            threshold={2}
+            updateOnWindowResize
+            className="h-[300px] w-full !overflow-visible"
+            breakpoints={{
+              320: {
+                slidesPerView: 1.2,
+              },
+              540: {
+                slidesPerView: 1.5,
+              },
+              900: {
+                slidesPerView: 2.5,
+              },
+            }}
+          >
+            {props.stories.map((story: Story, i: number) => (
+              <SwiperSlide key={`${story.heading}-mobile`}>
+                <StoryCard story={story} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
       </SectionContainer>
-    </section>
-  )
-}
+    </div>
+    <SectionContainer className="!pt-0">
+      <ul className="grid grid-cols-2 gap-4 sm:gap-10 gap-y-10 lg:grid-cols-4 md:gap-12 lg:gap-x-8 mt-8">
+        {props.highlights.map((highlight) => (
+          <HighlightCard highlight={highlight} key={highlight.heading} />
+        ))}
+      </ul>
+    </SectionContainer>
+  </section>
+)
 
 interface StoryCardProps {
   story: Story
@@ -102,10 +102,21 @@ const StoryCard: FC<StoryCardProps> = ({ story }) => (
     <Panel
       outerClassName="w-full h-full"
       hasActiveOnHover
-      innerClassName="flex flex-col justify-between text-foreground-lighter p-4 xl:p-6"
+      innerClassName="flex flex-col justify-between text-foreground-lighter bg-surface-75 p-2"
     >
-      <h3 className="text-foreground">{story.heading}</h3>
-      <q className="text-sm">{story.subheading}</q>
+      <div className="flex flex-col justify-between gap-6 p-3">
+        <Image
+          src={story.icon}
+          alt={story.heading}
+          width={150}
+          height={30}
+          className="max-h-[23px] max-w-[150px] w-auto object-contain object-left-bottom filter invert dark:invert-0 opacity-60"
+        />
+        <h3 className="text-foreground">{story.heading}</h3>
+      </div>
+      <div className="p-3 bg-surface-200 rounded-lg">
+        <q className="text-sm block">{story.subheading}</q>
+      </div>
     </Panel>
   </Link>
 )
