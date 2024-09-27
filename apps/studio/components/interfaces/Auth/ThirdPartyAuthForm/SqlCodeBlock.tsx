@@ -3,7 +3,6 @@ import { CodeBlock, cn } from 'ui'
 
 interface SQLCodeBlockProps {
   children: string[]
-  projectRef: string
 }
 
 export const SQLCodeBlock = ({ children }: SQLCodeBlockProps) => {
