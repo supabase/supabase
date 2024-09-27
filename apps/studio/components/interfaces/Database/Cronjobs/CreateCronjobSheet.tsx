@@ -8,6 +8,7 @@ import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseCronjobCreateMutation } from 'data/database-cronjobs/database-cronjobs-create-mutation'
 import { Cronjob } from 'data/database-cronjobs/database-cronjobs-query'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import {
   Button,
   Form_Shadcn_,
@@ -21,6 +22,7 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
+  WarningIcon,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -182,6 +184,14 @@ export const CreateCronjobSheet = ({
     )
   }
 
+  const { data } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const pgNetExtensionExists =
+    (data ?? []).find((ext) => ext.name === 'pg_net')?.installed_version != undefined
+
   const cronType = form.watch('values.type')
 
   return (
@@ -235,6 +245,11 @@ export const CreateCronjobSheet = ({
                               key={definition.value}
                               id={definition.value}
                               value={definition.value}
+                              disabled={
+                                !pgNetExtensionExists &&
+                                (definition.value === 'http_request' ||
+                                  definition.value === 'edge_function')
+                              }
                               label=""
                               showIndicator={false}
                             >
@@ -247,6 +262,17 @@ export const CreateCronjobSheet = ({
                                   <p className="text-foreground-light">{definition.description}</p>
                                 </div>
                               </div>
+                              {!pgNetExtensionExists &&
+                              (definition.value === 'http_request' ||
+                                definition.value === 'edge_function') ? (
+                                <div className="w-full flex gap-3 pl-10 py-2 items-center">
+                                  <WarningIcon />
+                                  <span>
+                                    The pg_net extension needs to be installed to make HTTP
+                                    requests.
+                                  </span>
+                                </div>
+                              ) : null}
                             </RadioGroupStackedItem>
                           ))}
                         </RadioGroupStacked>

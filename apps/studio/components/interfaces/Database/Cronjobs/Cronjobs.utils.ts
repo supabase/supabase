@@ -29,13 +29,9 @@ export const buildHttpRequestCommand = (
 }
 
 export const DEFAULT_CRONJOB_COMMAND = {
-  type: 'http_request' as const,
-  method: 'GET' as const,
-  endpoint: '',
-  httpHeaders: [],
-  httpParameters: [],
-  timeoutMs: 1000,
-}
+  type: 'sql_snippet',
+  snippet: '',
+} as const
 
 export const parseCronjobCommand = (originalCommand: string): CronjobType => {
   const command = originalCommand
