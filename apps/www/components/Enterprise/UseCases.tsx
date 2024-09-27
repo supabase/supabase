@@ -104,7 +104,7 @@ const StoryCard: FC<StoryCardProps> = ({ story }) => (
       hasActiveOnHover
       innerClassName="flex flex-col justify-between text-foreground-lighter bg-surface-75 p-2"
     >
-      <div className="flex flex-col justify-between gap-6 p-3">
+      <div className="flex flex-col justify-between gap-6 p-3 md:max-w-[230px]">
         <Image
           src={story.icon}
           alt={story.heading}
