@@ -27,7 +27,7 @@ const schedules = [
   { name: 'Every 5 minutes', expression: '*/5 * * * *' },
   { name: 'Every hour, at 30 minutes', expression: '30 * * * *' },
   { name: 'Every first of the month, at 00:00', expression: '0 0 1 * *' },
-  { name: 'Let me cook', expression: 'custom' },
+  { name: 'Custom', expression: 'custom' },
 ] as const
 
 export const CronjobScheduleSection = ({ form }: CronjobScheduleSectionProps) => {
