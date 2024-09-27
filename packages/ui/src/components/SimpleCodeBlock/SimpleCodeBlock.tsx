@@ -1,3 +1,4 @@
+'use client'
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  *
@@ -7,10 +8,9 @@
 
 import { Prism, themes, Highlight, Language } from 'prism-react-renderer'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import { Button } from 'ui'
+import { Button, copyToClipboard } from 'ui'
 import { useTheme } from 'next-themes'
-import { copyToClipboard } from 'lib/helpers'
-import { dart } from 'lib/constants/prism'
+import { dart } from './prism'
 
 dart(Prism)
 
@@ -25,7 +25,7 @@ interface SimpleCodeBlockProps {
   showCopy?: boolean
 }
 
-const SimpleCodeBlock = ({
+export const SimpleCodeBlock = ({
   children,
   parentClassName,
   className: languageClassName,
@@ -91,5 +91,3 @@ const SimpleCodeBlock = ({
     </Highlight>
   )
 }
-
-export default SimpleCodeBlock
