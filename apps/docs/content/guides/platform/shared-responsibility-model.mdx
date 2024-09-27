@@ -52,6 +52,19 @@ You can get away with a poorly-designed database for a while by simply adding co
 
 If you don’t want to implement logic inside your database, that is 100% fine. You can use _any_ tools which work with Postgres.
 
+## You are responsible for third-party services
+
+Supabase offers a lot of opportunities for flexibly integrating with third-party services, such as:
+
+- OAuth and SAML login providers
+- SMTP and SMS sending APIs
+- Calls to external APIs within Postgres functions or triggers
+- Calls to external APIs within Edge Functions
+
+You are free to use and integrate with any service, but you're also responsible for ensuring that the performance, availability, and security of the services you use match up with your application's requirements. We do not monitor for outages or performance issues within integrations with third-party services. Depending on the implementation, an issue with such an integration could also result in performance degradataion or an outage for your Supabase project.
+
+If your application architecture relies on such integrations, you should monitor the relevant logs and metrics to ensure optimal performance.
+
 ## You choose your level of comfort with Postgres
 
 Our goal at Supabase is to make _all_ of Postgres easy to use. That doesn’t mean you have to use all of it. If you’re a Postgres veteran, you’ll probably love the tools that we offer. If you’ve never used Postgres before, then start smaller and grow into it. If you just want to treat Postgres like a simple table-store, that’s perfectly fine.
