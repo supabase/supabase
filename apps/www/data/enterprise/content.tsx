@@ -55,7 +55,7 @@ export default {
   'use-cases': {
     id: 'use-cases',
     label: <>Build with Supabase</>,
-    heading: <>Stay on the forefront.</>,
+    heading: <>Stay on the forefront</>,
     stories: [
       {
         url: 'https://developer.mozilla.org/en-US/blog/introducing-ai-help/',
@@ -128,7 +128,7 @@ export default {
     heading: (
       <>
         Top performance,
-        <br /> at any scale.
+        <br /> at any scale
       </>
     ),
     subheading:
@@ -147,7 +147,7 @@ export default {
   security: {
     id: 'security',
     label: 'Security',
-    heading: <>Trusted for medical records, missions to the moon, and everything in between.</>,
+    heading: <>Trusted for medical records, missions to the moon, and everything in between</>,
     subheading:
       'Keep your data secure with SOC 2, HIPAA, and GDPR compliance. Your customers’ data is encrypted at rest and in transit, with built-in tools for monitoring and managing security threats.',
     cta: {
@@ -200,7 +200,12 @@ export default {
   support: {
     id: 'support',
     label: 'Support',
-    heading: <>Get expert help, whenever you need it.</>,
+    heading: (
+      <>
+        Get expert help,
+        <br /> whenever you need it
+      </>
+    ),
     features: [
       {
         icon: Globe2,
