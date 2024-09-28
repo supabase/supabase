@@ -18,7 +18,7 @@ export function LastSignInWrapper({
         <Tooltip_Shadcn_>
           <TooltipTrigger_Shadcn_ asChild className="absolute -right-8">
             <div className="p-2 flex">
-              <span className="w-2 h-2 bg-brand-600 rounded-full animate-pulse" />
+              <span className="w-2.5 h-2.5 bg-brand rounded-full animate-pulse" />
             </div>
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_>Last used</TooltipContent_Shadcn_>
