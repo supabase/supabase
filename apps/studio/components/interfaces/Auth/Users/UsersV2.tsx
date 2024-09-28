@@ -253,7 +253,7 @@ export const UsersV2 = () => {
           <AddUserDropdown projectKpsVersion={project?.kpsVersion} />
         </div>
       </div>
-      <LoadingLine loading={isLoading || isRefetching} />
+      <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
       <ResizablePanelGroup
         direction="horizontal"
         className="relative flex flex-grow bg-alternative min-h-0"
