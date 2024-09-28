@@ -1,6 +1,6 @@
 import { useParams, useTelemetryProps } from 'common'
 import { isEqual } from 'lodash'
-import { ExternalLink, Loader2, MegaphoneIcon } from 'lucide-react'
+import { ExternalLink, Loader2, Megaphone, MegaphoneIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
@@ -152,7 +152,7 @@ const MessagesTable = ({
                 <Button
                   type="default"
                   onClick={showSendMessage}
-                  icon={<MegaphoneIcon size={14} strokeWidth={1.5} />}
+                  icon={<Megaphone strokeWidth={1.5} />}
                 >
                   <span>Broadcast a message</span>
                 </Button>

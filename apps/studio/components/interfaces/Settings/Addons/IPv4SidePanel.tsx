@@ -13,17 +13,8 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-  Radio,
-  SidePanel,
-  cn,
-} from 'ui'
+import { Alert, AlertDescription_Shadcn_, Alert_Shadcn_, Button, Radio, SidePanel, cn } from 'ui'
+import { ExternalLink, AlertTriangle } from 'lucide-react'
 
 const IPv4SidePanel = () => {
   const { ref: projectRef } = useParams()
@@ -105,7 +96,7 @@ const IPv4SidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Dedicated IPv4 address</h4>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://supabase.com/docs/guides/platform/ipv4-address"
               target="_blank"
@@ -253,7 +244,7 @@ const IPv4SidePanel = () => {
                       // Scheduled billing plan change
                       subscription.scheduled_plan_change?.target_plan !== undefined && (
                         <Alert_Shadcn_ variant={'warning'} className="mb-2">
-                          <IconAlertTriangle className="h-4 w-4" />
+                          <AlertTriangle className="h-4 w-4" />
                           <AlertDescription_Shadcn_>
                             You have a scheduled subscription change that will be canceled if you
                             change your PITR add on.

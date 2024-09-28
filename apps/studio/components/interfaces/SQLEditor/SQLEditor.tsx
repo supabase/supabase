@@ -1,14 +1,16 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Loader2 } from 'lucide-react'
+import { AlertTriangle, ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { format } from 'sql-formatter'
 
+import { Separator } from '@ui/components/SidePanel/SidePanel'
 import { useParams, useTelemetryProps } from 'common'
+import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
@@ -37,18 +39,31 @@ import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   ImperativePanelHandle,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { AiAssistantPanel } from './AiAssistantPanel'
 import { DiffActionBar } from './DiffActionBar'
-import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
+import {
+  ROWS_PER_PAGE_OPTIONS,
+  sqlAiDisclaimerComment,
+  untitledSnippetTitle,
+} from './SQLEditor.constants'
 import {
   ContentDiff,
   DiffType,
@@ -62,6 +77,7 @@ import {
   compareAsModification,
   compareAsNewSnippet,
   createSqlSnippetSkeleton,
+  isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
@@ -118,7 +134,10 @@ const SQLEditor = () => {
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const [isAiOpen, setIsAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+
+  const [showPotentialIssuesModal, setShowPotentialIssuesModal] = useState(false)
+  const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
+  const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
 
   const isOptedInToAI = useOrgOptedIntoAi()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
@@ -144,6 +163,7 @@ const SQLEditor = () => {
   const isDiffOpen = !!sourceSqlDiff
 
   const limit = enableFolders ? snapV2.limit : snap.limit
+  const results = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
   const snippetIsLoading = enableFolders
     ? !(id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined)
     : !(id && ref && snap.loaded[ref])
@@ -273,10 +293,23 @@ const SQLEditor = () => {
           ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
           : selectedValue || editorRef.current?.getValue()
 
-        const containsDestructiveOperations = checkDestructiveQuery(sql)
+        let queryHasIssues = false
 
-        if (!force && containsDestructiveOperations) {
-          setIsConfirmModalOpen(true)
+        const destructiveOperations = checkDestructiveQuery(sql)
+        if (!force && destructiveOperations) {
+          setShowPotentialIssuesModal(true)
+          setQueryHasDestructiveOperations(true)
+          queryHasIssues = true
+        }
+
+        const updateWithoutWhereClause = isUpdateWithoutWhere(sql)
+        if (!force && updateWithoutWhereClause) {
+          setShowPotentialIssuesModal(true)
+          setQueryHasUpdateWithoutWhere(true)
+          queryHasIssues = true
+        }
+
+        if (queryHasIssues) {
           return
         }
 
@@ -601,22 +634,59 @@ const SQLEditor = () => {
 
   return (
     <>
-      <ConfirmModal
-        visible={isConfirmModalOpen}
-        title="Destructive operation"
-        danger
-        description="We've detected a potentially destructive operation in the query. Please confirm that you would like to execute this query."
-        buttonLabel="Run destructive query"
-        onSelectCancel={() => {
-          setIsConfirmModalOpen(false)
-          // [Joshen] Somehow calling this immediately doesn't work, hence the timeout
+      <ConfirmationModal
+        visible={showPotentialIssuesModal}
+        size="large"
+        title={`Potential issue${queryHasDestructiveOperations && queryHasUpdateWithoutWhere ? 's' : ''} detected with your query`}
+        confirmLabel="Run this query"
+        variant="warning"
+        alert={{
+          base: {
+            variant: 'warning',
+          },
+          title:
+            queryHasDestructiveOperations && queryHasUpdateWithoutWhere
+              ? 'The following potential issues have been detected:'
+              : 'The following potential issue has been detected:',
+          description: 'Ensure that these are intentional before executing this query',
+        }}
+        onCancel={() => {
+          setShowPotentialIssuesModal(false)
+          setQueryHasDestructiveOperations(false)
+          setQueryHasUpdateWithoutWhere(false)
           setTimeout(() => editorRef.current?.focus(), 100)
         }}
-        onSelectConfirm={() => {
-          setIsConfirmModalOpen(false)
+        onConfirm={() => {
+          setShowPotentialIssuesModal(false)
           executeQuery(true)
         }}
-      />
+      >
+        <div className="text-sm">
+          <ul className="border rounded-md grid bg-surface-200">
+            {queryHasDestructiveOperations && (
+              <li className="grid pt-3 pb-2 px-4">
+                <span className="font-bold">Query has destructive operation</span>
+                <span className="text-foreground-lighter">
+                  Make sure you are not accidentally removing something important.
+                </span>
+              </li>
+            )}
+            {queryHasDestructiveOperations && queryHasUpdateWithoutWhere && <Separator />}
+            {queryHasUpdateWithoutWhere && (
+              <li className="grid pt-2 pb-3 px-4 gap-1">
+                <span className="font-bold">Query uses update without a where clause</span>
+                <span className="text-foreground-lighter">
+                  Without a <code className="text-xs">where</code> clause, this could update all
+                  rows in the table.
+                </span>
+              </li>
+            )}
+          </ul>
+        </div>
+        <p className="mt-4 text-sm text-foreground-light">
+          Please confirm that you would like to execute this query.
+        </p>
+      </ConfirmationModal>
 
       <ResizablePanelGroup
         className="flex h-full"
@@ -625,7 +695,7 @@ const SQLEditor = () => {
       >
         <ResizablePanel minSize={30}>
           <ResizablePanelGroup
-            className="h-full relative"
+            className="relative"
             direction="vertical"
             autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
           >
@@ -663,7 +733,7 @@ const SQLEditor = () => {
                 )}
               </AISchemaSuggestionPopover>
             )}
-            <ResizablePanel collapsible collapsedSize={10} minSize={20}>
+            <ResizablePanel maxSize={70}>
               <div className="flex-grow overflow-y-auto border-b h-full">
                 {!isAiOpen && (
                   <motion.button
@@ -729,8 +799,10 @@ const SQLEditor = () => {
                 )}
               </div>
             </ResizablePanel>
+
             <ResizableHandle withHandle />
-            <ResizablePanel collapsible collapsedSize={10} minSize={20}>
+
+            <ResizablePanel maxSize={70}>
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
                   <Loader2 className="animate-spin text-brand" />
@@ -748,14 +820,80 @@ const SQLEditor = () => {
                 />
               )}
             </ResizablePanel>
+
+            <ResizablePanel maxSize={10} minSize={10} className="max-h-9">
+              {results?.rows !== undefined && !isExecuting && (
+                <GridFooter className="flex items-center justify-between gap-2">
+                  <Tooltip_Shadcn_>
+                    <TooltipTrigger_Shadcn_>
+                      <p className="text-xs">
+                        <span className="text-foreground">
+                          {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
+                        </span>
+                        <span className="text-foreground-lighter ml-1">
+                          {results.autoLimit !== undefined &&
+                            ` (Limited to only ${results.autoLimit} rows)`}
+                        </span>
+                      </p>
+                    </TooltipTrigger_Shadcn_>
+                    <TooltipContent_Shadcn_ className="max-w-xs">
+                      <p className="flex flex-col gap-y-1">
+                        <span>
+                          Results are automatically limited to preserve browser performance, in
+                          particular if your query returns an exceptionally large number of rows.
+                        </span>
+
+                        <span className="text-foreground-light">
+                          You may change or remove this limit from the dropdown on the right
+                        </span>
+                      </p>
+                    </TooltipContent_Shadcn_>
+                  </Tooltip_Shadcn_>
+                  {results.autoLimit !== undefined && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button type="default" iconRight={<ChevronUp size={14} />}>
+                          Limit results to:{' '}
+                          {
+                            ROWS_PER_PAGE_OPTIONS.find(
+                              (opt) => opt.value === (enableFolders ? snapV2.limit : snap.limit)
+                            )?.label
+                          }
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-40" align="end">
+                        <DropdownMenuRadioGroup
+                          value={enableFolders ? snapV2.limit.toString() : snap.limit.toString()}
+                          onValueChange={(val) => {
+                            if (enableFolders) snapV2.setLimit(Number(val))
+                            else snap.setLimit(Number(val))
+                          }}
+                        >
+                          {ROWS_PER_PAGE_OPTIONS.map((option) => (
+                            <DropdownMenuRadioItem
+                              key={option.label}
+                              value={option.value.toString()}
+                            >
+                              {option.label}
+                            </DropdownMenuRadioItem>
+                          ))}
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </GridFooter>
+              )}
+            </ResizablePanel>
           </ResizablePanelGroup>
         </ResizablePanel>
+
         <ResizableHandle withHandle />
+
         <ResizablePanel
           ref={aiPanelRef}
           collapsible
           collapsedSize={0}
-          minSize={21}
+          minSize={31}
           maxSize={40}
           onCollapse={() => setIsAiOpen(false)}
           onExpand={() => setIsAiOpen(true)}

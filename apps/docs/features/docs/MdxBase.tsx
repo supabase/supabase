@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
+import { preprocessMdxWithDefaults } from '~/features/directives/utils'
 import { components } from '~/features/docs/MdxBase.shared'
 
 const codeHikeOptions: CodeHikeConfig = {
@@ -29,7 +30,18 @@ const mdxOptions: SerializeOptions = {
   },
 }
 
-const MDXRemoteBase = ({ options = {}, ...props }: ComponentProps<typeof MDXRemote>) => {
+const MDXRemoteBase = async ({
+  source,
+  options = {},
+  customPreprocess,
+  ...props
+}: ComponentProps<typeof MDXRemote> & {
+  source: string
+  customPreprocess?: (mdx: string) => string | Promise<string>
+}) => {
+  const preprocess = customPreprocess ?? preprocessMdxWithDefaults
+  const preprocessedSource = await preprocess(source)
+
   const { mdxOptions: { remarkPlugins, rehypePlugins, ...otherMdxOptions } = {}, ...otherOptions } =
     options
   const {
@@ -51,7 +63,14 @@ const MDXRemoteBase = ({ options = {}, ...props }: ComponentProps<typeof MDXRemo
     },
   } as SerializeOptions
 
-  return <MDXRemote components={components} options={finalOptions} {...props} />
+  return (
+    <MDXRemote
+      source={preprocessedSource}
+      components={components}
+      options={finalOptions}
+      {...props}
+    />
+  )
 }
 
 export { MDXRemoteBase }

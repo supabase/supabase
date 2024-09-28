@@ -72,7 +72,7 @@ h6 { */
 }
 
 .h2:not(.prose *):not(.overwrite) {
-  @apply text-3xl;
+  @apply text-4xl;
 }
 
 .h3:not(.prose *):not(.overwrite) {

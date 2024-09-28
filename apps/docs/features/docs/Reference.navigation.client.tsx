@@ -1,6 +1,7 @@
 'use client'
 
 import * as Collapsible from '@radix-ui/react-collapsible'
+
 import { debounce } from 'lodash'
 import { ChevronUp } from 'lucide-react'
 import Link from 'next/link'
@@ -11,7 +12,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { cn } from 'ui'
 
 import { BASE_PATH } from '~/lib/constants'
-import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.navigation'
+import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { isElementInViewport } from '~/features/ui/helpers.dom'
 
 export const ReferenceContentInitiallyScrolledContext = createContext<boolean>(false)
@@ -91,7 +92,7 @@ export function ReferenceNavigationScrollHandler({
   )
 }
 
-function deriveHref(basePath: string, section: AbbrevCommonClientLibSection) {
+function deriveHref(basePath: string, section: AbbrevApiReferenceSection) {
   return 'slug' in section ? `${basePath}/${section.slug}` : ''
 }
 
@@ -105,6 +106,48 @@ function getLinkStyles(isActive: boolean, className?: string) {
   )
 }
 
+/**
+ * Creates a function that navigates to a reference subsection.
+ *
+ * Since reference "pages" are actually an agglomeration of many "pages", we
+ * don't want to actually complete a full page navigation.
+ *
+ * @param href - The path to the navigation target.
+ * @param sectionSlug - The slug of the section to navigate to.
+ * @returns A function that navigates to the reference subsection.
+ */
+function createReferenceSubsectionNavigator(href: string, sectionSlug?: string) {
+  return function navigateToReferenceSubsection(evt: MouseEvent) {
+    if (sectionSlug) {
+      evt.preventDefault()
+      history.pushState({}, '', `${BASE_PATH}${href}`)
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const domElement = document.getElementById(sectionSlug)
+      domElement?.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+      })
+      domElement?.querySelector('h2')?.focus()
+    }
+  }
+}
+
+export function RefInternalLink({
+  href,
+  sectionSlug,
+  children,
+}: {
+  href: string
+  sectionSlug?: string
+  children: React.ReactNode
+}) {
+  return (
+    <Link href={href} onClick={createReferenceSubsectionNavigator(href, sectionSlug)}>
+      {children}
+    </Link>
+  )
+}
+
 export function RefLink({
   basePath,
   section,
@@ -112,7 +155,7 @@ export function RefLink({
   className,
 }: {
   basePath: string
-  section: AbbrevCommonClientLibSection
+  section: AbbrevApiReferenceSection
   skipChildren?: boolean
   className?: string
 }) {
@@ -134,26 +177,13 @@ export function RefLink({
       ) : (
         <Link
           ref={ref}
+          // We don't use these links because we never do real navigation, so
+          // prefetching just wastes bandwidth
+          prefetch={false}
           href={href}
           aria-current={isActive ? 'page' : false}
           className={getLinkStyles(isActive, className)}
-          onClick={(evt: MouseEvent) => {
-            /*
-             * We don't actually want to navigate or rerender anything since
-             * links are all to sections on the same page.
-             */
-            evt.preventDefault()
-            history.pushState({}, '', `${BASE_PATH}${href}`)
-
-            if ('slug' in section) {
-              const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-              const domElement = document.getElementById(section.slug)
-              domElement?.scrollIntoView({
-                behavior: reduceMotion ? 'auto' : 'smooth',
-              })
-              domElement?.querySelector('h2')?.focus()
-            }
-          }}
+          onClick={createReferenceSubsectionNavigator(href, section.slug)}
         >
           {section.title}
         </Link>
@@ -162,7 +192,7 @@ export function RefLink({
   )
 }
 
-function useCompoundRefLinkActive(basePath: string, section: AbbrevCommonClientLibSection) {
+function useCompoundRefLinkActive(basePath: string, section: AbbrevApiReferenceSection) {
   const [open, _setOpen] = useState(false)
 
   const pathname = usePathname()
@@ -195,7 +225,7 @@ function CompoundRefLink({
   section,
 }: {
   basePath: string
-  section: AbbrevCommonClientLibSection
+  section: AbbrevApiReferenceSection
 }) {
   const { open, setOpen, isActive } = useCompoundRefLinkActive(basePath, section)
 

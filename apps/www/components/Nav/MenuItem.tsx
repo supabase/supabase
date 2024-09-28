@@ -1,6 +1,7 @@
-import React from 'react'
+import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { IconChevronRight, cn } from 'ui'
+import React from 'react'
+import { cn } from 'ui'
 
 const MenuItem = React.forwardRef<
   React.ElementRef<'a'>,
@@ -68,7 +69,7 @@ const MenuItem = React.forwardRef<
                   {title}
                 </p>
                 {hasChevron && (
-                  <IconChevronRight
+                  <ChevronRight
                     strokeWidth={2}
                     className="w-3 text-foreground transition-all will-change-transform -translate-x-1 opacity-0 group-hover/menu-item:translate-x-0 group-hover/menu-item:opacity-100"
                   />

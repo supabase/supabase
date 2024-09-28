@@ -11,7 +11,8 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, Form, IconExternalLink, Input } from 'ui'
+import { Button, Form, Input } from 'ui'
+import { ExternalLink } from 'lucide-react'
 
 const schema = yup.object({
   domain: yup.string().required('A value for your custom domain is required'),
@@ -73,7 +74,7 @@ const CustomDomainsConfigureHostname = () => {
                       !canConfigureCustomDomain ? (
                         "You need additional permissions to update your project's custom domain settings"
                       ) : (
-                        <Button asChild type="default" icon={<IconExternalLink />}>
+                        <Button asChild type="default" icon={<ExternalLink />}>
                           <Link
                             href="https://supabase.com/docs/guides/platform/custom-domains"
                             target="_blank"
@@ -92,7 +93,7 @@ const CustomDomainsConfigureHostname = () => {
                 <FormSectionContent loading={false}>
                   <Input
                     id="domain"
-                    disabled={!canConfigureCustomDomain}
+                    disabled={!canConfigureCustomDomain || isCheckingRecord || isCreating}
                     className="w-full"
                     type="text"
                     name="domain"
@@ -107,14 +108,14 @@ const CustomDomainsConfigureHostname = () => {
                     <code className="text-xs">{values.domain}</code>
                   ) : (
                     'your custom domain'
-                  )}
-                  , resolving to{' '}
+                  )}{' '}
+                  resolving to{' '}
                   {endpoint ? (
                     <code className="text-xs">{endpoint}</code>
                   ) : (
                     "your project's API URL"
-                  )}
-                  , with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
+                  )}{' '}
+                  with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
                   disable the proxy option.
                 </p>
               </FormSection>

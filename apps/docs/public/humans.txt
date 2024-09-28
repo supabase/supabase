@@ -7,6 +7,7 @@ Aleksi Immonen
 Alex Tasioulis
 Alexander Korotkov
 Amy Q
+Andrew Valleteau
 Angelico de los Reyes
 Ant Wilson
 Ariuna K
@@ -56,9 +57,7 @@ Lakshan Perera
 Laura C
 Long Hoang
 Margarita Sandomirskaia
-Marijana Pavlinić
 Mark Burggraf
-Michael Ridley
 Monica El Khoury
 Oli R
 Pamela Chia

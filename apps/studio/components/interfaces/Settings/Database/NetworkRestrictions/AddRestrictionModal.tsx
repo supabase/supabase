@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import { Button, Form, IconHelpCircle, Input, Modal } from 'ui'
+import { Button, Form, Input, Modal } from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
@@ -12,6 +12,7 @@ import {
   isValidAddress,
   normalize,
 } from './NetworkRestrictions.utils'
+import { HelpCircle } from 'lucide-react'
 
 const IPV4_MAX_CIDR_BLOCK_SIZE = 32
 const IPV6_MAX_CIDR_BLOCK_SIZE = 128
@@ -183,7 +184,7 @@ const AddRestrictionModal = ({
                           <p>CIDR Block Size</p>
                           <Tooltip.Root delayDuration={0}>
                             <Tooltip.Trigger>
-                              <IconHelpCircle size="tiny" strokeWidth={2} />
+                              <HelpCircle size="14" strokeWidth={2} />
                             </Tooltip.Trigger>
                             <Tooltip.Portal>
                               <Tooltip.Content side="bottom">
