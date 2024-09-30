@@ -7,38 +7,39 @@ import {
 } from 'ui-patterns/multi-select-2'
 
 export default function MultiSelectDemo() {
-  const [selectedProducts, _setSelectedProducts] = useState<string[]>([])
-  const [productsOpen, setProductsOpen] = useState(false)
+  const [selected, _setSelected] = useState<string[]>([])
+  const [open, setOpen] = useState(false)
 
   const onSelectedChange = (
     newItemsOrCreateNewItems: string[] | ((selected: string[]) => string[])
   ) => {
     const newItems =
       typeof newItemsOrCreateNewItems === 'function'
-        ? newItemsOrCreateNewItems(selectedProducts)
+        ? newItemsOrCreateNewItems(selected)
         : newItemsOrCreateNewItems
-    setSelectedProducts(newItems)
+    setSelected(newItems)
   }
 
-  const setSelectedProducts = useCallback(
+  const setSelected = useCallback(
     (products: string[]) => {
-      _setSelectedProducts(products.length === 0 ? [] : products)
+      _setSelected(products.length === 0 ? [] : products)
     },
-    [_setSelectedProducts]
+    [_setSelected]
   )
 
   return (
     <MultiSelector
-      open={productsOpen}
-      onOpenChange={setProductsOpen}
-      selected={selectedProducts}
+      open={open}
+      onOpenChange={setOpen}
+      selected={selected}
       onSelectedChange={onSelectedChange}
     >
-      <MultiSelectorTrigger className="w-48" label="Products" />
+      <MultiSelectorTrigger className="w-72" label="Fruits" />
       <MultiSelectorContent sameWidthAsTrigger>
-        <MultiSelectorItem value={'Product 1'}>Product 1</MultiSelectorItem>
-        <MultiSelectorItem value={'Product 2'}>Product 2</MultiSelectorItem>
-        <MultiSelectorItem value={'Product 3'}>Product 3</MultiSelectorItem>
+        <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
+        <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>
+        <MultiSelectorItem value="Grape">Grape</MultiSelectorItem>
+        <MultiSelectorItem value="Strawberry">Strawberry</MultiSelectorItem>
       </MultiSelectorContent>
     </MultiSelector>
   )

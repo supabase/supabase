@@ -10,23 +10,29 @@ fragment: true
 ## Usage
 
 ```tsx
-import { MultiSelect } from 'ui-patterns/multi-select-2'
+import {
+  MultiSelector,
+  MultiSelectorTrigger,
+  MultiSelectorContent,
+  MultiSelectorItem,
+} from 'ui-patterns/multi-select-2'
 ```
 
 ```tsx
-<MultiSelect
-  open={productsOpen}
-  onOpenChange={setProductsOpen}
-  selected={convertToItem(selectedProducts, { capitalize: true })}
+<MultiSelector
+  open={open}
+  onOpenChange={setOpen}
+  selected={selected}
   onSelectedChange={onSelectedChange}
 >
-  <MultiSelect.Trigger className="w-48" label="Products" />
-  <MultiSelect.Content sameWidthAsTrigger>
-    <MultiSelect.Item item={{ value: '1', label: 'Item 1' }} />
-    <MultiSelect.Item item={{ value: '2', label: 'Item 2' }} />
-    <MultiSelect.Item item={{ value: '3', label: 'Item 3' }} />
-  </MultiSelect.Content>
-</MultiSelect>
+  <MultiSelectorTrigger className="w-72" label="Fruits" />
+  <MultiSelectorContent sameWidthAsTrigger>
+    <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
+    <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>
+    <MultiSelectorItem value="Grape">Grape</MultiSelectorItem>
+    <MultiSelectorItem value="Strawberry">Strawberry</MultiSelectorItem>
+  </MultiSelectorContent>
+</MultiSelector>
 ```
 
 ## Examples
