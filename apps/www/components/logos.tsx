@@ -1,18 +1,27 @@
 import { cn } from 'ui'
 import { range } from 'lodash'
 
-const Logos: React.FC = () => {
+interface Props {
+  showHeading?: boolean
+  className?: string
+  align?: 'left' | 'center'
+  maskBackgroundColor?: 'hsl(var(--background-default)' | 'hsl(var(--background-alternative)'
+}
+
+const Logos: React.FC<Props> = ({ className, showHeading = true, align = 'center' }) => {
   const gap = 'gap-4 lg:gap-8'
 
   return (
-    <div className="pb-14 md:pb-24" suppressHydrationWarning>
-      <div className="max-w-xl md:max-w-3xl lg:max-w-5xl mx-auto animadura px-5 lg:px-12">
+    <div className={cn('pb-14 md:pb-24', className)} suppressHydrationWarning>
+      <div className="max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
         <div
           className={cn(
             'relative w-full mx-auto max-w-4xl opacity-90 dark:opacity-70',
             'overflow-hidden',
-            'flex flex-nowrap justify-center',
             "before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,hsl(var(--background-default))_0%,transparent_10%,transparent_90%,hsl(var(--background-default))_100%)] before:z-10",
+            'flex flex-nowrap justify-center',
+            'px-5 lg:px-12',
+            align === 'left' ? 'justify-start ml-0' : 'justify-center',
             gap
           )}
         >
@@ -29,9 +38,11 @@ const Logos: React.FC = () => {
           ))}
         </div>
       </div>
-      <p className="w-full text-center text-sm text-foreground-lighter mt-6 lg:mt-8">
-        Trusted by fast-growing companies worldwide
-      </p>
+      {showHeading && (
+        <p className="w-full text-center text-sm text-foreground-lighter mt-6 lg:mt-8">
+          Trusted by fast-growing companies worldwide
+        </p>
+      )}
     </div>
   )
 }
