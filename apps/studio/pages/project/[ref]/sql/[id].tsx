@@ -17,8 +17,7 @@ import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSnippets } from 'state/sql-editor'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import type { NextPageWithLayout } from 'types'
 
 const SqlEditor: NextPageWithLayout = () => {
@@ -30,7 +29,7 @@ const SqlEditor: NextPageWithLayout = () => {
   const appSnap = useAppStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const snippets = useSnippets(ref)
+  const snippets = useSnippets(ref!)
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
