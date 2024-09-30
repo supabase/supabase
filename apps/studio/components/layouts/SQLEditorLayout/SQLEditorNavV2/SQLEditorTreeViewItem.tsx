@@ -156,31 +156,23 @@ export const SQLEditorTreeViewItem = ({
                 }}
               />
             </HoverCardTrigger_Shadcn_>
-            <HoverCardContent_Shadcn_ className="p-0">
-              <HoverCardContent
-                hideWhenDetached
-                side="right"
-                align="center"
-                className="w-[500px] flex"
-                animate="slide-in"
-              >
-                <ScrollArea className="h-[240px] relative">
-                  <SimpleCodeBlock
-                    showCopy={false}
-                    className="sql"
-                    parentClassName="!p-0 [&>div>span]:text-xs"
-                  >
-                    {snippetContent}
-                  </SimpleCodeBlock>
-                  <CopyButton
-                    iconOnly
-                    text={snippetContent}
-                    type="text"
-                    icon={<Copy />}
-                    className="px-1 absolute right-3 top-0"
-                  />
-                </ScrollArea>
-              </HoverCardContent>
+            <HoverCardContent_Shadcn_ className="w-[500px]" side="right">
+              <ScrollArea className="h-[240px] relative max-w-[475px] pr-8">
+                <SimpleCodeBlock
+                  showCopy={false}
+                  className="sql"
+                  parentClassName="!p-0 [&>div>span]:text-xs"
+                >
+                  {snippetContent}
+                </SimpleCodeBlock>
+                <CopyButton
+                  iconOnly
+                  text={snippetContent}
+                  type="text"
+                  icon={<Copy />}
+                  className="px-1 absolute right-3 top-0"
+                />
+              </ScrollArea>
             </HoverCardContent_Shadcn_>
           </HoverCard_Shadcn_>
         </>
