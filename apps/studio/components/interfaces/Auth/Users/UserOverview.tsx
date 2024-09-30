@@ -447,13 +447,18 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       <ConfirmationModal
         visible={isDeleteModalOpen}
         variant="destructive"
-        title="Confirm to delete"
+        title="Confirm to delete user"
         confirmLabel="Delete"
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => handleDelete()}
+        alert={{
+          title: 'Deleting a user is irreversible',
+          description: 'This will remove the user from the project and all associated data.',
+        }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to delete user {user.email}?
+          This is permanent! Are you sure you want to delete the user{' '}
+          <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
         </p>
       </ConfirmationModal>
 
@@ -465,9 +470,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         confirmLabelLoading="Removing"
         onCancel={() => setIsDeleteFactorsModalOpen(false)}
         onConfirm={() => handleDeleteFactors()}
+        alert={{
+          base: { variant: 'warning' },
+          title: 'Removing MFA factors is irreversible',
+          description: 'This will log the user out of all active sessions.',
+        }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove the user's MFA factors?
+          This is permanent! Are you sure you want to remove the MFA factors for the user{' '}
+          <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
         </p>
       </ConfirmationModal>
 
@@ -500,10 +511,12 @@ const RowData = ({ property, value }: { property: string; value?: string | boole
         <div className="h-[26px] flex items-center justify-center">
           {value ? (
             <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
-              <Check size={11} className="text-contrast" strokeWidth={4} />
+              <Check size={10} className="text-contrast" strokeWidth={4} />
             </div>
           ) : (
-            <X size={13} className="text-foreground-light" />
+            <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
+              <X size={10} className="text-contrast" strokeWidth={4} />
+            </div>
           )}
         </div>
       ) : (
