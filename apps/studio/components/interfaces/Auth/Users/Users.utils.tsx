@@ -9,6 +9,11 @@ import { ColumnConfiguration, USERS_TABLE_COLUMNS, UsersTableColumn } from './Us
 import { HeaderCell } from './UsersGridComponents'
 import { cn } from 'ui'
 
+const SUPPORTED_CSP_AVATAR_URLS = [
+  'https://avatars.githubusercontent.com',
+  'https://lh3.googleusercontent.com',
+]
+
 export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean => {
   return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
 }
@@ -150,8 +155,7 @@ export function getAvatarUrl(user: User): string | undefined {
     profile_image_url,
   } = user.raw_user_meta_data ?? {}
 
-  return (
-    avatarUrl ||
+  const url = (avatarUrl ||
     avatarURL ||
     avatar_url ||
     profileImage ||
@@ -161,8 +165,9 @@ export function getAvatarUrl(user: User): string | undefined {
     profile_url ||
     profileImageUrl ||
     profileImageURL ||
-    profile_image_url
-  )
+    profile_image_url) as string | undefined
+
+  return SUPPORTED_CSP_AVATAR_URLS.some((x) => url?.startsWith(x)) ? url : undefined
 }
 
 export const formatUserColumns = ({
