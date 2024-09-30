@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronsUpDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import {
   createContext,
   forwardRef,
@@ -27,11 +27,6 @@ import {
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
-
-interface Item {
-  value: string
-  label: string
-}
 
 const MultiSelectContext = createContext<{
   selected: string[]
@@ -158,7 +153,7 @@ const MultiSelectorTrigger = forwardRef<
             {extraBadgesCount > 0 && <Badge className={badgeClasses}>+{extraBadgesCount}</Badge>}
           </div>
         )}
-        <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+        <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
       </button>
     </PopoverTrigger>
   )
@@ -179,7 +174,28 @@ const MultiSelectorContent = forwardRef<
 
 MultiSelectorContent.displayName = 'MultiSelectorContent'
 
-// const MultiSelectorItem = forwardRef({ item, className }: { item: Item; className?: string }) => {
+const MultiSelectorList = forwardRef<
+  React.ElementRef<typeof CommandList>,
+  React.ComponentPropsWithoutRef<typeof CommandList>
+>(({ className, children }, ref) => {
+  return (
+    <CommandList
+      ref={ref}
+      className={cn(
+        'p-2 flex flex-col gap-2 rounded-md scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg w-full absolute bg-overlay shadow-md z-10 border border-overlay top-1',
+        className
+      )}
+    >
+      {children}
+      <CommandEmpty>
+        <span className="text-foreground-muted">No results found</span>
+      </CommandEmpty>
+    </CommandList>
+  )
+})
+
+MultiSelectorList.displayName = 'MultiSelectorList'
+
 const MultiSelectorItem = forwardRef<
   React.ElementRef<typeof CommandItem>,
   { value: string } & React.ComponentPropsWithoutRef<typeof CommandItem>
@@ -206,4 +222,10 @@ const MultiSelectorItem = forwardRef<
 
 MultiSelectorItem.displayName = 'MultiSelectorItem'
 
-export { MultiSelector, MultiSelectorTrigger, MultiSelectorContent, MultiSelectorItem }
+export {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+}
