@@ -109,10 +109,10 @@ func signInWithFacebook() async throws {
   try await supabase.auth.signInWithOAuth(
     provider: .facebook,
     redirectTo: URL(string: "my.scheme://my-host")!, // Optionally set the redirect link to bring back the user via deeplink.
-    launchFlow: { url in 
+    launchFlow: { url in
       // use url to start OAuth flow
       // and return a result url that contains the OAuth token.
-      // ... 
+      // ...
       return resultURL
     }
   )
