@@ -99,6 +99,9 @@ export const WarehouseMenuItem = ({ item }: Props) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
+              onClick={(e) => {
+                e.preventDefault()
+              }}
               loading={isLoading}
               type="text"
               className="px-1 opacity-50 hover:opacity-100 !bg-transparent"

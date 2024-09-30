@@ -12,7 +12,7 @@ import {
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { MAX_REPLICAS_BELOW_XL, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
@@ -163,12 +163,18 @@ const ComputeInstanceSidePanel = () => {
   const selectedCompute = availableOptions.find((option) => option.identifier === selectedOption)
   const hasChanges =
     selectedOption !== (subscriptionCompute?.variant.identifier ?? defaultInstanceSize)
-  const hasReadReplicas = (databases ?? []).length > 1
+  const numReadReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef).length
+  const hasReadReplicas = numReadReplicas > 0
 
-  const blockDowngradeDueToPitr =
-    pitrAddon !== undefined && ['ci_micro', 'ci_nano'].includes(selectedOption) && hasChanges
+  const isDowngradingToBelowSmall = ['ci_micro', 'ci_nano'].includes(selectedOption)
+  const blockDowngradeDueToPitr = pitrAddon !== undefined && isDowngradingToBelowSmall && hasChanges
+  const hasMoreThanTwoReplicasForXLAndAbove =
+    numReadReplicas > MAX_REPLICAS_BELOW_XL &&
+    ['ci_micro', 'ci_small', 'ci_medium', 'ci_large'].includes(selectedOption)
   const blockDowngradeDueToReadReplicas =
-    hasChanges && hasReadReplicas && ['ci_micro', 'ci_nano'].includes(selectedOption)
+    hasChanges &&
+    hasReadReplicas &&
+    (isDowngradingToBelowSmall || hasMoreThanTwoReplicasForXLAndAbove)
 
   useEffect(() => {
     if (visible) {
@@ -409,12 +415,14 @@ const ComputeInstanceSidePanel = () => {
               <Alert_Shadcn_>
                 <WarningIcon />
                 <AlertTitle_Shadcn_>
-                  Unable to downgrade as project has active read replicas
+                  {hasMoreThanTwoReplicasForXLAndAbove && selectedOption !== 'ci_micro'
+                    ? `Unable to downgrade as project has more than ${MAX_REPLICAS_BELOW_XL} read replicas`
+                    : 'Unable to downgrade as project has active read replicas'}
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  The minimum compute size for using read replicas is the Small Compute. You need to
-                  remove all read replicas before downgrading Compute as it requires at least a
-                  Small compute instance.
+                  {hasMoreThanTwoReplicasForXLAndAbove && selectedOption !== 'ci_micro'
+                    ? `You can only have up to ${MAX_REPLICAS_BELOW_XL} read replicas for compute sizes below XL, as such you will need to remove at least ${numReadReplicas - MAX_REPLICAS_BELOW_XL} read replica${numReadReplicas - MAX_REPLICAS_BELOW_XL > 1 ? 's' : ''} before downgrading your compute.`
+                    : 'The minimum compute size for using read replicas is the Small Compute. You need to remove all read replicas before downgrading Compute as it requires at least a Small compute instance.'}
                 </AlertDescription_Shadcn_>
                 <AlertDescription_Shadcn_ className="mt-2">
                   <Button asChild type="default">

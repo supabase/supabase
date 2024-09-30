@@ -92,7 +92,21 @@ In order for vscode to understand the imports correctly, you need to specify the
 ```json settings.json
 {
   "deno.enable": true,
-  "deno.unstable": true,
+  "deno.unstable": [
+    "bare-node-builtins",
+    "byonm",
+    "sloppy-imports",
+    "unsafe-proto",
+    "webgpu",
+    "broadcast-channel",
+    "worker-options",
+    "cron",
+    "kv",
+    "ffi",
+    "fs",
+    "http",
+    "net"
+  ],
   "deno.importMap": "./supabase/functions/import_map.json"
 }
 ```

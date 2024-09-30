@@ -77,7 +77,9 @@ const SpreadsheetImport = ({
     event.persist()
     const [file] = event.target.files || event.dataTransfer.files
 
-    if (file.size > MAX_CSV_SIZE) {
+    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
+      toast.error('Sorry! We only accept CSV or TSV file types, please upload another file.')
+    } else if (file.size > MAX_CSV_SIZE) {
       event.target.value = ''
       return toast(
         <div className="space-y-1">
@@ -95,10 +97,6 @@ const SpreadsheetImport = ({
         </div>,
         { duration: Infinity }
       )
-    }
-
-    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
-      toast.error('Sorry! We only accept CSV or TSV file types, please upload another file.')
     } else {
       updateEditorDirty(true)
       setUploadedFile(file)

@@ -9,17 +9,23 @@ import {
   CodeBlock,
 } from 'ui'
 
+import ApiSchema from '~/components/ApiSchema'
 import { REFERENCES } from '~/content/navigation.references'
 import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
 import { MDXProviderReference } from '~/features/docs/Reference.mdx.client'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import {
+  getApiEndpointById,
   getCliSpec,
   getFlattenedSections,
   getFunctionsList,
+  getSelfHostedApiEndpointById,
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
+import { type IApiEndPoint } from './Reference.api.utils'
 import {
+  ApiOperationRequestBodyDetails,
+  ApiSchemaParamDetails,
   CollapsibleDetails,
   FnParameterDetails,
   RefSubLayout,
@@ -30,6 +36,7 @@ import {
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { RefInternalLink } from './Reference.navigation.client'
+import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
 
 type RefSectionsProps = {
   libraryId: string
@@ -75,8 +82,8 @@ type SectionSwitchProps = {
 }
 
 export function SectionSwitch({ libraryId, version, section }: SectionSwitchProps) {
-  const libPath = REFERENCES[libraryId].libPath
-  const allAvailableVersions = REFERENCES[libraryId].versions
+  const libPath = REFERENCES[libraryId.replaceAll('-', '_')].libPath
+  const allAvailableVersions = REFERENCES[libraryId.replaceAll('-', '_')].versions
   const isLatestVersion = allAvailableVersions.length === 0 || version === allAvailableVersions[0]
 
   const sectionLink = `/docs/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}${section.slug}`
@@ -104,6 +111,10 @@ export function SectionSwitch({ libraryId, version, section }: SectionSwitchProp
       )
     case 'cli-command':
       return <CliCommandSection link={sectionLink} section={section} />
+    case 'operation':
+      return <ApiEndpointSection link={sectionLink} section={section} />
+    case 'self-hosted-operation':
+      return <ApiEndpointSection servicePath={libraryId} link={sectionLink} section={section} />
     default:
       console.error(`Unhandled type in reference sections: ${section.type}`)
       return null
@@ -245,6 +256,111 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
             </Tabs_Shadcn_>
           )}
       </div>
+    </RefSubLayout.Section>
+  )
+}
+
+interface ApiEndpointSectionProps {
+  link: string
+  section: AbbrevApiReferenceSection
+  servicePath?: string
+}
+
+async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSectionProps) {
+  const endpointDetails = servicePath
+    ? await getSelfHostedApiEndpointById(servicePath, section.id)
+    : await getApiEndpointById(section.id)
+  if (!endpointDetails) return null
+
+  const pathParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'path')
+  const queryParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'query')
+  const bodyParameters =
+    endpointDetails.requestBody ??
+    (endpointDetails.parameters ?? [])
+      .filter((param) => param.in === 'body')
+      .map(
+        (bodyParam) =>
+          ({
+            content: {
+              'application/json': {
+                schema: bodyParam.schema,
+              },
+            },
+          }) satisfies IApiEndPoint['requestBody']
+      )[0]
+
+  const first2xxCode = Object.keys(endpointDetails.responses ?? {})
+    .filter((code) => code.startsWith('2'))
+    .sort()[0]
+
+  return (
+    <RefSubLayout.Section columns="double" link={link} {...section}>
+      <StickyHeader title={endpointDetails.summary} className="col-[1_/_-1]" />
+      <div className="flex flex-col gap-12">
+        <div className="flex items-center gap-2">
+          <span className="font-mono uppercase text-sm whitespace-nowrap bg-foreground text-background rounded-full font-mono font-medium px-2 py-0.5">
+            {endpointDetails.method}
+          </span>
+          <code className="text-foreground-lighter break-all">{endpointDetails.path}</code>
+        </div>
+        {endpointDetails.description && (
+          <ReactMarkdown className="prose break-words mb-8">
+            {endpointDetails.description}
+          </ReactMarkdown>
+        )}
+        {pathParameters.length > 0 && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">Path parameters</h3>
+            <ul>
+              {pathParameters.map((param, index) => (
+                <ApiSchemaParamDetails key={index} param={param} />
+              ))}
+            </ul>
+          </section>
+        )}
+        {queryParameters.length > 0 && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">Query parameters</h3>
+            <ul>
+              {queryParameters.map((param, index) => (
+                <ApiSchemaParamDetails key={index} param={param} />
+              ))}
+            </ul>
+          </section>
+        )}
+        {bodyParameters && (
+          <section>
+            <ApiOperationBodySchemeSelector requestBody={bodyParameters} className="mb-3" />
+            <ApiOperationRequestBodyDetails requestBody={bodyParameters} />
+          </section>
+        )}
+        {endpointDetails.responses && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">Response codes</h3>
+            <ul>
+              {Object.keys(endpointDetails.responses).map((code) => (
+                <li key={code} className="list-['-'] ml-2 pl-2">
+                  <span className="font-mono text-sm font-medium text-foreground">{code}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+      {endpointDetails.responses && first2xxCode && (
+        <div className="overflow-auto">
+          <h3 className="mb-3 text-base text-foreground">{`Response (${first2xxCode})`}</h3>
+          <ApiSchema
+            id={`${section.id}-2xx-response`}
+            schema={
+              endpointDetails.responses[first2xxCode].content?.['application/json']?.schema ??
+              // @ts-ignore - schema is here in older versions
+              endpointDetails.responses[first2xxCode].schema ??
+              {}
+            }
+          />
+        </div>
+      )}
     </RefSubLayout.Section>
   )
 }

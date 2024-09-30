@@ -384,6 +384,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                       onSelectCopyPersonal={() => {
                         onSelectCopyPersonal(element.metadata as Snippet)
                       }}
+                      onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                       onSelectUnshare={() => {
                         setSelectedSnippetToUnshare(element.metadata as Snippet)
                       }}
