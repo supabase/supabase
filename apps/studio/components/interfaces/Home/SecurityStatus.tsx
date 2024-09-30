@@ -87,16 +87,10 @@ export const SecurityStatus = () => {
 }
 
 const StatusDot = ({ level }: { level: LINTER_LEVELS }) => {
-  return (
-    <div
-      className={cn(
-        'w-2 h-2 rounded-full mt-1.5',
-        level === LINTER_LEVELS.ERROR
-          ? 'bg-destructive-600'
-          : level === LINTER_LEVELS.WARN
-            ? 'bg-warning-600'
-            : 'bg-foreground-lighter dark:bg-foreground-light'
-      )}
-    />
-  )
+  const variants = {
+    [LINTER_LEVELS.ERROR]: 'bg-destructive-600',
+    [LINTER_LEVELS.WARN]: 'bg-warning-600',
+    [LINTER_LEVELS.INFO]: 'bg-foreground-lighter dark:bg-foreground-light',
+  }
+  return <div className={cn('w-2 h-2 rounded-full mt-1.5', variants[level])} />
 }
