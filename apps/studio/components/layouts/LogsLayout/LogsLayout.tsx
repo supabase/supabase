@@ -17,18 +17,14 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   if (!canUseLogsExplorer) {
     return (
       <ProjectLayout>
-        <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-          <NoPermission isFullPage resourceText="access your project's logs explorer" />
-        </main>
+        <NoPermission isFullPage resourceText="access your project's logs explorer" />
       </ProjectLayout>
     )
   }
 
   return (
     <ProjectLayout title={title} product="Logs & Analytics" productMenu={<LogsSidebarMenuV2 />}>
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+      {children}
     </ProjectLayout>
   )
 }
