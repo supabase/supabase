@@ -19,6 +19,7 @@ export * from './src/components/Alert'
 export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
 export * from './src/components/CodeBlock'
+export * from './src/components/SimpleCodeBlock'
 export * from './src/components/TreeView/TreeView'
 
 // NAV
