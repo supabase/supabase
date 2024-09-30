@@ -272,7 +272,7 @@ export function LogsSidebarMenuV2() {
             <Alert_Shadcn_ className="p-3">
               <AlertTitle_Shadcn_ className="text-xs">No queries created yet</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_ className="text-xs">
-                You can create and save queries from the "Create query" button in the top right.
+                You can create and save queries from the "Create query" button in the top left.
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
           </div>
