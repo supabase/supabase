@@ -1,6 +1,5 @@
-import { Badge } from 'ui/src/components/shadcn/ui/badge'
 import { components } from 'api-types'
-import { cn } from 'ui/src/lib/utils'
+import { Badge, cn } from 'ui'
 
 interface ComputeBadgeProps extends React.ComponentProps<typeof Badge> {
   infraComputeSize: components['schemas']['DbInstanceSize'] | undefined

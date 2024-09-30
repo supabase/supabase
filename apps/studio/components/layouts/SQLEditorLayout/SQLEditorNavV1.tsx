@@ -18,7 +18,7 @@ import {
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
   InnerSideMenuSeparator,
-} from 'ui-patterns'
+} from 'ui-patterns/InnerSideMenu'
 import QueryItem from './QueryItem'
 import { selectItemsInRange } from './SQLEditorLayout.utils'
 

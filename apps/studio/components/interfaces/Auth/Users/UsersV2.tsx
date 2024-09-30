@@ -23,7 +23,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import AddUserDropdown from './AddUserDropdown'
 import { UserPanel } from './UserPanel'
