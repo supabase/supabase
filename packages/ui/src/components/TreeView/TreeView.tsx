@@ -25,6 +25,8 @@ const TreeViewItem = forwardRef<
     xPadding: number
     /** name of entity */
     name: string
+    /** hide the title/name of entity */
+    hideName?: boolean
     /** icon of entity */
     icon?: ReactNode
     /** Specifies if the item is being edited, shows an input */
@@ -48,6 +50,7 @@ const TreeViewItem = forwardRef<
       icon,
       isEditing = false,
       onEditSubmit,
+      hideName = false,
       ...props
     },
     ref
@@ -174,7 +177,10 @@ const TreeViewItem = forwardRef<
             />
           )
         )}
-        <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
+        <span
+          className={cn(isEditing && 'hidden', 'truncate text-sm')}
+          title={hideName ? '' : name}
+        >
           {name}
         </span>
         <form autoFocus onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>

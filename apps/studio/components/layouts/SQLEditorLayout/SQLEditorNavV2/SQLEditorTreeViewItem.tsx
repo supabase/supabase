@@ -81,9 +81,10 @@ export const SQLEditorTreeViewItem = ({
 
   const snippets = useSqlSnippetsQuery(ref)
 
-  // prettier-ignore
-  // @ts-ignore -- someone please why is .sql not right here?
-  const snippetContent = snippets.data?.snippets?.find((snippet: SqlSnippet) => snippet.id === element.id)?.content?.sql ?? ''
+  const snippetContent =
+    snippets.data?.snippets
+      ?.filter((snippet: SqlSnippet) => snippet.type === 'sql')
+      .find((snippet: SqlSnippet) => snippet.id === element.id)?.content?.sql ?? ''
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
@@ -123,6 +124,7 @@ export const SQLEditorTreeViewItem = ({
                 level={level}
                 xPadding={16}
                 name={element.name}
+                hideName
                 className={className}
                 isExpanded={isExpanded}
                 isBranch={isBranch}
@@ -157,7 +159,7 @@ export const SQLEditorTreeViewItem = ({
             <HoverCardContent_Shadcn_ className="p-0">
               <HoverCardContent
                 hideWhenDetached
-                side="left"
+                side="right"
                 align="center"
                 className="w-[500px] flex"
                 animate="slide-in"
@@ -175,7 +177,7 @@ export const SQLEditorTreeViewItem = ({
                     text={snippetContent}
                     type="text"
                     icon={<Copy />}
-                    className="px-1 absolute right-2 top-0"
+                    className="px-1 absolute right-3 top-0"
                   />
                 </ScrollArea>
               </HoverCardContent>
