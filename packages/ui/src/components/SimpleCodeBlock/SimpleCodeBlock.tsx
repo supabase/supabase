@@ -8,9 +8,10 @@
 
 import { Prism, themes, Highlight, Language } from 'prism-react-renderer'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import { Button, copyToClipboard } from 'ui'
 import { useTheme } from 'next-themes'
 import { dart } from './prism'
+import { copyToClipboard } from '../../lib/utils/clipboard'
+import { Button } from '../Button'
 
 dart(Prism)
 
