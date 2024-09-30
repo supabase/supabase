@@ -22,8 +22,8 @@ import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Mo
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { PauseDisabledState } from './PauseDisabledState'
-import { useProjectContext } from './ProjectContext'
-import { RestorePaidPlanProjectNotice } from './RestorePaidPlanProjectNotice'
+import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
+import { useProjectContext } from '../ProjectContext'
 
 export interface ProjectPausedStateProps {
   product?: string
