@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { RefreshCw, Search, User as UserIcon, Users, X } from 'lucide-react'
+import { Loader2, RefreshCw, Search, User as UserIcon, Users, X } from 'lucide-react'
 import { UIEvent, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
@@ -253,7 +253,7 @@ export const UsersV2 = () => {
           <AddUserDropdown projectKpsVersion={project?.kpsVersion} />
         </div>
       </div>
-      <LoadingLine loading={isLoading || isRefetching} />
+      <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
       <ResizablePanelGroup
         direction="horizontal"
         className="relative flex flex-grow bg-alternative min-h-0"
@@ -328,8 +328,14 @@ export const UsersV2 = () => {
           />
         )}
       </ResizablePanelGroup>
-      <div className="flex min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
-        Total: {totalUsers} users
+
+      <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
+        {isLoading || isRefetching ? 'Loading users...' : `Total: ${totalUsers} users`}
+        {(isLoading || isRefetching || isFetchingNextPage) && (
+          <span className="flex items-center gap-2">
+            <Loader2 size={14} className="animate-spin" /> Loading...
+          </span>
+        )}
       </div>
     </div>
   )
