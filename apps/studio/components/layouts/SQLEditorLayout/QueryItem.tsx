@@ -217,13 +217,13 @@ const QueryItem = ({
         }}
       >
         <ul className="text-sm text-foreground-light space-y-5">
-          <li className="flex gap-3">
-            <Eye />
+          <li className="flex gap-3 items-center">
+            <Eye size={16} />
             <span>Project members will have read-only access to this query.</span>
           </li>
-          <li className="flex gap-3">
-            <Unlock />
-            <span>Anyone will be able to duplicate it to their personal snippets.</span>
+          <li className="flex gap-3 items-center">
+            <Unlock size={16} />
+            <span>Anyone will be able to duplicate it to their personal snippetseeee.</span>
           </li>
         </ul>
       </ConfirmationModal>
