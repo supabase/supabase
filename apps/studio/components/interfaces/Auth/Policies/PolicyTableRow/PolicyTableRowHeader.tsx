@@ -1,7 +1,7 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { Lock } from 'lucide-react'
+import { Lock, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
@@ -36,7 +36,16 @@ const PolicyTableRowHeader = ({
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
       <div className="flex gap-x-4 text-left">
-        <Link href={`/project/${ref}/editor/${table.id}`}>
+        <Link href={`/project/${ref}/editor/${table.id}`} className="flex items-center gap-x-2">
+          {table.rls_enabled ? (
+            <div className="flex items-center gap-x-1 text-xs">
+              <Lock size={14} strokeWidth={2} className="text-brand" />
+            </div>
+          ) : (
+            <div className="flex items-center gap-x-1 text-xs">
+              <Unlock size={14} strokeWidth={2} className="text-warning-600" />
+            </div>
+          )}
           <h4 className="m-0">{table.name}</h4>
         </Link>
         <div className="flex items-center gap-x-2">
@@ -47,9 +56,6 @@ const PolicyTableRowHeader = ({
               </span>
             </Badge>
           )}
-          <Badge variant={table.rls_enabled ? 'brand' : 'warning'}>
-            {table.rls_enabled ? 'Row Level Security enabled' : 'Row Level Security disabled'}
-          </Badge>
         </div>
       </div>
       {!isTableLocked && (

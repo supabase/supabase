@@ -14,7 +14,6 @@ import { useProfile } from 'lib/profile'
 import { Item, Menu, useContextMenu } from 'react-contexify'
 import { createPortal } from 'react-dom'
 import {
-  Alert,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +33,7 @@ import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnR
 import LogSelection, { LogSelectionProps } from './LogSelection'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
-import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
+import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 
 interface Props {
@@ -97,7 +96,7 @@ const LogTable = ({
 
   const firstRow: LogData | undefined = data?.[0] as LogData
 
-  // move timestamp to the first column
+  // move timestamp to the first column, if it exists
   function getFirstRow() {
     if (!firstRow) return {}
 
@@ -130,7 +129,6 @@ const LogTable = ({
         return <div className="flex items-center">{v}</div>
       },
       minWidth: 128,
-      maxWidth: v === 'timestamp' ? 240 : 2400, // Without this, the column flickers on first render
     }
 
     return result
@@ -320,34 +318,33 @@ const LogTable = ({
     </div>
   )
 
-  const renderErrorAlert = () => {
+  const RenderErrorAlert = () => {
     if (!error) return null
+
     const childProps = {
       isCustomQuery: queryType ? false : true,
       error: error!,
     }
-    let Renderer = DefaultErrorRenderer
+
     if (
       typeof error === 'object' &&
       error.error?.errors.find((err) => err.reason === 'resourcesExceeded')
     ) {
-      Renderer = ResourcesExceededErrorRenderer
+      return <ResourcesExceededErrorRenderer {...childProps} />
     }
 
     return (
-      <div className="flex w-1/2 justify-center px-5">
-        <Alert variant="danger" title="Sorry! An error occurred when fetching data." withIcon>
-          <Renderer {...childProps} />
-        </Alert>
+      <div className="text-foreground flex gap-2 font-mono px-6">
+        <DefaultErrorRenderer {...childProps} />
       </div>
     )
   }
 
-  const renderNoResultAlert = () => {
+  const RenderNoResultAlert = () => {
     if (emptyState) return emptyState
     else
       return (
-        <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
+        <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100 h-full">
           <div className="flex flex-col gap-1">
             <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
             <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
@@ -365,76 +362,75 @@ const LogTable = ({
   if (!data) return null
 
   return (
-    <section className={'flex w-full flex-col h-full'} style={{ maxHeight }}>
+    <section className={'flex w-full flex-col h-screen'} style={{ maxHeight }}>
       {!queryType && <LogsExplorerTableHeader />}
-      <div className={`flex h-full flex-row overflow-x-auto`}>
-        <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={focusedLog ? 60 : 100}>
-            <DataGrid
-              role="table"
-              style={{ height: '100%' }}
-              className={cn('flex-1 flex-grow h-full', {
-                'data-grid--simple-logs': queryType,
-                'data-grid--logs-explorer': !queryType,
-              })}
-              rowHeight={40}
-              headerRowHeight={queryType ? 0 : 28}
-              onSelectedCellChange={(row) => {
-                setFocusedLog(row.row as LogData)
-                setCellPosition(row)
-              }}
-              selectedRows={new Set([])}
-              columns={columns}
-              rowClass={(row: LogData) =>
-                [
-                  'font-mono tracking-tight',
-                  isEqual(row, focusedLog)
-                    ? '!bg-surface-300 rdg-row--focused'
-                    : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
-                ].join(' ')
-              }
-              rows={logDataRows}
-              rowKeyGetter={(r) => {
-                if (!hasId) return JSON.stringify(r)
-                const row = r as LogData
-                return row.id
-              }}
-              renderers={{
-                renderRow: RowRenderer,
-                noRowsFallback: !isLoading ? (
-                  <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
-                    {!error && renderNoResultAlert()}
-                    {error && renderErrorAlert()}
-                  </div>
-                ) : null,
-              }}
+
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel defaultSize={focusedLog ? 60 : 100}>
+          <DataGrid
+            role="table"
+            style={{ height: '100%' }}
+            className={cn('flex-1 flex-grow h-full', {
+              'data-grid--simple-logs': queryType,
+              'data-grid--logs-explorer': !queryType,
+            })}
+            rowHeight={40}
+            headerRowHeight={queryType ? 0 : 28}
+            onSelectedCellChange={(row) => {
+              setFocusedLog(row.row as LogData)
+              setCellPosition(row)
+            }}
+            selectedRows={new Set([])}
+            columns={columns}
+            rowClass={(row: LogData) =>
+              [
+                'font-mono tracking-tight',
+                isEqual(row, focusedLog)
+                  ? '!bg-surface-300 rdg-row--focused'
+                  : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
+              ].join(' ')
+            }
+            rows={logDataRows}
+            rowKeyGetter={(r) => {
+              if (!hasId) return JSON.stringify(r)
+              const row = r as LogData
+              return row.id
+            }}
+            renderers={{
+              renderRow: RowRenderer,
+              noRowsFallback: !isLoading ? (
+                <div className="">
+                  {logDataRows.length === 0 && !error && <RenderNoResultAlert />}
+                  {error && <RenderErrorAlert />}
+                </div>
+              ) : null,
+            }}
+          />
+          {typeof window !== 'undefined' &&
+            createPortal(
+              <Menu id={LOGS_EXPLORER_CONTEXT_MENU_ID} animation={false}>
+                <Item onClick={onCopyCell}>
+                  <Clipboard size={14} />
+                  <span className="ml-2 text-xs">Copy cell content</span>
+                </Item>
+              </Menu>,
+              document.body
+            )}
+        </ResizablePanel>
+        <ResizableHandle />
+        {focusedLog && (
+          <ResizablePanel defaultSize={40}>
+            <LogSelection
+              projectRef={projectRef}
+              onClose={() => setFocusedLog(null)}
+              log={focusedLog}
+              queryType={queryType}
+              params={params}
+              collectionName={collectionName}
             />
-            {typeof window !== 'undefined' &&
-              createPortal(
-                <Menu id={LOGS_EXPLORER_CONTEXT_MENU_ID} animation={false}>
-                  <Item onClick={onCopyCell}>
-                    <Clipboard size={14} />
-                    <span className="ml-2 text-xs">Copy cell content</span>
-                  </Item>
-                </Menu>,
-                document.body
-              )}
           </ResizablePanel>
-          <ResizableHandle />
-          {focusedLog && (
-            <ResizablePanel defaultSize={40}>
-              <LogSelection
-                projectRef={projectRef}
-                onClose={() => setFocusedLog(null)}
-                log={focusedLog}
-                queryType={queryType}
-                params={params}
-                collectionName={collectionName}
-              />
-            </ResizablePanel>
-          )}
-        </ResizablePanelGroup>
-      </div>
+        )}
+      </ResizablePanelGroup>
     </section>
   )
 }
