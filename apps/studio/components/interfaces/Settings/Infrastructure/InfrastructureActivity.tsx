@@ -64,7 +64,9 @@ const InfrastructureActivity = () => {
   const selectedAddons = addons?.selected_addons ?? []
 
   const { computeInstance } = getAddons(selectedAddons)
-  const hasDedicatedIOResources = computeInstance !== undefined && true // !NON_DEDICATED_IO_RESOURCES.includes(computeInstance.variant.identifier)
+  const hasDedicatedIOResources =
+    computeInstance !== undefined &&
+    !NON_DEDICATED_IO_RESOURCES.includes(computeInstance.variant.identifier)
 
   function getCurrentComputeInstanceSpecs() {
     if (computeInstance?.variant.meta) {
