@@ -73,7 +73,7 @@ export const SecurityStatus = () => {
               </div>
             </div>
           ) : (
-            <div className="grid gap-y-4">
+            <div className="grid gap-y-3.5">
               {[
                 { lints: errorLints, level: LINTER_LEVELS.ERROR },
                 { lints: warnLints, level: LINTER_LEVELS.WARN },
@@ -91,7 +91,7 @@ export const SecurityStatus = () => {
                           </p>
                         </div>
                       </div>
-                      <PopoverSeparator_Shadcn_ />
+                      <PopoverSeparator_Shadcn_ className="" />
                     </>
                   )
               )}
