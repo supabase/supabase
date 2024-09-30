@@ -21,11 +21,11 @@ import ConnectingState from './ConnectingState'
 import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
+import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
 import { ProjectContextProvider } from './ProjectContext'
-import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
@@ -142,9 +142,9 @@ const ProjectLayout = ({
                 <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
               </>
             )}
-            <ResizablePanel className="h-full">
+            <ResizablePanel className="h-full flex flex-col">
               {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
-              <main className={'h-full flex flex-col flex-1 w-full overflow-x-hidden'}>
+              <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
                 {showPausedState ? (
                   <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
                     <div className="w-full">
