@@ -15,7 +15,6 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useFlag } from 'hooks/ui/useFlag'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -33,7 +32,6 @@ const SqlEditor: NextPageWithLayout = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippets = useSnippets(ref)
-  const enableFolders = useFlag('sqlFolderOrganization')
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
@@ -47,7 +45,7 @@ const SqlEditor: NextPageWithLayout = () => {
       // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
       // the snapV2 valtio store for some reason hence why the added typeof check here
       retry: false,
-      enabled: Boolean(enableFolders && id !== 'new' && typeof snapV2.addSnippet === 'function'),
+      enabled: Boolean(id !== 'new' && typeof snapV2.addSnippet === 'function'),
       onSuccess: (data) => {
         snapV2.addSnippet({ projectRef: ref as string, snippet: data })
       },

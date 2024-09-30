@@ -5,7 +5,6 @@ import { useMemo } from 'react'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { ResponseError } from 'types'
 import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
@@ -42,7 +41,6 @@ export const SQLEditorNavV1 = ({
   const searchText = _searchText.trim()
   const router = useRouter()
   const { ref, id: activeId } = useParams()
-  const enableFolders = useFlag('sqlFolderOrganization')
 
   const snippets = useSnippets(ref)
   const sqlSnippets = useMemo(() => {
@@ -52,7 +50,7 @@ export const SQLEditorNavV1 = ({
   const snap = useSqlEditorStateSnapshot()
 
   const { isLoading, isSuccess, isError, error } = useSqlSnippetsQuery(ref, {
-    enabled: !enableFolders,
+    enabled: false,
     refetchOnWindowFocus: false,
     staleTime: 300, // 5 minutes
     onSuccess(data) {
