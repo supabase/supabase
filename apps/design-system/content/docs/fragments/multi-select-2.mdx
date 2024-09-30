@@ -1,0 +1,36 @@
+---
+title: Multi Select 2
+description: Multiple selection component.
+component: true
+fragment: true
+---
+
+<ComponentPreview name="multi-select-2-demo" description="" peekCode wide />
+
+## Usage
+
+```tsx
+import { MultiSelect } from 'ui-patterns/multi-select-2'
+```
+
+```tsx
+<MultiSelect
+  open={productsOpen}
+  onOpenChange={setProductsOpen}
+  selected={convertToItem(selectedProducts, { capitalize: true })}
+  onSelectedChange={onSelectedChange}
+>
+  <MultiSelect.Trigger className="w-48" label="Products" />
+  <MultiSelect.Content sameWidthAsTrigger>
+    <MultiSelect.Item item={{ value: '1', label: 'Item 1' }} />
+    <MultiSelect.Item item={{ value: '2', label: 'Item 2' }} />
+    <MultiSelect.Item item={{ value: '3', label: 'Item 3' }} />
+  </MultiSelect.Content>
+</MultiSelect>
+```
+
+## Examples
+
+### Form
+
+<ComponentPreview name="multi-select-form" />
