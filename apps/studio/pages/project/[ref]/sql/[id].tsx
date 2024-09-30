@@ -17,7 +17,7 @@ import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSnippets } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import type { NextPageWithLayout } from 'types'
 
@@ -28,7 +28,6 @@ const SqlEditor: NextPageWithLayout = () => {
 
   const { project } = useProjectContext()
   const appSnap = useAppStateSnapshot()
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippets = useSnippets(ref)
@@ -134,7 +133,7 @@ const SqlEditor: NextPageWithLayout = () => {
         async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
           const formatted = await formatPgsqlRef.current(value)
-          if (id) snap.setSql(id, formatted)
+          if (id) snapV2.setSql(id, formatted)
           return [{ range: model.getFullModelRange(), text: formatted }]
         },
       })
