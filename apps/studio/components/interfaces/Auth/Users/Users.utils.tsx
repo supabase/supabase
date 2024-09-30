@@ -268,6 +268,8 @@ export const formatUserColumns = ({
     return res
   })
 
+  const profileImageColumn = gridColumns.find((col) => col.key === 'img')
+
   if (columnOrder.length > 0) {
     gridColumns = gridColumns
       .filter((col) => columnOrder.includes(col.key))
@@ -275,8 +277,6 @@ export const formatUserColumns = ({
         return columnOrder.indexOf(a.key) - columnOrder.indexOf(b.key)
       })
   }
-
-  const profileImageColumn = gridColumns.find((col) => col.key === 'img')
 
   return visibleColumns.length === 0
     ? gridColumns

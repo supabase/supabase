@@ -84,7 +84,7 @@ export const UsersV2 = () => {
     { isSuccess: isSuccessStorage, isError: isErrorStorage, error: errorStorage },
   ] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AUTH_USERS_COLUMNS_CONFIGURATION(projectRef ?? ''),
-    undefined as ColumnConfiguration[] | undefined
+    null as ColumnConfiguration[] | null
   )
 
   const [sortColumn, sortOrder] = sortByValue.split(':')
@@ -286,6 +286,7 @@ export const UsersV2 = () => {
                 visibleColumns: value,
                 setSortByValue,
               })
+
               setSelectedColumns(value)
               setColumns(updatedColumns)
               saveColumnConfiguration('toggle', { columns: updatedColumns })

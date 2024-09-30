@@ -94,7 +94,7 @@ export const FilterPopover = ({
               const icon = iconKey ? option[iconKey] : undefined
 
               return (
-                <div className="flex items-center gap-x-2">
+                <div key={value} className="flex items-center gap-x-2">
                   <Checkbox_Shadcn_
                     id={value}
                     checked={selectedOptions.includes(value)}
