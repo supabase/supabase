@@ -143,7 +143,7 @@ export default {
       },
       {
         heading: 'Databases launched daily',
-        subheading: '2,500+',
+        subheading: '3,500+',
       },
     ],
   },
