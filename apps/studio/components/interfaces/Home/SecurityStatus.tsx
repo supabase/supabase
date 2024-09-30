@@ -1,6 +1,13 @@
 import { CheckCircle2, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
+import {
+  Button,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  PopoverSeparator_Shadcn_,
+  cn,
+} from 'ui'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
@@ -16,6 +23,7 @@ export const SecurityStatus = () => {
   const errorLints = securityLints.filter((lint) => lint.level === 'ERROR')
   const warnLints = securityLints.filter((lint) => lint.level === 'WARN')
   const infoLints = securityLints.filter((lint) => lint.level === 'INFO')
+
   const noIssuesFound = errorLints.length === 0 && warnLints.length === 0 && infoLints.length === 0
 
   return (
@@ -44,42 +52,58 @@ export const SecurityStatus = () => {
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
-        className={`py-1.5 px-0 ${noIssuesFound ? 'w-64' : 'w-84'}`}
+        className={`py-1.5 px-0 ${noIssuesFound ? 'w-72' : 'w-84'}`}
         side="bottom"
         align="center"
       >
         <div className="py-2 text-sm flex gap-3">
-          {noIssuesFound && (
-            <CheckCircle2 className="text-brand shrink-0" size={18} strokeWidth={1.5} />
+          {noIssuesFound ? (
+            <div className="flex gap-3 px-4">
+              <CheckCircle2 className="text-brand shrink-0" size={18} strokeWidth={1.5} />
+              <div className="grid gap-1">
+                <p className="">No security issues found</p>
+                <p className="text-xs text-foreground-light">
+                  Keep monitoring Security Advisor for updates as your project grows.
+                </p>
+                <Button asChild type="default" className="w-min mt-2">
+                  <Link href={`/project/${project?.ref}/database/security-advisor`}>
+                    Security Advisor
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid gap-y-4">
+              {[
+                { lints: errorLints, level: LINTER_LEVELS.ERROR },
+                { lints: warnLints, level: LINTER_LEVELS.WARN },
+                { lints: infoLints, level: LINTER_LEVELS.INFO },
+              ].map(
+                ({ lints, level }) =>
+                  lints.length > 0 && (
+                    <>
+                      <div key={level} className="flex gap-3 pb-0 px-4">
+                        <StatusDot level={level} />
+                        <div>
+                          {lints.length} {level.toLowerCase()} issue{lints.length > 1 ? 's' : ''}
+                          <p className="text-xs text-foreground-lighter">
+                            {LINT_TABS.find((tab) => tab.id === level)?.descriptionShort}
+                          </p>
+                        </div>
+                      </div>
+                      <PopoverSeparator_Shadcn_ />
+                    </>
+                  )
+              )}
+              <Button asChild type="default" className="w-min ml-4">
+                <Link
+                  href={`/project/${project?.ref}/database/security-advisor${errorLints.length === 0 ? '?preset=WARN' : ''}`}
+                >
+                  Security Advisor
+                </Link>
+              </Button>
+            </div>
           )}
-
-          <div className="grid gap-y-4">
-            {[
-              { lints: errorLints, level: LINTER_LEVELS.ERROR },
-              { lints: warnLints, level: LINTER_LEVELS.WARN },
-              { lints: infoLints, level: LINTER_LEVELS.INFO },
-            ].map(
-              ({ lints, level }) =>
-                lints.length > 0 && (
-                  <div key={level} className="flex gap-3 border-b pb-4 px-4">
-                    <StatusDot level={level} />
-                    <div>
-                      {lints.length} {level.toLowerCase()} issue{lints.length > 1 ? 's' : ''}
-                      <p className="text-xs text-foreground-lighter">
-                        {LINT_TABS.find((tab) => tab.id === level)?.descriptionShort}
-                      </p>
-                    </div>
-                  </div>
-                )
-            )}
-            <Button asChild type="default" className="w-min ml-4">
-              <Link
-                href={`/project/${project?.ref}/database/security-advisor${errorLints.length === 0 ? '?preset=WARN' : ''}`}
-              >
-                Security Advisor
-              </Link>
-            </Button>
-          </div>
         </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
