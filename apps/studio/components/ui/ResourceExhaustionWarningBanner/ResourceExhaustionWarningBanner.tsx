@@ -107,8 +107,7 @@ const ResourceExhaustionWarningBanner = () => {
       variant={isCritical ? 'destructive' : 'warning'}
       className={cn(
         'flex items-center justify-between',
-        'border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px] [&>svg]:h-[26px]',
-        'sticky top-0 z-10'
+       'border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px] [&>svg]:h-[26px]'
       )}
     >
       <AlertTriangle />
