@@ -8,7 +8,7 @@ import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
 export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
-  content: Content['content']
+  content: Partial<Content['content']>
 }
 
 export type UpsertContentVariables = {
@@ -21,7 +21,6 @@ export async function upsertContent(
   signal?: AbortSignal
 ) {
   const { data, error } = await put('/platform/projects/{ref}/content', {
-    // @ts-ignore API codegen is wrong
     params: { path: { ref: projectRef } },
     body: {
       id: payload.id,
