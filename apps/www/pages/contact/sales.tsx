@@ -119,7 +119,7 @@ const ContactSales = () => {
   )
 }
 
-const CustomerQuote = ({
+export const CustomerQuote = ({
   quote,
   author,
   className,
@@ -136,7 +136,7 @@ const CustomerQuote = ({
   </div>
 )
 
-const CustomerLogo = ({ title, logo }: { title: string; logo: string }) => (
+export const CustomerLogo = ({ title, logo }: { title: string; logo: string }) => (
   <div className="relative h-8 max-h-6 w-28">
     <Image
       fill
