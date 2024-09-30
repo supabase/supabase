@@ -19,7 +19,6 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  cn,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -30,11 +29,11 @@ import {
   Separator,
 } from 'ui'
 import {
-  GenericSkeletonLoader,
   InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideMenuItem,
-} from 'ui-patterns'
+} from 'ui-patterns/InnerSideMenu'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (
