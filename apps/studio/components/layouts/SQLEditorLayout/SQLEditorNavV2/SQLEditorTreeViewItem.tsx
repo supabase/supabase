@@ -81,9 +81,10 @@ export const SQLEditorTreeViewItem = ({
 
   const snippets = useSqlSnippetsQuery(ref)
 
-  // prettier-ignore
-  // @ts-ignore -- someone please why is .sql not right here?
-  const snippetContent = snippets.data?.snippets?.find((snippet: SqlSnippet) => snippet.id === element.id)?.content?.sql ?? ''
+  const snippetContent =
+    snippets.data?.snippets
+      ?.filter((snippet) => snippet.type === 'sql')
+      .find((snippet) => snippet.id === element.id)?.content?.sql ?? ''
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
