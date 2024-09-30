@@ -40,6 +40,7 @@ import AddUserDropdown from './AddUserDropdown'
 import { UserPanel } from './UserPanel'
 import { PROVIDER_FILTER_OPTIONS } from './Users.constants'
 import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
+import { useUsersCountQuery } from 'data/auth/users-count-query'
 
 type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 export type UsersTableColumn = {
@@ -101,6 +102,7 @@ export const UsersV2 = () => {
   } = useUsersInfiniteQuery(
     {
       projectRef,
+      connectionString: project?.connectionString,
       keywords: filterKeywords,
       filter: filter === 'all' ? undefined : filter,
       providers: selectedProviders,
@@ -112,9 +114,17 @@ export const UsersV2 = () => {
     }
   )
 
+  const { data: countData } = useUsersCountQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+    keywords: filterKeywords,
+    filter: filter === 'all' ? undefined : filter,
+    providers: selectedProviders,
+  })
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const totalUsers = useMemo(() => data?.pages[0].total, [data?.pages[0].total])
-  const users = useMemo(() => data?.pages.flatMap((page) => page.users), [data?.pages])
+  const totalUsers = useMemo(() => countData?.result[0].count, [countData?.result[0].count])
+  const users = useMemo(() => data?.pages.flatMap((page) => page.result), [data?.pages])
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     if (isLoading || !isAtBottom(event)) return
