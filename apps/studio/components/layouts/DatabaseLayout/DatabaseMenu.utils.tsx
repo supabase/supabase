@@ -7,14 +7,12 @@ export const generateDatabaseMenu = (
   project?: Project,
   flags?: {
     pgNetExtensionExists: boolean
-    pgCronExtensionExists: boolean
     pitrEnabled: boolean
     columnLevelPrivileges: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists, pgCronExtensionExists, pitrEnabled, columnLevelPrivileges } =
-    flags || {}
+  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges } = flags || {}
 
   return [
     {
@@ -121,16 +119,12 @@ export const generateDatabaseMenu = (
               },
             ]
           : []),
-        ...(!!pgCronExtensionExists
-          ? [
-              {
-                name: 'Crons',
-                key: 'crons',
-                url: `/project/${ref}/database/crons`,
-                items: [],
-              },
-            ]
-          : []),
+        {
+          name: 'Cron Jobs',
+          key: 'cron-jobs',
+          url: `/project/${ref}/database/cron-jobs`,
+          items: [],
+        },
       ],
     },
     {

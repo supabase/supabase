@@ -26,8 +26,6 @@ const DatabaseProductMenu = () => {
   })
   const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
 
-  const pgCronExtensionExists =
-    (data ?? []).find((ext) => ext.name === 'pg_cron')?.installed_version != undefined
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
   const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
@@ -38,7 +36,6 @@ const DatabaseProductMenu = () => {
         page={page}
         menu={generateDatabaseMenu(project, {
           pgNetExtensionExists,
-          pgCronExtensionExists,
           pitrEnabled,
           columnLevelPrivileges,
         })}
