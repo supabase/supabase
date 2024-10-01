@@ -1188,7 +1188,7 @@ export const functions: NavMenuConstant = {
         },
         {
           name: 'Integrating with Log Drains',
-          url: '/guides/functions/log-drains',
+          url: '/guides/platform/log-drains',
         },
       ],
     },
