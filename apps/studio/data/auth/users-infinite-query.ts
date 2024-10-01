@@ -43,7 +43,7 @@ const getUsersSQL = ({
 
   if (hasValidKeywords) {
     conditions.push(
-      `id::text ilike '%${keywords}%' or email ilike '%${keywords}%' or phone ilike '%${keywords}%`
+      `id::text ilike '%${keywords}%' or email ilike '%${keywords}%' or phone ilike '%${keywords}%'`
     )
   }
 
