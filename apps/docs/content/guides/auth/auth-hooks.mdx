@@ -102,15 +102,13 @@ When a HTTP hook is created, the secret generated should be of the following for
 - `whsec_` signifies that the secret is symmetric
 - `<standard-base64-secret>` implies a Standard Base64 encoded secret which can contain the characters `+`, `/` and `=`
 
-
 The secret is used to verify the payload received in your hook. Create an entry in your `.env.local` file to store the secret for each hook that you have. For example:
 
 ```bash
 HOOK_SECRETS=<standard-base64-secret>
 ```
 
-There field is expressed in plural rather than singular as there are plans to allow for asymmetric signing and multiple hook secrets for ease of secret rotation. For instance: `<standard-base-64-secret>|<another-standard-base-64-secret>`. 
-
+There field is expressed in plural rather than singular as there are plans to allow for asymmetric signing and multiple hook secrets for ease of secret rotation. For instance: `<standard-base-64-secret>|<another-standard-base-64-secret>`.
 
 Use the secret in conjunction with the Standard Webhooks package to verify the payload before processing it:
 
