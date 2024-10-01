@@ -1,33 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Info, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { FormMessage } from '@ui/components/shadcn/ui/form'
-import { Input } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import { useCreateCollection } from 'data/analytics/warehouse-collections-create-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
-  Admonition,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormMessage_Shadcn_,
   Form_Shadcn_,
+  Input_Shadcn_,
   Modal,
-  WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { Alert } from '@ui/components/shadcn/ui/alert'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export const CreateWarehouseCollectionModal = ({
   open,
@@ -133,7 +125,7 @@ export const CreateWarehouseCollectionModal = ({
                 render={({ field }) => (
                   <FormItemLayout label="Collection name" layout="horizontal">
                     <FormControl_Shadcn_>
-                      <Input autoFocus placeholder="Events" {...field} />
+                      <Input_Shadcn_ autoFocus placeholder="Events" {...field} />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
@@ -149,7 +141,7 @@ export const CreateWarehouseCollectionModal = ({
                   >
                     <FormControl_Shadcn_>
                       <div className="relative flex items-center gap-2">
-                        <Input type="number" {...field} />
+                        <Input_Shadcn_ type="number" {...field} />
                         <span className="absolute right-3 text-foreground-lighter text-sm pointer-events-none">
                           days
                         </span>
@@ -159,7 +151,7 @@ export const CreateWarehouseCollectionModal = ({
                 )}
               />
             </div>
-            <FormMessage />
+            <FormMessage_Shadcn_ />
           </Modal.Content>
 
           {plan?.id === 'free' && (

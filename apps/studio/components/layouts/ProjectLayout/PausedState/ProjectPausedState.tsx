@@ -19,11 +19,11 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Modal } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import { useProjectContext } from '../ProjectContext'
-import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { PauseDisabledState } from './PauseDisabledState'
+import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
+import { useProjectContext } from '../ProjectContext'
 
 export interface ProjectPausedStateProps {
   product?: string
