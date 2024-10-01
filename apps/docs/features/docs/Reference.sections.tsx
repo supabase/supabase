@@ -9,6 +9,7 @@ import {
   CodeBlock,
 } from 'ui'
 
+import ApiSchema from '~/components/ApiSchema'
 import { REFERENCES } from '~/content/navigation.references'
 import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
 import { MDXProviderReference } from '~/features/docs/Reference.mdx.client'
@@ -18,12 +19,13 @@ import {
   getCliSpec,
   getFlattenedSections,
   getFunctionsList,
+  getSelfHostedApiEndpointById,
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
+import { type IApiEndPoint } from './Reference.api.utils'
 import {
   ApiOperationRequestBodyDetails,
   ApiSchemaParamDetails,
-  ApiSchemaParamSubdetails,
   CollapsibleDetails,
   FnParameterDetails,
   RefSubLayout,
@@ -34,9 +36,7 @@ import {
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { RefInternalLink } from './Reference.navigation.client'
-import { getTypeDisplayFromSchema } from './Reference.api.utils'
 import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
-import ApiSchema from '~/components/ApiSchema'
 
 type RefSectionsProps = {
   libraryId: string
@@ -82,8 +82,8 @@ type SectionSwitchProps = {
 }
 
 export function SectionSwitch({ libraryId, version, section }: SectionSwitchProps) {
-  const libPath = REFERENCES[libraryId].libPath
-  const allAvailableVersions = REFERENCES[libraryId].versions
+  const libPath = REFERENCES[libraryId.replaceAll('-', '_')].libPath
+  const allAvailableVersions = REFERENCES[libraryId.replaceAll('-', '_')].versions
   const isLatestVersion = allAvailableVersions.length === 0 || version === allAvailableVersions[0]
 
   const sectionLink = `/docs/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}${section.slug}`
@@ -113,6 +113,8 @@ export function SectionSwitch({ libraryId, version, section }: SectionSwitchProp
       return <CliCommandSection link={sectionLink} section={section} />
     case 'operation':
       return <ApiEndpointSection link={sectionLink} section={section} />
+    case 'self-hosted-operation':
+      return <ApiEndpointSection servicePath={libraryId} link={sectionLink} section={section} />
     default:
       console.error(`Unhandled type in reference sections: ${section.type}`)
       return null
@@ -261,14 +263,35 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
 interface ApiEndpointSectionProps {
   link: string
   section: AbbrevApiReferenceSection
+  servicePath?: string
 }
 
-async function ApiEndpointSection({ link, section }: ApiEndpointSectionProps) {
-  const endpointDetails = await getApiEndpointById(section.id)
+async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSectionProps) {
+  const endpointDetails = servicePath
+    ? await getSelfHostedApiEndpointById(servicePath, section.id)
+    : await getApiEndpointById(section.id)
   if (!endpointDetails) return null
 
-  const pathParameters = endpointDetails.parameters.filter((param) => param.in === 'path')
-  const queryParameters = endpointDetails.parameters.filter((param) => param.in === 'query')
+  const pathParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'path')
+  const queryParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'query')
+  const bodyParameters =
+    endpointDetails.requestBody ??
+    (endpointDetails.parameters ?? [])
+      .filter((param) => param.in === 'body')
+      .map(
+        (bodyParam) =>
+          ({
+            content: {
+              'application/json': {
+                schema: bodyParam.schema,
+              },
+            },
+          }) satisfies IApiEndPoint['requestBody']
+      )[0]
+
+  const first2xxCode = Object.keys(endpointDetails.responses ?? {})
+    .filter((code) => code.startsWith('2'))
+    .sort()[0]
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
@@ -305,27 +328,35 @@ async function ApiEndpointSection({ link, section }: ApiEndpointSectionProps) {
             </ul>
           </section>
         )}
-        {endpointDetails.requestBody && (
+        {bodyParameters && (
           <section>
-            <ApiOperationBodySchemeSelector
-              requestBody={endpointDetails.requestBody}
-              className="mb-3"
-            />
-            <ApiOperationRequestBodyDetails requestBody={endpointDetails.requestBody} />
+            <ApiOperationBodySchemeSelector requestBody={bodyParameters} className="mb-3" />
+            <ApiOperationRequestBodyDetails requestBody={bodyParameters} />
+          </section>
+        )}
+        {endpointDetails.responses && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">Response codes</h3>
+            <ul>
+              {Object.keys(endpointDetails.responses).map((code) => (
+                <li key={code} className="list-['-'] ml-2 pl-2">
+                  <span className="font-mono text-sm font-medium text-foreground">{code}</span>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
       </div>
-      {Object.keys(endpointDetails.responses).filter((code) => code.startsWith('2')).length > 0 && (
+      {endpointDetails.responses && first2xxCode && (
         <div className="overflow-auto">
-          <h3 className="mb-3 text-base text-foreground">Response</h3>
+          <h3 className="mb-3 text-base text-foreground">{`Response (${first2xxCode})`}</h3>
           <ApiSchema
             id={`${section.id}-2xx-response`}
             schema={
-              endpointDetails.responses[
-                Object.keys(endpointDetails.responses)
-                  .filter((code) => code.startsWith('2'))
-                  .sort()[0]
-              ].content?.['application/json']?.schema ?? {}
+              endpointDetails.responses[first2xxCode].content?.['application/json']?.schema ??
+              // @ts-ignore - schema is here in older versions
+              endpointDetails.responses[first2xxCode].schema ??
+              {}
             }
           />
         </div>

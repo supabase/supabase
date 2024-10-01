@@ -1,17 +1,14 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import MotionNumber from 'motion-number'
-import { useState } from 'react'
 
 import {
   badgeVariants,
   cn,
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
   Tooltip_Shadcn_,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
+import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
 
 interface DiskSpaceBarProps {
   showNewBar: boolean
@@ -26,17 +23,11 @@ export default function DiskSpaceBar({
   usedSize,
   newTotalSize,
 }: DiskSpaceBarProps) {
-  //   const [totalSize, setTotalSize] = useState<number>(8) // 8 GB total disk size
-  //   const [usedSize, setUsedSize] = useState<number>(4) // Starting with 4 GB used (50% usage)
-  const [resizeThreshold, setResizeThreshold] = useState<number>(0.5) // 500 MB threshold for resize
-
   const usedPercentage = (usedSize / totalSize) * 100
-  const resizePoint = totalSize - resizeThreshold
-  const resizePercentage = (resizePoint / totalSize) * 100
+  const resizePercentage = AUTOSCALING_THRESHOLD * 100
 
   const newUsedPercentage = (usedSize / newTotalSize) * 100
-  const newResizePoint = newTotalSize - resizeThreshold
-  const newResizePercentage = (newResizePoint / newTotalSize) * 100
+  const newResizePercentage = AUTOSCALING_THRESHOLD * 100
 
   return (
     <div className="flex flex-col gap-2">

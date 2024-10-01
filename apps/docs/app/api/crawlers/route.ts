@@ -3,7 +3,7 @@ import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { toHast } from 'mdast-util-to-hast'
 import { mdxjs } from 'micromark-extension-mdxjs'
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { visit } from 'unist-util-visit'
 
 import { REFERENCES } from '~/content/navigation.references'
@@ -15,7 +15,6 @@ import {
 import { getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
-import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 import { BASE_PATH } from '~/lib/constants'
 
 export async function GET(request: Request) {
@@ -52,7 +51,7 @@ export async function GET(request: Request) {
   } catch {}
 
   if (!section) {
-    redirect(notFoundLink(`${lib}/${slug}`))
+    notFound()
   }
 
   const html = htmlShell(

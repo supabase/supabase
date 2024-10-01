@@ -37,13 +37,14 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { urlRegex } from '../Auth/Auth.constants'
 
 const FORM_ID = 'log-drain-destination-form'
 
 const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('webhook'),
-    url: z.string().url('Endpoint URL is required and must be a valid URL'),
+    url: z.string().regex(urlRegex, 'Endpoint URL is required and must be a valid URL'),
     http: z.enum(['http1', 'http2']),
     gzip: z.boolean(),
     headers: z.record(z.string(), z.string()).optional(),

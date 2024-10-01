@@ -532,3 +532,24 @@ const _getTruncation = (date: Dayjs) => {
   }[zeroCount]!
   return truncation
 }
+
+export function checkForWithClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const withClauseRegex = /\b(WITH)\b(?=(?:[^']*'[^']*')*[^']*$)/i
+  return withClauseRegex.test(queryWithoutComments)
+}
+
+export function checkForILIKEClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const ilikeClauseRegex = /\b(ILIKE)\b(?=(?:[^']*'[^']*')*[^']*$)/i
+  return ilikeClauseRegex.test(queryWithoutComments)
+}
+
+export function checkForWildcard(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const wildcardRegex = /\*/
+  return wildcardRegex.test(queryWithoutComments)
+}

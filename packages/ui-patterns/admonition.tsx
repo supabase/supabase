@@ -70,9 +70,9 @@ const WarningIcon = () => (
 const admonitionSVG = cva('', {
   variants: {
     type: {
-      default: `[&_svg]:bg-foreground-muted [&_svg]:text-background-muted`,
-      warning: `[&_svg]:bg-warning [&_svg]:text-warning-100`,
-      destructive: `[&_svg]:bg-destructive [&_svg]:text-white`,
+      default: `[&>svg]:bg-foreground-muted [&>svg]:text-background-muted`,
+      warning: `[&>svg]:bg-warning [&>svg]:text-warning-100`,
+      destructive: `[&>svg]:bg-destructive [&>svg]:text-white`,
     },
   },
 })

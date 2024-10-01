@@ -1,12 +1,11 @@
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
-import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
@@ -73,7 +72,7 @@ const getContent = async ({ slug }: Params) => {
   const page = pageMap.find(({ slug: validSlug }) => validSlug && validSlug === slug)
 
   if (!page) {
-    redirect(notFoundLink(`cli/github-action/${slug}`))
+    notFound()
   }
 
   const { remoteFile, meta } = page

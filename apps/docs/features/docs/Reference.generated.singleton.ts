@@ -62,6 +62,20 @@ export async function getApiEndpointById(id: string) {
   return apiEndpointsById.get(id)
 }
 
+let selfHostedEndpointsById = new Map<string, Map<string, IApiEndPoint>>()
+
+export async function getSelfHostedApiEndpointById(servicePath: string, id: string) {
+  if (!selfHostedEndpointsById.has(servicePath)) {
+    const rawJson = await readFile(
+      join(process.cwd(), 'features/docs', `./generated/${servicePath}.latest.endpointsById.json`),
+      'utf-8'
+    )
+    selfHostedEndpointsById.set(servicePath, new Map(JSON.parse(rawJson)))
+  }
+
+  return selfHostedEndpointsById.get(servicePath)?.get(id)
+}
+
 const functionsList = new Map<string, Array<{ id: unknown }>>()
 
 export async function getFunctionsList(sdkId: string, version: string) {

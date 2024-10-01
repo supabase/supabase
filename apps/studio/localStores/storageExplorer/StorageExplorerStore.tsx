@@ -1,6 +1,17 @@
 import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
-import { chunk, compact, find, findIndex, has, isEqual, isObject, uniq, uniqBy } from 'lodash'
+import {
+  capitalize,
+  chunk,
+  compact,
+  find,
+  findIndex,
+  has,
+  isEqual,
+  isObject,
+  uniq,
+  uniqBy,
+} from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
@@ -722,13 +733,29 @@ class StorageExplorerStore {
             chunkSize,
             onShouldRetry(error) {
               const status = error.originalResponse ? error.originalResponse.getStatus() : 0
-              const doNotRetryStatuses = [400, 403, 404, 409, 429]
+              const doNotRetryStatuses = [400, 403, 404, 409, 415, 429]
 
               return !doNotRetryStatuses.includes(status)
             },
-            onError(error) {
+            onError: (error) => {
               numberOfFilesUploadedFail += 1
-              toast.error(`Failed to upload ${file.name}: ${error.message}`)
+              if (
+                error instanceof tus.DetailedError &&
+                error.originalResponse?.getStatus() === 415
+              ) {
+                // Unsupported mime type
+                toast.error(
+                  capitalize(
+                    error.originalResponse.getBody() ||
+                      `Failed to upload ${file.name}: ${metadata.mimetype} is not allowed`
+                  ),
+                  {
+                    description: `Allowed MIME types: ${this.selectedBucket.allowed_mime_types?.join(', ')}`,
+                  }
+                )
+              } else {
+                toast.error(`Failed to upload ${file.name}: ${error.message}`)
+              }
               reject(error)
             },
             onProgress: (bytesSent, bytesTotal) => {

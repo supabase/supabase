@@ -8,12 +8,10 @@ import { globby } from 'globby'
 import matter from 'gray-matter'
 import prettier from 'prettier'
 
-import { generateAPIPages } from './files/api'
 import { generateCLIPages } from './files/cli'
 import { generateReferencePages } from './files/reference-lib'
 
 async function generate() {
-  const apiPages = generateAPIPages()
   const cliPages = generateCLIPages()
   const referencePages = await generateReferencePages()
 
@@ -34,8 +32,7 @@ async function generate() {
 
   const allPages = (contentPages as Array<{ link: string; priority?: number }>).concat(
     referencePages,
-    cliPages,
-    apiPages
+    cliPages
   )
 
   const sitemap = `

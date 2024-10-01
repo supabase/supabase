@@ -307,7 +307,7 @@ Client access polices are cached for the duration of the connection. Your databa
 Realtime updates the access policy cache for a client based on your RLS polices when:
 
 - A client connects to Realtime and subscribes to a Channel
-- A new JWT is sent to Realtime from a client via the [`access_token` message](docs/guides/realtime/protocol#access-token)
+- A new JWT is sent to Realtime from a client via the [`access_token` message](/docs/guides/realtime/protocol#access-token)
 
 If a new JWT is never received on the Channel, the client will be disconnected when the JWT expires.
 
