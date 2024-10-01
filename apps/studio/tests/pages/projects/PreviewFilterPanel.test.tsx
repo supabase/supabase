@@ -1,10 +1,6 @@
-import { vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-
-import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
-import { render } from '../../helpers'
-import { clickDropdown } from 'tests/helpers'
+import { expect, test, vi } from 'vitest'
 
 test.skip('filter input change and submit', async () => {
   const mockFn = vi.fn()

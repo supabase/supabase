@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { formatTableRowsToSQL } from './TableEntity.utils'
 
 describe('TableEntity.utils: formatTableRowsToSQL', () => {
