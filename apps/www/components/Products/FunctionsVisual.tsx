@@ -3,8 +3,13 @@ import Image from 'next/image'
 import Typed from 'typed.js'
 import type { TypedOptions } from 'typed.js'
 import { useBreakpoint } from 'common'
+import { cn } from 'ui'
 
-const FunctionsVisual = () => {
+interface Props {
+  className?: string
+}
+
+const FunctionsVisual: React.FC<Props> = ({ className }) => {
   const typerRef = useRef<HTMLSpanElement>(null)
   const isMobile = useBreakpoint('md')
   const [typed, setTyped] = useState<Typed | null>(null)
@@ -64,7 +69,7 @@ const FunctionsVisual = () => {
 
   return (
     <figure
-      className="absolute inset-0 z-20"
+      className={cn('absolute inset-0 z-20', className)}
       role="img"
       aria-label="Supabase Edge Functions visual composition"
       onMouseOver={handleMouseEnter}
