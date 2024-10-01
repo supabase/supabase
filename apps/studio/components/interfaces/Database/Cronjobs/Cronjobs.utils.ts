@@ -87,10 +87,12 @@ export const parseCronjobCommand = (originalCommand: string): CronjobType => {
   }
 
   if (command.toLocaleLowerCase().startsWith('call ')) {
+    const [schemaName, functionName] = command.split('.')
+
     return {
       type: 'sql_function',
-      schema: '',
-      functionName: '',
+      schema: schemaName,
+      functionName: functionName,
     }
   }
 

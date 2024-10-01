@@ -18,9 +18,10 @@ export const SqlSnippetSection = ({ form }: SqlSnippetSectionProps) => {
         render={({ field }) => (
           <FormItemLayout label="SQL Snippet">
             <CodeEditor
-              id="create-cronjob-editor"
+              id="create-cron-job-editor"
               language="pgsql"
               className="h-72"
+              autofocus={false}
               value={field.value}
               onInputChange={field.onChange}
             />

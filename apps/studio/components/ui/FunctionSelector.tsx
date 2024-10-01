@@ -99,10 +99,16 @@ const FunctionSelector = ({
                 <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
               }
             >
-              <div className="w-full flex gap-1">
-                <p className="text-foreground-lighter">function:</p>
-                <p className="text-foreground">{value}</p>
-              </div>
+              {value ? (
+                <div className="w-full flex gap-1">
+                  <p className="text-foreground-lighter">function:</p>
+                  <p className="text-foreground">{value}</p>
+                </div>
+              ) : (
+                <div className="w-full flex gap-1">
+                  <p className="text-foreground-lighter">Choose a function...</p>
+                </div>
+              )}
             </Button>
           </PopoverTrigger_Shadcn_>
           <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>

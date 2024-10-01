@@ -215,7 +215,7 @@ export const CreateCronjobSheet = ({
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItemLayout label="Name of cronjob" layout="vertical" className="gap-1">
+                    <FormItemLayout label="Name" layout="vertical" className="gap-1">
                       <FormControl_Shadcn_>
                         <Input_Shadcn_ {...field} />
                       </FormControl_Shadcn_>
@@ -231,7 +231,7 @@ export const CreateCronjobSheet = ({
                   control={form.control}
                   name="values.type"
                   render={({ field }) => (
-                    <FormItemLayout label="Type of cron job" layout="vertical" className="gap-1">
+                    <FormItemLayout label="Type" layout="vertical" className="gap-1">
                       <FormControl_Shadcn_>
                         <RadioGroupStacked
                           id="function_type"

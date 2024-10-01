@@ -62,7 +62,7 @@ export const CronjobScheduleSection = ({ form }: CronjobScheduleSectionProps) =>
 
           return (
             <FormItem_Shadcn_ className="flex flex-col gap-1">
-              <FormLabel_Shadcn_>Cron schedule</FormLabel_Shadcn_>
+              <FormLabel_Shadcn_>Schedule</FormLabel_Shadcn_>
               <FormControl_Shadcn_>
                 <div className="flex flex-col gap-2">
                   <Select_Shadcn_ onValueChange={onChangeSelectValue} value={presetValue}>
