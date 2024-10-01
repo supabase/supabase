@@ -49,7 +49,6 @@ import passwordStrength from 'lib/password-strength'
 import type { CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
-  Admonition,
   Badge,
   Button,
   CollapsibleContent_Shadcn_,
@@ -76,6 +75,7 @@ import {
   TableRow,
   cn,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'

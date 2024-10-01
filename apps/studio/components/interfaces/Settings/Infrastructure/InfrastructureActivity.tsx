@@ -33,8 +33,9 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
-import { Admonition, Button } from 'ui'
 
 const NON_DEDICATED_IO_RESOURCES = [
   'ci_micro',
