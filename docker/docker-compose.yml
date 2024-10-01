@@ -5,7 +5,6 @@
 #   Destroy:        docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
 
 name: supabase
-version: "3.8"
 
 services:
   studio:
@@ -383,9 +382,11 @@ services:
       - -c
       - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
     restart: unless-stopped
-    ports:
-      # Pass down internal port because it's set dynamically by other services
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    # # Uncomment if you never want to use the pooler to access the database
+    # # otherwise the pooler will expose the port under the session port
+    # ports:
+    #   # Pass down internal port because it's set dynamically by other services
+    #   - ${POSTGRES_PORT}:${POSTGRES_PORT}
     environment:
       POSTGRES_HOST: /var/run/postgresql
       PGPORT: ${POSTGRES_PORT}
@@ -410,6 +411,8 @@ services:
       - ./volumes/db/_supabase.sql:/docker-entrypoint-initdb.d/migrations/97-_supabase.sql:Z
       # Changes required for Analytics support
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
+      # Changes required for Pooler support
+      - ./volumes/db/pooler.sql:/docker-entrypoint-initdb.d/migrations/99-pooler.sql:Z
       # Use named volume to persist pgsodium decryption key between restarts
       - db-config:/etc/postgresql-custom
 
@@ -436,6 +439,48 @@ services:
     environment:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
     command: [ "--config", "etc/vector/vector.yml" ]
+    # Comment out everything below this point if you are using an external Postgres database
+  supavisor:
+    container_name: supabase-pooler
+    image: supabase/supavisor:1.1.56
+    healthcheck:
+      test: curl -sSfL --head -o /dev/null "http://127.0.0.1:4000/api/health"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      db:
+        condition: service_healthy
+      analytics:
+        condition: service_healthy
+    command:
+      - /bin/sh
+      - -c
+      - /app/bin/migrate && /app/bin/supavisor eval "$$(cat /etc/pooler/pooler.exs)" && /app/bin/server
+    restart: unless-stopped
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+      - ${POOLER_PROXY_PORT_TRANSACTION}:${POOLER_PROXY_PORT_TRANSACTION}
+    environment:
+      - PORT=4000
+      - SECRET_KEY_BASE=${POOLER_SECRET_KEY_BASE}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DATABASE_URL=ecto://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/_supabase
+      - CLUSTER_POSTGRES=true
+      - SECRET_KEY_BASE=${POOLER_SECRET_KEY_BASE}
+      - VAULT_ENC_KEY=${POOLER_VAULT_ENC_KEY}
+      - API_JWT_SECRET=${JWT_SECRET}
+      - METRICS_JWT_SECRET=${JWT_SECRET}
+      - REGION=local
+      - ERL_AFLAGS=-proto_dist inet_tcp
+      - POOLER_TENANT_ID=${POOLER_TENANT_ID}
+      - POOLER_DEFAULT_POOL_SIZE=${POOLER_DEFAULT_POOL_SIZE}
+      - POOLER_MAX_CLIENT_CONN=${POOLER_MAX_CLIENT_CONN}
+      - POOLER_POOL_MODE=${POOLER_POOL_MODE}
+    volumes:
+      - ./volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro
 
 volumes:
   db-config:
