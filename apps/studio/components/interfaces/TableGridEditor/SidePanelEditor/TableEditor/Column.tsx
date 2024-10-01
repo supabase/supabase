@@ -226,7 +226,6 @@ const Column = ({
           <ColumnType
             value={column.format}
             enumTypes={enumTypes}
-            size="small"
             showLabel={false}
             className="table-editor-column-type lg:gap-0 "
             disabled={hasForeignKeys}

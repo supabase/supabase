@@ -1,9 +1,18 @@
-import { describe, vi, test } from 'vitest'
-import LogTable from 'components/interfaces/Settings/Logs/LogTable'
-import { waitFor, screen, prettyDOM } from '@testing-library/react'
+import { prettyDOM, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import dayjs from 'dayjs'
+import { beforeAll, expect, test, vi } from 'vitest'
 import { render } from '../../helpers'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+dayjs.extend(customParseFormat)
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(relativeTime)
 
 beforeAll(() => {
   vi.mock('next/router', () => require('next-router-mock'))

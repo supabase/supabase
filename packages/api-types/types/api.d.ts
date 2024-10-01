@@ -7151,6 +7151,9 @@ export interface operations {
         limit: string
         offset: string
         verified: string
+        sort?: string
+        order?: string
+        providers?: string[]
       }
       path: {
         /** @description Project ref */

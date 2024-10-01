@@ -69,6 +69,8 @@ export const LOCAL_STORAGE_KEYS = {
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
   AUTH_SMTP_CHANGES_WARNING: 'auth-smtp-changes-warning-dismissed',
+
+  AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
 }
 
 export const OPT_IN_TAGS = {

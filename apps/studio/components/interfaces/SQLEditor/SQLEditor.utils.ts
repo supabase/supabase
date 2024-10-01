@@ -8,6 +8,9 @@ import {
 } from './SQLEditor.constants'
 import { ContentDiff, DiffType } from './SQLEditor.types'
 
+/**
+ * @deprecated
+ */
 export const createSqlSnippetSkeleton = ({
   id,
   name,

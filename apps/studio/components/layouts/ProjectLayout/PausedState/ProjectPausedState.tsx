@@ -44,11 +44,11 @@ import {
   SelectValue_Shadcn_,
   Select_Shadcn_,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useProjectContext } from '../ProjectContext'
-import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { PauseDisabledState } from './PauseDisabledState'
+import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
+import { useProjectContext } from '../ProjectContext'
 
 export interface ProjectPausedStateProps {
   product?: string

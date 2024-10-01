@@ -1,11 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Message as MessageType } from 'ai'
 import { useChat } from 'ai/react'
-import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
+import { Info } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
+
 import { useParams, useTelemetryProps } from 'common'
 import { SchemaComboBox } from 'components/ui/SchemaComboBox'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
@@ -17,8 +18,8 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
+import Telemetry from 'lib/telemetry'
 import uuidv4 from 'lib/uuid'
-import { Info } from 'lucide-react'
 import {
   AiIconAnimation,
   Alert_Shadcn_,
@@ -31,7 +32,7 @@ import {
   TooltipTrigger_Shadcn_,
   WarningIcon,
 } from 'ui'
-import { AssistantChatForm } from 'ui-patterns/AssistantChat/AssistantChatForm'
+import { AssistantChatForm } from 'ui-patterns/AssistantChat'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import OptInToOpenAIToggle from '../../Organization/GeneralSettings/OptInToOpenAIToggle'
 import { DiffType } from '../SQLEditor.types'

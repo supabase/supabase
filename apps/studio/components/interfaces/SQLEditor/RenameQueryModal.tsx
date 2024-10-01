@@ -8,8 +8,6 @@ import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
@@ -30,9 +28,7 @@ const RenameQueryModal = ({
   const { ref } = useParams()
   const organization = useSelectedOrganization()
 
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const enableFolders = useFlag('sqlFolderOrganization')
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const isSQLSnippet = snippet.type === 'sql'
 
@@ -55,22 +51,16 @@ const RenameQueryModal = ({
     },
   })
 
-  const isAiButtonVisible = enableFolders ? true : isSQLSnippet
-
   const generateTitle = async () => {
-    if (enableFolders) {
-      if ('content' in snippet && isSQLSnippet) {
-        titleSql({ sql: snippet.content.sql })
-      } else {
-        try {
-          const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-          titleSql({ sql: content.sql })
-        } catch (error) {
-          toast.error('Unable to generate title based on query contents')
-        }
-      }
+    if ('content' in snippet && isSQLSnippet) {
+      titleSql({ sql: snippet.content.sql })
     } else {
-      if ('content' in snippet && isSQLSnippet) titleSql({ sql: snippet.content.sql })
+      try {
+        const { content } = await getContentById({ projectRef: ref, id: snippet.id })
+        titleSql({ sql: content.sql })
+      } catch (error) {
+        toast.error('Unable to generate title based on query contents')
+      }
     }
   }
 
@@ -86,17 +76,14 @@ const RenameQueryModal = ({
 
     setSubmitting(true)
     try {
-      if (enableFolders) {
-        // [Joshen] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
-        if (!('content' in snippet)) {
-          // [Joshen] I feel like there's definitely some optimization we can do here but will involve changes to API
-          const snippet = await getContentById({ projectRef: ref, id })
-          snapV2.addSnippet({ projectRef: ref, snippet })
-        }
-        snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
-      } else {
-        snap.renameSnippet(id, nameInput, descriptionInput)
+      // [Joshen] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
+      if (!('content' in snippet)) {
+        // [Joshen] I feel like there's definitely some optimization we can do here but will involve changes to API
+        const snippet = await getContentById({ projectRef: ref, id })
+        snapV2.addSnippet({ projectRef: ref, snippet })
       }
+      snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
+
       if (onComplete) onComplete()
     } catch (error: any) {
       // [Joshen] We probably need some rollback cause all the saving is async
@@ -132,7 +119,7 @@ const RenameQueryModal = ({
                 onChange={(e) => setNameInput(e.target.value)}
               />
               <div className="flex w-full justify-end mt-2">
-                {!hasHipaaAddon && isAiButtonVisible && (
+                {!hasHipaaAddon && (
                   <Button
                     type="default"
                     onClick={() => generateTitle()}

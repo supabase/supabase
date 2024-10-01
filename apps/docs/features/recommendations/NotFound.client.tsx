@@ -5,10 +5,10 @@ import { type SupabaseClient } from '@supabase/supabase-js'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
-import { useSetCommandMenuOpen } from '@ui-patterns/CommandMenu'
-import { GenericSkeletonLoader } from '@ui-patterns/ShimmeringLoader'
 import { type DocsSearchResult } from 'common'
 import { Button, cn } from 'ui'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import ButtonCard from '~/components/ButtonCard'
 
@@ -107,4 +107,4 @@ function RecommendationsList({
   )
 }
 
-export { SearchButton, Recommendations }
+export { Recommendations, SearchButton }
