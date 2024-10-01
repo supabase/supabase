@@ -1,5 +1,5 @@
-import { CronjobType } from './CreateCronjobSheet'
-import { HTTPHeader, HTTPParameter } from './Cronjobs.constants'
+import { CronJobType } from './CreateCronJobSheet'
+import { HTTPHeader, HTTPParameter } from './CronJobs.constants'
 
 export const buildCronQuery = (name: string, schedule: string, command: string) => {
   return `select
@@ -33,7 +33,7 @@ export const DEFAULT_CRONJOB_COMMAND = {
   snippet: '',
 } as const
 
-export const parseCronjobCommand = (originalCommand: string): CronjobType => {
+export const parseCronJobCommand = (originalCommand: string): CronJobType => {
   const command = originalCommand
     .replaceAll('$$', ' ')
     .replaceAll(/\n/g, ' ')

@@ -5,28 +5,28 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { Cronjob, useCronjobsQuery } from 'data/database-cronjobs/database-cronjobs-query'
+import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { Button, Sheet, SheetContent } from 'ui'
-import { CreateCronjobSheet } from './CreateCronjobSheet'
-import { CronjobCard } from './CronjobCard'
-import DeleteCronjob from './DeleteCronjob'
+import { CreateCronJobSheet } from './CreateCronJobSheet'
+import { CronJobCard } from './CronJobCard'
+import DeleteCronJob from './DeleteCronJob'
 
-export const CronjobsListing = () => {
+export const CronJobsListing = () => {
   const { project } = useProjectContext()
 
-  // used for confirmation prompt in the Create Cronjob Sheet
+  // used for confirmation prompt in the Create Cron Job Sheet
   const [isClosingCreateCronJobSheet, setIsClosingCreateCronJobSheet] = useState(false)
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useState<
-    Pick<Cronjob, 'jobname' | 'schedule' | 'active' | 'command'> | undefined
+    Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'> | undefined
   >()
-  const [cronjobForDeletion, setCronjobForDeletion] = useState<Cronjob | undefined>()
+  const [cronJobForDeletion, setCronJobForDeletion] = useState<CronJob | undefined>()
 
   const {
-    data: cronjobs,
+    data: cronJobs,
     error,
     isLoading,
     isError,
-  } = useCronjobsQuery({
+  } = useCronJobsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -36,7 +36,7 @@ export const CronjobsListing = () => {
 
   return (
     <>
-      {(cronjobs ?? []).length == 0 ? (
+      {(cronJobs ?? []).length == 0 ? (
         <div className="flex h-full w-full items-center justify-center">
           <ProductEmptyState
             title="Cron jobs"
@@ -79,11 +79,11 @@ export const CronjobsListing = () => {
               </Button>
             }
           />
-          {cronjobs.map((job) => (
-            <CronjobCard
+          {cronJobs.map((job) => (
+            <CronJobCard
               job={job}
-              editCronjob={(job) => setCreateCronJobSheetShown(job)}
-              deleteCronjob={(job) => setCronjobForDeletion(job)}
+              editCronJob={(job) => setCreateCronJobSheetShown(job)}
+              deleteCronJob={(job) => setCronJobForDeletion(job)}
             />
           ))}
         </div>
@@ -93,8 +93,8 @@ export const CronjobsListing = () => {
         onOpenChange={() => setIsClosingCreateCronJobSheet(true)}
       >
         <SheetContent size="default" tabIndex={undefined}>
-          <CreateCronjobSheet
-            selectedCronjob={createCronJobSheetShown}
+          <CreateCronJobSheet
+            selectedCronJob={createCronJobSheetShown}
             onClose={() => {
               setIsClosingCreateCronJobSheet(false)
               setCreateCronJobSheetShown(undefined)
@@ -104,10 +104,10 @@ export const CronjobsListing = () => {
           />
         </SheetContent>
       </Sheet>
-      <DeleteCronjob
-        visible={!!cronjobForDeletion}
-        onClose={() => setCronjobForDeletion(undefined)}
-        cronjob={cronjobForDeletion!}
+      <DeleteCronJob
+        visible={!!cronJobForDeletion}
+        onClose={() => setCronJobForDeletion(undefined)}
+        cronJob={cronJobForDeletion!}
       />
     </>
   )

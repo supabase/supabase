@@ -4,16 +4,16 @@ import { Button, Input, Label_Shadcn_, Switch } from 'ui'
 
 import { SQLCodeBlock } from 'components/interfaces/Auth/ThirdPartyAuthForm/SqlCodeBlock'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { Cronjob } from 'data/database-cronjobs/database-cronjobs-query'
-import { useDatabaseCronjobToggleMutation } from 'data/database-cronjobs/database-cronjobs-toggle-mutation'
+import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 
-interface CronjobCardProps {
-  job: Cronjob
-  editCronjob: (job: Cronjob) => void
-  deleteCronjob: (job: Cronjob) => void
+interface CronJobCardProps {
+  job: CronJob
+  editCronJob: (job: CronJob) => void
+  deleteCronJob: (job: CronJob) => void
 }
 
-export const CronjobCard = ({ job, editCronjob, deleteCronjob }: CronjobCardProps) => {
+export const CronJobCard = ({ job, editCronJob, deleteCronJob }: CronJobCardProps) => {
   // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
   // original schedule when cronstrue throws
   let schedule = job.schedule
@@ -23,7 +23,7 @@ export const CronjobCard = ({ job, editCronjob, deleteCronjob }: CronjobCardProp
   } catch {}
 
   const { project: selectedProject } = useProjectContext()
-  const { mutate: toggleDatabaseCronjob, isLoading } = useDatabaseCronjobToggleMutation()
+  const { mutate: toggleDatabaseCronJob, isLoading } = useDatabaseCronJobToggleMutation()
 
   return (
     <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
@@ -38,19 +38,19 @@ export const CronjobCard = ({ job, editCronjob, deleteCronjob }: CronjobCardProp
               <Loader2 size={18} strokeWidth={2} className="animate-spin text-foreground-muted" />
             ) : (
               <Label_Shadcn_
-                htmlFor={`cronjob-active-${job.jobid}`}
+                htmlFor={`cron-job-active-${job.jobid}`}
                 className="text-foreground-light"
               >
                 {job.active ? 'Active' : 'Inactive'}
               </Label_Shadcn_>
             )}
             <Switch
-              id={`cronjob-active-${job.jobid}`}
+              id={`cron-job-active-${job.jobid}`}
               size="large"
               disabled={isLoading}
               checked={job.active}
               onCheckedChange={() => {
-                toggleDatabaseCronjob({
+                toggleDatabaseCronJob({
                   projectRef: selectedProject?.ref!,
                   connectionString: selectedProject?.connectionString,
                   jobId: job.jobid,
@@ -83,11 +83,11 @@ export const CronjobCard = ({ job, editCronjob, deleteCronjob }: CronjobCardProp
           </div>
         </div>
         <div className="flex flex-row gap-2">
-          <Button type="default" disabled={false} onClick={() => editCronjob(job)}>
-            Configure cronjob
+          <Button type="default" disabled={false} onClick={() => editCronJob(job)}>
+            Configure cron job
           </Button>
-          <Button type="danger" disabled={false} onClick={() => deleteCronjob(job)}>
-            Delete cronjob
+          <Button type="danger" disabled={false} onClick={() => deleteCronJob(job)}>
+            Delete cron job
           </Button>
         </div>
       </div>

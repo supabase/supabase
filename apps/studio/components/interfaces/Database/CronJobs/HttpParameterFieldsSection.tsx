@@ -10,7 +10,7 @@ import {
   Input_Shadcn_,
   SheetSection,
 } from 'ui'
-import { CreateCronJobForm } from './CreateCronjobSheet'
+import { CreateCronJobForm } from './CreateCronJobSheet'
 
 interface HTTPParameterFieldsSectionProps {
   fieldName: 'values.httpParameters' | 'values.httpParameters'

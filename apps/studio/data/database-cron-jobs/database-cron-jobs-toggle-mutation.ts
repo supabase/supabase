@@ -3,52 +3,54 @@ import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
-import { databaseCronjobsKeys } from './keys'
+import { databaseCronJobsKeys } from './keys'
 
-export type DatabaseCronjobDeleteVariables = {
+export type DatabaseCronJobToggleVariables = {
   projectRef: string
   connectionString?: string
   jobId: number
+  active: boolean
 }
 
-export async function deleteDatabaseCronjob({
+export async function toggleDatabaseCronJob({
   projectRef,
   connectionString,
   jobId,
-}: DatabaseCronjobDeleteVariables) {
+  active,
+}: DatabaseCronJobToggleVariables) {
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT cron.unschedule(${jobId});`,
-    queryKey: ['cronjobs', 'delete'],
+    sql: `select cron.alter_job(job_id := ${jobId}, active := ${active});`,
+    queryKey: databaseCronJobsKeys.alter(),
   })
 
   return result
 }
 
-type DatabaseCronjobDeleteData = Awaited<ReturnType<typeof deleteDatabaseCronjob>>
+type DatabaseCronJobToggleData = Awaited<ReturnType<typeof toggleDatabaseCronJob>>
 
-export const useDatabaseCronjobDeleteMutation = ({
+export const useDatabaseCronJobToggleMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseCronjobDeleteData, ResponseError, DatabaseCronjobDeleteVariables>,
+  UseMutationOptions<DatabaseCronJobToggleData, ResponseError, DatabaseCronJobToggleVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseCronjobDeleteData, ResponseError, DatabaseCronjobDeleteVariables>(
-    (vars) => deleteDatabaseCronjob(vars),
+  return useMutation<DatabaseCronJobToggleData, ResponseError, DatabaseCronJobToggleVariables>(
+    (vars) => toggleDatabaseCronJob(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseCronjobsKeys.list(projectRef))
+        await queryClient.invalidateQueries(databaseCronJobsKeys.list(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to delete database cronjob: ${data.message}`)
+          toast.error(`Failed to toggle database cron job: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

@@ -21,7 +21,7 @@ import {
   SheetSection,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { CreateCronJobForm } from './CreateCronjobSheet'
+import { CreateCronJobForm } from './CreateCronJobSheet'
 
 interface HTTPRequestFieldsProps {
   form: UseFormReturn<CreateCronJobForm>

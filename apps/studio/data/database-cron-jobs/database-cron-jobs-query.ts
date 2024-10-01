@@ -1,14 +1,14 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { ResponseError } from 'types'
-import { databaseCronjobsKeys } from './keys'
+import { databaseCronJobsKeys } from './keys'
 
-export type DatabaseCronjobsVariables = {
+export type DatabaseCronJobsVariables = {
   projectRef?: string
   connectionString?: string
 }
 
-export type Cronjob = {
+export type CronJob = {
   jobid: number
   schedule: string
   command: string
@@ -22,10 +22,10 @@ export type Cronjob = {
 
 const cronJobSqlQuery = `select * from cron.job order by jobid;`
 
-export async function getDatabaseCronjobs({
+export async function getDatabaseCronJobs({
   projectRef,
   connectionString,
-}: DatabaseCronjobsVariables) {
+}: DatabaseCronJobsVariables) {
   if (!projectRef) throw new Error('Project ref is required')
 
   const { result } = await executeSql({
@@ -36,19 +36,19 @@ export async function getDatabaseCronjobs({
   return result
 }
 
-export type DatabaseCronjobData = Cronjob[]
-export type DatabaseCronjobError = ResponseError
+export type DatabaseCronJobData = CronJob[]
+export type DatabaseCronJobError = ResponseError
 
-export const useCronjobsQuery = <TData = DatabaseCronjobData>(
-  { projectRef, connectionString }: DatabaseCronjobsVariables,
+export const useCronJobsQuery = <TData = DatabaseCronJobData>(
+  { projectRef, connectionString }: DatabaseCronJobsVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DatabaseCronjobData, DatabaseCronjobError, TData> = {}
+  }: UseQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
 ) =>
-  useQuery<DatabaseCronjobData, DatabaseCronjobError, TData>(
-    databaseCronjobsKeys.list(projectRef),
-    () => getDatabaseCronjobs({ projectRef, connectionString }),
+  useQuery<DatabaseCronJobData, DatabaseCronJobError, TData>(
+    databaseCronJobsKeys.list(projectRef),
+    () => getDatabaseCronJobs({ projectRef, connectionString }),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       ...options,

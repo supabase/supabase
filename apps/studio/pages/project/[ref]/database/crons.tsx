@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { CronjobsListing } from 'components/interfaces/Database/Cronjobs/CronjobsListing'
+import { CronJobsListing } from 'components/interfaces/Database/CronJobs/CronJobsListing'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
@@ -13,7 +13,7 @@ const FunctionsPage: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
 
   if (isPermissionsLoaded && !canReadFunctions) {
-    return <NoPermission isFullPage resourceText="manage database cronjobs" />
+    return <NoPermission isFullPage resourceText="manage database cron jobs" />
   }
 
   return (
@@ -21,7 +21,7 @@ const FunctionsPage: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <CronjobsListing />
+            <CronJobsListing />
           </div>
         </ScaffoldSection>
       </ScaffoldContainer>

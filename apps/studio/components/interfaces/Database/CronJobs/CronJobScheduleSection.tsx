@@ -16,9 +16,9 @@ import {
   SelectValue_Shadcn_,
   SheetSection,
 } from 'ui'
-import { CreateCronJobForm } from './CreateCronjobSheet'
+import { CreateCronJobForm } from './CreateCronJobSheet'
 
-interface CronjobScheduleSectionProps {
+interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>
 }
 
@@ -30,7 +30,7 @@ const schedules = [
   { name: 'Custom', expression: 'custom' },
 ] as const
 
-export const CronjobScheduleSection = ({ form }: CronjobScheduleSectionProps) => {
+export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) => {
   let initialValue = schedules[0].expression as string
   const scheduleValue = form.getValues('schedule')
   if (scheduleValue && scheduleValue.length > 0) {

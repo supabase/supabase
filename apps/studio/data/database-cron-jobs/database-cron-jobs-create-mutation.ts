@@ -3,52 +3,52 @@ import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
-import { databaseCronjobsKeys } from './keys'
+import { databaseCronJobsKeys } from './keys'
 
-export type DatabaseCronjobCreateVariables = {
+export type DatabaseCronJobCreateVariables = {
   projectRef: string
   connectionString?: string
   query: string
 }
 
-export async function createDatabaseCronjob({
+export async function createDatabaseCronJob({
   projectRef,
   connectionString,
   query,
-}: DatabaseCronjobCreateVariables) {
+}: DatabaseCronJobCreateVariables) {
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql: query,
-    queryKey: ['cronjobs', 'create'],
+    queryKey: databaseCronJobsKeys.create(),
   })
 
   return result
 }
 
-type DatabaseCronjobCreateData = Awaited<ReturnType<typeof createDatabaseCronjob>>
+type DatabaseCronJobCreateData = Awaited<ReturnType<typeof createDatabaseCronJob>>
 
-export const useDatabaseCronjobCreateMutation = ({
+export const useDatabaseCronJobCreateMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseCronjobCreateData, ResponseError, DatabaseCronjobCreateVariables>,
+  UseMutationOptions<DatabaseCronJobCreateData, ResponseError, DatabaseCronJobCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseCronjobCreateData, ResponseError, DatabaseCronjobCreateVariables>(
-    (vars) => createDatabaseCronjob(vars),
+  return useMutation<DatabaseCronJobCreateData, ResponseError, DatabaseCronJobCreateVariables>(
+    (vars) => createDatabaseCronJob(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseCronjobsKeys.list(projectRef))
+        await queryClient.invalidateQueries(databaseCronJobsKeys.list(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to create database cronjob: ${data.message}`)
+          toast.error(`Failed to create database cron job: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

@@ -6,8 +6,8 @@ import z from 'zod'
 
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useDatabaseCronjobCreateMutation } from 'data/database-cronjobs/database-cronjobs-create-mutation'
-import { Cronjob } from 'data/database-cronjobs/database-cronjobs-query'
+import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
+import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import {
   Button,
@@ -26,9 +26,9 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { CRONJOB_DEFINITIONS } from './Cronjobs.constants'
-import { buildCronQuery, buildHttpRequestCommand, parseCronjobCommand } from './Cronjobs.utils'
-import { CronjobScheduleSection } from './CronjobScheduleSection'
+import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
+import { buildCronQuery, buildHttpRequestCommand, parseCronJobCommand } from './CronJobs.utils'
+import { CronJobScheduleSection } from './CronJobScheduleSection'
 import { EdgeFunctionSection } from './EdgeFunctionSection'
 import { HTTPHeaderFieldsSection } from './HttpHeaderFieldsSection'
 import { HTTPParameterFieldsSection } from './HttpParameterFieldsSection'
@@ -36,8 +36,8 @@ import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
 
-export interface CreateCronjobSheetProps {
-  selectedCronjob?: Pick<Cronjob, 'jobname' | 'schedule' | 'active' | 'command'>
+export interface CreateCronJobSheetProps {
+  selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
   isClosing: boolean
   setIsClosing: (v: boolean) => void
   onClose: () => void
@@ -77,7 +77,7 @@ const sqlSnippetSchema = z.object({
 })
 
 const FormSchema = z.object({
-  name: z.string().trim().min(1, 'Please provide a name for your cronjob'),
+  name: z.string().trim().min(1, 'Please provide a name for your cron job'),
   schedule: z
     .string()
     .trim()
@@ -99,27 +99,27 @@ const FormSchema = z.object({
 })
 
 export type CreateCronJobForm = z.infer<typeof FormSchema>
-export type CronjobType = CreateCronJobForm['values']
+export type CronJobType = CreateCronJobForm['values']
 
-const FORM_ID = 'create-cronjob-sidepanel'
+const FORM_ID = 'create-cron-job-sidepanel'
 
-export const CreateCronjobSheet = ({
-  selectedCronjob,
+export const CreateCronJobSheet = ({
+  selectedCronJob,
   isClosing,
   setIsClosing,
   onClose,
-}: CreateCronjobSheetProps) => {
-  const isEditing = !!selectedCronjob?.jobname
-  const { mutate: upsertCronjob, isLoading } = useDatabaseCronjobCreateMutation()
+}: CreateCronJobSheetProps) => {
+  const isEditing = !!selectedCronJob?.jobname
+  const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
 
-  const cronjobValues = parseCronjobCommand(selectedCronjob?.command || '')
+  const cronJobValues = parseCronJobCommand(selectedCronJob?.command || '')
 
   const form = useForm<CreateCronJobForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: selectedCronjob?.jobname || '',
-      schedule: selectedCronjob?.schedule || '',
-      values: cronjobValues,
+      name: selectedCronJob?.jobname || '',
+      schedule: selectedCronJob?.schedule || '',
+      values: cronJobValues,
     },
   })
 
@@ -165,7 +165,7 @@ export const CreateCronjobSheet = ({
 
     const query = buildCronQuery(name, schedule, command)
 
-    upsertCronjob(
+    upsertCronJob(
       {
         projectRef: project!.ref,
         connectionString: project?.connectionString,
@@ -174,9 +174,9 @@ export const CreateCronjobSheet = ({
       {
         onSuccess: () => {
           if (isEditing) {
-            toast.success(`Successfully updated cronjob ${name}`)
+            toast.success(`Successfully updated cron job ${name}`)
           } else {
-            toast.success(`Successfully created cronjob ${name}`)
+            toast.success(`Successfully created cron job ${name}`)
           }
           onClose()
         },
@@ -199,7 +199,7 @@ export const CreateCronjobSheet = ({
       <div className="flex flex-col h-full" tabIndex={-1}>
         <SheetHeader>
           <SheetTitle>
-            {isEditing ? `Edit ${selectedCronjob.jobname}` : `Create a new cronjob`}
+            {isEditing ? `Edit ${selectedCronJob.jobname}` : `Create a new cron job`}
           </SheetTitle>
         </SheetHeader>
 
@@ -224,7 +224,7 @@ export const CreateCronjobSheet = ({
                 />
               </SheetSection>
               <Separator />
-              <CronjobScheduleSection form={form} />
+              <CronJobScheduleSection form={form} />
               <Separator />
               <SheetSection>
                 <FormField_Shadcn_
@@ -323,7 +323,7 @@ export const CreateCronjobSheet = ({
             disabled={isLoading}
             loading={isLoading}
           >
-            {isEditing ? `Save cronjob` : 'Create cronjob'}
+            {isEditing ? `Save cron job` : 'Create cron job'}
           </Button>
         </SheetFooter>
       </div>

@@ -19,7 +19,7 @@ import {
   Input_Shadcn_,
   SheetSection,
 } from 'ui'
-import { CreateCronJobForm } from './CreateCronjobSheet'
+import { CreateCronJobForm } from './CreateCronJobSheet'
 
 interface HTTPHeaderFieldsSectionProps {
   fieldName: 'values.httpHeaders' | 'values.httpHeaders'
