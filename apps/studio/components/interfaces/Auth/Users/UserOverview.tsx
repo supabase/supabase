@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { Check, Copy, Mail, ShieldOff, Trash, X } from 'lucide-react'
+import { Ban, Check, Copy, Mail, ShieldOff, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -23,6 +23,9 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { PANEL_PADDING } from './UserPanel'
 import { getDisplayName, providerIconMap } from './Users.utils'
+import { BanUserModal } from './BanUserModal'
+import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 const CONTAINER_CLASS = cn(
@@ -42,6 +45,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isEmailAuth = user.email !== null
   const isPhoneAuth = user.phone !== null
   const isAnonUser = user.is_anonymous
+  const isBanned = user.banned_until !== null
 
   const providers = (user.raw_app_meta_data?.providers ?? []).map((provider) => {
     return {
@@ -67,10 +71,13 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const [successAction, setSuccessAction] = useState<
     'send_magic_link' | 'send_recovery' | 'send_otp'
   >()
+  const [isBanModalOpen, setIsBanModalOpen] = useState(false)
+  const [isUnbanModalOpen, setIsUnbanModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isDeleteFactorsModalOpen, setIsDeleteFactorsModalOpen] = useState(false)
 
   const { data } = useAuthConfigQuery({ projectRef })
+  const { data: apiData } = useProjectApiQuery({ projectRef })
   const mailerOtpExpiry = data?.MAILER_OTP_EXP ?? 0
   const minutes = Math.floor(mailerOtpExpiry / 60)
   const seconds = Math.floor(mailerOtpExpiry % 60)
@@ -116,6 +123,12 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       setIsDeleteFactorsModalOpen(false)
     },
   })
+  const { mutate: updateUser, isLoading: isUpdatingUser } = useUserUpdateMutation({
+    onSuccess: () => {
+      toast.success('Successfully unbanned user')
+      setIsUnbanModalOpen(false)
+    },
+  })
 
   const handleDelete = async () => {
     await timeout(200)
@@ -127,6 +140,24 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     await timeout(200)
     if (!projectRef) return console.error('Project ref is required')
     deleteUserMFAFactors({ projectRef, userId: user.id as string })
+  }
+
+  const handleUnban = () => {
+    if (!apiData) {
+      return toast.error(`Failed to ban user: Error loading project config`)
+    } else if (user.id === undefined) {
+      return toast.error(`Failed to ban user: User ID not found`)
+    }
+
+    const { protocol, endpoint, serviceApiKey } = apiData.autoApiService
+    updateUser({
+      projectRef,
+      protocol,
+      endpoint,
+      serviceApiKey,
+      userId: user.id,
+      banDuration: 'none',
+    })
   }
 
   useEffect(() => {
@@ -188,7 +219,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           )}
         </div>
 
-        {!!user.banned_until ? (
+        {isBanned ? (
           <Admonition
             type="warning"
             label={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
@@ -374,6 +405,31 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             className="!bg border-destructive-400"
           />
           <RowAction
+            title={
+              isBanned
+                ? `User is banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`
+                : 'Ban user'
+            }
+            description={
+              isBanned
+                ? 'User has no access to the project until after this date'
+                : 'Revoke access to the project for a set duration'
+            }
+            button={{
+              icon: <Ban />,
+              text: isBanned ? 'Unban user' : 'Ban user',
+              disabled: !canRemoveMFAFactors,
+              onClick: () => {
+                if (isBanned) {
+                  setIsUnbanModalOpen(true)
+                } else {
+                  setIsBanModalOpen(true)
+                }
+              },
+            }}
+            className="!bg border-destructive-400"
+          />
+          <RowAction
             title="Delete user"
             description="User will no longer have access to the project"
             button={{
@@ -390,26 +446,57 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
 
       <ConfirmationModal
         visible={isDeleteModalOpen}
-        title="Confirm to delete"
+        variant="destructive"
+        title="Confirm to delete user"
         confirmLabel="Delete"
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => handleDelete()}
+        alert={{
+          title: 'Deleting a user is irreversible',
+          description: 'This will remove the user from the project and all associated data.',
+        }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to delete user {user.email}?
+          This is permanent! Are you sure you want to delete the user{' '}
+          <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
         </p>
       </ConfirmationModal>
 
       <ConfirmationModal
         visible={isDeleteFactorsModalOpen}
+        variant="warning"
         title="Confirm to remove MFA factors"
         confirmLabel="Remove factors"
         confirmLabelLoading="Removing"
         onCancel={() => setIsDeleteFactorsModalOpen(false)}
         onConfirm={() => handleDeleteFactors()}
+        alert={{
+          base: { variant: 'warning' },
+          title: 'Removing MFA factors is irreversible',
+          description: 'This will log the user out of all active sessions.',
+        }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove the user's MFA factors?
+          This is permanent! Are you sure you want to remove the MFA factors for the user{' '}
+          <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
+        </p>
+      </ConfirmationModal>
+
+      <BanUserModal visible={isBanModalOpen} user={user} onClose={() => setIsBanModalOpen(false)} />
+
+      <ConfirmationModal
+        variant="warning"
+        visible={isUnbanModalOpen}
+        title="Confirm to unban user"
+        loading={isUpdatingUser}
+        confirmLabel="Unban user"
+        confirmLabelLoading="Unbanning"
+        onCancel={() => setIsUnbanModalOpen(false)}
+        onConfirm={() => handleUnban()}
+      >
+        <p className="text-sm text-foreground-light">
+          The user will have access to your project again once unbanned. Are you sure you want to
+          unban this user?
         </p>
       </ConfirmationModal>
     </>
@@ -424,10 +511,12 @@ const RowData = ({ property, value }: { property: string; value?: string | boole
         <div className="h-[26px] flex items-center justify-center">
           {value ? (
             <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
-              <Check size={11} className="text-contrast" strokeWidth={4} />
+              <Check size={10} className="text-contrast" strokeWidth={4} />
             </div>
           ) : (
-            <X size={13} className="text-foreground-light" />
+            <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
+              <X size={10} className="text-contrast" strokeWidth={4} />
+            </div>
           )}
         </div>
       ) : (
