@@ -1,5 +1,5 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { ArrowDown, ArrowUp, RefreshCw, Search, Users, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, Loader2, RefreshCw, Search, Users, X } from 'lucide-react'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
@@ -10,6 +10,7 @@ import AlertError from 'components/ui/AlertError'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
@@ -34,13 +35,12 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import AddUserDropdown from './AddUserDropdown'
 import { UserPanel } from './UserPanel'
 import { PROVIDER_FILTER_OPTIONS } from './Users.constants'
 import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
-import { useUsersCountQuery } from 'data/auth/users-count-query'
 
 type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 export type UsersTableColumn = {
@@ -353,7 +353,7 @@ export const UsersV2 = () => {
           <AddUserDropdown projectKpsVersion={project?.kpsVersion} />
         </div>
       </div>
-      <LoadingLine loading={isLoading || isRefetching} />
+      <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
       <ResizablePanelGroup
         direction="horizontal"
         className="relative flex flex-grow bg-alternative min-h-0"
@@ -438,8 +438,14 @@ export const UsersV2 = () => {
           />
         )}
       </ResizablePanelGroup>
-      <div className="flex min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
-        Total: {totalUsers} users
+
+      <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
+        {isLoading || isRefetching ? 'Loading users...' : `Total: ${totalUsers} users`}
+        {(isLoading || isRefetching || isFetchingNextPage) && (
+          <span className="flex items-center gap-2">
+            <Loader2 size={14} className="animate-spin" /> Loading...
+          </span>
+        )}
       </div>
     </div>
   )

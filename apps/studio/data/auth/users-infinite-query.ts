@@ -17,7 +17,7 @@ export type UsersVariables = {
   order?: 'asc' | 'desc'
 }
 
-export const USERS_PAGE_LIMIT = 20
+export const USERS_PAGE_LIMIT = 50
 export type User = components['schemas']['UserBody']
 
 const getUsersSQL = ({

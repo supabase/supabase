@@ -101,6 +101,10 @@ h6:not(.overwrite) {
   line-height: 1.2 !important;
 }
 
+.label:not(.prose *):not(.overwrite) {
+  @apply text-xs font-mono uppercase text-foreground-lighter tracking-wider;
+}
+
 .heading-gradient {
   @apply text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-foreground to-foreground/70;
 }

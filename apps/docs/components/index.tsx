@@ -73,7 +73,7 @@ import {
 } from './Navigation/NavigationMenu/MenuIcons'
 
 // Heavy/rare (lazy-loaded)
-import SqlToRest from '@ui-patterns/SqlToRest'
+import SqlToRest from 'ui-patterns/SqlToRest'
 import { AppleSecretGenerator } from './AppleSecretGenerator'
 import { AuthSmsProviderConfig } from './AuthSmsProviderConfig'
 import { Extensions } from './Extensions'
