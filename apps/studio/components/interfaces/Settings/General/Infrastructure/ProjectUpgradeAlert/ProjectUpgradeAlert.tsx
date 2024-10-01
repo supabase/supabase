@@ -17,8 +17,8 @@ import { ReleaseChannel, useProjectUpgradeMutation } from 'data/projects/project
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
+import { Admonition } from 'ui-patterns/admonition'
 import {
-  Admonition,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
