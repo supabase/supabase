@@ -158,7 +158,21 @@ export function LogsSidebarMenuV2() {
       : null,
   ]
 
+  const OPERATIONAL_COLLECTIONS = IS_PLATFORM
+    ? [
+        {
+          name: 'Postgres Version Upgrade',
+          key: 'pg-upgrade-logs',
+          url: `/project/${ref}/logs/pg-upgrade-logs`,
+          items: [],
+        },
+      ]
+    : []
+
   const filteredLogs = BASE_COLLECTIONS.filter((collection) => {
+    return collection?.name.toLowerCase().includes(searchText.toLowerCase())
+  })
+  const filteredOperationalLogs = OPERATIONAL_COLLECTIONS.filter((collection) => {
     return collection?.name.toLowerCase().includes(searchText.toLowerCase())
   })
   const filteredWarehouse = whCollections?.filter((collection) => {
@@ -259,6 +273,22 @@ export function LogsSidebarMenuV2() {
           </div>
         ) : null}
       </SidebarCollapsible>
+      {OPERATIONAL_COLLECTIONS.length > 0 && (
+        <>
+          <Separator className="my-4" />
+          <SidebarCollapsible title="Database operations" defaultOpen={true}>
+            {filteredOperationalLogs.map((collection) => (
+              <LogsSidebarItem
+                isActive={isActive(collection?.url ?? '')}
+                href={collection?.url ?? ''}
+                key={collection?.key}
+                icon={<SupaIcon className="text-foreground-light" />}
+                label={collection?.name ?? ''}
+              />
+            ))}
+          </SidebarCollapsible>
+        </>
+      )}
       <Separator className="my-4" />
       <SidebarCollapsible title="Queries" defaultOpen={true}>
         {savedQueriesLoading && (

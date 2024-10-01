@@ -1,6 +1,8 @@
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/timezone'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Alert, Button } from 'ui'
@@ -10,6 +12,9 @@ import { IS_PLATFORM } from 'lib/constants'
 import { X } from 'lucide-react'
 
 // [Joshen] Think twice about the category though - it doesn't correspond
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 const ProjectUpgradeFailedBanner = () => {
   const { ref } = useParams()
@@ -22,18 +27,20 @@ const ProjectUpgradeFailedBanner = () => {
   const [showMessage, setShowMessage] = useState(!isAcknowledged)
 
   const isFailed = status === DatabaseUpgradeStatus.Failed
-  const initiatedAt = dayjs.utc(initiated_at ?? 0).format('DD MMM YYYY HH:mm:ss')
+  const initiatedAt = dayjs
+    .utc(initiated_at ?? 0)
+    .tz(dayjs.tz.guess())
+    .format('DD MMM YYYY HH:mm:ss')
 
   const subject = 'Upgrade%20failed%20for%20project'
   const message = `Upgrade information:%0A• Initiated at: ${initiated_at}%0A• Error: ${error}`
 
   const initiatedAtEncoded = encodeURIComponent(
-    dayjs(initiated_at ?? 0)
-      .utcOffset(0)
-      .format('YYYY-MM-DDTHH:mm:ss')
+    dayjs.utc(initiated_at ?? 0).format('YYYY-MM-DDTHH:mm:ss')
   )
   const latestStatusAtEncoded = encodeURIComponent(
-    dayjs(latest_status_at ?? 0)
+    dayjs
+      .utc(latest_status_at ?? 0)
       .utcOffset(0)
       .format('YYYY-MM-DDTHH:mm:ss')
   )
@@ -84,7 +91,7 @@ const ProjectUpgradeFailedBanner = () => {
             target="_blank"
             rel="noreferrer"
           >
-            Database Version Upgrade logs page
+            Postgres Version Upgrade logs section
           </Link>
           .
         </div>
