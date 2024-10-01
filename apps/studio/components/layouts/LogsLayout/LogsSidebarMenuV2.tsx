@@ -250,7 +250,7 @@ export function LogsSidebarMenuV2() {
             label={collection?.name ?? ''}
           />
         ))}
-        {whCollectionsLoading ? (
+        {whCollectionsLoading && warehouseEnabled ? (
           <div className="p-4">
             <GenericSkeletonLoader />
           </div>
