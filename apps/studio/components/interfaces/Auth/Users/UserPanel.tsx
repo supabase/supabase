@@ -1,4 +1,4 @@
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 import { User } from 'data/auth/users-query'
 import { X } from 'lucide-react'
 import { useState } from 'react'

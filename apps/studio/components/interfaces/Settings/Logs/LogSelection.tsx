@@ -23,7 +23,7 @@ import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionI
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import type { LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat, isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface LogSelectionProps {
   log: LogData | null

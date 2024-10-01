@@ -50,9 +50,7 @@ const DatabaseProductMenu = () => {
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
   return (
     <ProjectLayout product="Database" productMenu={<DatabaseProductMenu />} isBlocking={false}>
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+      {children}
     </ProjectLayout>
   )
 }

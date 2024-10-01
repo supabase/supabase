@@ -4,7 +4,8 @@
 
 // Basic UI things
 import Link from 'next/link'
-import { Accordion, Admonition, Alert, Button, CodeBlock, Image, markdownComponents } from 'ui'
+import { Accordion, Alert, Button, CodeBlock, Image, markdownComponents } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
@@ -73,7 +74,7 @@ import {
 } from './Navigation/NavigationMenu/MenuIcons'
 
 // Heavy/rare (lazy-loaded)
-import SqlToRest from '@ui-patterns/SqlToRest'
+import SqlToRest from 'ui-patterns/SqlToRest'
 import { AppleSecretGenerator } from './AppleSecretGenerator'
 import { AuthSmsProviderConfig } from './AuthSmsProviderConfig'
 import { Extensions } from './Extensions'

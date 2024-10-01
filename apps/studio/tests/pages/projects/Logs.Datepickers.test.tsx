@@ -5,7 +5,7 @@ import { PREVIEWER_DATEPICKER_HELPERS } from 'components/interfaces/Settings/Log
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { vi } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import { render } from '../../helpers'
 
 dayjs.extend(timezone)
