@@ -77,7 +77,7 @@ const ProjectUpgradeAlert = () => {
     onSuccess: (res, variables) => {
       setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.UPGRADING)
       toast.success('Upgrading project')
-      router.push(`/project/${variables.ref}?upgradeInitiated=true`)
+      router.push(`/project/${variables.ref}?upgradeInitiated=true&trackingId=${res.tracking_id}`)
     },
   })
 

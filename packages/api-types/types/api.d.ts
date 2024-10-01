@@ -2197,11 +2197,11 @@ export interface paths {
   }
   '/v1/projects/{ref}/upgrade/eligibility': {
     /** [Beta] Returns the project's eligibility for upgrades */
-    get: operations['v1-get-postgrest-upgrade-eligibility']
+    get: operations['v1-get-postgres-upgrade-eligibility']
   }
   '/v1/projects/{ref}/upgrade/status': {
     /** [Beta] Gets the latest status of the project's upgrade */
-    get: operations['v1-get-postgrest-upgrade-status']
+    get: operations['v1-get-postgres-upgrade-status']
   }
   '/v1/projects/{ref}/vanity-subdomain': {
     /** [Beta] Gets current vanity subdomain config */
@@ -2270,6 +2270,7 @@ export interface components {
       | 'pitr_28'
       | 'ipv4_default'
       | 'auth_mfa_phone_default'
+      | 'auth_mfa_web_authn_default'
       | 'log_drain_default'
     AmiSearchOptions: {
       search_tags?: Record<string, never>
@@ -4211,6 +4212,7 @@ export interface components {
         | 'DISK_SIZE_GB_HOURS_GP3'
         | 'DISK_SIZE_GB_HOURS_IO2'
         | 'AUTH_MFA_PHONE'
+        | 'AUTH_MFA_WEB_AUTHN'
         | 'LOG_DRAIN_EVENTS'
         | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
         | 'DISK_THROUGHPUT_GP3'
@@ -4361,15 +4363,18 @@ export interface components {
     }
     PostgresConfigResponse: {
       effective_cache_size?: string
+      logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
       max_locks_per_transaction?: number
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
+      max_replication_slots?: number
       max_slot_wal_keep_size?: string
       max_standby_archive_delay?: string
       max_standby_streaming_delay?: string
+      max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
       /** @enum {string} */
@@ -4377,6 +4382,7 @@ export interface components {
       shared_buffers?: string
       statement_timeout?: string
       wal_keep_size?: string
+      wal_sender_timeout?: string
       work_mem?: string
     }
     /** @enum {string} */
@@ -4609,6 +4615,7 @@ export interface components {
       | 'pitr'
       | 'ipv4'
       | 'auth_mfa_phone'
+      | 'auth_mfa_web_authn'
       | 'log_drain'
     /** @enum {string} */
     ProjectAddonVariantPricingType: 'fixed' | 'usage'
@@ -6109,15 +6116,18 @@ export interface components {
     }
     UpdatePostgresConfigBody: {
       effective_cache_size?: string
+      logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
       max_locks_per_transaction?: number
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
+      max_replication_slots?: number
       max_slot_wal_keep_size?: string
       max_standby_archive_delay?: string
       max_standby_streaming_delay?: string
+      max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
       /** @enum {string} */
@@ -6125,6 +6135,7 @@ export interface components {
       shared_buffers?: string
       statement_timeout?: string
       wal_keep_size?: string
+      wal_sender_timeout?: string
       work_mem?: string
     }
     UpdatePostgrestConfigBody: {
@@ -8401,6 +8412,7 @@ export interface operations {
           | 'DISK_SIZE_GB_HOURS_GP3'
           | 'DISK_SIZE_GB_HOURS_IO2'
           | 'AUTH_MFA_PHONE'
+          | 'AUTH_MFA_WEB_AUTHN'
           | 'LOG_DRAIN_EVENTS'
           | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
           | 'DISK_THROUGHPUT_GP3'
@@ -16000,7 +16012,7 @@ export interface operations {
     }
   }
   /** [Beta] Returns the project's eligibility for upgrades */
-  'v1-get-postgrest-upgrade-eligibility': {
+  'v1-get-postgres-upgrade-eligibility': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -16023,8 +16035,11 @@ export interface operations {
     }
   }
   /** [Beta] Gets the latest status of the project's upgrade */
-  'v1-get-postgrest-upgrade-status': {
+  'v1-get-postgres-upgrade-status': {
     parameters: {
+      query?: {
+        tracking_id?: string
+      }
       path: {
         /** @description Project ref */
         ref: string
