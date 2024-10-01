@@ -1,5 +1,7 @@
-import toast from 'react-hot-toast'
+import { noop } from 'lodash'
+import { toast } from 'sonner'
 
+export { default as passwordStrength } from './password-strength'
 export { default as uuidv4 } from './uuid'
 
 export const tryParseJson = (jsonString: any) => {
@@ -136,28 +138,38 @@ export const snakeToCamel = (str: string) =>
   )
 
 /**
- * Copy text content (string or Promise<string>) into Clipboard.
- * Safari doesn't support write text into clipboard async, so if you need to load
- * text content async before coping, please use Promise<string> for the 1st arg.
+ * Copy text content (string or Promise<string>) into Clipboard. Safari doesn't support write text into clipboard async,
+ * so if you need to load text content async before coping, please use Promise<string> for the 1st arg.
+ *
+ * IF YOU NEED TO CHANGE THIS FUNCTION, PLEASE TEST IT IN SAFARI with a promised string. Expiring URL to a file in a
+ * private bucket will do.
+ *
+ * Copied code from https://wolfgangrittner.dev/how-to-use-clipboard-api-in-firefox/
  */
-export const copyToClipboard = async (str: string | Promise<string>, callback = () => {}) => {
-  try {
-    const focused = window.document.hasFocus()
-    if (focused) {
-      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-        const text = await Promise.resolve(str)
-        Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
-        return
-      }
-
-      Promise.resolve(str)
-        .then((text) => window.navigator?.clipboard?.writeText(text))
-        .then(callback)
+export const copyToClipboard = async (str: string | Promise<string>, callback = noop) => {
+  const focused = window.document.hasFocus()
+  if (focused) {
+    if (typeof ClipboardItem && navigator.clipboard?.write) {
+      // NOTE: Safari locks down the clipboard API to only work when triggered
+      // by a direct user interaction. You can't use it async in a promise.
+      // But! You can wrap the promise in a ClipboardItem, and give that to
+      // the clipboard API.
+      // Found this on https://developer.apple.com/forums/thread/691873
+      const text = new ClipboardItem({
+        'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
+      })
+      navigator.clipboard.write([text]).then(callback)
     } else {
-      console.warn('Unable to copy to clipboard')
+      // NOTE: Firefox has support for ClipboardItem and navigator.clipboard.write,
+      // but those are behind `dom.events.asyncClipboard.clipboardItem` preference.
+      // Good news is that other than Safari, Firefox does not care about
+      // Clipboard API being used async in a Promise.
+      Promise.resolve(str)
+        .then((text) => navigator.clipboard?.writeText(text))
+        .then(callback)
     }
-  } catch (error: any) {
-    toast.error(`Unable to copy to clipboard: ${error.message}`)
+  } else {
+    toast.error('Unable to copy to clipboard')
   }
 }
 
@@ -263,7 +275,14 @@ export const getDistanceLatLonKM = (lat1: number, lon1: number, lat2: number, lo
   return d
 }
 
-const currencyFormatter = Intl.NumberFormat('en-US', {
+const currencyFormatterDefault = Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
+const currencyFormatterSmallValues = Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
   minimumFractionDigits: 0,
@@ -272,7 +291,9 @@ const currencyFormatter = Intl.NumberFormat('en-US', {
 export const formatCurrency = (amount: number | undefined | null): string | null => {
   if (amount === undefined || amount === null) {
     return null
+  } else if (amount < 0.01) {
+    return currencyFormatterSmallValues.format(amount)
   } else {
-    return currencyFormatter.format(amount)
+    return currencyFormatterDefault.format(amount)
   }
 }

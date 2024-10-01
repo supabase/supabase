@@ -567,6 +567,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/platform/custom-postgres-config',
+    destination: '/docs/guides/database/custom-postgres-config',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/hosting/platform/access-control',
     destination: '/docs/guides/platform/access-control',
   },
@@ -1180,6 +1185,11 @@ module.exports = [
     source: '/blog/supabase-aquires-oriole',
     destination: '/blog/supabase-acquires-oriole',
   },
+  {
+    permanent: true,
+    source: '/events/scale-to-billions-generative-ai-humata',
+    destination: '/events/scale-to-millions-generative-ai-humata',
+  },
 
   //  DOCS
   {
@@ -1565,11 +1575,6 @@ module.exports = [
     permanent: true,
     source: '/docs/company/sla',
     destination: '/sla',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference',
-    destination: '/docs#reference-documentation',
   },
   {
     permanent: true,
@@ -2545,6 +2550,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/log-drains',
+    destination: '/docs/platform/log-drains',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/functions/functions-headers',
     destination: '/docs/functions/logging',
   },
@@ -2568,5 +2578,23 @@ module.exports = [
     source: '/docs/guides/auth/phone-login/textlocal',
     destination:
       '/docs/guides/auth/phone-login?showSmsProvider=Textlocal%2520%28Community%2520Supported%29',
+  },
+  {
+    permanent: true,
+    source: '/launchweek',
+    destination: '/launch-week',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/enterprise-billing',
+    destination: '/docs/guides/platform/org-based-billing',
+  },
+
+  // marketing
+
+  {
+    permanent: true,
+    source: '/changelogpod',
+    destination: 'https://forms.supabase.com/changelog-podcast-sponsorship',
   },
 ]

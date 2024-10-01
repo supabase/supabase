@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useTelemetryProps } from 'common'
 import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'

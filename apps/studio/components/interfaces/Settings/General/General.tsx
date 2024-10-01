@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronRight } from 'lucide-react'
+import { AlertCircle, BarChart2, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormActions } from 'components/ui/Forms/FormActions'
@@ -23,8 +23,6 @@ import {
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
   Form,
-  IconAlertCircle,
-  IconBarChart2,
   Input,
   WarningIcon,
 } from 'ui'
@@ -142,7 +140,7 @@ const General = () => {
                   v2MaintenanceEndTime &&
                   v2AnnouncementUrl !== 'https://' && (
                     <Alert_Shadcn_ variant="warning" className="mb-4">
-                      <IconAlertCircle strokeWidth={2} />
+                      <AlertCircle strokeWidth={2} />
                       <AlertTitle_Shadcn_>Upcoming project restart scheduled</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_ className="flex flex-col gap-3">
                         This project will automatically restart on {v2MaintenanceDate} between{' '}
@@ -214,7 +212,7 @@ const General = () => {
               <Panel.Content>
                 <div className="flex justify-between">
                   <div className="flex space-x-4">
-                    <IconBarChart2 strokeWidth={2} />
+                    <BarChart2 strokeWidth={2} />
                     <div>
                       <p className="text-sm">Project usage statistics has been moved</p>
                       <p className="text-foreground-light text-sm">

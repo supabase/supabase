@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -17,10 +17,10 @@ import {
 } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import {
   Button,
@@ -33,7 +33,6 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface MemberActionsProps {
   member: OrganizationMember
@@ -51,7 +50,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const { data: allProjects } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
-  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
@@ -233,7 +232,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
               icon={<MoreVertical />}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end">
+          <DropdownMenuContent side="bottom" align="end" className="w-52">
             <>
               {isPendingInviteAcceptance ? (
                 <>
@@ -282,17 +281,45 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       </div>
 
       <ConfirmationModal
+        size="large"
         visible={isDeleteModalOpen}
         loading={isDeletingMember}
-        title="Confirm to remove"
+        title="Confirm to remove member"
         confirmLabel="Remove"
+        variant="warning"
+        alert={{
+          title: 'All user content from this member will be permanently removed.',
+          description: (
+            <div>
+              Removing a member will delete all of the user's saved content in all projects of this
+              organization, which includes:
+              <ul className="list-disc pl-4 my-2">
+                <li>
+                  SQL snippets{' '}
+                  <span className="text-foreground">
+                    (both <span className="underline">private</span> and{' '}
+                    <span className="underline">shared</span> snippets)
+                  </span>
+                </li>
+                <li>Custom reports</li>
+                <li>Log Explorer queries</li>
+              </ul>
+              <p className="mt-4 text-foreground-lighter">
+                If you'd like to retain the member's shared SQL snippets, right click on them and
+                "Duplicate personal copy" in the SQL Editor before removing this member.
+              </p>
+            </div>
+          ),
+        }}
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => {
           handleMemberDelete()
         }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove {member.primary_email}
+          Are you sure you want to remove{' '}
+          <span className="text-foreground">{member.primary_email}</span> from{' '}
+          <span className="text-foreground">{selectedOrganization?.name}</span>?
         </p>
       </ConfirmationModal>
 

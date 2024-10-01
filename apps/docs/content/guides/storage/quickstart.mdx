@@ -88,6 +88,24 @@ void main() async {
 [Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+try await supabase.storage.createBucket("avatars")
+```
+
+[Reference.](/docs/reference/swift/storage-createbucket)
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.create_bucket('avatars')
+```
+
+[Reference.](/docs/reference/python/storage-createbucket)
+
+</TabPanel>
 </Tabs>
 
 ## Upload a file
@@ -186,6 +204,24 @@ void main() async {
 ```
 
 [Reference.](/docs/reference/dart/storage-from-download)
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await supabase.storage.from("avatars").download(path: "public/avatar1.png")
+```
+
+[Reference.](/docs/reference/python/storage-from-download)
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('avatars').download('public/avatar1.png')
+```
+
+[Reference.](/docs/reference/python/storage-from-download)
 
 </TabPanel>
 </Tabs>

@@ -4,57 +4,179 @@ title: 'Log Drains'
 description: 'Getting started with Supabase Log Drains'
 ---
 
-Log drains will send all logs of the Supabase stack to one or more desired destinations. It is only available for customers on Team and Enterprise Plans.
+Log drains will send all logs of the Supabase stack to one or more desired destinations. It is only available for customers on Team and Enterprise Plans. Log drains is available in the dashboard under [Project Settings > Log Drains](https://supabase.com/dashboard/project/_/settings/log-drains).
 
-<Admonition type="note">
+You can read about the initial announcement [here](https://supabase.com/blog/log-drains) and vote for your preferred drains in [this discussion](https://github.com/orgs/supabase/discussions/28324?sort=top).
 
-Log drains is in **Private Alpha**, and is not available in the dashboard yet. [Reach out to us](https://forms.supabase.com/logdrains) to get log drains enabled for your project.
-
-You can read about the initial announcement [here](https://github.com/orgs/supabase/discussions/26650).
-
-</Admonition>
+# Supported Destinations
 
 The following table lists the supported destinations and the required setup configuration:
 
-| Destination        | Transport Method | Configuration                                     |
-| ------------------ | ---------------- | ------------------------------------------------- |
-| Generic Webhook    | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
-| Datadog            | HTTP             | API Key <br /> Region                             |
-| Loki               | HTTP             | URL <br /> Headers                                |
-| Elastic - Filebeat | HTTP             | URL <br /> Username and Password                  |
+| Destination           | Transport Method | Configuration                                     |
+| --------------------- | ---------------- | ------------------------------------------------- |
+| Generic HTTP endpoint | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
+| Datadog               | HTTP             | API Key <br /> Region                             |
 
-### Destinations And Behavior
+HTTP requests are batched with a max of 250 logs or 1 second intervals, whichever happens first. Logs are compressed via Gzip if the destination supports it.
 
-HTTP requests are batched with a max of 250 items with at most 1 second intervals. Gzip compression will also be used if the 3rd party provider supports it.
+## Generic HTTP Endpoint
 
-#### Generic Webhook
-
-Logs are sent as a JSON payload. Both HTTP1 and HTTP2 are supported. A preset configuration of Headers can be supplied for all requests.
+Logs are sent as a POST request with a JSON body. Both HTTP/1 and HTTP/2 protocols are supported.
+Custom headers can optionally be configured for all requests.
 
 Note that requests are **unsigned**.
 
 <Admonition type="note">
+  Unsigned requests to HTTP endpoints are temporary and all requests will signed in the near future.
+</Admonition>
 
-Unsigned webhook requests are temporary and signed requests will be supported soon.
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+>
+    <AccordionItem
+      header="Edge Function Walkthrough (Uncompressed)"
+      id="uncompressed"
+    >
+
+1. Create and deploy the edge function
+
+Generate a new edge function template and update it to log out the received JSON payload. For simplicity, we will accept any request with an Anon Key.
+
+```bash
+supabase functions new hello-world
+```
+
+You can use this example snippet as an illustration of how the received request will be like.
+
+```ts
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+
+Deno.serve(async (req) => {
+  const data = await req.json()
+
+  console.log(`Received ${data.length} logs, first log:\n ${JSON.stringify(data[0])}`)
+  return new Response(JSON.stringify({ message: 'ok' }), {
+    headers: { 'Content-Type': 'application/json' },
+  })
+})
+```
+
+And then deploy it with:
+
+```bash
+supabase functions deploy hello-world --project-ref [PROJECT REF]
+```
+
+<Admonition type="warning">
+
+This will create an infinite loop, as we are generating an additional log event that will eventually trigger a new request to this edge function. However, due to the batching nature of how Log Drain events are dispatched, the rate of edge function triggers will not increase greatly and will have an upper bound.
 
 </Admonition>
 
-#### Datadog
+2. Configure the HTTP Drain
 
-Logs sent to Datadog have the name of the log source set on the `service` field of the event. The request body is gzipped.
+Create a HTTP drain under the [Project Settings > Log Drains](https://supabase.com/dashboard/project/_/settings/log-drains).
 
-The payload message are a stringified JSON of the raw log event, prefixed with the event timestamp.
+- Disable the Gzip, as we want to receive the payload without compression.
+- Under URL, set it to your edge function URL `https://[PROJECT REF].supabase.co/functions/v1/hello-world`
+- Under Headers, set the `Authorization: Bearer [ANON KEY]`
 
-#### Loki
+<ProjectConfigVariables variable="anonKey" />
 
-Logs are sent to a provided HTTP endpoint, see [documentation](https://grafana.com/docs/loki/latest/reference/loki-http-api/#ingest-logs) for `POST /loki/api/v1/push`.
+    </AccordionItem>
 
-Events will get batched with multiple streams per request, with each log source having its own stream. The stream is labeled with the `source` key.
+    <AccordionItem
+      header="Edge Function Gzip Example"
+      id="gzip"
+    >
 
-Requests are in the form of a gzipped JSON body. The payload message is a stringified JSON of the raw log event. No custom structured JSON metadata is attached to stream values. It is recommended that an `Authorization` header is used for authentication at the destination.
+Gzip payloads can be decompressed using native in-built APIs. Refer to the Edge Function [compression guide](https://supabase.com/docs/guides/functions/compression)
 
-#### Elastic - Filebeat
+```ts
+import { gunzipSync } from 'node:zlib'
 
-Logs are sent to Filebeat server. See the [Filebeat documentation](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-http_endpoint.html) on how to set up the Filebeat HTTP server.
+Deno.serve(async (req) => {
+  try {
+    // Check if the request body is gzip compressed
+    const contentEncoding = req.headers.get('content-encoding')
+    if (contentEncoding !== 'gzip') {
+      return new Response('Request body is not gzip compressed', {
+        status: 400,
+      })
+    }
 
-The Filebeat server only handles HTTP1 requests. Basic Auth can be provided for optional user authentication.
+    // Read the compressed body
+    const compressedBody = await req.arrayBuffer()
+
+    // Decompress the body
+    const decompressedBody = gunzipSync(new Uint8Array(compressedBody))
+
+    // Convert the decompressed body to a string
+    const decompressedString = new TextDecoder().decode(decompressedBody)
+    const data = JSON.parse(decompressedString)
+    // Process the decompressed body as needed
+    console.log(`Received: ${data.length} logs.`)
+
+    return new Response('ok', {
+      headers: { 'Content-Type': 'text/plain' },
+    })
+  } catch (error) {
+    console.error('Error:', error)
+    return new Response('Error processing request', { status: 500 })
+  }
+})
+```
+
+    </AccordionItem>
+
+</Accordion>
+
+## Datadog Logs
+
+Logs sent to Datadog have the name of the log source set on the `service` field of the event and the source set to `Supabase`. Logs are gzipped before they are sent to Datadog.
+
+The payload message is a JSON string of the raw log event, prefixed with the event timestamp.
+
+To setup Datadog log drain, generate a Datadog API key [here](https://app.datadoghq.com/organization-settings/api-keys) and the location of your Datadog site.
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+>
+    <AccordionItem
+      header="Walkthrough"
+      id="walkthrough"
+    >
+
+    1. Generate API Key in [Datadog dashboard](https://app.datadoghq.com/organization-settings/api-keys)
+    2. Create log drain in [Supabase dashboard](https://supabase.com/dashboard/project/_/settings/log-drains)
+    3. Watch for events in the [Datadog Logs page](https://app.datadoghq.com/logs)
+
+    </AccordionItem>
+
+    <AccordionItem
+      header="Example destination configuration"
+      id="cfg"
+    >
+
+    [Grok parser](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/grok_parser?tab=matchers) matcher for extracting the timestamp to a `date` field
+    ```
+    %{date("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZ"):date}
+    ```
+
+    [Grok parser](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/grok_parser?tab=matchers) matcher for converting stringified JSON to structured JSON on the `json` field.
+    ```
+     %{data::json}
+     ```
+
+    [Remapper](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/remapper) for setting the log level.
+    ```
+    metadata.parsed.error_severity, metadata.level
+    ```
+
+    </AccordionItem>
+
+</Accordion>
+
+If you are interested in other log drains, upvote them [here](https://github.com/orgs/supabase/discussions/28324)

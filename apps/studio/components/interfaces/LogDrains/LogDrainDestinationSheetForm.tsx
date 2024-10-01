@@ -1,23 +1,24 @@
-import { useParams } from 'common'
-import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { ExternalLink, TrashIcon } from 'lucide-react'
+import Link from 'next/link'
+import { ReactNode, useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useParams } from 'common'
+import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import {
   Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
-  RadioGroupStacked,
-  RadioGroupStackedItem,
-  Switch,
-  Sheet,
-  SheetContent,
-  SheetSection,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
+  RadioGroupCard,
+  RadioGroupCardItem,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -25,28 +26,25 @@ import {
   SelectLabel_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  cn,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+  Switch,
 } from 'ui'
-
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
-import { ReactNode, useEffect, useState } from 'react'
-import { TrashIcon } from 'lucide-react'
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import Link from 'next/link'
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
-import { FormDescription } from '@ui/components/shadcn/ui/form'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { urlRegex } from '../Auth/Auth.constants'
 
 const FORM_ID = 'log-drain-destination-form'
 
 const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('webhook'),
-    url: z.string().url('Endpoint URL is required and must be a valid URL'),
+    url: z.string().regex(urlRegex, 'Endpoint URL is required and must be a valid URL'),
     http: z.enum(['http1', 'http2']),
     gzip: z.boolean(),
     headers: z.record(z.string(), z.string()).optional(),
@@ -152,7 +150,7 @@ export function LogDrainDestinationSheetForm({
       description: defaultValues?.description || '',
       type: defaultType,
       http: defaultValues?.config?.http || 'http2',
-      gzip: defaultValues?.config?.gzip || true,
+      gzip: mode === 'create' ? true : defaultValues?.config?.gzip || false,
       headers: DEFAULT_HEADERS,
       url: defaultValues?.config?.url || '',
       api_key: defaultValues?.config?.api_key || '',
@@ -207,11 +205,16 @@ export function LogDrainDestinationSheetForm({
         onOpenChange(v)
       }}
     >
-      <SheetContent tabIndex={undefined} showClose={false} size="lg" className="overflow-y-auto">
+      <SheetContent
+        tabIndex={undefined}
+        showClose={false}
+        size="lg"
+        className="overflow-y-auto flex flex-col"
+      >
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
-        <SheetSection className="!px-0">
+        <SheetSection className="!px-0 !pb-0">
           <Form_Shadcn_ {...form}>
             <form
               id={FORM_ID}
@@ -229,53 +232,54 @@ export function LogDrainDestinationSheetForm({
                 form.handleSubmit(onSubmit)(e)
               }}
             >
-              <div className="space-y-4 px-content">
+              <div className="space-y-8 px-content">
                 <LogDrainFormItem
                   value="name"
                   placeholder="My Destination"
                   label="Name"
                   formControl={form.control}
                 />
-                {/* <LogDrainFormItem
+                <LogDrainFormItem
                   value="description"
                   placeholder="My Destination"
                   label="Description"
                   formControl={form.control}
-                /> */}
+                />
                 {mode === 'create' && (
-                  <FormItemLayout layout="horizontal" label="Type">
-                    <Select
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Type"
+                    description={LOG_DRAIN_TYPES.find((t) => t.value === type)?.description || ''}
+                  >
+                    <Select_Shadcn_
                       defaultValue={defaultType}
                       value={form.getValues('type')}
                       onValueChange={(v: LogDrainType) => form.setValue('type', v)}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger_Shadcn_>
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
-                      </SelectTrigger>
-                      <SelectContent>
+                      </SelectTrigger_Shadcn_>
+                      <SelectContent_Shadcn_>
                         {LOG_DRAIN_TYPES.map((type) => (
-                          <SelectItem
+                          <SelectItem_Shadcn_
                             value={type.value}
                             key={type.value}
                             id={type.value}
                             className="text-left"
                           >
                             {type.name}
-                          </SelectItem>
+                          </SelectItem_Shadcn_>
                         ))}
-                      </SelectContent>
-                      <FormDescription className="mt-2">
-                        {LOG_DRAIN_TYPES.find((t) => t.value === type)?.description}
-                      </FormDescription>
-                    </Select>
+                      </SelectContent_Shadcn_>
+                    </Select_Shadcn_>
                   </FormItemLayout>
                 )}
               </div>
 
-              <div className="space-y-6 mt-4">
+              <div className="space-y-8 mt-4">
                 {type === 'webhook' && (
                   <>
-                    <div className="px-content space-y-6">
+                    <div className="px-content space-y-8">
                       <LogDrainFormItem
                         value="url"
                         label="Endpoint URL"
@@ -288,18 +292,22 @@ export function LogDrainDestinationSheetForm({
                         render={({ field }) => (
                           <FormItemLayout layout="horizontal" label="HTTP Version">
                             <FormControl_Shadcn_>
-                              <RadioGroupStacked onValueChange={field.onChange} value={field.value}>
+                              <RadioGroupCard
+                                className="flex gap-2"
+                                onValueChange={field.onChange}
+                                value={field.value}
+                              >
                                 <FormItem_Shadcn_ asChild>
                                   <FormControl_Shadcn_>
-                                    <RadioGroupStackedItem value="http1" label="HTTP/1" />
+                                    <RadioGroupCardItem value="http1" label="HTTP/1" />
                                   </FormControl_Shadcn_>
                                 </FormItem_Shadcn_>
                                 <FormItem_Shadcn_ asChild>
                                   <FormControl_Shadcn_>
-                                    <RadioGroupStackedItem value="http2" label="HTTP/2" />
+                                    <RadioGroupCardItem value="http2" label="HTTP/2" />
                                   </FormControl_Shadcn_>
                                 </FormItem_Shadcn_>
-                              </RadioGroupStacked>
+                              </RadioGroupCard>
                             </FormControl_Shadcn_>
                             <FormMessage_Shadcn_ />
                           </FormItemLayout>
@@ -307,11 +315,11 @@ export function LogDrainDestinationSheetForm({
                       />
                     </div>
 
-                    {/* <FormField_Shadcn_
+                    <FormField_Shadcn_
                       control={form.control}
                       name="gzip"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="space-y-2">
+                        <FormItem_Shadcn_ className="space-y-2 px-4">
                           <div className="flex gap-2 items-center">
                             <FormControl_Shadcn_>
                               <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -323,16 +331,16 @@ export function LogDrainDestinationSheetForm({
                           </div>
                         </FormItem_Shadcn_>
                       )}
-                    /> */}
+                    />
 
-                    <div className="space-y-2">
-                      <div className="px-content">
+                    <div className="border-t">
+                      <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
                         <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
                         <p className="text-xs text-foreground-lighter">
                           Set custom headers when draining logs to the Endpoint URL
                         </p>
                       </div>
-                      <div className="divide-y border-y">
+                      <div className="divide-y">
                         {hasHeaders &&
                           Object.keys(headers || {})?.map((headerKey) => (
                             <div
@@ -366,14 +374,14 @@ export function LogDrainDestinationSheetForm({
                       description={
                         <>
                           The API Key obtained from the Datadog dashboard{' '}
-                          <Link
+                          <a
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm underline text-foreground"
+                            className="text-sm underline transition hover:text-foreground"
                             href="https://app.datadoghq.com/organization-settings/api-keys"
                           >
                             here
-                          </Link>
+                          </a>
                         </>
                       }
                     />
@@ -381,7 +389,24 @@ export function LogDrainDestinationSheetForm({
                       name="region"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItemLayout layout="horizontal" label={'Region'}>
+                        <FormItemLayout
+                          layout="horizontal"
+                          label={'Region'}
+                          description={
+                            <p>
+                              The Datadog region to send logs to. Read more about Datadog regions{' '}
+                              <a
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline hover:text-foreground transition"
+                                href="https://docs.datadoghq.com/getting_started/site/#access-the-datadog-site"
+                              >
+                                here
+                              </a>
+                              .
+                            </p>
+                          }
+                        >
                           <FormControl_Shadcn_>
                             <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                               <SelectTrigger_Shadcn_ className="col-span-3">
@@ -416,7 +441,7 @@ export function LogDrainDestinationSheetForm({
                 e.stopPropagation()
                 addHeader()
               }}
-              className="flex gap-2 mt-4 items-center px-content"
+              className="flex border-t py-4 gap-4 items-center px-content"
             >
               <label className="sr-only" htmlFor="header-name">
                 Header name
@@ -446,13 +471,41 @@ export function LogDrainDestinationSheetForm({
           )}
         </SheetSection>
 
-        <SheetSection></SheetSection>
+        <div className="mt-auto">
+          <SheetSection className="border-t bg-background-alternative-200 mt-auto">
+            <FormItemLayout
+              isReactForm={false}
+              layout="horizontal"
+              label={
+                <div className="text-foreground-light">
+                  Additional drain cost
+                  <div className="text-foreground-lighter mt-2">
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline flex gap-1 items-center"
+                      href="https://supabase.com/docs/guides/platform/log-drains"
+                    >
+                      Documentation <ExternalLink className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              }
+            >
+              <ul className="text-right text-foreground-light">
+                <li className="text-brand-link text-base">$60 per drain per month</li>
+                <li>$0.20 per million events</li>
+                <li>$0.09 per GB egress</li>
+              </ul>
+            </FormItemLayout>
+          </SheetSection>
 
-        <SheetFooter className="p-content">
-          <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
-            Save destination
-          </Button>
-        </SheetFooter>
+          <SheetFooter className="p-content !mt-0">
+            <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
+              Save destination
+            </Button>
+          </SheetFooter>
+        </div>
       </SheetContent>
     </Sheet>
   )

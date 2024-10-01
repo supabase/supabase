@@ -58,6 +58,10 @@ export const appState = proxy({
   setShowAiSettingsModal: (value: boolean) => {
     appState.showAiSettingsModal = value
   },
+  showGenerateSqlModal: false,
+  setShowGenerateSqlModal: (value: boolean) => {
+    appState.showGenerateSqlModal = value
+  },
 
   navigationPanelOpen: false,
   navigationPanelJustClosed: false,

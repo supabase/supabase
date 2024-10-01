@@ -1,5 +1,20 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import Image from 'next/image'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import z from 'zod'
+
+import {
+  Button,
+  Form_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
+} from 'ui'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -8,21 +23,6 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
-import {
-  Form_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  useToast,
-} from 'ui'
-import z from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { toast } from 'ui'
-import { Button } from 'ui'
-import Image from 'next/image'
 
 const form = z.object({
   value: z.array(z.string()).nonempty('Please select at least one person'),
@@ -51,12 +51,8 @@ const MultiSelectZod = () => {
     defaultValues: form.parse({ value: [users[0].name] }),
   })
 
-  const { toast } = useToast()
   const onSubmit = (data: Form) => {
-    toast({
-      title: 'Form submitted ',
-      description: JSON.stringify(data, null, 2),
-    })
+    toast('Form submitted ', { description: JSON.stringify(data, null, 2) })
   }
 
   return (

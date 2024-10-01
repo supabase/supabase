@@ -1,11 +1,12 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { contentKeys } from './keys'
+import { ContentType } from './content-query'
 
-type UpdateContentVariables = { projectRef: string; id: string; type: 'report'; content: any }
+type UpdateContentVariables = { projectRef: string; id: string; type: ContentType; content: any }
 
 export async function updateContent(
   { projectRef, id, type, content }: UpdateContentVariables,

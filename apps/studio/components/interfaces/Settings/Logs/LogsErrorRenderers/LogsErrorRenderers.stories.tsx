@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import DefaultErrorRenderer from './DefaultErrorRenderer'
+import { DefaultErrorRenderer } from './DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './ResourcesExceededErrorRenderer'
 import { Alert } from 'ui'
 

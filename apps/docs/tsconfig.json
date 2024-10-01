@@ -5,8 +5,7 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"],
-      "@ui-patterns/*": ["./../../packages/ui-patterns/*"]
+      "@ui/*": ["./../../packages/ui/src/*"]
     },
     "target": "ES2021",
     "lib": ["dom", "dom.iterable", "esnext"],
@@ -33,7 +32,6 @@
     "**/*.ts",
     "**/*.tsx",
     "pages/guides/append-test.js",
-    "jest.config.mjs",
     ".next/types/**/*.ts",
     "./../../packages/ui/src/**/*.d.ts"
   ],

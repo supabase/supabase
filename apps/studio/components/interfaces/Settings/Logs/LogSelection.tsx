@@ -1,6 +1,6 @@
 import { MousePointerClick, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { Loading } from 'components/ui/Loading'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
@@ -24,6 +24,7 @@ import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSel
 import PgUpgradeSelectionRenderer from './LogSelectionRenderers/PgUpgradeSelectionRenderer'
 import type { LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat, isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface LogSelectionProps {
   log: LogData | null
@@ -50,10 +51,11 @@ const LogSelection = ({
   )
   const [sql, setSql] = useState('')
 
+  const warehouseQueryEnabled = queryType === 'warehouse'
   const {
     refetch: refetchWarehouseData,
     data: warehouseQueryData,
-    isFetching: warehouseQueryFetching,
+    isLoading: warehouseQueryLoading,
   } = useWarehouseQueryQuery(
     {
       ref: projectRef,
@@ -91,7 +93,7 @@ const LogSelection = ({
     switch (queryType) {
       case 'warehouse':
         if (!warehouseQueryData) return null
-        return <DefaultPreviewSelectionRenderer log={warehouseQueryData.result[0]} />
+        return <DefaultPreviewSelectionRenderer log={warehouseQueryData.result?.[0] || {}} />
       case 'api':
         if (!fullLog) return null
         if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
@@ -149,6 +151,13 @@ const LogSelection = ({
 
     return JSON.stringify(fullLog || partialLog, null, 2)
   }, [fullLog, partialLog, queryType])
+
+  const rawLog = useMemo(() => {
+    if (queryType === 'warehouse') {
+      return warehouseQueryData?.result?.[0] || {}
+    }
+    return fullLog || partialLog
+  }, [queryType, warehouseQueryData, fullLog, partialLog])
 
   return (
     <div
@@ -216,9 +225,9 @@ const LogSelection = ({
             </Button>
           </TabsList_Shadcn_>
           <div className="flex-grow">
-            {isLoading || warehouseQueryFetching ? (
-              <div className="py-44">
-                <Loading />
+            {isLoading || (warehouseQueryEnabled && warehouseQueryLoading) ? (
+              <div className="p-4">
+                <GenericSkeletonLoader />
               </div>
             ) : (
               <>
@@ -226,12 +235,13 @@ const LogSelection = ({
                   <Formatter />
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ value="raw">
+                  {isLoading && 'Loading...'}
                   <CodeBlock
                     hideLineNumbers
                     language="json"
                     className="prose w-full pt-0 max-w-full border-none"
                   >
-                    {JSON.stringify(fullLog || partialLog, null, 2)}
+                    {JSON.stringify(rawLog, null, 2)}
                   </CodeBlock>
                 </TabsContent_Shadcn_>
               </>
