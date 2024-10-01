@@ -1,8 +1,9 @@
-import React from 'react'
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
-import { NavMenu, NavMenuItem } from '.'
 import Link from 'next/link'
+import React from 'react'
+import { describe, expect, it } from 'vitest'
+
+import { NavMenu, NavMenuItem } from './index'
 
 describe('NavMenu Component', () => {
   it('renders without crashing', () => {
