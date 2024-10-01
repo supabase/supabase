@@ -10,6 +10,19 @@ export const CRONJOB_TYPES = [
 
 export const CRONJOB_DEFINITIONS = [
   {
+    value: 'sql_snippet',
+    icon: <SqlEditor strokeWidth={1} />,
+    label: 'SQL Snippet',
+    description: 'Write a SQL snippet to run.',
+  },
+  {
+    value: 'sql_function',
+    icon: <ScrollText strokeWidth={1} />,
+    label: 'Postgres SQL Function',
+    description: 'Choose a Postgres SQL functions to run.',
+  },
+
+  {
     value: 'http_request',
     icon: <RESTApi strokeWidth={1} />,
     label: 'HTTP Request',
@@ -20,18 +33,6 @@ export const CRONJOB_DEFINITIONS = [
     icon: <EdgeFunctions strokeWidth={1} />,
     label: 'Supabase Edge Function',
     description: 'Choose a Supabase edge function to run.',
-  },
-  {
-    value: 'sql_function',
-    icon: <ScrollText strokeWidth={1} />,
-    label: 'Postgres SQL Function',
-    description: 'Choose a Postgres SQL functions to run.',
-  },
-  {
-    value: 'sql_snippet',
-    icon: <SqlEditor strokeWidth={1} />,
-    label: 'SQL Snippet',
-    description: 'Write a SQL snippet to run.',
   },
 ]
 

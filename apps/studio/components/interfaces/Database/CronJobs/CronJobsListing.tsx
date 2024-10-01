@@ -32,14 +32,14 @@ export const CronJobsListing = () => {
   })
 
   if (isLoading) return <GenericSkeletonLoader />
-  if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />
+  if (isError) return <AlertError error={error} subject="Failed to retrieve database cron jobs" />
 
   return (
     <>
       {(cronJobs ?? []).length == 0 ? (
         <div className="flex h-full w-full items-center justify-center">
           <ProductEmptyState
-            title="Cron jobs"
+            title="Cron Jobs"
             ctaButtonLabel="Create a new cron job"
             onClickCta={() =>
               setCreateCronJobSheetShown({
@@ -51,7 +51,7 @@ export const CronJobsListing = () => {
             }
           >
             <p className="text-sm text-foreground-light">
-              pgcron jobs in PostgreSQL allow you to schedule and automate tasks such as running SQL
+              Cron jobs in PostgreSQL allow you to schedule and automate tasks such as running SQL
               queries or maintenance routines at specified intervals. These jobs are managed using
               cron-like syntax and are executed directly within the PostgreSQL server, making it
               easy to schedule recurring tasks without needing an external scheduler.

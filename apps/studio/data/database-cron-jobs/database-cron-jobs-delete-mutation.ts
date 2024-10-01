@@ -48,7 +48,7 @@ export const useDatabaseCronJobDeleteMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to delete database cronjob: ${data.message}`)
+          toast.error(`Failed to delete database cron job: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
