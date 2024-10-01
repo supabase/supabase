@@ -24,6 +24,7 @@
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-collapsible": "^1.0.3",
+    "@radix-ui/react-context": "^1.0.1",
     "@radix-ui/react-context-menu": "^2.1.5",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
@@ -103,6 +104,7 @@
     "@testing-library/react": "^14.0.0",
     "@tokens-studio/sd-transforms": "^0.8.5",
     "@types/common-tags": "^1.8.1",
+    "@types/lodash": "4.17.5",
     "@types/react": "^18.2.24",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "^18.2.8",
@@ -118,7 +120,8 @@
     "ts-jest": "^29.1.1",
     "tsconfig": "*",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
-    "typescript": "^5.5.0"
+    "typescript": "~5.5.0",
+    "vitest": "^1.6.0"
   },
   "peerDependencies": {
     "next": "*",
