@@ -10,3 +10,4 @@ export const IS_PREVIEW = process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
 export const IS_PRODUCTION = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
 export const LOCAL_SUPABASE = process.env.NEXT_PUBLIC_LOCAL_SUPABASE === 'true'
 export const MISC_URL = process.env.NEXT_PUBLIC_MISC_URL ?? ''
+export const PROD_URL = `https://supabase.com${BASE_PATH}`
