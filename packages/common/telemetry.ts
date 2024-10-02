@@ -8,6 +8,8 @@ export function handlePageTelemetry(API_URL: string, route: string, telemetryPro
     ga: {
       screen_resolution: telemetryProps?.screenResolution,
       language: telemetryProps?.language,
+      userAgent: telemetryProps?.userAgent,
+      search: telemetryProps?.search,
     },
   })
 }

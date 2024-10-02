@@ -33,19 +33,24 @@ export default function App({ Component, pageProps }: AppProps) {
   useThemeSandbox()
 
   function handlePageTelemetry(route: string) {
-    return post(`${API_URL}/telemetry/page`, {
+    return post(`http://localhost:3231/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
       route,
+      current_url: window.location.href,
       ga: {
         screen_resolution: telemetryProps?.screenResolution,
         language: telemetryProps?.language,
+        user_agent: telemetryProps?.userAgent,
+        search: telemetryProps?.search,
       },
+    }, {
+      credentials: 'include'
     })
   }
 
   useEffect(() => {
-    if (blockEvents) return
+    // if (blockEvents) return
 
     function handleRouteChange(url: string) {
       handlePageTelemetry(url)
@@ -59,7 +64,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.events, consentValue])
 
   useEffect(() => {
-    if (blockEvents) return
+    // if (blockEvents) return
     /**
      * Send page telemetry on first page load
      */
