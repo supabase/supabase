@@ -11,7 +11,6 @@ import { Button, Modal, ScrollArea, cn } from 'ui'
 import APISidePanelPreview from './APISidePanelPreview'
 import CLSPreview from './CLSPreview'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
-import RLSAIAssistantPreview from './RLSAIAssistantPreview'
 
 const FeaturePreviewModal = () => {
   // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
@@ -21,12 +20,6 @@ const FeaturePreviewModal = () => {
       name: 'Project API documentation',
       content: <APISidePanelPreview />,
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
-      name: 'Supabase Assistant for RLS policies',
-      content: <RLSAIAssistantPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/21882',
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,

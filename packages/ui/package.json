@@ -75,7 +75,7 @@
     "react-intersection-observer": "^9.8.2",
     "react-markdown": "^8.0.3",
     "react-medium-image-zoom": "^5.2.4",
-    "react-resizable-panels": "^2.0.13",
+    "react-resizable-panels": "^2.1.4",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^4.2.17",
     "react-use": "^17.5.0",
