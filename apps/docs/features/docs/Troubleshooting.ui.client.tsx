@@ -1,11 +1,18 @@
 'use client'
 
-import { RotateCw, Search, X } from 'lucide-react'
+import { ChevronDown, RotateCw, Search, X } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useRef, useState, Suspense, useCallback } from 'react'
 
-import ShimmeringLoader from '@ui-patterns/ShimmeringLoader'
-import { Input_Shadcn_, cn, Button_Shadcn_ } from 'ui'
+import {
+  Input_Shadcn_,
+  cn,
+  Button_Shadcn_,
+  Collapsible_Shadcn_ as Collapsible,
+  CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
+  CollapsibleContent_Shadcn_ as CollapsibleContent,
+} from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 import { MultiSelect } from '~/components/MultiSelect.client'
 import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
@@ -15,6 +22,7 @@ import {
   TROUBLESHOOTING_DATA_ATTRIBUTES,
   troubleshootingSearchParams,
 } from './Troubleshooting.utils.shared'
+import { useBreakpoint } from 'common'
 
 function useTroubleshootingSearchState() {
   const [_state, _setState] = useQueryStates(troubleshootingSearchParams)
@@ -108,9 +116,47 @@ interface TroubleshootingFilterProps {
 export function TroubleshootingFilter(props: TroubleshootingFilterProps) {
   return (
     <Suspense fallback={<ShimmeringLoader className="h-7 py-0" />}>
-      <TroubleshootingFilterInternal {...props} />
+      <TroubleshootingFilterMobileCollapsed {...props} />
     </Suspense>
   )
+}
+
+function TroubleshootingFilterMobileCollapsed(props: TroubleshootingFilterProps) {
+  const isBelowSmallScreen = useBreakpoint('sm')
+  const { selectedProducts, selectedErrorCodes, selectedTags, searchState } =
+    useTroubleshootingSearchState()
+
+  const numberFiltersApplied =
+    (selectedProducts.length > 0 ? 1 : 0) +
+    (selectedErrorCodes.length > 0 ? 1 : 0) +
+    (selectedTags.length > 0 ? 1 : 0) +
+    (searchState ? 1 : 0)
+
+  if (isBelowSmallScreen) {
+    return (
+      <Collapsible className="border-b">
+        <CollapsibleTrigger className="group w-full pb-6 text-foreground-light">
+          <div className="flex items-center justify-between gap-2">
+            <span>Filters</span>
+            <ChevronDown
+              size={16}
+              className="group-data-[state=open]:rotate-180 transition-transform"
+            />
+          </div>
+          {numberFiltersApplied > 0 && (
+            <div className="group-data-[state=open]:hidden text-sm text-left">
+              {numberFiltersApplied} filter{numberFiltersApplied > 1 ? 's' : ''} applied
+            </div>
+          )}
+        </CollapsibleTrigger>
+        <CollapsibleContent className="flex flex-col gap-2">
+          <TroubleshootingFilterInternal {...props} />
+        </CollapsibleContent>
+      </Collapsible>
+    )
+  }
+
+  return <TroubleshootingFilterInternal {...props} />
 }
 
 function TroubleshootingFilterInternal({

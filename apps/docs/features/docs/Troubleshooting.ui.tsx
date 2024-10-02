@@ -7,13 +7,7 @@ import { TroubleshootingFilter } from './Troubleshooting.ui.client'
 import { formatError, TROUBLESHOOTING_DATA_ATTRIBUTES } from './Troubleshooting.utils.shared'
 import { cn } from 'ui'
 
-export function TroubleshootingPreview({
-  entry,
-  parentPage = '/guides/troubleshooting',
-}: {
-  entry: ITroubleshootingEntry
-  parentPage?: string
-}) {
+export function TroubleshootingPreview({ entry }: { entry: ITroubleshootingEntry }) {
   const keywords = [...entry.data.topics, ...(entry.data.keywords ?? [])]
   const attributes = {
     [TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_ATTRIBUTE]:
@@ -31,8 +25,8 @@ export function TroubleshootingPreview({
       aria-labelledby={`troubleshooting-entry-title-${entry.data.database_id}`}
       {...attributes}
     >
-      <div className="flex flex-wrap items-start gap-2 justify-between">
-        <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-start gap-x-2 gap-y-4 justify-between">
+        <div className="w-full flex flex-col gap-2">
           <Link
             href={`/guides/troubleshooting/${getArticleSlug(entry.data)}`}
             className={cn('visited:text-foreground-lighter', 'before:absolute before:inset-0')}
