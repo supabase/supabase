@@ -53,6 +53,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
           </p>
         </div>
 
+        {/* [Joshen] This whole thing here i reckon we can shift to a component, if in the future we wanna add more user logs */}
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Button
@@ -151,15 +152,6 @@ export const UserLogs = ({ user }: UserLogsProps) => {
           </div>
         )}
       </div>
-
-      {/* <Separator /> */}
-
-      {/* <div className={cn('flex flex-col', PANEL_PADDING)}>
-        <p>Postgrest logs</p>
-        <p className="text-sm text-foreground-light">
-          Latest logs from using client libraries for this user
-        </p>
-      </div> */}
     </div>
   )
 }
