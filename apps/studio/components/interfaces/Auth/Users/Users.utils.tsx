@@ -117,6 +117,7 @@ const phoneProviders = providers.phone.map((x) => {
 
 export function getDisplayName(user: User, fallback = '-'): string {
   const {
+    custom_claims,
     displayName,
     display_name,
     fullName,
@@ -132,8 +133,15 @@ export function getDisplayName(user: User, fallback = '-'): string {
     first_name,
   } = user.raw_user_meta_data ?? {}
 
-  const last = familyName || family_name || surname || lastName || last_name
-  const first = givenName || given_name || firstName || first_name
+  const last =
+    (custom_claims as any)?.last_name ||
+    familyName ||
+    family_name ||
+    surname ||
+    lastName ||
+    last_name
+  const first =
+    (custom_claims as any)?.first_name || givenName || given_name || firstName || first_name
 
   return (
     displayName ||

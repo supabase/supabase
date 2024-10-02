@@ -1,3 +1,6 @@
+import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
+import { Filters } from 'components/interfaces/Settings/Logs/Logs.types'
+
 export const analyticsKeys = {
   // warehouse
   warehouseQuery: (projectRef: string, query: string) =>
@@ -151,6 +154,12 @@ export const analyticsKeys = {
 
   usageApiRequestsCount: (projectRef: string | undefined) =>
     ['projects', projectRef, 'usage.api-requests-count'] as const,
+  previewLogs: (projectRef: string | undefined, table: LogsTableName, filters: Filters) => [
+    'projects',
+    projectRef,
+    table,
+    filters,
+  ],
 }
 
 function isoDateStringToDate(isoDateString: string | undefined): string | undefined {
