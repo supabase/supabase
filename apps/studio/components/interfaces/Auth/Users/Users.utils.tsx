@@ -207,7 +207,7 @@ export const formatUserColumns = ({
             : Array.isArray(value)
               ? value.join(', ')
               : value
-        const isConfirmed = !!user?.email_confirmed_at || !!user?.phone_confirmed_at
+        const isConfirmed = !!user?.confirmed_at
 
         if (col.id === 'img') {
           return (
