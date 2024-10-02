@@ -126,25 +126,27 @@ const ProjectLayout = ({
             direction="horizontal"
             autoSaveId="project-layout"
           >
-            {showProductMenu && productMenu && (
-              <>
-                <ResizablePanel
-                  id="panel-left"
-                  className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64')}
-                  defaultSize={0} // forces panel to smallest width possible, at w-64
-                >
-                  <MenuBarWrapper
-                    isLoading={isLoading}
-                    isBlocking={isBlocking}
-                    productMenu={productMenu}
-                  >
-                    <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-                  </MenuBarWrapper>
-                </ResizablePanel>
-                <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
-              </>
-            )}
-            <ResizablePanel defaultSize={100} id="panel-right" className="h-full flex flex-col">
+            <ResizablePanel
+              id="panel-left"
+              className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
+                hidden: !showProductMenu || !productMenu,
+              })}
+              defaultSize={0} // forces panel to smallest width possible, at w-64
+            >
+              <MenuBarWrapper
+                isLoading={isLoading}
+                isBlocking={isBlocking}
+                productMenu={productMenu}
+              >
+                <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+              </MenuBarWrapper>
+            </ResizablePanel>
+            <ResizableHandle
+              className={cn({ hidden: !showProductMenu || !productMenu })}
+              withHandle
+              disabled={resizableSidebar ? false : true}
+            />
+            <ResizablePanel id="panel-right" className="h-full flex flex-col">
               {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
               <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
                 {showPausedState ? (
