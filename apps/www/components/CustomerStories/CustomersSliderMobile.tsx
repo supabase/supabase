@@ -1,7 +1,6 @@
 import 'swiper/css'
 import React from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Autoplay } from 'swiper/modules'
 
 import { cn } from 'ui'
 import { CompositionCol } from '.'
@@ -23,11 +22,6 @@ const CustomersSliderMobile: React.FC<Props> = ({ columns, className }) => (
       threshold={2}
       updateOnWindowResize
       allowTouchMove
-      autoplay={{
-        delay: 4500,
-        disableOnInteraction: false,
-      }}
-      modules={[Autoplay]}
       className="!px-6 w-full h-full overflow-visible"
     >
       {columns.map((column: CompositionColType, i: number) => (
