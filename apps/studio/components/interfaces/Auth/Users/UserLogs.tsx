@@ -110,7 +110,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                 return (
                   <div
                     key={log.id}
-                    className="flex items-center transition font-mono p-2 bg-surface-100 divide-x"
+                    className="flex items-center transition font-mono px-2 py-1.5 bg-surface-100 divide-x"
                   >
                     <p className="text-xs text-foreground-light min-w-[120px] w-[120px] px-1">
                       {formattedTime}
