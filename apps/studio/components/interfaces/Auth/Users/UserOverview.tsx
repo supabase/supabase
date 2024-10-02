@@ -48,9 +48,9 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isAnonUser = user.is_anonymous
   const isBanned = user.banned_until !== null
 
-  const providers = (user.raw_app_meta_data?.providers ?? []).map((provider) => {
+  const providers = (user.raw_app_meta_data?.providers ?? []).map((provider: string) => {
     return {
-      name: provider,
+      name: provider.startsWith('sso') ? 'SAML' : provider,
       icon:
         provider === 'email'
           ? `${BASE_PATH}/img/icons/email-icon2.svg`
@@ -285,10 +285,13 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 <div className="flex-grow mt-0.5">
                   <p className="capitalize">{provider.name}</p>
                   <p className="text-xs text-foreground-light">
-                    Signed in with a {providerName} account via OAuth
+                    Signed in with a {providerName} account via{' '}
+                    {providerName === 'SAML' ? 'SSO' : 'OAuth'}
                   </p>
                   <Button asChild type="default" className="mt-2">
-                    <Link href={`/project/${projectRef}/auth/providers?provider=${provider.name}`}>
+                    <Link
+                      href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
+                    >
                       Configure {providerName} provider
                     </Link>
                   </Button>
