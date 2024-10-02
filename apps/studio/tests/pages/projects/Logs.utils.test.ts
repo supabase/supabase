@@ -1,8 +1,9 @@
 import {
-  checkForWithClause,
   checkForILIKEClause,
   checkForWildcard,
+  checkForWithClause,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
+import { describe, test, expect } from 'vitest'
 
 describe('checkForWithClause', () => {
   test('basic queries', () => {

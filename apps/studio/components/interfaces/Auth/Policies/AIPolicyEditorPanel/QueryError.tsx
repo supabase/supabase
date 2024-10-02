@@ -3,7 +3,6 @@ import { initial, last } from 'lodash'
 import { Dispatch, SetStateAction } from 'react'
 
 import { useTelemetryProps } from 'common'
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { QueryResponseError } from 'data/sql/execute-sql-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -31,7 +30,6 @@ const QueryError = ({
   setOpen: Dispatch<SetStateAction<boolean>>
   onSelectDebug: () => void
 }) => {
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
   const formattedError =
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
@@ -76,7 +74,7 @@ const QueryError = ({
                   {open ? 'Hide error details' : 'Show error details'}
                 </Button>
               </CollapsibleTrigger_Shadcn_>
-              {!hasHipaaAddon && isAiAssistantEnabled && (
+              {!hasHipaaAddon && (
                 <Button
                   size="tiny"
                   type="default"

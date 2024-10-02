@@ -19,7 +19,6 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  cn,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -30,11 +29,11 @@ import {
   Separator,
 } from 'ui'
 import {
-  GenericSkeletonLoader,
   InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideMenuItem,
-} from 'ui-patterns'
+} from 'ui-patterns/InnerSideMenu'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (
@@ -193,25 +192,27 @@ export function LogsSidebarMenuV2() {
                 Create query
               </Link>
             </DropdownMenuItem>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuItem className="gap-x-2" asChild>
-                  <button
-                    onClick={() => setCreateCollectionOpen(true)}
-                    className="w-full flex items-center text-xs px-2 py-1"
-                    disabled={!canCreateCollection}
-                  >
-                    <Plus size={14} />
-                    Create collection
-                  </button>
-                </DropdownMenuItem>
-              </TooltipTrigger>
-              {!canCreateCollection && (
-                <TooltipContent>
-                  You need additional permissions to create a collection
-                </TooltipContent>
-              )}
-            </Tooltip>
+            {warehouseEnabled && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuItem className="gap-x-2" asChild>
+                    <button
+                      onClick={() => setCreateCollectionOpen(true)}
+                      className="w-full flex items-center text-xs px-2 py-1"
+                      disabled={!canCreateCollection}
+                    >
+                      <Plus size={14} />
+                      Create collection
+                    </button>
+                  </DropdownMenuItem>
+                </TooltipTrigger>
+                {!canCreateCollection && (
+                  <TooltipContent>
+                    You need additional permissions to create a collection
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
         <CreateWarehouseCollectionModal
@@ -248,7 +249,7 @@ export function LogsSidebarMenuV2() {
             label={collection?.name ?? ''}
           />
         ))}
-        {whCollectionsLoading ? (
+        {whCollectionsLoading && warehouseEnabled ? (
           <div className="p-4">
             <GenericSkeletonLoader />
           </div>

@@ -1,16 +1,14 @@
 import { ExternalLink, Loader2 } from 'lucide-react'
+import Link from 'next/link'
 
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button } from 'ui'
 import Results from './Results'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useFlag } from 'hooks/ui/useFlag'
-import Link from 'next/link'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -30,12 +28,9 @@ const UtilityTabResults = ({
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const organization = useSelectedOrganization()
-
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const enableFolders = useFlag('sqlFolderOrganization')
 
-  const result = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
+  const result = snapV2.results[id]?.[0]
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   // Customers on HIPAA plans should not have access to Supabase AI
@@ -139,7 +134,7 @@ const UtilityTabResults = ({
                 type="default"
                 onClick={() => {
                   state.setSelectedDatabaseId(ref)
-                  snap.resetResult(id)
+                  snapV2.resetResult(id)
                 }}
               >
                 Switch to primary database

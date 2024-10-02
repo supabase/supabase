@@ -1,80 +1,116 @@
 import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
+import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { authKeys } from './keys'
-import { ResponseError } from 'types'
 
-type Filter = 'verified' | 'unverified' | 'anonymous'
+export type Filter = 'verified' | 'unverified' | 'anonymous'
 
 export type UsersVariables = {
   projectRef?: string
+  connectionString?: string
   page?: number
   keywords?: string
   filter?: Filter
+  providers?: string[]
+  sort?: 'created_at' | 'email' | 'phone'
+  order?: 'asc' | 'desc'
 }
 
 export const USERS_PAGE_LIMIT = 50
 export type User = components['schemas']['UserBody']
 
-export async function getUsers(
-  { projectRef, page = 0, keywords = '', filter }: UsersVariables,
-  signal?: AbortSignal
-) {
-  if (!projectRef) throw new Error('Project ref is required')
-
-  const limit = USERS_PAGE_LIMIT
+const getUsersSQL = ({
+  page = 0,
+  verified,
+  keywords,
+  providers,
+  sort,
+  order,
+}: {
+  page: number
+  verified?: Filter
+  keywords?: string
+  providers?: string[]
+  sort: string
+  order: string
+}) => {
   const offset = page * USERS_PAGE_LIMIT
-  const query: {
-    limit: string
-    offset: string
-    keywords: string
-    verified?: Filter
-  } = {
-    limit: limit.toString(),
-    offset: offset.toString(),
-    keywords,
+  const hasValidKeywords = keywords && keywords !== ''
+
+  const conditions: string[] = []
+  const baseQueryUsers = `select * from auth.users`
+
+  if (hasValidKeywords) {
+    conditions.push(
+      `id::text ilike '%${keywords}%' or email ilike '%${keywords}%' or phone ilike '%${keywords}%'`
+    )
   }
 
-  if (filter) {
-    query.verified = filter
+  if (verified === 'verified') {
+    conditions.push(`email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL`)
+  } else if (verified === 'anonymous') {
+    conditions.push(`is_anonymous is true`)
+  } else if (verified === 'unverified') {
+    conditions.push(`email_confirmed_at IS NULL AND phone_confirmed_at IS NULL`)
   }
 
-  const { data, error } = await get(`/platform/auth/{ref}/users`, {
-    params: {
-      path: { ref: projectRef },
-      query: query as any,
-    },
-    signal,
-  })
+  if (providers && providers.length > 0) {
+    // [Joshen] This is arguarbly not fully optimized, but at the same time not commonly used
+    // JFYI in case we do eventually run into performance issues here when filtering for SAML provider
+    if (providers.includes('saml 2.0')) {
+      conditions.push(
+        `(select jsonb_agg(case when value ~ '^sso' then 'sso' else value end) from jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => (p === 'saml 2.0' ? `'sso'` : `'${p}'`)).join(', ')}]`.trim()
+      )
+    } else {
+      conditions.push(
+        `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => `'${p}'`).join(', ')}]`
+      )
+    }
+  }
 
-  if (error) handleError(error)
-  return data
+  const combinedConditions = conditions.map((x) => `(${x})`).join(' and ')
+  const sortOn = sort ?? 'created_at'
+  const sortOrder = order ?? 'desc'
+
+  return `${baseQueryUsers}${conditions.length > 0 ? ` where ${combinedConditions}` : ''} order by "${sortOn}" ${sortOrder} limit ${USERS_PAGE_LIMIT} offset ${offset};`
 }
 
-export type UsersData = Awaited<ReturnType<typeof getUsers>>
-export type UsersError = ResponseError
+export type UsersData = { result: User[] }
+export type UsersError = ExecuteSqlError
 
 export const useUsersInfiniteQuery = <TData = UsersData>(
-  { projectRef, keywords, filter }: UsersVariables,
+  { projectRef, connectionString, keywords, filter, providers, sort, order }: UsersVariables,
   { enabled = true, ...options }: UseInfiniteQueryOptions<UsersData, UsersError, TData> = {}
 ) =>
   useInfiniteQuery<UsersData, UsersError, TData>(
-    authKeys.usersInfinite(projectRef, { keywords, filter }),
-    ({ signal, pageParam }) => getUsers({ projectRef, keywords, filter, page: pageParam }, signal),
+    authKeys.usersInfinite(projectRef, { keywords, filter, providers, sort, order }),
+    ({ signal, pageParam }) => {
+      return executeSql(
+        {
+          projectRef,
+          connectionString,
+          sql: getUsersSQL({
+            page: pageParam,
+            verified: filter,
+            keywords,
+            providers,
+            sort: sort ?? 'created_at',
+            order: order ?? 'desc',
+          }),
+          queryKey: authKeys.usersInfinite(projectRef),
+        },
+        signal
+      )
+    },
     {
       staleTime: 0,
       enabled: enabled && typeof projectRef !== 'undefined',
 
       getNextPageParam(lastPage, pages) {
         const page = pages.length
-        const currentTotalCount = page * USERS_PAGE_LIMIT
-        const totalCount = lastPage.total
-
-        if (currentTotalCount >= totalCount) {
-          return undefined
-        }
-
+        const hasNextPage = lastPage.result.length <= USERS_PAGE_LIMIT
+        if (!hasNextPage) return undefined
         return page
       },
       ...options,

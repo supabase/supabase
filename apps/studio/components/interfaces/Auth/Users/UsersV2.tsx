@@ -1,6 +1,6 @@
-import dayjs from 'dayjs'
-import { Loader2, RefreshCw, Search, User as UserIcon, Users, X } from 'lucide-react'
-import { UIEvent, useMemo, useRef, useState } from 'react'
+import AwesomeDebouncePromise from 'awesome-debounce-promise'
+import { ArrowDown, ArrowUp, Loader2, RefreshCw, Search, Users, X } from 'lucide-react'
+import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
@@ -8,11 +8,23 @@ import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeatureP
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
   Button,
   cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
   LoadingLine,
   ResizablePanel,
   ResizablePanelGroup,
@@ -23,41 +35,32 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import AddUserDropdown from './AddUserDropdown'
 import { UserPanel } from './UserPanel'
-import { formatUsersData, isAtBottom } from './Users.utils'
+import { PROVIDER_FILTER_OPTIONS } from './Users.constants'
+import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
 
 type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
-const USERS_TABLE_COLUMNS = [
+export type UsersTableColumn = {
+  id: string
+  name: string
+  minWidth?: number
+  width?: number
+  resizable?: boolean
+}
+export type ColumnConfiguration = { id: string; width?: number }
+export const USERS_TABLE_COLUMNS: UsersTableColumn[] = [
   { id: 'img', name: '', minWidth: 65, width: 65, resizable: false },
-  { id: 'id', name: 'UID', minWidth: undefined, width: 280, resizable: true },
-  { id: 'name', name: 'Display name', minWidth: 0, width: 150, resizable: false },
-  {
-    id: 'email',
-    name: 'Email',
-    minWidth: undefined,
-    width: 300,
-    resizable: true,
-  },
-  { id: 'phone', name: 'Phone', minWidth: undefined, resizable: true },
-  { id: 'providers', name: 'Providers', minWidth: 150, resizable: true },
-  { id: 'provider_type', name: 'Provider type', minWidth: 150, resizable: true },
-  {
-    id: 'created_at',
-    name: 'Created at',
-    minWidth: undefined,
-    width: 260,
-    resizable: true,
-  },
-  {
-    id: 'last_sign_in_at',
-    name: 'Last sign in at',
-    minWidth: undefined,
-    width: 260,
-    resizable: true,
-  },
+  { id: 'id', name: 'UID', width: 280 },
+  { id: 'name', name: 'Display name', minWidth: 0, width: 150 },
+  { id: 'email', name: 'Email', width: 300 },
+  { id: 'phone', name: 'Phone' },
+  { id: 'providers', name: 'Providers', minWidth: 150 },
+  { id: 'provider_type', name: 'Provider type', minWidth: 150 },
+  { id: 'created_at', name: 'Created at', width: 260 },
+  { id: 'last_sign_in_at', name: 'Last sign in at', width: 260 },
 ]
 
 // [Joshen] Just naming it as V2 as its a rewrite of the old one, to make it easier for reviews
@@ -68,124 +71,61 @@ export const UsersV2 = () => {
   const gridRef = useRef<DataGridHandle>(null)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
+  const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [filterKeywords, setFilterKeywords] = useState('')
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([])
+  const [selectedProviders, setSelectedProviders] = useState<string[]>([])
   const [selectedRow, setSelectedRow] = useState<number>()
+  const [sortByValue, setSortByValue] = useState<string>('created_at:desc')
+  const [
+    columnConfiguration,
+    setColumnConfiguration,
+    { isSuccess: isSuccessStorage, isError: isErrorStorage, error: errorStorage },
+  ] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.AUTH_USERS_COLUMNS_CONFIGURATION(projectRef ?? ''),
+    null as ColumnConfiguration[] | null
+  )
+
+  const [sortColumn, sortOrder] = sortByValue.split(':')
 
   const {
     data,
     error,
+    isSuccess,
     isLoading,
     isRefetching,
     isError,
-    // hasNextPage,
     isFetchingNextPage,
     refetch,
     fetchNextPage,
   } = useUsersInfiniteQuery(
     {
       projectRef,
+      connectionString: project?.connectionString,
       keywords: filterKeywords,
       filter: filter === 'all' ? undefined : filter,
+      providers: selectedProviders,
+      sort: sortColumn as 'created_at' | 'email' | 'phone',
+      order: sortOrder as 'asc' | 'desc',
     },
     {
       keepPreviousData: Boolean(filterKeywords),
     }
   )
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const totalUsers = useMemo(() => data?.pages[0].total, [data?.pages[0].total])
-  const users = useMemo(() => data?.pages.flatMap((page) => page.users), [data?.pages])
-
-  const usersTableColumns = USERS_TABLE_COLUMNS.map((col) => {
-    const res: Column<any> = {
-      key: col.id,
-      name: col.name,
-      resizable: col.resizable,
-      sortable: false,
-      width: col.width,
-      minWidth: col.minWidth ?? 120,
-      headerCellClass: 'z-50',
-      renderHeaderCell: () => {
-        if (col.id === 'img') return undefined
-        return (
-          <div className="flex items-center justify-between font-normal text-xs w-full">
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">{col.name}</p>
-            </div>
-          </div>
-        )
-      },
-      renderCell: ({ row }) => {
-        const value = row?.[col.id]
-        const user = users?.find((u) => u.id === row.id)
-        const formattedValue =
-          value !== null && ['created_at', 'last_sign_in_at'].includes(col.id)
-            ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
-            : Array.isArray(value)
-              ? value.join(', ')
-              : value
-        const isConfirmed = user?.email_confirmed_at || user?.phone_confirmed_at
-
-        if (col.id === 'img') {
-          return (
-            <div className="flex items-center justify-center">
-              <div
-                className={cn(
-                  'flex items-center justify-center w-6 h-6 rounded-full bg-center bg-cover bg-no-repeat',
-                  !row.img ? 'bg-selection' : 'border'
-                )}
-                style={{ backgroundImage: row.img ? `url('${row.img}')` : 'none' }}
-              >
-                {!row.img && <UserIcon size={12} />}
-              </div>
-            </div>
-          )
-        }
-
-        return (
-          <div
-            className={cn(
-              'w-full flex items-center text-xs',
-              col.id.includes('provider') ? 'capitalize' : ''
-            )}
-          >
-            {/* [Joshen] Not convinced this is the ideal way to display the icons, but for now */}
-            {col.id === 'providers' &&
-              row.provider_icons.map((icon: string, idx: number) => {
-                const provider = row.providers[idx]
-                return (
-                  <div
-                    className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
-                    style={{
-                      marginLeft: idx === 0 ? 0 : `-8px`,
-                      zIndex: row.provider_icons.length - idx,
-                    }}
-                  >
-                    <img
-                      key={`${user?.id}-${provider}`}
-                      width={16}
-                      src={icon}
-                      alt={`${provider} auth icon`}
-                      className={cn(provider === 'github' && 'dark:invert')}
-                    />
-                  </div>
-                )
-              })}
-            {col.id === 'last_sign_in_at' && !isConfirmed ? (
-              <p className="text-foreground-lighter">Waiting for verification</p>
-            ) : (
-              <p className={cn(col.id === 'providers' && 'ml-1')}>
-                {formattedValue === null ? '-' : formattedValue}
-              </p>
-            )}
-          </div>
-        )
-      },
-    }
-    return res
+  const { data: countData } = useUsersCountQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+    keywords: filterKeywords,
+    filter: filter === 'all' ? undefined : filter,
+    providers: selectedProviders,
   })
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const totalUsers = useMemo(() => countData?.result[0].count ?? 0, [countData?.result[0].count])
+  const users = useMemo(() => data?.pages.flatMap((page) => page.result), [data?.pages])
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     if (isLoading || !isAtBottom(event)) return
@@ -197,6 +137,59 @@ export const UsersV2 = () => {
     setFilterKeywords('')
   }
 
+  const swapColumns = (data: any[], sourceIdx: number, targetIdx: number) => {
+    const updatedColumns = data.slice()
+    const [removed] = updatedColumns.splice(sourceIdx, 1)
+    updatedColumns.splice(targetIdx, 0, removed)
+    return updatedColumns
+  }
+
+  // [Joshen] Left off here - it's tricky trying to do both column toggling and re-ordering
+  const saveColumnConfiguration = AwesomeDebouncePromise(
+    (event: 'resize' | 'reorder' | 'toggle', value) => {
+      if (event === 'toggle') {
+        const columnConfig = value.columns.map((col: any) => ({
+          id: col.key,
+          width: col.width,
+        }))
+        setColumnConfiguration(columnConfig)
+      } else if (event === 'resize') {
+        const columnConfig = columns.map((col, idx) => ({
+          id: col.key,
+          width: idx === value.idx ? value.width : col.width,
+        }))
+        setColumnConfiguration(columnConfig)
+      } else if (event === 'reorder') {
+        const columnConfig = value.columns.map((col: any) => ({
+          id: col.key,
+          width: col.width,
+        }))
+        setColumnConfiguration(columnConfig)
+      }
+    },
+    500
+  )
+
+  useEffect(() => {
+    if (
+      !isRefetching &&
+      (isSuccessStorage ||
+        (isErrorStorage && (errorStorage as Error).message.includes('data is undefined')))
+    ) {
+      const columns = formatUserColumns({
+        config: columnConfiguration ?? [],
+        users: users ?? [],
+        visibleColumns: selectedColumns,
+        setSortByValue,
+      })
+      setColumns(columns)
+      if (columns.length < USERS_TABLE_COLUMNS.length) {
+        setSelectedColumns(columns.filter((col) => col.key !== 'img').map((col) => col.key))
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, isRefetching, isSuccessStorage, isErrorStorage, errorStorage])
+
   return (
     <div className="h-full flex flex-col">
       <FormHeader className="py-4 px-6 !mb-0" title="Users" />
@@ -204,14 +197,17 @@ export const UsersV2 = () => {
         <div className="flex items-center gap-x-2">
           <Input
             size="tiny"
-            className="w-64 pl-7"
+            className="w-52 pl-7 bg-transparent"
             iconContainerClassName="pl-2"
             icon={<Search size={14} className="text-foreground-lighter" />}
-            placeholder="Search by email, phone number or UID"
+            placeholder="Search email, phone or UID"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => {
-              if (e.code === 'Enter') setFilterKeywords(search)
+              if (e.code === 'Enter') {
+                setSearch(search.trim())
+                setFilterKeywords(search.trim())
+              }
             }}
             actions={[
               search && (
@@ -220,25 +216,131 @@ export const UsersV2 = () => {
                   type="text"
                   icon={<X />}
                   onClick={() => clearSearch()}
-                  className="px-1"
+                  className="p-0 h-5 w-5"
                 />
               ),
             ]}
           />
+
           <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
-            <SelectTrigger_Shadcn_ size="tiny" className="w-[150px]">
+            <SelectTrigger_Shadcn_
+              size="tiny"
+              className={cn('w-[140px] !bg-transparent', filter === 'all' && 'border-dashed')}
+            >
               <SelectValue_Shadcn_ />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
               <SelectGroup_Shadcn_>
-                <SelectItem_Shadcn_ value="all">All users</SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="verified">Verified users</SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="unverified">Unverified users</SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="anonymous">Anonymous users</SelectItem_Shadcn_>
+                <SelectItem_Shadcn_ value="all" className="text-xs">
+                  All users
+                </SelectItem_Shadcn_>
+                <SelectItem_Shadcn_ value="verified" className="text-xs">
+                  Verified users
+                </SelectItem_Shadcn_>
+                <SelectItem_Shadcn_ value="unverified" className="text-xs">
+                  Unverified users
+                </SelectItem_Shadcn_>
+                <SelectItem_Shadcn_ value="anonymous" className="text-xs">
+                  Anonymous users
+                </SelectItem_Shadcn_>
               </SelectGroup_Shadcn_>
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
+
+          <FilterPopover
+            name="Provider"
+            options={PROVIDER_FILTER_OPTIONS}
+            labelKey="name"
+            valueKey="value"
+            iconKey="icon"
+            activeOptions={selectedProviders}
+            labelClass="text-xs"
+            maxHeightClass="h-[190px]"
+            onSaveFilters={setSelectedProviders}
+          />
+
+          <div className="border-r border-strong h-6" />
+
+          <FilterPopover
+            name={selectedColumns.length === 0 ? 'All columns' : 'Columns'}
+            title="Select columns to show"
+            buttonType={selectedColumns.length === 0 ? 'dashed' : 'default'}
+            options={USERS_TABLE_COLUMNS.slice(1)} // Ignore user image column
+            labelKey="name"
+            valueKey="id"
+            labelClass="text-xs"
+            maxHeightClass="h-[190px]"
+            clearButtonText="Reset"
+            activeOptions={selectedColumns}
+            onSaveFilters={(value) => {
+              // When adding back hidden columns:
+              // (1) width set to default value if any
+              // (2) they will just get appended to the end
+              // (3) If "clearing", reset order of the columns to original
+
+              let updatedConfig = (columnConfiguration ?? []).slice()
+              if (value.length === 0) {
+                updatedConfig = USERS_TABLE_COLUMNS.map((c) => ({ id: c.id, width: c.width }))
+              } else {
+                value.forEach((col) => {
+                  const hasExisting = updatedConfig.find((c) => c.id === col)
+                  if (!hasExisting)
+                    updatedConfig.push({
+                      id: col,
+                      width: USERS_TABLE_COLUMNS.find((c) => c.id === col)?.width,
+                    })
+                })
+              }
+
+              const updatedColumns = formatUserColumns({
+                config: updatedConfig,
+                users: users ?? [],
+                visibleColumns: value,
+                setSortByValue,
+              })
+
+              setSelectedColumns(value)
+              setColumns(updatedColumns)
+              saveColumnConfiguration('toggle', { columns: updatedColumns })
+            }}
+          />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button icon={sortOrder === 'desc' ? <ArrowDown /> : <ArrowUp />}>
+                Sorted by {sortColumn.replace('_', ' ')}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-44" align="start">
+              <DropdownMenuRadioGroup value={sortByValue} onValueChange={setSortByValue}>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Sort by created at</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioItem value="created_at:asc">Ascending</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="created_at:desc">
+                      Descending
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Sort by email</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioItem value="email:asc">Ascending</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="email:desc">Descending</DropdownMenuRadioItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Sort by phone</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioItem value="phone:asc">Ascending</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="phone:desc">Descending</DropdownMenuRadioItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
+
         <div className="flex items-center gap-2">
           {isNewAPIDocsEnabled && <APIDocsButton section={['user-management']} />}
           <Button
@@ -266,7 +368,7 @@ export const UsersV2 = () => {
               className="flex-grow border-t-0"
               rowHeight={44}
               headerRowHeight={36}
-              columns={usersTableColumns}
+              columns={columns}
               rows={formatUsersData(users ?? [])}
               rowClass={(_, idx) => {
                 const isSelected = idx === selectedRow
@@ -277,6 +379,16 @@ export const UsersV2 = () => {
                 ].join(' ')
               }}
               onScroll={handleScroll}
+              onColumnResize={(idx, width) => saveColumnConfiguration('resize', { idx, width })}
+              onColumnsReorder={(source, target) => {
+                const sourceIdx = columns.findIndex((col) => col.key === source)
+                const targetIdx = columns.findIndex((col) => col.key === target)
+
+                const updatedColumns = swapColumns(columns, sourceIdx, targetIdx)
+                setColumns(updatedColumns)
+
+                saveColumnConfiguration('reorder', { columns: updatedColumns })
+              }}
               renderers={{
                 renderRow(idx, props) {
                   return (
