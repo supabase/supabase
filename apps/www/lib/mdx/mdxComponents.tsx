@@ -64,19 +64,19 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {
     CodeBlock,
     CH,
-    h1: (props: any) => <Heading {...props} tag="h1" />,
-    h2: (props: any) => <Heading {...props} tag="h2" />,
-    h3: (props: any) => <Heading {...props} tag="h3" />,
-    h4: (props: any) => <Heading {...props} tag="h4" />,
-    h5: (props: any) => <Heading {...props} tag="h5" />,
-    h6: (props: any) => <Heading {...props} tag="h6" />,
+    h1: (props: CSSProperties) => <Heading {...props} tag="h1" />,
+    h2: (props: CSSProperties) => <Heading {...props} tag="h2" />,
+    h3: (props: CSSProperties) => <Heading {...props} tag="h3" />,
+    h4: (props: CSSProperties) => <Heading {...props} tag="h4" />,
+    h5: (props: CSSProperties) => <Heading {...props} tag="h5" />,
+    h6: (props: CSSProperties) => <Heading {...props} tag="h6" />,
     Badge,
     Quote,
     Avatar,
-    PGChart: (props: any) => {
+    PGChart: (props: CSSProperties) => {
       return <Chart {...props} />
     },
-    pre: (props: any) => {
+    pre: (props: CSSProperties) => {
       if (props.className !== ignoreClass) {
         return <CodeBlock {...props.children.props} />
       } else {
@@ -85,7 +85,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     },
     ImageGrid,
     ImageFadeStack,
-    img: (props: any) => {
+    img: (props: CSSProperties) => {
       if (props.className !== ignoreClass) {
         return (
           <Image
@@ -116,8 +116,8 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       />
     ),
     Link: LinkComponent,
-    code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
-    BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
+    code: (props: CSSProperties) => <InlineCodeTag>{props.children}</InlineCodeTag>,
+    BlogCollapsible: (props: CSSProperties) => <BlogCollapsible {...props} />,
     Admonition,
   }
 

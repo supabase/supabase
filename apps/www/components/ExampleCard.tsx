@@ -5,7 +5,7 @@ import { ArrowUpRight } from 'lucide-react'
 import { Button } from 'ui'
 import Panel from './Panel'
 
-function ExampleCard(props: any) {
+function ExampleCard(props: CSSProperties) {
   const isXs = useBreakpoint()
   const [mounted, setMounted] = useState(false)
 

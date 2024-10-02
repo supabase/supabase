@@ -64,7 +64,7 @@ const components = {
   IconCheck: Check,
   IconPanel,
   IconX: X,
-  Image: (props: any) => <Image fill className="object-contain" {...props} />,
+  Image: (props: CSSProperties) => <Image fill className="object-contain" {...props} />,
   JwtGenerator,
   KotlinProjectSetup,
   Link,
@@ -84,17 +84,17 @@ const components = {
   StepHikeCompact,
   Tabs,
   TabPanel,
-  h2: (props: any) => (
+  h2: (props: CSSProperties) => (
     <Heading tag="h2" {...props}>
       {props.children}
     </Heading>
   ),
-  h3: (props: any) => (
+  h3: (props: CSSProperties) => (
     <Heading tag="h3" {...props}>
       {props.children}
     </Heading>
   ),
-  h4: (props: any) => (
+  h4: (props: CSSProperties) => (
     <Heading tag="h4" {...props}>
       {props.children}
     </Heading>

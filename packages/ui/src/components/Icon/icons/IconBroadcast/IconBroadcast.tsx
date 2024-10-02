@@ -30,7 +30,7 @@ const SvgComponent = () => (
   </>
 )
 
-function IconBroadcast(props: any) {
+function IconBroadcast(props: CSSProperties) {
   return <IconBase src={<SvgComponent />} viewBox="0 0 24 24" {...props} />
 }
 

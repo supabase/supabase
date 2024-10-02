@@ -10,7 +10,7 @@ const src = (
   />
 )
 
-function IconDocumentation(props: any) {
+function IconDocumentation(props: CSSProperties) {
   return <IconBase src={src} {...props} />
 }
 

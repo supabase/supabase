@@ -1,4 +1,4 @@
-const SectionHeader = (props: any) => {
+const SectionHeader = (props: CSSProperties) => {
   return (
     <div className={props.className}>
       <div className="space-y-4">

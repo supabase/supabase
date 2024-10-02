@@ -3,7 +3,7 @@ import { Fragment } from 'react'
 import { IconPricingIncludedCheck, IconPricingInfo, IconPricingMinus } from './PricingIcons'
 import { HelpCircle } from 'lucide-react'
 
-export const PricingTableRowDesktop = (props: any) => {
+export const PricingTableRowDesktop = (props: CSSProperties) => {
   const category = props.category
 
   return (
@@ -97,7 +97,7 @@ export const PricingTableRowDesktop = (props: any) => {
   )
 }
 
-export const PricingTableRowMobile = (props: any) => {
+export const PricingTableRowMobile = (props: CSSProperties) => {
   const category = props.category
   const plan = props.plan
 

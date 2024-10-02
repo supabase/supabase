@@ -1,6 +1,6 @@
 import { Database } from 'lucide-react'
 
-const FeatureSection = (props: any) => {
+const FeatureSection = (props: CSSProperties) => {
   return (
     <div className="grid grid-cols-12">
       <div className="col-span-3">

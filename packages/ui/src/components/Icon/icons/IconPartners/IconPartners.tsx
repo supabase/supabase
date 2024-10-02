@@ -10,7 +10,7 @@ const src = (
   />
 )
 
-function IconPartners(props: any) {
+function IconPartners(props: CSSProperties) {
   return <IconBase src={src} stroke="none" {...props} />
 }
 

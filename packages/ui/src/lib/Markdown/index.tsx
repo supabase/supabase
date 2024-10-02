@@ -4,7 +4,7 @@ import { CodeBlock } from '../../components/CodeBlock/CodeBlock'
 import Image from 'next/image'
 import { cn } from '../utils'
 
-const NextImageHandler = (props: any) => {
+const NextImageHandler = (props: CSSProperties) => {
   return (
     <span className={cn('next-image--dynamic-fill', props.className)}>
       <Image {...props} className={['rounded-md border'].join(' ')} layout="fill" />
@@ -13,8 +13,8 @@ const NextImageHandler = (props: any) => {
 }
 
 export const markdownComponents = {
-  mono: (props: any) => <code className="text-sm">{props.children}</code>,
-  code: (props: any) => <CodeBlock {...props} />,
-  img: (props: any) => NextImageHandler(props),
-  Image: (props: any) => NextImageHandler(props),
+  mono: (props: CSSProperties) => <code className="text-sm">{props.children}</code>,
+  code: (props: CSSProperties) => <CodeBlock {...props} />,
+  img: (props: CSSProperties) => NextImageHandler(props),
+  Image: (props: CSSProperties) => NextImageHandler(props),
 }

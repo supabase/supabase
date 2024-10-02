@@ -30,7 +30,7 @@ export async function getStaticProps() {
   }
 }
 
-function CustomerStoriesPage(props: any) {
+function CustomerStoriesPage(props: CSSProperties) {
   const { basePath } = useRouter()
 
   const meta = {
