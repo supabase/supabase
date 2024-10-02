@@ -1,6 +1,3 @@
-import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
-import { Filters } from 'components/interfaces/Settings/Logs/Logs.types'
-
 export const analyticsKeys = {
   // warehouse
   warehouseQuery: (projectRef: string, query: string) =>
