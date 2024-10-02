@@ -41,9 +41,17 @@ const getUsersCountSQl = ({
   }
 
   if (providers && providers.length > 0) {
-    conditions.push(
-      `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => `'${p}'`).join(', ')}]`
-    )
+    // [Joshen] This is arguarbly not fully optimized, but at the same time not commonly used
+    // JFYI in case we do eventually run into performance issues here when filtering for SAML provider
+    if (providers.includes('saml 2.0')) {
+      conditions.push(
+        `(select jsonb_agg(case when value ~ '^sso' then 'sso' else value end) from jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => (p === 'saml 2.0' ? `'sso'` : `'${p}'`)).join(', ')}]`.trim()
+      )
+    } else {
+      conditions.push(
+        `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => `'${p}'`).join(', ')}]`
+      )
+    }
   }
 
   const combinedConditions = conditions.map((x) => `(${x})`).join(' and ')
