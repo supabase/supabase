@@ -4,11 +4,14 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useState } from 'react'
 import {
   Button,
   Form_Shadcn_,
@@ -26,6 +29,7 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import EnableExtensionModal from '../Extensions/EnableExtensionModal'
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
 import { buildCronQuery, buildHttpRequestCommand, parseCronJobCommand } from './CronJobs.utils'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
@@ -110,7 +114,13 @@ export const CreateCronJobSheet = ({
   onClose,
 }: CreateCronJobSheetProps) => {
   const isEditing = !!selectedCronJob?.jobname
+  const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
   const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
+
+  const canToggleExtensions = useCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'extensions'
+  )
 
   const cronJobValues = parseCronJobCommand(selectedCronJob?.command || '')
 
@@ -189,8 +199,8 @@ export const CreateCronJobSheet = ({
     connectionString: project?.connectionString,
   })
 
-  const pgNetExtensionExists =
-    (data ?? []).find((ext) => ext.name === 'pg_net')?.installed_version != undefined
+  const pgNetExtension = (data ?? []).find((ext) => ext.name === 'pg_net')
+  const pgNetExtensionInstalled = pgNetExtension?.installed_version != undefined
 
   const cronType = form.watch('values.type')
 
@@ -246,7 +256,7 @@ export const CreateCronJobSheet = ({
                               id={definition.value}
                               value={definition.value}
                               disabled={
-                                !pgNetExtensionExists &&
+                                !pgNetExtensionInstalled &&
                                 (definition.value === 'http_request' ||
                                   definition.value === 'edge_function')
                               }
@@ -262,7 +272,7 @@ export const CreateCronJobSheet = ({
                                   <p className="text-foreground-light">{definition.description}</p>
                                 </div>
                               </div>
-                              {!pgNetExtensionExists &&
+                              {!pgNetExtensionInstalled &&
                               (definition.value === 'http_request' ||
                                 definition.value === 'edge_function') ? (
                                 <div className="w-full flex gap-3 pl-10 py-2 items-center">
@@ -280,6 +290,26 @@ export const CreateCronJobSheet = ({
                     </FormItemLayout>
                   )}
                 />
+                {!pgNetExtensionInstalled ? (
+                  canToggleExtensions ? (
+                    <span className="text-sm text-foreground-light">
+                      To enable Edge Functions and HTTP Requests, you can{' '}
+                      <button
+                        className="hover:underline text-brand"
+                        type="button"
+                        onClick={() => setShowEnableExtensionModal(true)}
+                      >
+                        turn on the pg_net extension.
+                      </button>
+                    </span>
+                  ) : (
+                    <span className="text-sm text-foreground-light">
+                      You need additional permissions to enable pg_cron for this project
+                    </span>
+                  )
+                ) : (
+                  <></>
+                )}
               </SheetSection>
               <Separator />
               {cronType === 'http_request' && (
@@ -339,6 +369,13 @@ export const CreateCronJobSheet = ({
           lost.
         </p>
       </ConfirmationModal>
+      {pgNetExtension && (
+        <EnableExtensionModal
+          visible={showEnableExtensionModal}
+          extension={pgNetExtension}
+          onCancel={() => setShowEnableExtensionModal(false)}
+        />
+      )}
     </>
   )
 }

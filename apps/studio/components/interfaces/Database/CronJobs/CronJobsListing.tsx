@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -6,14 +8,18 @@ import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { Button, Sheet, SheetContent } from 'ui'
+import EnableExtensionModal from '../Extensions/EnableExtensionModal'
 import { CreateCronJobSheet } from './CreateCronJobSheet'
 import { CronJobCard } from './CronJobCard'
+import { CronJobsDisabledState } from './CronJobsDisabledState'
 import DeleteCronJob from './DeleteCronJob'
 
 export const CronJobsListing = () => {
   const { project } = useProjectContext()
 
+  const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
   // used for confirmation prompt in the Create Cron Job Sheet
   const [isClosingCreateCronJobSheet, setIsClosingCreateCronJobSheet] = useState(false)
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useState<
@@ -26,11 +32,31 @@ export const CronJobsListing = () => {
     error,
     isLoading,
     isError,
+    refetch,
   } = useCronJobsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
+  const { data: extensions, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const pgCronExtension = (extensions ?? []).find((ext) => ext.name === 'pg_cron')
+  const pgCronExtensionInstalled = pgCronExtension?.installed_version
+
+  useEffect(() => {
+    // refetch the cron jobs afte the pgcron extension has been installed
+    if (pgCronExtensionInstalled && isError) {
+      refetch()
+    }
+  }, [isError, pgCronExtensionInstalled, refetch])
+
+  // this avoid showing loading screen when the extension is not installed. Otherwise, we';; have to wait for three
+  // retries (which are sure to fail because the extension is not installed)
+  if (isLoadingExtensions) return <GenericSkeletonLoader />
+  if (!pgCronExtensionInstalled) return <CronJobsDisabledState />
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database cron jobs" />
 
@@ -64,26 +90,37 @@ export const CronJobsListing = () => {
             title="Cron jobs"
             description="Use cron jobs to schedule and automate tasks such as running SQL queries or maintenance routines at specified intervals."
             actions={
-              <Button
-                type="primary"
-                onClick={() =>
-                  setCreateCronJobSheetShown({
-                    jobname: '',
-                    schedule: '',
-                    command: '',
-                    active: true,
-                  })
-                }
-              >
-                Create a new cron job
-              </Button>
+              <>
+                <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                  <Link
+                    href="https://supabase.com/docs/guides/database/extensions/pg_cron"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Documentation
+                  </Link>
+                </Button>
+                <Button
+                  type="primary"
+                  onClick={() =>
+                    setCreateCronJobSheetShown({
+                      jobname: '',
+                      schedule: '',
+                      command: '',
+                      active: true,
+                    })
+                  }
+                >
+                  Create a new cron job
+                </Button>
+              </>
             }
           />
           {cronJobs.map((job) => (
             <CronJobCard
               job={job}
-              editCronJob={(job) => setCreateCronJobSheetShown(job)}
-              deleteCronJob={(job) => setCronJobForDeletion(job)}
+              onEditCronJob={(job) => setCreateCronJobSheetShown(job)}
+              onDeleteCronJob={(job) => setCronJobForDeletion(job)}
             />
           ))}
         </div>
@@ -108,6 +145,12 @@ export const CronJobsListing = () => {
         visible={!!cronJobForDeletion}
         onClose={() => setCronJobForDeletion(undefined)}
         cronJob={cronJobForDeletion!}
+      />
+
+      <EnableExtensionModal
+        visible={showEnableExtensionModal}
+        extension={pgCronExtension}
+        onCancel={() => setShowEnableExtensionModal(false)}
       />
     </>
   )
