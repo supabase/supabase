@@ -93,6 +93,7 @@ export const UsersV2 = () => {
   const {
     data,
     error,
+    isSuccess,
     isLoading,
     isRefetching,
     isError,
@@ -171,8 +172,9 @@ export const UsersV2 = () => {
 
   useEffect(() => {
     if (
-      isSuccessStorage ||
-      (isErrorStorage && (errorStorage as Error).message.includes('data is undefined'))
+      !isRefetching &&
+      (isSuccessStorage ||
+        (isErrorStorage && (errorStorage as Error).message.includes('data is undefined')))
     ) {
       const columns = formatUserColumns({
         config: columnConfiguration ?? [],
@@ -186,7 +188,7 @@ export const UsersV2 = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessStorage, isErrorStorage, errorStorage])
+  }, [isSuccess, isRefetching, isSuccessStorage, isErrorStorage, errorStorage])
 
   return (
     <div className="h-full flex flex-col">
