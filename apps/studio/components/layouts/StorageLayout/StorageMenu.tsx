@@ -23,7 +23,7 @@ import {
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
-} from 'ui-patterns'
+} from 'ui-patterns/InnerSideMenu'
 import BucketRow from './BucketRow'
 
 const StorageMenu = () => {

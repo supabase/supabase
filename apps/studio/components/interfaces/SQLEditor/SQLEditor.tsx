@@ -1,7 +1,7 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { AlertTriangle, ChevronUp, Loader2 } from 'lucide-react'
+import { ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -13,7 +13,6 @@ import { useParams, useTelemetryProps } from 'common'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -26,7 +25,6 @@ import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -35,7 +33,6 @@ import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
-import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
@@ -76,7 +73,7 @@ import {
   compareAsAddition,
   compareAsModification,
   compareAsNewSnippet,
-  createSqlSnippetSkeleton,
+  createSqlSnippetSkeletonV2,
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
@@ -104,12 +101,10 @@ const SQLEditor = () => {
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
   const appSnap = useAppStateSnapshot()
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRole = useGetImpersonatedRole()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
-  const enableFolders = useFlag('sqlFolderOrganization')
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
@@ -162,19 +157,16 @@ const SQLEditor = () => {
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
   const isDiffOpen = !!sourceSqlDiff
 
-  const limit = enableFolders ? snapV2.limit : snap.limit
-  const results = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
-  const snippetIsLoading = enableFolders
-    ? !(id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined)
-    : !(id && ref && snap.loaded[ref])
+  const limit = snapV2.limit
+  const results = snapV2.results[id]?.[0]
+  const snippetIsLoading = !(
+    id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
+  )
   const isLoading = urlId === 'new' ? false : snippetIsLoading
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
-      if (id) {
-        if (enableFolders) snapV2.addResult(id, data.result, vars.autoLimit)
-        else snap.addResult(id, data.result, vars.autoLimit)
-      }
+      if (id) snapV2.addResult(id, data.result, vars.autoLimit)
 
       // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
       refetchEntityDefinitions()
@@ -215,8 +207,7 @@ const SQLEditor = () => {
           }
         }
 
-        if (enableFolders) snapV2.addResultError(id, error, vars.autoLimit)
-        else snap.addResultError(id, error, vars.autoLimit)
+        snapV2.addResultError(id, error, vars.autoLimit)
       }
     },
   })
@@ -225,24 +216,19 @@ const SQLEditor = () => {
     async (id: string, sql: string) => {
       try {
         const { title: name } = await generateSqlTitle({ sql })
-
-        if (enableFolders) {
-          snapV2.renameSnippet({ id, name })
-        } else {
-          snap.renameSnippet(id, name)
-        }
+        snapV2.renameSnippet({ id, name })
       } catch (error) {
         // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
       }
     },
-    [generateSqlTitle, snap]
+    [generateSqlTitle, snapV2]
   )
 
   const prettifyQuery = useCallback(async () => {
     if (isDiffOpen) return
 
     // use the latest state
-    const state = enableFolders ? getSqlEditorV2StateSnapshot() : getSqlEditorStateSnapshot()
+    const state = getSqlEditorV2StateSnapshot()
     const snippet = state.snippets[id]
 
     if (editorRef.current && project) {
@@ -268,20 +254,20 @@ const SQLEditor = () => {
                   range: editorModel.getFullModelRange(),
                 },
               ])
-              snap.setSql(id, res.result)
+              snapV2.setSql(id, res.result)
             }
           },
         }
       )
     }
-  }, [formatQuery, id, isDiffOpen, project, snap])
+  }, [formatQuery, id, isDiffOpen, project, snapV2])
 
   const executeQuery = useCallback(
     async (force: boolean = false) => {
       if (isDiffOpen) return
 
       // use the latest state
-      const state = enableFolders ? getSqlEditorV2StateSnapshot() : getSqlEditorStateSnapshot()
+      const state = getSqlEditorV2StateSnapshot()
       const snippet = state.snippets[id]
 
       if (editorRef.current !== null && !isExecuting && project !== undefined) {
@@ -367,23 +353,25 @@ const SQLEditor = () => {
   const handleNewQuery = useCallback(
     async (sql: string, name: string) => {
       if (!ref) return console.error('Project ref is required')
+      if (!profile) return console.error('Profile is required')
+      if (!project) return console.error('Project is required')
 
       try {
-        const snippet = createSqlSnippetSkeleton({
+        const snippet = createSqlSnippetSkeletonV2({
           id: uuidv4(),
           name,
           sql,
-          owner_id: profile?.id,
-          project_id: project?.id,
+          owner_id: profile.id,
+          project_id: project.id,
         })
-        snap.addSnippet(snippet as SqlSnippet, ref)
-        snap.addNeedsSaving(snippet.id!)
+        snapV2.addSnippet({ projectRef: ref, snippet })
+        snapV2.addNeedsSaving(snippet.id!)
         router.push(`/project/${ref}/sql/${snippet.id}`)
       } catch (error: any) {
         toast.error(`Failed to create new query: ${error.message}`)
       }
     },
-    [profile?.id, project?.id, ref, router, snap]
+    [profile?.id, project?.id, ref, router, snapV2]
   )
 
   const updateEditorWithCheckForDiff = useCallback(
@@ -415,8 +403,8 @@ const SQLEditor = () => {
 
   const onDebug = useCallback(async () => {
     try {
-      const snippet = enableFolders ? snapV2.snippets[id] : snap.snippets[id]
-      const result = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
+      const snippet = snapV2.snippets[id]
+      const result = snapV2.results[id]?.[0]
 
       const { solution, sql } = await debugSql({
         sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
@@ -447,7 +435,7 @@ const SQLEditor = () => {
         )
       }
     }
-  }, [debugSql, entityDefinitions, id, snap.results, snap.snippets])
+  }, [debugSql, entityDefinitions, id, snapV2.results, snapV2.snippets])
 
   const acceptAiHandler = useCallback(async () => {
     try {
@@ -483,7 +471,7 @@ const SQLEditor = () => {
         ])
 
         if (pendingTitle) {
-          snap.renameSnippet(id, pendingTitle)
+          snapV2.renameSnippet({ id, name: pendingTitle })
         }
       }
 
@@ -515,7 +503,7 @@ const SQLEditor = () => {
     router,
     id,
     pendingTitle,
-    snap,
+    snapV2,
   ])
 
   const discardAiHandler = useCallback(() => {
@@ -854,20 +842,13 @@ const SQLEditor = () => {
                       <DropdownMenuTrigger asChild>
                         <Button type="default" iconRight={<ChevronUp size={14} />}>
                           Limit results to:{' '}
-                          {
-                            ROWS_PER_PAGE_OPTIONS.find(
-                              (opt) => opt.value === (enableFolders ? snapV2.limit : snap.limit)
-                            )?.label
-                          }
+                          {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="w-40" align="end">
                         <DropdownMenuRadioGroup
-                          value={enableFolders ? snapV2.limit.toString() : snap.limit.toString()}
-                          onValueChange={(val) => {
-                            if (enableFolders) snapV2.setLimit(Number(val))
-                            else snap.setLimit(Number(val))
-                          }}
+                          value={snapV2.limit.toString()}
+                          onValueChange={(val) => snapV2.setLimit(Number(val))}
                         >
                           {ROWS_PER_PAGE_OPTIONS.map((option) => (
                             <DropdownMenuRadioItem

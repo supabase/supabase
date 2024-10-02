@@ -1,5 +1,7 @@
 import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
+import { ChevronsUpDown, Lightbulb } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
@@ -12,8 +14,6 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { ChevronsUpDown, Lightbulb } from 'lucide-react'
-import Link from 'next/link'
 import {
   AiIconAnimation,
   Button,
@@ -21,7 +21,7 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
-import { AssistantChatForm } from 'ui-patterns'
+import { AssistantChatForm } from 'ui-patterns/AssistantChat'
 import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
 
