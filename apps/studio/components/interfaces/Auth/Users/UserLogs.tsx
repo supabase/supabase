@@ -59,7 +59,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
             <Button
               type={'status_code' in filters ? 'default' : 'secondary'}
               className="rounded-r-none border-r-0"
-              disabled={isLoadingAuthLogs || authLogs.length === 0}
+              disabled={isLoadingAuthLogs}
               onClick={() => setFilters({ search_query: user.id })}
             >
               Show all
@@ -68,7 +68,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
             <Button
               type={'status_code' in filters ? 'secondary' : 'default'}
               className="rounded-l-none border-l-0"
-              disabled={isLoadingAuthLogs || authLogs.length === 0}
+              disabled={isLoadingAuthLogs}
               onClick={() =>
                 setFilters({
                   search_query: user.id,
