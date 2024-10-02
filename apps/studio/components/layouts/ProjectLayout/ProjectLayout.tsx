@@ -144,7 +144,7 @@ const ProjectLayout = ({
                 <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
               </>
             )}
-            <ResizablePanel id="panel-right" className="h-full flex flex-col">
+            <ResizablePanel defaultSize={100} id="panel-right" className="h-full flex flex-col">
               {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
               <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
                 {showPausedState ? (
