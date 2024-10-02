@@ -21,7 +21,10 @@ export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean 
 export const formatUsersData = (users: User[]) => {
   return users.map((user) => {
     const provider: string = user.raw_app_meta_data?.provider ?? ''
-    const providers: string[] = user.raw_app_meta_data?.providers ?? []
+    const providers: string[] = (user.raw_app_meta_data?.providers ?? []).map((x: string) => {
+      if (x.startsWith('sso')) return 'SAML'
+      return x
+    })
 
     return {
       id: user.id,
@@ -34,9 +37,11 @@ export const formatUsersData = (users: User[]) => {
         .map((p) => {
           return p === 'email'
             ? `${BASE_PATH}/img/icons/email-icon2.svg`
-            : providerIconMap[p]
-              ? `${BASE_PATH}/img/icons/${providerIconMap[p]}.svg`
-              : undefined
+            : p === 'SAML'
+              ? `${BASE_PATH}/img/icons/saml-icon.svg`
+              : providerIconMap[p]
+                ? `${BASE_PATH}/img/icons/${providerIconMap[p]}.svg`
+                : undefined
         })
         .filter(Boolean),
       // I think it's alright to just check via the main provider since email and phone should be mutually exclusive
@@ -207,7 +212,7 @@ export const formatUserColumns = ({
             : Array.isArray(value)
               ? value.join(', ')
               : value
-        const isConfirmed = user?.email_confirmed_at || user?.phone_confirmed_at
+        const isConfirmed = !!user?.confirmed_at
 
         if (col.id === 'img') {
           return (
