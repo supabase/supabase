@@ -189,11 +189,11 @@ Now go ahead and serve your `index.html` file, for example via Python SimpleHTTP
 
 ## Expo React Native
 
-As you might know, I'm a big React Native fan, and when writing this tutorial I was very excited about making this work in Expo mobile apps also. 
+As you might know, I'm a big React Native fan, and when writing this tutorial I was very excited about making this work in Expo mobile apps also.
 
 Unfortunately, at the time of writing, custom protocols are not supported in [maplibre-react-native](https://github.com/maplibre/maplibre-react-native). There is an issues tracking this [here](https://github.com/maplibre/maplibre-react-native/issues/28), so if there are any native mobile wizards out there, I'd very much appreciate your contributions!
 
-In the meantime, however, the Expo team had a great idea, what about leveraging [React DOM components](https://docs.expo.dev/guides/dom-components/), which are currently experimentally supported in Expo SDK 52 preview. 
+In the meantime, however, the Expo team had a great idea, what about leveraging [React DOM components](https://docs.expo.dev/guides/dom-components/), which are currently experimentally supported in Expo SDK 52 preview.
 
 This approach allows you to utilize [react-map-gl](https://github.com/visgl/react-map-gl) and [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js) across your Expo web and mobile apps.
 
@@ -210,23 +210,23 @@ Follow the steps to [install the canary release](https://docs.expo.dev/versions/
 To render a React component to the DOM, add the 'use dom' directive to the top of the web component file:
 
 ```jsx Map.jsx
-'use dom';
+'use dom'
 
-import 'text-encoding-polyfill';
-import { useEffect } from 'react';
-import Map from 'react-map-gl';
-import maplibregl from 'maplibre-gl';
-import 'maplibre-gl/dist/maplibre-gl.css';
-import { Protocol } from 'pmtiles';
+import 'text-encoding-polyfill'
+import { useEffect } from 'react'
+import Map from 'react-map-gl'
+import maplibregl from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css'
+import { Protocol } from 'pmtiles'
 
 export default function MapBox(_) {
   useEffect(() => {
-    let protocol = new Protocol();
-    maplibregl.addProtocol('pmtiles', protocol.tile);
+    let protocol = new Protocol()
+    maplibregl.addProtocol('pmtiles', protocol.tile)
     return () => {
-      maplibregl.removeProtocol('pmtiles');
-    };
-  }, []);
+      maplibregl.removeProtocol('pmtiles')
+    }
+  }, [])
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
@@ -255,16 +255,16 @@ export default function MapBox(_) {
         mapLib={maplibregl}
       />
     </div>
-  );
+  )
 }
 ```
 
 Inside the native component file, import the web component to use it:
 
 ```jsx App.jsx
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import Map from './Map.jsx';
+import { StatusBar } from 'expo-status-bar'
+import { StyleSheet, Text, View } from 'react-native'
+import Map from './Map.jsx'
 
 export default function App() {
   return (
@@ -272,7 +272,7 @@ export default function App() {
       <Map dom={{ autoSize: true }} />
       <StatusBar style="auto" />
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     justifyContent: 'center',
   },
-});
+})
 ```
 
 ## Conclusion
