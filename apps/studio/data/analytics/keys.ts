@@ -154,12 +154,6 @@ export const analyticsKeys = {
 
   usageApiRequestsCount: (projectRef: string | undefined) =>
     ['projects', projectRef, 'usage.api-requests-count'] as const,
-  previewLogs: (projectRef: string | undefined, table: LogsTableName, filters: Filters) => [
-    'projects',
-    projectRef,
-    table,
-    filters,
-  ],
 }
 
 function isoDateStringToDate(isoDateString: string | undefined): string | undefined {
