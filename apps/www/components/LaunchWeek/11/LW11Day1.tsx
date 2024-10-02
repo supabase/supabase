@@ -1,10 +1,9 @@
-import React from 'react'
 import { ArrowRight } from 'lucide-react'
-import { cn } from 'ui'
-import { ExpandableVideo } from 'ui-patterns'
-import { WeekDayProps } from './Releases/data'
-import { DayLink } from './Releases/components'
 import Link from 'next/link'
+import { cn } from 'ui'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import { DayLink } from './Releases/components'
+import { WeekDayProps } from './Releases/data'
 
 const LW11Day1 = ({
   day,

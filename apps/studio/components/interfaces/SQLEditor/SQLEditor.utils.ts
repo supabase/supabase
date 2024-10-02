@@ -8,6 +8,9 @@ import {
 } from './SQLEditor.constants'
 import { ContentDiff, DiffType } from './SQLEditor.types'
 
+/**
+ * @deprecated
+ */
 export const createSqlSnippetSkeleton = ({
   id,
   name,
@@ -95,7 +98,20 @@ export function getDiffTypeDropdownLabel(diffType: DiffType) {
 }
 
 export function checkDestructiveQuery(sql: string) {
-  return destructiveSqlRegex.some((regex) => regex.test(removeCommentsFromSql(sql)))
+  const cleanedSql = removeCommentsFromSql(sql)
+  return destructiveSqlRegex.some((regex) => regex.test(cleanedSql))
+}
+
+// Function to check for UPDATE queries without WHERE clause
+export function isUpdateWithoutWhere(sql: string): boolean {
+  const updateWithoutWhereRegex =
+    /(?:^|;)\s*update\s+(?:"[\w.]+"\."[\w.]+"|[\w.]+)\s+set\s+[\w\W]+?(?!\s*where\s)/is
+  const updateStatements = sql
+    .split(';')
+    .filter((statement) => statement.trim().toLowerCase().startsWith('update'))
+  return updateStatements.some(
+    (statement) => updateWithoutWhereRegex.test(statement) && !/where\s/i.test(statement)
+  )
 }
 
 export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) =>

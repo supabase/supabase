@@ -1,10 +1,11 @@
+import { renderHook } from '@testing-library/react'
 import {
   isFloat,
   numberFormatter,
   precisionFormatter,
   useStacked,
 } from 'components/ui/Charts/Charts.utils'
-import { renderHook } from '@testing-library/react'
+import { test, expect } from 'vitest'
 
 test('isFloat', () => {
   expect(isFloat(123)).toBe(false)

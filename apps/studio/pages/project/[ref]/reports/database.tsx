@@ -55,7 +55,9 @@ const DatabaseUsage = () => {
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const showNewDiskManagementUI =
-    subscription?.usage_based_billing_project_addons && diskManagementV2
+    subscription?.usage_based_billing_project_addons &&
+    diskManagementV2 &&
+    project?.cloud_provider === 'AWS'
 
   const report = useDatabaseReport()
   const { data } = useDatabaseSizeQuery({
@@ -212,7 +214,10 @@ const DatabaseUsage = () => {
           renderer={(props) => {
             return (
               <div>
-                <div className="col-span-4 inline-grid grid-cols-12 gap-12 w-full">
+                <p className="text-sm -mt-4 text-foreground-lighter">
+                  The data refreshes every 24 hours.
+                </p>
+                <div className="col-span-4 inline-grid grid-cols-12 gap-12 w-full mt-5">
                   <div className="grid gap-2 col-span-2">
                     <h5 className="text-sm">Space used</h5>
                     <span className="text-lg">{formatBytes(databaseSizeBytes, 2, 'GB')}</span>

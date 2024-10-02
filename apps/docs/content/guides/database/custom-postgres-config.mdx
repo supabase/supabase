@@ -1,6 +1,6 @@
 ---
 id: 'customizing-postgres-configs'
-title: 'Customizing Postgres Configs'
+title: 'Customizing Postgres configs'
 description: 'Configuring Postgres for your Supabase project.'
 ---
 
@@ -32,7 +32,7 @@ To list all user-context settings, run:
 select * from pg_settings where context = 'user';
 ```
 
-As an example, the `statement_timeout` setting for the can be altered:
+As an example, the `statement_timeout` setting can be altered:
 
 ```sql
 alter database "postgres" set "statement_timeout" TO '60s';

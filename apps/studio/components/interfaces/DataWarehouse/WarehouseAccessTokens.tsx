@@ -1,9 +1,9 @@
+import { TooltipContent } from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { MoreVertical, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { TooltipContent } from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
@@ -32,7 +32,7 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import CreateWarehouseAccessToken from './CreateWarehouseAccessToken'
 
 const AccessTokenItem = ({

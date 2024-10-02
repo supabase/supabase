@@ -504,6 +504,7 @@ export const auth = {
         },
       ],
     },
+
     {
       name: 'Concepts',
       items: [
@@ -582,6 +583,10 @@ export const auth = {
           url: '/guides/auth/signout',
         },
       ],
+    },
+    {
+      name: 'Debugging',
+      items: [{ name: 'Error Codes', url: '/guides/auth/debugging/error-codes' }],
     },
     {
       name: 'Third-party auth',
@@ -1183,7 +1188,7 @@ export const functions: NavMenuConstant = {
         },
         {
           name: 'Integrating with Log Drains',
-          url: '/guides/functions/log-drains',
+          url: '/guides/platform/log-drains',
         },
       ],
     },
@@ -2255,6 +2260,17 @@ export const reference_kotlin_v2 = {
   },
 }
 
+export const reference_kotlin_v3 = {
+  icon: 'reference-kotlin',
+  title: 'kotlin',
+  url: 'guides/reference/kotlin',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase-community/supabase-kt',
+    repo: 'https://github.com/supabase-community/supabase-kt',
+  },
+}
+
 export const reference_cli = {
   icon: 'reference-cli',
   title: 'Supabase CLI',
@@ -2347,7 +2363,7 @@ export const references = [
       },
       {
         label: 'supabase-kt',
-        versions: ['v2', 'v1'],
+        versions: ['v3', 'v2', 'v1'],
         description: 'something about the reference',
         icon: '/docs/img/icons/kotlin-icon.svg',
         url: '/reference/kotlin/start',

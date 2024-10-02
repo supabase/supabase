@@ -5,8 +5,6 @@ import { useParams } from 'common'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { contentKeys } from 'data/content/keys'
 import { Snippet } from 'data/content/sql-folders-query'
-import { useFlag } from 'hooks/ui/useFlag'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 import { ChartConfig } from './ChartConfig'
@@ -46,14 +44,11 @@ const UtilityPanel = ({
 }: UtilityPanelProps) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
-
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const enableFolders = useFlag('sqlFolderOrganization')
 
-  const snippet = enableFolders ? snapV2.snippets[id]?.snippet : snap.snippets[id]?.snippet
+  const snippet = snapV2.snippets[id]?.snippet
   const queryKeys = contentKeys.list(ref)
-  const result = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
+  const result = snapV2.results[id]?.[0]
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -76,8 +71,7 @@ const UtilityPanel = ({
         },
       }
 
-      if (enableFolders) snapV2.updateSnippet({ id, snippet: newSnippet as unknown as Snippet })
-      else snap.updateSnippet(id, newSnippet)
+      snapV2.updateSnippet({ id, snippet: newSnippet as unknown as Snippet })
     },
     onError: async (err, newContent, context) => {
       toast.error(`Failed to update chart. Please try again.`)

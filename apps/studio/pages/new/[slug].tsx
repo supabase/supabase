@@ -49,7 +49,6 @@ import passwordStrength from 'lib/password-strength'
 import type { CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
-  Admonition,
   Badge,
   Button,
   CollapsibleContent_Shadcn_,
@@ -76,6 +75,7 @@ import {
   TableRow,
   cn,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -190,7 +190,7 @@ const instanceSizeSpecs: Record<
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
-  const { slug } = useParams()
+  const { slug, projectName } = useParams()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
@@ -307,7 +307,7 @@ const Wizard: NextPageWithLayout = () => {
     mode: 'onChange',
     defaultValues: {
       organization: slug,
-      projectName: '',
+      projectName: projectName || '',
       postgresVersion: '',
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
       dbPass: '',
@@ -400,6 +400,7 @@ const Wizard: NextPageWithLayout = () => {
     // [Joshen] Cause slug depends on router which doesnt load immediately on render
     // While the form data does load immediately
     if (slug) form.setValue('organization', slug)
+    if (projectName) form.setValue('projectName', projectName || '')
   }, [slug])
 
   useEffect(() => {

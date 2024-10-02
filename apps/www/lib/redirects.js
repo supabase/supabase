@@ -1185,6 +1185,11 @@ module.exports = [
     source: '/blog/supabase-aquires-oriole',
     destination: '/blog/supabase-acquires-oriole',
   },
+  {
+    permanent: true,
+    source: '/events/scale-to-billions-generative-ai-humata',
+    destination: '/events/scale-to-millions-generative-ai-humata',
+  },
 
   //  DOCS
   {
@@ -1570,11 +1575,6 @@ module.exports = [
     permanent: true,
     source: '/docs/company/sla',
     destination: '/sla',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference',
-    destination: '/docs#reference-documentation',
   },
   {
     permanent: true,

@@ -26,7 +26,6 @@ const ProjectsPage: NextPageWithLayout = () => {
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const orgCreationExperimentGroup = useFlag<string>('orgCreationExperimentGroup')
   const hasWindowLoaded = typeof window !== 'undefined'
 
   useEffect(() => {
@@ -41,10 +40,11 @@ const ProjectsPage: NextPageWithLayout = () => {
       else router.push(`/org/${organizations[0].slug}`)
     }
 
-    if (orgCreationExperimentGroup === 'group-b' && !navLayoutV2 && isSuccess && hasWindowLoaded) {
+    if (!navLayoutV2 && isSuccess && hasWindowLoaded) {
       // navigate to new page exactly once
+      const hasNoOrg = organizations.length === 0
       const hasShownNewPage = localStorage.getItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN)
-      if (!hasShownNewPage && organizations.length === 0) {
+      if (hasNoOrg && !hasShownNewPage) {
         localStorage.setItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN, 'true')
         router.push('/new')
       }

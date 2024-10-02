@@ -158,9 +158,11 @@ You can see a breakdown of the different types of egress on your [organization u
 We differentiate between database space usage and disk size. Database Space is the actual amount of space used by all your database objects, whereas disk size is the size of the underlying provisioned disk. Each database has a provisioned disk.
 Free Plan customers are limited to 500 MB of database space.
 
-For paid plan customers, we provision 8 GB of disk by default. If your database grows close to the underlying disk limit, we autoscale it by 1.5x. The first 8 GB of provisioned disk per project are free of charge. Disk size beyond the first 8 GB costs $0.125/month/GB.
+For paid plan customers, we provision 8 GB of GP3 disk by default. If your database grows close to the underlying disk limit, we autoscale it by 1.5x. The first 8 GB of provisioned disk per project are free of charge. Disk size beyond the first 8 GB costs $0.125/month/GB.
 
 Disk Size is prorated down to the hour, so your bill will show "Disk Size GB-Hrs". See [Database Size](/docs/guides/platform/database-size) for further information.
+
+Read more about [disk management](/docs/guides/platform/database-size#disk-management).
 
 ## Free Plan
 

@@ -136,8 +136,8 @@ export const CLIENT_LIBRARIES = [
         url: 'https://github.com/supabase-community/supabase-kt/tree/master/Postgrest',
       },
       {
-        name: 'gotrue-kt',
-        url: 'https://github.com/supabase-community/supabase-kt/tree/master/GoTrue',
+        name: 'auth-kt',
+        url: 'https://github.com/supabase-community/supabase-kt/tree/master/Auth',
       },
       {
         name: 'storage-kt',

@@ -43,7 +43,7 @@ export async function ClientSdkReferencePage({ sdkId, libVersion }: ClientSdkRef
           {!isLatestVersion && (
             <OldVersionAlert
               libPath={libraryMeta.libPath}
-              className="z-10 fixed top-[calc(var(--header-height)+1rem)] right-4 w-84 max-w-[calc(100vw-2rem)]"
+              className="z-20 fixed top-[calc(var(--header-height)+1rem)] right-4 w-84 max-w-[calc(100vw-2rem)]"
             />
           )}
           <article className="@container/article">
