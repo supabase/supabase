@@ -57,6 +57,7 @@ import {
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
+import { cn } from 'ui'
 
 type KeyStatus = 'STANDBY' | 'IN_USE' | 'PREVIOUSLY_USED'
 type JWTAlgorithm = 'HS256' | 'RS256' | 'ES256'
@@ -512,9 +513,9 @@ NEW_STANDBY_KEY_CONTENT
         transition: { duration: 0.3 },
       }}
       exit={{ opacity: 0, height: 0 }}
-      className={`border-t border-dashed ${key.status === 'IN_USE' ? 'bg-surface-200' : ''}`}
+      className={`border-t border-dashed ${key.status === 'IN_USE' ? 'bg-surface-200' : ''} [&_td]:py-2`}
     >
-      <TableCell className="py-4">
+      <TableCell className="">
         <Badge className={`${statusColors[key.status]} font-medium px-2 py-1 rounded-full`}>
           {statusLabels[key.status]}
         </Badge>
@@ -594,51 +595,17 @@ NEW_STANDBY_KEY_CONTENT
   return (
     <>
       <div className="space-y-8">
-        <Button
-          onClick={() => setShowCreateKeyDialog(true)}
-          disabled={actionInProgress !== null}
-          icon={<Key />}
-        >
-          Create New Standby Key
-        </Button>
-
-        <Card className="w-full bg-surface-100">
-          <CardHeader>
-            <CardTitle>Active Keys</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <Table className="p-5">
-              <TableHeader>
-                <TableRow className="bg-surface-300">
-                  <TableHead className="pl-5 text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                    Status
-                  </TableHead>
-                  <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                    Key ID
-                  </TableHead>
-                  <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                    Created At
-                  </TableHead>
-                  <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                    Type
-                  </TableHead>
-                  <TableHead className="pr-5 text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                    Actions
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <AnimatePresence>{activeKeys.map(renderKeyRow)}</AnimatePresence>
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        {previouslyUsedKeys.length > 0 && (
-          <Card className="w-full bg-surface-100">
-            <CardHeader>
-              <CardTitle>Previously Used Keys</CardTitle>
-            </CardHeader>
+        <div className="flex justify-end">
+          <Button
+            onClick={() => setShowCreateKeyDialog(true)}
+            disabled={actionInProgress !== null}
+            icon={<Key />}
+          >
+            Create New Standby Key
+          </Button>
+        </div>
+        <div>
+          <Card className="w-full bg-surface-100 overflow-hidden">
             <CardContent className="p-0">
               <Table className="p-5">
                 <TableHeader>
@@ -661,34 +628,68 @@ NEW_STANDBY_KEY_CONTENT
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <AnimatePresence>
-                    {previouslyUsedKeys
-                      .slice(0, showAllPreviousKeys ? undefined : 2)
-                      .map(renderKeyRow)}
-                  </AnimatePresence>
+                  <AnimatePresence>{activeKeys.map(renderKeyRow)}</AnimatePresence>
                 </TableBody>
               </Table>
-              {previouslyUsedKeys.length > 2 && (
-                <Button
-                  variant="ghost"
-                  className="mt-4"
-                  onClick={() => setShowAllPreviousKeys(!showAllPreviousKeys)}
-                >
-                  {showAllPreviousKeys ? (
-                    <>
-                      <ChevronUp className="mr-2 h-4 w-4" />
-                      Hide older keys
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="mr-2 h-4 w-4" />
-                      Show {previouslyUsedKeys.length - 2} more previously used keys
-                    </>
-                  )}
-                </Button>
-              )}
             </CardContent>
           </Card>
+        </div>
+
+        {previouslyUsedKeys.length > 0 && (
+          <div>
+            <h2 className="text-xl mb-4">Previously Used Keys</h2>
+            <Card className="w-full bg-surface-100 overflow-hidden">
+              <CardContent className="p-0">
+                <Table className="p-5">
+                  <TableHeader>
+                    <TableRow className="bg-surface-300">
+                      <TableHead className="pl-5 text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+                        Key ID
+                      </TableHead>
+                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+                        Created At
+                      </TableHead>
+                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+                        Type
+                      </TableHead>
+                      <TableHead className="pr-5 text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <AnimatePresence>
+                      {previouslyUsedKeys
+                        .slice(0, showAllPreviousKeys ? undefined : 2)
+                        .map(renderKeyRow)}
+                    </AnimatePresence>
+                  </TableBody>
+                </Table>
+                {previouslyUsedKeys.length > 2 && (
+                  <button
+                    onClick={() => setShowAllPreviousKeys(!showAllPreviousKeys)}
+                    className="w-full flex gap-2 items-center justify-center text-xs text-foreground-lighter h-auto py-2 border-t bg-surface-75"
+                  >
+                    <ChevronDown
+                      className={cn('transition-all w-3', showAllPreviousKeys ? 'rotate-180' : '')}
+                    />
+                    {showAllPreviousKeys ? (
+                      <>
+                        <span>Hide older keys</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Show {previouslyUsedKeys.length - 2} more previously used keys</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
       <Dialog open={showCreateKeyDialog} onOpenChange={setShowCreateKeyDialog}>
