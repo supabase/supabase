@@ -10,6 +10,7 @@ tags:
   - storage
   - postgis
   - maps
+  - react-native
 date: '2024-06-19'
 toc_depth: 3
 ---
@@ -185,6 +186,104 @@ const map = new maplibregl.Map({
 ```
 
 Now go ahead and serve your `index.html` file, for example via Python SimpleHTTPServer: `python3 -m http.server` and admire your beautiful map on [localhost:8000](http://localhost:8000/)!
+
+## Expo React Native
+
+As you might know, I'm a big React Native fan, and when writing this tutorial I was very excited about making this work in Expo mobile apps also.
+
+Unfortunately, at the time of writing, custom protocols are not supported in [maplibre-react-native](https://github.com/maplibre/maplibre-react-native). There is an issues tracking this [here](https://github.com/maplibre/maplibre-react-native/issues/28), so if there are any native mobile wizards out there, I'd very much appreciate your contributions!
+
+In the meantime, however, the Expo team had a great idea, what about leveraging [React DOM components](https://docs.expo.dev/guides/dom-components/), which are currently experimentally supported in Expo SDK 52 preview.
+
+This approach allows you to utilize [react-map-gl](https://github.com/visgl/react-map-gl) and [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js) across your Expo web and mobile apps.
+
+<Admonition>
+
+[Do you prefer the audio-visual learning? Watch the video guide!](https://supabase.link/react-native-maps-yt).
+
+Or jump straight into the [code](https://supabase.link/react-native-maps-gh).
+
+</Admonition>
+
+Follow the steps to [install the canary release](https://docs.expo.dev/versions/unversioned#canary-releases).
+
+To render a React component to the DOM, add the 'use dom' directive to the top of the web component file:
+
+```jsx Map.jsx
+'use dom'
+
+import 'text-encoding-polyfill'
+import { useEffect } from 'react'
+import Map from 'react-map-gl'
+import maplibregl from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css'
+import { Protocol } from 'pmtiles'
+
+export default function MapBox(_) {
+  useEffect(() => {
+    let protocol = new Protocol()
+    maplibregl.addProtocol('pmtiles', protocol.tile)
+    return () => {
+      maplibregl.removeProtocol('pmtiles')
+    }
+  }, [])
+
+  return (
+    <div style={{ width: '100%', height: '100%' }}>
+      <Map
+        style={{ width: '100%', height: 900 }}
+        mapStyle={{
+          version: 8,
+          sources: {
+            sample: {
+              type: 'vector',
+              url: 'pmtiles://https://r2-public.protomaps.com/protomaps-sample-datasets/cb_2018_us_zcta510_500k.pmtiles',
+            },
+          },
+          layers: [
+            {
+              id: 'zcta',
+              source: 'sample',
+              'source-layer': 'zcta',
+              type: 'line',
+              paint: {
+                'line-color': '#999',
+              },
+            },
+          ],
+        }}
+        mapLib={maplibregl}
+      />
+    </div>
+  )
+}
+```
+
+Inside the native component file, import the web component to use it:
+
+```jsx App.jsx
+import { StatusBar } from 'expo-status-bar'
+import { StyleSheet, Text, View } from 'react-native'
+import Map from './Map.jsx'
+
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <Map dom={{ autoSize: true }} />
+      <StatusBar style="auto" />
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'stretch',
+    justifyContent: 'center',
+  },
+})
+```
 
 ## Conclusion
 

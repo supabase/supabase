@@ -284,7 +284,7 @@ const ColumnType = ({
             It is recommended to use <code className="text-xs">
               {recommendation.alternative}
             </code>{' '}
-            insteadn
+            instead
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             <p>

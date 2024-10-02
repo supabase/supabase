@@ -123,6 +123,10 @@ const levelsData = {
     icon: 'reference-kotlin',
     name: 'Kotlin Reference v2.0',
   },
+  reference_kotlin_v3: {
+    icon: 'reference-kotlin',
+    name: 'Kotlin Reference v3.0',
+  },
   reference_cli: {
     icon: 'reference-cli',
     name: 'CLI Reference',

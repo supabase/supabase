@@ -1,9 +1,10 @@
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
+import { Button, Image } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
-import { Admonition, Button, Image } from 'ui'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
 import AuthProviders from '~/components/AuthProviders'
@@ -21,8 +22,8 @@ import {
   HuggingFaceDeployment,
   KotlinProjectSetup,
   MigrationWarnings,
-  ProjectSetup,
   OAuthPkceFlow,
+  ProjectSetup,
   QuickstartDbSetup,
   QuickstartIntro,
   SocialProviderSettingsSupabase,
@@ -37,7 +38,7 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 import { CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import * as CH from '~/features/ui/CodeHike'
-import { Tabs, TabPanel } from '~/features/ui/Tabs'
+import { TabPanel, Tabs } from '~/features/ui/Tabs'
 
 const components = {
   Accordion,
