@@ -180,7 +180,7 @@ export function getAvatarUrl(user: User): string | undefined {
     profileImageURL ||
     profile_image_url) as string | undefined
 
-  return SUPPORTED_CSP_AVATAR_URLS.some((x) => url?.startsWith(x)) ? url : undefined
+  return SUPPORTED_CSP_AVATAR_URLS.some((x) => (url ?? '')?.startsWith(x)) ? url : undefined
 }
 
 export const formatUserColumns = ({
