@@ -29,6 +29,8 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogDescription,
+  DialogSection,
+  DialogSectionSeparator,
 } from 'ui/src/components/shadcn/ui/dialog'
 import {
   Select,
@@ -54,10 +56,20 @@ import {
   Eye,
   ArrowUpCircle,
   Key,
+  Fingerprint,
+  GlobeLock,
+  ExternalLink,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { cn } from 'ui'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from 'ui/src/components/shadcn/ui/hover-card'
+import { algorithmDetails } from './algorithmDetails'
+import { AlgorithmHoverCard } from './AlgorithmHoverCard'
 
 type KeyStatus = 'STANDBY' | 'IN_USE' | 'PREVIOUSLY_USED'
 type JWTAlgorithm = 'HS256' | 'RS256' | 'ES256'
@@ -80,21 +92,12 @@ const statusLabels: Record<KeyStatus, string> = {
 }
 
 const statusColors: Record<KeyStatus, string> = {
-  STANDBY: 'text-xs font-mono uppercase bg-warning bg-opacity-100 text-warning-200 border-warning',
-  IN_USE: 'text-xs font-mono uppercase bg-brand bg-opacity-100 text-brand-200 border-brand',
-  PREVIOUSLY_USED: 'text-xs font-mono uppercase bg-alternative text-gray-800',
-}
-
-const algorithmLabels: Record<JWTAlgorithm, string> = {
-  HS256: 'HS256 (Symmetric)',
-  RS256: 'RS256 (RSA)',
-  ES256: 'ES256 (ECC)',
-}
-
-const algorithmDescriptions: Record<JWTAlgorithm, string> = {
-  HS256: 'HMAC with SHA-256: Fast, simple, requires secure key exchange',
-  RS256: 'RSA with SHA-256: Allows public key distribution, slower',
-  ES256: 'ECDSA with SHA-256: Compact keys, fast, modern alternative to RSA',
+  STANDBY:
+    'text-xs leading-normal px-1.5 font-mono py-0 uppercase bg-warning bg-opacity-100 text-warning-200 border-warning',
+  IN_USE:
+    'text-xs leading-normal px-1.5 font-mono py-0 uppercase bg-brand bg-opacity-100 text-brand-200 border-brand',
+  PREVIOUSLY_USED:
+    'text-xs leading-normal px-1.5 font-mono py-0 uppercase bg-alternative text-gray-800',
 }
 
 const initialKeys: SecretKey[] = [
@@ -337,6 +340,138 @@ const ApiKeySection: React.FC<{ inUseKey: SecretKey | undefined }> = ({ inUseKey
   )
 }
 
+const StandbyKeyIllustration = () => (
+  <svg
+    width="179"
+    height="106"
+    viewBox="0 0 179 106"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect
+      x="12.7177"
+      y="56.8446"
+      width="153.815"
+      height="22.5914"
+      rx="2.39438"
+      fill="#292929"
+      stroke="#2E2E2E"
+      stroke-width="0.435342"
+    />
+    <rect
+      x="20.3456"
+      y="62.8678"
+      width="32.4201"
+      height="10.545"
+      rx="5.27252"
+      fill="#DB8E00"
+      stroke="#2E2E2E"
+      stroke-width="0.435342"
+    />
+    <rect x="62.5447" y="66.8903" width="30.3622" height="2.5" rx="1.25" fill="#4D4D4D" />
+    <rect x="100.562" y="66.8903" width="42.6666" height="2.5" rx="1.25" fill="#4D4D4D" />
+    <rect
+      x="12.7177"
+      y="30.4939"
+      width="153.815"
+      height="22.5914"
+      rx="2.39438"
+      fill="#292929"
+      stroke="#2E2E2E"
+      stroke-width="0.435342"
+    />
+    <rect
+      x="20.3456"
+      y="36.5171"
+      width="32.4201"
+      height="10.545"
+      rx="5.27252"
+      fill="#DB8E00"
+      stroke="#2E2E2E"
+      stroke-width="0.435342"
+    />
+    <rect x="62.5447" y="40.5396" width="30.3622" height="2.5" rx="1.25" fill="#4D4D4D" />
+    <rect x="100.562" y="40.5396" width="42.6666" height="2.5" rx="1.25" fill="#4D4D4D" />
+    <rect
+      x="12.7177"
+      y="83.0563"
+      width="153.815"
+      height="22.5914"
+      rx="2.39438"
+      fill="#292929"
+      stroke="#2E2E2E"
+      stroke-width="0.435342"
+    />
+    <rect
+      x="20.3456"
+      y="89.0795"
+      width="32.4201"
+      height="10.545"
+      rx="5.27252"
+      fill="#DB8E00"
+      stroke="#2E2E2E"
+      stroke-width="0.435342"
+    />
+    <rect x="62.5447" y="93.1019" width="30.3622" height="2.5" rx="1.25" fill="#4D4D4D" />
+    <rect x="100.562" y="93.1019" width="42.6666" height="2.5" rx="1.25" fill="#4D4D4D" />
+    <rect
+      x="9.3874"
+      y="23.4523"
+      width="159.838"
+      height="25.2538"
+      rx="3.02066"
+      fill="#262626"
+      fill-opacity="0.75"
+      stroke="#2E2E2E"
+      stroke-width="0.549211"
+    />
+    <rect
+      x="6.03046"
+      y="17.6493"
+      width="165.945"
+      height="25.2538"
+      rx="3.02066"
+      fill="#262626"
+      fill-opacity="0.75"
+      stroke="#2E2E2E"
+      stroke-width="0.549211"
+    />
+    <rect
+      x="3.02461"
+      y="10.0497"
+      width="172.201"
+      height="27.0504"
+      rx="3.02066"
+      fill="#262626"
+      fill-opacity="0.75"
+      stroke="#2E2E2E"
+      stroke-width="0.549211"
+    />
+    <rect
+      x="0.591012"
+      y="1.0001"
+      width="177.324"
+      height="28.5004"
+      rx="3.02066"
+      fill="#292929"
+      stroke="#4D4D4D"
+      stroke-width="0.549211"
+    />
+    <rect
+      x="9.3874"
+      y="8.59867"
+      width="32.338"
+      height="13.3032"
+      rx="6.65161"
+      fill="#3ECF8E"
+      stroke="#2E2E2E"
+      stroke-width="0.549211"
+    />
+    <rect x="49" y="13.266" width="33.5858" height="3.96857" rx="1.98428" fill="#4D4D4D" />
+    <rect x="91.0535" y="13.266" width="47.1966" height="3.96857" rx="1.98428" fill="#4D4D4D" />
+  </svg>
+)
+
 export function JWTSecretKeysTable() {
   const [secretKeys, setSecretKeys] = useAtom(secretKeysAtom)
   const [selectedKey, setSelectedKey] = useState<SecretKey | null>(null)
@@ -500,29 +635,21 @@ NEW_STANDBY_KEY_CONTENT
     setReplacementKeyId(null)
   }
 
-  const MotionTableRow = motion(TableRow)
-
   const renderKeyRow = (key: SecretKey) => (
-    <MotionTableRow
+    <TableRow
       key={key.id}
-      layout
-      initial={{ opacity: 0, height: 0 }}
-      animate={{
-        opacity: 1,
-        height: 'auto',
-        transition: { duration: 0.3 },
-      }}
-      exit={{ opacity: 0, height: 0 }}
-      className={`border-t border-dashed ${key.status === 'IN_USE' ? 'bg-surface-200' : ''} [&_td]:py-2`}
+      className={key.status !== 'IN_USE' ? 'border-b border-dashed border-border' : ''}
     >
       <TableCell className="">
-        <Badge className={`${statusColors[key.status]} font-medium px-2 py-1 rounded-full`}>
-          {statusLabels[key.status]}
+        <Badge className={`${statusColors[key.status]}`}>
+          <span>{statusLabels[key.status]}</span>
         </Badge>
       </TableCell>
       <TableCell className="font-mono truncate max-w-[100px]">{key.keyId}</TableCell>
       <TableCell className="truncate max-w-[150px]">{key.createdAt}</TableCell>
-      <TableCell className="truncate max-w-[100px]">{algorithmLabels[key.algorithm]}</TableCell>
+      <TableCell className="truncate max-w-[100px]">
+        <AlgorithmHoverCard algorithm={key.algorithm} />
+      </TableCell>
       <TableCell className="text-right">
         <Dialog>
           <DropdownMenu>
@@ -589,13 +716,13 @@ NEW_STANDBY_KEY_CONTENT
           </DialogContent>
         </Dialog>
       </TableCell>
-    </MotionTableRow>
+    </TableRow>
   )
 
   return (
     <>
       <div className="space-y-8">
-        <div className="flex justify-end">
+        {/* <div className="flex justify-end">
           <Button
             onClick={() => setShowCreateKeyDialog(true)}
             disabled={actionInProgress !== null}
@@ -603,35 +730,52 @@ NEW_STANDBY_KEY_CONTENT
           >
             Create New Standby Key
           </Button>
-        </div>
+        </div> */}
         <div>
           <Card className="w-full bg-surface-100 overflow-hidden">
             <CardContent className="p-0">
-              <Table className="p-5">
-                <TableHeader>
-                  <TableRow className="bg-surface-300">
-                    <TableHead className="pl-5 text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                      Status
-                    </TableHead>
-                    <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                      Key ID
-                    </TableHead>
-                    <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                      Created At
-                    </TableHead>
-                    <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                      Type
-                    </TableHead>
-                    <TableHead className="pr-5 text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <AnimatePresence>{activeKeys.map(renderKeyRow)}</AnimatePresence>
-                </TableBody>
-              </Table>
+              <motion.div layout>
+                <Table className="p-5">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="pl-5 text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
+                        Key ID
+                      </TableHead>
+                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
+                        Created At
+                      </TableHead>
+                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
+                        Type
+                      </TableHead>
+                      <TableHead className="pr-5 text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>{activeKeys.map(renderKeyRow)}</TableBody>
+                </Table>
+              </motion.div>
             </CardContent>
+          </Card>
+          <Card className="bg-surface-100 mt-3">
+            <div className="flex">
+              <div className="bg-surface-200 px-10 flex items-center justify-center">
+                <StandbyKeyIllustration />
+              </div>
+              <div className="flex-1 pl-8 border-l h-full py-6 px-5">
+                <h4 className="text-sm">Standby JWT signing key</h4>
+                <p className="text-xs text-foreground-light mb-4 max-w-xs">
+                  Create Standby keys ahead of time which can then be promoted to 'In use' at any
+                  time.
+                </p>
+                <Button type="default" icon={<Plus />} onClick={() => setShowCreateKeyDialog(true)}>
+                  Create Standby Key
+                </Button>
+              </div>
+            </div>
           </Card>
         </div>
 
@@ -697,67 +841,67 @@ NEW_STANDBY_KEY_CONTENT
           <DialogHeader>
             <DialogTitle>Create a new JWT Key</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="algorithm">Choose the key type to use:</Label>
-              <Select
-                value={newKeyAlgorithm}
-                onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
-              >
-                <SelectTrigger id="algorithm">
-                  <SelectValue placeholder="Select algorithm" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="HS256">HS256 (Symmetric)</SelectItem>
-                  <SelectItem value="RS256">RS256 (RSA)</SelectItem>
-                  <SelectItem value="ES256">ES256 (ECC)</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-sm text-muted-foreground mt-1">
-                {algorithmDescriptions[newKeyAlgorithm]}
-              </p>
-            </div>
-            <div>
-              <Label htmlFor="description">Description:</Label>
-              <Input
-                id="description"
-                value={newKeyDescription}
-                onChange={(e) => setNewKeyDescription(e.target.value)}
-                placeholder="Enter key description"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="useCustomKey"
-                checked={useCustomSigningKey}
-                onCheckedChange={(checked) => setUseCustomSigningKey(checked as boolean)}
-              />
-              <Label htmlFor="useCustomKey">Use custom signing key?</Label>
-            </div>
-            {useCustomSigningKey && (
+          <DialogSectionSeparator />
+          <DialogSection>
+            <div className="space-y-4">
               <div>
-                <Label htmlFor="customKey">Custom Signing Key:</Label>
-                <Textarea
-                  id="customKey"
-                  value={customSigningKey}
-                  onChange={(e) => setCustomSigningKey(e.target.value)}
-                  placeholder="Enter your custom signing key"
-                  rows={4}
+                <Label htmlFor="algorithm">Choose the key type to use:</Label>
+                <Select
+                  value={newKeyAlgorithm}
+                  onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
+                >
+                  <SelectTrigger id="algorithm">
+                    <SelectValue placeholder="Select algorithm" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="HS256">HS256 (Symmetric)</SelectItem>
+                    <SelectItem value="RS256">RS256 (RSA)</SelectItem>
+                    <SelectItem value="ES256">ES256 (ECC)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-foreground-muted mt-1">
+                  {algorithmDetails[newKeyAlgorithm].shortDescription}
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="description">Description:</Label>
+                <Input
+                  id="description"
+                  value={newKeyDescription}
+                  onChange={(e) => setNewKeyDescription(e.target.value)}
+                  placeholder="Enter key description"
                 />
               </div>
-            )}
-            {formError && <p className="text-sm text-red-500">{formError}</p>}
-          </div>
-          <DialogFooter>
-            <Button onClick={() => addNewStandbyKey()} disabled={actionInProgress === 'new'}>
-              {actionInProgress === 'new' ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
-                </>
-              ) : (
-                'Create'
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="useCustomKey"
+                  checked={useCustomSigningKey}
+                  onCheckedChange={(checked) => setUseCustomSigningKey(checked as boolean)}
+                />
+                <Label htmlFor="useCustomKey">Use custom signing key?</Label>
+              </div>
+              {useCustomSigningKey && (
+                <div>
+                  <Label htmlFor="customKey">Custom Signing Key:</Label>
+                  <Textarea
+                    id="customKey"
+                    value={customSigningKey}
+                    onChange={(e) => setCustomSigningKey(e.target.value)}
+                    placeholder="Enter your custom signing key"
+                    rows={4}
+                  />
+                </div>
               )}
+              {formError && <p className="text-sm text-red-500">{formError}</p>}
+            </div>
+          </DialogSection>
+          <DialogFooter>
+            <Button
+              onClick={() => addNewStandbyKey()}
+              disabled={actionInProgress === 'new'}
+              loading={actionInProgress === 'new'}
+            >
+              {actionInProgress === 'new' ? <>Creating key...</> : 'Create Standy Signing Key'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -784,7 +928,7 @@ NEW_STANDBY_KEY_CONTENT
                       <span className="font-medium">{key.keyId}</span>
                       <span className="text-sm text-gray-500">Created: {key.createdAt}</span>
                       <span className="text-sm text-gray-500">
-                        Type: {algorithmLabels[key.algorithm]}
+                        Type: {algorithmDetails[key.algorithm].label}
                       </span>
                     </div>
                   </SelectItem>
