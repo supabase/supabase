@@ -14,7 +14,7 @@ import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 // MUST be process.cwd() here, not import.meta.url, or files that are added
 // with outputFileTracingIncludes (not auto-traced) will not be found at
 // runtime.
-const DOCS_DIRECTORY = process.cwd()
+export const DOCS_DIRECTORY = process.cwd()
 export const EXAMPLES_DIRECTORY = join(DOCS_DIRECTORY, '..', '..', 'examples')
 export const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
 export const REF_DOCS_DIRECTORY = join(DOCS_DIRECTORY, 'docs/ref')

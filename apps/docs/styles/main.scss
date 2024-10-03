@@ -342,3 +342,10 @@ th code {
     background-position: 1000px 0;
   }
 }
+
+.skip-link {
+  @apply sr-only;
+}
+.skip-link:focus {
+  @apply not-sr-only;
+}
