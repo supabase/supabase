@@ -1,5 +1,5 @@
 import { toString as CronToString } from 'cronstrue'
-import { Clock, Loader2 } from 'lucide-react'
+import { Clock, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
@@ -8,7 +8,17 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useState } from 'react'
-import { Button, Input, Label_Shadcn_, Switch } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Input,
+  Label_Shadcn_,
+  Switch,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface CronJobCardProps {
@@ -44,13 +54,13 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
         <div className="flex flex-col flex-0 overflow-y-auto w-full">
           <div className="flex flex-row justify-between items-center">
             <span className="text-base text-foreground">{job.jobname}</span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-x-2">
               {isLoading ? (
                 <Loader2 size={18} strokeWidth={2} className="animate-spin text-foreground-muted" />
               ) : (
                 <Label_Shadcn_
                   htmlFor={`cron-job-active-${job.jobid}`}
-                  className="text-foreground-light"
+                  className="text-foreground-light text-xs"
                 >
                   {job.active ? 'Active' : 'Inactive'}
                 </Label_Shadcn_>
@@ -62,6 +72,27 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 checked={job.active}
                 onCheckedChange={() => showToggleConfirmationModal(true)}
               />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" icon={<MoreVertical />} className="px-1.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-36">
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href={`/project/${ref}/sql/new?content=${encodeURIComponent(generateJobDetailsSQL(job.jobid))}`}
+                    >
+                      View previous runs
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onEditCronJob(job)}>
+                    Edit cron job
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => onDeleteCronJob(job)}>
+                    Delete cron job
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
           <div className="text-sm flex flex-row space-x-5 py-4">
@@ -80,26 +111,9 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
               <div className="grid grid-cols-10 gap-3">
                 <span className="text-foreground-light col-span-1">Command</span>
                 <div className="col-span-9">
-                  <SQLCodeBlock className="py-2">{[job.command]}</SQLCodeBlock>
+                  <SQLCodeBlock className="py-2">{[job.command.trim()]}</SQLCodeBlock>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-10">
-            <div className="col-start-2 flex flex-row gap-2">
-              <Button type="primary" disabled={false} asChild>
-                <Link
-                  href={`/project/${ref}/sql/new?content=${encodeURIComponent(generateJobDetailsSQL(job.jobid))}`}
-                >
-                  View previous runs
-                </Link>
-              </Button>
-              <Button type="default" disabled={false} onClick={() => onEditCronJob(job)}>
-                Configure
-              </Button>
-              <Button type="danger" disabled={false} onClick={() => onDeleteCronJob(job)}>
-                Delete
-              </Button>
             </div>
           </div>
         </div>
