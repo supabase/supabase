@@ -26,8 +26,7 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
       .string()
       .min(1, 'Please provide a name for your secret')
       .refine((value) => !value.match(/^(SUPABASE_).*/), {
-        message: 'Secret name must not start with the SUPABASE_ prefix',
-        path: ['name'],
+        message: 'Name must not start with the SUPABASE_ prefix',
       }),
     value: z.string().min(1, 'Please provider a value for your secret'),
   })
