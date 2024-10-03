@@ -77,7 +77,7 @@ During the 90-day restore window a paused project can be restored to the platfor
   src="/docs/img/guides/platform/paused-90-day.png"
 />
 
-After the 90-day restore window, you can download your project's backup file from the project dashboard. This backup is compatible with [pg_restore](https://www.postgresql.org/docs/current/app-pgrestore.html). You can extract your data from it, or attempt to manually restore the project.
+After the 90-day restore window, you can download your project's backup file from the project dashboard. See [restoring a backup](#restoring-a-downloaded-backup-locally) for instructions on how to load that backup locally to recover your data.
 
 <Image
   zoomable
@@ -92,6 +92,48 @@ If you upgrade to a paid plan while your project is paused, any expired one-clic
   alt="Project Paused: 90 Days Remaining"
   src="/docs/img/guides/platform/paused-paid-tier.png"
 />
+
+#### Restoring a Downloaded Backup Locally
+
+Downloaded backups are plaintext SQL files that can be loaded into a Postgres instance using [psql](https://www.postgresql.org/docs/current/app-psql.html). You can use our open source build tooling if you would like to restore a backup into a local environment so you can interact with it. Here are the steps:
+
+Install the [nix](https://nixos.org/):
+
+```sh
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+```
+
+Next, we need to start postgres locally.
+
+If you know the project's Postgres version from your project's [infrastructure project settings](https://supabase.com/dashboard/project/_/settings/infrastructure) page, you can use it to spin up an identical image locally. Using an identical image improves the odds of successfully restoring your project because all of the extension versions and configuration will match exactly.
+
+Given Postgres version `15.6.1.121`, start postgres locally with the nix command:
+
+```sh
+nix run 'github:supabase/postgres?ref=15.6.1.127#start-server' 15
+```
+
+where `15` referrs to the backup's Postgres major version.
+
+Note that the earliest Supabase Postgres version that supports a direct reference is `15.6.1.115`. If you don't know your project's Postgres version or it is lower than `15.6.1.115` then omit the `ref` option to build our most recent image:
+
+```sh
+nix run 'github:supabase/postgres#start-server' -- 15
+```
+
+Then we can restore the backup file into the Postgres instance from a separate shell session:
+
+```sh
+nix run github:supabase/postgres#start-client -- --file <BACKUP FILE>
+```
+
+Which loads the backup file into postgres and drops you into a [psql](https://www.postgresql.org/docs/current/app-psql.html) REPL. For `start-client` you do not need to provide a reference to the backup's Postgres version.
+
+Any errors encountered during the restore process are logged to stdout by the `start-server` process. Review those errors and edit the plaintext backup file as needed until the project restores successfully. A failed restore will create artifacts on the postgres server so be sure to restart the `start-server` process between restore attempts.
+
+Once your project has been restored locally, connect to it with your preferred Postgres tooling using `host=localhost`, `user=postgres`, `port=5432`, and an empty password.
+
+Be aware that this solution is only intended to give you access to the project to e.g. export data. `start-server` should never be used outside a local development workflow.
 
 #### Disk sizing
 
