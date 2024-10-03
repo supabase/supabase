@@ -176,7 +176,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   }, [installed, selectedOrg, source, dataLoading])
 
   const hasVercelManagedOrgSelected = useMemo(() => {
-    return !!selectedOrg && selectedOrg.slug.startsWith('vercel_')
+    return !!selectedOrg && selectedOrg.managed_by === 'vercel-marketplace'
   }, [selectedOrg])
 
   const disableInstallationForm =
