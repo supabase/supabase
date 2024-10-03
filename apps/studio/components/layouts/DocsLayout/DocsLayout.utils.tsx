@@ -1,6 +1,6 @@
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { BASE_PATH } from 'lib/constants'
-import { Book, BookOpen } from 'lucide-react'
+import { ArrowUpRight, Book, BookOpen } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 
 export const generateDocsMenu = (
@@ -71,7 +71,7 @@ export const generateDocsMenu = (
         {
           name: 'GraphiQL',
           key: 'graphiql',
-          url: `/project/${ref}/api/graphiql`,
+          url: `/project/${ref}/integrations/graphiql`,
           icon: (
             <SVG
               src={`${BASE_PATH}/img/graphql.svg`}
@@ -81,6 +81,7 @@ export const generateDocsMenu = (
             />
           ),
           items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
       ],
     },

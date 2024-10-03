@@ -2,6 +2,7 @@ import { useParams } from 'common'
 
 import { EncryptionKeysManagement, VaultToggle } from 'components/interfaces/Settings/Vault'
 import VaultNavTabs from 'components/interfaces/Settings/Vault/VaultNavTabs'
+import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
@@ -54,5 +55,7 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
   )
 }
 
-VaultSettingsSecrets.getLayout = (page) => <SettingsLayout title="Vault">{page}</SettingsLayout>
+VaultSettingsSecrets.getLayout = (page) => (
+  <ProjectIntegrationsLayout title="Vault">{page}</ProjectIntegrationsLayout>
+)
 export default VaultSettingsSecrets

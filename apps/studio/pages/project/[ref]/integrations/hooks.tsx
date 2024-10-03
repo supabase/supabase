@@ -16,6 +16,7 @@ import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
+import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 
 const HooksPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -124,6 +125,8 @@ const HooksPage: NextPageWithLayout = () => {
   )
 }
 
-HooksPage.getLayout = (page) => <DatabaseLayout title="Hooks">{page}</DatabaseLayout>
+HooksPage.getLayout = (page) => (
+  <ProjectIntegrationsLayout title="Hooks">{page}</ProjectIntegrationsLayout>
+)
 
 export default HooksPage
