@@ -35,6 +35,14 @@ Future<void> main() async {
     supabaseKey: "${anonKey ? anonKey : 'SUPABASE_ANON_KEY'}"
   )
   `,
+  py: `
+  import os
+  from supabase import create_client
+
+  url = '${endpoint}'
+  key = os.environ.get('SUPABASE_KEY')
+  supabase = create_client(url, key)
+  `,
 })
 
 const APIKeys = () => {
@@ -44,6 +52,7 @@ const APIKeys = () => {
     { name: 'Javascript', key: 'js' },
     { name: 'Dart', key: 'dart' },
     { name: 'Swift', key: 'swift' },
+    { name: 'Python', key: 'py' },
   ]
   const [selectedLanguage, setSelectedLanguage] = useState(availableLanguages[0])
 
