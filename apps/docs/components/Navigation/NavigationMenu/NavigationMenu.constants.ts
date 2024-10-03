@@ -172,6 +172,11 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       label: 'Resources',
       menuItems: [
         [
+          /*           {
+            label: 'Troubleshooting',
+            icon: 'contributing',
+            href: '/guides/troubleshooting',
+          }, */
           {
             label: 'Migration guides',
             icon: 'resources',
@@ -1295,6 +1300,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Slack Bot responding to mentions',
           url: '/guides/functions/examples/slack-bot-mention',
+        },
+        {
+          name: 'Image Transformation & Optimization',
+          url: '/guides/functions/examples/image-manipulation',
         },
       ],
     },

@@ -69,7 +69,7 @@ export const LogsPreviewer = ({
     setFilters,
     refresh,
     setParams,
-  } = useLogsPreview(projectRef as string, table, filterOverride)
+  } = useLogsPreview({ projectRef, table, filterOverride })
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
