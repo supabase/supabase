@@ -73,7 +73,7 @@ async function insertNewTroubleshootingEntry(entry: ITroubleshootingEntry, githu
       // @ts-ignore
       checksum,
       github_url: githubUrl,
-      date_created: timestamp,
+      date_created: entry.data.date_created ?? timestamp,
       date_updated: timestamp,
     })
     .select('id')
