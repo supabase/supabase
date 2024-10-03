@@ -141,8 +141,8 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
           description={`
 \`anon\` and \`service_role\` API keys will be replaced with \`publishable\` and \`secret\` API keys.   
 `}
-          href="https://supabase.com/docs/guides/api/api-keys#api-key-types"
-          linkText="Read the announcement"
+          href="https://github.com/orgs/supabase/discussions/29260"
+          buttonText="Read the announcement"
         />
       </Panel>
     </>
