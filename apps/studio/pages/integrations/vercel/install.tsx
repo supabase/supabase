@@ -232,12 +232,10 @@ const VercelIntegration: NextPageWithLayout = () => {
               </Alert_Shadcn_>
             )}
             {hasVercelManagedOrgSelected && (
-              <div className="prose text-sm text-red-900">
-                <p>
-                  Vercel Integration cannot be used with Vercel-managed organizations. Choose a
-                  different organization or create a Vercel resource directly.
-                </p>
-              </div>
+              <p className="prose text-sm text-red-900">
+                Vercel Integration cannot be used with Vercel-managed organizations. Choose a
+                different organization or create a Vercel resource directly.
+              </p>
             )}
             <div className="flex flex-row w-full justify-end">
               <Button
