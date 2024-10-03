@@ -1,5 +1,5 @@
 import { Megaphone } from 'lucide-react'
-import { PropsWithChildren, ReactNode } from 'react'
+import { forwardRef, PropsWithChildren, ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Badge, Button, Loading, cn } from 'ui'
 
@@ -55,23 +55,20 @@ function Content({ children, className }: { children: ReactNode; className?: str
   return <div className={cn('px-6 py-4', className)}>{children}</div>
 }
 
-function PanelNotice({
-  children,
-  className,
-  title,
-  description,
-  href,
-  buttonText,
-}: {
-  children: ReactNode
-  className?: string | false
-  title?: string
-  description?: string
-  href?: string
-  buttonText?: string
-}) {
+const PanelNotice = forwardRef<
+  HTMLDivElement,
+  {
+    className?: string | false
+    title?: string
+    description?: string
+    href?: string
+    buttonText?: string
+  }
+>(({ className, title, description, href, buttonText, ...props }, ref) => {
   return (
     <div
+      ref={ref}
+      {...props}
       className={cn(
         'relative px-6 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
         className
@@ -129,7 +126,9 @@ function PanelNotice({
       )}
     </div>
   )
-}
+})
+
+PanelNotice.displayName = 'PanelNotice'
 
 Panel.Content = Content
 Panel.Notice = PanelNotice
