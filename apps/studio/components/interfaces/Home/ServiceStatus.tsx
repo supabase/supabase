@@ -161,7 +161,8 @@ const ServiceStatus = () => {
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
-          <div
+          <Link
+            href={`/project/${ref}${service.logsUrl}`}
             key={service.name}
             className="px-4 py-2 text-xs flex items-center border-b last:border-none group relative"
           >
@@ -171,15 +172,10 @@ const ServiceStatus = () => {
                 <StatusMessage isLoading={service.isLoading} isSuccess={!!service.isSuccess} />
               </p>
 
-              <Link
-                className="hidden group-hover:flex text-foreground-light hover:text-foreground"
-                href={`/project/${ref}${service.logsUrl}`}
-              >
-                Go to Logs
-              </Link>
+              <div className="hidden group-hover:flex text-foreground">Go to Logs</div>
             </div>
             <StatusIcon isLoading={service.isLoading} isSuccess={!!service.isSuccess} />
-          </div>
+          </Link>
         ))}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
