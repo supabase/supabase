@@ -61,17 +61,28 @@ const DateTimeInput = ({
             <Button type="default" icon={<Edit />} className="px-1.5" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-28">
-            <DropdownMenuItem onClick={() => onChange('')}>Set to NULL</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onChange(dayjs().format('YYYY-MM-DDTHH:mm:ss'))}>
+            {isNullable && (
+              <DropdownMenuItem onClick={() => onChange('')}>Set to NULL</DropdownMenuItem>
+            )}
+            <DropdownMenuItem
+              onClick={() =>
+                onChange(
+                  dayjs().format(
+                    format === 'date'
+                      ? 'YYYY-MM-DD'
+                      : ['time', 'timetz'].includes(format)
+                        ? 'HH:mm:ss'
+                        : 'YYYY-MM-DDTHH:mm:ss'
+                  )
+                )
+              }
+            >
               Set to now
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       }
-      onChange={(e) => {
-        console.log(e.target.value)
-        onChange(e.target.value)
-      }}
+      onChange={(e) => onChange(e.target.value)}
     />
   )
 }
