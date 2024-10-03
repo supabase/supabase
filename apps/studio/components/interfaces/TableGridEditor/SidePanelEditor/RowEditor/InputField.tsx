@@ -231,6 +231,7 @@ const InputField = ({
         name={field.name}
         format={field.format}
         value={field.value ?? ''}
+        isNullable={field.isNullable}
         description={
           <>
             {field.defaultValue && <p>Default: {field.defaultValue}</p>}

@@ -1,14 +1,6 @@
-import type { ChangeEvent } from 'react'
-import type { RenderEditCellProps } from 'react-data-grid'
 import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-
-dayjs.extend(customParseFormat)
-
-function autoFocusAndSelect(input: HTMLInputElement | null) {
-  input?.focus()
-  input?.select()
-}
+import { useEffect, useRef, type ChangeEvent } from 'react'
+import type { RenderEditCellProps } from 'react-data-grid'
 
 interface Props<TRow, TSummaryRow = unknown> extends RenderEditCellProps<TRow, TSummaryRow> {
   format: string
@@ -23,6 +15,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   onRowChange,
   onClose,
 }: Props<TRow, TSummaryRow>) {
+  const ref = useRef<HTMLInputElement>(null)
   const value = row[column.key as keyof TRow] as unknown as string
   const timeValue = value ? dayjs(value, format).format(INPUT_DATE_TIME_FORMAT) : value
 
@@ -36,15 +29,22 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
     }
   }
 
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.focus()
+      ref.current.showPicker()
+    }
+  }, [])
+
   return (
     <input
-      className="sb-grid-datetime-editor"
-      ref={autoFocusAndSelect}
+      ref={ref}
+      step="1"
+      type="datetime-local"
+      className="h-full w-full px-2 text-sm"
       value={timeValue ?? ''}
       onChange={onChange}
       onBlur={() => onClose(true)}
-      type="datetime-local"
-      step="1"
     />
   )
 }
