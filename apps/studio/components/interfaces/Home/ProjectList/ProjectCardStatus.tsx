@@ -17,23 +17,32 @@ export const ProjectCardStatus = ({
 }: ProjectCardWarningsProps) => {
   const showResourceExhaustionWarnings = false
 
+  // [Terry] temp to remove auth_restricted_email_sending property from resourceWarnings
+  // set auth_restricted_email_sending from 'warning' to null so it doesn't show up in the warning banner
+  const filteredResourceWarnings = resourceWarnings
+    ? {
+        ...resourceWarnings,
+        auth_restricted_email_sending: null,
+      }
+    : undefined
+
   // [Joshen] Read only takes higher precedence over multiple resource warnings
-  const activeWarnings = resourceWarnings?.is_readonly_mode_enabled
+  const activeWarnings = filteredResourceWarnings?.is_readonly_mode_enabled
     ? ['is_readonly_mode_enabled']
-    : Object.keys(resourceWarnings || {}).filter(
+    : Object.keys(filteredResourceWarnings || {}).filter(
         (property) =>
           property !== 'project' &&
           property !== 'is_readonly_mode_enabled' &&
-          resourceWarnings?.[property as keyof typeof resourceWarnings] !== null
+          filteredResourceWarnings?.[property as keyof typeof filteredResourceWarnings] !== null
       )
 
   const hasCriticalWarning = activeWarnings.some(
-    (x) => resourceWarnings?.[x as keyof typeof resourceWarnings] === 'critical'
+    (x) => filteredResourceWarnings?.[x as keyof typeof filteredResourceWarnings] === 'critical'
   )
   const isCritical = activeWarnings.includes('is_readonly_mode_enabled') || hasCriticalWarning
   const warningContent =
-    resourceWarnings !== undefined
-      ? getWarningContent(resourceWarnings, activeWarnings[0], 'cardContent')
+    filteredResourceWarnings !== undefined
+      ? getWarningContent(filteredResourceWarnings, activeWarnings[0], 'cardContent')
       : undefined
 
   const getTitle = () => {
