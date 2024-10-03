@@ -264,7 +264,7 @@ const Connect = () => {
                     className="border border-t-0 rounded-lg rounded-t-none"
                     title="New API keys coming November 2024"
                     description={`
-\`anon\` and \`service_role\` API keys will be replaced with \`publishable\` and \`secret\` API keys.   
+\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.   
 `}
                     href="https://github.com/orgs/supabase/discussions/29260"
                     buttonText="Read the announcement"
