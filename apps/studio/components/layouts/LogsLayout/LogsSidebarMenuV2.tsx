@@ -157,6 +157,12 @@ export function LogsSidebarMenuV2() {
           items: [],
         }
       : null,
+    {
+      name: 'Edge Functions',
+      key: 'edge-functions-logs',
+      url: `/project/${ref}/logs/edge-functions-logs`,
+      items: [],
+    },
   ]
 
   const filteredLogs = BASE_COLLECTIONS.filter((collection) => {
