@@ -71,6 +71,7 @@ interface EventData {
   timezone?: string
   tags?: string[]
   date: string
+  end_date?: string
   speakers: string
   image?: string
   thumb?: string
@@ -148,7 +149,11 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
     })
     .filter(isNotNullOrUndefined)
 
-  const IS_REGISTRATION_OPEN = event.onDemand || Date.parse(event.date) > Date.now()
+  const IS_REGISTRATION_OPEN =
+    event.onDemand ||
+    (event.end_date?.length
+      ? Date.parse(event.end_date!) > Date.now()
+      : Date.parse(event.date) > Date.now())
 
   const ogImageUrl = encodeURI(
     `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=events&eventType=${event.type}&title=${event.meta_title ?? event.title}&description=${event.meta_description ?? event.description}&date=${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)}&duration=${event.duration}`
