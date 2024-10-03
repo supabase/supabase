@@ -1,6 +1,8 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Check, Webhook } from 'lucide-react'
 import { Badge, Input } from 'ui'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { copyToClipboard } from 'lib/helpers'
 import { Hook } from './hooks.constants'
 
 interface HookCardProps {
@@ -35,7 +37,9 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
                   disabled
                   className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
                   value={hook.method.schema}
-                  onCopy={() => {}}
+                  onCopy={() =>
+                    hook.method.type === 'postgres' && copyToClipboard(hook.method.schema)
+                  }
                 />
               </div>
               <div className="flex flex-row items-center">
@@ -47,7 +51,9 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
                   disabled
                   className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
                   value={hook.method.functionName}
-                  onCopy={() => {}}
+                  onCopy={() =>
+                    hook.method.type === 'postgres' && copyToClipboard(hook.method.functionName)
+                  }
                 />
               </div>
             </div>
@@ -66,7 +72,7 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
                   disabled
                   className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
                   value={hook.method.url}
-                  onCopy={() => {}}
+                  onCopy={() => hook.method.type === 'https' && copyToClipboard(hook.method.url)}
                 />
               </div>
               <div className="flex flex-row items-center">
