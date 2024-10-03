@@ -64,8 +64,6 @@ export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
             <Input
               {...rest}
               type="number"
-              min={1000}
-              max={5000}
               placeholder="1000"
               actions={<p className="text-foreground-light pr-2">ms</p>}
             />

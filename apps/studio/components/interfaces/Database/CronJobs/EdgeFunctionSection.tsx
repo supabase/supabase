@@ -134,6 +134,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
             <Input
               {...rest}
               type="number"
+              placeholder="1000"
               actions={<p className="text-foreground-light pr-2">ms</p>}
             />
           </FormItemLayout>

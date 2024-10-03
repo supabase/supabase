@@ -2,12 +2,7 @@ import { CronJobType } from './CreateCronJobSheet'
 import { HTTPHeader, HTTPParameter } from './CronJobs.constants'
 
 export const buildCronQuery = (name: string, schedule: string, command: string) => {
-  return `select
-  cron.schedule(
-    '${name}',
-    '${schedule}',
-    ${command}
-  );`
+  return `select cron.schedule('${name}','${schedule}',${command});`
 }
 
 export const buildHttpRequestCommand = (
@@ -87,7 +82,11 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
   }
 
   if (command.toLocaleLowerCase().startsWith('call ')) {
-    const [schemaName, functionName] = command.split('.')
+    const [schemaName, functionName] = command
+      .replace('CALL ', '')
+      .replace('()', '')
+      .trim()
+      .split('.')
 
     return {
       type: 'sql_function',

@@ -7,6 +7,7 @@ import z from 'zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
@@ -27,6 +28,7 @@ import {
   SheetTitle,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import EnableExtensionModal from '../Extensions/EnableExtensionModal'
@@ -39,8 +41,6 @@ import { HTTPParameterFieldsSection } from './HttpParameterFieldsSection'
 import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
-import { Admonition } from 'ui-patterns'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
@@ -53,7 +53,7 @@ const edgeFunctionSchema = z.object({
   type: z.literal('edge_function'),
   method: z.enum(['GET', 'POST']),
   edgeFunctionName: z.string().trim().min(1, 'Please select one of the listed Edge Functions'),
-  timeoutMs: z.number().default(1000),
+  timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
   httpParameters: z.array(z.object({ name: z.string(), value: z.string() })),
 })
@@ -67,7 +67,7 @@ const httpRequestSchema = z.object({
     .min(1, 'Please provide a URL')
     .regex(urlRegex, 'Please provide a valid URL')
     .refine((value) => value.startsWith('http'), 'Please include HTTP/HTTPs to your URL'),
-  timeoutMs: z.number().default(1000),
+  timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
   httpParameters: z.array(z.object({ name: z.string(), value: z.string() })),
 })
@@ -170,7 +170,7 @@ export const CreateCronJobSheet = ({
         values.timeoutMs
       )
     } else if (values.type === 'sql_function') {
-      command = `CALL ${values.schema}.${values.functionName}()`
+      command = `'CALL ${values.schema}.${values.functionName}()'`
     } else {
       command = `$$${values.snippet}$$`
     }
