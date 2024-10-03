@@ -14,7 +14,9 @@ import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
 import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
+import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-query'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
@@ -22,11 +24,10 @@ import { Button, cn, Separator } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
-import { PANEL_PADDING } from './UserPanel'
-import { getDisplayName, providerIconMap } from './Users.utils'
 import { BanUserModal } from './BanUserModal'
-import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { UserHeader } from './UserHeader'
+import { PANEL_PADDING } from './UserPanel'
+import { providerIconMap } from './Users.utils'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 const CONTAINER_CLASS = cn(
@@ -41,11 +42,8 @@ interface UserOverviewProps {
 
 export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const { ref: projectRef } = useParams()
-  const displayName = getDisplayName(user)
-  const hasDisplayName = displayName !== '-'
   const isEmailAuth = user.email !== null
   const isPhoneAuth = user.phone !== null
-  const isAnonUser = user.is_anonymous
   const isBanned = user.banned_until !== null
 
   const providers = (user.raw_app_meta_data?.providers ?? []).map((provider: string) => {
@@ -171,54 +169,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   return (
     <>
       <div>
-        <div className={cn(PANEL_PADDING)}>
-          {isPhoneAuth ? (
-            <div className="flex items-center gap-x-1">
-              <p>{user.phone}</p>
-              <CopyButton
-                iconOnly
-                type="text"
-                icon={<Copy />}
-                className="px-1"
-                text={user?.phone ?? ''}
-              />
-            </div>
-          ) : isAnonUser ? (
-            <>
-              <p>Anonymous user</p>
-              <div className="flex items-center gap-x-1">
-                <p className="text-foreground-light text-sm">{user.id}</p>
-                <CopyButton
-                  iconOnly
-                  type="text"
-                  icon={<Copy />}
-                  className="px-1"
-                  text={user?.id ?? ''}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              {hasDisplayName && <p>{displayName}</p>}
-              <div className="flex items-center gap-x-1">
-                <p
-                  className={cn(
-                    hasDisplayName ? 'text-foreground-light text-sm' : 'text-foreground'
-                  )}
-                >
-                  {user.email}
-                </p>
-                <CopyButton
-                  iconOnly
-                  type="text"
-                  icon={<Copy />}
-                  className="px-1"
-                  text={user?.email ?? ''}
-                />
-              </div>
-            </>
-          )}
-        </div>
+        <UserHeader user={user} />
 
         {isBanned ? (
           <Admonition

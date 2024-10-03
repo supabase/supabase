@@ -117,6 +117,7 @@ const phoneProviders = providers.phone.map((x) => {
 
 export function getDisplayName(user: User, fallback = '-'): string {
   const {
+    custom_claims,
     displayName,
     display_name,
     fullName,
@@ -132,14 +133,53 @@ export function getDisplayName(user: User, fallback = '-'): string {
     first_name,
   } = user.raw_user_meta_data ?? {}
 
-  const last = familyName || family_name || surname || lastName || last_name
-  const first = givenName || given_name || firstName || first_name
+  const {
+    displayName: ccDisplayName,
+    display_name: cc_display_name,
+    fullName: ccFullName,
+    full_name: cc_full_name,
+    familyName: ccFamilyName,
+    family_name: cc_family_name,
+    givenName: ccGivenName,
+    given_name: cc_given_name,
+    surname: ccSurname,
+    lastName: ccLastName,
+    last_name: cc_last_name,
+    firstName: ccFirstName,
+    first_name: cc_first_name,
+  } = custom_claims ?? {}
+
+  const last =
+    familyName ||
+    family_name ||
+    surname ||
+    lastName ||
+    last_name ||
+    ccFamilyName ||
+    cc_family_name ||
+    ccSurname ||
+    ccLastName ||
+    cc_last_name
+
+  const first =
+    givenName ||
+    given_name ||
+    firstName ||
+    first_name ||
+    ccGivenName ||
+    cc_given_name ||
+    ccFirstName ||
+    cc_first_name
 
   return (
     displayName ||
     display_name ||
+    ccDisplayName ||
+    cc_display_name ||
     fullName ||
     full_name ||
+    ccFullName ||
+    cc_full_name ||
     (first && last && `${first} ${last}`) ||
     fallback
   )
@@ -172,7 +212,7 @@ export function getAvatarUrl(user: User): string | undefined {
     profileImageURL ||
     profile_image_url) as string | undefined
 
-  return SUPPORTED_CSP_AVATAR_URLS.some((x) => url?.startsWith(x)) ? url : undefined
+  return SUPPORTED_CSP_AVATAR_URLS.some((x) => (url ?? '').startsWith(x)) ? url : undefined
 }
 
 export const formatUserColumns = ({
