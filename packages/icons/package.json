@@ -2,7 +2,8 @@
   "name": "icons",
   "main": "./src/icons/index.ts",
   "scripts": {
-    "build:icons": "build-icons --templateSrc=./scripts/exportTemplate.mjs --renderUniqueKey --iconFileExtension=.ts --exportFileName=index.ts"
+    "build:icons": "build-icons --templateSrc=./scripts/exportTemplate.mjs --renderUniqueKey --iconFileExtension=.ts --exportFileName=index.ts",
+    "clean": "rimraf node_modules"
   },
   "dependencies": {
     "typescript": "~5.5.0",

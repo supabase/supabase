@@ -10,6 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "content:build": "contentlayer2 build",
+    "clean": "rimraf node_modules .next .turbo",
     "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {

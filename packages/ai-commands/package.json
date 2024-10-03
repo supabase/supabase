@@ -6,6 +6,7 @@
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
+    "clean": "rimraf node_modules",
     "typecheck": "tsc --noEmit",
     "test": "jest"
   },

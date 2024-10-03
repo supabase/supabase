@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "clean": "rimraf node_modules tsconfig.tsbuildinfo .next .turbo",
     "test": "vitest --run",
     "test:watch": "vitest watch",
     "test:ui": "vitest --ui",

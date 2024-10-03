@@ -6,6 +6,7 @@
   "sideEffects": false,
   "scripts": {
     "test": "vitest",
+    "clean": "rimraf node_modules",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -5,6 +5,7 @@
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
+    "clean": "rimraf node_modules",
     "gen:types": "supabase gen types typescript --local >| ./database-types.ts",
     "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
   },
