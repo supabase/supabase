@@ -113,10 +113,6 @@ export const BranchRow = ({
   const createPullRequestURL =
     generateCreatePullRequestURL?.(branch.git_branch) ?? 'https://github.com'
 
-  const shouldRenderLogsButton =
-    branch.pr_number !== undefined && branch.latest_check_run_id !== undefined
-  const checkRunLogsURL = `https://github.com/${repo}/pull/${branch.pr_number}/checks?check_run_id=${branch.latest_check_run_id}`
-
   const { ref, inView } = useInView()
   const { data } = useBranchQuery(
     { projectRef, id: branch.id },
@@ -275,13 +271,16 @@ export const BranchRow = ({
               </div>
             )}
 
-            {shouldRenderLogsButton && (
-              <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                <Link passHref target="_blank" rel="noreferrer" href={checkRunLogsURL}>
-                  View Logs
-                </Link>
-              </Button>
-            )}
+            <Button asChild type="default">
+              <Link
+                passHref
+                target="_blank"
+                rel="noreferrer"
+                href={`/project/${projectRef}/logs/workflow-run-logs`}
+              >
+                View Logs
+              </Link>
+            </Button>
 
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
