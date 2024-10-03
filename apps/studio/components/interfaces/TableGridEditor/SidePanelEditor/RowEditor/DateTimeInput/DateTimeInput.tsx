@@ -1,5 +1,7 @@
 import dayjs from 'dayjs'
+import { Edit } from 'lucide-react'
 import { ReactNode } from 'react'
+
 import {
   Button,
   cn,
@@ -9,9 +11,7 @@ import {
   DropdownMenuTrigger,
   Input,
 } from 'ui'
-
 import { getColumnType } from './DateTimeInput.utils'
-import { Edit } from 'lucide-react'
 
 interface DateTimeInputProps {
   name: string
@@ -40,7 +40,7 @@ const DateTimeInput = ({
   return (
     <Input
       layout="horizontal"
-      className={cn('w-full', isNullable && '[&>div>div>div>input]:pr-10')}
+      className={cn('w-full [&>div>div>div>input]:pr-10')}
       label={name}
       descriptionText={
         <div className="space-y-1">
@@ -56,19 +56,17 @@ const DateTimeInput = ({
       type={inputType}
       step={inputType == 'datetime-local' || inputType == 'time' ? '1' : undefined}
       actions={
-        isNullable && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button type="default" icon={<Edit />} className="px-1.5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-28">
-              <DropdownMenuItem onClick={() => onChange('')}>Set to NULL</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onChange(dayjs().format('YYYY-MM-DDTHH:mm:ss'))}>
-                Set to now
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="default" icon={<Edit />} className="px-1.5" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-28">
+            <DropdownMenuItem onClick={() => onChange('')}>Set to NULL</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onChange(dayjs().format('YYYY-MM-DDTHH:mm:ss'))}>
+              Set to now
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       }
       onChange={(e) => {
         console.log(e.target.value)

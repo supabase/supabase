@@ -2,11 +2,10 @@ import dayjs from 'dayjs'
 import { useEffect, useRef, type ChangeEvent } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 
-interface Props<TRow, TSummaryRow = unknown> extends RenderEditCellProps<TRow, TSummaryRow> {
+interface BaseEditorProps<TRow, TSummaryRow = unknown>
+  extends RenderEditCellProps<TRow, TSummaryRow> {
   format: string
 }
-
-const INPUT_DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss'
 
 function BaseEditor<TRow, TSummaryRow = unknown>({
   row,
@@ -14,10 +13,10 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   format,
   onRowChange,
   onClose,
-}: Props<TRow, TSummaryRow>) {
+}: BaseEditorProps<TRow, TSummaryRow>) {
   const ref = useRef<HTMLInputElement>(null)
   const value = row[column.key as keyof TRow] as unknown as string
-  const timeValue = value ? dayjs(value, format).format(INPUT_DATE_TIME_FORMAT) : value
+  const timeValue = value ? dayjs(value, format).format('YYYY-MM-DDTHH:mm:ss') : value
 
   function onChange(event: ChangeEvent<HTMLInputElement>) {
     const _value = event.target.value
