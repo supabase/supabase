@@ -12,7 +12,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Input } from 'ui'
 import { AlertCircle, Loader } from 'lucide-react'
 
-const generateInitSnippet = (endpoint: string) => ({
+const generateInitSnippet = (endpoint: string, anonKey?: string) => ({
   js: `
 import { createClient } from '@supabase/supabase-js'
 
@@ -27,6 +27,14 @@ Future<void> main() async {
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
   runApp(MyApp());
 }`,
+  swift: `
+  import Supabase
+
+  let supabase = SupabaseClient(
+    supabaseURL: URL(string: "${endpoint}")!,
+    supabaseKey: "${anonKey ? anonKey : 'SUPABASE_ANON_KEY'}"
+  )
+  `,
 })
 
 const APIKeys = () => {
@@ -35,6 +43,7 @@ const APIKeys = () => {
   const availableLanguages = [
     { name: 'Javascript', key: 'js' },
     { name: 'Dart', key: 'dart' },
+    { name: 'Swift', key: 'swift' },
   ]
   const [selectedLanguage, setSelectedLanguage] = useState(availableLanguages[0])
 
@@ -67,7 +76,7 @@ const APIKeys = () => {
   const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
   const anonKey = apiKeys.find((key) => key.tags === 'anon')
 
-  const clientInitSnippet: any = generateInitSnippet(apiUrl)
+  const clientInitSnippet: any = generateInitSnippet(apiUrl, anonKey?.api_key_encrypted)
   const selectedLanguageSnippet = clientInitSnippet[selectedLanguage.key] ?? 'No snippet available'
 
   return (
