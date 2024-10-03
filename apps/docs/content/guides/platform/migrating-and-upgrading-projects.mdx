@@ -131,7 +131,7 @@ Which loads the backup file into Postgres and drops you into a [psql](https://ww
 
 Any errors encountered during the restore process are logged to stdout by the `start-server` process. Review those errors and edit the plaintext backup file as needed until the project restores successfully. A failed restore will create artifacts on the Postgres server so be sure to restart the `start-server` process between restore attempts.
 
-Once your project has been restored locally, connect to it with your preferred Postgres tooling using `host=localhost`, `user=postgres`, `port=5432`, and an empty password.
+Once your project has been restored locally, connect to it with your preferred Postgres tooling using `host=localhost`, `user=postgres`, `port=5432`, and an empty password. This will allow you to inspect your saved data and export whatever is necessary.
 
 Be aware that this solution is only intended to give you access to the project to e.g. export data. `start-server` should never be used outside a local development workflow.
 
