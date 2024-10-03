@@ -184,7 +184,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   }
 
   useEffect(() => {
-    if (urlProvider === provider.title.toLowerCase()) {
+    if (urlProvider?.toLowerCase() === provider.title.toLowerCase()) {
       setOpen(true)
       ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }

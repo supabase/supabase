@@ -172,6 +172,11 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       label: 'Resources',
       menuItems: [
         [
+          /*           {
+            label: 'Troubleshooting',
+            icon: 'contributing',
+            href: '/guides/troubleshooting',
+          }, */
           {
             label: 'Migration guides',
             icon: 'resources',
@@ -1188,7 +1193,7 @@ export const functions: NavMenuConstant = {
         },
         {
           name: 'Integrating with Log Drains',
-          url: '/guides/functions/log-drains',
+          url: '/guides/platform/log-drains',
         },
       ],
     },
@@ -1295,6 +1300,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Slack Bot responding to mentions',
           url: '/guides/functions/examples/slack-bot-mention',
+        },
+        {
+          name: 'Image Transformation & Optimization',
+          url: '/guides/functions/examples/image-manipulation',
         },
       ],
     },
@@ -2260,6 +2269,17 @@ export const reference_kotlin_v2 = {
   },
 }
 
+export const reference_kotlin_v3 = {
+  icon: 'reference-kotlin',
+  title: 'kotlin',
+  url: 'guides/reference/kotlin',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase-community/supabase-kt',
+    repo: 'https://github.com/supabase-community/supabase-kt',
+  },
+}
+
 export const reference_cli = {
   icon: 'reference-cli',
   title: 'Supabase CLI',
@@ -2352,7 +2372,7 @@ export const references = [
       },
       {
         label: 'supabase-kt',
-        versions: ['v2', 'v1'],
+        versions: ['v3', 'v2', 'v1'],
         description: 'something about the reference',
         icon: '/docs/img/icons/kotlin-icon.svg',
         url: '/reference/kotlin/start',
