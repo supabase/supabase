@@ -328,21 +328,15 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
           <SectionContainer className="grid lg:grid-cols-3 gap-12 !py-10 md:!py-16">
             {event.company && (
               <div className="order-first lg:col-span-full flex items-center gap-4 md:gap-6 lg:mb-4">
-                <figure className="h-6">
-                  <NextImage
-                    src={supabaseLogoWordmarkLight}
+                <figure className="h-6 [&_.next-image--dynamic-fill_img]:!h-full">
+                  <Image
+                    src={{ dark: supabaseLogoWordmarkDark, light: supabaseLogoWordmarkLight }}
+                    alt="Supabase Logo"
                     width={160}
                     height={30}
-                    alt="Supabase Logo"
-                    className="object-contain dark:hidden"
-                    priority
-                  />
-                  <NextImage
-                    src={supabaseLogoWordmarkDark}
-                    width={160}
-                    height={30}
-                    alt="Supabase Logo"
-                    className="object-contain hidden dark:block"
+                    sizes="100%"
+                    className="!relative object-contain object-left"
+                    containerClassName="h-full object-contain object-left !rounded-none !border-none"
                     priority
                   />
                 </figure>
@@ -350,22 +344,16 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 <Link
                   href={event.company?.website_url ?? '#'}
                   target="_blank"
-                  className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90"
+                  className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90 [&_.next-image--dynamic-fill_img]:!h-full"
                 >
-                  <NextImage
-                    src={`/images/events/` + event.company?.logo ?? ''}
+                  <Image
+                    src={{ dark: event.company?.logo ?? '', light: event.company?.logo_light }}
                     alt={`${event.company?.name} Logo`}
-                    fill
+                    width={160}
+                    height={30}
                     sizes="100%"
-                    className="!relative object-contain object-left hidden dark:block"
-                    priority
-                  />
-                  <NextImage
-                    src={`/images/events/` + event.company?.logo_light ?? ''}
-                    alt={`${event.company?.name} Logo`}
-                    fill
-                    sizes="100%"
-                    className="!relative object-contain object-left dark:hidden"
+                    className="!relative object-contain object-left"
+                    containerClassName="h-full object-contain object-left !rounded-none !border-none"
                     priority
                   />
                 </Link>
