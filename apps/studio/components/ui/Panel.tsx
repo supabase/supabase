@@ -60,11 +60,15 @@ function PanelNotice({
   className,
   title,
   description,
+  href,
+  buttonText,
 }: {
   children: ReactNode
   className?: string | false
   title?: string
   description?: string
+  href?: string
+  buttonText?: string
 }) {
   return (
     <div
@@ -107,17 +111,20 @@ function PanelNotice({
           </Badge>
           {/* <span className="font-medium text-foreground text-sm">{title}</span> */}
         </div>
-        <span className="text-foreground-light text-sm flex flex-col gap-0">
-          {/* <span className="font-medium text-foreground text-sm">{title}</span> */}
-          <ReactMarkdown className="prose text-xs max-w-none [&_p]:mt-2 [&_p]:mb-0">
-            {description}
-          </ReactMarkdown>
-        </span>
+        {description && (
+          <span className="text-foreground-light text-sm flex flex-col gap-0">
+            <ReactMarkdown className="prose text-xs max-w-none [&_p]:mt-2 [&_p]:mb-0">
+              {description}
+            </ReactMarkdown>
+          </span>
+        )}
       </div>
 
-      <Button size="tiny" type="default" className="text-xs">
-        Read the accouncement
-      </Button>
+      {href && (
+        <Button size="tiny" type="default" className="text-xs" asChild>
+          <a href={href}>{buttonText ?? 'Read the accouncement'}</a>
+        </Button>
+      )}
     </div>
   )
 }
