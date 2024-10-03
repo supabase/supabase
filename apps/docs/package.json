@@ -18,6 +18,7 @@
     "test:smoke": "npm run codegen:references && vitest -t \"prod smoke test\"",
     "embeddings": "tsx scripts/search/generate-embeddings.ts",
     "embeddings:refresh": "npm run embeddings -- --refresh",
+    "troubleshooting:sync": "tsx features/docs/Troubleshooting.script.ts",
     "last-changed": "tsx scripts/last-changed.ts",
     "last-changed:reset": "npm run last-changed -- --reset",
     "codegen:references": "tsx features/docs/Reference.generated.script.ts",
