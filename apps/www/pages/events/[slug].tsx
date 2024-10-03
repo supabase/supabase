@@ -73,6 +73,7 @@ interface EventData {
   date: string
   end_date?: string
   speakers: string
+  speakers_label?: string
   image?: string
   thumb?: string
   thumb_light?: string
@@ -410,7 +411,9 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
             <aside className="order-first lg:order-last">
               {speakers && (
                 <div className="flex flex-col gap-4">
-                  <h2 className="text-foreground-light text-sm font-mono uppercase">Speakers</h2>
+                  <h2 className="text-foreground-light text-sm font-mono uppercase">
+                    {event.speakers_label ?? 'Speakers'}
+                  </h2>
                   <ul className="list-none flex flex-col md:flex-row flex-wrap lg:flex-col gap-4 md:gap-8 lg:gap-4">
                     {speakers?.map((speaker) => (
                       <li key={speaker?.author_id}>
