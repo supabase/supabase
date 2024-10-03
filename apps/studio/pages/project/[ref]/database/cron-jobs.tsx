@@ -13,15 +13,13 @@ const CronJobsPage: NextPageWithLayout = () => {
   // }
 
   return (
-    <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
-          <div className="col-span-12">
-            <CronJobsListing />
-          </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
-    </>
+    <ScaffoldContainer className="h-full">
+      <ScaffoldSection className="h-full">
+        <div className="col-span-12 h-full">
+          <CronJobsListing />
+        </div>
+      </ScaffoldSection>
+    </ScaffoldContainer>
   )
 }
 

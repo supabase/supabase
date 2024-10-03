@@ -1,5 +1,5 @@
 import { uniqBy } from 'lodash'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -17,12 +17,16 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Command_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
+import { useParams } from 'common'
 
 type DatabaseFunction = DatabaseFunctionsData[number]
 
@@ -50,6 +54,8 @@ const FunctionSelector = ({
   filterFunction = () => true,
   noResultsLabel = <span>No functions found in this schema.</span>,
 }: FunctionSelectorProps) => {
+  const router = useRouter()
+  const { ref } = useParams()
   const { project } = useProjectContext()
   const [open, setOpen] = useState(false)
 
@@ -148,6 +154,28 @@ const FunctionSelector = ({
                       </CommandItem_Shadcn_>
                     ))}
                   </ScrollArea>
+                </CommandGroup_Shadcn_>
+                <CommandSeparator_Shadcn_ />
+                <CommandGroup_Shadcn_>
+                  <CommandItem_Shadcn_
+                    className="cursor-pointer w-full"
+                    onSelect={() => {
+                      setOpen(false)
+                      router.push(`/project/${ref}/database/functions`)
+                    }}
+                    onClick={() => setOpen(false)}
+                  >
+                    <Link
+                      href={`/project/${ref}/database/functions`}
+                      onClick={() => {
+                        setOpen(false)
+                      }}
+                      className="w-full flex items-center gap-2"
+                    >
+                      <Plus size={14} strokeWidth={1.5} />
+                      <p>New function</p>
+                    </Link>
+                  </CommandItem_Shadcn_>
                 </CommandGroup_Shadcn_>
               </CommandList_Shadcn_>
             </Command_Shadcn_>

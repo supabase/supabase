@@ -39,6 +39,8 @@ import { HTTPParameterFieldsSection } from './HttpParameterFieldsSection'
 import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
+import { Admonition } from 'ui-patterns'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
@@ -263,10 +265,10 @@ export const CreateCronJobSheet = ({
                               label=""
                               showIndicator={false}
                             >
-                              <div className="flex items-center space-x-5">
+                              <div className="flex items-center gap-x-5">
                                 <div className="text-foreground">{definition.icon}</div>
-                                <div className="flex-col space-y-0">
-                                  <div className="flex space-x-2">
+                                <div className="flex flex-col">
+                                  <div className="flex gap-x-2">
                                     <p className="text-foreground">{definition.label}</p>
                                   </div>
                                   <p className="text-foreground-light">{definition.description}</p>
@@ -275,11 +277,10 @@ export const CreateCronJobSheet = ({
                               {!pgNetExtensionInstalled &&
                               (definition.value === 'http_request' ||
                                 definition.value === 'edge_function') ? (
-                                <div className="w-full flex gap-3 pl-10 py-2 items-center">
+                                <div className="w-full flex gap-x-2 pl-11 py-2 items-center">
                                   <WarningIcon />
-                                  <span>
-                                    The pg_net extension needs to be installed to make HTTP
-                                    requests.
+                                  <span className="text-xs">
+                                    <code>pg_net</code> needs to be installed to use this type
                                   </span>
                                 </div>
                               ) : null}
@@ -290,25 +291,39 @@ export const CreateCronJobSheet = ({
                     </FormItemLayout>
                   )}
                 />
-                {!pgNetExtensionInstalled ? (
-                  canToggleExtensions ? (
-                    <span className="text-sm text-foreground-light">
-                      To enable Edge Functions and HTTP Requests, you can{' '}
-                      <button
-                        className="hover:underline text-brand"
-                        type="button"
-                        onClick={() => setShowEnableExtensionModal(true)}
-                      >
-                        turn on the pg_net extension.
-                      </button>
-                    </span>
-                  ) : (
-                    <span className="text-sm text-foreground-light">
-                      You need additional permissions to enable pg_cron for this project
-                    </span>
-                  )
-                ) : (
-                  <></>
+                {!pgNetExtensionInstalled && (
+                  <Admonition
+                    type="note"
+                    // @ts-ignore
+                    title={
+                      <span>
+                        Enable <code className="text-xs w-min">pg_net</code> for HTTP requests or
+                        Edge Functions
+                      </span>
+                    }
+                    description={
+                      <div className="flex flex-col gap-y-2">
+                        <span>
+                          This will allow you to send HTTP requests or trigger an edge function
+                          within your cron jobs
+                        </span>
+                        <ButtonTooltip
+                          type="default"
+                          className="w-min"
+                          disabled={!canToggleExtensions}
+                          onClick={() => setShowEnableExtensionModal(true)}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text: 'You need additional permissions to enable database extensions',
+                            },
+                          }}
+                        >
+                          Install pg_net extension
+                        </ButtonTooltip>
+                      </div>
+                    }
+                  />
                 )}
               </SheetSection>
               <Separator />
