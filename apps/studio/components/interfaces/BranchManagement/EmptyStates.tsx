@@ -5,14 +5,12 @@ import Link from 'next/link'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Button } from 'ui'
 
 export const BranchingEmptyState = () => {
   const snap = useAppStateSnapshot()
 
-  const hasAccessToBranching = useFlag<boolean>('branchManagement')
   const canEnableBranching = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
     resource: { is_default: true },
   })
@@ -20,26 +18,24 @@ export const BranchingEmptyState = () => {
   return (
     <ProductEmptyState title="Database Branching">
       <p className="text-sm text-light">
-        {hasAccessToBranching
-          ? 'Create preview branches to experiment changes to your database schema in a safe, non-destructible environment.'
-          : 'Database Branching is currently in early access and not available publicly yet.'}
+        Create preview branches to experiment changes to your database schema in a safe,
+        non-destructible environment.
       </p>
       <div className="flex items-center space-x-2 !mt-4">
-        {hasAccessToBranching && (
-          <ButtonTooltip
-            disabled={!canEnableBranching}
-            icon={<GitBranch strokeWidth={1.5} />}
-            onClick={() => snap.setShowEnableBranchingModal(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: 'You need additional permissions to enable branching',
-              },
-            }}
-          >
-            Enable branching
-          </ButtonTooltip>
-        )}
+        <ButtonTooltip
+          disabled={!canEnableBranching}
+          icon={<GitBranch strokeWidth={1.5} />}
+          onClick={() => snap.setShowEnableBranchingModal(true)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: 'You need additional permissions to enable branching',
+            },
+          }}
+        >
+          Enable branching
+        </ButtonTooltip>
+
         <Button type="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>
           <a
             target="_blank"

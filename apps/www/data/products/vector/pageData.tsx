@@ -235,7 +235,7 @@ docs.query(
       <>
         <span className="heading-gradient">Powerful Features</span>
         <br />
-        <span className="text-brand">Scale to billions</span>
+        <span className="text-brand">Scale to millions</span>
       </>
     ),
     paragraph:

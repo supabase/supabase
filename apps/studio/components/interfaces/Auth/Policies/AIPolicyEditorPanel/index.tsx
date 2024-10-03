@@ -29,14 +29,15 @@ import * as z from 'zod'
 
 import { Monaco } from '@monaco-editor/react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import {
   IStandaloneCodeEditor,
   IStandaloneDiffEditor,
 } from 'components/interfaces/SQLEditor/SQLEditor.types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
@@ -50,6 +51,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
+import { useQueryState } from 'nuqs'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
@@ -101,8 +103,9 @@ export const AIPolicyEditorPanel = memo(function ({
   const selectedOrganization = useSelectedOrganization()
 
   const telemetryProps = useTelemetryProps()
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+
+  const [editView, setEditView] = useQueryState('view', { defaultValue: 'templates' as const })
 
   // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
   const [using, setUsing] = useState('')
@@ -122,7 +125,9 @@ export const AIPolicyEditorPanel = memo(function ({
 
   // Use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
-  const [tabId, setTabId] = useState<'templates' | 'conversation'>('templates')
+  const [tabId, setTabId] = useState<'templates' | 'conversation'>(
+    editView as 'templates' | 'conversation'
+  )
 
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const placeholder = generatePlaceholder(selectedPolicy)
@@ -166,6 +171,8 @@ export const AIPolicyEditorPanel = memo(function ({
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const [selectedSchemas] = useSchemasForAi(selectedProject?.ref!)
+
+  // get entitiy (tables/views/materialized views/etc) definitions  to pass to AI Assistant
   const { data: entities } = useEntityDefinitionsQuery(
     {
       schemas: selectedSchemas,
@@ -180,6 +187,28 @@ export const AIPolicyEditorPanel = memo(function ({
   const supportWithCheck = ['update', 'all'].includes(command)
   const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
 
+  const { project } = useProjectContext()
+  const { data } = useDatabasePoliciesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const existingPolicies = (data ?? [])
+    .filter((policy) => policy.schema === schema && policy.table === selectedTable)
+    .sort((a, b) => a.name.localeCompare(b.name))
+
+  const existingPolicyDefinition = existingPolicies
+    .map((policy) => {
+      const definition = generatePolicyDefinition(policy)
+      return (
+        definition
+          .trim()
+          .replace(/\s*;\s*$/, '')
+          .replace(/\n\s*$/, '') + ';'
+      )
+    })
+    .join('\n\n')
+
   const {
     messages: chatMessages,
     append,
@@ -189,6 +218,7 @@ export const AIPolicyEditorPanel = memo(function ({
     api: `${BASE_PATH}/api/ai/sql/suggest`,
     body: {
       entityDefinitions: isOptedInToAI || !IS_PLATFORM ? entityDefinitions : undefined,
+      existingPolicies,
       policyDefinition:
         selectedPolicy !== undefined ? generatePolicyDefinition(selectedPolicy) : undefined,
     },
@@ -264,6 +294,7 @@ export const AIPolicyEditorPanel = memo(function ({
       setIsClosingPolicyEditorPanel(true)
     } else {
       onSelectCancel()
+      setEditView(null)
     }
   }
 
@@ -386,6 +417,10 @@ export const AIPolicyEditorPanel = memo(function ({
     }
   }
 
+  const clearHistory = () => {
+    setChatId(uuidv4())
+  }
+
   // when the panel is closed, reset all values
   useEffect(() => {
     if (!visible) {
@@ -437,6 +472,11 @@ export const AIPolicyEditorPanel = memo(function ({
     })
   }, [showDetails, error, errorPanelOpen])
 
+  // update tabId when the editView changes
+  useEffect(() => {
+    editView === 'conversation' ? setTabId('conversation') : setTabId('templates')
+  }, [editView])
+
   return (
     <>
       <Form_Shadcn_ {...form}>
@@ -448,7 +488,7 @@ export const AIPolicyEditorPanel = memo(function ({
               className={cn(
                 'bg-surface-200',
                 'p-0 flex flex-row gap-0',
-                assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
+                assistantVisible ? '!min-w-[1000px]' : '!min-w-[600px]'
               )}
             >
               <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
@@ -530,13 +570,16 @@ export const AIPolicyEditorPanel = memo(function ({
                     />
                   ) : null}
 
-                  {isAiAssistantEnabled ? (
+                  {/* which left side editor to show in the sheet  */}
+                  {editView === 'conversation' ? (
                     <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
                       <RLSCodeEditor
                         id="rls-sql-policy"
                         defaultValue={''}
+                        value={existingPolicyDefinition}
                         placeholder={placeholder}
                         editorRef={editorOneRef}
+                        editView={editView as 'templates' | 'conversation'} // someone help
                       />
                     </div>
                   ) : (
@@ -577,6 +620,7 @@ export const AIPolicyEditorPanel = memo(function ({
                             disableTabToUsePlaceholder
                             readOnly={!canUpdatePolicies}
                             id="rls-exp-one-editor"
+                            editView={editView as 'templates' | 'conversation'} // someone help
                             placeholder={
                               command === 'insert'
                                 ? '-- Provide a SQL expression for the with check statement'
@@ -649,6 +693,7 @@ export const AIPolicyEditorPanel = memo(function ({
                                 editorRef={editorTwoRef}
                                 monacoRef={monacoTwoRef as any}
                                 lineNumberStart={7 + expOneLineCount}
+                                editView={editView as 'templates' | 'conversation'} // someone help
                                 onChange={() => {
                                   setExpTwoContentHeight(
                                     editorTwoRef.current?.getContentHeight() ?? 0
@@ -752,18 +797,16 @@ export const AIPolicyEditorPanel = memo(function ({
                           incomingChange !== undefined
                         }
                         onClick={() => {
-                          if (isAiAssistantEnabled) {
-                            const sql = editorOneRef.current?.getValue().trim()
-                            if (!sql) return onSelectCancel()
-                            executeMutation({
-                              sql: sql,
-                              projectRef: selectedProject?.ref,
-                              connectionString: selectedProject?.connectionString,
-                              handleError: (error) => {
-                                throw error
-                              },
-                            })
-                          }
+                          const sql = editorOneRef.current?.getValue().trim()
+                          if (!sql) return onSelectCancel()
+                          executeMutation({
+                            sql: sql,
+                            projectRef: selectedProject?.ref,
+                            connectionString: selectedProject?.connectionString,
+                            handleError: (error) => {
+                              throw error
+                            },
+                          })
                         }}
                         tooltip={{
                           content: {
@@ -783,7 +826,7 @@ export const AIPolicyEditorPanel = memo(function ({
                   className={cn(
                     'border-l shadow-[rgba(0,0,0,0.13)_-4px_0px_6px_0px] z-10',
                     assistantVisible && 'w-[50%]',
-                    'bg-studio'
+                    'bg-studio overflow-auto'
                   )}
                 >
                   <Tabs_Shadcn_
@@ -792,15 +835,18 @@ export const AIPolicyEditorPanel = memo(function ({
                     className="flex flex-col h-full w-full"
                   >
                     <TabsList_Shadcn_ className="flex gap-4 px-content pt-2">
-                      <TabsTrigger_Shadcn_
-                        key="templates"
-                        value="templates"
-                        onClick={() => setTabId('templates')}
-                        className="px-0 data-[state=active]:bg-transparent"
-                      >
-                        Templates
-                      </TabsTrigger_Shadcn_>
-                      {isAiAssistantEnabled && !hasHipaaAddon && (
+                      {editView === 'templates' && (
+                        <TabsTrigger_Shadcn_
+                          key="templates"
+                          value="templates"
+                          onClick={() => setTabId('templates')}
+                          className="px-0 data-[state=active]:bg-transparent"
+                        >
+                          Templates
+                        </TabsTrigger_Shadcn_>
+                      )}
+
+                      {editView === 'conversation' && !hasHipaaAddon && (
                         <TabsTrigger_Shadcn_
                           key="conversation"
                           value="conversation"
@@ -811,26 +857,22 @@ export const AIPolicyEditorPanel = memo(function ({
                         </TabsTrigger_Shadcn_>
                       )}
                     </TabsList_Shadcn_>
-                    <TabsContent_Shadcn_
-                      value="templates"
-                      className={cn(
-                        '!mt-0 overflow-y-auto',
-                        'data-[state=active]:flex data-[state=active]:grow'
-                      )}
-                    >
-                      <ScrollArea className="h-full w-full">
-                        <PolicyTemplates
-                          schema={schema}
-                          table={table}
-                          selectedPolicy={selectedPolicy}
-                          selectedTemplate={selectedDiff}
-                          onSelectTemplate={(value) => {
-                            if (isAiAssistantEnabled) {
-                              updateEditorWithCheckForDiff({
-                                id: value.id,
-                                content: value.statement,
-                              })
-                            } else {
+
+                    {editView === 'templates' && (
+                      <TabsContent_Shadcn_
+                        value="templates"
+                        className={cn(
+                          '!mt-0 overflow-y-auto',
+                          'data-[state=active]:flex data-[state=active]:grow'
+                        )}
+                      >
+                        <ScrollArea className="h-full w-full">
+                          <PolicyTemplates
+                            schema={schema}
+                            table={table}
+                            selectedPolicy={selectedPolicy}
+                            selectedTemplate={selectedDiff}
+                            onSelectTemplate={(value) => {
                               form.setValue('name', value.name)
                               form.setValue('behavior', 'permissive')
                               form.setValue('command', value.command.toLowerCase())
@@ -849,16 +891,18 @@ export const AIPolicyEditorPanel = memo(function ({
                               } else {
                                 setShowCheckBlock(false)
                               }
-                            }
-                          }}
-                        />
-                      </ScrollArea>
-                    </TabsContent_Shadcn_>
+                            }}
+                          />
+                        </ScrollArea>
+                      </TabsContent_Shadcn_>
+                    )}
+
                     <TabsContent_Shadcn_
                       value="conversation"
                       className="flex grow !mt-0 overflow-y-auto"
                     >
                       <AIPolicyChat
+                        selectedTable={selectedTable!}
                         messages={messages}
                         selectedMessage={selectedDiff}
                         onSubmit={(message) =>
@@ -870,6 +914,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         }
                         onDiff={updateEditorWithCheckForDiff}
                         loading={isLoading || isDebugSqlLoading}
+                        clearHistory={clearHistory}
                       />
                     </TabsContent_Shadcn_>
                   </Tabs_Shadcn_>
@@ -890,6 +935,7 @@ export const AIPolicyEditorPanel = memo(function ({
         onConfirm={() => {
           onSelectCancel()
           setIsClosingPolicyEditorPanel(false)
+          setEditView(null)
         }}
       >
         <p className="text-sm text-foreground-light">

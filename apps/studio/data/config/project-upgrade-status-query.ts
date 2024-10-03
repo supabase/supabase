@@ -1,26 +1,12 @@
+import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import {
-  DatabaseUpgradeError,
-  DatabaseUpgradeStatus,
-  DatabaseUpgradeProgress,
-} from '@supabase/shared-types/out/events'
-import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL, PROJECT_STATUS } from 'lib/constants'
+import { get, handleError } from 'data/fetchers'
+import { PROJECT_STATUS } from 'lib/constants'
 import { configKeys } from './keys'
 
 export type ProjectUpgradingStatusVariables = {
   projectRef?: string
   projectStatus?: string
-}
-
-export type ProjectUpgradingStatusResponse = {
-  databaseUpgradeStatus: {
-    error?: DatabaseUpgradeError
-    progress?: DatabaseUpgradeProgress
-    status: DatabaseUpgradeStatus
-    initiated_at: string
-    target_version: number
-  } | null
 }
 
 export async function getProjectUpgradingStatus(
@@ -29,10 +15,13 @@ export async function getProjectUpgradingStatus(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await get(`${API_ADMIN_URL}/projects/${projectRef}/upgrade/status`, { signal })
-  if (response.error) throw response.error
+  const { data, error } = await get(`/v1/projects/{ref}/upgrade/status`, {
+    params: { path: { ref: projectRef } },
+    signal,
+  })
+  if (error) handleError(error)
 
-  return response as ProjectUpgradingStatusResponse
+  return data
 }
 
 export type ProjectUpgradingStatusData = Awaited<ReturnType<typeof getProjectUpgradingStatus>>
@@ -53,7 +42,7 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       refetchInterval(data) {
-        const response = data as unknown as ProjectUpgradingStatusResponse
+        const response = data as unknown as ProjectUpgradingStatusData
         if (!response) return false
 
         const interval =
@@ -68,7 +57,7 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
         return interval
       },
       onSuccess(data) {
-        const response = data as unknown as ProjectUpgradingStatusResponse
+        const response = data as unknown as ProjectUpgradingStatusData
         if (response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgraded) {
           client.invalidateQueries(configKeys.upgradeEligibility(projectRef))
         }

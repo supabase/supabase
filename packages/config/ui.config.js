@@ -327,7 +327,7 @@ const uiConfig = {
         // },
         '.text-code': {
           margin: '0 0.2em',
-          padding: '0.2em 0.4em 0.1em',
+          padding: '0.05em 0.4em 0.05em',
           background: 'hsla(0, 0%, 58.8%, 0.1)',
           border: '1px solid hsla(0, 0%, 39.2%, 0.2)',
           borderRadius: '3px',

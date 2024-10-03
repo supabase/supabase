@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import MotionNumber from 'motion-number'
-import { useState } from 'react'
 
 import {
   badgeVariants,
@@ -9,6 +8,7 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
+import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
 
 interface DiskSpaceBarProps {
   showNewBar: boolean
@@ -23,21 +23,17 @@ export default function DiskSpaceBar({
   usedSize,
   newTotalSize,
 }: DiskSpaceBarProps) {
-  const [resizeThreshold, setResizeThreshold] = useState<number>(0.5) // 500 MB threshold for resize
-
   const usedPercentage = (usedSize / totalSize) * 100
-  const resizePoint = totalSize - resizeThreshold
-  const resizePercentage = (resizePoint / totalSize) * 100
+  const resizePercentage = AUTOSCALING_THRESHOLD * 100
 
   const newUsedPercentage = (usedSize / newTotalSize) * 100
-  const newResizePoint = newTotalSize - resizeThreshold
-  const newResizePercentage = (newResizePoint / newTotalSize) * 100
+  const newResizePercentage = AUTOSCALING_THRESHOLD * 100
 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center h-6 gap-3">
         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-          {usedSize.toFixed(2)} GiB used of{' '}
+          {usedSize.toFixed(2)} GB used of{' '}
           <span className="text-foreground font-semibold -mt-[2px]">
             <MotionNumber
               value={newTotalSize}
@@ -48,7 +44,7 @@ export default function DiskSpaceBar({
               className="font-mono"
             />
           </span>{' '}
-          GiB
+          GB
         </span>
       </div>
       <div className="relative">
