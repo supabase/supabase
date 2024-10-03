@@ -1,15 +1,15 @@
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
-import { ArrowUpRight } from 'lucide-react'
 
 export const generateProjectIntegrationsMenu = (
   project?: Project,
   flags?: {
     pgNetExtensionExists: boolean
+    cronUiEnabled: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists } = flags || {}
+  const { pgNetExtensionExists, cronUiEnabled } = flags || {}
 
   return [
     {
@@ -30,13 +30,16 @@ export const generateProjectIntegrationsMenu = (
           url: `/project/${ref}/integrations/wrappers`,
           items: [],
         },
-        {
-          name: 'Cron Jobs',
-          key: 'cron-jobs',
-          url: `/project/${ref}/integrations/cron-jobs`,
-          items: [],
-          label: 'SOON',
-        },
+        ...(!!cronUiEnabled
+          ? [
+              {
+                name: 'Cron Jobs',
+                key: 'cron-jobs',
+                url: `/project/${ref}/integrations/cron-jobs`,
+                items: [],
+              },
+            ]
+          : []),
         {
           name: 'GraphiQL',
           key: 'graphiql',

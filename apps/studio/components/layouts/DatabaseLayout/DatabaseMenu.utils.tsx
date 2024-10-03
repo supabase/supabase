@@ -122,16 +122,6 @@ export const generateDatabaseMenu = (
               },
             ]
           : []),
-        ...(!!cronUiEnabled
-          ? [
-              {
-                name: 'Cron Jobs',
-                key: 'cron-jobs',
-                url: `/project/${ref}/database/cron-jobs`,
-                items: [],
-              },
-            ]
-          : []),
       ],
     },
     {

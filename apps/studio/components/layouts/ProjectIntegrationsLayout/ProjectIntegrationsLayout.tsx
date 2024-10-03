@@ -7,12 +7,14 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateProjectIntegrationsMenu } from './ProjectIntegrationsMenu.utils'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export interface ProjectIntegrationsLayoutProps {
   title?: string
 }
 
 const ProjectIntegrationsMenu = () => {
+  const cronUiEnabled = useFlag('cronUi')
   const project = useSelectedProject()
 
   const router = useRouter()
@@ -31,6 +33,7 @@ const ProjectIntegrationsMenu = () => {
         page={page}
         menu={generateProjectIntegrationsMenu(project, {
           pgNetExtensionExists,
+          cronUiEnabled,
         })}
       />
     </>
