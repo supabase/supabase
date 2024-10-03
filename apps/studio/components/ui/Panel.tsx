@@ -73,7 +73,7 @@ function PanelNotice({
   return (
     <div
       className={cn(
-        'relative px-6 py-5 bg-studio border-b flex flex-row justify-between gap-6 overflow-hidden items-center',
+        'relative px-6 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
         className
       )}
     >
@@ -121,9 +121,11 @@ function PanelNotice({
       </div>
 
       {href && (
-        <Button size="tiny" type="default" className="text-xs" asChild>
-          <a href={href}>{buttonText ?? 'Read the accouncement'}</a>
-        </Button>
+        <div>
+          <Button size="tiny" type="default" className="text-xs" asChild>
+            <a href={href}>{buttonText ?? 'Read the accouncement'}</a>
+          </Button>
+        </div>
       )}
     </div>
   )
