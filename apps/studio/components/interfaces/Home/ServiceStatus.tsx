@@ -8,6 +8,8 @@ import { useProjectServiceStatusQuery } from 'data/service-status/service-status
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+import Link from 'next/link'
+import dayjs from 'dayjs'
 
 const ServiceStatus = () => {
   const { ref } = useParams()
@@ -49,6 +51,7 @@ const ServiceStatus = () => {
     docsUrl?: string
     isLoading: boolean
     isSuccess?: boolean
+    logsUrl: string
   }[] = [
     {
       name: 'Database',
@@ -56,6 +59,7 @@ const ServiceStatus = () => {
       docsUrl: undefined,
       isLoading: isLoadingPostgres,
       isSuccess: isSuccessPostgres,
+      logsUrl: '/logs/postgres-logs',
     },
     {
       name: 'PostgREST',
@@ -63,6 +67,7 @@ const ServiceStatus = () => {
       docsUrl: undefined,
       isLoading,
       isSuccess: restStatus?.healthy,
+      logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled
       ? [
@@ -72,6 +77,7 @@ const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             isSuccess: authStatus?.healthy,
+            logsUrl: '/logs/auth-logs',
           },
         ]
       : []),
@@ -83,6 +89,7 @@ const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             isSuccess: realtimeStatus?.healthy,
+            logsUrl: '/logs/realtime-logs',
           },
         ]
       : []),
@@ -94,6 +101,7 @@ const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             isSuccess: storageStatus?.healthy,
+            logsUrl: '/logs/storage-logs',
           },
         ]
       : []),
@@ -105,6 +113,7 @@ const ServiceStatus = () => {
             docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
             isLoading,
             isSuccess: edgeFunctionsStatus?.healthy,
+            logsUrl: '/logs/edge-functions-logs',
           },
         ]
       : []),
@@ -112,6 +121,23 @@ const ServiceStatus = () => {
 
   const isLoadingChecks = services.some((service) => service.isLoading)
   const allServicesOperational = services.every((service) => service.isSuccess)
+
+  // If the project is less than 10 minutes old, and status is not operational, then it's likely the service is still starting up
+  const isProjectNew = dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < 10
+
+  const StatusMessage = ({ isLoading, isSuccess }: { isLoading: boolean; isSuccess: boolean }) => {
+    if (isLoading) return 'Checking status'
+    if (isSuccess) return 'No issues'
+    if (isProjectNew) return 'Coming up...'
+    return 'Unable to connect'
+  }
+
+  const StatusIcon = ({ isLoading, isSuccess }: { isLoading: boolean; isSuccess: boolean }) => {
+    if (isLoading) return <Loader2 size={14} className="animate-spin" />
+    if (isSuccess) return <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
+    if (isProjectNew) return <Loader2 size={14} className="animate-spin" />
+    return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
+  }
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
@@ -137,25 +163,22 @@ const ServiceStatus = () => {
         {services.map((service) => (
           <div
             key={service.name}
-            className="px-4 py-2 text-xs flex items-center justify-between border-b last:border-none"
+            className="px-4 py-2 text-xs flex items-center border-b last:border-none group relative"
           >
-            <div>
+            <div className="flex-1">
               <p>{service.name}</p>
-              <p className="text-foreground-light">
-                {service.isLoading
-                  ? 'Checking status'
-                  : service.isSuccess
-                    ? 'No issues'
-                    : 'Unable to connect'}
+              <p className="text-foreground-light flex items-center gap-1 group-hover:hidden">
+                <StatusMessage isLoading={service.isLoading} isSuccess={!!service.isSuccess} />
               </p>
+
+              <Link
+                className="hidden group-hover:flex text-foreground-light hover:text-foreground"
+                href={`/project/${ref}${service.logsUrl}`}
+              >
+                Go to Logs
+              </Link>
             </div>
-            {service.isLoading ? (
-              <Loader2 className="animate-spin text-foreground-light" size={18} />
-            ) : service.isSuccess ? (
-              <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
-            ) : (
-              <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
-            )}
+            <StatusIcon isLoading={service.isLoading} isSuccess={!!service.isSuccess} />
           </div>
         ))}
       </PopoverContent_Shadcn_>
