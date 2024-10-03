@@ -95,30 +95,15 @@ const ResourceExhaustionWarningBanner = () => {
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.buttonText
 
-  // Don't show banner if no warnings
-  if (activeWarnings.length === 0) {
-    return null
-  }
-  // don't show banner if no warning content
-  if (warningContent === undefined) {
-    return null
-  }
-
-  // don't show banner if on usage/infra page and not in read-only mode
+  const hasNoWarnings = activeWarnings.length === 0
+  const hasNoWarningContent = warningContent === undefined
   const isUsageOrInfraPage =
     router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')
-  if (isUsageOrInfraPage && !activeWarnings.includes('is_readonly_mode_enabled')) {
-    return null
-  }
-
-  // don't show banner if on database settings page and in read-only mode
-  const isReadOnlyMode =
-    activeWarnings.includes('is_readonly_mode_enabled') &&
-    router.pathname.endsWith('settings/database')
-
-  if (isReadOnlyMode) {
-    return null
-  }
+  const onUsageOrInfraAndNotInReadOnlyMode =
+    isUsageOrInfraPage && !activeWarnings.includes('is_readonly_mode_enabled')
+  const onDatabaseSettingsAndInReadOnlyMode =
+    router.pathname.endsWith('settings/database') &&
+    activeWarnings.includes('is_readonly_mode_enabled')
 
   // these take precedence over each other, so there's only one active warning to check
   const activeWarning =
@@ -140,7 +125,13 @@ const ResourceExhaustionWarningBanner = () => {
       return isMatch
     })
 
-  if (!isVisible) {
+  if (
+    hasNoWarnings ||
+    hasNoWarningContent ||
+    onUsageOrInfraAndNotInReadOnlyMode ||
+    onDatabaseSettingsAndInReadOnlyMode ||
+    !isVisible
+  ) {
     return null
   }
 

@@ -12,37 +12,38 @@ export interface ProjectCardWarningsProps {
 }
 
 export const ProjectCardStatus = ({
-  resourceWarnings,
+  resourceWarnings: allResourceWarnings,
   projectStatus,
 }: ProjectCardWarningsProps) => {
   const showResourceExhaustionWarnings = false
 
   // [Terry] temp to remove auth_restricted_email_sending property from resourceWarnings
   // set auth_restricted_email_sending from 'warning' to null so it doesn't show up in the warning banner
-  const filteredResourceWarnings = resourceWarnings
+  // [Joshen] Can remove this eventually once the auth email thing is resolved (Nov 2024)
+  const resourceWarnings = allResourceWarnings
     ? {
-        ...resourceWarnings,
+        ...allResourceWarnings,
         auth_restricted_email_sending: null,
       }
     : undefined
 
   // [Joshen] Read only takes higher precedence over multiple resource warnings
-  const activeWarnings = filteredResourceWarnings?.is_readonly_mode_enabled
+  const activeWarnings = resourceWarnings?.is_readonly_mode_enabled
     ? ['is_readonly_mode_enabled']
-    : Object.keys(filteredResourceWarnings || {}).filter(
+    : Object.keys(resourceWarnings || {}).filter(
         (property) =>
           property !== 'project' &&
           property !== 'is_readonly_mode_enabled' &&
-          filteredResourceWarnings?.[property as keyof typeof filteredResourceWarnings] !== null
+          resourceWarnings?.[property as keyof typeof resourceWarnings] !== null
       )
 
   const hasCriticalWarning = activeWarnings.some(
-    (x) => filteredResourceWarnings?.[x as keyof typeof filteredResourceWarnings] === 'critical'
+    (x) => resourceWarnings?.[x as keyof typeof resourceWarnings] === 'critical'
   )
   const isCritical = activeWarnings.includes('is_readonly_mode_enabled') || hasCriticalWarning
   const warningContent =
-    filteredResourceWarnings !== undefined
-      ? getWarningContent(filteredResourceWarnings, activeWarnings[0], 'cardContent')
+    resourceWarnings !== undefined
+      ? getWarningContent(resourceWarnings, activeWarnings[0], 'cardContent')
       : undefined
 
   const getTitle = () => {
