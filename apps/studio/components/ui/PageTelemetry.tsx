@@ -14,6 +14,18 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const snap = useAppStateSnapshot()
 
   useEffect(() => {
+    const handleBeforeUnload = () => {
+        if (router.isReady) {
+          handlePageLeaveTelemetry()
+        }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+}, [router.isReady]);
+
+  useEffect(() => {
     const consent =
       typeof window !== 'undefined'
         ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
@@ -21,9 +33,9 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     if (consent !== null) snap.setIsOptedInTelemetry(consent === 'true')
   }, [])
 
-    useEffect(() => {
+  useEffect(() => {
     function handleRouteChange(url: string) {
-      handlePageTelemetry(url)
+      if (snap.isOptedInTelemetry) handlePageTelemetry(url)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -31,35 +43,16 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router])
-
-  // useEffect(() => {
-  //   function handleRouteChange(url: string) {
-  //     if (snap.isOptedInTelemetry) handlePageTelemetry(url)
-  //   }
-
-  //   // Listen for page changes after a navigation or when the query changes
-  //   router.events.on('routeChangeComplete', handleRouteChange)
-  //   return () => {
-  //     router.events.off('routeChangeComplete', handleRouteChange)
-  //   }
-  // }, [router, snap.isOptedInTelemetry])
+  }, [router, snap.isOptedInTelemetry])
 
   useEffect(() => {
-    // Added for testing purposes
-    if (router.isReady) {
+    // Send page telemetry on first page load
+    // Waiting for router ready before sending page_view
+    // if not the path will be dynamic route instead of the browser url
+    if (router.isReady && snap.isOptedInTelemetry) {
       handlePageTelemetry(router.asPath)
     }
-  }, [router.isReady])
-
-  // useEffect(() => {
-  //   // Send page telemetry on first page load
-  //   // Waiting for router ready before sending page_view
-  //   // if not the path will be dynamic route instead of the browser url
-  //   if (router.isReady && snap.isOptedInTelemetry) {
-  //     handlePageTelemetry(router.asPath)
-  //   }
-  // }, [router.isReady, snap.isOptedInTelemetry])
+  }, [router.isReady, snap.isOptedInTelemetry])
 
   const user = useUser()
   useEffect(() => {
@@ -87,7 +80,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
    * @param route: the browser url
    * */
   const handlePageTelemetry = async (route: string) => {
-    // if (IS_PLATFORM) {
+    if (IS_PLATFORM) {
       /**
        * Get referrer from browser
        */
@@ -96,7 +89,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
       /**
        * Send page telemetry
        */
-      post(`http://localhost:3231/telemetry/page`, {
+      post(`${API_URL}/telemetry/page`, {
         referrer: referrer,
         title: document.title,
         route,
@@ -110,7 +103,18 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
       }, {
         credentials: 'include'
       })
-    // }
+    }
+  }
+
+  const handlePageLeaveTelemetry = async () => {
+    if (IS_PLATFORM) {
+      post(`${API_URL}/telemetry/pageleave`, {
+        route: window.location.pathname,
+        current_url: window.location.href,
+      }, {
+        credentials: 'include'
+      })
+    }
   }
 
   return <>{children}</>

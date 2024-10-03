@@ -33,7 +33,7 @@ export default function App({ Component, pageProps }: AppProps) {
   useThemeSandbox()
 
   function handlePageTelemetry(route: string) {
-    return post(`http://localhost:3231/telemetry/page`, {
+    return post(`${API_URL}/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
       route,
@@ -49,9 +49,32 @@ export default function App({ Component, pageProps }: AppProps) {
     })
   }
 
-  useEffect(() => {
-    // if (blockEvents) return
 
+  const handlePageLeaveTelemetry = async () => {
+      post(`${API_URL}/telemetry/pageleave`, {
+        route: window.location.pathname,
+        current_url: window.location.href,
+      }, {
+        credentials: 'include'
+      })
+  }
+
+  useEffect(() => {
+    if (blockEvents) return
+    const handleBeforeUnload = () => {
+        if (router.isReady) {
+          handlePageLeaveTelemetry()
+        }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+}, [router.isReady]);
+
+
+  useEffect(() => {
+    if (blockEvents) return
     function handleRouteChange(url: string) {
       handlePageTelemetry(url)
     }
@@ -64,7 +87,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.events, consentValue])
 
   useEffect(() => {
-    // if (blockEvents) return
+    if (blockEvents) return
     /**
      * Send page telemetry on first page load
      */
