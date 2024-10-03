@@ -7,32 +7,9 @@ import type { ResponseError } from 'types'
 import { usageKeys } from './keys'
 
 export async function getResourceWarnings(signal?: AbortSignal) {
-  //const { data, error } = await get(`/platform/projects-resource-warnings`, { signal })
-  //if (error) handleError(error)
-  const data = [
-    {
-      project: 'wimhlfftzbxfyavaoscg',
-      is_readonly_mode_enabled: false,
-      need_pitr: null,
-      disk_io_exhaustion: null,
-      disk_space_exhaustion: null,
-      cpu_exhaustion: null,
-      memory_and_swap_exhaustion: null,
-      auth_rate_limit_exhaustion: null,
-      auth_restricted_email_sending: 'warning',
-    },
-    {
-      project: 'gnshekhjrftvoaocqsvg',
-      is_readonly_mode_enabled: false,
-      need_pitr: null,
-      disk_io_exhaustion: 'critical',
-      disk_space_exhaustion: null,
-      cpu_exhaustion: null,
-      memory_and_swap_exhaustion: null,
-      auth_rate_limit_exhaustion: null,
-      auth_restricted_email_sending: null,
-    },
-  ]
+  const { data, error } = await get(`/platform/projects-resource-warnings`, { signal })
+  if (error) handleError(error)
+
   return data
 }
 
