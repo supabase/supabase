@@ -136,7 +136,7 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
           ))
         )}
         <Panel.Notice
-          className="border-t rounded-t-none"
+          className="border-t"
           title="New API keys coming November 2024"
           description={`
 \`anon\` and \`service_role\` API keys will be replaced with \`publishable\` and \`secret\` API keys.   
