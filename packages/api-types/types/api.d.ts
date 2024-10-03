@@ -989,6 +989,12 @@ export interface paths {
     /** Get infrastructure status */
     get: operations['StatusController_getStatus']
   }
+  '/platform/storage/{ref}/archive': {
+    /** Gets project storage archive */
+    get: operations['StorageArchiveController_getArchive']
+    /** Creates project storage archive */
+    post: operations['StorageArchiveController_createArchive']
+  }
   '/platform/storage/{ref}/buckets': {
     /** Gets list of buckets */
     get: operations['StorageBucketsController_getBuckets']
@@ -1803,6 +1809,12 @@ export interface paths {
   '/v0/status': {
     /** Get infrastructure status */
     get: operations['StatusController_getStatus']
+  }
+  '/v0/storage/{ref}/archive': {
+    /** Gets project storage archive */
+    get: operations['StorageArchiveController_getArchive']
+    /** Creates project storage archive */
+    post: operations['StorageArchiveController_createArchive']
   }
   '/v0/storage/{ref}/buckets': {
     /** Gets list of buckets */
@@ -3333,6 +3345,9 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }
+    GetArchiveResponse: {
+      fileUrl: string
+    }
     GetContentCountResponse: {
       count: number
     }
@@ -3874,8 +3889,10 @@ export interface components {
       custom_event_message_keys: string | null
       favourite: boolean
       id: number
+      lock_schema: boolean
       name: string
       public_token: string | null
+      retention_days: number
       slack_hook_url: string | null
       token: string
       webhook_notification_url: string | null
@@ -4313,13 +4330,16 @@ export interface components {
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
+      max_slot_wal_keep_size?: string
       max_standby_archive_delay?: string
       max_standby_streaming_delay?: string
+      max_wal_size?: string
       max_worker_processes?: number
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
       statement_timeout?: string
+      wal_keep_size?: string
       work_mem?: string
     }
     PostgresExtension: {
@@ -4698,6 +4718,8 @@ export interface components {
     ProjectResourceWarningsResponse: {
       /** @enum {string|null} */
       auth_rate_limit_exhaustion: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      auth_restricted_email_sending: 'critical' | 'warning' | null
       /** @enum {string|null} */
       cpu_exhaustion: 'critical' | 'warning' | null
       /** @enum {string|null} */
@@ -6033,13 +6055,16 @@ export interface components {
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
+      max_slot_wal_keep_size?: string
       max_standby_archive_delay?: string
       max_standby_streaming_delay?: string
+      max_wal_size?: string
       max_worker_processes?: number
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
       statement_timeout?: string
+      wal_keep_size?: string
       work_mem?: string
     }
     UpdatePostgrestConfigBody: {
@@ -7047,6 +7072,9 @@ export interface operations {
         limit: string
         offset: string
         verified: string
+        sort?: string
+        order?: string
+        providers?: string[]
       }
       path: {
         /** @description Project ref */
@@ -12875,6 +12903,44 @@ export interface operations {
         content: never
       }
       /** @description Failed to retrieve infrastructure status */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project storage archive */
+  StorageArchiveController_getArchive: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetArchiveResponse']
+        }
+      }
+      /** @description Failed to get project storage archive */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates project storage archive */
+  StorageArchiveController_createArchive: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create project storage archive */
       500: {
         content: never
       }

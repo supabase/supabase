@@ -30,6 +30,7 @@ enum MenuId {
   RefSwiftV2 = 'reference_swift_v2',
   RefKotlinV1 = 'reference_kotlin_v1',
   RefKotlinV2 = 'reference_kotlin_v2',
+  RefKotlinV3 = 'reference_kotlin_v3',
   RefCli = 'reference_cli',
   RefApi = 'reference_api',
   SelfHostingAuth = 'reference_self_hosting_auth',
@@ -165,6 +166,11 @@ const menus: Menu[] = [
   },
   {
     id: MenuId.RefKotlinV2,
+    type: 'reference',
+    path: '/reference/kotlin/v2',
+  },
+  {
+    id: MenuId.RefKotlinV3,
     type: 'reference',
     path: '/reference/kotlin',
   },

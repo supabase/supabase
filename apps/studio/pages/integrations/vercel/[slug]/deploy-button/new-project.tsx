@@ -128,6 +128,8 @@ const CreateProject = () => {
     delayedCheckPasswordStrength(password)
   }
 
+  const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
+
   const { mutate: createProject } = useProjectCreateMutation({
     onSuccess: (res) => {
       setNewProjectRef(res.ref)
@@ -138,7 +140,6 @@ const CreateProject = () => {
     },
   })
 
-  const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
   async function onCreateProject() {
     if (!organizationIntegration) return console.error('No organization installation details found')
     if (!organizationIntegration?.id) return console.error('No organization installation ID found')
@@ -162,7 +163,6 @@ const CreateProject = () => {
       dbSql,
     })
   }
-  const isInstallingRef = useRef(false)
 
   // Wait for the new project to be created before creating the connection
   useProjectApiQuery(
@@ -176,16 +176,9 @@ const CreateProject = () => {
       async onSuccess(data) {
         const isReady = data.autoApiService.service_api_keys.length > 0
 
-        if (
-          !isReady ||
-          !organizationIntegration ||
-          !foreignProjectId ||
-          !newProjectRef ||
-          isInstallingRef.current
-        ) {
+        if (!isReady || !organizationIntegration || !foreignProjectId || !newProjectRef) {
           return
         }
-        isInstallingRef.current = true
 
         const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
 

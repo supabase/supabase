@@ -84,10 +84,12 @@ export const SchemaGraph = () => {
     if (schema === undefined) return console.error('Schema is required')
 
     const nodes = reactFlowInstance.getNodes()
-    const nodesPositionData = nodes.reduce((a, b) => {
-      return { ...a, [b.id]: b.position }
-    }, {})
-    setStoredPositions(nodesPositionData)
+    if (nodes.length > 0) {
+      const nodesPositionData = nodes.reduce((a, b) => {
+        return { ...a, [b.id]: b.position }
+      }, {})
+      setStoredPositions(nodesPositionData)
+    }
   }
 
   useEffect(() => {
