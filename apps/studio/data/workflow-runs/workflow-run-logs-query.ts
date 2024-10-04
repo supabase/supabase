@@ -27,9 +27,11 @@ export async function getWorkflowRunLogs(
     signal,
   })
   if (error) handleError(error)
-  console.log('JSON:', JSON.stringify(data))
-  console.log('split on newlines', data.split('\n'))
   return data
+    .split('\n')
+    .flatMap((line) => line.split('\r'))
+    .join('\n')
+    .trim()
 }
 
 export type WorkflowRunLogsData = Awaited<ReturnType<typeof getWorkflowRunLogs>>
