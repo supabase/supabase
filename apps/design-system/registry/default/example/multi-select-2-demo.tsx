@@ -1,47 +1,40 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import {
   MultiSelector,
   MultiSelectorContent,
+  MultiSelectorInput,
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select-2'
 
 export default function MultiSelectDemo() {
-  const [selected, _setSelected] = useState<string[]>([])
-  const [open, setOpen] = useState(false)
+  const [selectedValues, setSelectedValues] = useState<string[]>([])
 
-  const onSelectedChange = (
-    newItemsOrCreateNewItems: string[] | ((selected: string[]) => string[])
-  ) => {
-    const newItems =
-      typeof newItemsOrCreateNewItems === 'function'
-        ? newItemsOrCreateNewItems(selected)
-        : newItemsOrCreateNewItems
-    setSelected(newItems)
-  }
-
-  const setSelected = useCallback(
-    (products: string[]) => {
-      _setSelected(products.length === 0 ? [] : products)
-    },
-    [_setSelected]
-  )
+  const fruits = [
+    { name: 'Apple', value: 'Apple' },
+    { name: 'Banana', value: 'Banana' },
+    { name: 'Cherry', value: 'Cherry' },
+    { name: 'Date', value: 'Date' },
+    { name: 'Elderberrie', value: 'Elderberrie' },
+    { name: 'Fig', value: 'Fig' },
+    { name: 'Grape', value: 'Grape' },
+    { name: 'Kiwi', value: 'Kiwi' },
+    { name: 'Mango', value: 'Mango' },
+    { name: 'Strawberry', value: 'Strawberry' },
+  ]
 
   return (
-    <MultiSelector
-      open={open}
-      onOpenChange={setOpen}
-      selected={selected}
-      onSelectedChange={onSelectedChange}
-    >
+    <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
       <MultiSelectorTrigger className="w-72" label="Fruits" />
       <MultiSelectorContent sameWidthAsTrigger>
+        <MultiSelectorInput placeholder="Search fruits" showCloseIcon />
         <MultiSelectorList>
-          <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
-          <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>
-          <MultiSelectorItem value="Grape">Grape</MultiSelectorItem>
-          <MultiSelectorItem value="Strawberry">Strawberry</MultiSelectorItem>
+          {fruits.map((fruit) => (
+            <MultiSelectorItem key={fruit.value} value={fruit.value}>
+              {fruit.name}
+            </MultiSelectorItem>
+          ))}
         </MultiSelectorList>
       </MultiSelectorContent>
     </MultiSelector>

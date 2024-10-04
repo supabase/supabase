@@ -7,40 +7,28 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select-2'
 
-export default function MultiSelectControlledDemo() {
-  const [selected, _setSelected] = useState<string[]>([])
-  const [open, setOpen] = useState(false)
-
-  const onSelectedChange = (
-    newItemsOrCreateNewItems: string[] | ((selected: string[]) => string[])
-  ) => {
-    const newItems =
-      typeof newItemsOrCreateNewItems === 'function'
-        ? newItemsOrCreateNewItems(selected)
-        : newItemsOrCreateNewItems
-    setSelected(newItems)
-  }
-
-  const setSelected = useCallback(
-    (products: string[]) => {
-      _setSelected(products.length === 0 ? [] : products)
-    },
-    [_setSelected]
-  )
+export default function MultiSelectDemo() {
+  const [selectedValues, setSelectedValues] = useState<string[]>([])
+  const [open, setOpen] = useState(true)
 
   return (
     <MultiSelector
       open={open}
       onOpenChange={setOpen}
-      selected={selected}
-      onSelectedChange={onSelectedChange}
+      values={selectedValues}
+      onValuesChange={setSelectedValues}
     >
       <MultiSelectorTrigger className="w-72" label="Fruits" />
       <MultiSelectorContent sameWidthAsTrigger>
         <MultiSelectorList>
-          <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
           <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>
+          <MultiSelectorItem value="Cherry">Cherry</MultiSelectorItem>
+          <MultiSelectorItem value="Date">Date</MultiSelectorItem>
+          <MultiSelectorItem value="Elderberrie">Elderberrie</MultiSelectorItem>
+          <MultiSelectorItem value="Fig">Fig</MultiSelectorItem>
           <MultiSelectorItem value="Grape">Grape</MultiSelectorItem>
+          <MultiSelectorItem value="Kiwi">Kiwi</MultiSelectorItem>
+          <MultiSelectorItem value="Mango">Mango</MultiSelectorItem>
           <MultiSelectorItem value="Strawberry">Strawberry</MultiSelectorItem>
         </MultiSelectorList>
       </MultiSelectorContent>

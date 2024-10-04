@@ -51,6 +51,30 @@ const data = [
     id: '6',
     name: 'Product 6',
   },
+  {
+    id: '7',
+    name: 'Product 7',
+  },
+  {
+    id: '8',
+    name: 'Product 8',
+  },
+  {
+    id: '9',
+    name: 'Product 9',
+  },
+  {
+    id: '10',
+    name: 'Product 10',
+  },
+  {
+    id: '11',
+    name: 'Product 11',
+  },
+  {
+    id: '12',
+    name: 'Product 12',
+  },
 ]
 
 const MultiSelectCombobox = ({ value, onChange }: MultiSelectComboboxProps) => {

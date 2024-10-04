@@ -2,7 +2,7 @@
 
 import { DialogProps } from '@radix-ui/react-dialog'
 import { Command as CommandPrimitive } from 'cmdk'
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
@@ -41,8 +41,10 @@ const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
     wrapperClassName?: string
+    showCloseIcon?: boolean
+    handleClose?: () => void
   }
->(({ className, wrapperClassName, ...props }, ref) => (
+>(({ className, wrapperClassName, showCloseIcon = false, handleClose, ...props }, ref) => (
   <div className={cn('flex items-center border-b px-3', wrapperClassName)} cmdk-input-wrapper="">
     <Search className="h-4 w-4 shrink-0 opacity-50" />
     <CommandPrimitive.Input
@@ -53,6 +55,17 @@ const CommandInput = React.forwardRef<
       )}
       {...props}
     />
+    {showCloseIcon && (
+      <button
+        onClick={handleClose}
+        className={cn(
+          'text-foreground-lighter hover:text-foreground-light transition-all opacity-0 duration-100',
+          !!props.value?.length && 'opacity-100'
+        )}
+      >
+        <X size={14} />
+      </button>
+    )}
   </div>
 ))
 

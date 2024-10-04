@@ -1,148 +1,123 @@
 'use client'
 
-import React, {
-  createContext,
-  forwardRef,
-  useCallback,
-  useContext,
-  useId,
-  useState,
-  PropsWithChildren,
-} from 'react'
+import React from 'react'
 import { ChevronsUpDown } from 'lucide-react'
 
+import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
+import { VariantProps, cva } from 'class-variance-authority'
+
+import { cn, Badge, Checkbox_Shadcn_ as Checkbox } from 'ui'
 import {
   Command,
   CommandEmpty,
+  CommandInput,
   CommandItem,
   CommandList,
 } from 'ui/src/components/shadcn/ui/command'
-import {
-  cn,
-  Badge,
-  Checkbox_Shadcn_ as Checkbox,
-  Popover_Shadcn_ as Popover,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
-} from 'ui'
-import { max } from 'lodash'
+import { Popover, PopoverContent, PopoverTrigger } from 'ui/src/components/shadcn/ui/popover'
 
 interface MultiSelectContextProps {
-  selected: string[]
-  handleSelect: (value: string) => void
+  values: string[]
+  onValuesChange: React.Dispatch<React.SetStateAction<string[]>>
+  onValueChange: (values: string) => void
   open: boolean
-  setOpen: (open: boolean) => void
-  handleKeyDown?: (event: React.KeyboardEvent) => void
-  itemRefs?: (HTMLElement | null)[]
-  // focusedIndex: number
-  // setFocusedIndex: React.Dispatch<React.SetStateAction<number>>
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  inputValue: string
+  setInputValue: React.Dispatch<React.SetStateAction<string>>
+  activeIndex: number
+  setActiveIndex: React.Dispatch<React.SetStateAction<number>>
+  size?: 'small'
+  disabled?: boolean
 }
 
-const MultiSelectContext = createContext<MultiSelectContextProps>({
-  selected: [],
-  handleSelect: () => {},
-  open: false,
-  setOpen: () => false,
-  handleKeyDown: () => {},
-  itemRefs: [],
-  // focusedIndex: -1,
-  // setFocusedIndex: () => -1,
-})
-
-function MultiSelectProvider({
-  selected,
-  onSelectedChange,
-  open,
-  setOpen,
-  handleKeyDown,
-  children,
-}: PropsWithChildren<{
-  selected: string[]
-  onSelectedChange: (selected: string[] | ((selected: string[]) => string[])) => void
-  handleKeyDown?: (event: React.KeyboardEvent) => void
-  open: boolean
-  setOpen: (open: boolean) => void
-}>) {
-  // const [focusedIndex, setFocusedIndex] = React.useState(-1)
-
-  const handleSelect = useCallback(
-    (value: string) => {
-      onSelectedChange((values: string[]) => {
-        const isSelected = values.some((currValue) => currValue === value)
-        if (isSelected) {
-          return values.filter((currValue) => currValue !== value)
-        } else {
-          return [...values, value]
-        }
-      })
-    },
-    [onSelectedChange]
-  )
-
-  return (
-    <MultiSelectContext.Provider
-      value={{
-        selected,
-        handleSelect,
-        open,
-        setOpen,
-        handleKeyDown,
-        // focusedIndex,
-        // setFocusedIndex,
-      }}
-    >
-      {children}
-    </MultiSelectContext.Provider>
-  )
-}
+const MultiSelectContext = React.createContext<MultiSelectContextProps | null>(null)
 
 function useMultiSelect() {
-  const context = useContext(MultiSelectContext)
+  const context = React.useContext(MultiSelectContext)
   if (!context) {
     throw new Error('useMultiSelect must be used within a MultiSelectProvider')
   }
   return context
 }
 
+const MultiSelectorVariants = cva('', {
+  variants: {
+    size: {
+      ...SIZE_VARIANTS,
+    },
+  },
+  defaultVariants: {
+    size: SIZE_VARIANTS_DEFAULT,
+  },
+})
+
+type MultiSelectorProps = {
+  values: string[]
+  onValuesChange: React.Dispatch<React.SetStateAction<string[]>>
+  loop?: boolean
+  disabled?: boolean
+  open?: boolean
+  setOpen?: React.Dispatch<React.SetStateAction<boolean>>
+} & React.ComponentPropsWithoutRef<typeof Popover> &
+  VariantProps<typeof MultiSelectorVariants>
+
 function MultiSelector({
+  values = [],
+  onValuesChange,
   open: _controlledOpen,
   setOpen: _setControlledOpen,
-  selected = [],
-  onSelectedChange,
+  disabled,
   children,
   ...props
-}: PropsWithChildren<
-  {
-    open?: boolean
-    setOpen?: React.Dispatch<React.SetStateAction<boolean>>
-    selected?: string[]
-    onSelectedChange: (selected: string[] | ((selected: string[]) => string[])) => void
-  } & React.ComponentProps<typeof Popover>
->) {
-  const [_internalOpen, _setInternalOpen] = useState(false)
+}: MultiSelectorProps) {
+  const [_internalOpen, _setInternalOpen] = React.useState(false)
   const open = _controlledOpen ?? _internalOpen
   const setOpen = _setControlledOpen ?? _setInternalOpen
+  const [inputValue, setInputValue] = React.useState<string>('')
+  const [activeIndex, setActiveIndex] = React.useState<number>(-1)
+
+  const onValueChange = React.useCallback(
+    (value: string) => {
+      onValuesChange((prevValues: string[]) => {
+        const isSelected = prevValues.some((currValue) => currValue === value)
+        if (isSelected) {
+          return prevValues.filter((currValue) => currValue !== value)
+        } else {
+          return [...prevValues, value]
+        }
+      })
+    },
+    [onValuesChange]
+  )
 
   return (
-    <MultiSelectProvider
-      selected={selected}
-      onSelectedChange={onSelectedChange}
-      open={open}
-      setOpen={setOpen}
-      // handleKeyDown={handleKeyDown}
+    <MultiSelectContext.Provider
+      value={{
+        values,
+        onValueChange,
+        onValuesChange,
+        open,
+        setOpen,
+        inputValue,
+        setInputValue,
+        activeIndex,
+        setActiveIndex,
+        size: 'small',
+        disabled,
+      }}
     >
       <Popover open={open} onOpenChange={setOpen} {...props}>
         {children}
       </Popover>
-    </MultiSelectProvider>
+    </MultiSelectContext.Provider>
   )
 }
 
-const MultiSelectorTrigger = forwardRef<
+const MultiSelectorTrigger = React.forwardRef<
   HTMLButtonElement,
   { label?: string; className?: string } & React.ComponentProps<typeof PopoverTrigger>
 >(({ label, className, ...props }, ref) => {
-  const { selected } = useMultiSelect()
+  const { values } = useMultiSelect()
 
   const inputRef = React.useRef<HTMLButtonElement>(null)
   const badgesRef = React.useRef<HTMLDivElement>(null)
@@ -151,23 +126,14 @@ const MultiSelectorTrigger = forwardRef<
   const [extraBadgesCount, setExtraBadgesCount] = React.useState(0)
 
   React.useEffect(() => {
-    const calculateVisibleBadges = () => {
-      if (!inputRef.current || !badgesRef.current) return
+    if (!inputRef.current || !badgesRef.current) return
 
-      let maxVisibleBadges = 1
-      setVisibleBadges(selected.slice(0, maxVisibleBadges))
-      setExtraBadgesCount(Math.max(0, selected.length - maxVisibleBadges))
-    }
+    let maxVisibleBadges = 1
+    setVisibleBadges(values.slice(0, maxVisibleBadges))
+    setExtraBadgesCount(Math.max(0, values.length - maxVisibleBadges))
+  }, [values])
 
-    calculateVisibleBadges()
-    window.addEventListener('resize', calculateVisibleBadges)
-
-    return () => {
-      window.removeEventListener('resize', calculateVisibleBadges)
-    }
-  }, [selected])
-
-  const badgeClasses = ''
+  const badgeClasses = 'rounded'
 
   return (
     <PopoverTrigger asChild ref={ref}>
@@ -185,10 +151,10 @@ const MultiSelectorTrigger = forwardRef<
         )}
         {...props}
       >
-        {selected.length === 0 ? (
+        {values.length === 0 ? (
           <span className="text-foreground-muted leading-[1.375rem]">{label}</span>
         ) : (
-          <div ref={badgesRef} className="flex gap-1 overflow-hidden">
+          <div ref={badgesRef} className="flex gap-1 -ml-1 overflow-hidden">
             {visibleBadges.map((value) => (
               <Badge key={value} className={cn('shrink-0', badgeClasses)}>
                 {value}
@@ -205,31 +171,69 @@ const MultiSelectorTrigger = forwardRef<
 
 MultiSelectorTrigger.displayName = 'MultiSelectorTrigger'
 
-const MultiSelectorContent = forwardRef<
+const MultiSelectorInputVariants = cva('bg-control border', {
+  variants: {
+    size: {
+      ...SIZE_VARIANTS,
+    },
+  },
+  defaultVariants: {
+    size: SIZE_VARIANTS_DEFAULT,
+  },
+})
+
+const MultiSelectorInput = React.forwardRef<
+  React.ElementRef<typeof CommandInput & { showCloseIcon?: boolean }>,
+  React.ComponentPropsWithoutRef<typeof CommandInput>
+>(({ className, showCloseIcon, ...props }, ref) => {
+  const { setOpen, inputValue, setInputValue, activeIndex, setActiveIndex, size, disabled } =
+    useMultiSelect()
+
+  const handleFocus = () => setOpen(true)
+  const handleClick = () => setActiveIndex(-1)
+  const handleClose = () => setInputValue('')
+
+  return (
+    <CommandInput
+      {...props}
+      ref={ref}
+      value={inputValue}
+      onValueChange={activeIndex === -1 ? setInputValue : undefined}
+      onFocus={handleFocus}
+      onClick={handleClick}
+      disabled={disabled}
+      showCloseIcon={showCloseIcon}
+      handleClose={handleClose}
+      className={cn(
+        MultiSelectorInputVariants({ size }),
+        'text-sm bg-transparent border-none outline-none placeholder:text-foreground-muted flex-1',
+        className,
+        activeIndex !== -1 && 'caret-transparent'
+      )}
+    />
+  )
+})
+
+MultiSelectorInput.displayName = 'MultiSelectorInput'
+
+const MultiSelectorContent = React.forwardRef<
   HTMLDivElement,
-  PropsWithChildren<
+  React.PropsWithChildren<
     {
       className?: string
     } & React.ComponentProps<typeof PopoverContent>
   >
 >(({ children, className, ...props }, ref) => {
-  const { handleKeyDown } = useMultiSelect()
-
   return (
-    <PopoverContent
-      ref={ref}
-      className={cn('w-full p-0 border-none', className)}
-      onKeyDown={handleKeyDown}
-      {...props}
-    >
-      <Command>{children}</Command>
+    <PopoverContent ref={ref} className={cn('w-full p-0', className)} {...props}>
+      <Command className="">{children}</Command>
     </PopoverContent>
   )
 })
 
 MultiSelectorContent.displayName = 'MultiSelectorContent'
 
-const MultiSelectorList = forwardRef<
+const MultiSelectorList = React.forwardRef<
   React.ElementRef<typeof CommandList>,
   React.ComponentPropsWithoutRef<typeof CommandList>
 >(({ className, children }, ref) => {
@@ -237,7 +241,8 @@ const MultiSelectorList = forwardRef<
     <CommandList
       ref={ref}
       className={cn(
-        'p-2 flex flex-col gap-2 rounded-md scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg w-full absolute bg-overlay shadow-md z-10 border border-overlay top-1',
+        'p-2 flex flex-col gap-2 rounded-md scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg w-full',
+        'max-h-[300px] overflow-y-auto',
         className
       )}
     >
@@ -251,28 +256,28 @@ const MultiSelectorList = forwardRef<
 
 MultiSelectorList.displayName = 'MultiSelectorList'
 
-const MultiSelectorItem = forwardRef<
+const MultiSelectorItem = React.forwardRef<
   HTMLDivElement,
   { value: string } & React.ComponentPropsWithoutRef<typeof CommandItem>
 >(({ className, value, children }, ref) => {
-  const id = useId()
-  const { selected, handleSelect, open } = useMultiSelect()
-  const isSelected = selected.some((item) => item === value)
+  const id = React.useId()
+  const { values: selectedValues, onValueChange, open } = useMultiSelect()
+  const isSelected = selectedValues.some((selectedValue) => selectedValue === value)
 
   return (
     <CommandItem
       ref={ref}
       tabIndex={open ? 0 : -1}
       role="option"
-      aria-selected={isSelected}
-      onSelect={() => handleSelect(value)}
+      aria-Value={isSelected}
+      onSelect={() => onValueChange(value)}
       className={cn(
         'relative',
         'text-foreground-lighter text-left pointer-events-auto',
         'px-2 py-1.5 rounded',
         'hover:text-foreground hover:!bg-overlay-hover',
         'w-full flex items-center space-x-2',
-        'peer-data-[selected=true]:bg-overlay-hover peer-data-[selected=true]:text-strong',
+        'peer-data-[Value=true]:bg-overlay-hover peer-data-[Value=true]:text-strong',
         className
       )}
     >
@@ -298,6 +303,7 @@ MultiSelectorItem.displayName = 'MultiSelectorItem'
 export {
   MultiSelector,
   MultiSelectorContent,
+  MultiSelectorInput,
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
