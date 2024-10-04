@@ -20,6 +20,7 @@ export async function getWorkflowRunLogs(
         workflow_run_id: workflowRunId,
       },
     },
+    parseAs: 'text',
     signal,
   })
   if (error) handleError(error)
