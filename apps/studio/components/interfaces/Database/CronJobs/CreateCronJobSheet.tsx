@@ -331,18 +331,18 @@ export const CreateCronJobSheet = ({
                 <>
                   <HttpRequestSection form={form} />
                   <Separator />
-                  <HTTPHeaderFieldsSection fieldName="values.httpHeaders" />
+                  <HTTPHeaderFieldsSection variant={cronType} />
                   <Separator />
-                  <HTTPParameterFieldsSection fieldName="values.httpParameters" />
+                  <HTTPParameterFieldsSection variant={cronType} />
                 </>
               )}
               {cronType === 'edge_function' && (
                 <>
                   <EdgeFunctionSection form={form} />
                   <Separator />
-                  <HTTPHeaderFieldsSection fieldName="values.httpHeaders" />
+                  <HTTPHeaderFieldsSection variant={cronType} />
                   <Separator />
-                  <HTTPParameterFieldsSection fieldName="values.httpParameters" />
+                  <HTTPParameterFieldsSection variant={cronType} />
                 </>
               )}
               {cronType === 'sql_function' && <SqlFunctionSection form={form} />}
