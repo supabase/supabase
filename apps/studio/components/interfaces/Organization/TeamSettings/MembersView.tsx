@@ -35,6 +35,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   const {
     data: roles,
     error: rolesError,
+    isSuccess: isSuccessRoles,
     isError: isErrorRoles,
   } = useOrganizationRolesV2Query({
     slug,
@@ -64,7 +65,8 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   const userMember = allMembers.find((m) => m.primary_email === profile?.primary_email)
   const orgScopedRoleIds = (roles?.org_scoped_roles ?? []).map((r) => r.id)
-  const isOrgScopedRole = orgScopedRoleIds.includes(userMember?.role_ids?.[0] ?? -1)
+  const isOrgScopedRole =
+    isSuccessRoles && isSuccessMembers && orgScopedRoleIds.includes(userMember?.role_ids?.[0] ?? -1)
 
   return (
     <>
