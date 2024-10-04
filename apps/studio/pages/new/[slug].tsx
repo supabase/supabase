@@ -468,12 +468,7 @@ const Wizard: NextPageWithLayout = () => {
                 <Button
                   htmlType="submit"
                   loading={isCreatingNewProject || isSuccessNewProject}
-                  disabled={
-                    !canCreateProject ||
-                    isCreatingNewProject ||
-                    isSuccessNewProject ||
-                    isManagedByVercel
-                  }
+                  disabled={!canCreateProject || isCreatingNewProject || isSuccessNewProject}
                 >
                   Create new project
                 </Button>
