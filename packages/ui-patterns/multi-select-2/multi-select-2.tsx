@@ -79,7 +79,7 @@ function MultiSelector({
   const onValueChange = React.useCallback(
     (value: string) => {
       onValuesChange((prevValues: string[]) => {
-        const isSelected = prevValues.some((currValue) => currValue === value)
+        const isSelected = prevValues.includes(value)
         if (isSelected) {
           return prevValues.filter((currValue) => currValue !== value)
         } else {
@@ -262,7 +262,7 @@ const MultiSelectorItem = React.forwardRef<
 >(({ className, value, children }, ref) => {
   const id = React.useId()
   const { values: selectedValues, onValueChange, open } = useMultiSelect()
-  const isSelected = selectedValues.some((selectedValue) => selectedValue === value)
+  const isSelected = selectedValues.includes(value)
 
   return (
     <CommandItem
