@@ -21,6 +21,9 @@ export async function getWorkflowRunLogs(
       },
     },
     parseAs: 'text',
+    headers: {
+      Accept: 'text/plain',
+    },
     signal,
   })
   if (error) handleError(error)
