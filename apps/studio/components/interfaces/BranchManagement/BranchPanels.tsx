@@ -37,6 +37,7 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
+import WorkflowLogs from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
   header: string
@@ -271,16 +272,7 @@ export const BranchRow = ({
               </div>
             )}
 
-            <Button asChild type="default">
-              <Link
-                passHref
-                target="_blank"
-                rel="noreferrer"
-                href={`/project/${projectRef}/logs/workflow-run-logs`}
-              >
-                View Logs
-              </Link>
-            </Button>
+            <WorkflowLogs projectRef={branch.project_ref} />
 
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>

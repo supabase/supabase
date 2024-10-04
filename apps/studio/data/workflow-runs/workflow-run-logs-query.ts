@@ -4,12 +4,12 @@ import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { workflowRunKeys } from './keys'
 
-export type WorkflowRunsVariables = {
+export type WorkflowRunLogsVariables = {
   workflowRunId?: string
 }
 
-export async function getWorkflowRuns(
-  { workflowRunId }: WorkflowRunsVariables,
+export async function getWorkflowRunLogs(
+  { workflowRunId }: WorkflowRunLogsVariables,
   signal?: AbortSignal
 ) {
   if (!workflowRunId) throw new Error('workflowRunId is required')
@@ -26,15 +26,18 @@ export async function getWorkflowRuns(
   return data.split('\n').filter(Boolean)
 }
 
-export type WorkflowRunsData = Awaited<ReturnType<typeof getWorkflowRuns>>
-export type WorkflowRunsError = ResponseError
+export type WorkflowRunLogsData = Awaited<ReturnType<typeof getWorkflowRunLogs>>
+export type WorkflowRunLogsError = ResponseError
 
-export const useWorkflowRunsQuery = <TData = WorkflowRunsData>(
-  { workflowRunId }: WorkflowRunsVariables,
-  { enabled = true, ...options }: UseQueryOptions<WorkflowRunsData, WorkflowRunsError, TData> = {}
+export const useWorkflowRunLogsQuery = <TData = WorkflowRunLogsData>(
+  { workflowRunId }: WorkflowRunLogsVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<WorkflowRunLogsData, WorkflowRunLogsError, TData> = {}
 ) =>
-  useQuery<WorkflowRunsData, WorkflowRunsError, TData>(
+  useQuery<WorkflowRunLogsData, WorkflowRunLogsError, TData>(
     workflowRunKeys.list(workflowRunId),
-    ({ signal }) => getWorkflowRuns({ workflowRunId }, signal),
+    ({ signal }) => getWorkflowRunLogs({ workflowRunId }, signal),
     { enabled: enabled && typeof workflowRunId !== 'undefined', ...options }
   )
