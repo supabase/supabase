@@ -65,8 +65,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   const userMember = allMembers.find((m) => m.primary_email === profile?.primary_email)
   const orgScopedRoleIds = (roles?.org_scoped_roles ?? []).map((r) => r.id)
-  const isOrgScopedRole =
-    isSuccessRoles && isSuccessMembers && orgScopedRoleIds.includes(userMember?.role_ids?.[0] ?? -1)
+  const isOrgScopedRole = orgScopedRoleIds.includes(userMember?.role_ids?.[0] ?? -1)
 
   return (
     <>
@@ -112,7 +111,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                 <Table.th key="header-action" />,
               ]}
               body={[
-                ...(!isOrgScopedRole
+                ...(isSuccessRoles && isSuccessMembers && !isOrgScopedRole
                   ? [
                       <Table.tr key="project-scope-notice">
                         <Table.td colSpan={12} className="!p-0">
