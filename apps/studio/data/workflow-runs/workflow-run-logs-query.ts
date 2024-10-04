@@ -27,7 +27,8 @@ export async function getWorkflowRunLogs(
     signal,
   })
   if (error) handleError(error)
-  console.log('data:', data)
+  console.log('JSON:', JSON.stringify(data))
+  console.log('split on newlines', data.split('\n'))
   return data
 }
 
