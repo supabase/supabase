@@ -5,12 +5,16 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
-  DISK_LIMITS,
   DISK_PRICING,
   DiskType,
 } from 'components/interfaces/DiskManagement/DiskManagement.constants'
+import {
+  calculateIOPSPrice,
+  calculateThroughputPrice,
+} from 'components/interfaces/DiskManagement/DiskManagement.utils'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
+import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
 import {
@@ -24,6 +28,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
+import { formatCurrency } from 'lib/helpers'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
 import {
@@ -46,11 +51,6 @@ import {
   cn,
 } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
-import {
-  calculateIOPSPrice,
-  calculateThroughputPrice,
-} from 'components/interfaces/DiskManagement/DiskManagement.utils'
-import { formatCurrency } from 'lib/helpers'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -73,9 +73,14 @@ const DeployNewReplicaPanel = ({
   const diskManagementV2 = useFlag('diskManagementV2')
 
   const { data } = useReadReplicasQuery({ projectRef })
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery()
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
+
+  const hasOverdueInvoices =
+    (allOverdueInvoices ?? []).filter((x) => x.organization_id === project?.organization_id)
+      .length > 0
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
@@ -172,7 +177,8 @@ const DeployNewReplicaPanel = ({
     isAWSProvider &&
     !isFreePlan &&
     isWalgEnabled &&
-    currentComputeAddon !== undefined
+    currentComputeAddon !== undefined &&
+    !hasOverdueInvoices
 
   const computeAddons =
     addons?.available_addons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
@@ -216,7 +222,22 @@ const DeployNewReplicaPanel = ({
       confirmText="Deploy replica"
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-4">
-        {!isAWSProvider ? (
+        {hasOverdueInvoices ? (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>Your organization has overdue invoices</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <span>
+                Please resolve all outstanding invoices first before deploying a new read replica
+              </span>
+              <div className="mt-3">
+                <Button asChild type="default">
+                  <Link href={`/org/${org?.slug}/invoices`}>View invoices</Link>
+                </Button>
+              </div>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        ) : !isAWSProvider ? (
           <Alert_Shadcn_>
             <WarningIcon />
             <AlertTitle_Shadcn_>
