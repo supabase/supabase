@@ -27,6 +27,7 @@ export async function getWorkflowRunLogs(
     signal,
   })
   if (error) handleError(error)
+  console.log('data:', data)
   return data
 }
 
