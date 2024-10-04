@@ -7,6 +7,7 @@ import dayjs from 'dayjs'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import {
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -73,7 +74,9 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
 
         <DialogSectionSeparator />
 
-        <DialogSection className="px-0 py-0 pt-2">
+        <DialogSection
+          className={cn('px-0', selectedWorkflowRunId === undefined ? 'py-2' : 'py-0 pt-2')}
+        >
           {selectedWorkflowRunId === undefined ? (
             <>
               {isWorkflowRunsLoading && <GenericSkeletonLoader />}
