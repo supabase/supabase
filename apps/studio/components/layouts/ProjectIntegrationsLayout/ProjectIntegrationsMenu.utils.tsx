@@ -6,13 +6,15 @@ export const generateProjectIntegrationsMenu = (
   flags?: {
     pgNetExtensionExists: boolean
     cronUiEnabled: boolean
+    graphqlExtensionExists: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists, cronUiEnabled } = flags || {}
+  const { pgNetExtensionExists, cronUiEnabled, graphqlExtensionExists } = flags || {}
 
   return [
     {
+      title: 'Manage',
       items: [
         ...(!!pgNetExtensionExists
           ? [
@@ -40,18 +42,28 @@ export const generateProjectIntegrationsMenu = (
               },
             ]
           : []),
-        {
-          name: 'GraphiQL',
-          key: 'graphiql',
-          url: `/project/${ref}/integrations/graphiql`,
-          items: [],
-        },
+        ...(!!graphqlExtensionExists
+          ? [
+              {
+                name: 'GraphiQL',
+                key: 'graphiql',
+                url: `/project/${ref}/integrations/graphiql`,
+                items: [],
+              },
+            ]
+          : []),
         {
           name: 'Vault',
           key: 'vault',
           url: `/project/${ref}/integrations/vault/secrets`,
           items: [],
           label: 'BETA',
+        },
+        {
+          name: 'API Docs',
+          key: 'vault',
+          url: `/project/${ref}/integrations/vault/secrets`,
+          items: [],
         },
       ],
     },

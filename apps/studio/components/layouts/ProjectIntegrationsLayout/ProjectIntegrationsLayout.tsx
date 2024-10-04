@@ -24,8 +24,9 @@ const ProjectIntegrationsMenu = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
+  console.log({ data })
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
+  const graphqlExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_graphql') !== undefined
 
   return (
     <>
@@ -34,6 +35,7 @@ const ProjectIntegrationsMenu = () => {
         menu={generateProjectIntegrationsMenu(project, {
           pgNetExtensionExists,
           cronUiEnabled,
+          graphqlExtensionExists,
         })}
       />
     </>

@@ -111,12 +111,6 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
 
   return [
     {
-      key: 'integrations',
-      label: 'Integrations',
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/hooks`),
-    },
-    {
       key: 'advisors',
       label: 'Advisors',
       icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
@@ -143,6 +137,12 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       label: 'API Docs',
       icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
+    },
+    {
+      key: 'integrations',
+      label: 'Integrations',
+      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/hooks`),
     },
   ]
 }
