@@ -44,7 +44,6 @@ const AuthSettings: NextPageWithLayout = () => {
             <SecretAPIKeys />
             <LegacyAPIKeys /> */}
             <JWTSecretKeysTablev2 />
-            <hr />
             {/* <JWTSecretKeysTable /> */}
           </>
         )}

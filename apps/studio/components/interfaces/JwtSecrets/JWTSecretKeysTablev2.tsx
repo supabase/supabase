@@ -34,6 +34,8 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogDescription,
+  DialogSectionSeparator,
+  DialogSection,
 } from 'ui/src/components/shadcn/ui/dialog'
 import {
   Select,
@@ -57,10 +59,16 @@ import {
   ArrowRight,
   CirclePower,
   Timer,
+  Book,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AlgorithmHoverCard } from './AlgorithmHoverCard'
 import { cn } from 'ui'
+import {
+  StandbyKeyIllustration,
+  WhyRotateKeysIllustration,
+  WhyUseStandbyKeysIllustration,
+} from './illustrations'
 
 type KeyStatus = 'IN_USE' | 'STANDBY' | 'PREVIOUSLY_USED' | 'REVOKED'
 type JWTAlgorithm = 'HS256' | 'RS256' | 'ES256'
@@ -169,7 +177,7 @@ export default function JWTSecretKeysTablev2() {
   const [showConfirmRotateDialog, setShowConfirmRotateDialog] = useState(false)
   const [showEditStandbyKeyDialog, setShowEditStandbyKeyDialog] = useState(false)
   const [showKeyDetailsDialog, setShowKeyDetailsDialog] = useState(false)
-  const [newKeyAlgorithm, setNewKeyAlgorithm] = useState<JWTAlgorithm>('ES256')
+  const [newKeyAlgorithm, setNewKeyAlgorithm] = useState<JWTAlgorithm>('RS256')
   const [newKeyDescription, setNewKeyDescription] = useState('')
   const [customSigningKey, setCustomSigningKey] = useState('')
   const [formError, setFormError] = useState('')
@@ -435,10 +443,8 @@ NEW_KEY_CONTENT
     description: string
     buttonLabel: React.ComponentProps<typeof Button>['children']
     onClick: React.ComponentProps<typeof Button>['onClick']
-
     loading: React.ComponentProps<typeof Button>['loading']
     icon?: React.ComponentProps<typeof Button>['icon']
-
     type?: React.ComponentProps<typeof Button>['type']
   }
 
@@ -446,16 +452,16 @@ NEW_KEY_CONTENT
     ({ title, description, buttonLabel, onClick, loading, icon, type, ...props }, ref) => {
       return (
         <Card
-          className="bg-surface-100 first:rounded-b-none last:rounded-t-none shadow-none"
+          className="bg-surface-100 first:rounded-b-none last:rounded-t-none shadow-none only:rounded-lg"
           ref={ref}
           {...props}
         >
-          <CardHeader className="lg:flex-row lg:items-center">
+          <CardHeader className="lg:flex-row lg:items-center gap-3 lg:gap-10">
             <div className="flex flex-col gap-1 flex-1 grow">
               <CardTitle>{title}</CardTitle>
               <CardDescription className="max-w-xl">{description}</CardDescription>
             </div>
-            <div className="flex justify-end flex-">
+            <div className="flex lg:justify-end flex-">
               <Button onClick={onClick} loading={loading} icon={icon} type={type}>
                 {buttonLabel}
               </Button>
@@ -564,12 +570,57 @@ NEW_KEY_CONTENT
         </Card>
       </div> */}
 
+      <Separator />
+
+      <div>
+        <h2 className="text-xl mb-4">Resources</h2>
+
+        <div className="flex flex-col lg:flex-row gap-6">
+          <Card className="bg-surface-75 overflow-hidden">
+            <div className="flex">
+              <div className="bg-surface-200 px-0 flex items-center justify-center w-[180px]">
+                <WhyRotateKeysIllustration />
+              </div>
+              <div className="flex-1 pl-8 border-l h-full py-6 px-5">
+                <h4 className="text-sm">Why Rotate keys?</h4>
+                <p className="text-xs text-foreground-light mb-4 max-w-xs">
+                  Create Standby keys ahead of time which can then be promoted to 'In use' at any
+                  time.
+                </p>
+                <Button type="outline" icon={<Book />}>
+                  View guide
+                </Button>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="bg-surface-75 overflow-hidden">
+            <div className="flex">
+              <div className="bg-surface-200 px-0 flex items-center justify-center w-[180px]">
+                <WhyUseStandbyKeysIllustration />
+              </div>
+              <div className="flex-1 pl-8 border-l h-full py-6 px-5">
+                <h4 className="text-sm">Why use a Standby key?</h4>
+                <p className="text-xs text-foreground-light mb-4 max-w-xs">
+                  Create Standby keys ahead of time which can then be promoted to 'In use' at any
+                  time.
+                </p>
+                <Button type="outline" icon={<Book />}>
+                  View guide
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+
       <Dialog open={showCreateKeyDialog} onOpenChange={setShowCreateKeyDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Create a new Standby Key</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <DialogSectionSeparator />
+          <DialogSection className="space-y-4">
             <div>
               <Label htmlFor="algorithm">Choose the key type to use:</Label>
               <Select
@@ -609,7 +660,7 @@ NEW_KEY_CONTENT
               />
             </div>
             {formError && <p className="text-sm text-red-500">{formError}</p>}
-          </div>
+          </DialogSection>
           <DialogFooter>
             <Button onClick={() => addNewStandbyKey()} disabled={actionInProgress === 'new'}>
               {actionInProgress === 'new' ? (
@@ -624,6 +675,7 @@ NEW_KEY_CONTENT
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
       <Dialog open={showRotateKeyDialog} onOpenChange={setShowRotateKeyDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -634,28 +686,32 @@ NEW_KEY_CONTENT
                 : 'Choose the algorithm for the new key:'}
             </DialogDescription>
           </DialogHeader>
-          {!standbyKey && (
-            <div className="space-y-4">
-              <Select
-                value={newKeyAlgorithm}
-                onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
-              >
-                <SelectTrigger id="rotateAlgorithm">
-                  <SelectValue placeholder="Select algorithm" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="HS256">HS256 (Symmetric)</SelectItem>
-                  <SelectItem value="RS256">RS256 (RSA)</SelectItem>
-                  <SelectItem value="ES256">ES256 (ECC)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          <DialogSectionSeparator />
+          <DialogSection>
+            {!standbyKey && (
+              <div className="space-y-4">
+                <Select
+                  value={newKeyAlgorithm}
+                  onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
+                >
+                  <SelectTrigger id="rotateAlgorithm">
+                    <SelectValue placeholder="Select algorithm" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="RS256">RS256 (RSA)</SelectItem>
+                    <SelectItem value="ES256">ES256 (ECC)</SelectItem>
+                    <SelectItem value="HS256">HS256 (Symmetric)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </DialogSection>
           <DialogFooter>
             <Button onClick={() => setShowConfirmRotateDialog(true)}>Review Rotation</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
       <Dialog open={showEditStandbyKeyDialog} onOpenChange={setShowEditStandbyKeyDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
