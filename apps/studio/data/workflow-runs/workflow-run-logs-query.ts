@@ -23,7 +23,7 @@ export async function getWorkflowRunLogs(
     signal,
   })
   if (error) handleError(error)
-  return data.split('\n').filter(Boolean)
+  return data
 }
 
 export type WorkflowRunLogsData = Awaited<ReturnType<typeof getWorkflowRunLogs>>
@@ -39,5 +39,5 @@ export const useWorkflowRunLogsQuery = <TData = WorkflowRunLogsData>(
   useQuery<WorkflowRunLogsData, WorkflowRunLogsError, TData>(
     workflowRunKeys.list(workflowRunId),
     ({ signal }) => getWorkflowRunLogs({ workflowRunId }, signal),
-    { enabled: enabled && typeof workflowRunId !== 'undefined', ...options }
+    { enabled: enabled && typeof workflowRunId !== 'undefined', staleTime: 0, ...options }
   )

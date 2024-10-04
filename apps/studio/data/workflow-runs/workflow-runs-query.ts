@@ -33,5 +33,5 @@ export const useWorkflowRunsQuery = <TData = WorkflowRunsData>(
   useQuery<WorkflowRunsData, WorkflowRunsError, TData>(
     workflowRunKeys.list(projectRef),
     ({ signal }) => getWorkflowRuns({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )

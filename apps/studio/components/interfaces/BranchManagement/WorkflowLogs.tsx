@@ -99,13 +99,7 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
             <>
               {isWorkflowRunLogsLoading && <GenericSkeletonLoader />}
               {isWorkflowRunLogsError && <AlertError error={workflowRunLogsError} />}
-              {isWorkflowRunLogsSuccess && (
-                <pre>
-                  {workflowRunLogs.map((log, index) => (
-                    <div key={index}>{log}</div>
-                  ))}
-                </pre>
-              )}
+              {isWorkflowRunLogsSuccess && <pre>{workflowRunLogs}</pre>}
             </>
           )}
         </DialogSection>
