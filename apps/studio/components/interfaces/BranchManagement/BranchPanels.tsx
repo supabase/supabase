@@ -118,7 +118,7 @@ export const BranchRow = ({
   const branchingWorkflowLogsEnabled = useFlag('branchingWorkflowLogs')
 
   const shouldRenderGitHubLogsButton =
-    branchingWorkflowLogsEnabled &&
+    !branchingWorkflowLogsEnabled &&
     branch.pr_number !== undefined &&
     branch.latest_check_run_id !== undefined
   const checkRunLogsURL = `https://github.com/${repo}/pull/${branch.pr_number}/checks?check_run_id=${branch.latest_check_run_id}`
