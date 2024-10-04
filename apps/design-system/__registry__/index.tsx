@@ -1820,6 +1820,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "multi-select-combobox-demo": {
+      name: "multi-select-combobox-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-combobox-demo")),
+      source: "",
+      files: ["registry/default/example/multi-select-combobox-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "tree-view-demo": {
       name: "tree-view-demo",
       type: "components:example",

@@ -9,12 +9,12 @@ import React, {
   useState,
   PropsWithChildren,
 } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { ChevronsUpDown } from 'lucide-react'
 
 import {
   Command,
-  CommandItem,
   CommandEmpty,
+  CommandItem,
   CommandList,
 } from 'ui/src/components/shadcn/ui/command'
 import {
@@ -25,21 +25,28 @@ import {
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
+import { max } from 'lodash'
 
 interface MultiSelectContextProps {
   selected: string[]
   handleSelect: (value: string) => void
   open: boolean
   setOpen: (open: boolean) => void
-  handleKeyDown: (event: React.KeyboardEvent) => void
+  handleKeyDown?: (event: React.KeyboardEvent) => void
+  itemRefs?: (HTMLElement | null)[]
+  // focusedIndex: number
+  // setFocusedIndex: React.Dispatch<React.SetStateAction<number>>
 }
 
 const MultiSelectContext = createContext<MultiSelectContextProps>({
   selected: [],
   handleSelect: () => {},
   open: false,
-  setOpen: () => {},
+  setOpen: () => false,
   handleKeyDown: () => {},
+  itemRefs: [],
+  // focusedIndex: -1,
+  // setFocusedIndex: () => -1,
 })
 
 function MultiSelectProvider({
@@ -52,10 +59,12 @@ function MultiSelectProvider({
 }: PropsWithChildren<{
   selected: string[]
   onSelectedChange: (selected: string[] | ((selected: string[]) => string[])) => void
-  handleKeyDown: (event: React.KeyboardEvent) => void
+  handleKeyDown?: (event: React.KeyboardEvent) => void
   open: boolean
   setOpen: (open: boolean) => void
 }>) {
+  // const [focusedIndex, setFocusedIndex] = React.useState(-1)
+
   const handleSelect = useCallback(
     (value: string) => {
       onSelectedChange((values: string[]) => {
@@ -71,7 +80,17 @@ function MultiSelectProvider({
   )
 
   return (
-    <MultiSelectContext.Provider value={{ selected, handleSelect, open, setOpen, handleKeyDown }}>
+    <MultiSelectContext.Provider
+      value={{
+        selected,
+        handleSelect,
+        open,
+        setOpen,
+        handleKeyDown,
+        // focusedIndex,
+        // setFocusedIndex,
+      }}
+    >
       {children}
     </MultiSelectContext.Provider>
   )
@@ -100,47 +119,9 @@ function MultiSelector({
     onSelectedChange: (selected: string[] | ((selected: string[]) => string[])) => void
   } & React.ComponentProps<typeof Popover>
 >) {
-  const [focusedIndex, setFocusedIndex] = React.useState(-1)
   const [_internalOpen, _setInternalOpen] = useState(false)
   const open = _controlledOpen ?? _internalOpen
   const setOpen = _setControlledOpen ?? _setInternalOpen
-
-  const handleSelect = React.useCallback((value: string) => {
-    onSelectedChange((values: string[]) => {
-      const isSelected = values.some((currentVal: string) => currentVal === value)
-      if (isSelected) {
-        return values.filter((currentVal: string) => currentVal !== value)
-      } else {
-        return [...values, value]
-      }
-    })
-  }, [])
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault()
-        setFocusedIndex((prevIndex) =>
-          prevIndex < selected.length - 1 ? prevIndex + 1 : prevIndex
-        )
-        break
-      case 'ArrowUp':
-        event.preventDefault()
-        setFocusedIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : 0))
-        break
-      case 'Enter':
-      case ' ':
-        event.preventDefault()
-        if (focusedIndex !== -1) {
-          handleSelect(selected[focusedIndex])
-        }
-        break
-      case 'Escape':
-        setOpen(false)
-        // inputRef.current?.focus()
-        break
-    }
-  }
 
   return (
     <MultiSelectProvider
@@ -148,7 +129,7 @@ function MultiSelector({
       onSelectedChange={onSelectedChange}
       open={open}
       setOpen={setOpen}
-      handleKeyDown={handleKeyDown}
+      // handleKeyDown={handleKeyDown}
     >
       <Popover open={open} onOpenChange={setOpen} {...props}>
         {children}
@@ -173,32 +154,9 @@ const MultiSelectorTrigger = forwardRef<
     const calculateVisibleBadges = () => {
       if (!inputRef.current || !badgesRef.current) return
 
-      const inputWidth = inputRef.current.offsetWidth
-      const badgesContainer = badgesRef.current
-      const badges = Array.from(badgesContainer.children) as HTMLElement[]
-
-      let totalWidth = 0
-      let visibleCount = 0
-
-      // Subtract 100px: 60px for chevron and padding, 40px for extraBadgesCount growth
-      const availableWidth = inputWidth - 100
-
-      for (let i = 0; i < selected.length; i++) {
-        if (i < badges.length) {
-          totalWidth += badges[i].offsetWidth + 4 // 4px for gap
-        } else {
-          // Estimate width for badges not yet rendered
-          totalWidth += 100 // Approximate width of a badge
-        }
-
-        if (totalWidth > availableWidth) {
-          break
-        }
-        visibleCount++
-      }
-
-      setVisibleBadges(selected.slice(0, visibleCount))
-      setExtraBadgesCount(Math.max(0, selected.length - visibleCount))
+      let maxVisibleBadges = 1
+      setVisibleBadges(selected.slice(0, maxVisibleBadges))
+      setExtraBadgesCount(Math.max(0, selected.length - maxVisibleBadges))
     }
 
     calculateVisibleBadges()
@@ -228,7 +186,6 @@ const MultiSelectorTrigger = forwardRef<
         {...props}
       >
         {selected.length === 0 ? (
-          // Leading prevents shift when switching to badges
           <span className="text-foreground-muted leading-[1.375rem]">{label}</span>
         ) : (
           <div ref={badgesRef} className="flex gap-1 overflow-hidden">
@@ -240,7 +197,7 @@ const MultiSelectorTrigger = forwardRef<
             {extraBadgesCount > 0 && <Badge className={badgeClasses}>+{extraBadgesCount}</Badge>}
           </div>
         )}
-        <ChevronDown size={16} strokeWidth={2} className="text-foreground-lighter shrink-0" />
+        <ChevronsUpDown size={16} strokeWidth={2} className="text-foreground-lighter shrink-0" />
       </button>
     </PopoverTrigger>
   )
@@ -261,11 +218,11 @@ const MultiSelectorContent = forwardRef<
   return (
     <PopoverContent
       ref={ref}
-      className={cn('w-full px-1 py-1.5 space-y-1', className)}
+      className={cn('w-full p-0 border-none', className)}
       onKeyDown={handleKeyDown}
       {...props}
     >
-      {children}
+      <Command>{children}</Command>
     </PopoverContent>
   )
 })
@@ -295,37 +252,24 @@ const MultiSelectorList = forwardRef<
 MultiSelectorList.displayName = 'MultiSelectorList'
 
 const MultiSelectorItem = forwardRef<
-  HTMLButtonElement,
+  HTMLDivElement,
   { value: string } & React.ComponentPropsWithoutRef<typeof CommandItem>
 >(({ className, value, children }, ref) => {
   const id = useId()
   const { selected, handleSelect, open } = useMultiSelect()
-
   const isSelected = selected.some((item) => item === value)
 
-  const mousePreventDefault = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }, [])
-
   return (
-    <button
+    <CommandItem
       ref={ref}
       tabIndex={open ? 0 : -1}
       role="option"
       aria-selected={isSelected}
-      onClick={() => handleSelect(value)}
-      onMouseDown={mousePreventDefault}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          handleSelect(value)
-        }
-      }}
+      onSelect={() => handleSelect(value)}
       className={cn(
         'relative',
         'text-foreground-lighter text-left pointer-events-auto',
-        'px-2 py-1.5 rounded-md',
+        'px-2 py-1.5 rounded',
         'hover:text-foreground hover:!bg-overlay-hover',
         'w-full flex items-center space-x-2',
         'peer-data-[selected=true]:bg-overlay-hover peer-data-[selected=true]:text-strong',
@@ -335,7 +279,6 @@ const MultiSelectorItem = forwardRef<
       <Checkbox
         id={`${id}-checkbox-${value}`}
         checked={isSelected}
-        // onCheckedChange={() => handleSelect(value)}
         tabIndex={-1}
         className="pointer-events-none"
       />
@@ -346,7 +289,7 @@ const MultiSelectorItem = forwardRef<
       >
         {children}
       </label>
-    </button>
+    </CommandItem>
   )
 })
 

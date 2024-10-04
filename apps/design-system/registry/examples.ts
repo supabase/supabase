@@ -1046,6 +1046,11 @@ export const examples: Registry = [
     files: ['example/multi-select-2-demo.tsx'],
   },
   {
+    name: 'multi-select-combobox-demo',
+    type: 'components:example',
+    files: ['example/multi-select-combobox-demo.tsx'],
+  },
+  {
     name: 'tree-view-demo',
     type: 'components:example',
     files: ['example/tree-view-demo.tsx'],

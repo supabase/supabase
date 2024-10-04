@@ -7,7 +7,7 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select-2'
 
-export default function MultiSelectDemo() {
+export default function MultiSelectControlledDemo() {
   const [selected, _setSelected] = useState<string[]>([])
   const [open, setOpen] = useState(false)
 

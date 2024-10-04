@@ -117,6 +117,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/multi-select-2',
           items: [],
         },
+        {
+          title: 'Multi Select Combobox',
+          href: '/docs/fragments/multi-select-combobox',
+          items: [],
+        },
       ],
     },
     {
