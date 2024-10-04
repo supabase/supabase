@@ -64,7 +64,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   const userMember = allMembers.find((m) => m.primary_email === profile?.primary_email)
   const orgScopedRoleIds = (roles?.org_scoped_roles ?? []).map((r) => r.id)
-  const isOrgScopedRole = false // orgScopedRoleIds.includes(userMember?.role_ids?.[0] ?? -1)
+  const isOrgScopedRole = orgScopedRoleIds.includes(userMember?.role_ids?.[0] ?? -1)
 
   return (
     <>
@@ -117,16 +117,16 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                           <Admonition
                             type="note"
                             title="You are currently assigned with project scoped roles in this organization"
-                            description="All ther members within the organization will not be visible to you"
+                            description="All the members within the organization will not be visible to you"
                             className="m-0 bg-alternative border-0 rounded-none"
                           />
                         </Table.td>
                       </Table.tr>,
                     ]
                   : []),
-                ...filteredMembers
-                  .slice(1)
-                  .map((member) => <MemberRow key={member.gotrue_id} member={member} />),
+                ...filteredMembers.map((member) => (
+                  <MemberRow key={member.gotrue_id} member={member} />
+                )),
                 ...(searchString.length > 0 && filteredMembers.length === 0
                   ? [
                       <Table.tr key="no-results" className="bg-panel-secondary-light">
