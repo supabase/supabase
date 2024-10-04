@@ -11,16 +11,16 @@ export default function MultiSelectDemo() {
   const [selectedValues, setSelectedValues] = useState<string[]>([])
 
   const fruits = [
-    { name: 'Apple', value: 'Apple' },
-    { name: 'Banana', value: 'Banana' },
-    { name: 'Cherry', value: 'Cherry' },
-    { name: 'Date', value: 'Date' },
-    { name: 'Elderberrie', value: 'Elderberrie' },
-    { name: 'Fig', value: 'Fig' },
-    { name: 'Grape', value: 'Grape' },
-    { name: 'Kiwi', value: 'Kiwi' },
-    { name: 'Mango', value: 'Mango' },
-    { name: 'Strawberry', value: 'Strawberry' },
+    'Apple',
+    'Banana',
+    'Cherry',
+    'Date',
+    'Elderberrie',
+    'Fig',
+    'Grape',
+    'Kiwi',
+    'Mango',
+    'Strawberry',
   ]
 
   return (
@@ -29,8 +29,8 @@ export default function MultiSelectDemo() {
       <MultiSelectorContent sameWidthAsTrigger>
         <MultiSelectorList>
           {fruits.map((fruit) => (
-            <MultiSelectorItem key={fruit.value} value={fruit.value}>
-              {fruit.name}
+            <MultiSelectorItem key={fruit} value={fruit}>
+              {fruit}
             </MultiSelectorItem>
           ))}
         </MultiSelectorList>

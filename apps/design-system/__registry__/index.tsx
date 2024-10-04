@@ -1820,6 +1820,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "multi-select-2-badge-limit-auto": {
+      name: "multi-select-2-badge-limit-auto",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-2-badge-limit-auto")),
+      source: "",
+      files: ["registry/default/example/multi-select-2-badge-limit-auto.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-2-badge-limit-wrap": {
+      name: "multi-select-2-badge-limit-wrap",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-2-badge-limit-wrap")),
+      source: "",
+      files: ["registry/default/example/multi-select-2-badge-limit-wrap.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "multi-select-2-badge-limit": {
       name: "multi-select-2-badge-limit",
       type: "components:example",

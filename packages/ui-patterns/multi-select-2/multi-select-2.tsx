@@ -112,68 +112,120 @@ const MultiSelectorTrigger = React.forwardRef<
   {
     label?: string
     className?: string
-    badgeLimit?: number
+    badgeLimit?: number | 'auto' | 'wrap'
     deletableBadge?: boolean
+    showIcon?: boolean
   } & React.ComponentProps<typeof PopoverTrigger>
->(({ label, className, deletableBadge = false, badgeLimit = 9999, ...props }, ref) => {
-  const { values, toggleValue } = useMultiSelect()
+>(
+  (
+    { label, className, deletableBadge = false, badgeLimit = 9999, showIcon = true, ...props },
+    ref
+  ) => {
+    const { values, toggleValue } = useMultiSelect()
 
-  const inputRef = React.useRef<HTMLButtonElement>(null)
-  const badgesRef = React.useRef<HTMLDivElement>(null)
+    const inputRef = React.useRef<HTMLButtonElement>(null)
+    const badgesRef = React.useRef<HTMLDivElement>(null)
 
-  const [visibleBadges, setVisibleBadges] = React.useState<string[]>([])
-  const [extraBadgesCount, setExtraBadgesCount] = React.useState(0)
+    const [visibleBadges, setVisibleBadges] = React.useState<string[]>([])
+    const [extraBadgesCount, setExtraBadgesCount] = React.useState(0)
 
-  React.useEffect(() => {
-    if (!inputRef.current || !badgesRef.current) return
+    const calculateVisibleBadges = () => {
+      if (!inputRef.current || !badgesRef.current) return
+      const inputWidth = inputRef.current.offsetWidth
+      const badgesContainer = badgesRef.current
+      const badges = Array.from(badgesContainer.children) as HTMLElement[]
+      let totalWidth = 0
+      let visibleCount = 0
 
-    setVisibleBadges(values.slice(0, badgeLimit))
-    setExtraBadgesCount(Math.max(0, values.length - badgeLimit))
-  }, [values])
+      const availableWidth = inputWidth - (showIcon ? 40 : 80)
+      for (let i = 0; i < values.length; i++) {
+        if (i < badges.length) {
+          totalWidth += badges[i].offsetWidth + 8 // 8px for gap
+        } else {
+          // Estimate width for badges not yet rendered
+          totalWidth += 0 // Approximate width of a badge
+        }
+        if (totalWidth > availableWidth) {
+          break
+        }
+        visibleCount++
+      }
+      setVisibleBadges(values.slice(0, visibleCount))
+      setExtraBadgesCount(Math.max(0, values.length - visibleCount))
+    }
 
-  const badgeClasses = 'rounded'
+    React.useEffect(() => {
+      if (!inputRef.current || !badgesRef.current) return
 
-  return (
-    <PopoverTrigger asChild ref={ref}>
-      <button
-        ref={inputRef}
-        role="combobox"
-        className={cn(
-          'flex w-full min-w-[200px] items-center justify-between rounded-md border',
-          'border-alternative bg-foreground/[.026] px-3 py-2 text-sm',
-          'ring-offset-background placeholder:text-muted-foreground',
-          'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-          'hover:border-primary transition-colors duration-200',
-          className
-        )}
-        {...props}
-      >
-        {values.length === 0 ? (
-          <span className="text-foreground-muted leading-[1.375rem]">{label}</span>
-        ) : (
-          <div ref={badgesRef} className="flex gap-1 -ml-1 overflow-hidden">
-            {visibleBadges.map((value) => (
-              <Badge key={value} className={cn('shrink-0', badgeClasses)}>
-                {value}
-                {deletableBadge && (
-                  <button
-                    onClick={() => toggleValue(value)}
-                    className="ml-1 text-foreground-lighter hover:text-foreground-light transition-colors"
-                  >
-                    <RemoveIcon size={12} />
-                  </button>
-                )}
-              </Badge>
-            ))}
-            {extraBadgesCount > 0 && <Badge className={badgeClasses}>+{extraBadgesCount}</Badge>}
-          </div>
-        )}
-        <ChevronsUpDown size={16} strokeWidth={2} className="text-foreground-lighter shrink-0" />
-      </button>
-    </PopoverTrigger>
-  )
-})
+      if (badgeLimit === 'auto') {
+        calculateVisibleBadges()
+        window.addEventListener('resize', calculateVisibleBadges)
+        return () => window.removeEventListener('resize', calculateVisibleBadges)
+      } else if (badgeLimit === 'wrap') {
+        setVisibleBadges(values)
+        setExtraBadgesCount(0)
+      } else {
+        setVisibleBadges(values.slice(0, badgeLimit))
+        setExtraBadgesCount(Math.max(0, values.length - badgeLimit))
+      }
+    }, [values, badgeLimit])
+
+    const badgeClasses = 'rounded'
+
+    return (
+      <PopoverTrigger asChild ref={ref}>
+        <button
+          ref={inputRef}
+          role="combobox"
+          className={cn(
+            'flex w-full min-w-[200px] items-center justify-between rounded-md border',
+            'border-alternative bg-foreground/[.026] px-3 py-2 text-sm',
+            'ring-offset-background placeholder:text-muted-foreground',
+            'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+            'disabled:cursor-not-allowed disabled:opacity-50',
+            'hover:border-primary transition-colors duration-200',
+            className
+          )}
+          {...props}
+        >
+          {values.length === 0 ? (
+            <span className="text-foreground-muted leading-[1.375rem]">{label}</span>
+          ) : (
+            <div
+              ref={badgesRef}
+              className={cn(
+                'flex gap-1 -ml-1 overflow-hidden',
+                badgeLimit === 'wrap' && 'flex-wrap'
+              )}
+            >
+              {visibleBadges.map((value) => (
+                <Badge key={value} className={cn('shrink-0', badgeClasses)}>
+                  {value}
+                  {deletableBadge && (
+                    <button
+                      onClick={() => toggleValue(value)}
+                      className="ml-1 text-foreground-lighter hover:text-foreground-light transition-colors"
+                    >
+                      <RemoveIcon size={12} />
+                    </button>
+                  )}
+                </Badge>
+              ))}
+              {extraBadgesCount > 0 && <Badge className={badgeClasses}>+{extraBadgesCount}</Badge>}
+            </div>
+          )}
+          {showIcon && (
+            <ChevronsUpDown
+              size={16}
+              strokeWidth={2}
+              className="text-foreground-lighter shrink-0"
+            />
+          )}
+        </button>
+      </PopoverTrigger>
+    )
+  }
+)
 
 MultiSelectorTrigger.displayName = 'MultiSelectorTrigger'
 

@@ -5,38 +5,54 @@ component: true
 fragment: true
 ---
 
-<ComponentPreview name="multi-select-demo" description="" peekCode wide />
+<ComponentPreview name="multi-select-2-demo" description="" peekCode wide />
 
 ## Usage
 
 ```tsx
 import {
   MultiSelector,
-  MultiSelectorContent,
-  MultiSelectorInput,
-  MultiSelectorItem,
-  MultiSelectorList,
   MultiSelectorTrigger,
-} from 'ui-patterns/multi-select'
+  MultiSelectorContent,
+  MultiSelectorItem,
+} from 'ui-patterns/multi-select-2'
 ```
 
 ```tsx
-<MultiSelector values={value} onValuesChange={setValue}>
-  <MultiSelectorTrigger>
-    <MultiSelectorInput placeholder="Select items" />
-  </MultiSelectorTrigger>
-  <MultiSelectorContent>
-    <MultiSelectorList>
-      <MultiSelectorItem value="1">Item 1</MultiSelectorItem>
-      <MultiSelectorItem value="2">Item 2</MultiSelectorItem>
-      <MultiSelectorItem value="3">Item 3</MultiSelectorItem>
-    </MultiSelectorList>
+<MultiSelector
+  open={open}
+  onOpenChange={setOpen}
+  selected={selected}
+  onSelectedChange={onSelectedChange}
+>
+  <MultiSelectorTrigger className="w-72" label="Fruits" />
+  <MultiSelectorContent sameWidthAsTrigger>
+    <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
+    <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>
+    <MultiSelectorItem value="Grape">Grape</MultiSelectorItem>
+    <MultiSelectorItem value="Strawberry">Strawberry</MultiSelectorItem>
   </MultiSelectorContent>
 </MultiSelector>
 ```
 
 ## Examples
 
-### Form
+### Badge Combo Box
 
-<ComponentPreview name="multi-select-form" />
+<ComponentPreview name="multi-select-2-combobox" />
+
+### Badge Limit
+
+<ComponentPreview name="multi-select-2-badge-limit" />
+
+### Badge Limit="auto"
+
+<ComponentPreview name="multi-select-2-badge-limit-auto" />
+
+### Badge Limit="wrap"
+
+<ComponentPreview name="multi-select-2-badge-limit-wrap" />
+
+### Deletable Badge
+
+<ComponentPreview name="multi-select-2-deletable-badge" />

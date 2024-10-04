@@ -1046,6 +1046,16 @@ export const examples: Registry = [
     files: ['example/multi-select-2-demo.tsx'],
   },
   {
+    name: 'multi-select-2-badge-limit-auto',
+    type: 'components:example',
+    files: ['example/multi-select-2-badge-limit-auto.tsx'],
+  },
+  {
+    name: 'multi-select-2-badge-limit-wrap',
+    type: 'components:example',
+    files: ['example/multi-select-2-badge-limit-wrap.tsx'],
+  },
+  {
     name: 'multi-select-2-badge-limit',
     type: 'components:example',
     files: ['example/multi-select-2-badge-limit.tsx'],
