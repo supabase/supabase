@@ -79,7 +79,7 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
         >
           {selectedWorkflowRunId === undefined ? (
             <>
-              {isWorkflowRunsLoading && <GenericSkeletonLoader />}
+              {isWorkflowRunsLoading && <GenericSkeletonLoader className="py-2 px-5" />}
               {isWorkflowRunsError && <AlertError error={workflowRunsError} />}
               {isWorkflowRunsSuccess &&
                 (workflowRuns.length > 0 ? (
@@ -108,7 +108,7 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
             </>
           ) : (
             <>
-              {isWorkflowRunLogsLoading && <GenericSkeletonLoader />}
+              {isWorkflowRunLogsLoading && <GenericSkeletonLoader className="py-2 px-5" />}
               {isWorkflowRunLogsError && <AlertError error={workflowRunLogsError} />}
               {isWorkflowRunLogsSuccess && (
                 <div className="flex flex-col gap-2">
