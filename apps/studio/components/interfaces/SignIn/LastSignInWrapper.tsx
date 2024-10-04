@@ -1,6 +1,7 @@
 import { LastSignInType, useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { ReactNode } from 'react'
-import { Badge, cn } from 'ui'
+import { Badge, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Info } from 'lucide-react'
 
 export function LastSignInWrapper({
   children,
@@ -14,9 +15,14 @@ export function LastSignInWrapper({
   return (
     <div className="flex items-center relative">
       {lastSignIn === type && (
-        <Badge variant="default" className="absolute -right-[84px]">
-          Last used
-        </Badge>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild className="absolute -right-8">
+            <div className="p-2 flex">
+              <span className="w-2.5 h-2.5 bg-brand rounded-full animate-pulse" />
+            </div>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_>Last used</TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
       )}
       <div
         className={cn('w-full', {
