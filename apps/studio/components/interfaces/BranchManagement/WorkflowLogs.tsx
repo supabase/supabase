@@ -3,6 +3,8 @@ import { useState } from 'react'
 import AlertError from 'components/ui/AlertError'
 import { useWorkflowRunLogsQuery } from 'data/workflow-runs/workflow-run-logs-query'
 import { useWorkflowRunsQuery } from 'data/workflow-runs/workflow-runs-query'
+import dayjs from 'dayjs'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import {
   Button,
   Dialog,
@@ -15,6 +17,7 @@ import {
   DialogTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import BranchStatusBadge from './BranchStatusBadge'
 
 interface WorkflowLogsProps {
   projectRef: string
@@ -70,21 +73,26 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
 
         <DialogSectionSeparator />
 
-        <DialogSection>
+        <DialogSection className="px-0 py-0 pt-2">
           {selectedWorkflowRunId === undefined ? (
             <>
               {isWorkflowRunsLoading && <GenericSkeletonLoader />}
               {isWorkflowRunsError && <AlertError error={workflowRunsError} />}
               {isWorkflowRunsSuccess &&
                 (workflowRuns.length > 0 ? (
-                  <ul>
+                  <ul className="divide-y">
                     {workflowRuns.map((workflowRun) => (
-                      <li key={workflowRun.id}>
+                      <li key={workflowRun.id} className="py-2 px-5">
                         <button
                           type="button"
                           onClick={() => setSelectedWorkflowRunId(workflowRun.id)}
+                          className="flex items-center gap-2 w-full justify-between"
                         >
-                          {workflowRun.id}
+                          <div className="flex items-center gap-4">
+                            <BranchStatusBadge status={workflowRun.status} />
+                            {dayjs(workflowRun.created_at).format('DD MMM, YYYY HH:mm')}
+                          </div>
+                          <ArrowRight size={16} />
                         </button>
                       </li>
                     ))}
@@ -99,7 +107,21 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
             <>
               {isWorkflowRunLogsLoading && <GenericSkeletonLoader />}
               {isWorkflowRunLogsError && <AlertError error={workflowRunLogsError} />}
-              {isWorkflowRunLogsSuccess && <pre>{workflowRunLogs}</pre>}
+              {isWorkflowRunLogsSuccess && (
+                <div className="flex flex-col gap-2">
+                  <Button
+                    onClick={() => setSelectedWorkflowRunId(undefined)}
+                    type="text"
+                    icon={<ArrowLeft />}
+                    className="self-start mx-2"
+                  >
+                    Back to workflow runs
+                  </Button>
+                  <pre className="whitespace-pre max-h-[500px] overflow-scroll px-5 pb-5">
+                    {workflowRunLogs}
+                  </pre>
+                </div>
+              )}
             </>
           )}
         </DialogSection>
