@@ -16,14 +16,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
-import {
-  Button,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-} from 'ui'
-import { toast } from 'sonner'
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
 const Home: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
@@ -61,9 +54,6 @@ const Home: NextPageWithLayout = () => {
           />
         </div>
         <div className="flex items-center gap-x-3">
-          <Button type="default" onClick={() => toast('Hello world')}>
-            Toast
-          </Button>
           {project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <SecurityStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
