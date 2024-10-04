@@ -15,7 +15,7 @@ const PageLayout: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
   } else {
     return (
-      <FormsContainer>
+      <FormsContainer className="w-full">
         <AuthProvidersForm />
       </FormsContainer>
     )

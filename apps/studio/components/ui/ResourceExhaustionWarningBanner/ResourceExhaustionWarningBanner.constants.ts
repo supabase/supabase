@@ -1,6 +1,9 @@
 const AFTER_26_09_2024 = Date.now() >= new Date('2024-09-26T00:00:00Z').getTime()
 
 interface ResourceWarningMessage {
+  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/auth')
+  restrictToRoutes?: string[]
+
   bannerContent: {
     warning: { title: string; description: string }
     critical: { title?: string; description?: string }
@@ -212,6 +215,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
     metric: null,
   },
   auth_restricted_email_sending: {
+    restrictToRoutes: ['/project/[ref]', '/project/[ref]/auth', '/project/[ref]/settings/auth'], // project home, auth, settings
     bannerContent: {
       warning: {
         title: AFTER_26_09_2024
