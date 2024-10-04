@@ -123,8 +123,6 @@ export const UsersV2 = () => {
     providers: selectedProviders,
   })
 
-  console.log({ countData })
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const totalUsers = useMemo(() => countData?.result[0].count ?? 0, [countData?.result[0].count])
   const users = useMemo(() => data?.pages.flatMap((page) => page.result), [data?.pages])
