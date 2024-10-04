@@ -79,6 +79,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -203,6 +204,10 @@ const Wizard: NextPageWithLayout = () => {
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery()
+  const hasOutstandingInvoices =
+    (allOverdueInvoices ?? []).filter((x) => x.organization_id === currentOrg?.id).length > 0
+
   const { data: allProjects } = useProjectsQuery({})
   const organizationProjects =
     allProjects?.filter(
@@ -246,7 +251,8 @@ const Wizard: NextPageWithLayout = () => {
 
   const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
 
-  const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !isManagedByVercel
+  const canCreateProject =
+    isAdmin && !freePlanWithExceedingLimits && !isManagedByVercel && !hasOutstandingInvoices
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
@@ -462,7 +468,12 @@ const Wizard: NextPageWithLayout = () => {
                 <Button
                   htmlType="submit"
                   loading={isCreatingNewProject || isSuccessNewProject}
-                  disabled={isCreatingNewProject || isSuccessNewProject || isManagedByVercel}
+                  disabled={
+                    !canCreateProject ||
+                    isCreatingNewProject ||
+                    isSuccessNewProject ||
+                    isManagedByVercel
+                  }
                 >
                   Create new project
                 </Button>
@@ -1044,16 +1055,17 @@ const Wizard: NextPageWithLayout = () => {
                   </>
                 )}
 
-                {isAdmin && freePlanWithExceedingLimits && slug && (
-                  <Panel.Content>
-                    <FreeProjectLimitWarning
-                      membersExceededLimit={membersExceededLimit || []}
-                      orgSlug={slug}
-                    />
-                  </Panel.Content>
-                )}
-
-                {!freePlanWithExceedingLimits && isManagedByVercel && (
+                {freePlanWithExceedingLimits ? (
+                  isAdmin &&
+                  slug && (
+                    <Panel.Content>
+                      <FreeProjectLimitWarning
+                        membersExceededLimit={membersExceededLimit || []}
+                        orgSlug={slug}
+                      />
+                    </Panel.Content>
+                  )
+                ) : isManagedByVercel ? (
                   <Panel.Content>
                     <PartnerManagedResource
                       partner="vercel-marketplace"
@@ -1064,7 +1076,28 @@ const Wizard: NextPageWithLayout = () => {
                       }}
                     />
                   </Panel.Content>
-                )}
+                ) : hasOutstandingInvoices ? (
+                  <Panel.Content>
+                    <Admonition
+                      type="default"
+                      title="Your organization has overdue invoices"
+                      description={
+                        <div className="space-y-3">
+                          <p className="text-sm leading-normal">
+                            Please resolve all outstanding invoices first before creating a new
+                            project
+                          </p>
+
+                          <div>
+                            <Button asChild type="default">
+                              <Link href={`/org/${slug}/invoices`}>View invoices</Link>
+                            </Button>
+                          </div>
+                        </div>
+                      }
+                    />
+                  </Panel.Content>
+                ) : null}
               </div>
             )}
           </>
