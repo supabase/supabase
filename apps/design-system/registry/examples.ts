@@ -1046,9 +1046,19 @@ export const examples: Registry = [
     files: ['example/multi-select-2-demo.tsx'],
   },
   {
-    name: 'multi-select-combobox-demo',
+    name: 'multi-select-2-badge-limit',
     type: 'components:example',
-    files: ['example/multi-select-combobox-demo.tsx'],
+    files: ['example/multi-select-2-badge-limit.tsx'],
+  },
+  {
+    name: 'multi-select-2-combobox',
+    type: 'components:example',
+    files: ['example/multi-select-2-combobox.tsx'],
+  },
+  {
+    name: 'multi-select-2-deletable-badge',
+    type: 'components:example',
+    files: ['example/multi-select-2-deletable-badge.tsx'],
   },
   {
     name: 'tree-view-demo',

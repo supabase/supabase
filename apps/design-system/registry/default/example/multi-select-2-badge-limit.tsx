@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -8,7 +8,7 @@ import {
 } from 'ui-patterns/multi-select-2'
 
 export default function MultiSelectDemo() {
-  const [selectedValues, setSelectedValues] = useState<string[]>([])
+  const [selectedValues, setSelectedValues] = useState<string[]>(['Apple', 'Banana'])
   const [open, setOpen] = useState(true)
 
   return (
@@ -18,9 +18,10 @@ export default function MultiSelectDemo() {
       values={selectedValues}
       onValuesChange={setSelectedValues}
     >
-      <MultiSelectorTrigger className="w-72" label="Fruits" />
+      <MultiSelectorTrigger className="w-72" label="Fruits" badgeLimit={1} />
       <MultiSelectorContent sameWidthAsTrigger>
         <MultiSelectorList>
+          <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
           <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>
           <MultiSelectorItem value="Cherry">Cherry</MultiSelectorItem>
           <MultiSelectorItem value="Date">Date</MultiSelectorItem>

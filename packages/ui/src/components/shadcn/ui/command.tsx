@@ -2,7 +2,7 @@
 
 import { DialogProps } from '@radix-ui/react-dialog'
 import { Command as CommandPrimitive } from 'cmdk'
-import { Search, X } from 'lucide-react'
+import { Search, X as RemoveIcon } from 'lucide-react'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
@@ -63,7 +63,7 @@ const CommandInput = React.forwardRef<
           !!props.value?.length && 'opacity-100'
         )}
       >
-        <X size={14} />
+        <RemoveIcon size={14} />
       </button>
     )}
   </div>

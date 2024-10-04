@@ -2,7 +2,6 @@ import { useState } from 'react'
 import {
   MultiSelector,
   MultiSelectorContent,
-  MultiSelectorInput,
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
@@ -28,7 +27,6 @@ export default function MultiSelectDemo() {
     <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
       <MultiSelectorTrigger className="w-72" label="Fruits" />
       <MultiSelectorContent sameWidthAsTrigger>
-        <MultiSelectorInput placeholder="Search fruits" showCloseIcon />
         <MultiSelectorList>
           {fruits.map((fruit) => (
             <MultiSelectorItem key={fruit.value} value={fruit.value}>

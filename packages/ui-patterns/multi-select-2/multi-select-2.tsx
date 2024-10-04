@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { ChevronsUpDown } from 'lucide-react'
+import { ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 import { VariantProps, cva } from 'class-variance-authority'
@@ -19,7 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from 'ui/src/components/shadc
 interface MultiSelectContextProps {
   values: string[]
   onValuesChange: React.Dispatch<React.SetStateAction<string[]>>
-  onValueChange: (values: string) => void
+  toggleValue: (values: string) => void
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   inputValue: string
@@ -56,27 +56,21 @@ type MultiSelectorProps = {
   onValuesChange: React.Dispatch<React.SetStateAction<string[]>>
   loop?: boolean
   disabled?: boolean
-  open?: boolean
-  setOpen?: React.Dispatch<React.SetStateAction<boolean>>
 } & React.ComponentPropsWithoutRef<typeof Popover> &
   VariantProps<typeof MultiSelectorVariants>
 
 function MultiSelector({
   values = [],
   onValuesChange,
-  open: _controlledOpen,
-  setOpen: _setControlledOpen,
   disabled,
   children,
   ...props
 }: MultiSelectorProps) {
-  const [_internalOpen, _setInternalOpen] = React.useState(false)
-  const open = _controlledOpen ?? _internalOpen
-  const setOpen = _setControlledOpen ?? _setInternalOpen
+  const [open, setOpen] = React.useState<boolean>(true)
   const [inputValue, setInputValue] = React.useState<string>('')
   const [activeIndex, setActiveIndex] = React.useState<number>(-1)
 
-  const onValueChange = React.useCallback(
+  const toggleValue = React.useCallback(
     (value: string) => {
       onValuesChange((prevValues: string[]) => {
         const isSelected = prevValues.includes(value)
@@ -94,7 +88,7 @@ function MultiSelector({
     <MultiSelectContext.Provider
       value={{
         values,
-        onValueChange,
+        toggleValue,
         onValuesChange,
         open,
         setOpen,
@@ -115,9 +109,14 @@ function MultiSelector({
 
 const MultiSelectorTrigger = React.forwardRef<
   HTMLButtonElement,
-  { label?: string; className?: string } & React.ComponentProps<typeof PopoverTrigger>
->(({ label, className, ...props }, ref) => {
-  const { values } = useMultiSelect()
+  {
+    label?: string
+    className?: string
+    badgeLimit?: number
+    deletableBadge?: boolean
+  } & React.ComponentProps<typeof PopoverTrigger>
+>(({ label, className, deletableBadge = false, badgeLimit = 9999, ...props }, ref) => {
+  const { values, toggleValue } = useMultiSelect()
 
   const inputRef = React.useRef<HTMLButtonElement>(null)
   const badgesRef = React.useRef<HTMLDivElement>(null)
@@ -128,9 +127,8 @@ const MultiSelectorTrigger = React.forwardRef<
   React.useEffect(() => {
     if (!inputRef.current || !badgesRef.current) return
 
-    let maxVisibleBadges = 1
-    setVisibleBadges(values.slice(0, maxVisibleBadges))
-    setExtraBadgesCount(Math.max(0, values.length - maxVisibleBadges))
+    setVisibleBadges(values.slice(0, badgeLimit))
+    setExtraBadgesCount(Math.max(0, values.length - badgeLimit))
   }, [values])
 
   const badgeClasses = 'rounded'
@@ -158,6 +156,14 @@ const MultiSelectorTrigger = React.forwardRef<
             {visibleBadges.map((value) => (
               <Badge key={value} className={cn('shrink-0', badgeClasses)}>
                 {value}
+                {deletableBadge && (
+                  <button
+                    onClick={() => toggleValue(value)}
+                    className="ml-1 text-foreground-lighter hover:text-foreground-light transition-colors"
+                  >
+                    <RemoveIcon size={12} />
+                  </button>
+                )}
               </Badge>
             ))}
             {extraBadgesCount > 0 && <Badge className={badgeClasses}>+{extraBadgesCount}</Badge>}
@@ -261,7 +267,7 @@ const MultiSelectorItem = React.forwardRef<
   { value: string } & React.ComponentPropsWithoutRef<typeof CommandItem>
 >(({ className, value, children }, ref) => {
   const id = React.useId()
-  const { values: selectedValues, onValueChange, open } = useMultiSelect()
+  const { values: selectedValues, toggleValue, open } = useMultiSelect()
   const isSelected = selectedValues.includes(value)
 
   return (
@@ -270,7 +276,7 @@ const MultiSelectorItem = React.forwardRef<
       tabIndex={open ? 0 : -1}
       role="option"
       aria-Value={isSelected}
-      onSelect={() => onValueChange(value)}
+      onSelect={() => toggleValue(value)}
       className={cn(
         'relative',
         'text-foreground-lighter text-left pointer-events-auto',
