@@ -190,7 +190,9 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
       "room-1", {"config": {"private": True}}
     )
 
-    channel.on_broadcast("test", callback=lambda payload: print(payload)).subscribe(
+    await channel.on_broadcast(
+      "test", callback=lambda payload: print(payload)
+    ).subscribe(
       lambda state, err: (
         print("Connected")
         if state == RealtimeSubscribeStates.SUBSCRIBED
