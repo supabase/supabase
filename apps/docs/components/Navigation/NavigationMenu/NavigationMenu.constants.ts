@@ -749,6 +749,10 @@ export const database: NavMenuConstant = {
           name: 'Partitioning your tables',
           url: '/guides/database/partitions',
         },
+        {
+          name: 'Managing connections',
+          url: '/guides/database/connection-management',
+        },
       ],
     },
     {
@@ -828,6 +832,52 @@ export const database: NavMenuConstant = {
         {
           name: 'Debugging performance issues',
           url: '/guides/database/debugging-performance',
+        },
+        {
+          name: 'Supavisor',
+          url: '/guides/database/supavisor',
+        },
+      ],
+    },
+    {
+      name: 'ORM Quickstarts',
+      url: undefined,
+      items: [
+        {
+          name: 'Prisma',
+          url: '/guides/database/prisma',
+          items: [
+            {
+              name: 'Prisma troubleshooting',
+              url: '/guides/database/prisma/prisma-troubleshooting',
+            },
+          ],
+        },
+        {
+          name: 'Drizzle',
+          url: '/guides/database/drizzle',
+        },
+        {
+          name: 'Postgres.js',
+          url: '/guides/database/postgres-js',
+        },
+      ],
+    },
+    {
+      name: 'GUI quickstarts',
+      url: undefined,
+      items: [
+        {
+          name: 'pgAdmin',
+          url: '/guides/database/pgadmin',
+        },
+        {
+          name: 'PSQL',
+          url: '/guides/database/psql',
+        },
+        {
+          name: 'DBeaver',
+          url: '/guides/database/dbeaver',
         },
       ],
     },
