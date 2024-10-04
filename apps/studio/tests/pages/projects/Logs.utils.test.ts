@@ -91,4 +91,8 @@ describe('checkForWildcard', () => {
     expect(checkForWildcard('-- *\nSELECT column FROM table')).toBe(false)
     expect(checkForWildcard('/* * */\nSELECT column FROM table')).toBe(false)
   })
+
+  test('count(*)', () => {
+    expect(checkForWildcard('SELECT count(*) FROM table')).toBe(false)
+  })
 })
