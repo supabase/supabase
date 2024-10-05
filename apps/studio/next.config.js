@@ -94,7 +94,7 @@ const csp = [
     : []),
 ].join(' ')
 
-const endUrl = `https://${process.env.VERCEL_BRANCH_URL ?? process.env.NEXT_PUBLIC_SITE_URL}/api/vercel/flags`
+const endUrl = `${process.env.VERCEL_BRANCH_URL ? `https://${process.env.VERCEL_BRANCH_URL}` : process.env.NEXT_PUBLIC_SITE_URL}${process.env.NEXT_PUBLIC_BASE_PATH}/api/vercel/flags`
 
 console.log(endUrl)
 /**
