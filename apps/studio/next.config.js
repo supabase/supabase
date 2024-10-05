@@ -94,6 +94,9 @@ const csp = [
     : []),
 ].join(' ')
 
+const endUrl = `${process.env.VERCEL_BRANCH_URL ?? process.env.NEXT_PUBLIC_SITE_URL}/api/vercel/flags`
+
+console.log(endUrl)
 /**
  * @type {import('next').NextConfig}
  */
@@ -107,7 +110,7 @@ const nextConfig = {
     return [
       {
         source: `/.well-known/vercel/flags`,
-        destination: `${process.env.VERCEL_BRANCH_URL ?? process.env.NEXT_PUBLIC_SITE_URL}/api/vercel/flags`,
+        destination: endUrl,
         basePath: false,
       },
     ]
