@@ -23,7 +23,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { useCreateAPIKeyMutation } from 'data/api-keys/create-api-key-mutation'
+import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 
 const FORM_ID = 'create-publishable-api-key'
 const SCHEMA = z.object({
@@ -34,7 +34,7 @@ export interface CreatePublishableAPIKeyModalProps {
   projectRef: string
 }
 
-const CreatePublishableAPIKeyModal = ({ projectRef }: CreatePublishableAPIKeyModal) => {
+const CreatePublishableAPIKeyModal = ({ projectRef }: any) => {
   const [visible, setVisible] = useState(false)
 
   const onClose = (value: boolean) => {
@@ -48,9 +48,9 @@ const CreatePublishableAPIKeyModal = ({ projectRef }: CreatePublishableAPIKeyMod
     },
   })
 
-  const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useCreateAPIKeyMutation()
+  const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+  const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
     createAPIKey(
       {
         projectRef,
@@ -108,8 +108,8 @@ const CreatePublishableAPIKeyModal = ({ projectRef }: CreatePublishableAPIKeyMod
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          <Button form={FORM_ID} htmlType="submit">
-            Create API key
+          <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>
+            Create Publishable API key
           </Button>
         </DialogFooter>
       </DialogContent>

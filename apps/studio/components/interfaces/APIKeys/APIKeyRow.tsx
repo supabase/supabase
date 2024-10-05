@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Eye, EyeOff, MoreVertical, TrashIcon } from 'lucide-react'
+import { Eye, EyeOff, Loader2, MoreVertical, TrashIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -14,8 +14,11 @@ import CopyButton from 'components/ui/CopyButton'
 import Table from 'components/to-be-cleaned/Table'
 
 import { APIKeysData } from 'data/api-keys/api-keys-query'
+import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
+import { useParams } from 'common'
 
 const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
+  const { ref: projectRef } = useParams()
   const isSecret = apiKey.type === 'secret'
   const [shown, setShown] = useState(!isSecret)
 
@@ -28,6 +31,22 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
 
   const canDeleteAPIKeys = true // todo
 
+  const { mutate: deleteAPIKey, isLoading: isDeletingAPIKey } = useAPIKeyDeleteMutation()
+
+  const onDeleteAPIKeySubmit = () => {
+    deleteAPIKey(
+      {
+        projectRef,
+        id: apiKey.id,
+      },
+      {
+        onSuccess: () => {
+          // onClose(false)
+        },
+      }
+    )
+  }
+
   return (
     <Table.tr key={apiKey.id}>
       <Table.td>
@@ -36,8 +55,7 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
 
           {isSecret && (
             <Button
-              type="icon"
-              variant="icon"
+              type="outline"
               icon={shown ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
               onClick={() => {
                 setShown((shown) => {
@@ -57,11 +75,11 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
         </div>
       </Table.td>
 
-      {isSecret && (
+      {/* {isSecret && (
         <Table.td>
           <code>{apiKey.secret_jwt_template?.role ?? ''}</code>
         </Table.td>
-      )}
+      )} */}
 
       <Table.td>{apiKey.description || '/'}</Table.td>
 
@@ -75,14 +93,19 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
               <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   className="flex gap-1.5 !pointer-events-auto"
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     if (canDeleteAPIKeys) {
                       e.preventDefault()
+                      onDeleteAPIKeySubmit()
                     }
                   }}
                 >
-                  <TrashIcon size="14" />
-                  Delete API key
+                  {isDeletingAPIKey ? (
+                    <Loader2 size="14" className="animate-spin" />
+                  ) : (
+                    <TrashIcon size="14" />
+                  )}
+                  {isDeletingAPIKey ? 'Deleting key..' : 'Delete API key'}
                 </DropdownMenuItem>
               </TooltipTrigger_Shadcn_>
               {!canDeleteAPIKeys && (

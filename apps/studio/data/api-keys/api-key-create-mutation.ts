@@ -14,9 +14,9 @@ export type APIKeyCreateVariables = {
     }
   | {
       type: 'secret'
-      secret_jwt_template?: {
-        role: string
-      } | null
+      // secret_jwt_template?: { // @mildtomato (Jonny) removed this field to reduce scope
+      //   role: string
+      // } | null
     }
 )
 
@@ -28,7 +28,10 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
         ? {
             type: payload.type,
             description: payload.description || null,
-            secret_jwt_template: payload?.secret_jwt_template || null,
+            // secret_jwt_template: payload?.secret_jwt_template || null,
+            secret_jwt_template: {
+              role: 'service_role', // @mildtomato (Jonny) this should be default in API for type secret
+            },
           }
         : {
             type: payload.type,
@@ -42,7 +45,7 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
 
 type APIKeyCreateData = Awaited<ReturnType<typeof createAPIKey>>
 
-export const useCreateAPIKeyMutation = ({
+export const useAPIKeyCreateMutation = ({
   onSuccess,
   onError,
   ...options

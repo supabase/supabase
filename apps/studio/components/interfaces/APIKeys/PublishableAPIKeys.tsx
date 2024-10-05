@@ -27,7 +27,7 @@ const PublishableAPIKeys = () => {
 
   const { data: projectAPI } = useProjectApiQuery({ projectRef: projectRef })
 
-  const { data: apiKeysData } = useAPIKeysQuery({ ref: projectRef })
+  const { data: apiKeysData } = useAPIKeysQuery({ projectRef })
 
   const publishableApiKeys = useMemo(
     () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],

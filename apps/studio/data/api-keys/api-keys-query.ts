@@ -5,12 +5,12 @@ import { ResponseError } from 'types'
 import { apiKeysKeys } from './keys'
 
 export interface APIKeysVariables {
-  ref: string
+  projectRef: string
 }
 
-export async function getAPIKeys({ ref }: APIKeysVariables, signal?: AbortSignal) {
+export async function getAPIKeys({ projectRef }: APIKeysVariables, signal?: AbortSignal) {
   const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {
-    params: { path: { ref } },
+    params: { path: { ref: projectRef } },
     signal,
   })
 
@@ -24,14 +24,14 @@ export async function getAPIKeys({ ref }: APIKeysVariables, signal?: AbortSignal
 export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
 
 export const useAPIKeysQuery = <TData = APIKeysData>(
-  { ref }: APIKeysVariables,
+  { projectRef }: APIKeysVariables,
   { enabled, ...options }: UseQueryOptions<APIKeysData, ResponseError, TData> = {}
 ) =>
   useQuery<APIKeysData, ResponseError, TData>(
-    apiKeysKeys.list(ref),
-    ({ signal }) => getAPIKeys({ ref }, signal),
+    apiKeysKeys.list(projectRef),
+    ({ signal }) => getAPIKeys({ projectRef }, signal),
     {
-      enabled: enabled && !!ref,
+      enabled: enabled && !!projectRef,
       refetchOnMount: false,
       ...options,
     }

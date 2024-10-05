@@ -24,7 +24,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { useCreateAPIKeyMutation } from 'data/api-keys/create-api-key-mutation'
+import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 
 const FORM_ID = 'create-secret-api-key'
 const SCHEMA = z.object({
@@ -46,24 +46,24 @@ const CreateSecretAPIKeyModal = ({ projectRef }: CreateSecretAPIKeyModalProps) =
   const form = useForm<z.infer<typeof SCHEMA>>({
     resolver: zodResolver(SCHEMA),
     defaultValues: {
-      role: 'service_role',
+      // role: 'service_role',
       description: '',
     },
   })
 
-  const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useCreateAPIKeyMutation()
+  const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+  const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
     createAPIKey(
       {
         projectRef,
         type: 'secret',
         description: values.description.trim(),
-        secret_jwt_template: values.role.trim()
-          ? {
-              role: values.role,
-            }
-          : undefined,
+        // secret_jwt_template: values.role.trim()
+        //   ? {
+        //       role: values.role,
+        //     }
+        //   : undefined,
       },
       {
         onSuccess: () => {
@@ -97,7 +97,7 @@ const CreateSecretAPIKeyModal = ({ projectRef }: CreateSecretAPIKeyModalProps) =
               id={FORM_ID}
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              {/* <FormField_Shadcn_
                 key="role"
                 name="role"
                 control={form.control}
@@ -123,8 +123,7 @@ const CreateSecretAPIKeyModal = ({ projectRef }: CreateSecretAPIKeyModalProps) =
                     )}
                   </>
                 )}
-              />
-
+              /> */}
               <FormField_Shadcn_
                 key="description"
                 name="description"
@@ -144,7 +143,7 @@ const CreateSecretAPIKeyModal = ({ projectRef }: CreateSecretAPIKeyModalProps) =
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          <Button form={FORM_ID} htmlType="submit">
+          <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>
             Create API key
           </Button>
         </DialogFooter>

@@ -27,7 +27,7 @@ const SecretAPIKeys = () => {
 
   const { data: projectAPI } = useProjectApiQuery({ projectRef: projectRef })
 
-  const { data: apiKeysData } = useAPIKeysQuery({ ref: projectRef })
+  const { data: apiKeysData } = useAPIKeysQuery({ projectRef })
 
   const secretApiKeys = useMemo(
     () => apiKeysData?.filter(({ type }) => type === 'secret') ?? [],
@@ -45,7 +45,7 @@ const SecretAPIKeys = () => {
       <Table
         head={[
           <Table.th key="">API Key</Table.th>,
-          <Table.th key="">Postgres Role for RLS</Table.th>,
+          // <Table.th key="">Postgres Role for RLS</Table.th>,
           <Table.th key="">Description</Table.th>,
           <Table.th key="actions" />,
         ]}
