@@ -106,7 +106,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/.well-known/vercel/flags`,
+        source: `/.well-known/vercel/flags`,
         destination: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/api/vercel/flags`,
       },
     ]
