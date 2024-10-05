@@ -28,10 +28,11 @@ const FlagProvider = ({ children }: PropsWithChildren<{}>) => {
   const processFlags = async (user?: User) => {
     const flagStore: any = {}
     const flagValues = await getFlags(user)
-    const overridesCookieValue = JSON.parse(getCookies()['vercel-flag-overrides']) as Record<
-      string,
-      boolean
-    >
+    let overridesCookieValue: Record<string, boolean> = {}
+    try {
+      const cookies = getCookies()
+      overridesCookieValue = JSON.parse(cookies['vercel-flag-overrides'])
+    } catch {}
 
     flagValues.forEach((item) => {
       flagStore[item.settingKey] = overridesCookieValue[item.settingKey] ?? item.settingValue
