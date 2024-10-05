@@ -550,6 +550,8 @@ export function checkForILIKEClause(query: string) {
 export function checkForWildcard(query: string) {
   const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
 
+  const queryWithoutCount = queryWithoutComments.replace(/count\(\*\)/gi, '')
+
   const wildcardRegex = /\*/
-  return wildcardRegex.test(queryWithoutComments)
+  return wildcardRegex.test(queryWithoutCount)
 }
