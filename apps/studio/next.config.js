@@ -66,7 +66,7 @@ const csp = [
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL} http://localhost:*/events;`,
+        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL};`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `img-src 'self' blob: data: ${IMG_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_URL};`,
@@ -94,9 +94,6 @@ const csp = [
     : []),
 ].join(' ')
 
-const endUrl = `${process.env.VERCEL_BRANCH_URL ? `https://${process.env.VERCEL_BRANCH_URL}` : process.env.NEXT_PUBLIC_SITE_URL}${process.env.NEXT_PUBLIC_BASE_PATH}/api/vercel/flags`
-
-console.log(endUrl)
 /**
  * @type {import('next').NextConfig}
  */
@@ -110,7 +107,7 @@ const nextConfig = {
     return [
       {
         source: `/.well-known/vercel/flags`,
-        destination: endUrl,
+        destination: `${process.env.VERCEL_BRANCH_URL ? `https://${process.env.VERCEL_BRANCH_URL}` : process.env.NEXT_PUBLIC_SITE_URL}${process.env.NEXT_PUBLIC_BASE_PATH}/api/vercel/flags`,
         basePath: false,
       },
     ]
@@ -411,43 +408,27 @@ const nextConfig = {
   },
   async headers() {
     return [
-      // {
-      //   source: '/(.*?)',
-      // headers: [
-      //   {
-      //     key: 'X-Frame-Options',
-      //     value: 'DENY',
-      //   },
-      //   {
-      //     key: 'X-Content-Type-Options',
-      //     value: 'no-sniff',
-      //   },
-      // {
-      //   key: 'Content-Security-Policy',
-      //   value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? csp : "frame-ancestors 'none';",
-      // },
-      // {
-      //   key: 'Referrer-Policy',
-      //   value: 'strict-origin-when-cross-origin',
-      // },
-      // ],
-      // },
-
       {
-        // matching all API routes
         source: '/(.*?)',
         headers: [
-          { key: 'Access-Control-Allow-Credentials', value: 'true' },
-          { key: 'Access-Control-Allow-Origin', value: '*' }, // replace this your actual origin
-          { key: 'Access-Control-Allow-Methods', value: 'GET,DELETE,PATCH,POST,PUT' },
           {
-            key: 'Access-Control-Allow-Headers',
-            value:
-              'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'no-sniff',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? csp : "frame-ancestors 'none';",
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
           },
         ],
       },
-
       {
         source: '/img/:slug*',
         headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
@@ -528,7 +509,7 @@ const nextConfig = {
 // module.exports = withBundleAnalyzer(nextConfig)
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
-const minorConfig =
+module.exports = withVercelToolbar(
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
     ? withSentryConfig(
         withBundleAnalyzer(nextConfig),
@@ -556,6 +537,4 @@ const minorConfig =
         }
       )
     : nextConfig
-
-// Instead of module.exports = nextConfig, do this:
-module.exports = withVercelToolbar(nextConfig)
+)
