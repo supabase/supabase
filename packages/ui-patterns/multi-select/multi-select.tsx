@@ -66,7 +66,7 @@ function MultiSelector({
   children,
   ...props
 }: MultiSelectorProps) {
-  const [open, setOpen] = React.useState<boolean>(true)
+  const [open, setOpen] = React.useState<boolean>(false)
   const [inputValue, setInputValue] = React.useState<string>('')
   const [activeIndex, setActiveIndex] = React.useState<number>(-1)
 
@@ -111,6 +111,7 @@ const MultiSelectorTrigger = React.forwardRef<
   HTMLButtonElement,
   {
     label?: string
+    persistLabel?: boolean
     className?: string
     badgeLimit?: number | 'auto' | 'wrap'
     deletableBadge?: boolean
@@ -118,7 +119,15 @@ const MultiSelectorTrigger = React.forwardRef<
   } & React.ComponentProps<typeof PopoverTrigger>
 >(
   (
-    { label, className, deletableBadge = false, badgeLimit = 9999, showIcon = true, ...props },
+    {
+      label,
+      persistLabel = false,
+      className,
+      deletableBadge = true,
+      badgeLimit = 9999,
+      showIcon = true,
+      ...props
+    },
     ref
   ) => {
     const { values, toggleValue } = useMultiSelect()
@@ -128,6 +137,7 @@ const MultiSelectorTrigger = React.forwardRef<
 
     const [visibleBadges, setVisibleBadges] = React.useState<string[]>([])
     const [extraBadgesCount, setExtraBadgesCount] = React.useState(0)
+    const [isDeleteHovered, setIsDeleteHovered] = React.useState(false)
 
     const calculateVisibleBadges = () => {
       if (!inputRef.current || !badgesRef.current) return
@@ -172,10 +182,18 @@ const MultiSelectorTrigger = React.forwardRef<
 
     const badgeClasses = 'rounded'
 
+    const handleTriggerClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+      if (isDeleteHovered) {
+        event.stopPropagation()
+        event.preventDefault()
+      }
+    }
+
     return (
       <PopoverTrigger asChild ref={ref}>
         <button
           ref={inputRef}
+          onClick={handleTriggerClick}
           role="combobox"
           className={cn(
             'flex w-full min-w-[200px] items-center justify-between rounded-md border',
@@ -205,7 +223,12 @@ const MultiSelectorTrigger = React.forwardRef<
                   {value}
                   {deletableBadge && (
                     <button
-                      onClick={() => toggleValue(value)}
+                      onMouseEnter={() => setIsDeleteHovered(true)}
+                      onMouseLeave={() => setIsDeleteHovered(false)}
+                      onClick={() => {
+                        toggleValue(value)
+                        setIsDeleteHovered(false)
+                      }}
                       className="ml-1 text-foreground-lighter hover:text-foreground-light transition-colors"
                     >
                       <RemoveIcon size={12} />
@@ -214,9 +237,11 @@ const MultiSelectorTrigger = React.forwardRef<
                 </Badge>
               ))}
               {extraBadgesCount > 0 && <Badge className={badgeClasses}>+{extraBadgesCount}</Badge>}
-              {/* <span className="text-foreground-muted whitespace-nowrap leading-[1.375rem] ml-1">
-                {label}
-              </span> */}
+              {persistLabel && (
+                <span className="text-foreground-muted whitespace-nowrap leading-[1.375rem] ml-1">
+                  {label}
+                </span>
+              )}
             </div>
           )}
           {showIcon && (
