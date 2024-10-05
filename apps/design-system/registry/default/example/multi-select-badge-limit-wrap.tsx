@@ -5,7 +5,7 @@ import {
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
-} from 'ui-patterns/multi-select-2'
+} from 'ui-patterns/multi-select'
 
 export default function MultiSelectDemo() {
   const [selectedValues, setSelectedValues] = useState<string[]>(['Apple', 'Banana'])
@@ -18,7 +18,13 @@ export default function MultiSelectDemo() {
       values={selectedValues}
       onValuesChange={setSelectedValues}
     >
-      <MultiSelectorTrigger className="w-72" label="Fruits" badgeLimit="auto" />
+      <MultiSelectorTrigger
+        className="w-72"
+        label="Select fruits"
+        badgeLimit="wrap"
+        showIcon={false}
+        deletableBadge
+      />
       <MultiSelectorContent sameWidthAsTrigger>
         <MultiSelectorList>
           <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>

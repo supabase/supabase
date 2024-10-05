@@ -1787,6 +1787,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "multi-select-old-demo": {
+      name: "multi-select-old-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-old-demo")),
+      source: "",
+      files: ["registry/default/example/multi-select-old-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-old-form": {
+      name: "multi-select-old-form",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-old-form")),
+      source: "",
+      files: ["registry/default/example/multi-select-old-form.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "multi-select-demo": {
       name: "multi-select-demo",
       type: "components:example",
@@ -1798,79 +1820,57 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "multi-select-form": {
-      name: "multi-select-form",
+    "multi-select-badge-limit-auto": {
+      name: "multi-select-badge-limit-auto",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/multi-select-form")),
+      component: React.lazy(() => import("@/registry/default/example/multi-select-badge-limit-auto")),
       source: "",
-      files: ["registry/default/example/multi-select-form.tsx"],
+      files: ["registry/default/example/multi-select-badge-limit-auto.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
     },
-    "multi-select-2-demo": {
-      name: "multi-select-2-demo",
+    "multi-select-badge-limit-wrap": {
+      name: "multi-select-badge-limit-wrap",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/multi-select-2-demo")),
+      component: React.lazy(() => import("@/registry/default/example/multi-select-badge-limit-wrap")),
       source: "",
-      files: ["registry/default/example/multi-select-2-demo.tsx"],
+      files: ["registry/default/example/multi-select-badge-limit-wrap.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
     },
-    "multi-select-2-badge-limit-auto": {
-      name: "multi-select-2-badge-limit-auto",
+    "multi-select-badge-limit": {
+      name: "multi-select-badge-limit",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/multi-select-2-badge-limit-auto")),
+      component: React.lazy(() => import("@/registry/default/example/multi-select-badge-limit")),
       source: "",
-      files: ["registry/default/example/multi-select-2-badge-limit-auto.tsx"],
+      files: ["registry/default/example/multi-select-badge-limit.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
     },
-    "multi-select-2-badge-limit-wrap": {
-      name: "multi-select-2-badge-limit-wrap",
+    "multi-select-combobox": {
+      name: "multi-select-combobox",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/multi-select-2-badge-limit-wrap")),
+      component: React.lazy(() => import("@/registry/default/example/multi-select-combobox")),
       source: "",
-      files: ["registry/default/example/multi-select-2-badge-limit-wrap.tsx"],
+      files: ["registry/default/example/multi-select-combobox.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
     },
-    "multi-select-2-badge-limit": {
-      name: "multi-select-2-badge-limit",
+    "multi-select-deletable-badge": {
+      name: "multi-select-deletable-badge",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/multi-select-2-badge-limit")),
+      component: React.lazy(() => import("@/registry/default/example/multi-select-deletable-badge")),
       source: "",
-      files: ["registry/default/example/multi-select-2-badge-limit.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "multi-select-2-combobox": {
-      name: "multi-select-2-combobox",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/multi-select-2-combobox")),
-      source: "",
-      files: ["registry/default/example/multi-select-2-combobox.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "multi-select-2-deletable-badge": {
-      name: "multi-select-2-deletable-badge",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/multi-select-2-deletable-badge")),
-      source: "",
-      files: ["registry/default/example/multi-select-2-deletable-badge.tsx"],
+      files: ["registry/default/example/multi-select-deletable-badge.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

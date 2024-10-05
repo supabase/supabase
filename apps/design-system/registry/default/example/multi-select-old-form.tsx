@@ -22,7 +22,7 @@ import {
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
-} from 'ui-patterns/multi-select'
+} from 'ui-patterns/multi-select-old'
 
 const form = z.object({
   value: z.array(z.string()).nonempty('Please select at least one person'),

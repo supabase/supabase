@@ -2,22 +2,19 @@ import { useState } from 'react'
 import {
   MultiSelector,
   MultiSelectorContent,
-  MultiSelectorInput,
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
-} from 'ui-patterns/multi-select-2'
+} from 'ui-patterns/multi-select'
 
 export default function MultiSelectDemo() {
-  const [selectedValues, setSelectedValues] = useState<string[]>([])
+  const [selectedValues, setSelectedValues] = useState<string[]>(['Apple', 'Banana'])
 
   return (
     <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
-      <MultiSelectorTrigger className="w-72" label="Fruits" />
+      <MultiSelectorTrigger className="w-72" label="Select fruits" deletableBadge />
       <MultiSelectorContent sameWidthAsTrigger>
-        <MultiSelectorInput placeholder="Search fruits" showCloseIcon />
         <MultiSelectorList>
-          <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
           <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>
           <MultiSelectorItem value="Cherry">Cherry</MultiSelectorItem>
           <MultiSelectorItem value="Date">Date</MultiSelectorItem>
