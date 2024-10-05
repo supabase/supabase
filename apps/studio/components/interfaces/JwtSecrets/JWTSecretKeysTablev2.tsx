@@ -60,6 +60,7 @@ import {
   CirclePower,
   Timer,
   Book,
+  FileKey,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AlgorithmHoverCard } from './AlgorithmHoverCard'
@@ -309,8 +310,10 @@ NEW_KEY_CONTENT
     setFormError('')
   }
 
+  const MotionTableRow = motion(TableRow)
+
   const renderKeyRow = (key: SecretKey) => (
-    <motion.tr
+    <MotionTableRow
       key={key.id}
       layout
       initial={{ opacity: 0, height: 0 }}
@@ -320,9 +323,9 @@ NEW_KEY_CONTENT
         transition: { duration: 0.2 },
       }}
       exit={{ opacity: 0, height: 0 }}
-      className={key.status !== 'IN_USE' ? 'border-b border-dashed border-border' : 'border-b'}
+      className={cn(key.status !== 'IN_USE' ? 'border-b border-dashed border-border' : 'border-b')}
     >
-      <TableCell className="py-4 w-[150px] pr-0">
+      <TableCell className="w-[150px] pr-0 py-2 pl-0">
         <div className="flex -space-x-px items-center">
           <Badge
             className={cn(
@@ -338,13 +341,13 @@ NEW_KEY_CONTENT
           </Badge>
         </div>
       </TableCell>
-      <TableCell className="font-mono truncate max-w-[100px] pl-0">
+      <TableCell className="font-mono truncate max-w-[100px] pl-0 py-2">
         <div className="">
           <Badge
             className={cn(
               'bg-opacity-100 bg-200 border-foreground-muted',
               'rounded-l-none',
-              'gap-2 py-0 h-6'
+              'gap-2 py-2 h-6'
             )}
           >
             <span className="truncate">{key.keyId}</span>
@@ -359,13 +362,15 @@ NEW_KEY_CONTENT
           </Badge>
         </div>
       </TableCell>
-      <TableCell className="truncate max-w-[150px] font-mono text-xs">{key.createdAt}</TableCell>
+      <TableCell className="truncate max-w-[150px] font-mono text-xs py-2">
+        {key.createdAt}
+      </TableCell>
       {/* <TableCell className="truncate max-w-[150px]">{key.expiresAt || 'N/A'}</TableCell> */}
-      <TableCell className="truncate max-w-[100px]">
+      <TableCell className="truncate max-w-[100px] py-2">
         {/* {algorithmLabels[key.algorithm]} */}
         <AlgorithmHoverCard algorithm={key.algorithm} />
       </TableCell>
-      <TableCell className="text-right">
+      <TableCell className="text-right py-2 pr-0">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -404,7 +409,7 @@ NEW_KEY_CONTENT
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>
-    </motion.tr>
+    </MotionTableRow>
   )
 
   const renderKeyFlowVisual = () => (
@@ -487,7 +492,7 @@ NEW_KEY_CONTENT
           onClick={() => setShowRotateKeyDialog(true)}
           loading={actionInProgress === 'rotate'}
           icon={<RotateCw />}
-          type="danger"
+          type="warning"
         />
 
         {!standbyKey && (
@@ -504,12 +509,12 @@ NEW_KEY_CONTENT
       </div>
       <div>
         <h2 className="text-xl mb-4">Active keys</h2>
-        <Card className="w-full bg-surface-100 overflow-hidden">
+        <Card className="w-full overflow-hidden border-0">
           <CardContent className="p-0">
             <Table className="p-5">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="pl-5 text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0 w-20">
+                  <TableHead className="pl-0 text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0 w-20">
                     Status
                   </TableHead>
                   <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pl-0">
@@ -524,7 +529,7 @@ NEW_KEY_CONTENT
                   <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                     Type
                   </TableHead>
-                  <TableHead className="pr-5 text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
+                  <TableHead className="pr-0 text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -762,6 +767,7 @@ NEW_KEY_CONTENT
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
       <Dialog open={showConfirmRotateDialog} onOpenChange={setShowConfirmRotateDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -777,34 +783,41 @@ NEW_KEY_CONTENT
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
       <Dialog open={showKeyDetailsDialog} onOpenChange={setShowKeyDetailsDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="text-lg font-medium">Key Details</DialogTitle>
           </DialogHeader>
-          {selectedKey && (
-            <div className="space-y-4 mt-4">
-              <div>
-                <h4 className="font-bold text-base mb-2">Public Key (PEM format)</h4>
-                <pre className="bg-gray-100 p-3 rounded-md text-xs overflow-x-auto whitespace-pre-wrap break-all max-h-40">
-                  {selectedKey.publicKey}
-                </pre>
-              </div>
-              <div>
-                <h4 className="font-bold text-base mb-2">JWKS URL</h4>
-                <pre className="bg-gray-100 p-3 rounded-md text-xs overflow-x-auto break-all">
-                  {selectedKey.jwksUrl}
-                </pre>
-              </div>
-              {selectedKey.customSigningKey && (
-                <div>
-                  <h4 className="font-bold text-base mb-2">Custom Signing Key</h4>
-                  <pre className="bg-gray-100 p-3 rounded-md text-xs overflow-x-auto break-all">
-                    {selectedKey.customSigningKey}
+          <DialogSectionSeparator />
+          <DialogSection className="flex flex-col gap-6">
+            {selectedKey && (
+              <>
+                <div className="bg-surface-100/50 border rounded-md">
+                  <div className="flex items-center gap-2 px-3 py-2 border-b">
+                    <FileKey strokeWidth={1.5} size={15} className="text-foreground-light" />
+                    <h4 className="text-xs font-mono">Public Key (PEM format)</h4>
+                  </div>
+                  <pre className="bg-surface-100 p-3 text-xs overflow-x-auto whitespace-pre-wrap break-all max-h-40">
+                    {selectedKey.publicKey}
                   </pre>
                 </div>
-              )}
-            </div>
+                <div>
+                  <h4 className="text-sm mb-2">JWKS URL</h4>
+                  <pre className="bg-surface-100 border p-3 rounded-md text-xs overflow-x-auto break-all">
+                    {selectedKey.jwksUrl}
+                  </pre>
+                </div>
+              </>
+            )}
+          </DialogSection>
+          {selectedKey?.customSigningKey && (
+            <DialogSection>
+              <h4 className="text-sm mb-2">Custom Signing Key</h4>
+              <pre className="bg-surface-100 border p-3 rounded-md text-xs overflow-x-auto break-all">
+                {selectedKey?.customSigningKey}
+              </pre>
+            </DialogSection>
           )}
         </DialogContent>
       </Dialog>
