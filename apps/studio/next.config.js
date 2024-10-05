@@ -107,7 +107,8 @@ const nextConfig = {
     return [
       {
         source: `/.well-known/vercel/flags`,
-        destination: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/api/vercel/flags`,
+        destination: `${process.env.VERCEL_BRANCH_URL ?? process.env.NEXT_PUBLIC_SITE_URL}/api/vercel/flags`,
+        basePath: false,
       },
     ]
   },
