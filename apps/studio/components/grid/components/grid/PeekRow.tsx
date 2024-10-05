@@ -13,10 +13,9 @@ import { useTrackedState } from '../../store/Store'
 import { SupaRow } from 'components/grid/types'
 import { useState } from 'react'
 
-export const PeakRow = ({ row }: { row: SupaRow }) => {
+export const PeekRow = ({ row }: { row: SupaRow }) => {
   const state = useTrackedState()
   const tableColumnMap = state.table?.columns
-  const [isCopied, setIsCopied] = useState(false)
 
   // [terry] move this from ColumnType.tsx to a common place instead of copying here
   const inferIcon = (type: string) => {
@@ -46,10 +45,15 @@ export const PeakRow = ({ row }: { row: SupaRow }) => {
   return (
     <Popover_Shadcn_>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type="text" className="h-[26px] w-[26px]" icon={<Eye />} />
+        <Button
+          type="text"
+          className="h-[26px] w-[26px] opacity-0 group-hover:opacity-100 transition-opacity"
+          icon={<Eye />}
+        />
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
         side="right"
+        sideOffset={10}
         avoidCollisions
         className="w-auto p-0 z-50 "
         collisionBoundary={document.querySelector('.sb-grid')}
@@ -63,7 +67,7 @@ export const PeakRow = ({ row }: { row: SupaRow }) => {
                 const column = tableColumnMap?.find((col) => col.name === key)
                 const dataType = column?.dataType || 'unknown'
                 return (
-                  <PeakRowRow
+                  <PeekRowItem
                     key={key}
                     columnKey={key}
                     value={value}
@@ -79,14 +83,14 @@ export const PeakRow = ({ row }: { row: SupaRow }) => {
   )
 }
 
-interface PeakRowRowProps {
+interface PeekRowItemProps {
   columnKey: string
   value: any
   dataType: string
   inferIcon: (dataType: string) => React.ReactNode
 }
 
-export const PeakRowRow = ({ columnKey, value, dataType, inferIcon }: PeakRowRowProps) => {
+export const PeekRowItem = ({ columnKey, value, dataType, inferIcon }: PeekRowItemProps) => {
   const [isCopied, setIsCopied] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
