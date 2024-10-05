@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -12,7 +12,8 @@ export type ProjectUpgradeVariables = {
 export async function upgradeProject({ ref, target_version }: ProjectUpgradeVariables) {
   const { data, error } = await post('/v1/projects/{ref}/upgrade', {
     params: { path: { ref } },
-    body: { target_version },
+    // @ts-expect-error release_channel param is optional on API end, but not typed properly from generated types
+    body: { target_version: target_version.toString() },
   })
   if (error) handleError(error)
   return data

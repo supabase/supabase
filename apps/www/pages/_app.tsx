@@ -3,13 +3,13 @@ import 'config/code-hike.scss'
 import '../styles/index.css'
 
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
+import { AuthProvider, IS_PROD, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { PortalToast, themes } from 'ui'
+import { SonnerToaster, themes } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
@@ -18,7 +18,7 @@ import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
 import { WwwCommandMenu } from '~/components/CommandMenu'
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION, IS_PREVIEW } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
@@ -27,6 +27,8 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
+  const IS_DEV = !IS_PROD && !IS_PREVIEW
+  const blockEvents = IS_DEV || !hasAcceptedConsent
 
   useThemeSandbox()
 
@@ -43,7 +45,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }
 
   useEffect(() => {
-    if (!hasAcceptedConsent) return
+    if (blockEvents) return
 
     function handleRouteChange(url: string) {
       handlePageTelemetry(url)
@@ -57,7 +59,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.events, consentValue])
 
   useEffect(() => {
-    if (!hasAcceptedConsent) return
+    if (blockEvents) return
     /**
      * Send page telemetry on first page load
      */
@@ -67,10 +69,10 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.isReady, consentValue])
 
   const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
-  const { basePath, pathname } = useRouter()
+  const { basePath } = useRouter()
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()
-  const forceDarkMode = pathname === '/' || isDarkLaunchWeek
+  const forceDarkMode = isDarkLaunchWeek
 
   let applicationName = 'Supabase'
   let faviconRoute = DEFAULT_FAVICON_ROUTE
@@ -104,7 +106,7 @@ export default function App({ Component, pageProps }: AppProps) {
           site_name: 'Supabase',
           images: [
             {
-              url: `https://supabase.com${basePath}/images/og/og-image-v2.jpg`,
+              url: `https://supabase.com${basePath}/images/og/supabase-og.png`,
               width: 800,
               height: 600,
               alt: 'Supabase Og Image',
@@ -126,7 +128,7 @@ export default function App({ Component, pageProps }: AppProps) {
             forcedTheme={forceDarkMode ? 'dark' : undefined}
           >
             <CommandProvider>
-              <PortalToast />
+              <SonnerToaster position="top-right" />
               <Component {...pageProps} />
               <WwwCommandMenu />
             </CommandProvider>

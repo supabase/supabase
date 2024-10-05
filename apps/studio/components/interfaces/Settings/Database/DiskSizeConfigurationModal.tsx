@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { SetStateAction } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { number, object } from 'yup'
 
 import { useParams } from 'common'
@@ -17,6 +17,7 @@ import {
   Alert_Shadcn_,
   Button,
   Form,
+  InfoIcon,
   InputNumber,
   Modal,
   WarningIcon,
@@ -177,7 +178,7 @@ const DiskSizeConfigurationModal = ({
         </Form>
       ) : (
         <Alert_Shadcn_ className="border-none">
-          <Info size={16} />
+          <InfoIcon />
           <AlertTitle_Shadcn_>
             {projectSubscriptionData?.plan?.id === 'free'
               ? 'Disk size configuration is not available for projects on the Free Plan'

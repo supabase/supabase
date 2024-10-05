@@ -1,9 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { post } from 'lib/common/fetch'
+import { handleError, post } from 'data/fetchers'
+import { sqlKeys } from 'data/sql/keys'
+import { useFlag } from 'hooks/ui/useFlag'
 import type { ResponseError } from 'types'
-import { API_URL } from 'lib/constants'
 import { authKeys } from './keys'
 
 export type UserInviteVariables = {
@@ -12,9 +13,12 @@ export type UserInviteVariables = {
 }
 
 export async function inviteUser({ projectRef, email }: UserInviteVariables) {
-  const response = await post(`${API_URL}/auth/${projectRef}/invite`, { email })
-  if (response.error) throw response.error
-  return response
+  const { data, error } = await post('/platform/auth/{ref}/invite', {
+    params: { path: { ref: projectRef } },
+    body: { email },
+  })
+  if (error) handleError(error)
+  return data
 }
 
 type UserInviteData = Awaited<ReturnType<typeof inviteUser>>
@@ -28,12 +32,25 @@ export const useUserInviteMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const userManagementV2 = useFlag('userManagementV2')
+
   return useMutation<UserInviteData, ResponseError, UserInviteVariables>(
     (vars) => inviteUser(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(authKeys.users(projectRef))
+
+        if (userManagementV2) {
+          await Promise.all([
+            queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
+            queryClient.invalidateQueries(
+              sqlKeys.query(projectRef, authKeys.usersCount(projectRef))
+            ),
+          ])
+        } else {
+          await queryClient.invalidateQueries(authKeys.users(projectRef))
+        }
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

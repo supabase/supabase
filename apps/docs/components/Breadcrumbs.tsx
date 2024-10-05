@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import React, { Fragment } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
+import React, { Fragment, Suspense } from 'react'
 
 import { useBreakpoint } from 'common'
 import {
@@ -29,19 +29,36 @@ import {
 import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 
-const Breadcrumbs = ({ className }: { className?: string }) => {
-  const pathname = usePathname()
-  const menuId = getMenuId(pathname)
-  const menu = NavItems[menuId]
-  const breadcrumbs = findMenuItemByUrl(menu, pathname, [])
+interface BreadcrumbsProps extends React.HTMLAttributes<HTMLDivElement> {
+  minLength?: number
+  forceDisplayOnMobile?: boolean
+}
+
+export default function Breadcrumbs(props: BreadcrumbsProps) {
+  return (
+    <Suspense>
+      <BreadcrumbsInternal {...props} />
+    </Suspense>
+  )
+}
+
+const BreadcrumbsInternal = ({
+  className,
+  minLength = 2,
+  forceDisplayOnMobile = false,
+}: BreadcrumbsProps) => {
+  const breadcrumbs = useBreadcrumbs()
   const [open, setOpen] = React.useState(false)
   const isMobile = useBreakpoint('md')
 
   const ITEMS_TO_DISPLAY = isMobile ? 4 : 3
 
-  if (!breadcrumbs?.length || breadcrumbs?.length === 1) return null
+  if (!breadcrumbs?.length || breadcrumbs?.length < minLength) return null
 
-  const appendedBreadcrumbs = breadcrumbs?.slice(-ITEMS_TO_DISPLAY + 1, isMobile ? -1 : undefined)
+  const appendedBreadcrumbs = breadcrumbs?.slice(
+    -ITEMS_TO_DISPLAY + 1,
+    isMobile && !forceDisplayOnMobile ? -1 : undefined
+  )
 
   return (
     <Breadcrumb className={cn(className)}>
@@ -50,8 +67,10 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
           <>
             <BreadcrumbItem>
               {breadcrumbs[0].url ? (
-                <BreadcrumbLink href={`/docs${breadcrumbs[0].url}`}>
-                  {breadcrumbs[0].title || breadcrumbs[0].name}
+                <BreadcrumbLink asChild>
+                  <Link href={breadcrumbs[0].url}>
+                    {breadcrumbs[0].title || breadcrumbs[0].name}
+                  </Link>
                 </BreadcrumbLink>
               ) : (
                 <BreadcrumbPage>{breadcrumbs[0].title || breadcrumbs[0].name}</BreadcrumbPage>
@@ -75,7 +94,7 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
                         className={cn(!crumb.url && 'pointer-events-none')}
                       >
                         {crumb.url ? (
-                          <Link href={`/docs${crumb.url}`}>{crumb.title || crumb.name}</Link>
+                          <Link href={crumb.url}>{crumb.title || crumb.name}</Link>
                         ) : (
                           crumb.title || crumb.name
                         )}
@@ -94,7 +113,7 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
                         .slice(1, -2)
                         .map((crumb) =>
                           crumb.url ? (
-                            <Link href={`/docs${crumb.url}`}>{crumb.title || crumb.name}</Link>
+                            <Link href={crumb.url}>{crumb.title || crumb.name}</Link>
                           ) : (
                             crumb.title || crumb.name
                           )
@@ -121,8 +140,8 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
               )}
             >
               {crumb.url ? (
-                <BreadcrumbLink href={`/docs${crumb.url}`}>
-                  {crumb.title || crumb.name}
+                <BreadcrumbLink asChild>
+                  <Link href={crumb.url}>{crumb.title || crumb.name}</Link>
                 </BreadcrumbLink>
               ) : (
                 <BreadcrumbPage>{crumb.title || crumb.name}</BreadcrumbPage>
@@ -136,6 +155,20 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
       </BreadcrumbList>
     </Breadcrumb>
   )
+}
+
+function useBreadcrumbs() {
+  const pathname = usePathname()
+
+  const isTroubleshootingPage = pathname.startsWith('/guides/troubleshooting')
+  if (isTroubleshootingPage) {
+    const breadcrumbs = [{ name: 'Troubleshooting', url: '/guides/troubleshooting' }]
+    return breadcrumbs
+  }
+
+  const menuId = getMenuId(pathname)
+  const menu = NavItems[menuId]
+  return findMenuItemByUrl(menu, pathname, [])
 }
 
 function findMenuItemByUrl(menu, targetUrl, parents = []) {
@@ -157,5 +190,3 @@ function findMenuItemByUrl(menu, targetUrl, parents = []) {
   // If the URL is not found, return null
   return null
 }
-
-export default Breadcrumbs

@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
 import { screen } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'

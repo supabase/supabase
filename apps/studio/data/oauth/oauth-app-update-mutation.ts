@@ -1,11 +1,10 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { put } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
+import { handleError, put } from 'data/fetchers'
 
 export type OAuthAppUpdateVariables = {
   id: string
@@ -32,15 +31,18 @@ export async function updateOAuthApp({
   if (!website) throw new Error('OAuth app URL is required')
   if (!redirect_uris || redirect_uris.length === 0) throw new Error('Redirect URIs are required')
 
-  const response = await put(`${API_URL}/organizations/${slug}/oauth/apps/${id}`, {
-    name,
-    website,
-    icon,
-    scopes,
-    redirect_uris,
+  const { data, error } = await put(`/platform/organizations/{slug}/oauth/apps/{id}`, {
+    params: { path: { id, slug } },
+    body: {
+      name,
+      website,
+      icon: icon as undefined, // Generated type is incorrect an allows for `string | undefined` only, while we need `null` here.
+      scopes,
+      redirect_uris,
+    },
   })
-  if (response.error) throw response.error
-  return response
+  if (error) throw handleError(error)
+  return data
 }
 
 type OAuthAppUpdateData = Awaited<ReturnType<typeof updateOAuthApp>>

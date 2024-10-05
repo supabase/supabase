@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { indexOf } from 'lodash'
+import { ExternalLink, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
@@ -22,7 +23,6 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
-  Admonition,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -37,8 +37,9 @@ import {
   Separator,
   Skeleton,
   Switch,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -48,7 +49,6 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
-import { ExternalLink, Lock } from 'lucide-react'
 import { HardenAPIModal } from './HardenAPIModal'
 
 const formSchema = z

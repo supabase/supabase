@@ -72,7 +72,7 @@ h6 { */
 }
 
 .h2:not(.prose *):not(.overwrite) {
-  @apply text-3xl;
+  @apply text-4xl;
 }
 
 .h3:not(.prose *):not(.overwrite) {
@@ -99,6 +99,10 @@ h6:not(.overwrite) {
 .h1:not(.prose *):not(.overwrite),
 .h2:not(.prose *):not(.overwrite) {
   line-height: 1.2 !important;
+}
+
+.label:not(.prose *):not(.overwrite) {
+  @apply text-xs font-mono uppercase text-foreground-lighter tracking-wider;
 }
 
 .heading-gradient {

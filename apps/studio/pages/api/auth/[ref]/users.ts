@@ -35,12 +35,13 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   let queryUsers = ''
 
   if (hasValidKeywords && !hasVerifiedValue) {
-    queryCount = SqlString.format('SELECT count(*) from auth.users WHERE email ilike ?;', [
-      `%${keywords}%`,
-    ])
+    queryCount = SqlString.format(
+      'SELECT count(*) from auth.users WHERE (email ilike ? OR id::text ilike ?);',
+      [`%${keywords}%`, `%${keywords}%`]
+    )
     queryUsers = SqlString.format(
-      'SELECT * from auth.users WHERE email ilike ? ORDER BY created_at DESC LIMIT ? OFFSET ?;',
-      [`%${keywords}%`, limitInt, offsetInt]
+      'SELECT * from auth.users WHERE (email ilike ? OR id::text ilike ?) ORDER BY created_at DESC LIMIT ? OFFSET ?;',
+      [`%${keywords}%`, `%${keywords}%`, limitInt, offsetInt]
     )
   }
 
@@ -68,22 +69,22 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   if (hasValidKeywords && hasVerifiedValue) {
     if (verified === 'verified') {
       queryCount = SqlString.format(
-        'SELECT count(*)  from auth.users WHERE (email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL) AND email ilike ?;',
-        [`%${keywords}%`]
+        'SELECT count(*)  from auth.users WHERE (email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL) AND (email ilike ? OR id::text ilike ?);',
+        [`%${keywords}%`, `%${keywords}%`]
       )
       queryUsers = SqlString.format(
-        'SELECT * from auth.users WHERE (email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL) AND email ilike ? ORDER BY created_at DESC LIMIT ? OFFSET ?;',
-        [`%${keywords}%`, limitInt, offsetInt]
+        'SELECT * from auth.users WHERE (email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL) AND (email ilike ? OR id::text ilike ?) ORDER BY created_at DESC LIMIT ? OFFSET ?;',
+        [`%${keywords}%`, `%${keywords}%`, limitInt, offsetInt]
       )
     }
     if (verified === 'unverified') {
       queryCount = SqlString.format(
-        'SELECT count(*)  from auth.users WHERE (email_confirmed_at IS NULL AND phone_confirmed_at IS NULL) AND email ilike ?;',
-        [`%${keywords}%`]
+        'SELECT count(*)  from auth.users WHERE (email_confirmed_at IS NULL AND phone_confirmed_at IS NULL) AND (email ilike ? OR id::text ilike ?);',
+        [`%${keywords}%`, `%${keywords}%`]
       )
       queryUsers = SqlString.format(
-        'SELECT * from auth.users WHERE (email_confirmed_at IS NULL AND phone_confirmed_at IS NULL) AND email ilike ? ORDER BY created_at DESC LIMIT ? OFFSET ?;',
-        [`%${keywords}%`, limitInt, offsetInt]
+        'SELECT * from auth.users WHERE (email_confirmed_at IS NULL AND phone_confirmed_at IS NULL) AND (email ilike ? OR id::text ilike ?) ORDER BY created_at DESC LIMIT ? OFFSET ?;',
+        [`%${keywords}%`, `%${keywords}%`, limitInt, offsetInt]
       )
     }
   }

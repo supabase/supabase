@@ -1,8 +1,14 @@
 import { isEqual } from 'lodash'
 import { ChevronRight, XCircle } from 'lucide-react'
-import type { PropsWithChildren } from 'react'
+import type { HTMLAttributes, PropsWithChildren } from 'react'
 
-import { Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_, cn } from 'ui'
+import {
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  cn,
+  CodeBlock,
+} from 'ui'
 
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { MDXRemoteRefs } from '~/features/docs/Reference.mdx'
@@ -15,6 +21,10 @@ import type {
 import { TYPESPEC_NODE_ANONYMOUS } from '~/features/docs/Reference.typeSpec'
 import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
+import { getTypeDisplayFromSchema, IApiEndPoint, type ISchema } from './Reference.api.utils'
+import { API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES } from './Reference.ui.shared'
+import ReactMarkdown from 'react-markdown'
+import ApiSchema from '~/components/ApiSchema'
 
 interface SectionProps extends PropsWithChildren {
   link: string
@@ -97,7 +107,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
         // spaced-out in regular position
         'pt-[calc(var(--header-height)+1rem)] -mt-[calc(var(--header-height)+1rem-2px)]',
         // Same for bottom
-        'pb-8 -mb-4',
+        'pb-8 -mb-3',
         'bg-gradient-to-b from-background from-85% to-transparent to-100%',
         'text-2xl font-medium text-foreground',
         'scroll-mt-[calc(var(--header-height)+1rem)]',
@@ -220,7 +230,7 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
       </div>
       {description && (
         <div className="prose text-sm">
-          <MDXRemoteBase source={normalizeMarkdown(description)} />
+          <MDXRemoteBase source={description} customPreprocess={normalizeMarkdown} />
         </div>
       )}
       {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}
@@ -243,7 +253,10 @@ export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret
         <div className="text-xs text-foreground-muted">{getTypeName(returnType)}</div>
         {returnType.comment?.shortText && (
           <div className="prose text-sm">
-            <MDXRemoteBase source={normalizeMarkdown(returnType.comment?.shortText)} />
+            <MDXRemoteBase
+              source={returnType.comment?.shortText}
+              customPreprocess={normalizeMarkdown}
+            />
           </div>
         )}
         {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}
@@ -308,7 +321,7 @@ function TypeSubDetails({
   )
 }
 
-function RequiredBadge({ isOptional }: { isOptional: boolean | 'NA' }) {
+export function RequiredBadge({ isOptional }: { isOptional: boolean | 'NA' }) {
   return isOptional === true ? (
     <span className="font-mono text-[10px] text-foreground-lighter tracking-wide">Optional</span>
   ) : isOptional === false ? (
@@ -324,6 +337,244 @@ function RequiredBadge({ isOptional }: { isOptional: boolean | 'NA' }) {
       Required
     </span>
   ) : undefined
+}
+
+export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['parameters'][number] }) {
+  return (
+    <li className="border-t last-of-type:border-b py-5 flex flex-col gap-3">
+      <div className="flex flex-wrap items-baseline gap-3">
+        <span className="font-mono text-sm font-medium text-foreground break-all">
+          {param.name}
+        </span>
+        <RequiredBadge isOptional={!param.required} />
+        {param.schema?.deprecated && <span className="text-xs text-warning-600">Deprecated</span>}
+        {param.schema && (
+          <span className="text-xs text-foreground-muted">
+            {getTypeDisplayFromSchema(param.schema)?.displayName ?? ''}
+          </span>
+        )}
+      </div>
+      {param.description && (
+        <ReactMarkdown className="prose break-words text-sm">{param.description}</ReactMarkdown>
+      )}
+      {param.schema && <ApiSchemaParamSubdetails schema={param.schema} />}
+    </li>
+  )
+}
+
+export function ApiOperationRequestBodyDetails({
+  requestBody,
+}: {
+  requestBody: IApiEndPoint['requestBody']
+}) {
+  const availableSchemes = Object.keys(requestBody.content) as Array<
+    'application/json' | 'application/x-www-form-urlencoded'
+  >
+
+  return (
+    <>
+      {availableSchemes.map((scheme, index) => (
+        <ApiOperationRequestBodyDetailsInternal
+          key={index}
+          schema={requestBody.content[scheme].schema}
+          hidden={index > 0}
+          {...{
+            [API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES.KEY]: scheme,
+          }}
+        />
+      ))}
+    </>
+  )
+}
+
+interface ApiOperationRequestBodyDetailsInternalProps extends HTMLAttributes<HTMLUListElement> {
+  schema: ISchema
+}
+
+function ApiOperationRequestBodyDetailsInternal({
+  schema,
+  ...props
+}: ApiOperationRequestBodyDetailsInternalProps) {
+  if ('allOf' in schema) {
+    return (
+      <>
+        <span className="font-mono text-sm font-medium text-foreground">All of the following:</span>
+        {schema.allOf.map((option, index) => (
+          <ApiSchemaParamSubdetails key={index} schema={option} />
+        ))}
+      </>
+    )
+  } else if ('anyOf' in schema) {
+    return (
+      <>
+        <span className="font-mono text-sm font-medium text-foreground">Any of the following:</span>
+        {schema.anyOf.map((option, index) => (
+          <ApiSchemaParamSubdetails key={index} schema={option} />
+        ))}
+      </>
+    )
+  } else if ('oneOf' in schema) {
+    return (
+      <>
+        <span className="font-mono text-sm font-medium text-foreground">One of the following:</span>
+        {schema.oneOf.map((option, index) => (
+          <ApiSchemaParamSubdetails key={index} schema={option} />
+        ))}
+      </>
+    )
+  } else if ('enum' in schema) {
+    return (
+      <span className="font-mono text-sm font-medium text-foreground">
+        {schema.enum.join(' | ')}
+      </span>
+    )
+  } else if (
+    schema.type === 'string' ||
+    schema.type === 'boolean' ||
+    schema.type === 'number' ||
+    schema.type === 'integer'
+  ) {
+    return <span className="font-mono text-sm font-medium text-foreground">{schema.type}</span>
+  } else if (schema.type === 'array') {
+    return (
+      <>
+        <span className="font-mono text-sm font-medium text-foreground">{`Array of ${getTypeDisplayFromSchema(schema.items).displayName}`}</span>
+        {!(
+          'type' in schema.items &&
+          ['string', 'boolean', 'number', 'integer'].includes(schema.items.type)
+        ) && <ApiSchemaParamSubdetails className="mt-4" schema={schema.items} />}
+      </>
+    )
+  } else if (schema.type === 'object') {
+    return (
+      <ul {...props}>
+        {Object.keys(schema.properties)
+          .map((property) => ({
+            name: property,
+            required: schema.required?.includes(property),
+            in: 'body' as const,
+            schema: schema.properties[property],
+          }))
+          .map((property, index) => (
+            <ApiSchemaParamDetails key={index} param={property} />
+          ))}
+      </ul>
+    )
+  }
+}
+
+export function ApiSchemaParamSubdetails({
+  schema,
+  className,
+}: {
+  schema: ISchema
+  className?: string
+}) {
+  if (
+    !('enum' in schema) &&
+    'type' in schema &&
+    (['boolean', 'number', 'integer'].includes(schema.type) ||
+      (schema.type === 'string' &&
+        !('minLength' in schema || 'maxLength' in schema || 'pattern' in schema)) ||
+      (schema.type === 'array' &&
+        'type' in schema.items &&
+        ['boolean', 'number', 'integer', 'string'].includes(schema.items.type)))
+  ) {
+    return null
+  }
+
+  const subContent =
+    'enum' in schema
+      ? schema.enum
+      : 'anyOf' in schema
+        ? schema.anyOf
+        : 'oneOf' in schema
+          ? schema.oneOf
+          : 'allOf' in schema
+            ? schema.allOf
+            : 'type' in schema && schema.type === 'string'
+              ? ['minLength', 'maxLength', 'pattern']
+                  .filter((key) => key in schema)
+                  .map((key) => ({
+                    constraint: key,
+                    value: schema[key],
+                  }))
+              : []
+
+  return (
+    <Collapsible_Shadcn_>
+      <CollapsibleTrigger_Shadcn_
+        className={cn(
+          'group',
+          'w-fit rounded-full',
+          'px-5 py-1',
+          'border border-default',
+          'flex items-center gap-2',
+          'text-left text-sm text-foreground-light',
+          'hover:bg-surface-100',
+          'data-[state=open]:w-full',
+          'data-[state=open]:rounded-b-none data-[state=open]:rounded-tl-lg data-[state=open]:rounded-tr-lg',
+          'transition [transition-property:width,background-color]',
+          className
+        )}
+      >
+        <XCircle
+          size={14}
+          className={cn(
+            'text-foreground-muted',
+            'group-data-[state=closed]:rotate-45',
+            'transition-transform'
+          )}
+        />
+        {'enum' in schema
+          ? 'Accepted values'
+          : 'allOf' in schema || 'anyOf' in schema || 'oneOf' in schema
+            ? 'Options'
+            : schema.type === 'array'
+              ? 'Items'
+              : schema.type === 'object'
+                ? 'Object schema'
+                : 'Details'}
+      </CollapsibleTrigger_Shadcn_>
+      <CollapsibleContent_Shadcn_>
+        {'type' in schema && schema.type === 'object' ? (
+          <div className={cn('border-b border-x border-fault', 'rounded-b-lg', 'p-5')}>
+            <ApiSchema schema={schema} />
+          </div>
+        ) : (
+          <ul className={cn('border-b border-x border-default', 'rounded-b-lg')}>
+            {subContent.map((detail: any, index: number) => (
+              <li
+                key={index}
+                className={cn(
+                  'px-5 py-3',
+                  'border-t border-default first:border-t-0',
+                  'flex flex-col gap-3'
+                )}
+              >
+                {'enum' in schema ? (
+                  <span className="font-mono text-sm font-medium text-foreground">
+                    {String(detail)}
+                  </span>
+                ) : 'type' in schema && schema.type === 'string' ? (
+                  <span className="text-sm text-foreground flex items-baseline gap-2">
+                    <span className="font-mono text-sm font-medium text-foreground">
+                      {detail.constraint}
+                    </span>
+                    {detail.value}
+                  </span>
+                ) : 'anyOf' in schema || 'allOf' in schema || 'oneOf' in schema ? (
+                  <ApiSchemaParamDetails
+                    param={{ name: '', schema: detail, required: !detail.nullable, in: 'body' }}
+                  />
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
+      </CollapsibleContent_Shadcn_>
+    </Collapsible_Shadcn_>
+  )
 }
 
 /**

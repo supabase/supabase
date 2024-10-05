@@ -11,7 +11,7 @@
 import { MDXProvider } from '@mdx-js/react'
 import { type PropsWithChildren } from 'react'
 
-import { Admonition } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 const components = { Admonition }
 

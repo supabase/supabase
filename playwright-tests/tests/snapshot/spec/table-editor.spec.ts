@@ -2,8 +2,8 @@ import { Page, expect, test } from '@playwright/test'
 import { kebabCase } from 'lodash'
 
 const dismissToast = async (page: Page) => {
-  await page.locator('#toast').getByRole('button').waitFor({ state: 'visible' })
-  await page.locator('#toast').getByRole('button').click()
+  await page.locator('li.toast').getByRole('button').waitFor({ state: 'visible' })
+  await page.locator('li.toast').getByRole('button').click()
 }
 
 test.describe('Table Editor page', () => {
@@ -37,7 +37,7 @@ test.describe('Table Editor page', () => {
     await page.getByRole('button', { name: 'Add column' }).click()
     await page.getByRole('textbox', { name: 'column_name' }).click()
     await page.getByRole('textbox', { name: 'column_name' }).fill('defaultValueColumn')
-    await page.getByRole('button', { name: '---' }).click()
+    await page.locator('button').filter({ hasText: 'Choose a column type...' }).click()
     await page.getByText('Signed two-byte integer').click()
     await page.getByTestId('defaultValueColumn-default-value').click()
     await page.getByTestId('defaultValueColumn-default-value').fill('2')

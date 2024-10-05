@@ -77,9 +77,13 @@ export const REFERENCES = {
     name: 'Kotlin',
     library: 'supabase-kt',
     libPath: 'kotlin',
-    versions: ['v2', 'v1'],
+    versions: ['v3', 'v2', 'v1'],
     icon: 'reference-kotlin',
     meta: {
+      v3: {
+        libId: 'reference_kotlin_v3',
+        specFile: 'supabase_kt_v3',
+      },
       v2: {
         libId: 'reference_kotlin_v2',
         specFile: 'supabase_kt_v2',
@@ -107,17 +111,58 @@ export const REFERENCES = {
   cli: {
     type: 'cli',
     name: 'CLI',
+    libPath: 'cli',
     versions: [],
     icon: 'reference-cli',
   },
   api: {
     type: 'api',
     name: 'API',
+    libPath: 'api',
     versions: [],
     icon: 'reference-api',
+  },
+  self_hosting_analytics: {
+    type: 'self-hosting',
+    name: 'Self-Hosting Analytics',
+    libPath: 'self-hosting-analytics',
+    versions: [],
+    icon: 'reference-analytics',
+  },
+  self_hosting_auth: {
+    type: 'self-hosting',
+    name: 'Self-Hosting Auth',
+    libPath: 'self-hosting-auth',
+    versions: [],
+    icon: 'self-hosting',
+  },
+  self_hosting_functions: {
+    type: 'self-hosting',
+    name: 'Self-Hosting Functions',
+    libPath: 'self-hosting-functions',
+    versions: [],
+    icon: 'reference-functions',
+  },
+  self_hosting_realtime: {
+    type: 'self-hosting',
+    name: 'Self-Hosting Realtime',
+    libPath: 'self-hosting-realtime',
+    versions: [],
+    icon: 'self-hosting',
+  },
+  self_hosting_storage: {
+    type: 'self-hosting',
+    name: 'Self-Hosting Storage',
+    libPath: 'self-hosting-storage',
+    versions: [],
+    icon: 'self-hosting',
   },
 } as const
 
 export const clientSdkIds = Object.keys(REFERENCES).filter(
   (reference) => REFERENCES[reference].type === 'sdk'
+)
+
+export const selfHostingServices = Object.keys(REFERENCES).filter(
+  (reference) => REFERENCES[reference].type === 'self-hosting'
 )

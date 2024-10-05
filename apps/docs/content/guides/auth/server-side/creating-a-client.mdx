@@ -227,7 +227,7 @@ export const config = {
 }
 ```
 
-```ts utils/supabase/middlware.ts
+```ts utils/supabase/middleware.ts
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -482,6 +482,8 @@ const supabase = createServerClient(
 
 ```html index.astro
 <script>
+  import { createBrowserClient } from "@supabase/ssr";
+
   const supabase = createBrowserClient(
     import.meta.env.PUBLIC_SUPABASE_URL,
     import.meta.env.PUBLIC_SUPABASE_ANON_KEY

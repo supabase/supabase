@@ -1,17 +1,18 @@
-import React, { Dispatch, Fragment, SetStateAction, useEffect } from 'react'
-import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion'
+import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
+import { X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Dispatch, Fragment, SetStateAction, useEffect } from 'react'
 import { useKey } from 'react-use'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { Accordion, Button, cn, IconX } from 'ui'
-import { ThemeToggle } from 'ui-patterns'
+import { Accordion, Button, cn } from 'ui'
+import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
+import type { DropdownMenuItem } from '../Navigation.types'
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
-import type { DropdownMenuItem } from '../Navigation.types'
 
 const DEFAULT_EASE = [0.24, 0.25, 0.05, 1]
 
@@ -150,7 +151,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                   className="inline-flex items-center justify-center focus:ring-brand bg-surface-100 hover:bg-surface-200 focus:outline-none focus:ring-2 focus:ring-inset border border-default bg-surface-100/75 text-foreground-light rounded min-w-[30px] w-[30px] h-[30px]"
                 >
                   <span className="sr-only">Close menu</span>
-                  <IconX />
+                  <X />
                 </button>
               </div>
             </div>

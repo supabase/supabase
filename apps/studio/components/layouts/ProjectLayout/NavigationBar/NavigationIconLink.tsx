@@ -2,9 +2,12 @@ import { noop } from 'lodash'
 import Link from 'next/link'
 import { AnchorHTMLAttributes, forwardRef } from 'react'
 import { cn } from 'ui'
+import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 import type { Route } from 'components/ui/ui.types'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   route: Route
@@ -15,6 +18,10 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
   ({ route, isActive = false, onClick = noop, ...props }, ref) => {
     const snap = useAppStateSnapshot()
 
+    const [allowNavPanelToExpand] = useLocalStorageQuery(
+      LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
+      true
+    )
     const iconClasses = [
       'absolute left-0 top-0 flex rounded items-center h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
       'group-hover/item:text-foreground-light',
@@ -34,14 +41,19 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
       `${isActive && '!bg-selection shadow-sm'}`,
     ]
 
-    return route.link !== undefined ? (
+    const linkContent = (
       <Link
         role="button"
         aria-current={isActive}
         ref={ref}
-        href={route.link!}
+        href={route.link || '#'} // Provide a fallback href
         {...props}
-        onClick={onClick}
+        onClick={(e) => {
+          if (!route.link) {
+            e.preventDefault() // Prevent navigation if there's no link
+          }
+          onClick(e)
+        }}
         className={cn(classes, props.className)}
       >
         <span id="icon-link" className={cn(...iconClasses)} {...props}>
@@ -62,9 +74,20 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
           {route.label}
         </span>
       </Link>
-    ) : (
-      <span ref={ref} {...props}></span>
     )
+
+    if (!allowNavPanelToExpand) {
+      return (
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>{linkContent}</TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="right">
+            <span>{route.label}</span>
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
+      )
+    }
+
+    return linkContent
   }
 )
 

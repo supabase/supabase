@@ -1,6 +1,6 @@
 import { Mail, MoreHorizontal, ShieldOff, Trash, User as UserIcon } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'

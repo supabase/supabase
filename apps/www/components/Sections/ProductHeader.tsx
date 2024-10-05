@@ -1,6 +1,7 @@
-import { Button, IconBookOpen } from 'ui'
 import Link from 'next/link'
+import { Button } from 'ui'
 import ProductIcon from '../ProductIcon'
+import { BookOpen } from 'lucide-react'
 
 type subheader = string
 interface Types {
@@ -49,7 +50,7 @@ const ProductHeader = (props: Types) => (
             </Link>
           </Button>
           {props.documentation_url && (
-            <Button asChild type="default" size="medium" icon={<IconBookOpen />}>
+            <Button asChild type="default" size="medium" icon={<BookOpen />}>
               <Link href={props.documentation_url} as={props.documentation_url} className="ml-2">
                 See documentation
               </Link>

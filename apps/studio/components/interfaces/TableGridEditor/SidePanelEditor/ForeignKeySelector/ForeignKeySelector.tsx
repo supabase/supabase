@@ -1,17 +1,12 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { sortBy } from 'lodash'
-import { Table } from 'lucide-react'
+import { ArrowRight, Database, ExternalLink, HelpCircle, Table, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconArrowRight,
-  IconDatabase,
-  IconExternalLink,
-  IconHelpCircle,
-  IconX,
   Listbox,
   SidePanel,
 } from 'ui'
@@ -227,7 +222,7 @@ export const ForeignKeySelector = ({
       <SidePanel.Content>
         <div className="py-6 space-y-6">
           <InformationBox
-            icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
+            icon={<HelpCircle size={20} strokeWidth={1.5} />}
             title="What are foreign keys?"
             description={`Foreign keys help maintain referential integrity of your data by ensuring that no
                 one can insert rows into the table that do not have a matching entry to another
@@ -249,7 +244,7 @@ export const ForeignKeySelector = ({
                   value={schema.name}
                   label={schema.name}
                   className="min-w-96"
-                  addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
+                  addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
                 >
                   <div className="flex items-center gap-2">
                     {/* For aria searching to target the schema name instead of schema */}
@@ -345,7 +340,7 @@ export const ForeignKeySelector = ({
                         </Listbox>
                       </div>
                       <div className="col-span-1 flex justify-center items-center">
-                        <IconArrowRight />
+                        <ArrowRight />
                       </div>
                       <div className="col-span-4">
                         <Listbox
@@ -375,7 +370,7 @@ export const ForeignKeySelector = ({
                         <Button
                           type="default"
                           className="px-1"
-                          icon={<IconX />}
+                          icon={<X />}
                           disabled={fk.columns.length === 1}
                           onClick={() => onRemoveColumn(idx)}
                         />
@@ -423,7 +418,7 @@ export const ForeignKeySelector = ({
                             <li key={`type-error-${idx}`}>
                               <div className="flex items-center gap-x-1">
                                 <code className="text-xs">{fk.columns[idx]?.source}</code>{' '}
-                                <IconArrowRight /> {x.targetType}
+                                <ArrowRight /> {x.targetType}
                               </div>
                             </li>
                           )
@@ -437,7 +432,7 @@ export const ForeignKeySelector = ({
               <SidePanel.Separator />
 
               <InformationBox
-                icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
+                icon={<HelpCircle size="20" strokeWidth={1.5} />}
                 title="Which action is most appropriate?"
                 description={
                   <>
@@ -503,7 +498,7 @@ export const ForeignKeySelector = ({
                 label="Action if referenced row is removed"
                 // @ts-ignore
                 labelOptional={
-                  <Button asChild type="default" icon={<IconExternalLink />}>
+                  <Button asChild type="default" icon={<ExternalLink />}>
                     <a
                       target="_blank"
                       rel="noreferrer"

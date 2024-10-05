@@ -6,17 +6,17 @@ import type { Metadata, ResolvingMetadata } from 'next'
 import { redirect } from 'next/navigation'
 import { visit } from 'unist-util-visit'
 
-import { REFERENCES, clientSdkIds } from '~/content/navigation.references'
+import { REFERENCES, clientSdkIds, selfHostingServices } from '~/content/navigation.references'
 import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
 
-export interface AbbrevCommonClientLibSection {
+export interface AbbrevApiReferenceSection {
   id: string
   type: string
   title?: string
   slug?: string
-  items?: Array<AbbrevCommonClientLibSection>
+  items?: Array<AbbrevApiReferenceSection>
   excludes?: Array<string>
   meta?: {
     shared?: boolean
@@ -25,6 +25,9 @@ export interface AbbrevCommonClientLibSection {
 
 export function parseReferencePath(slug: Array<string>) {
   const isClientSdkReference = clientSdkIds.includes(slug[0])
+  const isCliReference = slug[0] === 'cli'
+  const isApiReference = slug[0] === 'api'
+  const isSelfHostingReference = slug[0].startsWith('self-hosting-')
 
   if (isClientSdkReference) {
     let [sdkId, maybeVersion, maybeCrawlers, ...path] = slug
@@ -44,6 +47,23 @@ export function parseReferencePath(slug: Array<string>) {
       maybeVersion,
       maybeCrawlers,
       path,
+    }
+  } else if (isCliReference) {
+    return {
+      __type: 'cli' as const,
+      path: slug.slice(1),
+    }
+  } else if (isApiReference) {
+    return {
+      __type: 'api' as const,
+      path: slug.slice(1),
+    }
+  } else if (isSelfHostingReference) {
+    return {
+      __type: 'self-hosting' as const,
+      service: slug[0].replace('self-hosting-', ''),
+      servicePath: slug[0],
+      path: slug.slice(1),
     }
   } else {
     return {
@@ -68,7 +88,7 @@ async function generateStaticParamsForSdkVersion(sdkId: string, version: string)
 }
 
 export async function generateReferenceStaticParams() {
-  const nonCrawlerPages = clientSdkIds
+  const sdkPages = clientSdkIds
     .flatMap((sdkId) =>
       REFERENCES[sdkId].versions.map((version) => ({
         sdkId,
@@ -79,7 +99,23 @@ export async function generateReferenceStaticParams() {
       slug: [sdkId, version === REFERENCES[sdkId].versions[0] ? null : version].filter(Boolean),
     }))
 
-  return nonCrawlerPages
+  const cliPages = [
+    {
+      slug: ['cli'],
+    },
+  ]
+
+  const apiPages = [
+    {
+      slug: ['api'],
+    },
+  ]
+
+  const selfHostingPages = selfHostingServices.map((service) => ({
+    slug: [REFERENCES[service].libPath],
+  }))
+
+  return [...sdkPages, ...cliPages, ...apiPages, ...selfHostingPages]
 }
 
 export async function generateReferenceMetadata(
@@ -90,7 +126,9 @@ export async function generateReferenceMetadata(
 
   const parsedPath = parseReferencePath(slug)
   const isClientSdkReference = parsedPath.__type === 'clientSdk'
-
+  const isCliReference = parsedPath.__type === 'cli'
+  const isApiReference = parsedPath.__type === 'api'
+  const isSelfHostingReference = parsedPath.__type === 'self-hosting'
   if (isClientSdkReference) {
     const { sdkId, maybeVersion } = parsedPath
     const version = maybeVersion ?? REFERENCES[sdkId].versions[0]
@@ -126,6 +164,20 @@ export async function generateReferenceMetadata(
         images,
       },
     }
+  } else if (isCliReference) {
+    return {
+      title: 'CLI Reference | Supabase Docs',
+      description: 'CLI reference for the Supabase CLI',
+    }
+  } else if (isApiReference) {
+    return {
+      title: 'Management API Reference | Supabase Docs',
+      description: 'Management API reference for the Supabase API',
+    }
+  } else if (isSelfHostingReference) {
+    return {
+      title: 'Self-Hosting | Supabase Docs',
+    }
   } else {
     return {}
   }
@@ -150,17 +202,59 @@ export async function redirectNonexistentReferenceSection(
 }
 
 export function normalizeMarkdown(markdownUnescaped: string): string {
-  const markdown = markdownUnescaped.replaceAll(/(?<!\\)\{/g, '\\{').replaceAll(/(?<!\\)\}/g, '\\}')
+  /**
+   * Need to first escape the braces so that the MDX parser doesn't choke on
+   * them. Unlike the MDX parser, the regular Markdown parser handles braces
+   * gracefully, so we use it to find the positions of the code blocks, then
+   * escape all other braces before the final conversion with the MDX parser.
+   */
+  const markdownTree = fromMarkdown(markdownUnescaped)
+
+  const codeBlocks = [] as Array<{
+    type: string
+    start: number
+    end: number
+  }>
+  visit(markdownTree, ['code', 'inlineCode'], (node) => {
+    codeBlocks.push({
+      type: node.type,
+      start: node.position.start.offset,
+      end: node.position.end.offset,
+    })
+  })
+  // Sort code blocks by start offset in descending order
+  codeBlocks.sort((a, b) => b.start - a.start)
+
+  let markdown = markdownUnescaped
+  let lastIndex = markdown.length
+
+  // Iterate through the sorted code blocks
+  for (const block of codeBlocks) {
+    // Escape braces in the text between the current code block and the last processed position
+    const textBetween = markdown.slice(block.end, lastIndex)
+    const escapedTextBetween = textBetween.replace(/(?<!\\)([{}])/g, '\\$1')
+
+    // Replace the original text with the escaped version
+    markdown = markdown.slice(0, block.end) + escapedTextBetween + markdown.slice(lastIndex)
+
+    // Update the last processed position
+    lastIndex = block.start
+  }
+
+  // Escape braces in the remaining text before the first code block
+  if (lastIndex > 0) {
+    const remainingText = markdown.slice(0, lastIndex)
+    const escapedRemainingText = remainingText.replace(/(?<!\\)([{}])/g, '\\$1')
+    markdown = escapedRemainingText + markdown.slice(lastIndex)
+  }
 
   const mdxTree = fromMarkdown(markdown, {
     extensions: [mdxjs()],
     mdastExtensions: [mdxFromMarkdown()],
   })
-
   visit(mdxTree, 'text', (node) => {
     node.value = node.value.replace(/\n/g, ' ')
   })
-
   const content = toMarkdown(mdxTree, {
     extensions: [mdxToMarkdown()],
   })

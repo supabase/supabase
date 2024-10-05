@@ -3,10 +3,9 @@ import { ExternalLink, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
 import { useParams } from 'common'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import {
@@ -18,8 +17,8 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
-  RadioGroupStacked,
-  RadioGroupStackedItem,
+  RadioGroupCard,
+  RadioGroupCardItem,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -38,13 +37,14 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { urlRegex } from '../Auth/Auth.constants'
 
 const FORM_ID = 'log-drain-destination-form'
 
 const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('webhook'),
-    url: z.string().url('Endpoint URL is required and must be a valid URL'),
+    url: z.string().regex(urlRegex, 'Endpoint URL is required and must be a valid URL'),
     http: z.enum(['http1', 'http2']),
     gzip: z.boolean(),
     headers: z.record(z.string(), z.string()).optional(),
@@ -205,7 +205,12 @@ export function LogDrainDestinationSheetForm({
         onOpenChange(v)
       }}
     >
-      <SheetContent tabIndex={undefined} showClose={false} size="lg" className="overflow-y-auto">
+      <SheetContent
+        tabIndex={undefined}
+        showClose={false}
+        size="lg"
+        className="overflow-y-auto flex flex-col"
+      >
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
@@ -227,7 +232,7 @@ export function LogDrainDestinationSheetForm({
                 form.handleSubmit(onSubmit)(e)
               }}
             >
-              <div className="space-y-4 px-content">
+              <div className="space-y-8 px-content">
                 <LogDrainFormItem
                   value="name"
                   placeholder="My Destination"
@@ -246,35 +251,35 @@ export function LogDrainDestinationSheetForm({
                     label="Type"
                     description={LOG_DRAIN_TYPES.find((t) => t.value === type)?.description || ''}
                   >
-                    <Select
+                    <Select_Shadcn_
                       defaultValue={defaultType}
                       value={form.getValues('type')}
                       onValueChange={(v: LogDrainType) => form.setValue('type', v)}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger_Shadcn_>
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
-                      </SelectTrigger>
-                      <SelectContent>
+                      </SelectTrigger_Shadcn_>
+                      <SelectContent_Shadcn_>
                         {LOG_DRAIN_TYPES.map((type) => (
-                          <SelectItem
+                          <SelectItem_Shadcn_
                             value={type.value}
                             key={type.value}
                             id={type.value}
                             className="text-left"
                           >
                             {type.name}
-                          </SelectItem>
+                          </SelectItem_Shadcn_>
                         ))}
-                      </SelectContent>
-                    </Select>
+                      </SelectContent_Shadcn_>
+                    </Select_Shadcn_>
                   </FormItemLayout>
                 )}
               </div>
 
-              <div className="space-y-6 mt-4">
+              <div className="space-y-8 mt-4">
                 {type === 'webhook' && (
                   <>
-                    <div className="px-content space-y-6">
+                    <div className="px-content space-y-8">
                       <LogDrainFormItem
                         value="url"
                         label="Endpoint URL"
@@ -287,18 +292,22 @@ export function LogDrainDestinationSheetForm({
                         render={({ field }) => (
                           <FormItemLayout layout="horizontal" label="HTTP Version">
                             <FormControl_Shadcn_>
-                              <RadioGroupStacked onValueChange={field.onChange} value={field.value}>
+                              <RadioGroupCard
+                                className="flex gap-2"
+                                onValueChange={field.onChange}
+                                value={field.value}
+                              >
                                 <FormItem_Shadcn_ asChild>
                                   <FormControl_Shadcn_>
-                                    <RadioGroupStackedItem value="http1" label="HTTP/1" />
+                                    <RadioGroupCardItem value="http1" label="HTTP/1" />
                                   </FormControl_Shadcn_>
                                 </FormItem_Shadcn_>
                                 <FormItem_Shadcn_ asChild>
                                   <FormControl_Shadcn_>
-                                    <RadioGroupStackedItem value="http2" label="HTTP/2" />
+                                    <RadioGroupCardItem value="http2" label="HTTP/2" />
                                   </FormControl_Shadcn_>
                                 </FormItem_Shadcn_>
-                              </RadioGroupStacked>
+                              </RadioGroupCard>
                             </FormControl_Shadcn_>
                             <FormMessage_Shadcn_ />
                           </FormItemLayout>
@@ -462,39 +471,41 @@ export function LogDrainDestinationSheetForm({
           )}
         </SheetSection>
 
-        <SheetSection className="border-t mt-4 bg-background-alternative-200">
-          <FormItemLayout
-            isReactForm={false}
-            layout="horizontal"
-            label={
-              <div className="text-foreground-light">
-                Additional drain cost
-                <div className="text-foreground-lighter mt-2">
-                  <Link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline flex gap-1 items-center"
-                    href="https://supabase.com/docs/guides/platform/log-drains"
-                  >
-                    Documentation <ExternalLink className="w-4 h-4" />
-                  </Link>
+        <div className="mt-auto">
+          <SheetSection className="border-t bg-background-alternative-200 mt-auto">
+            <FormItemLayout
+              isReactForm={false}
+              layout="horizontal"
+              label={
+                <div className="text-foreground-light">
+                  Additional drain cost
+                  <div className="text-foreground-lighter mt-2">
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline flex gap-1 items-center"
+                      href="https://supabase.com/docs/guides/platform/log-drains"
+                    >
+                      Documentation <ExternalLink className="w-4 h-4" />
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            }
-          >
-            <ul className="text-right text-foreground-light">
-              <li className="text-brand-link text-base">$60 / drain / month</li>
-              <li>$0.20 per million events</li>
-              <li>$0.09 per GB</li>
-            </ul>
-          </FormItemLayout>
-        </SheetSection>
+              }
+            >
+              <ul className="text-right text-foreground-light">
+                <li className="text-brand-link text-base">$60 per drain per month</li>
+                <li>$0.20 per million events</li>
+                <li>$0.09 per GB egress</li>
+              </ul>
+            </FormItemLayout>
+          </SheetSection>
 
-        <SheetFooter className="p-content">
-          <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
-            Save destination
-          </Button>
-        </SheetFooter>
+          <SheetFooter className="p-content !mt-0">
+            <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
+              Save destination
+            </Button>
+          </SheetFooter>
+        </div>
       </SheetContent>
     </Sheet>
   )
