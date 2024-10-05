@@ -24,6 +24,7 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { VercelToolbar } from '@vercel/toolbar/next'
 import { ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -152,6 +153,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   useThemeSandbox()
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+  const shouldInjectToolbar = process.env.NODE_ENV === 'development'
 
   return (
     <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
@@ -199,6 +201,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
           </AuthContainer>
         </Hydrate>
       </QueryClientProvider>
+      {shouldInjectToolbar && <VercelToolbar />}
     </ErrorBoundary>
   )
 }

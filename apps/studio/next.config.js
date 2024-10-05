@@ -1,4 +1,5 @@
 const { withSentryConfig } = require('@sentry/nextjs')
+const withVercelToolbar = require('@vercel/toolbar/plugins/next')()
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
@@ -65,7 +66,7 @@ const csp = [
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL};`,
+        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL} http://localhost:*/events;`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `img-src 'self' blob: data: ${IMG_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_URL};`,
@@ -101,6 +102,14 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     webpackBuildWorker: true,
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/.well-known/vercel/flags',
+        destination: '/api/vercel/flags',
+      },
+    ]
   },
   async redirects() {
     return [
@@ -398,27 +407,43 @@ const nextConfig = {
   },
   async headers() {
     return [
+      // {
+      //   source: '/(.*?)',
+      // headers: [
+      //   {
+      //     key: 'X-Frame-Options',
+      //     value: 'DENY',
+      //   },
+      //   {
+      //     key: 'X-Content-Type-Options',
+      //     value: 'no-sniff',
+      //   },
+      // {
+      //   key: 'Content-Security-Policy',
+      //   value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? csp : "frame-ancestors 'none';",
+      // },
+      // {
+      //   key: 'Referrer-Policy',
+      //   value: 'strict-origin-when-cross-origin',
+      // },
+      // ],
+      // },
+
       {
+        // matching all API routes
         source: '/(.*?)',
         headers: [
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Origin', value: '*' }, // replace this your actual origin
+          { key: 'Access-Control-Allow-Methods', value: 'GET,DELETE,PATCH,POST,PUT' },
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'no-sniff',
-          },
-          {
-            key: 'Content-Security-Policy',
-            value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? csp : "frame-ancestors 'none';",
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
+            key: 'Access-Control-Allow-Headers',
+            value:
+              'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
           },
         ],
       },
+
       {
         source: '/img/:slug*',
         headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
@@ -499,7 +524,7 @@ const nextConfig = {
 // module.exports = withBundleAnalyzer(nextConfig)
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
-module.exports =
+const minorConfig =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
     ? withSentryConfig(
         withBundleAnalyzer(nextConfig),
@@ -527,3 +552,6 @@ module.exports =
         }
       )
     : nextConfig
+
+// Instead of module.exports = nextConfig, do this:
+module.exports = withVercelToolbar(nextConfig)
