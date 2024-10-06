@@ -2197,11 +2197,11 @@ export interface paths {
   }
   '/v1/projects/{ref}/upgrade/eligibility': {
     /** [Beta] Returns the project's eligibility for upgrades */
-    get: operations['v1-get-postgrest-upgrade-eligibility']
+    get: operations['v1-get-postgres-upgrade-eligibility']
   }
   '/v1/projects/{ref}/upgrade/status': {
     /** [Beta] Gets the latest status of the project's upgrade */
-    get: operations['v1-get-postgrest-upgrade-status']
+    get: operations['v1-get-postgres-upgrade-status']
   }
   '/v1/projects/{ref}/vanity-subdomain': {
     /** [Beta] Gets current vanity subdomain config */
@@ -3582,6 +3582,11 @@ export interface components {
       }
       projects: components['schemas']['IntegrationVercelProject'][]
     }
+    GitConfig: {
+      owner: string
+      ref: string
+      repo: string
+    }
     GitHubAuthorization: {
       id: number
       sender_id: number
@@ -3854,6 +3859,7 @@ export interface components {
       role_id: number
     }
     Invoice: {
+      amount_due: number
       id: string
       invoice_pdf: string
       number: string
@@ -4363,15 +4369,18 @@ export interface components {
     }
     PostgresConfigResponse: {
       effective_cache_size?: string
+      logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
       max_locks_per_transaction?: number
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
+      max_replication_slots?: number
       max_slot_wal_keep_size?: string
       max_standby_archive_delay?: string
       max_standby_streaming_delay?: string
+      max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
       /** @enum {string} */
@@ -4379,6 +4388,7 @@ export interface components {
       shared_buffers?: string
       statement_timeout?: string
       wal_keep_size?: string
+      wal_sender_timeout?: string
       work_mem?: string
     }
     /** @enum {string} */
@@ -6112,15 +6122,18 @@ export interface components {
     }
     UpdatePostgresConfigBody: {
       effective_cache_size?: string
+      logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
       max_locks_per_transaction?: number
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
+      max_replication_slots?: number
       max_slot_wal_keep_size?: string
       max_standby_archive_delay?: string
       max_standby_streaming_delay?: string
+      max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
       /** @enum {string} */
@@ -6128,6 +6141,7 @@ export interface components {
       shared_buffers?: string
       statement_timeout?: string
       wal_keep_size?: string
+      wal_sender_timeout?: string
       work_mem?: string
     }
     UpdatePostgrestConfigBody: {
@@ -6634,6 +6648,10 @@ export interface components {
       walVerification: Record<string, never>
     }
     WorkflowRunResponse: {
+      branch_id: string
+      check_run_id: number | null
+      created_at: string
+      git_config: components['schemas']['GitConfig'] | null
       id: string
       /** @enum {string} */
       status:
@@ -6643,6 +6661,8 @@ export interface components {
         | 'MIGRATIONS_FAILED'
         | 'FUNCTIONS_DEPLOYED'
         | 'FUNCTIONS_FAILED'
+      updated_at: string
+      workdir: string | null
     }
   }
   responses: never
@@ -16005,7 +16025,7 @@ export interface operations {
     }
   }
   /** [Beta] Returns the project's eligibility for upgrades */
-  'v1-get-postgrest-upgrade-eligibility': {
+  'v1-get-postgres-upgrade-eligibility': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -16028,8 +16048,11 @@ export interface operations {
     }
   }
   /** [Beta] Gets the latest status of the project's upgrade */
-  'v1-get-postgrest-upgrade-status': {
+  'v1-get-postgres-upgrade-status': {
     parameters: {
+      query?: {
+        tracking_id?: string
+      }
       path: {
         /** @description Project ref */
         ref: string
