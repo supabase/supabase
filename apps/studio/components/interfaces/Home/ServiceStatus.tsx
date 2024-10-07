@@ -133,9 +133,8 @@ const ServiceStatus = () => {
   }
 
   const StatusIcon = ({ isLoading, isSuccess }: { isLoading: boolean; isSuccess: boolean }) => {
-    if (isLoading) return <Loader2 size={14} className="animate-spin" />
+    if (isLoading || isProjectNew) return <Loader2 size={14} className="animate-spin" />
     if (isSuccess) return <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
-    if (isProjectNew) return <Loader2 size={14} className="animate-spin" />
     return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
   }
 
