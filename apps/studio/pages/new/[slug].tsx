@@ -204,9 +204,14 @@ const Wizard: NextPageWithLayout = () => {
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
+  const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery()
-  const hasOutstandingInvoices =
-    (allOverdueInvoices ?? []).filter((x) => x.organization_id === currentOrg?.id).length > 0
+  const overdueInvoices = (allOverdueInvoices ?? []).filter(
+    (x) => x.organization_id === currentOrg?.id
+  )
+  const ignoreOverdueInvoices = ['team', 'enterprise'].includes(orgSubscription?.plan.id ?? '')
+  const hasOutstandingInvoices = !ignoreOverdueInvoices && overdueInvoices.length > 0
 
   const { data: allProjects } = useProjectsQuery({})
   const organizationProjects =
@@ -214,10 +219,6 @@ const Wizard: NextPageWithLayout = () => {
       (project) =>
         project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
-
-  const { data: orgSubscription } = useOrgSubscriptionQuery({
-    orgSlug: slug,
-  })
   const { data: defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
