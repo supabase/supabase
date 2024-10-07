@@ -224,7 +224,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
       critical: {
         title: "Authentication emails are only sent to organization members' email addresses",
         description:
-          'Set up a custom SMTP provider to handle flows like password reset or user invitation, and other flows which require sending emails to any user',
+          'Set up a custom SMTP provider to handle flows like password reset, user invitation, and other flows which require sending emails to any user',
       },
     },
     cardContent: {
