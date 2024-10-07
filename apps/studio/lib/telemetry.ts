@@ -6,11 +6,11 @@ import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import type { User } from 'types'
 
 export interface TelemetryProps {
+  language: string
+  search?: string
+  userAgent?: string
   viewportHeight?: string
   viewportWidth?: string
-  language: string
-  userAgent?: string
-  search?: string
 }
 
 /**
@@ -45,18 +45,14 @@ const sendEvent = (
     `${API_URL}/telemetry/event`,
     {
       action: action,
-      page_url: document?.location.href,
-      page_title: document?.title,
+      pageUrl: document?.location.href,
+      pageTitle: document?.title,
       pathname: page_location,
       ph: {
         referrer: document?.referrer,
-        language: phProps.language,
-        user_agent: phProps.userAgent,
-        search: phProps.search,
-        viewport_height: phProps.viewportHeight,
-        viewport_width: phProps.viewportWidth,
+        ...phProps,
       },
-      custom_properties: {
+      customProperties: {
         category,
         label,
         value,
@@ -84,7 +80,7 @@ const sendIdentify = (user: User) => {
   return post(
     `${API_URL}/telemetry/identify`,
     {
-      user_id: user.gotrue_id,
+      userId: user.gotrue_id,
     },
     {
       credentials: 'include',

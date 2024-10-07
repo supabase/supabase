@@ -21,7 +21,6 @@ const useSendPageTelemetryWithConsent = () => {
           title: document.title,
           route: `${BASE_PATH}${route}`,
           ga: {
-            screen_resolution: telemetryProps?.screenResolution,
             language: telemetryProps?.language,
             session_id: '',
           },

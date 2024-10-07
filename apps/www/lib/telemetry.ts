@@ -11,11 +11,11 @@ export interface TelemetryEvent {
 }
 
 export interface TelemetryProps {
+  language: string
+  search?: string
+  userAgent?: string
   viewportHeight?: string
   viewportWidth?: string
-  language: string
-  userAgent?: string
-  search?: string
 }
 
 const noop = () => {}
@@ -39,18 +39,14 @@ const sendEvent = (event: TelemetryEvent, phProps: TelemetryProps, router: NextR
     `${API_URL}/telemetry/event`,
     {
       action,
-      page_url: document?.location.href,
-      page_title: document?.title,
+      pageUrl: document?.location.href,
+      pageTitle: document?.title,
       pathname: router.asPath,
       ph: {
         referrer: document?.referrer,
-        language: phProps.language,
-        user_agent: phProps.userAgent,
-        search: phProps.search,
-        viewport_height: phProps.viewportHeight,
-        viewport_width: phProps.viewportWidth,
+        ...phProps,
       },
-      custom_properties: {
+      customProperties: {
         category,
         label,
         value,

@@ -36,16 +36,12 @@ export default function App({ Component, pageProps }: AppProps) {
     return post(
       `${API_URL}/telemetry/page`,
       {
-        page_url: document.location.href,
-        page_title: document.title,
+        pageUrl: document.location.href,
+        pageTitle: document.title,
         pathname: route,
         ph: {
           referrer: document.referrer,
-          language: telemetryProps.language,
-          user_agent: telemetryProps.userAgent,
-          search: telemetryProps.search,
-          viewport_height: telemetryProps.viewportHeight,
-          viewport_width: telemetryProps.viewportWidth,
+          ...telemetryProps,
         },
       },
       {
@@ -58,8 +54,8 @@ export default function App({ Component, pageProps }: AppProps) {
     post(
       `${API_URL}/telemetry/pageleave`,
       {
-        page_url: document.location.href,
-        page_title: document.title,
+        pageUrl: document.location.href,
+        pageTitle: document.title,
         pathname: document.location.pathname,
       },
       {
