@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { PauseCircle } from 'lucide-react'
+import { ExternalLink, PauseCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -19,11 +19,11 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Modal } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import { useProjectContext } from '../ProjectContext'
-import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { PauseDisabledState } from './PauseDisabledState'
+import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
+import { useProjectContext } from '../ProjectContext'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -165,6 +165,17 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                                 </span>
                                 . However, your database backup and Storage objects will still be
                                 available for download thereafter.
+                              </AlertDescription_Shadcn_>
+                              <AlertDescription_Shadcn_ className="mt-3">
+                                <Button asChild type="default" icon={<ExternalLink />}>
+                                  <a
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#time-limits"
+                                  >
+                                    More information
+                                  </a>
+                                </Button>
                               </AlertDescription_Shadcn_>
                             </Alert_Shadcn_>
                           </>

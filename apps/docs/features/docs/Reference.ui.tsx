@@ -230,7 +230,7 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
       </div>
       {description && (
         <div className="prose text-sm">
-          <MDXRemoteBase source={normalizeMarkdown(description)} />
+          <MDXRemoteBase source={description} customPreprocess={normalizeMarkdown} />
         </div>
       )}
       {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}
@@ -253,7 +253,10 @@ export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret
         <div className="text-xs text-foreground-muted">{getTypeName(returnType)}</div>
         {returnType.comment?.shortText && (
           <div className="prose text-sm">
-            <MDXRemoteBase source={normalizeMarkdown(returnType.comment?.shortText)} />
+            <MDXRemoteBase
+              source={returnType.comment?.shortText}
+              customPreprocess={normalizeMarkdown}
+            />
           </div>
         )}
         {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}

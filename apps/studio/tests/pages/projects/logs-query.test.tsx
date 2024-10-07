@@ -1,10 +1,10 @@
-import { vi } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
 import { LogsExplorerPage } from 'pages/project/[ref]/logs/explorer/index'
 import { clickDropdown, render } from 'tests/helpers'
 import { routerMock } from 'tests/mocks/router'
+import { beforeAll, describe, expect, test, vi } from 'vitest'
 
 // [Joshen] Am temporarily commenting out the breaking tests due to:
 // "TypeError: _fetch.get.mockReset is not a function" error from Jest
@@ -21,7 +21,7 @@ beforeAll(() => {
       ...mod,
       IS_PLATFORM: true,
       useIsLoggedIn: vi.fn(),
-      useParams: jest.fn(() => ({ ref: 'projectRef' })),
+      useParams: vi.fn(() => ({ ref: 'projectRef' })),
     }
   })
   vi.mock('lib/gotrue', () => ({

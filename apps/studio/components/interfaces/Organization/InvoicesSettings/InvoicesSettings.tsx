@@ -133,7 +133,7 @@ const InvoicesSettings = () => {
                           <p>{dayjs(x.period_end * 1000).format('MMM DD, YYYY')}</p>
                         </Table.td>
                         <Table.td>
-                          <p>{formatCurrency(x.subtotal / 100)}</p>
+                          <p>{formatCurrency(x.amount_due / 100)}</p>
                         </Table.td>
                         <Table.td>
                           <p>{x.number}</p>
@@ -146,7 +146,7 @@ const InvoicesSettings = () => {
                         </Table.td>
                         <Table.td className="align-right">
                           <div className="flex items-center justify-end space-x-2">
-                            {x.subtotal > 0 &&
+                            {x.amount_due > 0 &&
                               [
                                 InvoiceStatus.UNCOLLECTIBLE,
                                 InvoiceStatus.OPEN,

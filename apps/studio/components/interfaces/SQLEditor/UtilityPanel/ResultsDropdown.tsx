@@ -7,11 +7,9 @@ import { toast } from 'sonner'
 
 import { useTelemetryProps } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useFlag } from 'hooks/ui/useFlag'
 import { copyToClipboard } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { ChevronDownIcon, Clipboard, Download } from 'lucide-react'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -28,12 +26,9 @@ export type ResultsDropdownProps = {
 const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
   const { project } = useProjectContext()
   const telemetryProps = useTelemetryProps()
-
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const enableFolders = useFlag('sqlFolderOrganization')
 
-  const result = enableFolders ? snapV2.results?.[id]?.[0] : snap.results?.[id]?.[0] ?? undefined
+  const result = snapV2.results?.[id]?.[0] ?? undefined
   const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
   const router = useRouter()
 
@@ -136,11 +131,7 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
         className="hidden"
         headers={headers}
         data={csvData}
-        filename={
-          enableFolders
-            ? `supabase_${project?.ref}_${snapV2.snippets[id]?.snippet.name}.csv`
-            : `supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}.csv`
-        }
+        filename={`supabase_${project?.ref}_${snapV2.snippets[id]?.snippet.name}.csv`}
       />
 
       <DropdownMenuContent side="bottom" align="start">
