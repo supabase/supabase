@@ -215,7 +215,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
     metric: null,
   },
   auth_restricted_email_sending: {
-    restrictToRoutes: ['/project/[ref]', '/project/[ref]/auth', '/project/[ref]/settings/auth'], // project home, auth, settings
+    restrictToRoutes: ['/project/[ref]/auth', '/project/[ref]/settings/auth'], // project home, auth, settings
     bannerContent: {
       warning: {
         title: AFTER_26_09_2024
