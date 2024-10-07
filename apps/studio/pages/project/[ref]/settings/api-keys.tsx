@@ -15,6 +15,7 @@ import type { NextPageWithLayout } from 'types'
 import PublishableAPIKeys from 'components/interfaces/APIKeys/PublishableAPIKeys'
 import SecretAPIKeys from 'components/interfaces/APIKeys/SecretAPIKeys'
 import LegacyAPIKeys from 'components/interfaces/APIKeys/LegacyAPIKeys'
+import { Separator } from 'ui'
 
 const AuthSettings: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -38,7 +39,9 @@ const AuthSettings: NextPageWithLayout = () => {
           <NoPermission isFullPage resourceText="access your project's API keys" />
         ) : (
           <>
+            <Separator />
             <PublishableAPIKeys />
+            <Separator />
             <SecretAPIKeys />
             <LegacyAPIKeys />
           </>

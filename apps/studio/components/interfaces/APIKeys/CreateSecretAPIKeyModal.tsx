@@ -25,19 +25,18 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
+import { Plus } from 'lucide-react'
+import { useParams } from 'common'
 
 const FORM_ID = 'create-secret-api-key'
 const SCHEMA = z.object({
-  role: z.string(),
+  // role: z.string(),
   description: z.string(),
 })
 
-export interface CreateSecretAPIKeyModalProps {
-  projectRef: string
-}
-
-const CreateSecretAPIKeyModal = ({ projectRef }: CreateSecretAPIKeyModalProps) => {
+const CreateSecretAPIKeyModal = () => {
   const [visible, setVisible] = useState(false)
+  const { ref: projectRef } = useParams()
 
   const onClose = (value: boolean) => {
     setVisible(value)
@@ -54,6 +53,7 @@ const CreateSecretAPIKeyModal = ({ projectRef }: CreateSecretAPIKeyModalProps) =
   const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
+    console.log('got to onSubmit')
     createAPIKey(
       {
         projectRef,
@@ -76,8 +76,8 @@ const CreateSecretAPIKeyModal = ({ projectRef }: CreateSecretAPIKeyModalProps) =
   return (
     <Dialog open={visible} onOpenChange={onClose}>
       <DialogTrigger asChild>
-        <Button type="default" className="pointer-events-auto">
-          Create new
+        <Button type="default" className="mt-2" icon={<Plus />}>
+          Add new Secret key
         </Button>
       </DialogTrigger>
       <DialogContent>

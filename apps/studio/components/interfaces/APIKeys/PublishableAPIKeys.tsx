@@ -19,6 +19,7 @@ import CreatePublishableAPIKeyModal from './CreatePublishableAPIKeyModal'
 import APIKeyRow from './APIKeyRow'
 
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -37,12 +38,11 @@ const PublishableAPIKeys = () => {
   return (
     <div>
       <FormHeader
-        title="Publishable API keys"
+        title="Publishable key"
         description="Use these API keys on the web, in mobile or desktop apps, CLIs or other public components of your app. It's safe to publish these."
         actions={<CreatePublishableAPIKeyModal projectRef={projectRef} />}
       />
-
-      <Table
+      {/* <Table
         head={[
           <Table.th key="">API Key</Table.th>,
           <Table.th key="">Description</Table.th>,
@@ -62,7 +62,17 @@ const PublishableAPIKeys = () => {
             publishableApiKeys.map((apiKey) => <APIKeyRow key={apiKey.id} apiKey={apiKey} />)
           )
         }
-      />
+      /> */}
+      {publishableApiKeys.map((apiKey) => (
+        // <APIKeyRow key={apiKey.id} apiKey={apiKey} />
+        <div className="flex flex-row gap-2 w-full items-center">
+          <span>Publishable key</span> <Input className="flex-1 grow" copy value={apiKey.api_key} />
+        </div>
+      ))}
+      <div>
+        <div>- Show API Urls</div>
+        <div>- Show Public JWTs</div>
+      </div>
     </div>
   )
 }

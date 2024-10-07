@@ -10,13 +10,23 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
-import Table from 'components/to-be-cleaned/Table'
+// import Table from 'components/to-be-cleaned/Table'
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui/src/components/shadcn/ui/table'
+
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
 
 import CreateSecretAPIKeyModal from './CreateSecretAPIKeyModal'
-import APIKeyRow from './APIKeyRow'
+import APIKeyRow from './APIKeyRowv2'
 
 import { useAPIKeysQuery, APIKeysData } from 'data/api-keys/api-keys-query'
 
@@ -37,33 +47,51 @@ const SecretAPIKeys = () => {
   return (
     <div>
       <FormHeader
-        title="Secret API keys"
+        title="Secret keys"
         description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application. Keep secret and never publish."
-        actions={<CreateSecretAPIKeyModal projectRef={projectRef} />}
+        // actions={<CreateSecretAPIKeyModal projectRef={projectRef} />}
       />
 
-      <Table
-        head={[
-          <Table.th key="">API Key</Table.th>,
-          // <Table.th key="">Postgres Role for RLS</Table.th>,
-          <Table.th key="">Description</Table.th>,
-          <Table.th key="actions" />,
-        ]}
-        body={
-          secretApiKeys.length === 0 ? (
-            <Table.tr>
-              <Table.td colSpan={4} className="!rounded-b-md overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead
+              key=""
+              className="pl-0 text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2"
+            >
+              Name
+            </TableHead>
+            <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0">
+              API Key
+            </TableHead>
+            {/* <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pl-0">
+            Postgres Role for RLS
+          </TableHead> */}
+            <TableHead
+              className="pr-0 text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2"
+              key="actions"
+            />
+          </TableRow>
+        </TableHeader>
+        <TableBody className="border-b">
+          {secretApiKeys.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={4} className="!rounded-b-md overflow-hidden">
                 <p className="text-sm text-foreground">No secret API keys created yet</p>
                 <p className="text-sm text-foreground-light">
                   Your project can't be accessed from your servers using secret API keys.
                 </p>
-              </Table.td>
-            </Table.tr>
+              </TableCell>
+            </TableRow>
           ) : (
             secretApiKeys.map((apiKey) => <APIKeyRow key={apiKey.id} apiKey={apiKey} />)
-          )
-        }
-      />
+          )}
+        </TableBody>
+        <CreateSecretAPIKeyModal />
+      </Table>
+      {/* {secretApiKeys.map((apiKey) => (
+        <APIKeyRow key={apiKey.id} apiKey={apiKey} />
+      ))} */}
     </div>
   )
 }

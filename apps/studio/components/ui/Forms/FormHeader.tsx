@@ -27,7 +27,7 @@ const FormHeader = ({
             {title}
           </ReactMarkdown>
         </h3>
-        {description && <Markdown content={description} className="max-w-full" />}
+        {description && <Markdown content={description} className="max-w-xl" />}
       </div>
       <div className="flex items-center gap-x-2">
         {docsUrl !== undefined && (

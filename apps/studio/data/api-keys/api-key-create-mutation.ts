@@ -21,6 +21,8 @@ export type APIKeyCreateVariables = {
 )
 
 export async function createAPIKey(payload: APIKeyCreateVariables) {
+  console.log('about to send')
+
   const { data, error } = await post('/v1/projects/{ref}/api-keys', {
     params: { path: { ref: payload.projectRef } },
     body:
