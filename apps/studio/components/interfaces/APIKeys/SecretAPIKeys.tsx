@@ -7,7 +7,7 @@ import {
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, Card, CardContent } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
 // import Table from 'components/to-be-cleaned/Table'
@@ -49,46 +49,49 @@ const SecretAPIKeys = () => {
       <FormHeader
         title="Secret keys"
         description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application. Keep secret and never publish."
-        // actions={<CreateSecretAPIKeyModal projectRef={projectRef} />}
+        actions={<CreateSecretAPIKeyModal projectRef={projectRef} />}
       />
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead
-              key=""
-              className="pl-0 text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2"
-            >
-              Name
-            </TableHead>
-            <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0">
-              API Key
-            </TableHead>
-            {/* <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pl-0">
+      <Card className="w-full bg-surface-100 overflow-hidden">
+        <CardContent className="p-0">
+          <Table className="p-5">
+            <TableHeader>
+              <TableRow className="bg-200">
+                <TableHead
+                  key=""
+                  className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 overflow-hidden"
+                >
+                  Name
+                </TableHead>
+                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pr-0">
+                  API Key
+                </TableHead>
+                {/* <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pl-0">
             Postgres Role for RLS
           </TableHead> */}
-            <TableHead
-              className="pr-0 text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2"
-              key="actions"
-            />
-          </TableRow>
-        </TableHeader>
-        <TableBody className="border-b">
-          {secretApiKeys.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={4} className="!rounded-b-md overflow-hidden">
-                <p className="text-sm text-foreground">No secret API keys created yet</p>
-                <p className="text-sm text-foreground-light">
-                  Your project can't be accessed from your servers using secret API keys.
-                </p>
-              </TableCell>
-            </TableRow>
-          ) : (
-            secretApiKeys.map((apiKey) => <APIKeyRow key={apiKey.id} apiKey={apiKey} />)
-          )}
-        </TableBody>
-        <CreateSecretAPIKeyModal />
-      </Table>
+                <TableHead
+                  className="text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2"
+                  key="actions"
+                />
+              </TableRow>
+            </TableHeader>
+            <TableBody className="">
+              {secretApiKeys.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="!rounded-b-md overflow-hidden">
+                    <p className="text-sm text-foreground">No secret API keys created yet</p>
+                    <p className="text-sm text-foreground-light">
+                      Your project can't be accessed from your servers using secret API keys.
+                    </p>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                secretApiKeys.map((apiKey) => <APIKeyRow key={apiKey.id} apiKey={apiKey} />)
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      {/* <CreateSecretAPIKeyModal /> */}
       {/* {secretApiKeys.map((apiKey) => (
         <APIKeyRow key={apiKey.id} apiKey={apiKey} />
       ))} */}

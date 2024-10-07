@@ -325,7 +325,7 @@ NEW_KEY_CONTENT
       exit={{ opacity: 0, height: 0 }}
       className={cn(key.status !== 'IN_USE' ? 'border-b border-dashed border-border' : 'border-b')}
     >
-      <TableCell className="w-[150px] pr-0 py-2 pl-0">
+      <TableCell className="w-[150px] pr-0 py-2">
         <div className="flex -space-x-px items-center">
           <Badge
             className={cn(
@@ -370,7 +370,7 @@ NEW_KEY_CONTENT
         {/* {algorithmLabels[key.algorithm]} */}
         <AlgorithmHoverCard algorithm={key.algorithm} />
       </TableCell>
-      <TableCell className="text-right py-2 pr-0">
+      <TableCell className="text-right py-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -509,12 +509,12 @@ NEW_KEY_CONTENT
       </div>
       <div>
         <h2 className="text-xl mb-4">Active keys</h2>
-        <Card className="w-full overflow-hidden border-0">
+        <Card className="w-full overflow-hidden border-0 bg-surface-100 border rounded-md">
           <CardContent className="p-0">
             <Table className="p-5">
-              <TableHeader>
+              <TableHeader className="bg-200">
                 <TableRow>
-                  <TableHead className="pl-0 text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0 w-20">
+                  <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0 w-20">
                     Status
                   </TableHead>
                   <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pl-0">
@@ -529,7 +529,7 @@ NEW_KEY_CONTENT
                   <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                     Type
                   </TableHead>
-                  <TableHead className="pr-0 text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
+                  <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                     Actions
                   </TableHead>
                 </TableRow>

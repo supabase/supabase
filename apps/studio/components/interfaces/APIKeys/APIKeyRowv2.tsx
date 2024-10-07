@@ -8,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Input_Shadcn_,
   TableCell,
   TableRow,
   TooltipTrigger_Shadcn_,
@@ -50,14 +51,21 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
 
   return (
     <TableRow key={apiKey.id}>
-      <TableCell className="pl-0">{apiKey.description || '/'}</TableCell>
+      <TableCell className="">{apiKey.description || '/'}</TableCell>
       <TableCell className="">
         <div className="flex flex-row gap-2">
-          <code>{shown ? apiKey.api_key : hiddenKey}</code>
+          {/* <code>{shown ? apiKey.api_key : hiddenKey}</code> */}
+
+          <Input_Shadcn_
+            size="tiny"
+            className="flex-1 grow gap-1 font-mono !rounded-full max-w-60 truncate"
+            value={apiKey.api_key}
+          />
 
           {isSecret && (
             <Button
               type="outline"
+              className="rounded-full px-2"
               icon={shown ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
               onClick={() => {
                 setShown((shown) => {
@@ -72,26 +80,22 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
               }}
             />
           )}
-          <CopyButton text={apiKey.api_key} iconOnly />
+          <CopyButton type="default" text={apiKey.api_key} iconOnly className="rounded-full px-2" />
         </div>
       </TableCell>
 
-      {/* {isSecret && (
-        <TableCell>
-          <code>{apiKey.secret_jwt_template?.role ?? ''}</code>
-        </TableCell>
-      )} */}
+      {/* {isSecret && <TableCell>{apiKey.created_on ?? ''}</TableCell>} */}
 
-      <TableCell className="pr-0">
+      <TableCell className="flex justify-end">
         <DropdownMenu>
           <DropdownMenuTrigger className="h-8 w-8 p-2 focus-visible:outline-none">
-            <MoreVertical size="14" />
+            <MoreVertical size="14" className="text-foreground-light hover:text-foreground" />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="max-w-40" align="end">
             <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
-                  className="flex gap-1.5 !pointer-events-auto"
+                  className="flex gap-2 !pointer-events-auto"
                   onClick={async (e) => {
                     if (canDeleteAPIKeys) {
                       e.preventDefault()
@@ -100,9 +104,9 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
                   }}
                 >
                   {isDeletingAPIKey ? (
-                    <Loader2 size="14" className="animate-spin" />
+                    <Loader2 size="12" className="animate-spin" />
                   ) : (
-                    <TrashIcon size="14" />
+                    <TrashIcon size="12" />
                   )}
                   {isDeletingAPIKey ? 'Deleting key..' : 'Delete API key'}
                 </DropdownMenuItem>

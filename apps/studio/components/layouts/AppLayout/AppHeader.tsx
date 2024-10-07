@@ -13,6 +13,7 @@ import OrganizationDropdown from './OrganizationDropdown'
 import ProjectDropdown from './ProjectDropdown'
 import SettingsButton from './SettingsButton'
 import UserSettingsDropdown from './UserSettingsDropdown'
+import { ConnectDialog } from 'components/interfaces/Home/Connect/ConnectDialog'
 
 // [Joshen] Just FYI this is only for Nav V2 which is still going through design iteration
 // Component is not currently in use
