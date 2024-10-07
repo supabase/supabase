@@ -103,19 +103,23 @@ Install [nix](https://nixos.org/):
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
 
-Next, we need to start Postgres locally.
+To identify your project's backup image version, reference the backup's download button following `PG:`.
 
-If you know the project's Postgres version from your project's [infrastructure project settings](https://supabase.com/dashboard/project/_/settings/infrastructure) page, you can use it to spin up an identical image locally. Using an identical image improves the odds of successfully restoring your project because all of the extension versions and configuration will match exactly.
+<Image
+  zoomable
+  alt="Project Paused: 90 Days Remaining"
+  src="/docs/img/guides/platform/paused-dl-image-version.png"
+/>
 
-Given Postgres version `15.6.1.121`, start postgres locally with the nix command:
+Given Postgres version `15.6.1.115`, start postgres locally with the nix command:
 
 ```sh
-nix run 'github:supabase/postgres?ref=15.6.1.121#start-server' 15
+nix run 'github:supabase/postgres?ref=15.6.1.115#start-server' 15
 ```
 
 where `15` refers to the backup's Postgres major version.
 
-Note that the earliest Supabase Postgres version that supports a direct reference is `15.6.1.115`. If you don't know your project's Postgres version or it is lower than `15.6.1.115` then omit the `ref` option to build our most recent image:
+Note that the earliest Supabase Postgres version that supports a direct reference is `15.6.1.115`. If you don't know your roject's Postgres version or it is lower than `15.6.1.115` then omit the `ref` option to build our most recent image:
 
 ```sh
 nix run 'github:supabase/postgres#start-server' -- 15
