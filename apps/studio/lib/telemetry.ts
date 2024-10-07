@@ -6,10 +6,11 @@ import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import type { User } from 'types'
 
 export interface TelemetryProps {
-  screenResolution?: string
+  viewportHeight?: string
+  viewportWidth?: string
   language: string
   userAgent?: string
-  search?: string
+  searchTerms?: string
 }
 
 /**
@@ -22,7 +23,7 @@ const sendEvent = (
     label: string
     value?: string
   },
-  gaProps: TelemetryProps,
+  phProps: TelemetryProps,
   router: NextRouter
 ) => {
   if (!IS_PLATFORM) return
@@ -40,30 +41,38 @@ const sendEvent = (
   // such as access/refresh tokens
   const page_location = router.asPath.split('#')[0]
 
-  return post(`${API_URL}/telemetry/event`, {
-    action: action,
-    category: category,
-    label: label,
-    value: value,
-    page_referrer: document?.referrer,
-    page_title: document?.title,
-    page_location,
-    ga: {
-      screen_resolution: gaProps.screenResolution,
-      language: gaProps.language,
-      user_agent: gaProps.userAgent,
-      search: gaProps.search,
+  return post(
+    `${API_URL}/telemetry/event`,
+    {
+      action: action,
+      page_url: document?.location.href,
+      page_title: document?.title,
+      pathname: page_location,
+      ph: {
+        referrer: document?.referrer,
+        language: phProps.language,
+        user_agent: phProps.userAgent,
+        search_terms: phProps.searchTerms,
+        viewport_height: phProps.viewportHeight,
+        viewport_width: phProps.viewportWidth,
+      },
+      custom_properties: {
+        category,
+        label,
+        value,
+      },
     },
-  }, {
-    credentials: 'include'
-  })
+    {
+      credentials: 'include',
+    }
+  )
 }
 
 /**
  * TODO: GA4 doesn't have identify method.
  * We may or may not need gaClientId here. Confirm later
  */
-const sendIdentify = (user: User, gaProps?: TelemetryProps) => {
+const sendIdentify = (user: User) => {
   if (!IS_PLATFORM) return
 
   const consent =
@@ -72,17 +81,15 @@ const sendIdentify = (user: User, gaProps?: TelemetryProps) => {
       : null
   if (consent !== 'true') return
 
-  return post(`${API_URL}/telemetry/identify`, {
-    user,
-    ga: {
-      screen_resolution: gaProps?.screenResolution,
-      language: gaProps?.language,
-      user_agent: gaProps?.userAgent,
-      search: gaProps?.search,
+  return post(
+    `${API_URL}/telemetry/identify`,
+    {
+      user_id: user.gotrue_id,
     },
-  }, {
-    credentials: 'include'
-  })
+    {
+      credentials: 'include',
+    }
+  )
 }
 /**
  * Generates a unique identifier for an anonymous user based on their gotrue id.

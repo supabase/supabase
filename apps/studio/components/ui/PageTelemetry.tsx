@@ -15,15 +15,15 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-        if (router.isReady) {
-          handlePageLeaveTelemetry()
-        }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
+      if (router.isReady) {
+        if (snap.isOptedInTelemetry) handlePageLeaveTelemetry()
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
     return () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-}, [router.isReady]);
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [router.isReady, snap.isOptedInTelemetry])
 
   useEffect(() => {
     const consent =
@@ -82,38 +82,43 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const handlePageTelemetry = async (route: string) => {
     if (IS_PLATFORM) {
       /**
-       * Get referrer from browser
-       */
-      let referrer: string | undefined = document.referrer
-
-      /**
        * Send page telemetry
        */
-      post(`${API_URL}/telemetry/page`, {
-        referrer: referrer,
-        title: document.title,
-        route,
-        current_url: window.location.href,
-        ga: {
-          screen_resolution: telemetryProps?.screenResolution,
-          language: telemetryProps?.language,
-          user_agent: telemetryProps?.userAgent,
-          search: telemetryProps?.search,
+      post(
+        `${API_URL}/telemetry/page`,
+        {
+          page_url: document.location.href,
+          page_title: document.title,
+          pathname: route,
+          ph: {
+            referrer: document.referrer,
+            language: telemetryProps.language,
+            user_agent: telemetryProps.userAgent,
+            search_terms: telemetryProps.searchTerms,
+            viewport_height: telemetryProps.viewportHeight,
+            viewport_width: telemetryProps.viewportWidth,
+          },
         },
-      }, {
-        credentials: 'include'
-      })
+        {
+          credentials: 'include',
+        }
+      )
     }
   }
 
   const handlePageLeaveTelemetry = async () => {
     if (IS_PLATFORM) {
-      post(`${API_URL}/telemetry/pageleave`, {
-        route: window.location.pathname,
-        current_url: window.location.href,
-      }, {
-        credentials: 'include'
-      })
+      post(
+        `${API_URL}/telemetry/pageleave`,
+        {
+          page_url: document.location.href,
+          page_title: document.title,
+          pathname: document.location.pathname,
+        },
+        {
+          credentials: 'include',
+        }
+      )
     }
   }
 

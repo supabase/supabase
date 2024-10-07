@@ -32,8 +32,8 @@ const useSendTelemetryEvent = () => {
         page_location: pathname,
       },
       headers: {
-        credentials: 'include'
-      }
+        credentials: 'include',
+      },
     })
       .then(({ error }) => {
         if (error) console.error(error)

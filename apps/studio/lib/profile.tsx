@@ -55,7 +55,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   } = useProfileQuery({
     enabled: isLoggedIn,
     onSuccess(profile) {
-      Telemetry.sendIdentify(profile, telemetryProps)
+      Telemetry.sendIdentify(profile)
     },
     onError(err) {
       // if the user does not yet exist, create a profile for them
