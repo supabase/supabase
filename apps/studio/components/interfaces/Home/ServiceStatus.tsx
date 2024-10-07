@@ -1,4 +1,6 @@
-import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react'
+import dayjs from 'dayjs'
+import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -8,8 +10,6 @@ import { useProjectServiceStatusQuery } from 'data/service-status/service-status
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
-import Link from 'next/link'
-import dayjs from 'dayjs'
 
 const ServiceStatus = () => {
   const { ref } = useParams()
@@ -164,17 +164,21 @@ const ServiceStatus = () => {
           <Link
             href={`/project/${ref}${service.logsUrl}`}
             key={service.name}
-            className="px-4 py-2 text-xs flex items-center border-b last:border-none group relative"
+            className="transition px-3 py-2 text-xs flex items-center justify-between border-b last:border-none group relative hover:bg-surface-300"
           >
-            <div className="flex-1">
-              <p>{service.name}</p>
-              <p className="text-foreground-light flex items-center gap-1 group-hover:hidden">
-                <StatusMessage isLoading={service.isLoading} isSuccess={!!service.isSuccess} />
-              </p>
-
-              <div className="hidden group-hover:flex text-foreground">Go to Logs</div>
+            <div className="flex gap-x-2">
+              <StatusIcon isLoading={service.isLoading} isSuccess={!!service.isSuccess} />
+              <div className="flex-1">
+                <p>{service.name}</p>
+                <p className="text-foreground-light flex items-center gap-1">
+                  <StatusMessage isLoading={service.isLoading} isSuccess={!!service.isSuccess} />
+                </p>
+              </div>
             </div>
-            <StatusIcon isLoading={service.isLoading} isSuccess={!!service.isSuccess} />
+            <div className="flex items-center gap-x-1 transition opacity-0 group-hover:opacity-100">
+              <span className="text-xs text-foreground">View logs</span>
+              <ChevronRight size={14} className="text-foreground" />
+            </div>
           </Link>
         ))}
       </PopoverContent_Shadcn_>
