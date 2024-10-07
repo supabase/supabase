@@ -70,6 +70,7 @@ import {
   WhyRotateKeysIllustration,
   WhyUseStandbyKeysIllustration,
 } from './illustrations'
+import ShowPublicJWTsDialogComposer from './ShowPublicJWTsDialogComposer'
 
 type KeyStatus = 'IN_USE' | 'STANDBY' | 'PREVIOUSLY_USED' | 'REVOKED'
 type JWTAlgorithm = 'HS256' | 'RS256' | 'ES256'
@@ -821,6 +822,10 @@ NEW_KEY_CONTENT
           )}
         </DialogContent>
       </Dialog>
+
+      <div className="flex items-center space-x-2">
+        <ShowPublicJWTsDialogComposer inUseKey={inUseKey} />
+      </div>
     </>
   )
 }

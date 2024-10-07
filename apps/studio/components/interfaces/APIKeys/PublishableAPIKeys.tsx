@@ -35,6 +35,7 @@ import Connect from '../Home/Connect/Connect'
 import ConnectTabContentNew from '../Home/Connect/ConnectTabContent'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import CopyButton from 'components/ui/CopyButton'
+import ShowPublicJWTsDialogComposer from '../JwtSecrets/ShowPublicJWTsDialogComposer'
 
 const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -110,9 +111,7 @@ const PublishableAPIKeys = () => {
           <Link size={14} className="text-foreground-light" /> Show Supabase Url
         </div>
         <Separator />
-        <div className="flex items-center gap-2 text-xs text-foreground-light hover:text-foreground cursor-pointer">
-          <Key size={14} className="text-foreground-light" /> Show Public JWTs
-        </div>
+        <ShowPublicJWTsDialogComposer />
       </div>
 
       {/* // dark quick copy for all frameworks */}
