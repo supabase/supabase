@@ -315,7 +315,7 @@ By default, `docker compose` sets the database's `log_min_messages` configuratio
 
 #### Exposing your Postgres database
 
-By default, the Postgres database is only accessible locally. If you want to expose it to the outside world, you can update the `docker-compose.yml` file and remove the `127.0.0.1:` prefix from the `ports` section:
+By default, the Postgres database is only accessible locally. If you want to expose it to the outside world, you can update the `docker-compose.yml` file as follows:
 
 ```yaml docker-compose.yml
   db:
