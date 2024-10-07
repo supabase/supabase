@@ -75,7 +75,7 @@ import ShowPublicJWTsDialogComposer from './ShowPublicJWTsDialogComposer'
 type KeyStatus = 'IN_USE' | 'STANDBY' | 'PREVIOUSLY_USED' | 'REVOKED'
 type JWTAlgorithm = 'HS256' | 'RS256' | 'ES256'
 
-interface SecretKey {
+export interface SecretKey {
   id: string
   status: KeyStatus
   keyId: string
@@ -113,7 +113,7 @@ const algorithmDescriptions: Record<JWTAlgorithm, string> = {
   ES256: 'ECDSA with SHA-256: Compact keys, fast, modern alternative to RSA',
 }
 
-const initialKeys: SecretKey[] = [
+export const INITIAL_SECRET_KEYS: SecretKey[] = [
   {
     id: '1',
     status: 'IN_USE',
@@ -168,7 +168,7 @@ ZptN9nnJAMh+auCW4vJ1uF/OjQaB66Jx9kMSLEjAYGXKKLhSbGkIamFiJB5HqQ==
   },
 ]
 
-const secretKeysAtom = atomWithStorage<SecretKey[]>('secretKeys', initialKeys)
+const secretKeysAtom = atomWithStorage<SecretKey[]>('secretKeys', INITIAL_SECRET_KEYS)
 
 export default function JWTSecretKeysTablev2() {
   const [secretKeys, setSecretKeys] = useAtom(secretKeysAtom)

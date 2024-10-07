@@ -1,21 +1,23 @@
 import { useState } from 'react'
-import { useParams } from 'common'
-import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useAtom } from 'jotai'
+import { atomWithStorage } from 'jotai/utils'
 import { Button, Alert_Shadcn_, AlertTitle_Shadcn_, AlertDescription_Shadcn_ } from 'ui'
 import { WarningIcon } from 'ui'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from 'ui'
 import { DialogSection, DialogSectionSeparator } from 'ui/src/components/shadcn/ui/dialog'
 import { Key } from 'lucide-react'
+import { INITIAL_SECRET_KEYS, SecretKey } from './JWTSecretKeysTablev2'
+
+const secretKeysAtom = atomWithStorage<SecretKey[]>('secretKeys', INITIAL_SECRET_KEYS)
 
 const ShowPublicJWTsDialogComposer: React.FC = () => {
   const [showDialog, setShowDialog] = useState(false)
-  const { ref: projectRef } = useParams()
-  const { data: apiKeysData } = useAPIKeysQuery({ projectRef })
+  const [secretKeys] = useAtom(secretKeysAtom)
 
-  const inUseKey = apiKeysData?.find((key) => key.type === 'publishable')
+  const inUseKey = secretKeys.find((key) => key.status === 'IN_USE')
 
   const algorithm = inUseKey?.algorithm || 'RS256'
-  const jwksUrl = inUseKey?.jwksUrl || `https://${projectRef}.supabase.co/rest/v1/jwks`
+  const jwksUrl = inUseKey?.jwksUrl || ''
 
   return (
     <>
@@ -46,7 +48,7 @@ const ShowPublicJWTsDialogComposer: React.FC = () => {
               <>
                 <h4 className="text-sm mb-2">JWKS URL</h4>
                 <pre className="bg-surface-100 border p-3 rounded-md text-xs overflow-x-auto break-all">
-                  {jwksUrl}
+                  {jwksUrl || 'No JWKS URL available'}
                 </pre>
               </>
             )}
