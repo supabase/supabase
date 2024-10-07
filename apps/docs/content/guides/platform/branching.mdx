@@ -45,7 +45,7 @@ In Git, you have a Production Branch (typically this is `main`, `master`, `prod`
 
 You can create a corresponding Preview Branch for any Git branch in your repository. Each time a new Preview Branch is created, the migrations in the Git branch of that Preview Branch are run on the Preview Branch.
 
-The Preview Branch is also seeded with sample data based on `./supabase/seed.sql`, if that file exists.
+The Preview Branch is also seeded with sample data based on `./supabase/seed.sql` by default, if that file exists.
 
 Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevelopment.com/) workflow, with one main Production branch and multiple development branches:
 
@@ -83,7 +83,7 @@ The Git integration can read files from your Git provider, watching every commit
 
 ### Data changes
 
-The Preview Branch is seeded with sample data based on `./supabase/seed.sql`, if that file exists.
+The Preview Branch is seeded with sample data based on `./supabase/seed.sql` by default, if that file exists.
 
 For security reasons, Preview Branches do not contain production data. Future versions of Branching may allow for automated data cloning after we are confident that we can provide safe data masking.
 
@@ -542,11 +542,11 @@ You might want to roll back changes you've made in an earlier migration change. 
 
 To fix this, push your latest changes, then delete the preview branch in Supabase and reopen it.
 
-The new preview branch is reseeded from your `./supabase/seed.sql` file. Any additional data changes you made on the old preview branch are lost. This is equivalent to running `supabase db reset` locally. All migrations are rerun in sequential order.
+The new preview branch is reseeded from your `./supabase/seed.sql` file by default. Any additional data changes you made on the old preview branch are lost. This is equivalent to running `supabase db reset` locally. All migrations are rerun in sequential order.
 
 ### Seeding behavior
 
-Your Preview Branches are seeded with sample data from the file `./supabase/seed.sql`.
+Your Preview Branches are seeded with sample data from the file `./supabase/seed.sql` by default.
 
 The database is only seeded once, when the preview branch is created. To rerun seeding, delete the preview branch and recreate it by closing, and reopening your pull request.
 
