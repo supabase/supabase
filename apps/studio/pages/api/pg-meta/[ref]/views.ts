@@ -23,12 +23,29 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const headers = constructHeaders(req.headers)
-  let response = await get(`${PG_META_URL}/views`, {
-    headers,
-  })
+
+  const query = Object.entries(req.query).reduce((query, entry) => {
+    const [key, value] = entry
+    if (Array.isArray(value)) {
+      for (const v of value) {
+        query.append(key, v)
+      }
+    } else if (value) {
+      query.set(key, value)
+    }
+    return query
+  }, new URLSearchParams())
+
+  let url = `${PG_META_URL}/views`
+  if (Object.keys(req.query).length > 0) {
+    url += `?${query}`
+  }
+
+  const response = await get(url, { headers })
   if (response.error) {
     return res.status(400).json({ error: response.error })
   }
+
   return res.status(200).json(response)
 }
 
