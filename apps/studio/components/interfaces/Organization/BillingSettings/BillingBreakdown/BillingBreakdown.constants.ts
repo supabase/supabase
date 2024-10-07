@@ -1,5 +1,4 @@
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import React from 'react'
 
 export const USAGE_APPROACHING_THRESHOLD = 0.8
 

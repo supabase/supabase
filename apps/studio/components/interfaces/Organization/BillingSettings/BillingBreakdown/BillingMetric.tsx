@@ -87,7 +87,9 @@ const BillingMetric = ({
                   <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                     {metric.name}
                   </p>
-                  <ChevronRight strokeWidth={1.5} size={16} className="transition" />
+                  {usageMeta.available_in_plan && (
+                    <ChevronRight strokeWidth={1.5} size={16} className="transition" />
+                  )}
                 </div>
               </Link>
             ) : (
@@ -147,72 +149,75 @@ const BillingMetric = ({
           )}
         </div>
       </HoverCardTrigger>
+      {usageMeta.available_in_plan && (
+        <HoverCardContent side="bottom" align="center" className="w-[500px]" animate="slide-in">
+          <div className="text-sm">
+            <p className="font-medium">{usageMeta.unit_price_desc}</p>
 
-      <HoverCardContent side="bottom" align="center" className="w-[500px]" animate="slide-in">
-        <div className="text-sm">
-          <p className="font-medium">{usageMeta.unit_price_desc}</p>
-
-          {metric.tip && (
-            <div className="my-2">
-              <p className="text-sm">
-                {metric.tip}{' '}
-                {metric.docLink && (
-                  <Link
-                    href={metric.docLink.url}
-                    target="_blank"
-                    className="transition text-brand hover:text-brand-600 underline"
-                  >
-                    {metric.docLink.title}
-                  </Link>
-                )}
-              </p>
-            </div>
-          )}
-
-          {subscription.usage_billing_enabled === false &&
-            relativeToSubscription &&
-            (isApproachingLimit || isExceededLimit) && (
-              <div className="mt-2">
+            {metric.tip && (
+              <div className="my-2">
                 <p className="text-sm">
-                  Exceeding your plans included usage will lead to restrictions to your project.
-                  Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.
+                  {metric.tip}{' '}
+                  {metric.docLink && (
+                    <Link
+                      href={metric.docLink.url}
+                      target="_blank"
+                      className="transition text-brand hover:text-brand-600 underline"
+                    >
+                      {metric.docLink.title}
+                    </Link>
+                  )}
                 </p>
               </div>
             )}
 
-          {sortedProjectAllocations && sortedProjectAllocations.length > 0 && (
-            <table className="list-disc w-full">
-              <thead>
-                <tr>
-                  <th className="text-left">Project</th>
-                  <th className="text-right">Usage</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedProjectAllocations.map((allocation) => (
-                  <tr key={`${usageMeta.metric}_${allocation.ref}`}>
-                    <td>{allocation.name}</td>
-                    <td className="text-right">
-                      {formatUsage(usageMeta.metric as PricingMetric, allocation)}
+            {subscription.usage_billing_enabled === false &&
+              relativeToSubscription &&
+              (isApproachingLimit || isExceededLimit) && (
+                <div className="mt-2">
+                  <p className="text-sm">
+                    Exceeding your plans included usage will lead to restrictions to your project.
+                    Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.
+                  </p>
+                </div>
+              )}
+
+            {sortedProjectAllocations && sortedProjectAllocations.length > 0 && (
+              <table className="list-disc w-full">
+                <thead>
+                  <tr>
+                    <th className="text-left">Project</th>
+                    <th className="text-right">Usage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedProjectAllocations.map((allocation) => (
+                    <tr key={`${usageMeta.metric}_${allocation.ref}`}>
+                      <td>{allocation.name}</td>
+                      <td className="text-right">
+                        {formatUsage(usageMeta.metric as PricingMetric, allocation)}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr></tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td className="py-2 border-t text-left">
+                      Total{unit && <span> ({unit})</span>}
+                    </td>
+                    <td className="py-2 border-t text-right">
+                      {formatUsage(usageMeta.metric as PricingMetric, {
+                        usage: usageMeta.usage_original,
+                      })}{' '}
                     </td>
                   </tr>
-                ))}
-                <tr></tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td className="py-2 border-t text-left">Total{unit && <span> ({unit})</span>}</td>
-                  <td className="py-2 border-t text-right">
-                    {formatUsage(usageMeta.metric as PricingMetric, {
-                      usage: usageMeta.usage_original,
-                    })}{' '}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          )}
-        </div>
-      </HoverCardContent>
+                </tfoot>
+              </table>
+            )}
+          </div>
+        </HoverCardContent>
+      )}
     </HoverCard>
   )
 }
