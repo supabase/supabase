@@ -338,7 +338,7 @@ services:
     # Uncomment to use Big Query backend for analytics
     # volumes:
     #   - type: bind
-    #     source: ${PWD}/gcloud.
+    #     source: ${PWD}/gcloud.json
     #     target: /opt/app/rel/logflare/bin/gcloud.json
     #     read_only: true
     environment:
