@@ -1,8 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { detectBrowser, isBrowser } from 'common'
+import { cn } from 'ui'
 
-const DatabaseVisual = () => {
+interface Props {
+  className?: string
+}
+
+const DatabaseVisual: React.FC<Props> = ({ className }) => {
   const containerRef = useRef(null)
   const ref = useRef(null)
   const [gradientPos, setGradientPos] = useState({ x: 0, y: 0 })
@@ -49,7 +54,7 @@ const DatabaseVisual = () => {
 
   return (
     <figure
-      className="absolute inset-0 z-0"
+      className={cn('absolute inset-0 z-0', className)}
       ref={containerRef}
       role="img"
       aria-label="Supabase Postgres database visual composition"

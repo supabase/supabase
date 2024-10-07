@@ -8,8 +8,10 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { convertArgumentTypes } from 'components/interfaces/Database/Functions/Functions.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import FunctionSelector from 'components/ui/FunctionSelector'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { AuthConfigResponse } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -34,7 +36,6 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import FunctionSelector from './FunctionSelector'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
 
@@ -392,6 +393,21 @@ export const CreateHookSheet = ({
                             value={field.value}
                             onChange={field.onChange}
                             disabled={field.disabled}
+                            filterFunction={(func) => {
+                              if (func.return_type === 'json' || func.return_type === 'jsonb') {
+                                const { value } = convertArgumentTypes(func.argument_types)
+                                if (value.length !== 1) return false
+                                return value[0].type === 'json' || value[0].type === 'jsonb'
+                              }
+                              return false
+                            }}
+                            noResultsLabel={
+                              <span>
+                                No function with a single JSON/B argument
+                                <br />
+                                and JSON/B return type found in this schema.
+                              </span>
+                            }
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>

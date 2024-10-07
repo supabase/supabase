@@ -3859,6 +3859,7 @@ export interface components {
       role_id: number
     }
     Invoice: {
+      amount_due: number
       id: string
       invoice_pdf: string
       number: string
