@@ -430,14 +430,6 @@ const nextConfig = {
         ],
       },
       {
-        source: '/img/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
-      },
-      {
-        source: '/fonts/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
-      },
-      {
         source: '/.well-known/vercel/flags',
         headers: [
           {
@@ -445,6 +437,14 @@ const nextConfig = {
             value: 'application/json',
           },
         ],
+      },
+      {
+        source: '/img/:slug*',
+        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+      },
+      {
+        source: '/fonts/:slug*',
+        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
       },
     ]
   },
