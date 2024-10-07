@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronRight, Info, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -9,7 +9,14 @@ import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-serv
 import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+import {
+  Button,
+  InfoIcon,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+} from 'ui'
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
@@ -238,6 +245,13 @@ const ServiceStatus = () => {
             </div>
           </Link>
         ))}
+        <PopoverSeparator />
+        <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
+          <div className="mt-0.5">
+            <InfoIcon />
+          </div>
+          Recently restored projects can take up to 5 minutes to become fully operational.
+        </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
