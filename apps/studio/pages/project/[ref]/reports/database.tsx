@@ -130,56 +130,67 @@ const DatabaseUsage = () => {
             <div className="space-y-6">
               {dateRange && (
                 <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="ram_usage"
+                  label="Memory usage"
+                  interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
-                  attribute={'ram_usage'}
-                  label={'Memory usage'}
-                  interval={dateRange.interval}
-                  provider={'infra-monitoring'}
                 />
               )}
 
               {dateRange && (
                 <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="swap_usage"
+                  label="Swap usage"
+                  interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
-                  attribute={'swap_usage'}
-                  label={'Swap usage'}
-                  interval={dateRange.interval}
-                  provider={'infra-monitoring'}
                 />
               )}
 
               {dateRange && (
                 <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="avg_cpu_usage"
+                  label="Average CPU usage"
+                  interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
-                  attribute={'avg_cpu_usage'}
-                  label={'Average CPU usage'}
-                  interval={dateRange.interval}
-                  provider={'infra-monitoring'}
                 />
               )}
 
               {dateRange && (
                 <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="max_cpu_usage"
+                  label="Max CPU usage"
+                  interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
-                  attribute={'max_cpu_usage'}
-                  label={'Max CPU usage'}
-                  interval={dateRange.interval}
-                  provider={'infra-monitoring'}
                 />
               )}
 
               {dateRange && (
                 <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="disk_io_consumption"
+                  label="Disk IO consumed"
+                  interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
-                  attribute={'disk_io_consumption'}
-                  label={'Disk IO consumed'}
+                />
+              )}
+
+              {dateRange && (
+                <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="pg_stat_database_num_backends"
+                  label="Number of database connections"
                   interval={dateRange.interval}
-                  provider={'infra-monitoring'}
+                  startDate={dateRange?.period_start?.date}
+                  endDate={dateRange?.period_end?.date}
                 />
               )}
             </div>
