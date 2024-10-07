@@ -11,6 +11,6 @@ export function useTelemetryProps() {
     viewportWidth: isBrowser ? `${window.innerWidth}` : undefined,
     language: locale ?? 'en-US',
     userAgent: isBrowser ? window.navigator.userAgent : undefined,
-    searchTerms: isBrowser ? window.location.search : undefined,
+    search: isBrowser ? window.location.search : undefined,
   }
 }

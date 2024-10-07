@@ -94,7 +94,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
             referrer: document.referrer,
             language: telemetryProps.language,
             user_agent: telemetryProps.userAgent,
-            search_terms: telemetryProps.searchTerms,
+            search: telemetryProps.search,
             viewport_height: telemetryProps.viewportHeight,
             viewport_width: telemetryProps.viewportWidth,
           },

@@ -15,7 +15,7 @@ export interface TelemetryProps {
   viewportWidth?: string
   language: string
   userAgent?: string
-  searchTerms?: string
+  search?: string
 }
 
 const noop = () => {}
@@ -46,7 +46,7 @@ const sendEvent = (event: TelemetryEvent, phProps: TelemetryProps, router: NextR
         referrer: document?.referrer,
         language: phProps.language,
         user_agent: phProps.userAgent,
-        search_terms: phProps.searchTerms,
+        search: phProps.search,
         viewport_height: phProps.viewportHeight,
         viewport_width: phProps.viewportWidth,
       },
