@@ -163,7 +163,8 @@ const ServiceStatus = () => {
 
   // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
   const isProjectNew =
-    dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < SERVICE_STATUS_THRESHOLD
+    dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < SERVICE_STATUS_THRESHOLD ||
+    project?.status === 'COMING_UP'
 
   useEffect(() => {
     let timer: any
