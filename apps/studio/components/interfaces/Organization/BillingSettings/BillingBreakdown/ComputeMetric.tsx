@@ -6,7 +6,7 @@ import { formatCurrency } from 'lib/helpers'
 import { useMemo } from 'react'
 import { formatUsage } from '../helpers'
 import { Metric } from './BillingBreakdown.constants'
-import { ChevronRight, PieChart } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
 export interface ComputeMetricProps {

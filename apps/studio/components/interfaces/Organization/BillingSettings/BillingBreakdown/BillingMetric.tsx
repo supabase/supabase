@@ -8,7 +8,7 @@ import { useMemo } from 'react'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
-import { ChevronRight, InfoIcon, PieChart } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 
 export interface BillingMetricProps {
   idx: number
