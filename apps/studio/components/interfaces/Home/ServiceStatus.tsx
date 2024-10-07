@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
@@ -11,10 +11,13 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 
+const SERVICE_STATUS_THRESHOLD = 5 // minutes
+
 const ServiceStatus = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
+  const [remainingTimeTillCheck, setRemainingTimeTillCheck] = useState(0)
 
   const {
     projectAuthAll: authEnabled,
@@ -123,12 +126,13 @@ const ServiceStatus = () => {
   const allServicesOperational = services.every((service) => service.isSuccess)
 
   // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
-  const isProjectNew = dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < 5
+  const isProjectNew =
+    dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < SERVICE_STATUS_THRESHOLD
 
   const StatusMessage = ({ isLoading, isSuccess }: { isLoading: boolean; isSuccess: boolean }) => {
     if (isLoading) return 'Checking status'
-    if (isSuccess) return 'No issues'
     if (isProjectNew) return 'Coming up...'
+    if (isSuccess) return 'No issues'
     return 'Unable to connect'
   }
 
@@ -137,6 +141,30 @@ const ServiceStatus = () => {
     if (isSuccess) return <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
     return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
   }
+
+  useEffect(() => {
+    if (true) {
+      const remainingDuration = dayjs.utc().diff(dayjs.utc('2024-10-07 07:53:00'), 'minute')
+      setRemainingTimeTillCheck(SERVICE_STATUS_THRESHOLD - remainingDuration)
+    }
+  }, [isProjectNew])
+
+  useEffect(() => {
+    if (remainingTimeTillCheck <= 0) return
+
+    // Just to trigger a re-render so service status will update accordingly
+    const timer = setInterval(
+      () => {
+        console.log('Boom')
+        setRemainingTimeTillCheck(0)
+      },
+      1000 * 60 * remainingTimeTillCheck
+    )
+
+    return () => clearInterval(timer)
+  }, [remainingTimeTillCheck])
+
+  console.log(remainingTimeTillCheck, 'mins')
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
