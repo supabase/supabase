@@ -1,6 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import type { SupaRow } from 'components/grid/types'
@@ -11,6 +11,7 @@ import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-muta
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
 import { useGetTables } from 'data/tables/tables-query'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import type { TableLike } from 'hooks/misc/useTable'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { noop } from 'lib/void'
@@ -30,6 +31,7 @@ const DeleteConfirmationDialogs = ({
 }: DeleteConfirmationDialogsProps) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+  const { selectedSchema } = useQuerySchemaState()
 
   const [{ filter }, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
   const filters = formatFilterURLParams(filter as string[])
@@ -76,7 +78,7 @@ const DeleteConfirmationDialogs = ({
   })
   const { mutate: deleteTable } = useTableDeleteMutation({
     onSuccess: async () => {
-      const tables = await getTables(snap.selectedSchemaName)
+      const tables = await getTables(selectedSchema)
       onAfterDeleteTable(tables)
       toast.success(`Successfully deleted table "${selectedTable?.name}"`)
     },

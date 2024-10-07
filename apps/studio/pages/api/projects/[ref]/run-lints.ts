@@ -41,6 +41,7 @@ ${query}
 `
 
 export const LINT_SQL = /* SQL */ `set local search_path = '';
+
 (
 with foreign_keys as (
     select
@@ -131,7 +132,6 @@ select
         'schema', n.nspname,
         'name', c.relname,
         'type', 'view',
-
         'exposed_to', array_remove(array_agg(DISTINCT case when pg_catalog.has_table_privilege('anon', c.oid, 'SELECT') then 'anon' when pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT') then 'authenticated' end), null)
     ) as metadata,
     format('auth_users_exposed_%s_%s', n.nspname, c.relname) as cache_key
@@ -257,8 +257,9 @@ from
     policies
 where
     is_rls_active
+    -- NOTE: does not include realtime in support of monitoring policies on realtime.messages
     and schema_name not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and (
         -- Example: auth.uid()
@@ -368,6 +369,7 @@ select
         psui.relname,
         psui.indexrelname
     ) as cache_key
+
 from
     pg_catalog.pg_stat_user_indexes psui
     join pg_catalog.pg_index pi
@@ -410,7 +412,6 @@ select
         'multiple_permissive_policies_%s_%s_%s_%s',
         n.nspname,
         c.relname,
-
         r.rolname,
         act.cmd
     ) as cache_key
@@ -458,7 +459,6 @@ group by
 having
     count(1) > 1)
 union all
-
 (
 select
     'policy_exists_rls_disabled' as name,
@@ -470,12 +470,12 @@ select
     format(
         'Table \`%s.%s\` has RLS policies but RLS is not enabled on the table. Policies include %s.',
         n.nspname,
-
         c.relname,
         array_agg(p.polname order by p.polname)
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0007_policy_exists_rls_disabled' as remediation,
     jsonb_build_object(
+        'schema', n.nspname,
         'name', c.relname,
         'type', 'table'
     ) as metadata,
@@ -602,10 +602,8 @@ group by
     n.nspname,
     c.relkind,
     c.relname,
-
     replace(pi.indexdef, pi.indexname, '')
 having
-
     count(*) > 1)
 union all
 (
@@ -645,6 +643,7 @@ where
         pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
         or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
     )
+    and substring(pg_catalog.version() from 'PostgreSQL ([0-9]+)') >= '15' -- security invoker was added in pg15
     and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
     and n.nspname not in (
         '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
@@ -667,7 +666,7 @@ select
     'WARN' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects functions with a mutable search_path parameter which could fail to execute successfully for some roles.' as description,
+    'Detects functions where the search_path parameter is not set to an empty string.' as description,
     format(
         'Function \`%s.%s\` has a role mutable search_path',
         n.nspname,
@@ -738,9 +737,7 @@ where
     )
     and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
     and n.nspname not in (
-
         '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
-
     ))
 union all
 (
@@ -753,13 +750,11 @@ select
     'Detects extensions installed in the \`public\` schema.' as description,
     format(
         'Extension \`%s\` is installed in the public schema. Move it to another schema.',
-
         pe.extname
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public' as remediation,
     jsonb_build_object(
         'schema', pe.extnamespace::regnamespace,
-
         'name', pe.extname,
         'type', 'extension'
     ) as metadata,
@@ -777,11 +772,9 @@ where
     -- search path. That currently isn't available via SQL. In other lints
     -- we have used has_schema_privilege('anon', 'extensions', 'USAGE') but that
     -- is not appropriate here as it would evaluate true for the extensions schema
-
     and pe.extnamespace::regnamespace::text = 'public')
 union all
 (
-
 with policies as (
     select
         nsp.nspname as schema_name,
@@ -817,12 +810,9 @@ select
     jsonb_build_object(
         'schema', schema_name,
         'name', table_name,
-
         'type', 'table'
     ) as metadata,
-
     format('rls_references_user_metadata_%s_%s_%s', schema_name, table_name, policy_name) as cache_key
-
 from
     policies
 where
@@ -841,11 +831,9 @@ where
 union all
 (
 select
-
     'materialized_view_in_api' as name,
     'Materialized View in API' as title,
     'WARN' as level,
-
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
     'Detects materialized views that are accessible over the Data APIs.' as description,
@@ -925,4 +913,47 @@ where
     and n.nspname not in (
         '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
-    and dep.objid is null)`.trim()
+    and dep.objid is null)
+union all
+(
+select
+    'unsupported_reg_types' as name,
+    'Unsupported reg types' as title,
+    'WARN' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Identifies columns using unsupported reg* types outside pg_catalog schema, which prevents database upgrades using pg_upgrade.' as description,
+    format(
+        'Table \`%s.%s\` has a column \`%s\` with unsupported reg* type \`%s\`.',
+        n.nspname,
+        c.relname,
+        a.attname,
+        t.typname
+    ) as detail,
+    'https://supabase.com/docs/guides/database/database-linter?lint=unsupported_reg_types' as remediation,
+    jsonb_build_object(
+        'schema', n.nspname,
+        'name', c.relname,
+        'column', a.attname,
+        'type', 'table'
+    ) as metadata,
+    format(
+        'unsupported_reg_types_%s_%s_%s',
+        n.nspname,
+        c.relname,
+        a.attname
+    ) AS cache_key
+from
+    pg_catalog.pg_attribute a
+    join pg_catalog.pg_class c
+        on a.attrelid = c.oid
+    join pg_catalog.pg_namespace n
+        on c.relnamespace = n.oid
+    join pg_catalog.pg_type t
+        on a.atttypid = t.oid
+    join pg_catalog.pg_namespace tn
+        on t.typnamespace = tn.oid
+where
+    tn.nspname = 'pg_catalog'
+    and t.typname in ('regcollation', 'regconfig', 'regdictionary', 'regnamespace', 'regoper', 'regoperator', 'regproc', 'regprocedure')
+    and n.nspname not in ('pg_catalog', 'information_schema', 'pgsodium'))`.trim()

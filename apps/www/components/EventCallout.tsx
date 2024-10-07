@@ -9,7 +9,7 @@ interface Props {
   size?: 'tiny' | 'small' | 'large'
 }
 
-const EVENT_LINK = '/events/scale-to-billions-generative-ai-humata'
+const EVENT_LINK = '/events/scale-to-millions-generative-ai-humata'
 
 const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<Props>) => {
   switch (size) {
@@ -25,7 +25,7 @@ const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<
         >
           <span className="py-1 uppercase text-brand font-mono">Webinar</span>
           <span className="py-1 uppercase mx-3 px-3 border-x">21 Aug</span>
-          <span className="py-1">Scale to Billions: Generative AI/Humata</span>
+          <span className="py-1">Scale to Millions: Generative AI/Humata</span>
         </Link>
       )
     case 'small':
@@ -41,7 +41,7 @@ const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<
           <VideoCameraIcon className="w-4 h-4 text-brand mr-2" />
           <span className="py-1 uppercase text-brand font-mono">Upcoming Webinar</span>
           <span className="py-1 uppercase mx-3 px-3 border-x">21 Aug</span>
-          <span className="py-1">Scale to Billions: Generative AI/Humata</span>
+          <span className="py-1">Scale to Millions: Generative AI/Humata</span>
           <ChevronRightIcon className="translate-x-0 transition-transform group-hover:translate-x-0.5 w-3 h-3 ml-1.5" />
         </Link>
       )

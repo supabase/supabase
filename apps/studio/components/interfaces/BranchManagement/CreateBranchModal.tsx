@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Check, ExternalLink, Loader2 } from 'lucide-react'
+import { AlertCircle, Check, ExternalLink, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import AlertError from 'components/ui/AlertError'
@@ -25,7 +25,6 @@ import {
   FormItem_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconAlertCircle,
   Input_Shadcn_,
   Modal,
 } from 'ui'
@@ -207,7 +206,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
           <Modal.Content className="py-2">
             <Alert_Shadcn_ variant="warning">
-              <IconAlertCircle strokeWidth={1.5} />
+              <AlertCircle strokeWidth={1.5} />
               <AlertTitle_Shadcn_>Each Preview branch costs $0.32 per day</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 Each preview branch costs $0.32 per day until it is removed. This pricing is for

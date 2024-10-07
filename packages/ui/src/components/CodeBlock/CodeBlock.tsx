@@ -3,7 +3,7 @@
 import { Check, Copy } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Children, ReactNode, useState } from 'react'
-import * as CopyToClipboard from 'react-copy-to-clipboard'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter, SyntaxHighlighterProps } from 'react-syntax-highlighter'
 import { cn } from '../../lib/utils/cn'
 import { Button } from '../Button/Button'
@@ -46,12 +46,31 @@ export interface CodeBlockProps {
   hideCopy?: boolean
   hideLineNumbers?: boolean
   className?: string
+  wrapperClassName?: string
   value?: string
   theme?: any
   children?: string
   renderer?: SyntaxHighlighterProps['renderer']
+  focusable?: boolean
 }
 
+/**
+ * CodeBlock component for displaying syntax-highlighted code.
+ * @param {ReactNode} [props.title] - Optional title for the code block.
+ * @param {string} [props.language] - The programming language of the code.
+ * @param {number[]} [props.linesToHighlight=[]] - Array of line numbers to highlight.
+ * @param {boolean} [props.highlightBorder] - Whether to show a border on highlighted lines.
+ * @param {Object} [props.styleConfig] - Custom style configurations.
+ * @param {string} [props.className] - Additional CSS classes for the code block.
+ * @param {string} [props.wrapperClassName] - CSS classes for the wrapper div.
+ * @param {string} [props.value] - The code content as a string.
+ * @param {any} [props.theme] - Custom theme for syntax highlighting.
+ * @param {string} [props.children] - The code content as children.
+ * @param {boolean} [props.hideCopy=false] - Whether to hide the copy button.
+ * @param {boolean} [props.hideLineNumbers=false] - Whether to hide line numbers.
+ * @param {SyntaxHighlighterProps['renderer']} [props.renderer] - Custom renderer for syntax highlighting.
+ * @param {boolean} [props.focusable=true] - Whether the code block is focusable. When true, users can focus the code block to select text or use ⌘A (Cmd+A) to select all. This is so we don't need to load Monaco Editor.
+ */
 export const CodeBlock = ({
   title,
   language,
@@ -59,12 +78,14 @@ export const CodeBlock = ({
   highlightBorder,
   styleConfig,
   className,
+  wrapperClassName,
   value,
   theme,
   children,
   hideCopy = false,
   hideLineNumbers = false,
   renderer,
+  focusable = true,
 }: CodeBlockProps) => {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
@@ -120,7 +141,12 @@ export const CodeBlock = ({
         </div>
       )}
       {className ? (
-        <div className="group relative max-w-[90vw] md:max-w-none overflow-auto">
+        <div
+          className={cn(
+            'group relative max-w-[90vw] md:max-w-none overflow-auto',
+            wrapperClassName
+          )}
+        >
           {/* @ts-ignore */}
           <SyntaxHighlighter
             language={lang}
@@ -128,7 +154,7 @@ export const CodeBlock = ({
             // @ts-ignore
             style={monokaiTheme}
             className={cn(
-              'code-block border border-surface p-4 w-full !my-0 !bg-surface-100',
+              'code-block border border-surface p-4 w-full !my-0 !bg-surface-100 outline-none focus:border-foreground-lighter/50',
               `${!title ? '!rounded-md' : '!rounded-t-none !rounded-b-md'}`,
               `${!showLineNumbers ? 'pl-6' : ''}`,
               className
@@ -170,6 +196,12 @@ export const CodeBlock = ({
               paddingBottom: '4px',
             }}
             renderer={renderer}
+            contentEditable={focusable}
+            onBeforeInput={(e: any) => {
+              e.preventDefault()
+              return false
+            }}
+            suppressContentEditableWarning={true}
           >
             {codeValue}
           </SyntaxHighlighter>

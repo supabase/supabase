@@ -10,7 +10,8 @@ import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
-import { Button, IconCode, IconExternalLink } from 'ui'
+import { Code, ExternalLink } from 'lucide-react'
+import { Button } from 'ui'
 import FunctionsNav from '../../interfaces/Functions/FunctionsNav'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 
@@ -28,9 +29,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
   if (!canReadFunctions) {
     return (
       <ProjectLayout title={title || 'Edge Functions'} product="Edge Functions">
-        <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-          <NoPermission isFullPage resourceText="access your project's edge functions" />
-        </main>
+        <NoPermission isFullPage resourceText="access your project's edge functions" />
       </ProjectLayout>
     )
   }
@@ -78,7 +77,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                     'flex items-center justify-center text-brand',
                   ].join(' ')}
                 >
-                  <IconCode size={14} strokeWidth={3} />
+                  <Code size={14} strokeWidth={3} />
                 </div>
 
                 <div className="flex items-center justify-between w-full">
@@ -126,7 +125,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                       asChild
                       type="default"
                       className="translate-y-[1px]"
-                      icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                      icon={<ExternalLink size={14} strokeWidth={1.5} />}
                     >
                       <Link href="https://supabase.com/docs/guides/functions" target="_link">
                         Documentation

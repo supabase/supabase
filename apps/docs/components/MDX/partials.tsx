@@ -1,5 +1,6 @@
 'use client'
 
+import AuthErrorCodesTable from './auth_error_codes_table.mdx'
 import AuthRateLimits from './auth_rate_limits.mdx'
 import CreateClientSnippet from './create_client_snippet.mdx'
 import DatabaseSetup from './database_setup.mdx'
@@ -15,6 +16,7 @@ import SocialProviderSettingsSupabase from './social_provider_settings_supabase.
 import SocialProviderSetup from './social_provider_setup.mdx'
 
 export {
+  AuthErrorCodesTable,
   AuthRateLimits,
   CreateClientSnippet,
   DatabaseSetup,

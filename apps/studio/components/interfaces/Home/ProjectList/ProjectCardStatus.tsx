@@ -2,8 +2,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { AlertTriangle, Info, RefreshCcw } from 'lucide-react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, cn, IconPauseCircle } from 'ui'
+import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
 import { InferredProjectStatus } from './ProjectCard.utils'
 
 export interface ProjectCardWarningsProps {
@@ -12,10 +12,20 @@ export interface ProjectCardWarningsProps {
 }
 
 export const ProjectCardStatus = ({
-  resourceWarnings,
+  resourceWarnings: allResourceWarnings,
   projectStatus,
 }: ProjectCardWarningsProps) => {
   const showResourceExhaustionWarnings = false
+
+  // [Terry] temp to remove auth_restricted_email_sending property from resourceWarnings
+  // set auth_restricted_email_sending from 'warning' to null so it doesn't show up in the warning banner
+  // [Joshen] Can remove this eventually once the auth email thing is resolved (Nov 2024)
+  const resourceWarnings = allResourceWarnings
+    ? {
+        ...allResourceWarnings,
+        auth_restricted_email_sending: null,
+      }
+    : undefined
 
   // [Joshen] Read only takes higher precedence over multiple resource warnings
   const activeWarnings = resourceWarnings?.is_readonly_mode_enabled
@@ -42,6 +52,7 @@ export const ProjectCardStatus = ({
     if (projectStatus === 'isRestarting') return 'Project is restarting'
     if (projectStatus === 'isComingUp') return 'Project is coming up'
     if (projectStatus === 'isRestoring') return 'Project is restoring'
+    if (projectStatus === 'isUpgrading') return 'Project is upgrading'
     if (projectStatus === 'isRestoreFailed') return 'Project restore failed'
     if (projectStatus === 'isPauseFailed') return 'Project pause failed'
 
@@ -61,6 +72,7 @@ export const ProjectCardStatus = ({
     if (projectStatus === 'isRestarting') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isComingUp') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isRestoring') return 'Your project will be ready in a few minutes'
+    if (projectStatus === 'isUpgrading') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isRestoreFailed') return 'Please contact support for assistance'
     if (projectStatus === 'isPauseFailed') return 'Please contact support for assistance'
 
@@ -100,7 +112,7 @@ export const ProjectCardStatus = ({
       )}
     >
       {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
-        <IconPauseCircle strokeWidth={1.5} size={12} />
+        <PauseCircle strokeWidth={1.5} size={12} />
       ) : projectStatus === 'isRestoring' ||
         projectStatus === 'isComingUp' ||
         projectStatus === 'isRestarting' ? (

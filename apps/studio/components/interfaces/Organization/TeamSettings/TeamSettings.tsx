@@ -1,6 +1,6 @@
 import { Search } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
@@ -122,13 +122,31 @@ const TeamSettings = () => {
       </ScaffoldContainerLegacy>
 
       <ConfirmationModal
+        size="medium"
         visible={isLeaveTeamModalOpen}
-        title="Are you sure?"
+        title="Confirm to leave organization"
         confirmLabel="Leave"
-        onCancel={() => setIsLeaveTeamModalOpen(false)}
-        onConfirm={() => {
-          leaveTeam()
+        variant="warning"
+        alert={{
+          title: 'All of your user content will be permanently removed.',
+          description: (
+            <div>
+              <p>
+                Leaving the organization will delete all of your saved content in the projects of
+                the organization, which includes:
+              </p>
+              <ul className="list-disc pl-4">
+                <li>
+                  SQL snippets <span className="text-foreground">(both private and shared)</span>
+                </li>
+                <li>Custom reports</li>
+                <li>Log Explorer queries</li>
+              </ul>
+            </div>
+          ),
         }}
+        onCancel={() => setIsLeaveTeamModalOpen(false)}
+        onConfirm={() => leaveTeam()}
       >
         <p className="text-sm text-foreground-light">
           Are you sure you want to leave this organization? This is permanent.

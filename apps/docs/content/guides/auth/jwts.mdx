@@ -66,7 +66,7 @@ The first segment `eyJhbGciOiJIUzI1NiJ9` is known as the "header", and when deco
 }
 ```
 
-The second segment `eyJzdWIiOiIwMDAxIiwibmFtZSI6IlNhbSBWaW1lcyIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoxNTE4MjM5MDIyfQ` contains our original payload:
+The second segment <code className="break-all">eyJzdWIiOiIwMDAxIiwibmFtZSI6IlNhbSBWaW1lcyIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoxNTE4MjM5MDIyfQ</code> contains our original payload:
 
 ```js
 {
@@ -160,6 +160,14 @@ You'll notice that this token is quite a bit longer, since it contains informati
   "user_metadata": null,
   "role": "authenticated"
 }
+```
+
+If using the service role key, you'll need to pass it into both the `apikey` and `authorization` headers (again, only do this from a secure environment such as your own server):
+
+```bash
+curl "$YOUR_PROJECT_URL/rest/v1/colors?select=name" \
+ -H "apikey: $YOUR_SERVICE_ROLE_KEY" \
+ -H "authorization: Bearer $YOUR_SERVICE_ROLE_KEY"
 ```
 
 Now that you understand what JWTs are and where they're used in Supabase, you can explore how to use them in combination with Row Level Security to start restricting access to certain tables, rows, and columns in your Postgres database.

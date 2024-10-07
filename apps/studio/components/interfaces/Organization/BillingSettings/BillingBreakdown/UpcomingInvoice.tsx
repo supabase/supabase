@@ -1,14 +1,15 @@
 import clsx from 'clsx'
 
+import * as Tooltip from '@radix-ui/react-tooltip'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgUpcomingInvoiceQuery } from 'data/invoices/org-invoice-upcoming-query'
-import React, { useMemo, useState } from 'react'
-import { Button, Collapsible, IconChevronRight, IconInfo } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { billingMetricUnit, formatUsage } from '../helpers'
-import Link from 'next/link'
 import { formatCurrency } from 'lib/helpers'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
+import { Button, Collapsible } from 'ui'
+import { billingMetricUnit, formatUsage } from '../helpers'
+import { ChevronRight, Info } from 'lucide-react'
 
 export interface UpcomingInvoiceProps {
   slug?: string
@@ -25,7 +26,7 @@ const feeTooltipData: TooltipData[] = [
     identifier: 'COMPUTE',
     text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the compute size of your project. Paused projects do not incur compute costs.',
     linkRef:
-      'https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute',
+      'https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
   },
 ]
 
@@ -165,7 +166,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                             type="text"
                             className="!px-1"
                             icon={
-                              <IconChevronRight
+                              <ChevronRight
                                 className={clsx(
                                   'transition',
                                   usageFeesExpanded.includes(fee.description) && 'rotate-90'
@@ -283,7 +284,7 @@ const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) =
   return (
     <Tooltip.Root delayDuration={0}>
       <Tooltip.Trigger>
-        <IconInfo size={12} strokeWidth={2} />
+        <Info size={12} strokeWidth={2} />
       </Tooltip.Trigger>
       <Tooltip.Portal>
         <Tooltip.Content side="bottom">

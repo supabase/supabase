@@ -567,6 +567,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/platform/custom-postgres-config',
+    destination: '/docs/guides/database/custom-postgres-config',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/hosting/platform/access-control',
     destination: '/docs/guides/platform/access-control',
   },
@@ -1180,6 +1185,11 @@ module.exports = [
     source: '/blog/supabase-aquires-oriole',
     destination: '/blog/supabase-acquires-oriole',
   },
+  {
+    permanent: true,
+    source: '/events/scale-to-billions-generative-ai-humata',
+    destination: '/events/scale-to-millions-generative-ai-humata',
+  },
 
   //  DOCS
   {
@@ -1535,6 +1545,75 @@ module.exports = [
     source: '/projects',
     destination: 'https://supabase.com/dashboard/projects',
   },
+  // Reorganizing pooler docs:-----------------------------
+
+  //external libraries
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#integrations',
+    destination: '/docs/guides/database/connecting-to-postgres#quickstart-connection-guides',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-drizzle',
+    destination: '/docs/guides/database/drizzle',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-prisma',
+    destination: '/docs/guides/database/prisma',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-postgresjs',
+    destination: '/docs/guides/database/postgres-js',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-pgadmin',
+    destination: '/docs/guides/database/pgadmin',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-psql',
+    destination: '/docs/guides/database/psql',
+  },
+
+  // pooling
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connection-pooler',
+    destination: '/docs/guides/database/connecting-to-postgres#connection-pooling-in-depth',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#troubleshooting-supavisor',
+    destination: '/docs/guides/database/supavisor',
+  },
+
+  //IPv4/IPv6
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#finding-your-database-hostname',
+    destination: '/docs/guides/platform/ipv4-address#finding-your-databases-ip-address',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#managing-your-ip-address',
+    destination: '/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#ipv6-address',
+    destination: '/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#ipv4-address',
+    destination: '/docs/guides/platform/ipv4-address',
+  },
+  //--------------------------------------------------------
+
   // START docs 2.0, moving pages in to structure
   {
     permanent: true,
@@ -1565,11 +1644,6 @@ module.exports = [
     permanent: true,
     source: '/docs/company/sla',
     destination: '/sla',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference',
-    destination: '/docs#reference-documentation',
   },
   {
     permanent: true,
@@ -2545,6 +2619,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/log-drains',
+    destination: '/docs/platform/log-drains',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/functions/functions-headers',
     destination: '/docs/functions/logging',
   },
@@ -2568,5 +2647,23 @@ module.exports = [
     source: '/docs/guides/auth/phone-login/textlocal',
     destination:
       '/docs/guides/auth/phone-login?showSmsProvider=Textlocal%2520%28Community%2520Supported%29',
+  },
+  {
+    permanent: true,
+    source: '/launchweek',
+    destination: '/launch-week',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/enterprise-billing',
+    destination: '/docs/guides/platform/org-based-billing',
+  },
+
+  // marketing
+
+  {
+    permanent: true,
+    source: '/changelogpod',
+    destination: 'https://forms.supabase.com/changelog-podcast-sponsorship',
   },
 ]

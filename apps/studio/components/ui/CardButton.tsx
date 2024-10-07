@@ -1,6 +1,7 @@
+import { Loader, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import React, { PropsWithChildren } from 'react'
-import { IconChevronRight, IconLoader, cn } from 'ui'
+import { cn } from 'ui'
 
 interface CardButtonProps {
   title?: string | React.ReactNode
@@ -150,13 +151,7 @@ const CardButton = ({
           group-hover:text-foreground
         "
         >
-          {loading ? (
-            <IconLoader className="animate-spin" />
-          ) : !hideChevron ? (
-            <IconChevronRight />
-          ) : (
-            <></>
-          )}
+          {loading ? <Loader className="animate-spin" /> : !hideChevron ? <ChevronRight /> : <></>}
         </div>
       )}
     </>

@@ -6,6 +6,7 @@ Alaister Young
 Aleksi Immonen
 Alexander Korotkov
 Amy Q
+Andrew Valleteau
 Angelico de los Reyes
 Ant Wilson
 Ariuna K
@@ -18,8 +19,10 @@ Chandana Anumula
 Charis Lam
 Chase Granberry
 Chris Caruso
+Chris Chandler
 Chris Copplestone
 Chris Gwilliams
+Chris Stockton
 Craig Cannon
 Dave Wilson
 Deji I
@@ -52,10 +55,9 @@ Kevin Grüneberg
 Lakshan Perera
 Laura C
 Long Hoang
+Łukasz Niemier
 Margarita Sandomirskaia
-Marijana Pavlinić
 Mark Burggraf
-Michael Ridley
 Monica El Khoury
 Oli R
 Pamela Chia

@@ -5,7 +5,7 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
@@ -15,7 +15,10 @@ import { useOrganizationRolesV2Query } from 'data/organization-members/organizat
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import {
+  useHasAccessToProjectLevelPermissions,
+  useOrgSubscriptionQuery,
+} from 'data/subscriptions/org-subscription-query'
 import {
   doPermissionsCheck,
   useCheckPermissions,
@@ -29,6 +32,7 @@ import {
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
+  CommandList_Shadcn_,
   Command_Shadcn_,
   Dialog,
   DialogContent,
@@ -58,7 +62,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
-import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
@@ -72,12 +75,11 @@ export const InviteMemberButton = () => {
   const { data: projects } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
-  const orgScopedRoles = (allRoles?.org_scoped_roles ?? []).sort(
-    (a, b) => b.base_role_id - a.base_role_id
-  )
-  const orgProjects = (projects ?? []).filter(
-    (project) => project.organization_id === organization?.id
-  )
+  const orgScopedRoles = allRoles?.org_scoped_roles ?? []
+
+  const orgProjects = (projects ?? [])
+    .filter((project) => project.organization_id === organization?.id)
+    .sort((a, b) => a.name.localeCompare(b.name))
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
@@ -87,8 +89,7 @@ export const InviteMemberButton = () => {
     { enabled: canReadSubscriptions }
   )
   const currentPlan = subscription?.plan
-  const isOptedIntoProjectLevelPermissions =
-    useIsOptedIntoProjectLevelPermissions(slug as string) && currentPlan?.id === 'enterprise'
+  const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
   const hasOrgRole =
@@ -149,7 +150,7 @@ export const InviteMemberButton = () => {
       }
     }
 
-    if (isOptedIntoProjectLevelPermissions) {
+    if (hasAccessToProjectLevelPermissions) {
       inviteMember(
         {
           slug,
@@ -247,7 +248,7 @@ export const InviteMemberButton = () => {
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              {isOptedIntoProjectLevelPermissions && (
+              {hasAccessToProjectLevelPermissions && (
                 <FormField_Shadcn_
                   name="applyToOrg"
                   control={form.control}
@@ -326,7 +327,7 @@ export const InviteMemberButton = () => {
                               type="default"
                               role="combobox"
                               size="small"
-                              className="justify-between"
+                              className="justify-between max-w-[470px]"
                               iconRight={
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               }
@@ -336,37 +337,58 @@ export const InviteMemberButton = () => {
                             </Button>
                           </PopoverTrigger_Shadcn_>
                           <PopoverContent_Shadcn_ sameWidthAsTrigger className="p-0">
-                            <Command_Shadcn_>
+                            <Command_Shadcn_
+                              // [Joshen] Let's update this to use keywords in CommandItem once cmdk is updated
+                              filter={(value, search) => {
+                                const project = orgProjects.find((project) => project.ref === value)
+                                const projectName = project?.name.toLowerCase()
+                                if (
+                                  projectName !== undefined &&
+                                  projectName.includes(search.toLowerCase())
+                                ) {
+                                  return 1
+                                } else if (value.includes(search)) {
+                                  return 1
+                                } else {
+                                  return 0
+                                }
+                              }}
+                            >
                               <CommandInput_Shadcn_ placeholder="Search project..." />
-                              <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
-                              <CommandGroup_Shadcn_>
-                                <ScrollArea
-                                  className={(orgProjects || []).length > 7 ? 'h-[210px]' : ''}
-                                >
-                                  {orgProjects.map((project) => {
-                                    return (
-                                      <CommandItem_Shadcn_
-                                        key={project.ref}
-                                        value={project.ref}
-                                        onSelect={() => {
-                                          form.setValue('projectRef', project.ref)
-                                          setProjectDropdownOpen(false)
-                                        }}
-                                      >
-                                        <Check
-                                          className={cn(
-                                            'mr-2 h-4 w-4',
-                                            field.value === project.ref
-                                              ? 'opacity-100'
-                                              : 'opacity-0'
-                                          )}
-                                        />
-                                        {project.name}
-                                      </CommandItem_Shadcn_>
-                                    )
-                                  })}
-                                </ScrollArea>
-                              </CommandGroup_Shadcn_>
+                              <CommandList_Shadcn_>
+                                <CommandEmpty_Shadcn_>No projects found...</CommandEmpty_Shadcn_>
+                                <CommandGroup_Shadcn_>
+                                  <ScrollArea
+                                    className={cn(
+                                      (orgProjects || []).length > 7 &&
+                                        'max-h-[210px] overflow-y-auto'
+                                    )}
+                                  >
+                                    {orgProjects.map((project) => {
+                                      return (
+                                        <CommandItem_Shadcn_
+                                          key={project.ref}
+                                          value={project.ref}
+                                          onSelect={(value) => {
+                                            form.setValue('projectRef', value)
+                                            setProjectDropdownOpen(false)
+                                          }}
+                                        >
+                                          <Check
+                                            className={cn(
+                                              'mr-2 h-4 w-4',
+                                              field.value === project.ref
+                                                ? 'opacity-100'
+                                                : 'opacity-0'
+                                            )}
+                                          />
+                                          {project.name}
+                                        </CommandItem_Shadcn_>
+                                      )
+                                    })}
+                                  </ScrollArea>
+                                </CommandGroup_Shadcn_>
+                              </CommandList_Shadcn_>
                             </Command_Shadcn_>
                           </PopoverContent_Shadcn_>
                         </Popover_Shadcn_>

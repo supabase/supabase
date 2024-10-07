@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 import { Markdown } from '../Markdown'
 import { PropsWithChildren } from 'react'
 

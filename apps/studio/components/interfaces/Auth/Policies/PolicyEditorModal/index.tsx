@@ -1,6 +1,6 @@
 import { isEmpty, noop } from 'lodash'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -96,7 +96,6 @@ const PolicyEditorModal = ({
   const onSelectBackFromTemplates = () => setView(previousView)
 
   const onToggleFeaturePreviewModal = () => {
-    snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
     snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
     onSelectCancel()
   }

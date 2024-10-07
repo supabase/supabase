@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
@@ -55,7 +55,7 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
   const { ref: projectRef } = useParams()
   const { mutate: createAuthIntegration, isLoading } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
-      toast.success(`Successfully created a new AWS Cognito Auth integration.`)
+      toast.success(`Successfully created a new Amazon Cognito Auth integration.`)
       onClose()
     },
   })
@@ -98,12 +98,12 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
         <DialogHeader>
           <DialogTitle className="truncate">
             {isCreating
-              ? `Add new AWS Cognito Auth connection`
-              : `Update existing AWS Cognito Auth connection`}
+              ? `Add new Amazon Cognito Auth connection`
+              : `Update existing Amazon Cognito Auth connection`}
           </DialogTitle>
           <DialogDescription>
-            By adding an AWS Cognito Auth connection, you can authenticate users using AWS Cognito
-            User Pools.
+            By adding an Amazon Cognito Auth connection, you can authenticate users using Amazon
+            Cognito User Pools.
           </DialogDescription>
         </DialogHeader>
         <Separator />
@@ -118,7 +118,7 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
               render={({ field }) => (
                 <FormItemLayout
                   className="px-8"
-                  label={`Enable AWS Cognito Auth Connection`}
+                  label={`Enable Amazon Cognito Auth Connection`}
                   layout="flex"
                 >
                   <FormControl_Shadcn_>
@@ -133,7 +133,7 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
             />
             <Separator /> */}
               <p className="text-sm text-foreground-light">
-                This will enable a JWT token from AWS Cognito project to access data from this
+                This will enable a JWT token from Amazon Cognito project to access data from this
                 Supabase project.
               </p>
               <FormField_Shadcn_
@@ -141,7 +141,7 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
                 control={form.control}
                 name="awsCognitoUserPoolId"
                 render={({ field }) => (
-                  <FormItemLayout label="AWS Cognito User Pool ID">
+                  <FormItemLayout label="Amazon Cognito User Pool ID">
                     <div className="flex flex-row">
                       <Button
                         type="default"

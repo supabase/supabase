@@ -1,13 +1,14 @@
 import matter from 'gray-matter'
 import { type Metadata, type ResolvingMetadata } from 'next'
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { readFile, readdir } from 'node:fs/promises'
 import { extname, join, sep } from 'node:path'
 
+import { pluckPromise } from '~/features/helpers.fn'
 import { cache_fullProcess_withDevCacheBust, existsFile } from '~/features/helpers.fs'
 import type { OrPromise } from '~/features/helpers.types'
-import { notFoundLink } from '~/features/recommendations/NotFound.utils'
-import { BASE_PATH, MISC_URL } from '~/lib/constants'
+import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
+import { BASE_PATH } from '~/lib/constants'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
 import { newEditLink } from './GuidesMdx.template'
 
@@ -44,14 +45,14 @@ const getGuidesMarkdownInternal = async ({ slug }: { slug: string[] }) => {
     !fullPath.startsWith(GUIDES_DIRECTORY) ||
     !PUBLISHED_SECTIONS.some((section) => relPath.startsWith(section))
   ) {
-    redirect(notFoundLink(slug.join('/')))
+    notFound()
   }
 
   let mdx: string
   try {
     mdx = await readFile(fullPath, 'utf-8')
   } catch {
-    redirect(notFoundLink(slug.join('/')))
+    notFound()
   }
 
   const editLink = newEditLink(
@@ -108,9 +109,6 @@ const genGuidesStaticParams = (directory?: string) => async () => {
   return result
 }
 
-const pluckPromise = <T, K extends keyof T>(promise: Promise<T>, key: K) =>
-  promise.then((data) => data[key])
-
 const genGuideMeta =
   <Params,>(
     generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: `/${string}` }>
@@ -136,12 +134,11 @@ const genGuideMeta =
       openGraph: {
         ...parentOg,
         url: `${BASE_PATH}${pathname}`,
-        images: {
-          url: `${MISC_URL}/functions/v1/og-images?site=docs&type=${encodeURIComponent(ogType)}&title=${encodeURIComponent(meta.title)}&description=${encodeURIComponent(meta.description ?? 'undefined')}`,
-          width: 800,
-          height: 600,
-          alt: meta.title,
-        },
+        images: generateOpenGraphImageMeta({
+          type: ogType,
+          title: meta.title,
+          description: meta.description,
+        }),
       },
     }
   }

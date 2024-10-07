@@ -4,8 +4,8 @@ import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_
 import type { User } from 'data/auth/users-query'
 import { ChevronDown, User as IconUser } from 'lucide-react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { getAvatarUrl, getDisplayName } from '../Auth/Users/UserListItem.utils'
 import RoleImpersonationSelector from './RoleImpersonationSelector'
+import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
 
 export interface RoleImpersonationPopoverProps {
   serviceRoleLabel?: string

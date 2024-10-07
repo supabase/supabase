@@ -21,11 +21,11 @@ import ConnectingState from './ConnectingState'
 import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
+import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
 import { ProjectContextProvider } from './ProjectContext'
-import ProjectPausedState from './ProjectPausedState'
 import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
@@ -44,6 +44,7 @@ const routesToIgnoreProjectDetailsRequest = [
 const routesToIgnoreDBConnection = [
   '/project/[ref]/branches',
   '/project/[ref]/database/backups/scheduled',
+  '/project/[ref]/database/backups/pitr',
   '/project/[ref]/settings/addons',
 ]
 
@@ -89,6 +90,12 @@ const ProjectLayout = ({
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
+  const showProductMenu = selectedProject
+    ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+      (selectedProject.status === PROJECT_STATUS.COMING_UP &&
+        router.pathname.includes('/project/[ref]/settings'))
+    : true
+
   const ignorePausedState =
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
@@ -119,26 +126,29 @@ const ProjectLayout = ({
             direction="horizontal"
             autoSaveId="project-layout"
           >
-            {!showPausedState && productMenu && (
-              <>
-                <ResizablePanel
-                  className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64')}
-                  defaultSize={1} // forces panel to smallest width possible, at w-64
-                >
-                  <MenuBarWrapper
-                    isLoading={isLoading}
-                    isBlocking={isBlocking}
-                    productMenu={productMenu}
-                  >
-                    <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-                  </MenuBarWrapper>
-                </ResizablePanel>
-                <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
-              </>
-            )}
-            <ResizablePanel className="h-full">
+            <ResizablePanel
+              id="panel-left"
+              className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
+                hidden: !showProductMenu || !productMenu,
+              })}
+              defaultSize={0} // forces panel to smallest width possible, at w-64
+            >
+              <MenuBarWrapper
+                isLoading={isLoading}
+                isBlocking={isBlocking}
+                productMenu={productMenu}
+              >
+                <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+              </MenuBarWrapper>
+            </ResizablePanel>
+            <ResizableHandle
+              className={cn({ hidden: !showProductMenu || !productMenu })}
+              withHandle
+              disabled={resizableSidebar ? false : true}
+            />
+            <ResizablePanel id="panel-right" className="h-full flex flex-col">
+              {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
               <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
-                {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
                 {showPausedState ? (
                   <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
                     <div className="w-full">
@@ -221,6 +231,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
+  const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
 
   const requiresDbConnection: boolean =
     (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
@@ -248,11 +259,11 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Loading />
   }
 
-  if (isRestarting) {
+  if (isRestarting && !isBackupsPage) {
     return <RestartingState />
   }
 
-  if (isProjectUpgrading) {
+  if (isProjectUpgrading && !isBackupsPage) {
     return <UpgradingState />
   }
 
@@ -272,7 +283,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoringState />
   }
 
-  if (isProjectRestoreFailed) {
+  if (isProjectRestoreFailed && !isBackupsPage) {
     return <RestoreFailedState />
   }
 

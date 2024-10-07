@@ -5,12 +5,14 @@ import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { object, string } from 'yup'
 
 import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
+import { LastSignInWrapper } from './LastSignInWrapper'
 
 const signInSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
@@ -20,6 +22,7 @@ const signInSchema = object({
 const SignInForm = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const [lastSignIn, setLastSignIn] = useLastSignIn()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
@@ -40,6 +43,7 @@ const SignInForm = () => {
     })
 
     if (!error) {
+      setLastSignIn('email')
       try {
         const data = await getMfaAuthenticatorAssuranceLevel()
         if (data) {
@@ -130,16 +134,18 @@ const SignInForm = () => {
               />
             </div>
 
-            <Button
-              block
-              form="signIn-form"
-              htmlType="submit"
-              size="large"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-            >
-              Sign In
-            </Button>
+            <LastSignInWrapper type="email">
+              <Button
+                block
+                form="signIn-form"
+                htmlType="submit"
+                size="large"
+                disabled={isSubmitting}
+                loading={isSubmitting}
+              >
+                Sign In
+              </Button>
+            </LastSignInWrapper>
           </div>
         )
       }}

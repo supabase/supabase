@@ -160,6 +160,13 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.from_('books').select().eq('title', 'Harry').execute()
+```
+
+</TabPanel>
 </Tabs>
 
 The equality symbol above (`=`) is very "strict" on what it matches. In a full text search context, we might want to find all "Harry Potter" books and so we can rewrite the
@@ -284,6 +291,14 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.from_('books').select().text_search('description', "'big'").execute()
+```
+
+</TabPanel>
+
 <TabPanel id="data" label="Data">
 
 {/* <!-- vale off --> */}
@@ -390,6 +405,19 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```sql
+create function title_description(books) returns text as $$
+  select $1.title || ' ' || $1.description;
+$$ language sql immutable;
+```
+
+```python
+data = supabase.from_('books').select().text_search('title_description', "little").execute()
+```
+
+</TabPanel>
 <TabPanel id="data" label="Data">
 
 {/* <!-- vale off --> */}
@@ -470,6 +498,13 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.from_('books').select().text_search('description', "'little' & 'big'").execute()
+```
+
+</TabPanel>
 <TabPanel id="data" label="Data">
 
 {/* <!-- vale off --> */}
@@ -546,6 +581,13 @@ val data = supabase.from("books").select {
         textSearch("description", "'title' | 'big'", TextSearchType.NONE)
     }
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = client.from_('books').select().text_search('description', "'little' | 'big'").execute()
 ```
 
 </TabPanel>
@@ -633,6 +675,13 @@ let response = try await supabase.rpc(
 ```kotlin
 val rpcParams = mapOf("prefix" to "Lit")
 val result = supabase.postgrest.rpc("search_books_by_title_prefix", rpcParams)
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = client.rpc('search_books_by_title_prefix', { 'prefix': 'Lit' }).execute()
 ```
 
 </TabPanel>
@@ -762,6 +811,13 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = client.from_('books').select().text_search('fts', "'little' & 'big'").execute()
+```
+
+</TabPanel>
 <TabPanel id="data" label="Data">
 
 {/* <!-- vale off --> */}
@@ -846,6 +902,13 @@ val data = supabase.from("books").select {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = client.from_('books').select().text_search('description', "'big' <-> 'dreams'").execute()
+```
+
+</TabPanel>
 </Tabs>
 
 We can also use the `<->` to find words within a certain distance of each other. For example to find `year` and `school` within 2 words of each other:
@@ -908,6 +971,13 @@ val data = supabase.from("books").select {
         textSearch("description", "'year' <2> 'school'", TextSearchType.NONE)
     }
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = client.from_('books').select().text_search('description', "'year' <2> 'school'").execute()
 ```
 
 </TabPanel>
@@ -976,6 +1046,13 @@ val data = supabase.from("books").select {
         textSearch("description", "'big' & !'little'", TextSearchType.NONE)
     }
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = client.from_('books').select().text_search('description', "'big' & !'little'").execute()
 ```
 
 </TabPanel>

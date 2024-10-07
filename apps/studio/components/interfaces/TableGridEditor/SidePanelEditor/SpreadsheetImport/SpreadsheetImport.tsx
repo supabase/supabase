@@ -2,9 +2,9 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 import { debounce, includes, noop } from 'lodash'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { Button, IconExternalLink, SidePanel, Tabs } from 'ui'
+import { Button, SidePanel, Tabs } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
@@ -18,6 +18,7 @@ import {
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
+import { ExternalLink } from 'lucide-react'
 
 const MAX_CSV_SIZE = 1024 * 1024 * 100 // 100 MB
 
@@ -60,38 +61,12 @@ const SpreadsheetImport = ({
   })
   const [errors, setErrors] = useState<any>([])
   const [selectedHeaders, setSelectedHeaders] = useState<string[]>([])
-  const [selectedColumnTypeMap, setSelectedColumnTypeMap] = useState<any>([])
 
-  const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => ({
-    name: column.name,
-    format: column.format,
-  }))
+  const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => column.name)
   const incompatibleHeaders = selectedHeaders.filter(
-    (header) => !selectedTableColumns.some((column) => column.name === header)
+    (header) => !selectedTableColumns.includes(header)
   )
   const isCompatible = selectedTable !== undefined ? incompatibleHeaders.length === 0 : true
-
-  const checkInferredColumnTypes = (columnTypeMap: any) => {
-    // all other types can in theory be casted into a string
-    // e.g. a column with type of text can still contain the value "1", but inferColumnType() will
-    // still infer it as an int8
-    const stringTypes = ['text', 'varchar']
-    const lookup: { [key: string]: string[] } = {
-      int8: ['int2', 'int4', 'int8', 'float4', 'float8', 'numeric', ...stringTypes],
-      float8: ['float4', 'float8', 'numeric', ...stringTypes],
-      jsonb: ['json', 'jsonb', ...stringTypes],
-      text: ['uuid', ...stringTypes],
-      timestamptz: ['date', 'time', 'timetz', 'timestamp', 'timestamptz', ...stringTypes],
-      bool: ['bool', ...stringTypes],
-    }
-    return selectedTableColumns
-      .filter((c) => Object.keys(columnTypeMap).includes(c.name))
-      .filter((c) => !lookup[columnTypeMap[c.name]].includes(c.format))
-      .map((c) => ({ name: c.name, format: columnTypeMap[c.name], expectedFormat: c.format }))
-  }
-
-  const incompatibleTypeColumns = checkInferredColumnTypes(selectedColumnTypeMap)
-  const isTypeCompatible = selectedTable !== undefined ? selectedColumnTypeMap.length === 0 : true
 
   const onProgressUpdate = (progress: number) => {
     setParseProgress(progress)
@@ -102,13 +77,15 @@ const SpreadsheetImport = ({
     event.persist()
     const [file] = event.target.files || event.dataTransfer.files
 
-    if (file.size > MAX_CSV_SIZE) {
+    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
+      toast.error('Sorry! We only accept CSV or TSV file types, please upload another file.')
+    } else if (file.size > MAX_CSV_SIZE) {
       event.target.value = ''
       return toast(
         <div className="space-y-1">
           <p>The dashboard currently only supports importing of CSVs below 100MB.</p>
           <p>For bulk data loading, we recommend doing so directly through the database.</p>
-          <Button asChild type="default" icon={<IconExternalLink />} className="!mt-2">
+          <Button asChild type="default" icon={<ExternalLink />} className="!mt-2">
             <Link
               href="https://supabase.com/docs/guides/database/tables#bulk-data-loading"
               target="_blank"
@@ -120,10 +97,6 @@ const SpreadsheetImport = ({
         </div>,
         { duration: Infinity }
       )
-    }
-
-    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
-      toast.error('Sorry! We only accept CSV or TSV file types, please upload another file.')
     } else {
       updateEditorDirty(true)
       setUploadedFile(file)
@@ -139,7 +112,6 @@ const SpreadsheetImport = ({
 
       setErrors(errors)
       setSelectedHeaders(headers)
-      setSelectedColumnTypeMap(columnTypeMap)
       setSpreadsheetData({ headers, rows: previewRows, rowCount, columnTypeMap })
     }
     event.target.value = ''
@@ -161,10 +133,8 @@ const SpreadsheetImport = ({
           `Some issues have been detected on ${errors.length} rows. More details below the content preview.`
         )
       }
-
       setErrors(errors)
       setSelectedHeaders(headers)
-      setSelectedColumnTypeMap(columnTypeMap)
       setSpreadsheetData({ headers, rows, rowCount: rows.length, columnTypeMap })
     } else {
       setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
@@ -191,7 +161,7 @@ const SpreadsheetImport = ({
     } else if (selectedHeaders.length === 0) {
       toast.error('Please select at least one header from your CSV')
       resolve()
-    } else if (!(isCompatible && isTypeCompatible)) {
+    } else if (!isCompatible) {
       toast.error(
         'The data that you are trying to import is incompatible with your table structure'
       )
@@ -262,7 +232,6 @@ const SpreadsheetImport = ({
             errors={errors}
             selectedHeaders={selectedHeaders}
             incompatibleHeaders={incompatibleHeaders}
-            incompatibeTypeColumns={incompatibleTypeColumns}
           />
           <SidePanel.Separator />
         </>
