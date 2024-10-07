@@ -10,7 +10,9 @@ interface Props {
 
 const DashboardFeatures: React.FC<Props> = ({ title, tabs }) => (
   <SectionContainer className="text-center" id="dashboard">
-    <h3 className="mb-8 text-2xl lg:text-4xl text-foreground-lighter">{title}</h3>
+    <h3 className="mb-8 text-2xl md:text-4xl max-w-[300px] sm:max-w-none mx-auto text-foreground-lighter">
+      {title}
+    </h3>
     <TabsWithHighlights tabs={tabs} />
   </SectionContainer>
 )
