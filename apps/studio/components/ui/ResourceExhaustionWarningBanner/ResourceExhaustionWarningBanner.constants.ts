@@ -212,16 +212,19 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
     buttonText: 'Check usage',
     metric: null,
   },
+  // [Joshen] We can remove this once auth team gives the signal to
   auth_restricted_email_sending: {
     restrictToRoutes: ['/project/[ref]', '/project/[ref]/auth', '/project/[ref]/settings/auth'], // project home, auth, settings
     bannerContent: {
       warning: {
-        title: "Authentication emails are restricted to only your organization's members",
-        description: 'Set up a custom SMTP provider to send messages to any user',
+        title: "Authentication emails are only sent to organization members' email addresses",
+        description:
+          'Set up a custom SMTP provider to handle flows like password reset or user invitation which require sending emails to any user',
       },
       critical: {
-        title: "Authentication emails are restricted to only your organization's members",
-        description: 'Set up a custom SMTP provider to send messages to any user',
+        title: "Authentication emails are only sent to organization members' email addresses",
+        description:
+          'Set up a custom SMTP provider to handle flows like password reset or user invitation which require sending emails to any user',
       },
     },
     cardContent: {
