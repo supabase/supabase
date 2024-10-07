@@ -17,7 +17,6 @@ const ServiceStatus = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
-  const [remainingTimeTillCheck, setRemainingTimeTillCheck] = useState(0)
 
   const {
     projectAuthAll: authEnabled,
@@ -34,13 +33,21 @@ const ServiceStatus = () => {
   const isBranch = project?.parentRef !== project?.ref
 
   // [Joshen] Need pooler service check eventually
-  const { data: status, isLoading } = useProjectServiceStatusQuery({ projectRef: ref })
-  const { data: edgeFunctionsStatus } = useEdgeFunctionServiceStatusQuery({ projectRef: ref })
-  const { isLoading: isLoadingPostgres, isSuccess: isSuccessPostgres } =
-    usePostgresServiceStatusQuery({
-      projectRef: ref,
-      connectionString: project?.connectionString,
-    })
+  const {
+    data: status,
+    isLoading,
+    refetch: refetchServiceStatus,
+  } = useProjectServiceStatusQuery({ projectRef: ref })
+  const { data: edgeFunctionsStatus, refetch: refetchEdgeFunctionServiceStatus } =
+    useEdgeFunctionServiceStatusQuery({ projectRef: ref })
+  const {
+    isLoading: isLoadingPostgres,
+    isSuccess: isSuccessPostgres,
+    refetch: refetchPostgresServiceStatus,
+  } = usePostgresServiceStatusQuery({
+    projectRef: ref,
+    connectionString: project?.connectionString,
+  })
 
   const authStatus = status?.find((service) => service.name === 'auth')
   const restStatus = status?.find((service) => service.name === 'rest')
@@ -143,28 +150,26 @@ const ServiceStatus = () => {
   }
 
   useEffect(() => {
-    if (true) {
-      const remainingDuration = dayjs.utc().diff(dayjs.utc('2024-10-07 07:53:00'), 'minute')
-      setRemainingTimeTillCheck(SERVICE_STATUS_THRESHOLD - remainingDuration)
+    let timer: any
+
+    if (isProjectNew) {
+      const secondsSinceProjectCreated = dayjs
+        .utc()
+        .diff(dayjs.utc(project?.inserted_at), 'seconds')
+      const remainingTimeTillNextCheck = SERVICE_STATUS_THRESHOLD * 60 - secondsSinceProjectCreated
+
+      timer = setTimeout(() => {
+        refetchServiceStatus()
+        refetchPostgresServiceStatus()
+        refetchEdgeFunctionServiceStatus()
+      }, remainingTimeTillNextCheck * 1000)
     }
+
+    return () => {
+      clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isProjectNew])
-
-  useEffect(() => {
-    if (remainingTimeTillCheck <= 0) return
-
-    // Just to trigger a re-render so service status will update accordingly
-    const timer = setInterval(
-      () => {
-        console.log('Boom')
-        setRemainingTimeTillCheck(0)
-      },
-      1000 * 60 * remainingTimeTillCheck
-    )
-
-    return () => clearInterval(timer)
-  }, [remainingTimeTillCheck])
-
-  console.log(remainingTimeTillCheck, 'mins')
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
@@ -172,7 +177,7 @@ const ServiceStatus = () => {
         <Button
           type="default"
           icon={
-            isLoadingChecks ? (
+            isLoadingChecks || isProjectNew ? (
               <Loader2 className="animate-spin" />
             ) : (
               <div
