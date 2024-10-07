@@ -234,6 +234,7 @@ export const BranchRow = ({
                     View Repository
                   </Link>
                 </Button>
+                {branchingWorkflowLogsEnabled && <WorkflowLogs projectRef={branch.project_ref} />}
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <Button type="text" icon={<MoreVertical />} className="px-1" />
