@@ -22,7 +22,7 @@ const solutions: SolutionsType = {
         relational database.
       </>
     ),
-    description_short: 'Fully portable Postgres database',
+    description_short: 'Fully managed Postgres database',
     label: '',
     url: '/database',
   },
