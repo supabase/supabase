@@ -25,6 +25,9 @@ const useSendPageTelemetryWithConsent = () => {
             session_id: '',
           },
         },
+        headers: {
+          credentials: 'include',
+        },
       }).catch((e) => {
         console.error('Problem sending telemetry:', e)
       })
