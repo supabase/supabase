@@ -437,6 +437,15 @@ const nextConfig = {
         source: '/fonts/:slug*',
         headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
       },
+      {
+        source: '/.well-known/vercel/flags',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/json',
+          },
+        ],
+      },
     ]
   },
   images: {
