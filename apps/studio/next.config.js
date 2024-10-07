@@ -1,5 +1,4 @@
 const { withSentryConfig } = require('@sentry/nextjs')
-const withVercelToolbar = require('@vercel/toolbar/plugins/next')()
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
@@ -509,7 +508,7 @@ const nextConfig = {
 // module.exports = withBundleAnalyzer(nextConfig)
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
-module.exports = withVercelToolbar(
+module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
     ? withSentryConfig(
         withBundleAnalyzer(nextConfig),
@@ -537,4 +536,3 @@ module.exports = withVercelToolbar(
         }
       )
     : nextConfig
-)
