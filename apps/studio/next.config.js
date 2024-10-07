@@ -441,7 +441,16 @@ const nextConfig = {
         source: '/.well-known/vercel/flags',
         headers: [
           {
-            key: 'Content-Type',
+            key: 'content-type',
+            value: 'application/json',
+          },
+        ],
+      },
+      {
+        source: `${process.env.NEXT_PUBLIC_BASE_PATH}/.well-known/vercel/flags`,
+        headers: [
+          {
+            key: 'content-type',
             value: 'application/json',
           },
         ],
