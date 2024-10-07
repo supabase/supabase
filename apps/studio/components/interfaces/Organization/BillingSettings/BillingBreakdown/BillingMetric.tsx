@@ -8,7 +8,7 @@ import { useMemo } from 'react'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
-import { ChevronRight, PieChart } from 'lucide-react'
+import { ChevronRight, InfoIcon, PieChart } from 'lucide-react'
 
 export interface BillingMetricProps {
   idx: number
@@ -77,8 +77,8 @@ const BillingMetric = ({
         : `(${(+(usageRatio * 100).toFixed(0)).toLocaleString()}%)`
 
   return (
-    <HoverCard openDelay={0} closeDelay={0}>
-      <HoverCardTrigger asChild>
+    <HoverCard openDelay={50} closeDelay={200}>
+      <HoverCardTrigger>
         <div className="flex items-center justify-between cursor-pointer">
           <div>
             {metric.anchor ? (
@@ -91,7 +91,7 @@ const BillingMetric = ({
                 </div>
               </Link>
             ) : (
-              <p className="text-xs text-foreground-light">{metric.name}</p>
+              <p className="text-xs text-foreground-light flex space-x-1">{metric.name}</p>
             )}
             <span className="text-sm">{usageLabel}</span>&nbsp;
             {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
@@ -136,9 +136,7 @@ const BillingMetric = ({
                     }
                   />
                 </svg>
-              ) : (
-                <PieChart className="h-8 w-8 p-1" />
-              )}
+              ) : null}
             </div>
           ) : (
             <div>
@@ -156,7 +154,18 @@ const BillingMetric = ({
 
           {metric.tip && (
             <div className="my-2">
-              <p className="text-sm">{metric.tip}</p>
+              <p className="text-sm">
+                {metric.tip}{' '}
+                {metric.docLink && (
+                  <Link
+                    href={metric.docLink.url}
+                    target="_blank"
+                    className="transition text-brand hover:text-brand-600 underline"
+                  >
+                    {metric.docLink.title}
+                  </Link>
+                )}
+              </p>
             </div>
           )}
 
