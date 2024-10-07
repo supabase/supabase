@@ -122,8 +122,8 @@ const ServiceStatus = () => {
   const isLoadingChecks = services.some((service) => service.isLoading)
   const allServicesOperational = services.every((service) => service.isSuccess)
 
-  // If the project is less than 10 minutes old, and status is not operational, then it's likely the service is still starting up
-  const isProjectNew = dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < 10
+  // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
+  const isProjectNew = dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < 5
 
   const StatusMessage = ({ isLoading, isSuccess }: { isLoading: boolean; isSuccess: boolean }) => {
     if (isLoading) return 'Checking status'
