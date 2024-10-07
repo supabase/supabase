@@ -13,6 +13,35 @@ import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
+const StatusMessage = ({
+  isLoading,
+  isSuccess,
+  isProjectNew,
+}: {
+  isLoading: boolean
+  isSuccess: boolean
+  isProjectNew: boolean
+}) => {
+  if (isLoading) return 'Checking status'
+  if (isProjectNew) return 'Coming up...'
+  if (isSuccess) return 'No issues'
+  return 'Unable to connect'
+}
+
+const StatusIcon = ({
+  isLoading,
+  isSuccess,
+  isProjectNew,
+}: {
+  isLoading: boolean
+  isSuccess: boolean
+  isProjectNew: boolean
+}) => {
+  if (isLoading || isProjectNew) return <Loader2 size={14} className="animate-spin" />
+  if (isSuccess) return <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
+  return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
+}
+
 const ServiceStatus = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
@@ -136,19 +165,6 @@ const ServiceStatus = () => {
   const isProjectNew =
     dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < SERVICE_STATUS_THRESHOLD
 
-  const StatusMessage = ({ isLoading, isSuccess }: { isLoading: boolean; isSuccess: boolean }) => {
-    if (isLoading) return 'Checking status'
-    if (isProjectNew) return 'Coming up...'
-    if (isSuccess) return 'No issues'
-    return 'Unable to connect'
-  }
-
-  const StatusIcon = ({ isLoading, isSuccess }: { isLoading: boolean; isSuccess: boolean }) => {
-    if (isLoading || isProjectNew) return <Loader2 size={14} className="animate-spin" />
-    if (isSuccess) return <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
-    return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
-  }
-
   useEffect(() => {
     let timer: any
 
@@ -199,11 +215,19 @@ const ServiceStatus = () => {
             className="transition px-3 py-2 text-xs flex items-center justify-between border-b last:border-none group relative hover:bg-surface-300"
           >
             <div className="flex gap-x-2">
-              <StatusIcon isLoading={service.isLoading} isSuccess={!!service.isSuccess} />
+              <StatusIcon
+                isLoading={service.isLoading}
+                isSuccess={!!service.isSuccess}
+                isProjectNew={isProjectNew}
+              />
               <div className="flex-1">
                 <p>{service.name}</p>
                 <p className="text-foreground-light flex items-center gap-1">
-                  <StatusMessage isLoading={service.isLoading} isSuccess={!!service.isSuccess} />
+                  <StatusMessage
+                    isLoading={service.isLoading}
+                    isSuccess={!!service.isSuccess}
+                    isProjectNew={isProjectNew}
+                  />
                 </p>
               </div>
             </div>
