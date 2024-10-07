@@ -461,9 +461,9 @@ NEW_KEY_CONTENT
           ref={ref}
           {...props}
         >
-          <CardHeader className="lg:flex-row lg:items-center gap-3 lg:gap-10">
-            <div className="flex flex-col gap-1 flex-1 grow">
-              <CardTitle>{title}</CardTitle>
+          <CardHeader className="lg:flex-row lg:items-center gap-3 lg:gap-10 py-4">
+            <div className="flex flex-col gap-0 flex-1 grow">
+              <CardTitle className="text-sm">{title}</CardTitle>
               <CardDescription className="max-w-xl">{description}</CardDescription>
             </div>
             <div className="flex lg:justify-end flex-">
