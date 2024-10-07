@@ -338,7 +338,7 @@ services:
     # Uncomment to use Big Query backend for analytics
     # volumes:
     #   - type: bind
-    #     source: ${PWD}/gcloud.json
+    #     source: ${PWD}/gcloud.
     #     target: /opt/app/rel/logflare/bin/gcloud.json
     #     read_only: true
     environment:
@@ -383,9 +383,6 @@ services:
       - -c
       - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
     restart: unless-stopped
-    ports:
-      # Pass down internal port because it's set dynamically by other services
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     environment:
       POSTGRES_HOST: /var/run/postgresql
       PGPORT: ${POSTGRES_PORT}
