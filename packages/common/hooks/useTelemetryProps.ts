@@ -10,7 +10,7 @@ export function useTelemetryProps() {
     language: locale ?? 'en-US',
     search: isBrowser ? window.location.search : undefined,
     userAgent: isBrowser ? window.navigator.userAgent : undefined,
-    viewportHeight: isBrowser ? `${window.innerHeight}` : undefined,
-    viewportWidth: isBrowser ? `${window.innerWidth}` : undefined,
+    viewportHeight: isBrowser ? window.innerHeight : undefined,
+    viewportWidth: isBrowser ? window.innerWidth : undefined,
   }
 }

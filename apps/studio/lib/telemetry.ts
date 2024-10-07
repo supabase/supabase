@@ -9,8 +9,8 @@ export interface TelemetryProps {
   language: string
   search?: string
   userAgent?: string
-  viewportHeight?: string
-  viewportWidth?: string
+  viewportHeight?: number
+  viewportWidth?: number
 }
 
 /**
