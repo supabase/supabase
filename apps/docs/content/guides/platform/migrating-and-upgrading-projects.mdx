@@ -125,13 +125,13 @@ Note that the earliest Supabase Postgres version that supports a direct referenc
 nix run 'github:supabase/postgres#start-server' -- 15
 ```
 
-Then we can restore the backup file into the Postgres instance from a separate shell session:
+Then restore the backup file into the Postgres instance from a separate shell session:
 
 ```sh
 nix run github:supabase/postgres#start-client -- --file <BACKUP FILE>
 ```
 
-Which loads the backup file into Postgres and drops you into a [psql](https://www.postgresql.org/docs/current/app-psql.html) REPL. For `start-client` you do not need to provide a reference to the backup's Postgres version.
+Which loads the backup file into Postgres and drops you into a [psql](https://www.postgresql.org/docs/current/app-psql.html) `psql` prompt. For `start-client` you do not need to provide a reference to the backup's Postgres version.
 
 Any errors encountered during the restore process are logged to stdout by the `start-server` process. Review those errors and edit the plaintext backup file as needed until the project restores successfully. A failed restore will create artifacts on the Postgres server so be sure to restart the `start-server` process between restore attempts.
 
