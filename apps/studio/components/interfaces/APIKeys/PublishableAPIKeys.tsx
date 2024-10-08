@@ -33,7 +33,7 @@ import {
 } from 'lucide-react'
 import Connect from '../Home/Connect/Connect'
 import ConnectTabContentNew from '../Home/Connect/ConnectTabContent'
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import SimpleCodeBlock from 'ui/src/components/SimpleCodeBlock/SimpleCodeBlock'
 import CopyButton from 'components/ui/CopyButton'
 import ShowPublicJWTsDialogComposer from '../JwtSecrets/ShowPublicJWTsDialogComposer'
 

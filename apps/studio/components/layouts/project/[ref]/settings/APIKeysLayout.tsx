@@ -8,12 +8,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  cn,
   Input_Shadcn_,
   Label_Shadcn_,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Separator,
 } from 'ui'
 import {
   ScaffoldContainer,
@@ -21,6 +23,7 @@ import {
   ScaffoldHeader,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
+import { Sparkle, Sparkles } from 'lucide-react'
 
 const ApiKeysLayout = ({ children }: PropsWithChildren) => {
   return (
@@ -33,30 +36,50 @@ const ApiKeysLayout = ({ children }: PropsWithChildren) => {
           </ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
-        {/* <Tabs_Shadcn_ defaultValue="account" className="w-[400px]">
-          <TabsList_Shadcn_ className="flex gap-2">
-            <TabsTrigger_Shadcn_ value="account">New API Keys</TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ value="password">Legacy API Keys</TabsTrigger_Shadcn_>
-          </TabsList_Shadcn_>
-        </Tabs_Shadcn_> */}
-        <div className="flex justfify-between items-center bg-surface-100 border px-5 py-3 rounded-md">
-          <div className="flex-1 text-sm">
-            <h4 className="text-foreground">New API keys are available</h4>
-            <p className="text-foreground-light">
-              New API keys are available. They are more secure and easier to manage than legacy API
-              keys.
-            </p>
-          </div>
-          <div className="-space-x-px bg-surface-75 border p-1 rounded-md">
-            <Button type="default" className="rounded-r-none border-foreground-muted">
-              New API Keys
-            </Button>
-            <Button type="outline" className="rounded-l-none">
-              Legacy API Keys
-            </Button>
+      <ScaffoldContainer className="flex flex-col gap-10">
+        <div
+          className={cn(
+            'relative px-6 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center border rounded-md'
+          )}
+        >
+          <div
+            className="absolute inset-0 -mt-[5px]"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, hsl(var(--background-200)/1) 0%, hsl(var(--background-200)/1) 30%, hsl(var(--background-200)/0) 100%),
+                linear-gradient(to right, hsl(var(--border-default)/0.33) 1px, transparent 1px),
+                linear-gradient(to bottom, hsl(var(--border-default)/0.33) 1px, transparent 1px)
+              `,
+              backgroundSize: '100% 100%, 15px 15px, 15px 15px',
+              backgroundPosition: '0 0, 0 0, 0 0',
+            }}
+          ></div>
+          <div className="w-full relative flex flex-row gap-3 items-center">
+            <div className="flex flex-col grow text-sm">
+              <h4 className="text-foreground">New API keys are available</h4>
+              <p className="text-foreground-light">
+                New API keys are available. They are more secure and easier to manage than legacy
+                API keys.
+              </p>
+            </div>
+            <div className="flex gap-1 p-1 bg-surface-75 border rounded-lg">
+              <Button
+                type="default"
+                className="border-foreground-muted"
+                size="tiny"
+                icon={<Sparkles />}
+              >
+                New Keys
+              </Button>
+              <Button type="text" className="text-foreground-lighter" size="tiny">
+                Legacy Keys
+              </Button>
+            </div>
           </div>
         </div>
+      </ScaffoldContainer>
+      <ScaffoldContainer className="flex flex-col gap-10 py-8" bottomPadding>
+        <Separator />
         {children}
       </ScaffoldContainer>
     </div>

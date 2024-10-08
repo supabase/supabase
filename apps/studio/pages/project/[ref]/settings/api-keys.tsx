@@ -45,8 +45,6 @@ const AuthSettings: NextPageWithLayout = () => {
         <NoPermission isFullPage resourceText="access your project's API keys" />
       ) : (
         <>
-          <Separator />
-
           <PublishableAPIKeys />
           <Separator />
           <SecretAPIKeys />
