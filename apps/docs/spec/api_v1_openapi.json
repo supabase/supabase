@@ -1302,7 +1302,7 @@
     },
     "/v1/projects/{ref}/upgrade/eligibility": {
       "get": {
-        "operationId": "v1-get-postgrest-upgrade-eligibility",
+        "operationId": "v1-get-postgres-upgrade-eligibility",
         "summary": "[Beta] Returns the project's eligibility for upgrades",
         "parameters": [
           {
@@ -1331,7 +1331,7 @@
     },
     "/v1/projects/{ref}/upgrade/status": {
       "get": {
-        "operationId": "v1-get-postgrest-upgrade-status",
+        "operationId": "v1-get-postgres-upgrade-status",
         "summary": "[Beta] Gets the latest status of the project's upgrade",
         "parameters": [
           {
@@ -1340,6 +1340,12 @@
             "in": "path",
             "description": "Project ref",
             "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          {
+            "name": "tracking_id",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
@@ -3322,21 +3328,25 @@
       "PostgresConfigResponse": {
         "type": "object",
         "properties": {
-          "statement_timeout": { "type": "string" },
           "effective_cache_size": { "type": "string" },
+          "logical_decoding_work_mem": { "type": "string" },
           "maintenance_work_mem": { "type": "string" },
           "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
           "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
           "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
           "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
           "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_replication_slots": { "type": "integer" },
           "max_slot_wal_keep_size": { "type": "string" },
           "max_standby_archive_delay": { "type": "string" },
           "max_standby_streaming_delay": { "type": "string" },
           "max_wal_size": { "type": "string" },
+          "max_wal_senders": { "type": "integer" },
           "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
           "shared_buffers": { "type": "string" },
+          "statement_timeout": { "type": "string" },
           "wal_keep_size": { "type": "string" },
+          "wal_sender_timeout": { "type": "string" },
           "work_mem": { "type": "string" },
           "session_replication_role": { "enum": ["origin", "replica", "local"], "type": "string" }
         }
@@ -3344,21 +3354,25 @@
       "UpdatePostgresConfigBody": {
         "type": "object",
         "properties": {
-          "statement_timeout": { "type": "string" },
           "effective_cache_size": { "type": "string" },
+          "logical_decoding_work_mem": { "type": "string" },
           "maintenance_work_mem": { "type": "string" },
           "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
           "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
           "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
           "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
           "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_replication_slots": { "type": "integer" },
           "max_slot_wal_keep_size": { "type": "string" },
           "max_standby_archive_delay": { "type": "string" },
           "max_standby_streaming_delay": { "type": "string" },
           "max_wal_size": { "type": "string" },
+          "max_wal_senders": { "type": "integer" },
           "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
           "shared_buffers": { "type": "string" },
+          "statement_timeout": { "type": "string" },
           "wal_keep_size": { "type": "string" },
+          "wal_sender_timeout": { "type": "string" },
           "work_mem": { "type": "string" },
           "session_replication_role": { "enum": ["origin", "replica", "local"], "type": "string" }
         }
