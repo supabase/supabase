@@ -6,63 +6,32 @@ import { handleError, post } from 'data/fetchers'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
+import { components } from 'api-types'
+import { Profile } from 'data/profile/types'
 
-type SendEventGA = {
-  action: string
-  category: string
-  label: string
-  value: string
-  page_referrer: string
-  page_title: string
-  page_location: string
-  ga: {
-    screen_resolution: string
-    language: string
-  }
+type SendPageGA = components['schemas']['TelemetryPageBody']
+type SendPagePH = components['schemas']['TelemetryPageBodyV2']
+
+export type SendPageVariables = {
+  url: string
 }
 
-type SendEventPH = {
-  action: string
-  page_url: string
-  page_title: string
-  pathname: string
-  ph: {
-    language: string
-    referrer: string
-    userAgent: string
-    search: string
-    viewport_height: number
-    viewport_width: number
-  }
-  custom_properties: { [key: string]: string }
-}
+type SendPagePayload = any
 
-export type SendEventVariables = {
-  action: string
-  category: string
-  label: string
-  value?: string
-}
-
-type SendEventPayload = any
-
-export async function sendEvent(type: 'GA' | 'PH', body: SendEventPayload) {
+export async function sendPage(type: 'GA' | 'PH', body: SendPagePayload) {
   const headers = type === 'PH' ? { Version: '2' } : undefined
-  const { data, error } = await post(`/platform/telemetry/event`, { body, headers })
+  const { data, error } = await post(`/platform/telemetry/page`, { body, headers })
   if (error) handleError(error)
   return data
 }
 
-type SendEventData = Awaited<ReturnType<typeof sendEvent>>
+type SendPageData = Awaited<ReturnType<typeof sendPage>>
 
-export const useSendEventMutation = ({
+export const useSendPageMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<
-  UseMutationOptions<SendEventData, ResponseError, SendEventVariables>,
-  'mutationFn'
-> = {}) => {
+}: Omit<UseMutationOptions<SendPageData, ResponseError, SendPageVariables>, 'mutationFn'> = {}) => {
   const router = useRouter()
   const usePostHogParameters = useFlag('enablePosthogChanges')
 
@@ -71,7 +40,6 @@ export const useSendEventMutation = ({
 
   const payload = usePostHogParameters
     ? ({
-        page_url: window.location.href,
         page_title: title,
         pathname: router.pathname,
         ph: {
@@ -82,30 +50,24 @@ export const useSendEventMutation = ({
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
-        custom_properties: {},
-      } as SendEventPH)
+      } as SendPagePH)
     : ({
-        page_referrer: referrer,
-        page_title: title,
-        page_location: router.asPath.split('#')[0],
+        title,
+        referrer,
         ga: {
           screen_resolution: isBrowser ? `${window.innerWidth}x${window.innerHeight}` : undefined,
           language: router?.locale ?? 'en-US',
         },
-      } as SendEventGA)
+      } as SendPageGA)
 
-  return useMutation<SendEventData, ResponseError, SendEventVariables>(
+  return useMutation<SendPageData, ResponseError, SendPageVariables>(
     (vars) => {
-      const { action, ...otherVars } = vars
+      const { url } = vars
       const type = usePostHogParameters ? 'PH' : 'GA'
       const body = usePostHogParameters
-        ? ({
-            action,
-            ...(payload as Omit<SendEventPH, 'action'>),
-            custom_properties: otherVars,
-          } as SendEventPH)
-        : ({ ...vars, ...payload } as SendEventGA)
-      return sendEvent(type, body)
+        ? ({ page_url: url, ...payload } as SendPagePH)
+        : ({ route: url, ...payload } as SendPageGA)
+      return sendPage(type, body)
     },
     {
       async onSuccess(data, variables, context) {
@@ -113,7 +75,7 @@ export const useSendEventMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to send Telemetry event: ${data.message}`)
+          toast.error(`Failed to send Telemetry page: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

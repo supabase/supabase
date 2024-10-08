@@ -1,17 +1,19 @@
 import * as Sentry from '@sentry/nextjs'
-import { useTelemetryProps, useUser } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { post } from 'lib/common/fetch'
-import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useUser } from 'common'
+import { useSendPageMutation } from 'data/telemetry/send-page-mutation'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { getAnonId } from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 
 const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
+  const user = useUser()
   const router = useRouter()
-  const telemetryProps = useTelemetryProps()
   const snap = useAppStateSnapshot()
+
+  const { mutate: sendPage } = useSendPageMutation()
 
   useEffect(() => {
     const consent =
@@ -19,11 +21,12 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
         ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
         : null
     if (consent !== null) snap.setIsOptedInTelemetry(consent === 'true')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
-    function handleRouteChange(url: string) {
-      if (snap.isOptedInTelemetry) handlePageTelemetry(url)
+    function handleRouteChange() {
+      if (snap.isOptedInTelemetry) handlePageTelemetry(window.location.href)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -31,6 +34,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, snap.isOptedInTelemetry])
 
   useEffect(() => {
@@ -38,11 +42,11 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     // Waiting for router ready before sending page_view
     // if not the path will be dynamic route instead of the browser url
     if (router.isReady && snap.isOptedInTelemetry) {
-      handlePageTelemetry(router.asPath)
+      handlePageTelemetry(window.location.href)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, snap.isOptedInTelemetry])
 
-  const user = useUser()
   useEffect(() => {
     // don't set the sentry user id if the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)
     if (!user?.id) {
@@ -62,31 +66,8 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     setSentryId().catch((e) => console.error(e))
   }, [user?.id])
 
-  /**
-   * send page_view event
-   *
-   * @param route: the browser url
-   * */
   const handlePageTelemetry = async (route: string) => {
-    if (IS_PLATFORM) {
-      /**
-       * Get referrer from browser
-       */
-      let referrer: string | undefined = document.referrer
-
-      /**
-       * Send page telemetry
-       */
-      post(`${API_URL}/telemetry/page`, {
-        referrer: referrer,
-        title: document.title,
-        route,
-        ga: {
-          screen_resolution: telemetryProps?.screenResolution,
-          language: telemetryProps?.language,
-        },
-      })
-    }
+    if (IS_PLATFORM) sendPage({ url: route })
   }
 
   return <>{children}</>

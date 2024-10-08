@@ -18,9 +18,9 @@ export type SendIdentifyVariables = {
   user: Profile
 }
 
-type sendIdentifyPayload = any
+type SendIdentifyPayload = any
 
-export async function sendIdentify(type: 'GA' | 'PH', body: sendIdentifyPayload) {
+export async function sendIdentify(type: 'GA' | 'PH', body: SendIdentifyPayload) {
   const headers = type === 'PH' ? { Version: '2' } : undefined
   const { data, error } = await post(`/platform/telemetry/identify`, { body, headers })
   if (error) handleError(error)
