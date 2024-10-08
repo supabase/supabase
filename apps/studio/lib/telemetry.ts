@@ -127,7 +127,7 @@ const sendGroupIdentify = ({
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       : null
   if (consent !== 'true') return
-
+  if (!organizationSlug && !projectRef) return
   return post(
     `${API_URL}/telemetry/group/identify`,
     {
@@ -152,12 +152,12 @@ const sendGroupReset = ({ resetOrganization = false, resetProject = false }) => 
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       : null
   if (consent !== 'true') return
-
+  if (!resetOrganization && !resetProject) return
   return post(
     `${API_URL}/telemetry/group/reset`,
     {
-      reset_organization: resetOrganization,
-      reset_project: resetProject,
+      ...(!!resetOrganization && { reset_organization: resetOrganization }),
+      ...(!!resetProject && { reset_project: resetProject }),
     },
     {
       credentials: 'include',
