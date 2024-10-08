@@ -181,7 +181,14 @@ const ResourceExhaustionWarningBanner = () => {
           </Button>
         )}
         {isDismissable && (
-          <Button type="text" icon={<X />} className="px-1.5" onClick={() => dismissBanner()} />
+          <Button
+            type="text"
+            icon={<X />}
+            className="px-1.5 !space-x-0"
+            onClick={() => dismissBanner()}
+          >
+            <span className="sr-only">Close</span>
+          </Button>
         )}
       </div>
     </Alert_Shadcn_>
