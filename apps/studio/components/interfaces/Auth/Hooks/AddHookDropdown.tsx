@@ -87,46 +87,44 @@ export const AddHookDropdown = ({
           ))}
         </div>
 
-        {nonEnterpriseHookOptions.length > 0 && <DropdownMenuSeparator className="my-0" />}
+        <DropdownMenuSeparator className="my-0" />
 
-        <SheetSection className="bg-surface-200 !px-0 !py-2">
-          {!isTeamsOrEnterprisePlan && (
-            <DropdownMenuLabel className="grid gap-1 bg-surface-200">
-              <p className="text-foreground-light">Team or Enterprise Plan required</p>
-              <p className="text-foreground-lighter text-xs">
-                The following hooks are not available on{' '}
-                <a
-                  target="_href"
-                  href={`https://supabase.com/dashboard/org/${organization?.slug ?? '_'}/billing`}
-                  className="underline"
-                >
-                  your plan
-                </a>
-                .
-              </p>
-            </DropdownMenuLabel>
-          )}
-          {enterpriseHookOptions.map((h) =>
-            isTeamsOrEnterprisePlan ? (
-              <DropdownMenuItem
-                key={h.title}
-                disabled={!isTeamsOrEnterprisePlan}
-                className=""
-                onClick={() => onSelectHook(h.title)}
+        {!isTeamsOrEnterprisePlan && (
+          <DropdownMenuLabel className="grid gap-1 bg-surface-200">
+            <p className="text-foreground-light">Team or Enterprise Plan required</p>
+            <p className="text-foreground-lighter text-xs">
+              The following hooks are not available on{' '}
+              <a
+                target="_href"
+                href={`https://supabase.com/dashboard/org/${organization?.slug ?? '_'}/billing`}
+                className="underline"
               >
-                {h.title}
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem
-                key={h.title}
-                disabled={!isTeamsOrEnterprisePlan}
-                onClick={() => onSelectHook(h.title)}
-              >
-                {h.title}
-              </DropdownMenuItem>
-            )
-          )}
-        </SheetSection>
+                your plan
+              </a>
+              .
+            </p>
+          </DropdownMenuLabel>
+        )}
+        {enterpriseHookOptions.map((h) =>
+          isTeamsOrEnterprisePlan ? (
+            <DropdownMenuItem
+              key={h.title}
+              disabled={!isTeamsOrEnterprisePlan}
+              className=""
+              onClick={() => onSelectHook(h.title)}
+            >
+              {h.title}
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem
+              key={h.title}
+              disabled={!isTeamsOrEnterprisePlan}
+              onClick={() => onSelectHook(h.title)}
+            >
+              {h.title}
+            </DropdownMenuItem>
+          )
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )
