@@ -305,7 +305,6 @@ export const CreateHookSheet = ({
                 render={({ field }) => (
                   <FormItemLayout
                     layout="flex"
-                    className="px-8"
                     label={`Enable ${values.hookType}`}
                     description={
                       values.hookType === 'Send SMS hook'
@@ -329,7 +328,7 @@ export const CreateHookSheet = ({
                   control={form.control}
                   name="selectedType"
                   render={({ field }) => (
-                    <FormItemLayout label="Hook type" className="px-8">
+                    <FormItemLayout label="Hook type">
                       <FormControl_Shadcn_>
                         <RadioGroupStacked
                           value={field.value}
@@ -357,7 +356,7 @@ export const CreateHookSheet = ({
               )}
               {values.selectedType === 'postgres' ? (
                 <>
-                  <div className="grid grid-cols-2 gap-8 px-8">
+                  <div className="grid grid-cols-2 gap-8">
                     <FormField_Shadcn_
                       key="postgresValues.schema"
                       control={form.control}
@@ -416,7 +415,7 @@ export const CreateHookSheet = ({
                       )}
                     />
                   </div>
-                  <div className="h-72 w-full px-8 gap-3 flex flex-col">
+                  <div className="h-72 w-full gap-3 flex flex-col">
                     <p className="text-sm text-foreground-light">
                       The following statements will be executed on the function:
                     </p>
@@ -429,7 +428,7 @@ export const CreateHookSheet = ({
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col px-8 gap-4">
+                <div className="flex flex-col gap-4">
                   <FormField_Shadcn_
                     key="httpsValues.url"
                     control={form.control}
