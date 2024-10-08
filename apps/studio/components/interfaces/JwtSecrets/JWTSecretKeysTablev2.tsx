@@ -168,7 +168,7 @@ ZptN9nnJAMh+auCW4vJ1uF/OjQaB66Jx9kMSLEjAYGXKKLhSbGkIamFiJB5HqQ==
   },
 ]
 
-const secretKeysAtom = atomWithStorage<SecretKey[]>('secretKeys', INITIAL_SECRET_KEYS)
+export const secretKeysAtom = atomWithStorage<SecretKey[]>('secretKeys', INITIAL_SECRET_KEYS)
 
 export default function JWTSecretKeysTablev2() {
   const [secretKeys, setSecretKeys] = useAtom(secretKeysAtom)
