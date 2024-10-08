@@ -257,7 +257,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         name: 'Edge Function Invocations',
         unit: 'absolute',
         description:
-          'Every serverless function invocation independent of response status is counted.\nBilling is based on the sum of all invocations throughout your billing period.',
+          'Every serverless function invocation independent of response status is counted except OPTIONS and HEAD requests.\nBilling is based on the sum of all invocations throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
         links: [
           {
