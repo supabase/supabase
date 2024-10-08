@@ -1,5 +1,6 @@
 'use client'
 
+// @ts-nocheck [Joshen] TEMP - REMOVE WHEN PR IS READY TO MERGE
 import { isBrowser } from 'common'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/router'

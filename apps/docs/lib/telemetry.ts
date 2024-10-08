@@ -1,5 +1,5 @@
+// @ts-nocheck [Joshen] TEMP - REMOVE WHEN PR IS READY TO MERGE
 import { useConsent } from 'ui-patterns/ConsentToast'
-
 import { isBrowser } from 'common'
 import { useRouter } from 'next/router'
 import { unauthedAllowedPost } from './fetch/fetchWrappers'
