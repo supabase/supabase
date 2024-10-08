@@ -19,6 +19,7 @@ import career from '~/data/career.json'
 export async function getStaticProps() {
   const job_res = await fetch('https://api.ashbyhq.com/posting-api/job-board/supabase')
   const job_data = await job_res.json()
+
   const jobs = groupJobsByTeam(job_data.jobs.filter((job: JobItemProps) => !filterGenericJob(job)))
   const placeholderJob = job_data.jobs.find(filterGenericJob)
 
@@ -75,7 +76,7 @@ export async function getStaticProps() {
   return {
     props: {
       jobs,
-      placeholderJob,
+      placeholderJob: placeholderJob ?? null,
       contributors: contributors,
     },
   }
@@ -463,9 +464,11 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                 </div>
               ))}
             </div>
-            <div className="pt-4 mt-4 border-t border-muted -space-y-px">
-              {placeholderJob && <JobItem job={placeholderJob} />}
-            </div>
+            {placeholderJob && (
+              <div className="pt-4 mt-4 border-t border-muted -space-y-px">
+                <JobItem job={placeholderJob} />
+              </div>
+            )}
           </SectionContainer>
         </div>
       </DefaultLayout>
