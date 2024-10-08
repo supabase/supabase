@@ -1545,6 +1545,75 @@ module.exports = [
     source: '/projects',
     destination: 'https://supabase.com/dashboard/projects',
   },
+  // Reorganizing pooler docs:-----------------------------
+
+  //external libraries
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#integrations',
+    destination: '/docs/guides/database/connecting-to-postgres#quickstart-connection-guides',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-drizzle',
+    destination: '/docs/guides/database/drizzle',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-prisma',
+    destination: '/docs/guides/database/prisma',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-postgresjs',
+    destination: '/docs/guides/database/postgres-js',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-pgadmin',
+    destination: '/docs/guides/database/pgadmin',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-psql',
+    destination: '/docs/guides/database/psql',
+  },
+
+  // pooling
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connection-pooler',
+    destination: '/docs/guides/database/connecting-to-postgres#connection-pooling-in-depth',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#troubleshooting-supavisor',
+    destination: '/docs/guides/database/supavisor',
+  },
+
+  //IPv4/IPv6
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#finding-your-database-hostname',
+    destination: '/docs/guides/platform/ipv4-address#finding-your-databases-ip-address',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#managing-your-ip-address',
+    destination: '/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#ipv6-address',
+    destination: '/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#ipv4-address',
+    destination: '/docs/guides/platform/ipv4-address',
+  },
+  //--------------------------------------------------------
+
   // START docs 2.0, moving pages in to structure
   {
     permanent: true,

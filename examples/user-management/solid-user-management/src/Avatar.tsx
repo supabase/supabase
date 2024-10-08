@@ -61,7 +61,7 @@ const Avatar: Component<Props> = (props) => {
 	}
 
 	return (
-		<div style={{ width: props.size }} aria-live="polite">
+		<div style={{ width: `${props.size}px` }} aria-live="polite">
 			{avatarUrl() ? (
 				<img
 					src={avatarUrl()!}
