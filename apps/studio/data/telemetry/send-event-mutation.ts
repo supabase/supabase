@@ -82,8 +82,8 @@ export const useSendEventMutation = ({
         custom_properties: {},
       } as SendEventPH)
     : ({
-        page_referrer: document?.referrer,
-        page_title: document?.title,
+        page_referrer: typeof document !== 'undefined' ? document?.referrer : '',
+        page_title: typeof document !== 'undefined' ? document?.title : '',
         page_location: router.asPath.split('#')[0],
         ga: {
           screen_resolution: isBrowser ? `${window.innerWidth}x${window.innerHeight}` : undefined,

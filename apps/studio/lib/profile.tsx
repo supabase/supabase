@@ -1,4 +1,4 @@
-import { useIsLoggedIn, useTelemetryProps } from 'common'
+import { useIsLoggedIn } from 'common'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import { toast } from 'sonner'
 
@@ -7,7 +7,7 @@ import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import Telemetry from 'lib/telemetry'
+import { useSendIdentifyMutation } from 'data/telemetry/send-identify-mutation'
 import type { ResponseError } from 'types'
 
 export type ProfileContextType = {
@@ -28,9 +28,9 @@ export const ProfileContext = createContext<ProfileContextType>({
 
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const isLoggedIn = useIsLoggedIn()
-  const telemetryProps = useTelemetryProps()
 
   const { mutate: sendEvent } = useSendEventMutation()
+  const { mutate: sendIdentify } = useSendIdentifyMutation()
 
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
     async onSuccess() {
@@ -51,7 +51,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   } = useProfileQuery({
     enabled: isLoggedIn,
     onSuccess(profile) {
-      Telemetry.sendIdentify(profile, telemetryProps)
+      sendIdentify({ user: profile })
     },
     onError(err) {
       // if the user does not yet exist, create a profile for them
