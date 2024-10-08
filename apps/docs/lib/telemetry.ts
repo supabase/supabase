@@ -1,10 +1,8 @@
-import { usePathname } from 'next/navigation'
-
 import { useConsent } from 'ui-patterns/ConsentToast'
 
-import { unauthedAllowedPost } from './fetch/fetchWrappers'
-import { useRouter } from 'next/router'
 import { isBrowser } from 'common'
+import { useRouter } from 'next/router'
+import { unauthedAllowedPost } from './fetch/fetchWrappers'
 
 type TelemetryEvent = {
   action: string
@@ -22,7 +20,6 @@ const noop = () => {}
 const useSendTelemetryEvent = () => {
   const router = useRouter()
   const { hasAcceptedConsent } = useConsent()
-  const pathname = usePathname()
 
   if (!hasAcceptedConsent) return noop
 
@@ -44,7 +41,10 @@ const useSendTelemetryEvent = () => {
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
-        custom_properties: {},
+        custom_properties: {
+          category: event.category,
+          label: event.label,
+        } as any,
       },
       headers: { Version: '2' },
     })

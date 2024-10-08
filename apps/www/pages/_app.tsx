@@ -3,7 +3,7 @@ import 'config/code-hike.scss'
 import '../styles/index.css'
 
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { AuthProvider, IS_PROD, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
+import { AuthProvider, IS_PROD, isBrowser, ThemeProvider, useThemeSandbox } from 'common'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
@@ -25,30 +25,40 @@ import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
-  const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
   const IS_DEV = !IS_PROD && !IS_PREVIEW
   const blockEvents = IS_DEV || !hasAcceptedConsent
 
+  const title = typeof document !== 'undefined' ? document?.title : ''
+  const referrer = typeof document !== 'undefined' ? document?.referrer : ''
+
   useThemeSandbox()
 
-  function handlePageTelemetry(route: string) {
-    return post(`${API_URL}/telemetry/page`, {
-      referrer: document.referrer,
-      title: document.title,
-      route,
-      ga: {
-        screen_resolution: telemetryProps?.screenResolution,
-        language: telemetryProps?.language,
+  function handlePageTelemetry(url: string) {
+    return post(
+      `${API_URL}/telemetry/page`,
+      {
+        page_url: url,
+        page_title: title,
+        pathname: router.pathname,
+        ph: {
+          referrer,
+          language: router?.locale ?? 'en-US',
+          userAgent: navigator.userAgent,
+          search: window.location.search,
+          viewport_height: isBrowser ? window.innerHeight : 0,
+          viewport_width: isBrowser ? window.innerWidth : 0,
+        },
       },
-    })
+      { headers: { Version: '2' } }
+    )
   }
 
   useEffect(() => {
     if (blockEvents) return
 
-    function handleRouteChange(url: string) {
-      handlePageTelemetry(url)
+    function handleRouteChange() {
+      handlePageTelemetry(window.location.href)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -64,7 +74,7 @@ export default function App({ Component, pageProps }: AppProps) {
      * Send page telemetry on first page load
      */
     if (router.isReady) {
-      handlePageTelemetry(router.asPath)
+      handlePageTelemetry(window.location.href)
     }
   }, [router.isReady, consentValue])
 

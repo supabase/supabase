@@ -1,7 +1,7 @@
 import { post } from '~/lib/fetchWrapper'
 import { API_URL, IS_PROD, IS_PREVIEW } from 'lib/constants'
 import { NextRouter } from 'next/router'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
 
 export interface TelemetryEvent {
   category: string
@@ -32,20 +32,28 @@ const sendEvent = (event: TelemetryEvent, gaProps: TelemetryProps, router: NextR
   if (blockEvent) return noop
 
   const { category, action, label, value } = event
+  const title = typeof document !== 'undefined' ? document?.title : ''
+  const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
-  return post(`${API_URL}/telemetry/event`, {
-    action: action,
-    category: category,
-    label: label,
-    value: value,
-    page_referrer: document?.referrer,
-    page_title: document?.title,
-    page_location: router.asPath,
-    ga: {
-      screen_resolution: gaProps?.screenResolution,
-      language: gaProps?.language,
+  return post(
+    `${API_URL}/telemetry/event`,
+    {
+      action: action,
+      page_url: window.location.href,
+      page_title: title,
+      pathname: router.pathname,
+      ph: {
+        referrer,
+        language: router?.locale ?? 'en-US',
+        userAgent: navigator.userAgent,
+        search: window.location.search,
+        viewport_height: isBrowser ? window.innerHeight : 0,
+        viewport_width: isBrowser ? window.innerWidth : 0,
+      },
+      custom_properties: { category, label, value } as any,
     },
-  })
+    { headers: { Version: '2' } }
+  )
 }
 
 export default {
