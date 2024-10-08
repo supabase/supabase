@@ -5,6 +5,7 @@ interface ResourceWarningMessage {
   bannerContent: {
     warning: { title: string; description: string }
     critical: { title?: string; description?: string }
+    allowDismissable?: boolean
   }
   cardContent: {
     warning: { title: string; description: string }
@@ -226,6 +227,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description:
           'Set up a custom SMTP provider to handle flows like password reset which require sending emails to any user',
       },
+      allowDismissable: true,
     },
     cardContent: {
       warning: {
