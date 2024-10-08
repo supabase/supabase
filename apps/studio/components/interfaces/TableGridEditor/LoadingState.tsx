@@ -12,7 +12,7 @@ export const TableGridSkeletonLoader = () => {
   return (
     <div className="flex flex-col">
       <div className="h-10 bg-dash-sidebar" />
-      <div className="h-[35px] border-y" />
+      <div className="h-9 border-y" />
 
       <TableGridInnerLoadingState />
     </div>
