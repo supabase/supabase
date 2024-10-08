@@ -16,6 +16,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  SheetSection,
 } from 'ui'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
@@ -86,9 +87,9 @@ export const AddHookDropdown = ({
           ))}
         </div>
 
-        {nonEnterpriseHookOptions.length > 0 && <DropdownMenuSeparator />}
+        {nonEnterpriseHookOptions.length > 0 && <DropdownMenuSeparator className="my-0" />}
 
-        <div className="bg-surface-200 -mt-1">
+        <SheetSection className="bg-surface-200 !px-0 !py-2">
           {!isTeamsOrEnterprisePlan && (
             <DropdownMenuLabel className="grid gap-1 bg-surface-200">
               <p className="text-foreground-light">Team or Enterprise Plan required</p>
@@ -125,7 +126,7 @@ export const AddHookDropdown = ({
               </DropdownMenuItem>
             )
           )}
-        </div>
+        </SheetSection>
       </DropdownMenuContent>
     </DropdownMenu>
   )
