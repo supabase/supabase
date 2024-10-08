@@ -1,7 +1,6 @@
-// @ts-nocheck [Joshen] TEMP - REMOVE WHEN PR IS READY TO MERGE
-import { useConsent } from 'ui-patterns/ConsentToast'
 import { isBrowser } from 'common'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
+import { useConsent } from 'ui-patterns/ConsentToast'
 import { unauthedAllowedPost } from './fetch/fetchWrappers'
 
 type TelemetryEvent = {
@@ -18,7 +17,7 @@ const noop = () => {}
  * Checks for user consent to telemetry before sending.
  */
 const useSendTelemetryEvent = () => {
-  const router = useRouter()
+  const pathname = usePathname()
   const { hasAcceptedConsent } = useConsent()
 
   if (!hasAcceptedConsent) return noop
@@ -29,13 +28,13 @@ const useSendTelemetryEvent = () => {
   return (event: TelemetryEvent) =>
     unauthedAllowedPost('/platform/telemetry/event', {
       body: {
+        pathname,
         action: event.action,
         page_url: window.location.href,
         page_title: title,
-        pathname: router.pathname,
         ph: {
           referrer,
-          language: router?.locale ?? 'en-US',
+          language: navigator.language ?? 'en-US',
           userAgent: navigator.userAgent,
           search: window.location.search,
           viewport_height: isBrowser ? window.innerHeight : 0,

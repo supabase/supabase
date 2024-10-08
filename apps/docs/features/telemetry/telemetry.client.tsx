@@ -1,16 +1,14 @@
 'use client'
 
-// @ts-nocheck [Joshen] TEMP - REMOVE WHEN PR IS READY TO MERGE
 import { isBrowser } from 'common'
 import { usePathname } from 'next/navigation'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect } from 'react'
 import { useConsent } from 'ui-patterns/ConsentToast'
 import { IS_PLATFORM } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
 
 const useSendPageTelemetryWithConsent = () => {
-  const router = useRouter()
+  const pathname = usePathname()
   const { hasAcceptedConsent } = useConsent()
 
   const sendPageTelemetry = useCallback(() => {
@@ -21,12 +19,12 @@ const useSendPageTelemetryWithConsent = () => {
 
     unauthedAllowedPost('/platform/telemetry/page', {
       body: {
+        pathname,
         page_url: window.location.href,
         page_title: title,
-        pathname: router.pathname,
         ph: {
           referrer,
-          language: router?.locale ?? 'en-US',
+          language: navigator.language ?? 'en-US',
           userAgent: navigator.userAgent,
           search: window.location.search,
           viewport_height: isBrowser ? window.innerHeight : 0,
