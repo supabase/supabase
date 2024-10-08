@@ -27,6 +27,9 @@ services:
       analytics:
         condition: service_healthy
     environment:
+      # The healthcheck will fail if HOSTNAME is not set because NextJS uses this environment variable to set the app's hostname
+      HOSTNAME: 0.0.0.0
+    
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
