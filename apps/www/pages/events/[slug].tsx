@@ -149,19 +149,22 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
       return authors.find((author) => author.author_id === speakerId)
     })
     .filter(isNotNullOrUndefined)
+  const hadEndDate = event.end_date?.length
 
   const IS_REGISTRATION_OPEN =
     event.onDemand ||
-    (event.end_date?.length
-      ? Date.parse(event.end_date!) > Date.now()
-      : Date.parse(event.date) > Date.now())
+    (hadEndDate ? Date.parse(event.end_date!) > Date.now() : Date.parse(event.date) > Date.now())
 
   const ogImageUrl = encodeURI(
     `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=events&eventType=${event.type}&title=${event.meta_title ?? event.title}&description=${event.meta_description ?? event.description}&date=${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)}&duration=${event.duration}`
   )
 
   const meta = {
-    title: `${event.meta_title ?? event.title} | ${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)}${event.end_date?.length ? dayjs(event.end_date).tz(event.timezone).format(` - DD MMM YYYY`) : ''} | ${capitalize(event.type)}`,
+    title: `${event.meta_title ?? event.title} | ${dayjs(event.date)
+      .tz(event.timezone)
+      .format(
+        hadEndDate ? `DD` : `DD MMM YYYY`
+      )}${hadEndDate ? dayjs(event.end_date).tz(event.timezone).format(` - DD MMM`) : ''} | ${capitalize(event.type)}`,
     description: event.meta_description ?? event.description,
     url: `https://supabase.com/events/${event.slug}`,
     image: ogImageUrl,
@@ -359,7 +362,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90"
                 >
                   <NextImage
-                    src={`/images/events/` + event.company?.logo ?? ''}
+                    src={event.company?.logo}
                     alt={`${event.company?.name} Logo`}
                     fill
                     sizes="100%"
@@ -367,7 +370,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     priority
                   />
                   <NextImage
-                    src={`/images/events/` + event.company?.logo_light ?? ''}
+                    src={event.company?.logo_light}
                     alt={`${event.company?.name} Logo`}
                     fill
                     sizes="100%"
