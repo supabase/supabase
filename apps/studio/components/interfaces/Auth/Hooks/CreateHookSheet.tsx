@@ -31,6 +31,7 @@ import {
   SheetContent,
   SheetFooter,
   SheetHeader,
+  SheetSection,
   SheetTitle,
   Switch,
   cn,
@@ -290,7 +291,7 @@ export const CreateHookSheet = ({
           </div>
         </SheetHeader>
         <Separator />
-        <div className="overflow-auto flex-grow">
+        <SheetSection className="overflow-auto flex-grow">
           <Form_Shadcn_ {...form}>
             <form
               id={FORM_ID}
@@ -482,7 +483,7 @@ export const CreateHookSheet = ({
               )}
             </form>
           </Form_Shadcn_>
-        </div>
+        </SheetSection>
         <SheetFooter>
           {!isCreating && (
             <div className="flex-1">

@@ -185,7 +185,7 @@ const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
 SheetHeader.displayName = 'SheetHeader'
 
 const SheetSection = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('px-content py-content', className)} {...props} />
+  <div className={cn('px-4 py-4 sheetsectionnn', className)} {...props} />
 )
 SheetSection.displayName = 'SheetSection'
 
