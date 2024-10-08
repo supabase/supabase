@@ -74,9 +74,7 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
 
         <DialogSectionSeparator />
 
-        <DialogSection
-          className={cn('px-0', selectedWorkflowRunId === undefined ? 'py-2' : 'py-0 pt-2')}
-        >
+        <DialogSection className={cn('px-0', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : 'py-2')}>
           {selectedWorkflowRunId === undefined ? (
             <>
               {isWorkflowRunsLoading && <GenericSkeletonLoader className="py-2 px-5" />}
@@ -101,31 +99,30 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-center text-sm text-foreground-light">
+                  <p className="text-center text-sm text-foreground-light py-4">
                     No workflow runs found.
                   </p>
                 ))}
             </>
           ) : (
-            <>
+            <div className="flex flex-col gap-2">
+              <Button
+                onClick={() => setSelectedWorkflowRunId(undefined)}
+                type="text"
+                icon={<ArrowLeft />}
+                className="self-start mx-2"
+              >
+                Back to workflow runs
+              </Button>
+
               {isWorkflowRunLogsLoading && <GenericSkeletonLoader className="py-2 px-5" />}
               {isWorkflowRunLogsError && <AlertError error={workflowRunLogsError} />}
               {isWorkflowRunLogsSuccess && (
-                <div className="flex flex-col gap-2">
-                  <Button
-                    onClick={() => setSelectedWorkflowRunId(undefined)}
-                    type="text"
-                    icon={<ArrowLeft />}
-                    className="self-start mx-2"
-                  >
-                    Back to workflow runs
-                  </Button>
-                  <pre className="whitespace-pre max-h-[500px] overflow-scroll px-5 pb-5">
-                    {workflowRunLogs}
-                  </pre>
-                </div>
+                <pre className="whitespace-pre max-h-[500px] overflow-scroll px-5 pb-5">
+                  {workflowRunLogs}
+                </pre>
               )}
-            </>
+            </div>
           )}
         </DialogSection>
       </DialogContent>
