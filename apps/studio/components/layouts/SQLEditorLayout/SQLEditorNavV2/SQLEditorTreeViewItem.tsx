@@ -124,7 +124,6 @@ export const SQLEditorTreeViewItem = ({
                 level={level}
                 xPadding={16}
                 name={element.name}
-                hideName
                 className={className}
                 isExpanded={isExpanded}
                 isBranch={isBranch}
