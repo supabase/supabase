@@ -2491,6 +2491,8 @@
           "db_port": { "type": "integer" },
           "ref": { "type": "string" },
           "postgres_version": { "type": "string" },
+          "postgres_engine": { "type": "string" },
+          "release_channel": { "type": "string" },
           "status": {
             "enum": [
               "ACTIVE_HEALTHY",
@@ -2515,7 +2517,15 @@
           "db_pass": { "type": "string" },
           "jwt_secret": { "type": "string" }
         },
-        "required": ["db_port", "ref", "postgres_version", "status", "db_host"]
+        "required": [
+          "db_port",
+          "ref",
+          "postgres_version",
+          "postgres_engine",
+          "release_channel",
+          "status",
+          "db_host"
+        ]
       },
       "UpdateBranchBody": {
         "type": "object",
@@ -2591,9 +2601,11 @@
         "type": "object",
         "properties": {
           "host": { "type": "string", "description": "Database host" },
-          "version": { "type": "string", "description": "Database version" }
+          "version": { "type": "string", "description": "Database version" },
+          "postgres_engine": { "type": "string", "description": "Database engine" },
+          "release_channel": { "type": "string", "description": "Release channel" }
         },
-        "required": ["host", "version"]
+        "required": ["host", "version", "postgres_engine", "release_channel"]
       },
       "V1ProjectResponse": {
         "type": "object",
@@ -2649,6 +2661,15 @@
           "16xlarge"
         ]
       },
+      "ReleaseChannel": {
+        "type": "string",
+        "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+      },
+      "PostgresEngine": {
+        "type": "string",
+        "description": "Postgres engine version. If not provided, the latest version will be used.",
+        "enum": ["15"]
+      },
       "V1CreateProjectBody": {
         "type": "object",
         "properties": {
@@ -2700,7 +2721,9 @@
             "type": "string",
             "description": "Template URL used to create the project from the CLI.",
             "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
-          }
+          },
+          "release_channel": { "$ref": "#/components/schemas/ReleaseChannel" },
+          "postgres_engine": { "$ref": "#/components/schemas/PostgresEngine" }
         },
         "required": ["db_pass", "name", "organization_id", "region"]
       },
@@ -2867,6 +2890,8 @@
         "type": "object",
         "properties": {
           "desired_instance_size": { "$ref": "#/components/schemas/DesiredInstanceSize" },
+          "release_channel": { "$ref": "#/components/schemas/ReleaseChannel" },
+          "postgres_engine": { "$ref": "#/components/schemas/PostgresEngine" },
           "branch_name": { "type": "string" },
           "git_branch": { "type": "string" },
           "persistent": { "type": "boolean" },
@@ -3114,8 +3139,11 @@
       },
       "UpgradeDatabaseBody": {
         "type": "object",
-        "properties": { "target_version": { "type": "number" } },
-        "required": ["target_version"]
+        "properties": {
+          "release_channel": { "$ref": "#/components/schemas/ReleaseChannel" },
+          "target_version": { "type": "string" }
+        },
+        "required": ["release_channel", "target_version"]
       },
       "ProjectUpgradeInitiateResponse": {
         "type": "object",
@@ -3125,14 +3153,16 @@
       "ProjectVersion": {
         "type": "object",
         "properties": {
-          "postgres_version": { "type": "number" },
+          "postgres_version": { "$ref": "#/components/schemas/PostgresEngine" },
+          "release_channel": { "$ref": "#/components/schemas/ReleaseChannel" },
           "app_version": { "type": "string" }
         },
-        "required": ["postgres_version", "app_version"]
+        "required": ["postgres_version", "release_channel", "app_version"]
       },
       "ProjectUpgradeEligibilityResponse": {
         "type": "object",
         "properties": {
+          "current_app_version_release_channel": { "$ref": "#/components/schemas/ReleaseChannel" },
           "eligible": { "type": "boolean" },
           "current_app_version": { "type": "string" },
           "latest_app_version": { "type": "string" },
@@ -3146,6 +3176,7 @@
           "extension_dependent_objects": { "type": "array", "items": { "type": "string" } }
         },
         "required": [
+          "current_app_version_release_channel",
           "eligible",
           "current_app_version",
           "latest_app_version",
@@ -4215,10 +4246,14 @@
             "type": "array",
             "items": { "type": "string", "enum": ["AI_SQL_GENERATOR_OPT_IN"] }
           },
+          "allowed_release_channels": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ReleaseChannel" }
+          },
           "id": { "type": "string" },
           "name": { "type": "string" }
         },
-        "required": ["opt_in_tags", "id", "name"]
+        "required": ["opt_in_tags", "allowed_release_channels", "id", "name"]
       }
     }
   }

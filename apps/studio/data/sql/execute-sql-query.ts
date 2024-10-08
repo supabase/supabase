@@ -129,12 +129,3 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
       ),
     { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )
-
-export const prefetchExecuteSql = (
-  client: QueryClient,
-  { projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables
-) => {
-  return client.prefetchQuery(sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]), ({ signal }) =>
-    executeSql({ projectRef, connectionString, sql, queryKey, handleError }, signal)
-  )
-}

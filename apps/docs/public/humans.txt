@@ -4,7 +4,6 @@ Supabase is 100% remote.
 
 Alaister Young
 Aleksi Immonen
-Alex Tasioulis
 Alexander Korotkov
 Amy Q
 Andrew Valleteau
@@ -56,6 +55,7 @@ Kevin Grüneberg
 Lakshan Perera
 Laura C
 Long Hoang
+Łukasz Niemier
 Margarita Sandomirskaia
 Mark Burggraf
 Monica El Khoury

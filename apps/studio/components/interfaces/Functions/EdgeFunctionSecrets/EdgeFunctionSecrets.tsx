@@ -12,10 +12,11 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, Input } from 'ui'
+import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AddNewSecretModal from './AddNewSecretModal'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()

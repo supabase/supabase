@@ -5,10 +5,10 @@
  */
 
 import CopyButton from 'components/ui/CopyButton'
-import dayjs from 'dayjs'
 import React from 'react'
 import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
 import { AlertCircle, Info } from 'lucide-react'
+import dayjs from 'dayjs'
 
 export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
@@ -220,26 +220,6 @@ export const SeverityFormatter = ({
   }
 }
 
-/**
- * Formats a timestamp into a local timestamp display
- *
- * Accepts either unix microsecond or iso timestamp.
- * For LogTable column rendering
- */
-export const TimestampLocalFormatter = ({
-  value,
-  className,
-}: {
-  className?: string
-  value: string | number
-}) => {
-  return <span className={`text-xs ${className}`}>{timestampLocalFormatter(value)}</span>
-}
-
-/**
- * Formats a string to local timestamp display
- * Accepts unix microsecond or iso timestamp
- */
 export const timestampLocalFormatter = (value: string | number) => {
   const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
   return dayjs(timestamp).format('DD MMM  HH:mm:ss')
