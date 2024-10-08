@@ -628,6 +628,11 @@ const templates = {
   },
 }
 
+function generateConfirmationURL(email_data) {
+  // TODO: replace the ref with your project ref
+  return `https://<ref>.supabase.co/auth/v1/verify?token=${email_data.token}&type=${email_data.email_action_type}&redirect_to=${email_data.redirect_to}`
+}
+
 Deno.serve(async (req) => {
   const payload = await req.text()
   const serverToken = Deno.env.get('POSTMARK_SERVER_TOKEN')
@@ -640,8 +645,9 @@ Deno.serve(async (req) => {
   const subject = subjects[language][email_data.email_action_type] || 'Notification'
 
   let template = templates[language][email_data.email_action_type]
+  const confirmation_url = generateConfirmationURL(email_data)
   let htmlBody = template
-    .replace('{{confirmation_url}}', email_data.confirmation_url)
+    .replace('{{confirmation_url}}', confirmation_url)
     .replace('{{token}}', email_data.token || '')
     .replace('{{new_token}}', email_data.new_token || '')
     .replace('{{site_url}}', email_data.site_url || '')
@@ -734,10 +740,16 @@ const templates = {
     reauthentication: `<h2>Confirm reauthentication</h2><p>Enter the code: {{token}}</p>`
 };
 
+function generateConfirmationURL(email_data) {
+   // TODO: replace the ref with your project ref
+   return `https://<ref>.supabase.co/auth/v1/verify?token=${email_data.token}&type=${email_data.email_action_type}&redirect_to=${email_data.redirect_to}`
+}
+
 async function sendEmailWithPostmark(user: any, email_data: any, serverToken: string): Promise<Response> {
     const subject = subjects[email_data.email_action_type] || 'Notification';
+    const confirmation_url = generateConfirmationURL(email_data)
     let template = templates[email_data.email_action_type];
-    let htmlBody = template.replace('{{confirmation_url}}', email_data.confirmation_url)
+    let htmlBody = template.replace('{{confirmation_url}}', confirmation_url)
         .replace('{{token}}', email_data.token || '')
         .replace('{{new_token}}', email_data.new_token || '')
         .replace('{{site_url}}', email_data.site_url || '')
@@ -765,7 +777,8 @@ async function sendEmailWithPostmark(user: any, email_data: any, serverToken: st
 async function sendEmailWithSendGrid(user: any, email_data: any, apiKey: string): Promise<Response> {
     const subject = subjects[email_data.email_action_type] || 'Notification';
     let template = templates[email_data.email_action_type];
-    let htmlBody = template.replace('{{confirmation_url}}', email_data.confirmation_url)
+    cont confirmation_url = generateConfirmationURL(email_data)
+    let htmlBody = template.replace('{{confirmation_url}}', confirmation_url)
         .replace('{{token}}', email_data.token || '')
         .replace('{{new_token}}', email_data.new_token || '')
         .replace('{{site_url}}', email_data.site_url || '')
