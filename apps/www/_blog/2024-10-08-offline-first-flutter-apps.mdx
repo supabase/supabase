@@ -13,6 +13,7 @@ tags:
 date: '2024-10-08'
 toc_depth: 2
 ---
+
 <Admonition>
 
 Don’t have time for reading? Skip to [the example](https://github.com/GetDutchie/brick/tree/main/example_supabase).
@@ -29,7 +30,7 @@ The worst version of your app is always the unusable one. People use their phone
 
 Even if you’re online-only, Brick’s round trip time is drastically shorter because all data [from Supabase is stored in a local cache](https://getdutchie.github.io/brick/#/offline_first/offline_first_with_supabase_repository). When you query the same data again, your app retrieves the local copy, reducing the time and expense of a round trip. And, if SQLite isn’t performant enough, Brick also offers a third cache in memory. When requests are made while the app is offline, they’ll be [continually retried until the app comes online](https://getdutchie.github.io/brick/#/offline_first/offline_queue), ensuring that your local state syncs up to your remote state.
 
-Of course, you can [always opt-out of the cache](https://getdutchie.github.io/brick/#/offline_first/policies) on a request-by-request basis for sensitive or must-be-fresh data. 
+Of course, you can [always opt-out of the cache](https://getdutchie.github.io/brick/#/offline_first/policies) on a request-by-request basis for sensitive or must-be-fresh data.
 
 ### Getting Started
 
@@ -70,14 +71,14 @@ import 'package:uuid/uuid.dart';
 @ConnectOfflineFirstWithSupabase()
 class User extends OfflineFirstWithSupabaseModel {
 	final String name;
-	
-	// Be sure to specify an index that **is not** auto incremented in your table. 
-	// An offline-first strategy requires distributed clients to create 
+
+	// Be sure to specify an index that **is not** auto incremented in your table.
+	// An offline-first strategy requires distributed clients to create
 	// indexes without fear of collision.
   @Supabase(unique: true)
   @Sqlite(index: true, unique: true)
   final String uuid;
-  
+
   Users({
     String? uuid,
     required this.name,
@@ -109,7 +110,7 @@ Finally, run your app:
 // Saved in my_app/lib/src/brick/repository.dart
 import 'package:brick_offline_first_with_supabase/brick_offline_first_with_supabase.dart';
 import 'package:brick_sqlite/brick_sqlite.dart';
-// This hide is for Brick's @Supabase annotation; in most cases, 
+// This hide is for Brick's @Supabase annotation; in most cases,
 // supabase_flutter **will not** be imported in application code.
 import 'package:brick_supabase/brick_supabase.dart' hide Supabase;
 import 'package:sqflite_common/sqlite_api.dart';
@@ -134,13 +135,13 @@ class Repository extends OfflineFirstWithSupabaseRepository {
     final (client, queue) = OfflineFirstWithSupabaseRepository.clientQueue(
       databaseFactory: databaseFactory,
     );
-		
+
 		await Supabase.initialize(
-			url: supabaseUrl, 
-			anonKey: supabaseAnonKey, 
+			url: supabaseUrl,
+			anonKey: supabaseAnonKey,
 			httpClient: client,
 		);
-		
+
     final provider = SupabaseProvider(
       Supabase.instance.client,
       modelDictionary: supabaseModelDictionary,
@@ -168,9 +169,9 @@ import 'package:sqflite/sqflite.dart' show databaseFactory;
 
 Future<void> main() async {
   await Repository.configure(databaseFactory);
-  // .initialize() does not need to be invoked within main() 
-  // It can be invoked from within a state manager or within 
-  // an initState() 
+  // .initialize() does not need to be invoked within main()
+  // It can be invoked from within a state manager or within
+  // an initState()
   await Repository().initialize();
   runApp(MyApp());
 }
@@ -187,7 +188,7 @@ Which `databaseFactory` is used depends on your platform. For unit testing, use 
 The fun part. [Brick’s DSL queries](https://getdutchie.github.io/brick/#/supabase/query) are written once and transformed for local and remote integration. For example, to retrieve all users with the name “Thomas”:
 
 ```dart
-await Repository().get<User>(query: Query.where('name', 'Thomas')); 
+await Repository().get<User>(query: Query.where('name', 'Thomas'));
 ```
 
 Or query by association:
@@ -196,7 +197,7 @@ Or query by association:
 await Repository().get<Order>(query: Query.where('user', Where.exact('name', 'Thomas'));
 ```
 
-Queries can be [much more advanced](https://getdutchie.github.io/brick/#/data/query), leveraging `contains`, `not`, `like` operators as well as sub clauses. Please note that, as of writing, not [all Supabase operators are supported](https://getdutchie.github.io/brick/#/supabase/query?id=where). 
+Queries can be [much more advanced](https://getdutchie.github.io/brick/#/data/query), leveraging `contains`, `not`, `like` operators as well as sub clauses. Please note that, as of writing, not [all Supabase operators are supported](https://getdutchie.github.io/brick/#/supabase/query?id=where).
 
 **Reactivity**
 
@@ -232,16 +233,16 @@ import 'package:my_app/lib/src/users/user.model.dart';
 
 @ConnectOfflineFirstWithSupabase()
 class Order extends OfflineFirstWithSupabaseModel {
-  // Like Supabase's client, specifying a foreign_key 
-  // is possible but only necessary if there are joins 
+  // Like Supabase's client, specifying a foreign_key
+  // is possible but only necessary if there are joins
   // with multiple foreign keys
   // @Supabase(foreignKey: 'user_id')
 	final User user;
-	
+
   @Supabase(unique: true)
   @Sqlite(index: true, unique: true)
   final String uuid;
-  
+
   Order({
     String? uuid,
     required this.user,
@@ -249,7 +250,7 @@ class Order extends OfflineFirstWithSupabaseModel {
 })
 ```
 
-Brick allows very granular [model configuration](https://getdutchie.github.io/brick/#/supabase/models) - you can specify specific tables, [individual columns](https://getdutchie.github.io/brick/#/supabase/fields), and more. 
+Brick allows very granular [model configuration](https://getdutchie.github.io/brick/#/supabase/models) - you can specify specific tables, [individual columns](https://getdutchie.github.io/brick/#/supabase/fields), and more.
 
 ### Testing
 
