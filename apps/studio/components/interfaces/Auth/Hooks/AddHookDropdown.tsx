@@ -80,7 +80,7 @@ export const AddHookDropdown = ({
       <DropdownMenuContent className="w-76 p-0" align="end">
         <div>
           {nonEnterpriseHookOptions.map((h) => (
-            <DropdownMenuItem key={h.title} onClick={() => onSelectHook(h.title)} className="p-2">
+            <DropdownMenuItem key={h.title} onClick={() => onSelectHook(h.title)}>
               {h.title}
             </DropdownMenuItem>
           ))}
@@ -90,7 +90,7 @@ export const AddHookDropdown = ({
 
         <div className="bg-surface-200 -mt-1">
           {!isTeamsOrEnterprisePlan && (
-            <DropdownMenuLabel className="grid gap-1 bg-surface-200 p-2">
+            <DropdownMenuLabel className="grid gap-1 bg-surface-200">
               <p className="text-foreground-light">Team or Enterprise Plan required</p>
               <p className="text-foreground-lighter text-xs">
                 The following hooks are not available on{' '}
