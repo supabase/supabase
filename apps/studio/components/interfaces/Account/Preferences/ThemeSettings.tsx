@@ -24,8 +24,6 @@ const ThemeSettings = () => {
     true
   )
 
-  const [expandNavigationPanel, setExpandNavigationPanel] = useState(allowNavPanelToExpand)
-
   /**
    * Avoid Hydration Mismatch
    * https://github.com/pacocoursey/next-themes?tab=readme-ov-file#avoid-hydration-mismatch
@@ -66,7 +64,6 @@ const ThemeSettings = () => {
   }
 
   function handleExpandNavigationPanel() {
-    setExpandNavigationPanel(!expandNavigationPanel)
     setAllowNavPanelToExpand(!allowNavPanelToExpand)
   }
 
@@ -100,7 +97,7 @@ const ThemeSettings = () => {
         >
           <Switch
             size="large"
-            checked={expandNavigationPanel}
+            checked={allowNavPanelToExpand}
             onCheckedChange={() => handleExpandNavigationPanel()}
           />
         </FormItemLayout>
