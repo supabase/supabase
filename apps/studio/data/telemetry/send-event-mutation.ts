@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'sonner'
 
 import { isBrowser } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { useFlag } from 'hooks/ui/useFlag'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
@@ -47,6 +47,12 @@ export type SendEventVariables = {
 type SendEventPayload = any
 
 export async function sendEvent(type: 'GA' | 'PH', body: SendEventPayload) {
+  const consent =
+    typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null
+  if (consent !== 'true') return
+
   const headers = type === 'PH' ? { Version: '2' } : undefined
   const { data, error } = await post(`/platform/telemetry/event`, {
     body,
@@ -117,7 +123,7 @@ export const useSendEventMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to send Telemetry event: ${data.message}`)
+          console.error(`Failed to send Telemetry event: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

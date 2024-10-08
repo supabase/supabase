@@ -1,13 +1,11 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'sonner'
 
+import { components } from 'api-types'
 import { isBrowser } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
-import { components } from 'api-types'
-import { Profile } from 'data/profile/types'
 
 type SendPageGA = components['schemas']['TelemetryPageBody']
 type SendPagePH = components['schemas']['TelemetryPageBodyV2']
@@ -79,7 +77,7 @@ export const useSendPageMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to send Telemetry page: ${data.message}`)
+          console.error(`Failed to send Telemetry page: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
