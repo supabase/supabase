@@ -1,12 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { Check, Copy, FileDiff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { format } from 'sql-formatter'
 import { Button, CodeBlock, cn } from 'ui'
-import Telemetry from 'lib/telemetry'
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 interface AAIPolicyPreProps {
   onDiff: (s: string) => void
@@ -16,8 +13,6 @@ interface AAIPolicyPreProps {
 
 export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) => {
   const [copied, setCopied] = useState(false)
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
 
   const { mutate: sendEvent } = useSendEventMutation()
 

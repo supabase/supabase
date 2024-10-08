@@ -1,7 +1,5 @@
-import { useTelemetryProps } from 'common'
 import { InsertCode, ReplaceCode } from 'icons'
 import { Check, Copy } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { format } from 'sql-formatter'
 import {
@@ -13,9 +11,8 @@ import {
   cn,
 } from 'ui'
 
-import Telemetry from 'lib/telemetry'
-import { DiffType } from '../SQLEditor.types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { DiffType } from '../SQLEditor.types'
 
 interface AiMessagePreProps {
   onDiff: (type: DiffType, s: string) => void
@@ -25,8 +22,6 @@ interface AiMessagePreProps {
 
 export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps) => {
   const [copied, setCopied] = useState(false)
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
 
   const { mutate: sendEvent } = useSendEventMutation()
 
