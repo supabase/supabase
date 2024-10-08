@@ -50,7 +50,7 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
                 <br />
                 You can use the keys below in the Supabase client libraries.
                 <br />
-                <a
+                {/* <a
                   href="https://supabase.com/docs#client-libraries"
                   target="_blank"
                   rel="noreferrer"
@@ -58,7 +58,7 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
                   <Button icon={<BookOpen />} type="default" className="mt-4">
                     Client Docs
                   </Button>
-                </a>
+                </a> */}
               </p>
             </div>
           )
@@ -137,9 +137,10 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
         )}
         <Panel.Notice
           className="border-t"
-          title="New API keys coming Q4 2024"
-          description={`
-\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.    
+          title="API keys have moved"
+          badgeLabel={'Changelog'}
+          description={` 
+\`anon\` and \`service_role\` API keys can now be replaced with \`publishable\` and \`secret\` API keys.   
 `}
           href="https://github.com/orgs/supabase/discussions/29260"
           buttonText="Read the announcement"

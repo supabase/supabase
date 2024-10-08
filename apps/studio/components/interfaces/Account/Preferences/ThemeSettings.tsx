@@ -24,7 +24,7 @@ const ThemeSettings = () => {
     true
   )
 
-  const [expandNavigationPanel, setExpandNavigationPanel] = useState(allowNavPanelToExpand)
+  // const [expandNavigationPanel, setExpandNavigationPanel] = useState(allowNavPanelToExpand)
 
   /**
    * Avoid Hydration Mismatch
@@ -66,13 +66,13 @@ const ThemeSettings = () => {
   }
 
   function handleExpandNavigationPanel() {
-    setExpandNavigationPanel(!expandNavigationPanel)
+    // setExpandNavigationPanel(!expandNavigationPanel)
     setAllowNavPanelToExpand(!allowNavPanelToExpand)
   }
 
   return (
     <Panel title={<h5 key="panel-title">Appearance</h5>}>
-      <Panel.Content className="grid gap-8">
+      <Panel.Content className="grid gap-8 !py-5">
         <div className="grid grid-cols-12">
           <div className="col-span-4 flex flex-col gap-5">
             <Label_Shadcn_ htmlFor="theme" className="text-light">
@@ -88,20 +88,19 @@ const ThemeSettings = () => {
             <SingleThemeSelection />
           </div>
         </div>
-
-        <Separator />
-
+      </Panel.Content>
+      <Separator />
+      <Panel.Content>
         <FormItemLayout
           isReactForm={false}
           label="Expand Navigation menu"
           layout="flex-row-reverse"
           description="Allow the Navigation panel to expand on hover"
-          className="pb-3"
         >
           <Switch
             size="large"
-            checked={expandNavigationPanel}
-            onCheckedChange={() => handleExpandNavigationPanel()}
+            checked={allowNavPanelToExpand}
+            onCheckedChange={setAllowNavPanelToExpand}
           />
         </FormItemLayout>
       </Panel.Content>
