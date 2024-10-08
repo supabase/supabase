@@ -26,6 +26,8 @@ services:
     depends_on:
       analytics:
         condition: service_healthy
+    ports:
+      - ${STUDIO_PORT}:3000/tcp
     environment:
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
