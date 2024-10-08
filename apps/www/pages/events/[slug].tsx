@@ -161,7 +161,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
   )
 
   const meta = {
-    title: `${event.meta_title ?? event.title} | ${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)} | ${capitalize(event.type)}`,
+    title: `${event.meta_title ?? event.title} | ${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)}${event.end_date?.length ? dayjs(event.end_date).tz(event.timezone).format(` - DD MMM YYYY`) : ''} | ${capitalize(event.type)}`,
     description: event.meta_description ?? event.description,
     url: `https://supabase.com/events/${event.slug}`,
     image: ogImageUrl,
