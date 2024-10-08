@@ -254,9 +254,7 @@ const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
 
 ;(async () => {
   const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY, {
-    db: {
-      schema: 'storage',
-    },
+    schema: 'storage',
   })
   const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
   const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)
