@@ -50,7 +50,7 @@ export default function App({ Component, pageProps }: AppProps) {
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
       },
-      { headers: { Version: '2' } }
+      { headers: { Version: '2' }, credentials: 'include' }
     )
   }
 

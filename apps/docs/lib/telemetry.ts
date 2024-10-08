@@ -46,6 +46,7 @@ const useSendTelemetryEvent = () => {
         } as any,
       },
       headers: { Version: '2' },
+      credentials: 'include',
     })
       .then(({ error }) => {
         if (error) console.error(error)

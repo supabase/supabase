@@ -52,7 +52,7 @@ const sendEvent = (event: TelemetryEvent, gaProps: TelemetryProps, router: NextR
       },
       custom_properties: { category, label, value } as any,
     },
-    { headers: { Version: '2' } }
+    { headers: { Version: '2' }, credentials: 'include' }
   )
 }
 
