@@ -13,6 +13,7 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { UserOverview } from './UserOverview'
+import { UserLogs } from './UserLogs'
 
 interface UserPanelProps {
   selectedUser?: User
@@ -22,7 +23,7 @@ interface UserPanelProps {
 export const PANEL_PADDING = 'px-5 py-5'
 
 export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
-  const [view, setView] = useState<'overview' | 'raw'>('overview')
+  const [view, setView] = useState<'overview' | 'raw' | 'logs'>('overview')
 
   return (
     <>
@@ -47,6 +48,12 @@ export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
               Overview
             </TabsTrigger_Shadcn_>
             <TabsTrigger_Shadcn_
+              value="logs"
+              className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
+            >
+              Logs
+            </TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_
               value="raw"
               className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
             >
@@ -58,6 +65,12 @@ export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
             className={cn('mt-0 flex-grow min-h-0 overflow-y-auto')}
           >
             {selectedUser && <UserOverview user={selectedUser} onDeleteSuccess={onClose} />}
+          </TabsContent_Shadcn_>
+          <TabsContent_Shadcn_
+            value="logs"
+            className={cn('mt-0 flex-grow min-h-0 overflow-y-auto')}
+          >
+            {selectedUser && <UserLogs user={selectedUser} />}
           </TabsContent_Shadcn_>
           <TabsContent_Shadcn_
             value="raw"

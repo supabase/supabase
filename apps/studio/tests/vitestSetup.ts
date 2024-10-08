@@ -1,8 +1,8 @@
-import { beforeAll, vi } from 'vitest'
 import { setupServer } from 'msw/node'
+import { createDynamicRouteParser } from 'next-router-mock/dist/dynamic-routes'
+import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 import { APIMock } from './mocks/api'
 import { routerMock } from './mocks/router'
-import { createDynamicRouteParser } from 'next-router-mock/dist/dynamic-routes'
 
 export const mswServer = setupServer(...APIMock)
 

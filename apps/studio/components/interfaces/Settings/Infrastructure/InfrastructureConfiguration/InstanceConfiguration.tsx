@@ -207,7 +207,7 @@ const InstanceConfigurationUI = () => {
   }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
 
   return (
-    <>
+    <div className="nowheel">
       <div
         className={`h-[500px] w-full relative ${
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
@@ -342,7 +342,7 @@ const InstanceConfigurationUI = () => {
       />
 
       <ComputeInstanceSidePanel />
-    </>
+    </div>
   )
 }
 

@@ -1,9 +1,11 @@
-const AFTER_26_09_2024 = Date.now() >= new Date('2024-09-26T00:00:00Z').getTime()
-
 interface ResourceWarningMessage {
+  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/auth')
+  restrictToRoutes?: string[]
+
   bannerContent: {
     warning: { title: string; description: string }
     critical: { title?: string; description?: string }
+    allowDismissable?: boolean
   }
   cardContent: {
     warning: { title: string; description: string }
@@ -211,41 +213,32 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
     buttonText: 'Check usage',
     metric: null,
   },
+  // [Joshen] We can remove this once auth team gives the signal to
   auth_restricted_email_sending: {
+    restrictToRoutes: ['/project/[ref]/auth', '/project/[ref]/settings/auth'], // project home, auth, settings
     bannerContent: {
       warning: {
-        title: AFTER_26_09_2024
-          ? "Auth emails are restricted to your organization's members"
-          : "On 26th September: Auth email sending will be restricted to your organization's members",
-        description: AFTER_26_09_2024
-          ? "To fight abuse, emails sent by Auth are restricted to the members of this project's organization. Set up a custom SMTP provider to send messages to any user."
-          : "To fight abuse, emails sent by Auth will be restricted to the members of this project's organization. Set up a custom SMTP provider before then to send messages to any user and avoid disruptions.",
+        title: "Authentication emails are only sent to organization members' email addresses",
+        description:
+          'Set up a custom SMTP provider to handle flows like password reset which require sending emails to any user',
       },
       critical: {
-        title: AFTER_26_09_2024
-          ? "Auth emails are restricted to your organization's members"
-          : "On 26th September: Auth email sending will be restricted to your organization's members",
-        description: AFTER_26_09_2024
-          ? "To fight abuse, emails sent by Auth are restricted to the members of this project's organization. Set up a custom SMTP provider to send messages to any user."
-          : "To fight abuse, emails sent by Auth will be restricted to the members of this project's organization. Set up a custom SMTP provider before then to send messages to any user and avoid disruptions.",
+        title: "Authentication emails are only sent to organization members' email addresses",
+        description:
+          'Set up a custom SMTP provider to handle flows like password reset which require sending emails to any user',
       },
+      allowDismissable: true,
     },
     cardContent: {
       warning: {
-        title: AFTER_26_09_2024
-          ? 'Auth emails are restricted'
-          : 'Action required: Auth emails to be restricted',
-        description: AFTER_26_09_2024
-          ? "Your project can only send Auth emails to your organization's members. Set up a custom SMTP provider to send Auth emails to any user."
-          : "On 26th September your project will only be able to send Auth emails to your organization's members. Set up a custom SMTP provider before then to avoid disruptions!",
+        title: 'Auth emails are restricted',
+        description:
+          "Your project can only send Auth emails to your organization's members. Set up a custom SMTP provider to send Auth emails to any user",
       },
       critical: {
-        title: AFTER_26_09_2024
-          ? 'Auth emails are restricted'
-          : 'Action required: Auth emails to be restricted',
-        description: AFTER_26_09_2024
-          ? "Your project can only send Auth emails to your organization's members. Set up a custom SMTP provider to send Auth emails to any user."
-          : "On 26th September your project will only be able to send Auth emails to your organization's members. Set up a custom SMTP provider before then to avoid disruptions!",
+        title: 'Auth emails are restricted',
+        description:
+          "Your project can only send Auth emails to your organization's members. Set up a custom SMTP provider to send Auth emails to any user.",
       },
     },
     docsUrl: 'https://github.com/orgs/supabase/discussions/29370',

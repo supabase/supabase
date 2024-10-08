@@ -1,8 +1,9 @@
 import {
-  checkForWithClause,
   checkForILIKEClause,
   checkForWildcard,
+  checkForWithClause,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
+import { describe, test, expect } from 'vitest'
 
 describe('checkForWithClause', () => {
   test('basic queries', () => {
@@ -89,5 +90,9 @@ describe('checkForWildcard', () => {
     expect(checkForWildcard('SELECT column FROM table /* * */')).toBe(false)
     expect(checkForWildcard('-- *\nSELECT column FROM table')).toBe(false)
     expect(checkForWildcard('/* * */\nSELECT column FROM table')).toBe(false)
+  })
+
+  test('count(*)', () => {
+    expect(checkForWildcard('SELECT count(*) FROM table')).toBe(false)
   })
 })

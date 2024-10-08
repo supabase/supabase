@@ -1,21 +1,18 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
-import { useParams } from 'common'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { MutableRefObject, useEffect, useRef } from 'react'
 
-import type { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useParams } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { cn } from 'ui'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
-import { createSqlSnippetSkeleton, createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
+import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
 
 export type MonacoEditorProps = {
   id: string
@@ -40,17 +37,14 @@ const MonacoEditor = ({
   const { profile } = useProfile()
   const { ref, content } = useParams()
   const project = useSelectedProject()
-
-  const snap = useSqlEditorStateSnapshot({ sync: true })
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const enableFolders = useFlag('sqlFolderOrganization')
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
 
-  const snippet = enableFolders ? snapV2.snippets[id] : snap.snippets[id]
+  const snippet = snapV2.snippets[id]
 
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
@@ -99,41 +93,27 @@ const MonacoEditor = ({
 
   // [Joshen] Also needs updating here
   const debouncedSetSql = debounce((id, value) => {
-    if (enableFolders) snapV2.setSql(id, value)
-    else snap.setSql(id, value)
+    snapV2.setSql(id, value)
   }, 1000)
 
   function handleEditorChange(value: string | undefined) {
-    const snippetCheck = enableFolders ? snapV2.snippets[id] : snap.snippets[id]
+    const snippetCheck = snapV2.snippets[id]
 
     if (id && value) {
       if (snippetCheck) {
         debouncedSetSql(id, value)
       } else {
         if (ref && profile !== undefined && project !== undefined) {
-          if (enableFolders) {
-            const snippet = createSqlSnippetSkeletonV2({
-              id,
-              name: untitledSnippetTitle,
-              sql: value,
-              owner_id: profile?.id,
-              project_id: project?.id,
-            })
-            snapV2.addSnippet({ projectRef: ref, snippet })
-            snapV2.addNeedsSaving(snippet.id)
-            router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
-          } else {
-            const snippet = createSqlSnippetSkeleton({
-              id,
-              name: untitledSnippetTitle,
-              sql: value,
-              owner_id: profile.id,
-              project_id: project.id,
-            })
-            snap.addSnippet(snippet as SqlSnippet, ref)
-            snap.addNeedsSaving(snippet.id!)
-            router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
-          }
+          const snippet = createSqlSnippetSkeletonV2({
+            id,
+            name: untitledSnippetTitle,
+            sql: value,
+            owner_id: profile?.id,
+            project_id: project?.id,
+          })
+          snapV2.addSnippet({ projectRef: ref, snippet })
+          snapV2.addNeedsSaving(snippet.id)
+          router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
         }
       }
     }
