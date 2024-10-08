@@ -382,11 +382,6 @@ services:
       - -c
       - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
     restart: unless-stopped
-    # # Uncomment if you never want to use the pooler to access the database
-    # # otherwise the pooler will expose the port under the session port
-    # ports:
-    #   # Pass down internal port because it's set dynamically by other services
-    #   - ${POSTGRES_PORT}:${POSTGRES_PORT}
     environment:
       POSTGRES_HOST: /var/run/postgresql
       PGPORT: ${POSTGRES_PORT}
@@ -439,7 +434,8 @@ services:
     environment:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
     command: [ "--config", "etc/vector/vector.yml" ]
-    # Comment out everything below this point if you are using an external Postgres database
+
+  # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
     container_name: supabase-pooler
     image: supabase/supavisor:1.1.56
@@ -463,22 +459,21 @@ services:
       - ${POOLER_PROXY_PORT_TRANSACTION}:${POOLER_PROXY_PORT_TRANSACTION}
     environment:
       - PORT=4000
-      - SECRET_KEY_BASE=${POOLER_SECRET_KEY_BASE}
       - POSTGRES_PORT=${POSTGRES_PORT}
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - DATABASE_URL=ecto://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/_supabase
       - CLUSTER_POSTGRES=true
-      - SECRET_KEY_BASE=${POOLER_SECRET_KEY_BASE}
-      - VAULT_ENC_KEY=${POOLER_VAULT_ENC_KEY}
+      - SECRET_KEY_BASE=UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
+      - VAULT_ENC_KEY=your-encryption-key-32-chars-min
       - API_JWT_SECRET=${JWT_SECRET}
       - METRICS_JWT_SECRET=${JWT_SECRET}
       - REGION=local
       - ERL_AFLAGS=-proto_dist inet_tcp
-      - POOLER_TENANT_ID=${POOLER_TENANT_ID}
+      - POOLER_TENANT_ID=your-tenant-id
       - POOLER_DEFAULT_POOL_SIZE=${POOLER_DEFAULT_POOL_SIZE}
       - POOLER_MAX_CLIENT_CONN=${POOLER_MAX_CLIENT_CONN}
-      - POOLER_POOL_MODE=${POOLER_POOL_MODE}
+      - POOLER_POOL_MODE=transaction
     volumes:
       - ./volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro
 
