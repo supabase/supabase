@@ -70,6 +70,15 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/.well-known/vercel/flags',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'application/json',
+          },
+        ],
+      },
     ]
   },
   async rewrites() {
