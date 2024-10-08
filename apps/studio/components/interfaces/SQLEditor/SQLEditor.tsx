@@ -78,6 +78,7 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -163,6 +164,8 @@ const SQLEditor = () => {
     id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
   )
   const isLoading = urlId === 'new' ? false : snippetIsLoading
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
@@ -475,15 +478,11 @@ const SQLEditor = () => {
         }
       }
 
-      Telemetry.sendEvent(
-        {
-          category: 'sql_editor',
-          action: 'ai_suggestion_accepted',
-          label: debugSolution ? 'debug_snippet' : 'edit_snippet',
-        },
-        telemetryProps,
-        router
-      )
+      sendEvent({
+        category: 'sql_editor',
+        action: 'ai_suggestion_accepted',
+        label: debugSolution ? 'debug_snippet' : 'edit_snippet',
+      })
 
       setSelectedMessage(undefined)
       setSelectedDiffType(DiffType.Modification)
@@ -507,15 +506,11 @@ const SQLEditor = () => {
   ])
 
   const discardAiHandler = useCallback(() => {
-    Telemetry.sendEvent(
-      {
-        category: 'sql_editor',
-        action: 'ai_suggestion_rejected',
-        label: debugSolution ? 'debug_snippet' : 'edit_snippet',
-      },
-      telemetryProps,
-      router
-    )
+    sendEvent({
+      category: 'sql_editor',
+      action: 'ai_suggestion_rejected',
+      label: debugSolution ? 'debug_snippet' : 'edit_snippet',
+    })
 
     setSelectedMessage(undefined)
     setDebugSolution(undefined)

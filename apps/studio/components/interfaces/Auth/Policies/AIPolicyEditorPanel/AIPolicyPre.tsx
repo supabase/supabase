@@ -6,6 +6,7 @@ import { Button, CodeBlock, cn } from 'ui'
 import Telemetry from 'lib/telemetry'
 import { useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 interface AAIPolicyPreProps {
   onDiff: (s: string) => void
@@ -17,6 +18,8 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
   const [copied, setCopied] = useState(false)
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   useEffect(() => {
     if (!copied) return
@@ -73,15 +76,11 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
               className={cn('text-foreground-lighter hover:text-foreground', 'transition')}
               onClick={() => {
                 onDiff(formatted)
-                Telemetry.sendEvent(
-                  {
-                    category: 'rls_editor',
-                    action: 'ai_suggestion_diffed',
-                    label: 'rls-ai-assistant',
-                  },
-                  telemetryProps,
-                  router
-                )
+                sendEvent({
+                  category: 'rls_editor',
+                  action: 'ai_suggestion_diffed',
+                  label: 'rls-ai-assistant',
+                })
               }}
             >
               <FileDiff className={cn('h-4 w-4')} />
@@ -109,15 +108,11 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
               className={cn('text-foreground-lighter hover:text-foreground', 'transition')}
               onClick={() => {
                 handleCopy(formatted)
-                Telemetry.sendEvent(
-                  {
-                    category: 'rls_editor',
-                    action: 'ai_suggestion_copied',
-                    label: 'rls-ai-assistant',
-                  },
-                  telemetryProps,
-                  router
-                )
+                sendEvent({
+                  category: 'rls_editor',
+                  action: 'ai_suggestion_copied',
+                  label: 'rls-ai-assistant',
+                })
               }}
             >
               {copied ? (

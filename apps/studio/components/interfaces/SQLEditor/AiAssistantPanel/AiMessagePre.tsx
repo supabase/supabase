@@ -15,6 +15,7 @@ import {
 
 import Telemetry from 'lib/telemetry'
 import { DiffType } from '../SQLEditor.types'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 interface AiMessagePreProps {
   onDiff: (type: DiffType, s: string) => void
@@ -26,6 +27,8 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
   const [copied, setCopied] = useState(false)
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   useEffect(() => {
     if (!copied) return
@@ -69,15 +72,11 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
               size="tiny"
               onClick={() => {
                 onDiff(DiffType.Addition, formatted)
-                Telemetry.sendEvent(
-                  {
-                    category: 'sql_editor_ai_assistant',
-                    action: 'ai_suggestion_inserted',
-                    label: 'sql-editor-ai-assistant',
-                  },
-                  telemetryProps,
-                  router
-                )
+                sendEvent({
+                  category: 'sql_editor_ai_assistant',
+                  action: 'ai_suggestion_inserted',
+                  label: 'sql-editor-ai-assistant',
+                })
               }}
             >
               <InsertCode className="h-4 w-4 text-foreground-light" strokeWidth={1.5} />
@@ -95,15 +94,11 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
               size="tiny"
               onClick={() => {
                 onDiff(DiffType.Modification, formatted)
-                Telemetry.sendEvent(
-                  {
-                    category: 'sql_editor_ai_assistant',
-                    action: 'ai_suggestion_replaced',
-                    label: 'sql-editor-ai-assistant',
-                  },
-                  telemetryProps,
-                  router
-                )
+                sendEvent({
+                  category: 'sql_editor_ai_assistant',
+                  action: 'ai_suggestion_replaced',
+                  label: 'sql-editor-ai-assistant',
+                })
               }}
             >
               <ReplaceCode className="h-4 w-4 text-foreground-light" strokeWidth={1.5} />
@@ -121,15 +116,11 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
               size="tiny"
               onClick={() => {
                 handleCopy(formatted)
-                Telemetry.sendEvent(
-                  {
-                    category: 'sql_editor_ai_assistant',
-                    action: 'ai_suggestion_copied',
-                    label: 'sql-editor-ai-assistant',
-                  },
-                  telemetryProps,
-                  router
-                )
+                sendEvent({
+                  category: 'sql_editor_ai_assistant',
+                  action: 'ai_suggestion_copied',
+                  label: 'sql-editor-ai-assistant',
+                })
               }}
             >
               {copied ? (
