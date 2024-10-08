@@ -9,6 +9,7 @@ import useLatest from 'hooks/misc/useLatest'
 import { useFlag } from 'hooks/ui/useFlag'
 import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import Telemetry from 'lib/telemetry'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
@@ -94,6 +95,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       const organization = organizations.find((org) => org.slug === slug)
       if (organization) {
         localStorage.setItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION, organization.slug)
+        Telemetry.sendGroupIdentify({ organizationSlug: organization.slug })
       }
     }
   }, [slug, orgsInitialized])
@@ -107,6 +109,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       const organization = organizations?.find((organization) => organization.id === organizationId)
       if (organization) {
         localStorage.setItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION, organization.slug)
+        Telemetry.sendGroupIdentify({ organizationSlug: organization.slug, projectRef: ref })
       }
     }
   }, [ref, projectsInitialized])
