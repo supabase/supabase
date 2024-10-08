@@ -22,7 +22,11 @@ type SendIdentifyPayload = any
 
 export async function sendIdentify(type: 'GA' | 'PH', body: SendIdentifyPayload) {
   const headers = type === 'PH' ? { Version: '2' } : undefined
-  const { data, error } = await post(`/platform/telemetry/identify`, { body, headers })
+  const { data, error } = await post(`/platform/telemetry/identify`, {
+    body,
+    headers,
+    credentials: 'include',
+  })
   if (error) handleError(error)
   return data
 }
