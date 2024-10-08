@@ -13,6 +13,7 @@ import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderC
 import ButtonCard from '~/components/ButtonCard'
 import { Extensions } from '~/components/Extensions'
 import { JwtGenerator } from '~/components/JwtGenerator'
+import LegacyApiKeys from '~/components/LegacyApiKeys'
 import {
   AuthErrorCodesTable,
   AuthRateLimits,
@@ -68,6 +69,7 @@ const components = {
   Image: (props: any) => <Image fill className="object-contain" {...props} />,
   JwtGenerator,
   KotlinProjectSetup,
+  LegacyApiKeys,
   Link,
   MigrationWarnings,
   NavData,
