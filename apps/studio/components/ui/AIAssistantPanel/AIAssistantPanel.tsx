@@ -17,44 +17,23 @@ import { AIAssistant } from './AIAssistant'
 // Perhaps end goal: we try to shift RLS assistant (and SQL editor assistant?) here maybe
 
 export const AiAssistantPanel = () => {
-  const [chatId, setChatId] = useState(uuidv4())
+  const showEditor = false
 
-  const isOptedInToAI = useOrgOptedIntoAi()
   const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
   const { open, editor } = aiAssistantPanel
 
-  const {
-    messages: chatMessages,
-    append,
-    isLoading,
-  } = useChat({
-    id: chatId,
-    api: `${BASE_PATH}/api/ai/sql/suggest`,
-    body: {
-      entityDefinitions: isOptedInToAI || !IS_PLATFORM ? undefined : undefined,
-    },
-  })
-
   return (
     <Sheet open={open} onOpenChange={() => setAiAssistantPanel({ open: !open, editor: undefined })}>
-      <SheetContent showClose className={cn('flex gap-0 w-[900px]')}>
+      <SheetContent showClose className={cn('flex gap-0', showEditor ? 'w-[1000px]' : 'w-[500px]')}>
         {/* Assistant */}
-        <AIAssistant
-          className="border-r"
-          isLoading={isLoading}
-          onSubmit={(message) =>
-            append({
-              content: message,
-              role: 'user',
-              createdAt: new Date(),
-            })
-          }
-        />
+        <AIAssistant className={showEditor ? 'border-r w-1/2' : 'w-full'} showEditor={showEditor} />
 
         {/* Editor */}
-        <div className={cn('w-1/2')}>
-          <SheetHeader className="flex items-center gap-x-2 py-3">Editor: {editor}</SheetHeader>
-        </div>
+        {showEditor && (
+          <div className={cn('w-1/2')}>
+            <SheetHeader className="flex items-center gap-x-2 py-3">Editor: {editor}</SheetHeader>
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   )

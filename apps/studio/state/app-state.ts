@@ -89,7 +89,7 @@ export const appState = proxy({
   },
 
   aiAssistantPanel: { open: false, editor: undefined } as { open: boolean; editor?: string },
-  setAiAssistantPanel: (value: { open: boolean; editor?: string }) =>
+  setAiAssistantPanel: (value: { open: boolean; editor?: 'rls-policies' | 'functions' }) =>
     (appState.aiAssistantPanel = value),
 })
 

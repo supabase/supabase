@@ -195,7 +195,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 </PageTelemetry>
 
                 {!isTestEnv && <HCaptchaLoadedStore />}
-                {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
+                {/* {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />} */}
               </FlagProvider>
             </ProfileProvider>
           </AuthContainer>

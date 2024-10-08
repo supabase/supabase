@@ -128,7 +128,7 @@ const FunctionsList = ({
               <Button
                 type="default"
                 className="px-1.5"
-                onClick={() => setAiAssistantPanel({ open: true, editor: 'database-functions' })}
+                onClick={() => setAiAssistantPanel({ open: true, editor: 'functions' })}
               >
                 🧑‍💻
               </Button>
