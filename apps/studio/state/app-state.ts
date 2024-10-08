@@ -88,8 +88,9 @@ export const appState = proxy({
     appState.navigationPanelJustClosed = value
   },
 
-  showAiAssistantPanel: true,
-  setShowAiAssistantPanel: (value: boolean) => (appState.showAiAssistantPanel = value),
+  aiAssistantPanel: { open: false, editor: undefined } as { open: boolean; editor?: string },
+  setAiAssistantPanel: (value: { open: boolean; editor?: string }) =>
+    (appState.aiAssistantPanel = value),
 })
 
 export const getAppStateSnapshot = () => snapshot(appState)

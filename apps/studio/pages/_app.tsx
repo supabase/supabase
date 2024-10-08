@@ -55,6 +55,7 @@ import { AppPropsWithLayout } from 'types'
 import { SonnerToaster } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
+import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -182,6 +183,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                 <StudioCommandMenu />
                                 <GenerateSql />
                                 <FeaturePreviewModal />
+                                <AiAssistantPanel />
                               </FeaturePreviewContextProvider>
                             </AppBannerWrapper>
                             <SonnerToaster position="top-right" />
