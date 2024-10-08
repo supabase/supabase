@@ -122,13 +122,13 @@ If you are using TypeScript the compiler might complain about `event.locals.supa
 ```ts src/app.d.ts
 // src/app.d.ts
 
-import { SupabaseClient, Session } from '@supabase/supabase-js'
+import type { SupabaseClient, Session, User } from '@supabase/supabase-js'
 
 declare global {
   namespace App {
     interface Locals {
       supabase: SupabaseClient
-      safeGetSession(): Promise<{ session: Session | null; user: User | null }>
+      safeGetSession(): Promise<{ session: Session | null; user?: User | null }>
     }
     interface PageData {
       session: Session | null
