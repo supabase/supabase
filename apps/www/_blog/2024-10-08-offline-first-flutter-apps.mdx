@@ -46,6 +46,9 @@ Add the Brick dependencies to your `pubspec.yaml`:
 dependencies:
   brick_offline_first_with_supabase: ^1.0.0
   sqflite: ^2.3.0
+  brick_sqlite: ^3.1.0
+  uuid: ^3.0.4
+
 dev_dependencies:
   brick_offline_first_with_supabase_build: ^1.0.0
   build_runner: ^2.4.0
@@ -68,7 +71,9 @@ import 'package:brick_sqlite/brick_sqlite.dart';
 import 'package:brick_supabase/brick_supabase.dart';
 import 'package:uuid/uuid.dart';
 
-@ConnectOfflineFirstWithSupabase()
+@ConnectOfflineFirstWithSupabase(
+  supabaseConfig: SupabaseSerializable(tableName: 'users'),
+)
 class User extends OfflineFirstWithSupabaseModel {
 	final String name;
 
@@ -77,13 +82,13 @@ class User extends OfflineFirstWithSupabaseModel {
 	// indexes without fear of collision.
   @Supabase(unique: true)
   @Sqlite(index: true, unique: true)
-  final String uuid;
+  final String id;
 
-  Users({
-    String? uuid,
+  User({
+    String? id,
     required this.name,
-  }) : this.uuid = uuid ?? const Uuid().v4();
-})
+  }) : this.id = id ?? const Uuid().v4();
+}
 ```
 
 When some (or all) of your models have been defined, generate the code:
@@ -164,7 +169,7 @@ class Repository extends OfflineFirstWithSupabaseRepository {
 ```
 
 ```dart
-import 'package:my_app/brick/repository.dart'
+import 'package:my_app/brick/repository.dart';
 import 'package:sqflite/sqflite.dart' show databaseFactory;
 
 Future<void> main() async {
@@ -194,6 +199,7 @@ await Repository().get<User>(query: Query.where('name', 'Thomas'));
 Or query by association:
 
 ```dart
+// Assuming we had a model `Order` with a `user` association
 await Repository().get<Order>(query: Query.where('user', Where.exact('name', 'Thomas'));
 ```
 
@@ -201,10 +207,10 @@ Queries can be [much more advanced](https://getdutchie.github.io/brick/#/data/qu
 
 **Reactivity**
 
-Beyond async requests, you can subscribe to a stream of updated local data from anywhere in your app (for example, if you pull-to-refresh a list of orders, all listeners will be notified of the new data):
+Beyond async requests, you can subscribe to a stream of updated local data from anywhere in your app (for example, if you pull-to-refresh a list of users, all listeners will be notified of the new data):
 
 ```dart
-final users = Repository().subscribe<Order>(query: Query.where('user', Where.exact('name', 'Thomas'));
+final Stream<List<User>> usersStream = Repository().subscribe<User>(query: Query.where('name', 'Thomas'));
 ```
 
 This **does not** leverage Supabase’s channels by default; if Supabase updates, your app will not be notified. This opt-in feature is [currently under active development](https://github.com/GetDutchie/brick/issues/454).
@@ -230,8 +236,11 @@ import 'package:brick_offline_first_with_supabase/brick_offline_first_with_supab
 import 'package:brick_sqlite/brick_sqlite.dart';
 import 'package:brick_supabase/brick_supabase.dart';
 import 'package:my_app/lib/src/users/user.model.dart';
+import 'package:uuid/uuid.dart';
 
-@ConnectOfflineFirstWithSupabase()
+@ConnectOfflineFirstWithSupabase(
+  supabaseConfig: SupabaseSerializable(tableName: 'orders'),
+)
 class Order extends OfflineFirstWithSupabaseModel {
   // Like Supabase's client, specifying a foreign_key
   // is possible but only necessary if there are joins
@@ -241,13 +250,13 @@ class Order extends OfflineFirstWithSupabaseModel {
 
   @Supabase(unique: true)
   @Sqlite(index: true, unique: true)
-  final String uuid;
+  final String id;
 
   Order({
-    String? uuid,
+    String? id,
     required this.user,
-  }) : this.uuid = uuid ?? const Uuid().v4();
-})
+  }) : this.id = id ?? const Uuid().v4();
+}
 ```
 
 Brick allows very granular [model configuration](https://getdutchie.github.io/brick/#/supabase/models) - you can specify specific tables, [individual columns](https://getdutchie.github.io/brick/#/supabase/fields), and more.
