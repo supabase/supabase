@@ -206,12 +206,13 @@ const Wizard: NextPageWithLayout = () => {
 
   const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
 
-  const { data: allOverdueInvoices } = useOverdueInvoicesQuery()
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
+    enabled: !['team', 'enterprise'].includes(orgSubscription?.plan.id ?? ''),
+  })
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === currentOrg?.id
   )
-  const ignoreOverdueInvoices = ['team', 'enterprise'].includes(orgSubscription?.plan.id ?? '')
-  const hasOutstandingInvoices = !ignoreOverdueInvoices && overdueInvoices.length > 0
+  const hasOutstandingInvoices = overdueInvoices.length > 0
 
   const { data: allProjects } = useProjectsQuery({})
   const organizationProjects =

@@ -73,16 +73,17 @@ const DeployNewReplicaPanel = ({
   const diskManagementV2 = useFlag('diskManagementV2')
 
   const { data } = useReadReplicasQuery({ projectRef })
-  const { data: allOverdueInvoices } = useOverdueInvoicesQuery()
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
+    enabled: !['team', 'enterprise'].includes(subscription?.plan.id ?? ''),
+  })
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === project?.organization_id
   )
-  const ignoreOverdueInvoices = ['team', 'enterprise'].includes(subscription?.plan.id ?? '')
-  const hasOverdueInvoices = !ignoreOverdueInvoices && overdueInvoices.length > 0
+  const hasOverdueInvoices = overdueInvoices.length > 0
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
