@@ -79,16 +79,16 @@ function CustomerStoriesPage(props: any) {
       />
       <DefaultLayout>
         <div className="relative z-0 bg-background overflow-hidden">
-          <div className="container mx-auto mt-44 px-8 sm:px-4 xl:px-20">
+          <div className="container mx-auto mt-28 sm:mt-44 px-4 xl:px-20">
             <div className="mx-auto relative z-10">
               <motion.div
-                className="mx-auto max-w-2xl text-center"
+                className="mx-auto sm:max-w-2xl text-center"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
               >
                 <WebinarAnnouncement />
                 <h1 className="text-foreground mb-3 text-3xl">Customer stories</h1>
-                <h2 className="text-foreground-light text-xl">
+                <h2 className="text-foreground-light text-base sm:text-xl">
                   Discover case studies on how Supabase is being used around the world to quickly
                   create outstanding products and set new industry standards.
                 </h2>
@@ -125,7 +125,7 @@ function CustomerStoriesPage(props: any) {
             </div>
             <div
               className={[
-                'absolute inset-0 h-[300px] bg-background z-0 after:!bg-background',
+                'absolute inset-0 h-[150px] sm:h-[300px] bg-background z-0 after:!bg-background',
                 styles['bg-visual'],
               ].join(' ')}
             />

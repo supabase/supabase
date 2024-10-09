@@ -71,8 +71,10 @@ interface EventData {
   timezone?: string
   tags?: string[]
   date: string
+  end_date?: string
   speakers: string
-  image?: string
+  speakers_label?: string
+  og_image?: string
   thumb?: string
   thumb_light?: string
   youtubeHero?: string
@@ -147,15 +149,24 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
       return authors.find((author) => author.author_id === speakerId)
     })
     .filter(isNotNullOrUndefined)
+  const hadEndDate = event.end_date?.length
 
-  const IS_REGISTRATION_OPEN = event.onDemand || Date.parse(event.date) > Date.now()
+  const IS_REGISTRATION_OPEN =
+    event.onDemand ||
+    (hadEndDate ? Date.parse(event.end_date!) > Date.now() : Date.parse(event.date) > Date.now())
 
-  const ogImageUrl = encodeURI(
-    `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=events&eventType=${event.type}&title=${event.meta_title ?? event.title}&description=${event.meta_description ?? event.description}&date=${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)}&duration=${event.duration}`
-  )
+  const ogImageUrl = event.og_image
+    ? event.og_image
+    : encodeURI(
+        `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=events&eventType=${event.type}&title=${event.meta_title ?? event.title}&description=${event.meta_description ?? event.description}&date=${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)}&duration=${event.duration}`
+      )
 
   const meta = {
-    title: `${event.meta_title ?? event.title} | ${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)} | ${capitalize(event.type)}`,
+    title: `${event.meta_title ?? event.title} | ${dayjs(event.date)
+      .tz(event.timezone)
+      .format(
+        hadEndDate ? `DD` : `DD MMM YYYY`
+      )}${hadEndDate ? dayjs(event.end_date).tz(event.timezone).format(` - DD MMM`) : ''} | ${capitalize(event.type)}`,
     description: event.meta_description ?? event.description,
     url: `https://supabase.com/events/${event.slug}`,
     image: ogImageUrl,
@@ -196,9 +207,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
           type: 'article',
           images: [
             {
-              url:
-                meta.image ??
-                `${origin}${router.basePath}/images/events/${event.image ? event.image : event.thumb}`,
+              url: meta.image,
               alt: `${event.title} thumbnail`,
               width: 1200,
               height: 627,
@@ -353,7 +362,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90"
                 >
                   <NextImage
-                    src={`/images/events/` + event.company?.logo ?? ''}
+                    src={event.company?.logo}
                     alt={`${event.company?.name} Logo`}
                     fill
                     sizes="100%"
@@ -361,7 +370,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     priority
                   />
                   <NextImage
-                    src={`/images/events/` + event.company?.logo_light ?? ''}
+                    src={event.company?.logo_light}
                     alt={`${event.company?.name} Logo`}
                     fill
                     sizes="100%"
@@ -405,7 +414,9 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
             <aside className="order-first lg:order-last">
               {speakers && (
                 <div className="flex flex-col gap-4">
-                  <h2 className="text-foreground-light text-sm font-mono uppercase">Speakers</h2>
+                  <h2 className="text-foreground-light text-sm font-mono uppercase">
+                    {event.speakers_label ?? 'Speakers'}
+                  </h2>
                   <ul className="list-none flex flex-col md:flex-row flex-wrap lg:flex-col gap-4 md:gap-8 lg:gap-4">
                     {speakers?.map((speaker) => (
                       <li key={speaker?.author_id}>

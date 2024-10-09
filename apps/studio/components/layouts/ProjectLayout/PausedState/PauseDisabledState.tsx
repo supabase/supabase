@@ -1,4 +1,4 @@
-import { ChevronDown, Download } from 'lucide-react'
+import { ChevronDown, Download, ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -18,7 +18,6 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
   WarningIcon,
 } from 'ui'
@@ -30,6 +29,7 @@ export const PauseDisabledState = () => {
   const [toastId, setToastId] = useState<string | number>()
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
+  const dbVersion = project?.dbVersion?.replace('supabase-postgres-', '')
   const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
   const allowStorageObjectsDownload = useFlag('enableNinetyDayStorageDownload')
 
@@ -141,7 +141,7 @@ export const PauseDisabledState = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="default" icon={<Download />} iconRight={<ChevronDown />}>
-              Download backup
+              Download backups
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="start">
@@ -157,7 +157,7 @@ export const PauseDisabledState = () => {
               }}
             >
               <Database size={16} />
-              Download database backup
+              Database backup (PG: {dbVersion})
             </DropdownMenuItemTooltip>
             <DropdownMenuItemTooltip
               className="gap-x-2"
@@ -171,7 +171,7 @@ export const PauseDisabledState = () => {
               }}
             >
               <Storage size={16} />
-              Download storage objects
+              Storage objects
             </DropdownMenuItemTooltip>
             {/* [Joshen] Once storage object download is supported, can just use the below component */}
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDownloadStorageArchive()}>
@@ -180,6 +180,15 @@ export const PauseDisabledState = () => {
             </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
+        <Button asChild type="default" icon={<ExternalLink />}>
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#time-limits"
+          >
+            More information
+          </a>
+        </Button>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )

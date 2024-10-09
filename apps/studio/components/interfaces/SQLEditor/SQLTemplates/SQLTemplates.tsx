@@ -3,13 +3,13 @@ import { partition } from 'lodash'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { useParams, useTelemetryProps } from 'common'
+import { useParams } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import Telemetry from 'lib/telemetry'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
@@ -22,12 +22,13 @@ const SQLTemplates = () => {
   const [sql] = partition(SQL_TEMPLATES, { type: 'template' })
 
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const telemetryProps = useTelemetryProps()
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const handleNewQuery = async (sql: string, name: string) => {
     if (!ref) return console.error('Project ref is required')
@@ -74,15 +75,11 @@ const SQLTemplates = () => {
               sql={x.sql}
               onClick={(sql, title) => {
                 handleNewQuery(sql, title)
-                Telemetry.sendEvent(
-                  {
-                    category: 'scripts',
-                    action: 'script_clicked',
-                    label: x.title,
-                  },
-                  telemetryProps,
-                  router
-                )
+                sendEvent({
+                  category: 'scripts',
+                  action: 'script_clicked',
+                  label: x.title,
+                })
               }}
             />
           ))}

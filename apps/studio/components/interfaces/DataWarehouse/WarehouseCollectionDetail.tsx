@@ -252,7 +252,7 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
               params={{ sql }}
               maxHeight="calc(100vh - 139px)"
               showHeader={false}
-              emptyState={
+              EmptyState={
                 <ProductEmptyState title="No events found" size="large">
                   <div className="space-y-4">
                     <p>Try adjusting your filters, send a test event or refresh the results.</p>
