@@ -10,6 +10,8 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import InformationBox from 'components/ui/InformationBox'
+import CopyButton from 'components/ui/CopyButton'
 
 const SupportPage = () => {
   const [sentCategory, setSentCategory] = useState<string>()
@@ -89,6 +91,18 @@ const SupportPage = () => {
               />
             )}
           </div>
+
+          <InformationBox
+            title="Having trouble submitting the form?"
+            description={
+              <div className="flex items-center gap-x-1">
+                Email us directly at support@supabase.com{' '}
+                <CopyButton text={'support@supabase.com'} iconOnly type="text" />
+              </div>
+            }
+            defaultVisibility={true}
+            hideCollapse={true}
+          />
         </div>
       </div>
     </div>
