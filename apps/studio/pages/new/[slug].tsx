@@ -500,7 +500,7 @@ const Wizard: NextPageWithLayout = () => {
                               <SelectGroup_Shadcn_>
                                 {organizations?.map((x: any) => (
                                   <SelectItem_Shadcn_ key={x.id} value={x.slug}>
-                                    <span>{x.name}</span>
+                                    {x.name}
                                   </SelectItem_Shadcn_>
                                 ))}
                               </SelectGroup_Shadcn_>
@@ -591,7 +591,7 @@ const Wizard: NextPageWithLayout = () => {
                                       const value = providerObj['id']
                                       return (
                                         <SelectItem_Shadcn_ key={value} value={value}>
-                                          <span>{label}</span>
+                                          {label}
                                         </SelectItem_Shadcn_>
                                       )
                                     })}
