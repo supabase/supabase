@@ -19,7 +19,7 @@ export const LogPage: NextPageWithLayout = () => {
       EmptyState={
         <LogsTableEmptyState
           title="No results found"
-          description="By default only errors are logged into PostgREST logs. If you want to see HTTP requests, check the API Gateway logs."
+          description="Only errors are captured into PostgREST logs by default. Check the API Gateway logs for HTTP requests."
         />
       }
     />
