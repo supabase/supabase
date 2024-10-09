@@ -53,7 +53,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
   }, [edgeFunctions, form, isSuccess, selectedProject?.ref, selectedProject?.restUrl])
 
   return (
-    <SheetSection className="flex flex-col gap-3">
+    <SheetSection className="flex flex-col gap-6">
       <FormField_Shadcn_
         control={form.control}
         name="values.method"

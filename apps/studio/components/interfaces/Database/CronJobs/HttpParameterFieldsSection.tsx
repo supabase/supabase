@@ -25,7 +25,7 @@ export const HTTPParameterFieldsSection = ({ variant }: HTTPParameterFieldsSecti
   return (
     <SheetSection>
       <span>HTTP Parameters</span>
-      <div className="space-y-2">
+      <div className="space-y-2 mt-1">
         {fields.map((field, index) => (
           <div key={field.id} className="flex items-center space-x-2">
             <FormField_Shadcn_
