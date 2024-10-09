@@ -2145,6 +2145,110 @@ functions:
             error: null
           }
           ```
+      - id: enroll-webauthn-factor
+        name: Enroll a WebAuthn Factor
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.enroll({
+            factorType: 'webauthn',
+            friendlyName: 'your_friendly_name'
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'webauthn',
+              friendly_name?: 'Important app',
+            },
+            error: null
+          }
+          ```
+      - id: enroll-webauthn-factor-multi-step
+        name: Register a WebAuthn Factor with Multi-Stpe Enroll
+        isSpotlight: false
+        code: |
+          ```js
+          const { data: { factorId }, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn' })
+          const { data: {options}, error } = await supabase.auth.mfa.challenge({ factorId })
+          // Configure registration options as needed
+          const options = await supabase.auth.generateRegistrationOptions(){
+                options,
+                rp_name,
+                user: {
+                  name,
+                  display_name,
+                }
+                authenticator_options: {
+			        attestation: 'direct', // or developer choice of 'enterprise'
+			        authenticatorAttachment,
+			        requireResidentKey,
+			        userVerification,
+                })
+            const credential = await navigator.credentials.create(data)
+            const { data, error } = await supabase.auth.mfa.verify({ factorId, credential })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              access_token: '<ACCESS_TOKEN>',
+              token_type: 'Bearer',
+              expires_in: 3600,
+              refresh_token: '<REFRESH_TOKEN>',
+              user: {
+                id: '11111111-1111-1111-1111-111111111111',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'example@email.com',
+                email_confirmed_at: '2024-01-01T00:00:00Z',
+                phone: '',
+                confirmation_sent_at: '2024-01-01T00:00:00Z',
+                confirmed_at: '2024-01-01T00:00:00Z',
+                last_sign_in_at: '2024-01-01T00:00:00Z',
+                app_metadata: {
+                  provider: 'email',
+                  providers: [
+                    "email",
+                  ]
+                },
+                user_metadata: {},
+                identities: [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": true,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "email@example.com"
+                  },
+                ],
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z',
+                is_anonymous: false,
+                factors: [
+                  "id": '<ID>',
+                  "friendly_name": 'Important Auth App',
+                  "factor_type": 'totp',
+                  "status": 'verified',
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z"
+                ]
+              }
+            }
+            error: null
+          }
+          ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
     $ref: '@supabase/auth-js.GoTrueMFAApi.challenge'
@@ -2208,6 +2312,27 @@ functions:
           {
             data: {
               id: '<ID>',
+              type: 'phone',
+              expires_at: 1700000000
+            },
+            error: null
+          }
+          ```
+      - id: create-mfa-webauthn-challenge
+        name: Create a challenge for a WebAuthn factor
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'webauthn',
               expires_at: 1700000000
             },
             error: null
@@ -2253,6 +2378,147 @@ functions:
                   providers: [
                     "email",
                   ]        
+                },
+                user_metadata: {},
+                identities: [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": true,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "email@example.com"
+                  },
+                ],
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z',
+                is_anonymous: false,
+                factors: [
+                  "id": '<ID>',
+                  "friendly_name": 'Important Auth App',
+                  "factor_type": 'totp',
+                  "status": 'verified',
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z"
+                ]
+              }
+            }
+            error: null
+          }
+          ```
+      - id: verify-webauthn-login
+        name: WebAuthn Login
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.verify({
+            type: 'webauthn'
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              access_token: '<ACCESS_TOKEN>',
+              token_type: 'Bearer',
+              expires_in: 3600,
+              refresh_token: '<REFRESH_TOKEN>',
+              user: {
+                id: '11111111-1111-1111-1111-111111111111',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'example@email.com',
+                email_confirmed_at: '2024-01-01T00:00:00Z',
+                phone: '',
+                confirmation_sent_at: '2024-01-01T00:00:00Z',
+                confirmed_at: '2024-01-01T00:00:00Z',
+                last_sign_in_at: '2024-01-01T00:00:00Z',
+                app_metadata: {
+                  provider: 'email',
+                  providers: [
+                    "email",
+                  ]
+                },
+                user_metadata: {},
+                identities: [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": true,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "email@example.com"
+                  },
+                ],
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z',
+                is_anonymous: false,
+                factors: [
+                  "id": '<ID>',
+                  "friendly_name": 'Important Auth App',
+                  "factor_type": 'totp',
+                  "status": 'verified',
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z"
+                ]
+              }
+            }
+            error: null
+          }
+          ```
+      - id: verify-webauthn-multi-step-login
+        name: WebAuthn Login (Multi-Step)
+        isSpotlight: false
+        code: |
+          ```js
+          const { data: factors, error } = await supabase.auth.mfa.listFactors()
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: factors.find((type) => type === 'webauthn'), // use first verified factor
+          })
+          const credential = await generateLoginOptions(data, {
+                allowedTimeout: '10s'
+          })
+          const { data: factor, error } = await supabase.auth.mfa.verify({ factorId, credential})
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              access_token: '<ACCESS_TOKEN>',
+              token_type: 'Bearer',
+              expires_in: 3600,
+              refresh_token: '<REFRESH_TOKEN>',
+              user: {
+                id: '11111111-1111-1111-1111-111111111111',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'example@email.com',
+                email_confirmed_at: '2024-01-01T00:00:00Z',
+                phone: '',
+                confirmation_sent_at: '2024-01-01T00:00:00Z',
+                confirmed_at: '2024-01-01T00:00:00Z',
+                last_sign_in_at: '2024-01-01T00:00:00Z',
+                app_metadata: {
+                  provider: 'email',
+                  providers: [
+                    "email",
+                  ]
                 },
                 user_metadata: {},
                 identities: [
