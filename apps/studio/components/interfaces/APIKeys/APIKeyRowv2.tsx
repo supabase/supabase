@@ -51,8 +51,8 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
 
   return (
     <TableRow key={apiKey.id}>
-      <TableCell className="">{apiKey.description || '/'}</TableCell>
-      <TableCell className="">
+      <TableCell className="py-2">{apiKey.description || '/'}</TableCell>
+      <TableCell className="py-2">
         <div className="flex flex-row gap-2">
           {/* <code>{shown ? apiKey.api_key : hiddenKey}</code> */}
 
@@ -88,8 +88,14 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
 
       <TableCell className="flex justify-end">
         <DropdownMenu>
-          <DropdownMenuTrigger className="h-8 w-8 p-2 focus-visible:outline-none">
-            <MoreVertical size="14" className="text-foreground-light hover:text-foreground" />
+          <DropdownMenuTrigger className="px-1 focus-visible:outline-none" asChild>
+            <Button
+              type="text"
+              size="tiny"
+              icon={
+                <MoreVertical size="14" className="text-foreground-light hover:text-foreground" />
+              }
+            />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="max-w-40" align="end">
             <Tooltip_Shadcn_>

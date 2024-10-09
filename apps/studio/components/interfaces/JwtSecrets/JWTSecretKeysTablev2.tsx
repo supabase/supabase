@@ -374,10 +374,7 @@ NEW_KEY_CONTENT
       <TableCell className="text-right py-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreVertical className="h-4 w-4" />
-            </Button>
+            <Button type="text" className="px-2" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
@@ -510,7 +507,7 @@ NEW_KEY_CONTENT
       </div>
       <div>
         <h2 className="text-xl mb-4">Active keys</h2>
-        <Card className="w-full overflow-hidden border-0 bg-surface-100 border rounded-md">
+        <Card className="w-full overflow-hidden bg-surface-100 border rounded-md">
           <CardContent className="p-0">
             <Table className="p-5">
               <TableHeader className="bg-200">

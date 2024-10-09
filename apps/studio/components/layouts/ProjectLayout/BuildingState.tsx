@@ -13,7 +13,12 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { ArrowRight, Loader2 } from 'lucide-react'
-import { Badge, Button } from 'ui'
+import { Badge, Button, Separator } from 'ui'
+import ApiKeysNotice from 'components/ui/ApiKeysNotice'
+import PublishableAPIKeys from 'components/interfaces/APIKeys/PublishableAPIKeys'
+import SecretAPIKeys from 'components/interfaces/APIKeys/SecretAPIKeys'
+import QuickKeyCopyWrapper from 'components/interfaces/APIKeys/QuickKeyCopy'
+import { ScaffoldContainer } from '../Scaffold'
 
 const BuildingState = () => {
   const { ref } = useParams()
@@ -49,86 +54,87 @@ const BuildingState = () => {
   if (project === undefined) return null
 
   return (
-    <div className="mx-auto my-16 w-full max-w-7xl items-center justify-center">
-      <div className="mx-6 flex flex-col space-y-16">
-        <div className=" flex flex-col gap-4">
-          <div className="flex items-center space-x-3">
-            <h1 className="text-3xl text-foreground">{project?.name}</h1>
-            <Badge variant="default" className="bg-surface-100 bg-opacity-100">
-              <div className="flex items-center gap-2">
-                <Loader2 className="animate-spin" size={12} />
-                <span>
-                  {project.status === PROJECT_STATUS.UNKNOWN
-                    ? 'Initiating project set up'
-                    : 'Setting up project'}
-                </span>
-              </div>
-            </Badge>
-          </div>
-          <div>
-            <p className="text-sm text-foreground-light">
-              {' '}
-              We are provisioning your database and API endpoints
-            </p>
-            <p className="text-sm text-foreground-light"> This may take a few minutes</p>
-          </div>
+    <ScaffoldContainer className="flex flex-col gap-10 max-w-4xl py-20">
+      <div className="flex flex-col gap-5">
+        <div className="flex items-center space-x-3">
+          <h1 className="text-3xl text-foreground">{project?.name}</h1>
+          <Badge variant="default" className="bg-surface-100 bg-opacity-100">
+            <div className="flex items-center gap-2">
+              <Loader2 className="animate-spin" size={12} />
+              <span>
+                {project.status === PROJECT_STATUS.UNKNOWN
+                  ? 'Initiating project set up'
+                  : 'Setting up project'}
+              </span>
+            </div>
+          </Badge>
         </div>
         <div>
-          <div className=" grid grid-cols-12 gap-12">
-            <div className="col-span-12 space-y-12 lg:col-span-4">
-              <div>
-                <h4 className="text-base text-foreground">While you wait</h4>
-
-                <ChecklistItem
-                  description={
-                    <p className="text-sm text-foreground-light">
-                      Browse the Supabase{' '}
-                      <Link
-                        href="https://supabase.com/docs"
-                        className="mb-0 text-brand transition-colors hover:text-brand-600"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        documentation
-                      </Link>
-                      .
-                    </p>
-                  }
-                />
-              </div>
-              <div>
-                <h4 className="text-base text-foreground">Not working?</h4>
-                <ChecklistItem
-                  description={
-                    <p className="text-sm text-foreground-light">
-                      Try refreshing after a couple of minutes.
-                    </p>
-                  }
-                />
-                <ul>
-                  <ChecklistItem
-                    description={
-                      <>
-                        <p className="mb-4 text-sm text-foreground-light">
-                          If your dashboard hasn't connected within 2 minutes, you can open a
-                          support ticket.
-                        </p>
-                        <Button asChild type="default">
-                          <Link href="/support/new">Contact support team</Link>
-                        </Button>
-                      </>
-                    }
-                  />
-                </ul>
-              </div>
-            </div>
-            <div className="col-span-12  lg:col-span-8">
-              <DisplayApiSettings />
-              <DisplayConfigSettings />
-            </div>
-          </div>
+          <p className="text-sm text-foreground-light">
+            {' '}
+            We are provisioning your database and API endpoints
+          </p>
+          <p className="text-sm text-foreground-light"> This may take a few minutes</p>
         </div>
       </div>
+
+      <div className="">
+        {/* <ApiKeysNotice /> */}
+        {/* <PublishableAPIKeys /> */}
+        <QuickKeyCopyWrapper />
+        {/* <SecretAPIKeys /> */}
+        {/* <DisplayApiSettings /> */}
+        {/* <DisplayConfigSettings /> */}
+      </div>
+      <Separator />
+      <div className="col-span-12 space-y-12 lg:col-span-4 ">
+        <div>
+          <h4 className="text-base text-foreground">While you wait</h4>
+
+          <ChecklistItem
+            description={
+              <p className="text-sm text-foreground-light">
+                Browse the Supabase{' '}
+                <Link
+                  href="https://supabase.com/docs"
+                  className="mb-0 text-brand transition-colors hover:text-brand-600"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  documentation
+                </Link>
+                .
+              </p>
+            }
+          />
+        </div>
+        <div>
+          <h4 className="text-base text-foreground">Not working?</h4>
+          <ChecklistItem
+            description={
+              <p className="text-sm text-foreground-light">
+                Try refreshing after a couple of minutes.
+              </p>
+            }
+          />
+          <ul>
+            <ChecklistItem
+              description={
+                <>
+                  <p className="mb-4 text-sm text-foreground-light">
+                    If your dashboard hasn't connected within 2 minutes, you can open a support
+                    ticket.
+                  </p>
+                  <Button asChild type="default">
+                    <Link href="/support/new">Contact support team</Link>
+                  </Button>
+                </>
+              }
+            />
+          </ul>
+        </div>
+      </div>
+
       {project.status === PROJECT_STATUS.COMING_UP && (
         <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
           <div className="space-y-8">
@@ -153,7 +159,7 @@ const BuildingState = () => {
           </div>
         </div>
       )}
-    </div>
+    </ScaffoldContainer>
   )
 }
 export default BuildingState
