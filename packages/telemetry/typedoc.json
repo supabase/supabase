@@ -1,0 +1,20 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
+  "entryPoints": ["./src/*"],
+  "out": "./docs",
+  "outputFileStrategy": "modules",
+  "githubPages": false,
+  "readme": "./README.md",
+  "mergeReadme": true,
+  "indexFormat": "table",
+  "useCodeBlocks": true,
+  "parametersFormat": "table",
+  "propertiesFormat": "table",
+  "expandObjects": true,
+  "textContentMappings": {
+    "breadcrumbs.home": "Home",
+    "title.indexPage": "Telemtery Events",
+    "title.memberPage": "{name}"
+  }
+}

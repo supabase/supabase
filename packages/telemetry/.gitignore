@@ -1,0 +1,4 @@
+.vitepress/cache/*
+.vitepress/dist/*
+# The typedoc markdown is needed by vitepress, but shouldn't be added to source control:
+docs/**
