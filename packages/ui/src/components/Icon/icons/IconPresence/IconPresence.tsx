@@ -19,7 +19,7 @@ const SvgComponent = () => (
   </>
 )
 
-function IconPresence(props: any) {
+function IconPresence(props: CSSProperties) {
   return <IconBase src={<SvgComponent />} viewBox="12.5 12 24 24" {...props} />
 }
 

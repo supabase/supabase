@@ -11,7 +11,7 @@ const src = (
   />
 )
 
-function IconYCombinator(props: any) {
+function IconYCombinator(props: CSSProperties) {
   return <IconBase src={src} stroke="none" {...props} />
 }
 

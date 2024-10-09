@@ -9,14 +9,14 @@ export const Check = () => (
   </svg>
 )
 
-export const IconPricingIncludedCheck = (props: any) => (
+export const IconPricingIncludedCheck = (props: CSSProperties) => (
   <span className="mx-auto">
     <Check />
     <span className="sr-only">Included in {props.plan}</span>
   </span>
 )
 
-export const IconPricingMinus = (props: any) => (
+export const IconPricingMinus = (props: CSSProperties) => (
   <>
     <svg
       xmlns="http://www.w3.org/2000/svg"

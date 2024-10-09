@@ -16,7 +16,7 @@ import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
 
 export type BlogView = 'list' | 'grid'
 
-function Blog(props: any) {
+function Blog(props: CSSProperties) {
   const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
   const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
   const [blogs, setBlogs] = useState(props.blogs)

@@ -98,7 +98,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const AuthContainer = useMemo(
     // eslint-disable-next-line react/display-name
-    () => (props: any) => {
+    () => (props: CSSProperties) => {
       return IS_PLATFORM ? (
         <SessionContextProvider supabaseClient={supabase as any}>
           <AuthProvider>{props.children}</AuthProvider>

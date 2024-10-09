@@ -11,7 +11,7 @@ import { MDXRemote } from 'next-mdx-remote'
 
 interface Props {
   components: React.ReactNode
-  props: any
+  props: CSSProperties
 }
 
 const LayoutComparison = ({ components, props }: Props) => {
@@ -33,7 +33,7 @@ const LayoutComparison = ({ components, props }: Props) => {
 
   const { basePath } = useRouter()
 
-  const NextCard = (props: any) => {
+  const NextCard = (props: CSSProperties) => {
     const { post, label, className } = props
     return (
       <Link href={`${post.url}`} as={`${post.url}`}>

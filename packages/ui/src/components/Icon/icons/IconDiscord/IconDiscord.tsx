@@ -10,7 +10,7 @@ const src = (
   />
 )
 
-function IconDiscord(props: any) {
+function IconDiscord(props: CSSProperties) {
   return <IconBase src={src} stroke="none" {...props} />
 }
 

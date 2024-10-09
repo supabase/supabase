@@ -10,7 +10,7 @@ const src = (
   />
 )
 
-function IconDiscussions(props: any) {
+function IconDiscussions(props: CSSProperties) {
   return <IconBase src={src} stroke="none" {...props} />
 }
 

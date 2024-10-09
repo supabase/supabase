@@ -213,7 +213,7 @@ const ProjectUsage = () => {
 }
 export default ProjectUsage
 
-const PanelHeader = (props: any) => {
+const PanelHeader = (props: CSSProperties) => {
   const Tag = props?.href ? Link : 'div'
   return (
     <Tag href={props.href}>

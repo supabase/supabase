@@ -8,7 +8,7 @@ const src = (
   />
 )
 
-function IconLinkedinSolid(props: any) {
+function IconLinkedinSolid(props: CSSProperties) {
   return <IconBase src={src} stroke="none" {...props} />
 }
 

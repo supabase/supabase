@@ -62,7 +62,7 @@ export async function getStaticProps({ params }: any) {
   return payload
 }
 
-function CaseStudyPage(props: any) {
+function CaseStudyPage(props: CSSProperties) {
   const {
     about,
     company_url,

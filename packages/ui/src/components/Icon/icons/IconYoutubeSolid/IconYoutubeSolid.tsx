@@ -10,7 +10,7 @@ const src = (
   />
 )
 
-function IconYoutubeSolid(props: any) {
+function IconYoutubeSolid(props: CSSProperties) {
   return <IconBase src={src} stroke="none" {...props} />
 }
 

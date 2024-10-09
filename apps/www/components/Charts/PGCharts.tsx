@@ -27,7 +27,7 @@ const renderColorfulLegendText = (value: string, entry: any) => {
   )
 }
 
-const CustomizedAxisTick = (props: any) => {
+const CustomizedAxisTick = (props: CSSProperties) => {
   const { x, y, stroke, payload } = props
 
   return (

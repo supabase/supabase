@@ -29,7 +29,7 @@ const SvgComponent = () => (
   </svg>
 )
 
-function IconDatabaseChanges(props: any) {
+function IconDatabaseChanges(props: CSSProperties) {
   return <IconBase src={<SvgComponent />} viewBox="0 0 25 24" {...props} />
 }
 

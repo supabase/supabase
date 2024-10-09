@@ -1,4 +1,4 @@
-function BlogLayout(props: any) {
+function BlogLayout(props: CSSProperties) {
   return <div>{props.children}</div>
 }
 

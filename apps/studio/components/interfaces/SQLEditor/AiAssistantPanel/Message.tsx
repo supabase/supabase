@@ -76,7 +76,7 @@ const Message = memo(function Message({
         remarkPlugins={[remarkGfm]}
         components={{
           ...markdownComponents,
-          pre: (props: any) => {
+          pre: (props: CSSProperties) => {
             return (
               <AiMessagePre
                 onDiff={onDiff}

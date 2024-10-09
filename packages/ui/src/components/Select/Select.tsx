@@ -38,7 +38,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLSelectElement>
   validation?: (x: any) => void
 }
 
-export const ColLayout = (props: any) => <div>{props.children}</div>
+export const ColLayout = (props: CSSProperties) => <div>{props.children}</div>
 
 /**
  * @deprecated Use ./Select_shadcn_ instead

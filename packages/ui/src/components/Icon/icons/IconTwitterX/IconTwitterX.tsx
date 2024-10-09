@@ -9,7 +9,7 @@ const src = (
   />
 )
 
-function IconTwitterX(props: any) {
+function IconTwitterX(props: CSSProperties) {
   return <IconBase src={src} stroke="none" {...props} />
 }
 

@@ -140,7 +140,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
   const { basePath } = useRouter()
 
-  const NextCard = (props: any) => {
+  const NextCard = (props: CSSProperties) => {
     const { post, label, className } = props
 
     return (

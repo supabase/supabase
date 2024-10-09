@@ -560,7 +560,7 @@ export const DOCS_RESOURCE_CONTENT: {
     category: string
     description?: string
     docsUrl: string
-    code: (props: any) => { key: string; title?: string; bash: string; js: string }[]
+    code: (props: CSSProperties) => { key: string; title?: string; bash: string; js: string }[]
   }
 } = {
   rpcSingle: {

@@ -10,7 +10,7 @@ const src = (
   />
 )
 
-function IconChangelog(props: any) {
+function IconChangelog(props: CSSProperties) {
   return <IconBase src={src} {...props} />
 }
 

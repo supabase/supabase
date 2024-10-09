@@ -10,7 +10,7 @@ const src = (
   />
 )
 
-function IconIntegrations(props: any) {
+function IconIntegrations(props: CSSProperties) {
   return <IconBase src={src} {...props} />
 }
 

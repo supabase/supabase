@@ -22,7 +22,7 @@ type Props = {
   darkMode: boolean
 }
 
-const NavFlyOutMenu = (props: any) => {
+const NavFlyOutMenu = (props: CSSProperties) => {
   const { scrollTo } = props
   const segments = IntroductionSegments.map((segment: any) => segment.chapters)
 
@@ -48,7 +48,7 @@ const NavFlyOutMenu = (props: any) => {
   )
 }
 
-const VideoShot = (props: any) => {
+const VideoShot = (props: CSSProperties) => {
   const { src } = props
   return (
     <div className="p-2 rounded-xl bg-gradient-to-b from-border-strong to-background-surface-300">
@@ -66,7 +66,7 @@ const VideoShot = (props: any) => {
   )
 }
 
-const HamburgerMenu = (props: any) => {
+const HamburgerMenu = (props: CSSProperties) => {
   const { openMenu } = props
   return (
     <div className="cursor-pointer" onClick={openMenu}>
@@ -88,7 +88,7 @@ const HamburgerMenu = (props: any) => {
   )
 }
 
-const SectionHeader = (props: any) => {
+const SectionHeader = (props: CSSProperties) => {
   const { sectionNumber, header } = props
   return (
     <div className="col-span-12">
@@ -214,7 +214,7 @@ const Introduction = () => {
   )
 }
 
-const TableOfContents = (props: any) => {
+const TableOfContents = (props: CSSProperties) => {
   const { scrollTo } = props
   return (
     <div className="bg-surface-100 text-foreground">
@@ -254,7 +254,7 @@ const TableOfContents = (props: any) => {
 }
 
 const Performance = () => {
-  const Bar = (props: any) => {
+  const Bar = (props: CSSProperties) => {
     const { color, finalPercentage, duration = 2000 } = props
     const countTo = parseInt(finalPercentage, 10)
     const [count, setCount] = useState<number>(0)

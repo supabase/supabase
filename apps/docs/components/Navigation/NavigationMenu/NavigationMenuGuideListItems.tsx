@@ -27,7 +27,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
   )
 })
 
-const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
+const ContentAccordionLink = React.memo(function ContentAccordionLink(props: CSSProperties) {
   const pathname = usePathname()
   const { resolvedTheme } = useTheme()
   const activeItem = props.subItem.url === pathname
@@ -118,7 +118,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   )
 })
 
-const ContentLink = React.memo(function ContentLink(props: any) {
+const ContentLink = React.memo(function ContentLink(props: CSSProperties) {
   const pathname = usePathname()
 
   return (
