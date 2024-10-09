@@ -4,10 +4,13 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
 import { useUser } from 'common'
+import { useSendGroupsIdentifyMutation } from 'data/telemetry/send-groups-identify-mutation'
+import { useSendGroupsResetMutation } from 'data/telemetry/send-groups-reset-mutation'
+import { useSendPageLeaveMutation } from 'data/telemetry/send-page-leave-mutation'
 import { useSendPageMutation } from 'data/telemetry/send-page-mutation'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSendPageLeaveMutation } from 'data/telemetry/send-page-leave-mutation'
+import { usePrevious } from 'hooks/deprecated'
 
 const getAnonId = async (id: string) => {
   const hash = new Sha256()
@@ -23,8 +26,12 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const snap = useAppStateSnapshot()
 
+  const previousPathname = usePrevious(router.pathname)
+
   const { mutate: sendPage } = useSendPageMutation()
   const { mutateAsync: sendPageLeave } = useSendPageLeaveMutation()
+  const { mutate: sendGroupsIdentify } = useSendGroupsIdentifyMutation()
+  const { mutate: sendGroupsReset } = useSendGroupsResetMutation()
 
   useEffect(() => {
     const consent =
@@ -76,6 +83,34 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     // if an error happens, continue without setting a sentry id
     setSentryId().catch((e) => console.error(e))
   }, [user?.id])
+
+  useEffect(() => {
+    const { ref, slug } = router.query
+
+    const isEnteringProjectRoute =
+      !(previousPathname ?? '').includes('[ref]') && router.pathname.includes('[ref]')
+    const isLeavingProjectRoute =
+      (previousPathname ?? '').includes('[ref]') && !router.pathname.includes('[ref]')
+
+    const isEnteringOrgRoute =
+      !(previousPathname ?? '').includes('[slug]') && router.pathname.includes('[slug]')
+    const isLeavingOrgRoute =
+      (previousPathname ?? '').includes('[slug]') && !router.pathname.includes('[slug]')
+
+    if (isEnteringProjectRoute || isEnteringOrgRoute) {
+      sendGroupsIdentify({
+        organization_slug: isEnteringOrgRoute ? (slug as string) : undefined,
+        project_ref: isEnteringProjectRoute ? (ref as string) : undefined,
+      })
+    }
+    if (isLeavingProjectRoute || isLeavingOrgRoute) {
+      sendGroupsReset({
+        reset_organization: isLeavingOrgRoute,
+        reset_project: isLeavingProjectRoute,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.pathname])
 
   useEffect(() => {
     const handleBeforeUnload = async () => await sendPageLeave()
