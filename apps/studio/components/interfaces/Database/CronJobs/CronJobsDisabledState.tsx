@@ -9,6 +9,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button } from 'ui'
 import EnableExtensionModal from '../Extensions/EnableExtensionModal'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
 export const CronJobsDisabledState = () => {
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
@@ -29,56 +30,52 @@ export const CronJobsDisabledState = () => {
 
   return (
     <>
-      <div>
-        <div className="w-full px-12 py-12 bg-no-repeat border rounded-md bg-studio border-default">
-          <div className="w-3/5 space-y-8">
-            <div className="space-y-2">
-              <h4 className="text-lg">pg_cron</h4>
-              <p className="text-sm text-foreground-light">
-                Cron jobs in PostgreSQL allow you to schedule and automate tasks such as running SQL
-                queries or maintenance routines at specified intervals. These jobs are managed using
-                cron-like syntax and are executed directly within the PostgreSQL server, making it
-                easy to schedule recurring tasks without needing an external scheduler.
-              </p>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Button asChild type="default" icon={<ExternalLink />}>
-                <Link
-                  href="https://supabase.com/docs/guides/database/extensions/pg_cron"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  About pg_cron
-                </Link>
-              </Button>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button type="primary" onClick={() => setShowEnableExtensionModal(true)}>
-                    Enable pg_cron
-                  </Button>
-                </Tooltip.Trigger>
-                {!canToggleExtensions && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to enable pg_cron for this project
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-            </div>
+      <div className="w-full h-full flex items-center justify-center">
+        <ProductEmptyState title="Cron Jobs">
+          <div className="text-sm text-foreground-light mb-4 grid gap-2">
+            <p>
+              Cron jobs in PostgreSQL allow you to schedule and automate tasks such as running SQL
+              queries or maintenance routines at specified intervals.
+            </p>
+            <p>Enable cron jobs in your project.</p>
           </div>
-        </div>
+
+          <div className="flex items-center gap-3 mt-4">
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger asChild>
+                <Button type="primary" onClick={() => setShowEnableExtensionModal(true)}>
+                  Enable Cron Jobs
+                </Button>
+              </Tooltip.Trigger>
+              {!canToggleExtensions && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-foreground">
+                        You need additional permissions to enable pg_cron for this project
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              )}
+            </Tooltip.Root>
+            <Button asChild type="text" icon={<ExternalLink />}>
+              <Link
+                href="https://supabase.com/docs/guides/database/extensions/pg_cron"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Documentation
+              </Link>
+            </Button>
+          </div>
+        </ProductEmptyState>
       </div>
 
       <EnableExtensionModal
