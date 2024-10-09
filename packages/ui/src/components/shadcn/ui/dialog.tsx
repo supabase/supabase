@@ -37,13 +37,15 @@ DialogPortal.displayName = DialogPrimitive.Portal.displayName
 
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & { centered: boolean }
+>(({ className, centered, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
       'bg-black/40 backdrop-blur-sm',
-      'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-closed:animate-overlay-hide',
+      'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-closed:animate-overlay-hide py-8',
+      !centered &&
+        'flex flex-col flex-startpb-8 pt-8 lg:pt-20 [@media(min-height:720px)]:pt-[15vh] lg:px-5',
       className
     )}
     {...props}
@@ -53,8 +55,8 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const DialogContentVariants = cva(
   cn(
-    'my-8',
-    'relative z-50 grid w-full border shadow-md dark:shadow-sm duration-200',
+    '',
+    'relative z-50 w-full border shadow-md dark:shadow-sm duration-200',
     'data-[state=open]:animate-in data-[state=closed]:animate-out',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
     'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',
@@ -86,26 +88,32 @@ const DialogContent = React.forwardRef<
     VariantProps<typeof DialogContentVariants> & {
       hideClose?: boolean
       dialogOverlayProps?: React.ComponentPropsWithoutRef<typeof DialogOverlay>
+      centered?: boolean
     }
->(({ className, children, size, hideClose, dialogOverlayProps, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay {...dialogOverlayProps}>
-      <DialogPrimitive.Content
-        ref={ref}
-        className={cn(DialogContentVariants({ size }), className)}
-        {...props}
-      >
-        {children}
-        {!hideClose && (
-          <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted">
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Content>
-    </DialogOverlay>
-  </DialogPortal>
-))
+>(
+  (
+    { className, children, size, hideClose, dialogOverlayProps, centered = true, ...props },
+    ref
+  ) => (
+    <DialogPortal>
+      <DialogOverlay centered={centered} {...dialogOverlayProps}>
+        <DialogPrimitive.Content
+          ref={ref}
+          className={cn(DialogContentVariants({ size }), className)}
+          {...props}
+        >
+          {children}
+          {!hideClose && (
+            <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+          )}
+        </DialogPrimitive.Content>
+      </DialogOverlay>
+    </DialogPortal>
+  )
+)
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
 const DialogHeader = React.forwardRef<
