@@ -29,6 +29,7 @@ const useSendTelemetryEvent = () => {
       body: {
         ...event,
         page_title: document?.title,
+        // @ts-ignore [JOSHEN] To be fixed for PH
         page_location: pathname,
       },
     })
