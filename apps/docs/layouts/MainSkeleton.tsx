@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { usePathname } from 'next/navigation'
 import { memo, useEffect, type PropsWithChildren, type ReactNode } from 'react'
 
 import { cn } from 'ui'
@@ -8,6 +9,8 @@ import { cn } from 'ui'
 import DefaultNavigationMenu, {
   MenuId,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
+import { type NavMenuSection } from '~/components/Navigation/Navigation.types'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
@@ -59,9 +62,9 @@ const levelsData = {
     icon: 'ai',
     name: 'AI & Vectors',
   },
-  supabase_cli: {
+  local_development: {
     icon: 'reference-cli',
-    name: 'Supabase CLI',
+    name: 'Local Development',
   },
   platform: {
     icon: 'platform',
@@ -328,9 +331,11 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
 interface SkeletonProps extends PropsWithChildren {
   menuId?: MenuId
   menuName?: string
+  hideSideNav?: boolean
   NavigationMenu?: ReactNode
   hideFooter?: boolean
   className?: string
+  additionalNavItems?: Partial<NavMenuSection>[]
 }
 
 function TopNavSkeleton({ children }) {
@@ -346,19 +351,27 @@ function TopNavSkeleton({ children }) {
 
 function SidebarSkeleton({
   children,
-  menuId,
+  menuId: _menuId,
   menuName,
   NavigationMenu,
   hideFooter = false,
   className,
+  hideSideNav,
+  additionalNavItems,
 }: SkeletonProps) {
+  const pathname = usePathname()
+  const menuId = _menuId ?? getMenuId(pathname)
+
   const mobileMenuOpen = useMenuMobileOpen()
-  const hideSideNav = !menuId && !NavigationMenu
 
   return (
     <div className={cn('flex flex-row h-full relative', className)}>
       {!hideSideNav && (
-        <NavContainer>{NavigationMenu ?? <DefaultNavigationMenu menuId={menuId} />}</NavContainer>
+        <NavContainer>
+          {NavigationMenu ?? (
+            <DefaultNavigationMenu menuId={menuId} additionalNavItems={additionalNavItems} />
+          )}
+        </NavContainer>
       )}
       <Container>
         <div

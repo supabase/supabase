@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
@@ -83,7 +83,7 @@ const getContent = async ({ slug }: Params) => {
     `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
   )
 
-  const content = await response.text()
+  const content = removeRedundantH1(await response.text())
 
   return {
     pathname: `/guides/cli/github-action/${slug}` satisfies `/${string}`,

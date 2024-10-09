@@ -1,14 +1,15 @@
 import matter from 'gray-matter'
-import { type Heading } from 'mdast'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { toMarkdown } from 'mdast-util-to-markdown'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
 
-import { genGuideMeta, genGuidesStaticParams } from '~/features/docs/GuidesMdx.utils'
+import {
+  genGuideMeta,
+  genGuidesStaticParams,
+  removeRedundantH1,
+} from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
@@ -16,7 +17,6 @@ import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLin
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-import remarkGfm from 'remark-gfm'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -184,22 +184,7 @@ const getContent = async (params: Params) => {
     const rawContent = await response.text()
 
     const { content: contentWithoutFrontmatter } = matter(rawContent)
-
-    // This is the more robust way of doing it, but problems with the rewritten
-    // Markdown and handling of tables this way, so saving it for later.
-    //
-    // const mdxTree = fromMarkdown(contentWithoutFrontmatter)
-    // const maybeH1 = mdxTree.children[0]
-    // if (maybeH1 && maybeH1.type === 'heading' && (maybeH1 as Heading).depth === 1) {
-    //   mdxTree.children.shift()
-    // }
-    // content = toMarkdown(mdxTree)
-
-    content = contentWithoutFrontmatter
-    if (meta.title) {
-      const h1Regex = new RegExp(`(?:^|\n)# ${meta.title}\n+`)
-      content = content.replace(h1Regex, '')
-    }
+    content = removeRedundantH1(contentWithoutFrontmatter)
   }
 
   return {
