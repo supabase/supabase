@@ -345,7 +345,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                             {subscriptionPlanId}
                           </Badge>
                         )}
-                        {organizationSlug === 'no-org' && <span>No specific org</span>}
+                        {organizationSlug === 'no-org' && <span>No specific organization</span>}
                       </div>
                     </SelectValue_Shadcn_>
                   </SelectTrigger_Shadcn_>
