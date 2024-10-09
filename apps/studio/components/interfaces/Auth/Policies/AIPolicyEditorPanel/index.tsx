@@ -1,15 +1,41 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Monaco } from '@monaco-editor/react'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useChat } from 'ai/react'
-import { IS_PLATFORM, useParams, useTelemetryProps } from 'common'
 import { isEqual, uniqBy } from 'lodash'
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
+import { useQueryState } from 'nuqs'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { useChat } from 'ai/react'
+import { IS_PLATFORM, useParams } from 'common'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import {
+  IStandaloneCodeEditor,
+  IStandaloneDiffEditor,
+} from 'components/interfaces/SQLEditor/SQLEditor.types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
+import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
+import { databasePoliciesKeys } from 'data/database-policies/keys'
+import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -25,33 +51,6 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-import * as z from 'zod'
-
-import { Monaco } from '@monaco-editor/react'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import {
-  IStandaloneCodeEditor,
-  IStandaloneDiffEditor,
-} from 'components/interfaces/SQLEditor/SQLEditor.types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
-import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
-import { useQueryState } from 'nuqs'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
@@ -96,13 +95,11 @@ export const AIPolicyEditorPanel = memo(function ({
   onSelectCancel,
   authContext,
 }: AIPolicyEditorPanelProps) {
-  const router = useRouter()
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
 
-  const telemetryProps = useTelemetryProps()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const [editView, setEditView] = useQueryState('view', { defaultValue: 'templates' as const })
@@ -233,6 +230,8 @@ export const AIPolicyEditorPanel = memo(function ({
         a.role.localeCompare(b.role)
     )
   }, [chatMessages, debugThread])
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async () => {
@@ -511,15 +510,11 @@ export const AIPolicyEditorPanel = memo(function ({
                           onClick={() => {
                             setIncomingChange(undefined)
                             setSelectedDiff(undefined)
-                            Telemetry.sendEvent(
-                              {
-                                category: 'rls_editor',
-                                action: 'ai_suggestion_discarded',
-                                label: 'rls-ai-assistant',
-                              },
-                              telemetryProps,
-                              router
-                            )
+                            sendEvent({
+                              category: 'rls_editor',
+                              action: 'ai_suggestion_discarded',
+                              label: 'rls-ai-assistant',
+                            })
                           }}
                         >
                           Discard
@@ -529,15 +524,11 @@ export const AIPolicyEditorPanel = memo(function ({
                           onClick={() => {
                             acceptChange()
                             setSelectedDiff(undefined)
-                            Telemetry.sendEvent(
-                              {
-                                category: 'rls_editor',
-                                action: 'ai_suggestion_accepted',
-                                label: 'rls-ai-assistant',
-                              },
-                              telemetryProps,
-                              router
-                            )
+                            sendEvent({
+                              category: 'rls_editor',
+                              action: 'ai_suggestion_accepted',
+                              label: 'rls-ai-assistant',
+                            })
                           }}
                         >
                           Accept
