@@ -8,10 +8,11 @@ import { useSendGroupsIdentifyMutation } from 'data/telemetry/send-groups-identi
 import { useSendGroupsResetMutation } from 'data/telemetry/send-groups-reset-mutation'
 import { useSendPageLeaveMutation } from 'data/telemetry/send-page-leave-mutation'
 import { useSendPageMutation } from 'data/telemetry/send-page-mutation'
+import { usePrevious } from 'hooks/deprecated'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { usePrevious } from 'hooks/deprecated'
-import { useFlag } from 'hooks/ui/useFlag'
 
 const getAnonId = async (id: string) => {
   const hash = new Sha256()
@@ -26,6 +27,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const user = useUser()
   const router = useRouter()
   const snap = useAppStateSnapshot()
+  const organization = useSelectedOrganization()
 
   const previousPathname = usePrevious(router.pathname)
   const enablePostHogTelemetry = useFlag('enablePosthogChanges')
@@ -88,6 +90,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
 
   useEffect(() => {
     const { ref, slug } = router.query
+    const trackTelemetryPH = enablePostHogTelemetry && snap.isOptedInTelemetry
 
     const isEnteringProjectRoute =
       !(previousPathname ?? '').includes('[ref]') && router.pathname.includes('[ref]')
@@ -99,24 +102,24 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     const isLeavingOrgRoute =
       (previousPathname ?? '').includes('[slug]') && !router.pathname.includes('[slug]')
 
-    if (enablePostHogTelemetry && (isEnteringProjectRoute || isEnteringOrgRoute)) {
-      sendGroupsIdentify({
-        organization_slug: isEnteringOrgRoute ? (slug as string) : undefined,
-        project_ref: isEnteringProjectRoute ? (ref as string) : undefined,
-      })
-    }
-    if (enablePostHogTelemetry && (isLeavingProjectRoute || isLeavingOrgRoute)) {
-      sendGroupsReset({
-        reset_organization: isLeavingOrgRoute || isLeavingProjectRoute,
-        reset_project: isLeavingProjectRoute,
-      })
+    if (trackTelemetryPH) {
+      if (isEnteringProjectRoute) {
+        sendGroupsIdentify({ organization_slug: organization?.slug, project_ref: ref as string })
+      } else if (isEnteringOrgRoute) {
+        sendGroupsIdentify({ organization_slug: slug as string, project_ref: undefined })
+      } else if (isLeavingProjectRoute || isLeavingOrgRoute) {
+        sendGroupsReset({
+          reset_organization: isLeavingOrgRoute || isLeavingProjectRoute,
+          reset_project: isLeavingProjectRoute,
+        })
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.pathname])
 
   useEffect(() => {
     const handleBeforeUnload = async () => {
-      if (enablePostHogTelemetry) await sendPageLeave()
+      if (enablePostHogTelemetry && snap.isOptedInTelemetry) await sendPageLeave()
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
 
