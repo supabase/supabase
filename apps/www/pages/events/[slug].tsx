@@ -357,7 +357,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90 [&_.next-image--dynamic-fill_img]:!h-full"
                 >
                   <Image
-                    src={{ dark: event.company?.logo ?? '', light: event.company?.logo_light }}
+                    src={{ dark: event.company?.logo, light: event.company?.logo_light }}
                     alt={`${event.company?.name} Logo`}
                     width={160}
                     height={30}

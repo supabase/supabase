@@ -49,7 +49,7 @@ export interface ImageProps extends Omit<NextImageProps, 'src'> {
  * - containerClassName: {string} (optional) to style the parent <figure> container
  */
 const Image = ({ src, alt = '', zoomable, ...props }: ImageProps) => {
-  // const [mounted, setMounted] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
   const isLessThanLgBreakpoint = useBreakpoint()
 
@@ -60,11 +60,11 @@ const Image = ({ src, alt = '', zoomable, ...props }: ImageProps) => {
   const source =
     typeof src === 'string' ? src : resolvedTheme?.includes('dark') ? src.dark : src.light
 
-  // useEffect(() => {
-  //   setMounted(true)
-  // }, [])
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
-  // if (!mounted) return null
+  if (!mounted) return null
 
   return (
     <figure className={cn('next-image--dynamic-fill', props.containerClassName)}>
