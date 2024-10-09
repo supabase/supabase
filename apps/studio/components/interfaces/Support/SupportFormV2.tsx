@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/nextjs'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { ExternalLink, Loader2, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -76,27 +76,38 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
 
-  const FormSchema = z
-    .object({
-      organizationSlug: z.string().min(1, 'Please select an organization'),
-      projectRef: z.string().min(1, 'Please select a project'),
-      category: z.string(),
-      severity: z.string(),
-      library: z.string(),
-      subject: z.string().min(1, 'Please add a subject heading'),
-      message: z.string().min(1, "Please add a message about the issue that you're facing"),
-      affectedServices: z.string(),
-      allowSupportAccess: z.boolean(),
-    })
-    .refine(
-      (data) => {
-        return !(data.category === 'Problem' && data.library === '')
-      },
-      {
-        message: "Please select the library that you're facing issues with",
-        path: ['library'],
-      }
-    )
+  const {
+    data: organizations,
+    isLoading: isLoadingOrganizations,
+    isSuccess: isSuccessOrganizations,
+  } = useOrganizationsQuery()
+
+  const FormSchema = useMemo(() => {
+    return z
+      .object({
+        organizationSlug:
+          organizations?.length === 0
+            ? z.string()
+            : z.string().min(1, 'Please select an organization'),
+        projectRef: z.string().min(1, 'Please select a project'),
+        category: z.string(),
+        severity: z.string(),
+        library: z.string(),
+        subject: z.string().min(1, 'Please add a subject heading'),
+        message: z.string().min(1, "Please add a message about the issue that you're facing"),
+        affectedServices: z.string(),
+        allowSupportAccess: z.boolean(),
+      })
+      .refine(
+        (data) => {
+          return !(data.category === 'Problem' && data.library === '')
+        },
+        {
+          message: "Please select the library that you're facing issues with",
+          path: ['library'],
+        }
+      )
+  }, [organizations])
 
   const defaultValues = {
     organizationSlug: '',
@@ -126,18 +137,15 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
   } = useDocsSearch(supabaseClient)
 
   const {
-    data: organizations,
-    isLoading: isLoadingOrganizations,
-    isSuccess: isSuccessOrganizations,
-  } = useOrganizationsQuery()
-
-  const {
     data: subscription,
     isLoading: isLoadingSubscription,
     isSuccess: isSuccessSubscription,
-  } = useOrgSubscriptionQuery({
-    orgSlug: organizationSlug,
-  })
+  } = useOrgSubscriptionQuery(
+    {
+      orgSlug: organizationSlug,
+    },
+    { enabled: organizationSlug != null && organizationSlug !== 'no-org' }
+  )
 
   const {
     data: allProjects,
@@ -200,6 +208,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
 
     const payload = {
       ...values,
+      organizationSlug: values.organizationSlug === 'no-org' ? '' : values.organizationSlug,
       library:
         values.category === 'Problem' && selectedLibrary !== undefined ? selectedLibrary.key : '',
       message: formatMessage(values.message, attachments),
@@ -273,6 +282,10 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
           form.setValue('organizationSlug', firstOrganization.slug)
         }
       }
+
+      if (organizations?.length === 0) {
+        form.setValue('organizationSlug', 'no-org')
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref, slug, isSuccessOrganizations, isSuccessProjects])
@@ -324,12 +337,15 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                     <SelectValue_Shadcn_ asChild placeholder="Select an organization">
                       <div className="flex items-center gap-x-2">
                         {(organizations ?? []).find((o) => o.slug === field.value)?.name}
-                        {isLoadingSubscription && <Loader2 size={14} className="animate-spin" />}
+                        {isLoadingSubscription && organizationSlug !== 'no-org' && (
+                          <Loader2 size={14} className="animate-spin" />
+                        )}
                         {isSuccessSubscription && (
                           <Badge variant="outline" className="capitalize">
                             {subscriptionPlanId}
                           </Badge>
                         )}
+                        {organizationSlug === 'no-org' && <span>No specific org</span>}
                       </div>
                     </SelectValue_Shadcn_>
                   </SelectTrigger_Shadcn_>
@@ -338,6 +354,9 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                       {organizations?.map((org) => (
                         <SelectItem_Shadcn_ value={org.slug}>{org.name}</SelectItem_Shadcn_>
                       ))}
+                      {organizations?.length === 0 && (
+                        <SelectItem_Shadcn_ value={'no-org'}>No specific org</SelectItem_Shadcn_>
+                      )}
                     </SelectGroup_Shadcn_>
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
