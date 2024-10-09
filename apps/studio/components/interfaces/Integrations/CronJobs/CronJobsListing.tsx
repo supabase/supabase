@@ -10,11 +10,12 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { Button, Sheet, SheetContent } from 'ui'
-import EnableExtensionModal from '../Extensions/EnableExtensionModal'
+
 import { CreateCronJobSheet } from './CreateCronJobSheet'
 import { CronJobCard } from './CronJobCard'
 import { CronJobsDisabledState } from './CronJobsDisabledState'
 import DeleteCronJob from './DeleteCronJob'
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 
 export const CronJobsListing = () => {
   const { project } = useProjectContext()

@@ -8,7 +8,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button } from 'ui'
-import EnableExtensionModal from '../Extensions/EnableExtensionModal'
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 
 export const CronJobsDisabledState = () => {
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
