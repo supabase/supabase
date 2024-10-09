@@ -17,6 +17,7 @@ const useSendPageTelemetryWithConsent = () => {
 
       unauthedAllowedPost('/platform/telemetry/page', {
         body: {
+          // @ts-ignore [JOSHEN] To be fixed for PH
           referrer: document.referrer,
           title: document.title,
           route: `${BASE_PATH}${route}`,
