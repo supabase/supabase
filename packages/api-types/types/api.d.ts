@@ -5595,7 +5595,7 @@ export interface components {
       language: string
       referrer: string
       search: string
-      userAgent: string
+      user_agent: string
       viewport_height: number
       viewport_width: number
     }
@@ -5637,7 +5637,7 @@ export interface components {
       language: string
       referrer: string
       search: string
-      userAgent: string
+      user_agent: string
       viewport_height: number
       viewport_width: number
     }
@@ -11998,6 +11998,9 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PostgresConfigResponse']
         }
+      }
+      403: {
+        content: never
       }
       /** @description Failed to update project's Postgres config */
       500: {
