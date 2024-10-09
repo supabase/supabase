@@ -140,12 +140,9 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     data: subscription,
     isLoading: isLoadingSubscription,
     isSuccess: isSuccessSubscription,
-  } = useOrgSubscriptionQuery(
-    {
-      orgSlug: organizationSlug,
-    },
-    { enabled: organizationSlug !== 'no-org' }
-  )
+  } = useOrgSubscriptionQuery({
+    orgSlug: organizationSlug === 'no-org' ? undefined : organizationSlug,
+  })
 
   const {
     data: allProjects,
