@@ -185,7 +185,7 @@ export const LogsPreviewer = ({
   const noResults = logData.length === 0 && !error
   const footerHeight = noResults ? '0px' : '48px'
   const navBarHeight = '48px'
-  const filterPanelHeight = '54px'
+  const filterPanelHeight = '58px'
   const chartHeight = showChart && !noResults ? '114px' : '0px'
   const maxHeight = `calc(100vh - ${navBarHeight} - ${filterPanelHeight} - ${footerHeight} - ${chartHeight})`
 

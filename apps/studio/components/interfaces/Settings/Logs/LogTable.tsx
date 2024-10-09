@@ -348,6 +348,8 @@ const LogTable = ({
 
   if (!data) return null
 
+  console.log({ maxHeight })
+
   return (
     <section className={'flex w-full flex-col h-screen'} style={{ maxHeight }}>
       {!queryType && <LogsExplorerTableHeader />}
