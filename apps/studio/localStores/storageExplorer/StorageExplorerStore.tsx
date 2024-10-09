@@ -44,6 +44,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { lookupMime } from 'lib/mime'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
+import Link from 'next/link'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -570,9 +571,17 @@ class StorageExplorerStore {
             {unit}.
           </p>
           <p className="text-foreground-light">
-            You may change the file size upload limit under Storage in Project Settings.
+            You can change the file size upload limit in{' '}
+            <Link
+              className="underline"
+              href={`/project/${this.projectRef}/settings/storage`}
+              target="_blank"
+            >
+              Storage settings.
+            </Link>
           </p>
-        </div>
+        </div>,
+        { duration: 8000 }
       )
 
       if (numberOfFilesRejected === filesToUpload.length) return
