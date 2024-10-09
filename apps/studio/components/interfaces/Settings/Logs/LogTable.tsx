@@ -36,6 +36,8 @@ import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
+import { useRouter } from 'next/router'
+import { useQueryState } from 'nuqs'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -89,6 +91,8 @@ const LogTable = ({
 
   const [cellPosition, setCellPosition] = useState<any>()
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
+  const [focusedLogId, setFocusedLogId] = useQueryState('log')
+  const router = useRouter()
 
   const canCreateLogQuery = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'log_sql', owner_id: profile?.id },
@@ -196,6 +200,22 @@ const LogTable = ({
       setFocusedLog(null)
     }
   }, [data, focusedLog, stringData])
+
+  // If we have a log id in the query, set the focused log
+  useEffect(() => {
+    if (focusedLogId) {
+      const log = data.find((log) => {
+        if (typeof log === 'object' && log !== null && 'id' in log) {
+          return log.id === router.query.log
+        }
+        return false
+      })
+      if (log && 'id' in log && (!focusedLog || focusedLog.id !== log.id)) {
+        setFocusedLog(log)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const logDataRows = useMemo(() => {
     if (hasId && hasTimestamp) {
@@ -366,13 +386,17 @@ const LogTable = ({
             onSelectedCellChange={(row) => {
               setFocusedLog(row.row as LogData)
               setCellPosition(row)
+
+              if (row.row?.id) {
+                setFocusedLogId(row.row.id)
+              }
             }}
             selectedRows={new Set([])}
             columns={columns}
             rowClass={(row: LogData) =>
               [
                 'font-mono tracking-tight',
-                isEqual(row, focusedLog)
+                isEqual(row, focusedLog) || row.id === focusedLogId
                   ? '!bg-surface-300 rdg-row--focused'
                   : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
               ].join(' ')
@@ -405,12 +429,16 @@ const LogTable = ({
             )}
         </ResizablePanel>
         <ResizableHandle />
-        {focusedLog && (
+        {(focusedLog || focusedLogId) && (
           <ResizablePanel defaultSize={40}>
             <LogSelection
               projectRef={projectRef}
-              onClose={() => setFocusedLog(null)}
-              log={focusedLog}
+              onClose={() => {
+                setFocusedLog(null)
+                setFocusedLogId(null)
+              }}
+              partialLog={focusedLog}
+              logId={focusedLogId ?? undefined}
               queryType={queryType}
               params={params}
               collectionName={collectionName}
