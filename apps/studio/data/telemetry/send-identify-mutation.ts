@@ -66,7 +66,7 @@ export const useSendIdentifyMutation = ({
       const type = usePostHogParameters ? 'PH' : 'GA'
       const body = usePostHogParameters
         ? ({
-            user_id: user.id.toString(),
+            user_id: user.gotrue_id,
             organization_slug: slug,
             project_ref: ref,
           } as SendIdentifyPH)
