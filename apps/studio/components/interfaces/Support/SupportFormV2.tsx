@@ -144,7 +144,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     {
       orgSlug: organizationSlug,
     },
-    { enabled: organizationSlug != null && organizationSlug !== 'no-org' }
+    { enabled: organizationSlug !== 'no-org' }
   )
 
   const {
