@@ -1,9 +1,9 @@
 import { Sha256 } from '@aws-crypto/sha256-browser'
 import * as Sentry from '@sentry/nextjs'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 
-import { useUser } from 'common'
+import { useParams, useUser } from 'common'
 import { useSendGroupsIdentifyMutation } from 'data/telemetry/send-groups-identify-mutation'
 import { useSendGroupsResetMutation } from 'data/telemetry/send-groups-reset-mutation'
 import { useSendPageLeaveMutation } from 'data/telemetry/send-page-leave-mutation'
@@ -26,11 +26,17 @@ const getAnonId = async (id: string) => {
 const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const user = useUser()
   const router = useRouter()
+  const { ref, slug } = useParams()
   const snap = useAppStateSnapshot()
   const organization = useSelectedOrganization()
 
   const previousPathname = usePrevious(router.pathname)
   const enablePostHogTelemetry = useFlag('enablePosthogChanges')
+  const consent =
+    typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null
+  const trackTelemetryPH = enablePostHogTelemetry && consent === 'true'
 
   const { mutate: sendPage } = useSendPageMutation()
   const { mutateAsync: sendPageLeave } = useSendPageLeaveMutation()
@@ -89,24 +95,25 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   }, [user?.id])
 
   useEffect(() => {
-    const { ref, slug } = router.query
-    const trackTelemetryPH = enablePostHogTelemetry && snap.isOptedInTelemetry
-
+    const isLandingOnProjectRoute =
+      router.pathname.includes('[ref]') && previousPathname === router.pathname
     const isEnteringProjectRoute =
       !(previousPathname ?? '').includes('[ref]') && router.pathname.includes('[ref]')
     const isLeavingProjectRoute =
       (previousPathname ?? '').includes('[ref]') && !router.pathname.includes('[ref]')
 
+    const isLandingOnOrgRoute =
+      router.pathname.includes('[slug]') && previousPathname === router.pathname
     const isEnteringOrgRoute =
       !(previousPathname ?? '').includes('[slug]') && router.pathname.includes('[slug]')
     const isLeavingOrgRoute =
       (previousPathname ?? '').includes('[slug]') && !router.pathname.includes('[slug]')
 
     if (trackTelemetryPH) {
-      if (isEnteringProjectRoute) {
+      if (ref && (isLandingOnProjectRoute || isEnteringProjectRoute)) {
         sendGroupsIdentify({ organization_slug: organization?.slug, project_ref: ref as string })
-      } else if (isEnteringOrgRoute) {
-        sendGroupsIdentify({ organization_slug: slug as string, project_ref: undefined })
+      } else if (slug && (isLandingOnOrgRoute || isEnteringOrgRoute)) {
+        sendGroupsIdentify({ organization_slug: slug, project_ref: undefined })
       } else if (isLeavingProjectRoute || isLeavingOrgRoute) {
         sendGroupsReset({
           reset_organization: isLeavingOrgRoute || isLeavingProjectRoute,
@@ -114,8 +121,9 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
         })
       }
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.pathname])
+  }, [trackTelemetryPH, slug, ref, router.pathname])
 
   useEffect(() => {
     const handleBeforeUnload = async () => {
