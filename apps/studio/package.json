@@ -118,7 +118,6 @@
     "tus-js-client": "^4.1.0",
     "ui": "*",
     "ui-patterns": "*",
-    "use-isomorphic-layout-effect": "^1.1.2",
     "uuid": "^9.0.1",
     "valtio": "^1.12.0",
     "vite-tsconfig-paths": "^4.3.2",

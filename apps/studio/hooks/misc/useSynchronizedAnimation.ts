@@ -1,5 +1,5 @@
+import { useIsomorphicLayoutEffect } from 'common'
 import { useRef } from 'react'
-import useIsomorphicLayoutEffect from 'use-isomorphic-layout-effect'
 
 // Source: https://youtu.be/3kDVachh-BM
 
