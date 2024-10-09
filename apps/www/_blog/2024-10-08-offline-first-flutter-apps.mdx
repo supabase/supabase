@@ -47,6 +47,7 @@ dependencies:
   brick_offline_first_with_supabase: ^1.0.0
   sqflite: ^2.3.0
   brick_sqlite: ^3.1.0
+  uuid: ^3.0.4
 
 dev_dependencies:
   brick_offline_first_with_supabase_build: ^1.0.0
@@ -81,12 +82,12 @@ class User extends OfflineFirstWithSupabaseModel {
 	// indexes without fear of collision.
   @Supabase(unique: true)
   @Sqlite(index: true, unique: true)
-  final String uuid;
+  final String id;
 
   User({
-    String? uuid,
+    String? id,
     required this.name,
-  }) : this.uuid = uuid ?? const Uuid().v4();
+  }) : this.id = id ?? const Uuid().v4();
 }
 ```
 
@@ -206,7 +207,7 @@ Queries can be [much more advanced](https://getdutchie.github.io/brick/#/data/qu
 
 **Reactivity**
 
-Beyond async requests, you can subscribe to a stream of updated local data from anywhere in your app (for example, if you pull-to-refresh a list of orders, all listeners will be notified of the new data):
+Beyond async requests, you can subscribe to a stream of updated local data from anywhere in your app (for example, if you pull-to-refresh a list of users, all listeners will be notified of the new data):
 
 ```dart
 final Stream<List<User>> usersStream = Repository().subscribe<User>(query: Query.where('name', 'Thomas'));
@@ -219,7 +220,7 @@ This **does not** leverage Supabase’s channels by default; if Supabase updates
 After a model has been created, it can uploaded to Supabase without serializing it to JSON first:
 
 ```dart
-await Repository().upsert<User>(User(id: uuid, name: 'Thomas'));
+await Repository().upsert<User>(User(name: 'Thomas'));
 ```
 
 All attached associations [will be upserted too](https://getdutchie.github.io/brick/#/supabase/models?id=upsert-behavior).
@@ -235,8 +236,11 @@ import 'package:brick_offline_first_with_supabase/brick_offline_first_with_supab
 import 'package:brick_sqlite/brick_sqlite.dart';
 import 'package:brick_supabase/brick_supabase.dart';
 import 'package:my_app/lib/src/users/user.model.dart';
+import 'package:uuid/uuid.dart';
 
-@ConnectOfflineFirstWithSupabase()
+@ConnectOfflineFirstWithSupabase(
+  supabaseConfig: SupabaseSerializable(tableName: 'orders'),
+)
 class Order extends OfflineFirstWithSupabaseModel {
   // Like Supabase's client, specifying a foreign_key
   // is possible but only necessary if there are joins
@@ -246,13 +250,13 @@ class Order extends OfflineFirstWithSupabaseModel {
 
   @Supabase(unique: true)
   @Sqlite(index: true, unique: true)
-  final String uuid;
+  final String id;
 
   Order({
-    String? uuid,
+    String? id,
     required this.user,
-  }) : this.uuid = uuid ?? const Uuid().v4();
-})
+  }) : this.id = id ?? const Uuid().v4();
+}
 ```
 
 Brick allows very granular [model configuration](https://getdutchie.github.io/brick/#/supabase/models) - you can specify specific tables, [individual columns](https://getdutchie.github.io/brick/#/supabase/fields), and more.
