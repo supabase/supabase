@@ -232,16 +232,16 @@ export const UsersV2 = () => {
             <SelectContent_Shadcn_>
               <SelectGroup_Shadcn_>
                 <SelectItem_Shadcn_ value="all" className="text-xs">
-                  All users
+                  <span>All users</span>
                 </SelectItem_Shadcn_>
                 <SelectItem_Shadcn_ value="verified" className="text-xs">
-                  Verified users
+                  <span>Verified users</span>
                 </SelectItem_Shadcn_>
                 <SelectItem_Shadcn_ value="unverified" className="text-xs">
-                  Unverified users
+                  <span>Unverified users</span>
                 </SelectItem_Shadcn_>
                 <SelectItem_Shadcn_ value="anonymous" className="text-xs">
-                  Anonymous users
+                  <span>Anonymous users</span>
                 </SelectItem_Shadcn_>
               </SelectGroup_Shadcn_>
             </SelectContent_Shadcn_>

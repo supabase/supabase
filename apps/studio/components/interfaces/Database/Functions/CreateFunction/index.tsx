@@ -227,7 +227,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                               {['void', 'record', 'trigger', 'integer', ...POSTGRES_DATA_TYPES].map(
                                 (option) => (
                                   <SelectItem_Shadcn_ value={option} key={option}>
-                                    {option}
+                                    <span>{option}</span>
                                   </SelectItem_Shadcn_>
                                 )
                               )}
@@ -314,13 +314,13 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                                 </SelectTrigger_Shadcn_>
                                 <SelectContent_Shadcn_>
                                   <SelectItem_Shadcn_ value="IMMUTABLE" key="IMMUTABLE">
-                                    immutable
+                                    <span>immutable</span>
                                   </SelectItem_Shadcn_>
                                   <SelectItem_Shadcn_ value="STABLE" key="STABLE">
-                                    stable
+                                    <span>stable</span>
                                   </SelectItem_Shadcn_>
                                   <SelectItem_Shadcn_ value="VOLATILE" key="VOLATILE">
-                                    volatile
+                                    <span>volatile</span>
                                   </SelectItem_Shadcn_>
                                 </SelectContent_Shadcn_>
                               </Select_Shadcn_>
@@ -484,7 +484,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                               <ScrollArea className="h-52">
                                 {['integer', ...POSTGRES_DATA_TYPES].map((option) => (
                                   <SelectItem_Shadcn_ value={option} key={option}>
-                                    {option}
+                                    <span>{option}</span>
                                   </SelectItem_Shadcn_>
                                 ))}
                               </ScrollArea>
@@ -634,7 +634,7 @@ const FormFieldLanguage = () => {
             <SelectContent_Shadcn_>
               {allowedLanguages.map((option) => (
                 <SelectItem_Shadcn_ value={option} key={option}>
-                  {option}
+                  <span>{option}</span>
                 </SelectItem_Shadcn_>
               ))}
             </SelectContent_Shadcn_>

@@ -114,7 +114,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
 
                       return (
                         <SelectItem_Shadcn_ key={fn.id} value={functionUrl}>
-                          {fn.name}
+                          <span>{fn.name}</span>
                         </SelectItem_Shadcn_>
                       )
                     })}

@@ -68,14 +68,14 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                   <Select_Shadcn_ onValueChange={onChangeSelectValue} value={presetValue}>
                     <FormControl_Shadcn_>
                       <SelectTrigger_Shadcn_>
-                        <SelectValue_Shadcn_ placeholder="Select a method for the HTTP request" />
+                        <SelectValue_Shadcn_ />
                       </SelectTrigger_Shadcn_>
                     </FormControl_Shadcn_>
                     <SelectContent_Shadcn_>
                       {schedules.map((schedule) => {
                         return (
                           <SelectItem_Shadcn_ key={schedule.name} value={schedule.expression}>
-                            {schedule.name}
+                            <span>{schedule.name}</span>
                           </SelectItem_Shadcn_>
                         )
                       })}

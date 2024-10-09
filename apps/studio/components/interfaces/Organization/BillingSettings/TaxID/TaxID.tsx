@@ -21,6 +21,7 @@ import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-i
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { X } from 'lucide-react'
 import {
   Button,
   FormControl_Shadcn_,
@@ -37,7 +38,6 @@ import {
 } from 'ui'
 import { TAX_IDS } from './TaxID.constants'
 import { checkTaxIdEqual, sanitizeTaxIdValue } from './TaxID.utils'
-import { X } from 'lucide-react'
 
 const TaxID = () => {
   const { slug } = useParams()
@@ -202,14 +202,16 @@ const TaxID = () => {
                               onValueChange={(value) => onSelectTaxIdType(value)}
                             >
                               <SelectTrigger_Shadcn_>
-                                <SelectValue_Shadcn_ placeholder="None" />
+                                <SelectValue_Shadcn_ placeholder={<span>None</span>} />
                               </SelectTrigger_Shadcn_>
                               <SelectContent_Shadcn_>
                                 <SelectGroup_Shadcn_>
                                   {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map(
                                     (option) => (
                                       <SelectItem_Shadcn_ key={option.name} value={option.name}>
-                                        {option.country} - {option.name}
+                                        <span>
+                                          {option.country} - {option.name}
+                                        </span>
                                       </SelectItem_Shadcn_>
                                     )
                                   )}

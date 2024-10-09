@@ -36,8 +36,8 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { urlRegex } from '../Auth/Auth.constants'
+import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -417,7 +417,7 @@ export function LogDrainDestinationSheetForm({
                                   <SelectLabel_Shadcn_>Region</SelectLabel_Shadcn_>
                                   {DATADOG_REGIONS.map((reg) => (
                                     <SelectItem_Shadcn_ key={reg.value} value={reg.value}>
-                                      {reg.label}
+                                      <span>{reg.label}</span>
                                     </SelectItem_Shadcn_>
                                   ))}
                                 </SelectGroup_Shadcn_>

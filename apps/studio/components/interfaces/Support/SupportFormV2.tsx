@@ -10,12 +10,14 @@ import * as z from 'zod'
 
 import { useDocsSearch, useParams, type DocsSearchResult as Page } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
+import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import type { Project } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useFlag } from 'hooks/ui/useFlag'
+import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import {
   Badge,
@@ -37,8 +39,11 @@ import {
   TextArea_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { DocsLinkGroup } from './DocsLink'
+import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
+import { LibrarySuggestions } from './LibrarySuggestions'
 import { PlanExpectationInfoBox } from './PlanExpectationInfoBox'
 import {
   CATEGORY_OPTIONS,
@@ -46,12 +51,7 @@ import {
   SERVICE_OPTIONS,
   SEVERITY_OPTIONS,
 } from './Support.constants'
-import { LibrarySuggestions } from './LibrarySuggestions'
-import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
-import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
-import { detectBrowser } from 'lib/helpers'
-import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -321,7 +321,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                   onValueChange={field.onChange}
                 >
                   <SelectTrigger_Shadcn_ className="w-full">
-                    <SelectValue_Shadcn_ asChild placeholder="Select an organization">
+                    <SelectValue_Shadcn_ asChild placeholder={<span>Select an organization</span>}>
                       <div className="flex items-center gap-x-2">
                         {(organizations ?? []).find((o) => o.slug === field.value)?.name}
                         {isLoadingSubscription && <Loader2 size={14} className="animate-spin" />}
@@ -336,7 +336,9 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                   <SelectContent_Shadcn_>
                     <SelectGroup_Shadcn_>
                       {organizations?.map((org) => (
-                        <SelectItem_Shadcn_ value={org.slug}>{org.name}</SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value={org.slug}>
+                          <span>{org.name}</span>
+                        </SelectItem_Shadcn_>
                       ))}
                     </SelectGroup_Shadcn_>
                   </SelectContent_Shadcn_>
@@ -362,13 +364,13 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                     }}
                   >
                     <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_ placeholder="Select a project" />
+                      <SelectValue_Shadcn_ placeholder={<span>Select a project</span>} />
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
                       <SelectGroup_Shadcn_>
                         {projects?.map((project) => (
                           <SelectItem_Shadcn_ value={project.ref as string}>
-                            {project.name}
+                            <span>{project.name}</span>
                           </SelectItem_Shadcn_>
                         ))}
                       </SelectGroup_Shadcn_>
@@ -440,7 +442,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                     onValueChange={field.onChange}
                   >
                     <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_ placeholder="Select a project">
+                      <SelectValue_Shadcn_ placeholder="Select a severity">
                         {field.value}
                       </SelectValue_Shadcn_>
                     </SelectTrigger_Shadcn_>
@@ -545,13 +547,13 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger_Shadcn_ className="w-full">
-                          <SelectValue_Shadcn_ placeholder="Please select a library" />
+                          <SelectValue_Shadcn_ placeholder={<span>Please select a library</span>} />
                         </SelectTrigger_Shadcn_>
                         <SelectContent_Shadcn_>
                           <SelectGroup_Shadcn_>
                             {CLIENT_LIBRARIES.map((option) => (
                               <SelectItem_Shadcn_ value={option.language}>
-                                {option.language}
+                                <span>{option.language}</span>
                               </SelectItem_Shadcn_>
                             ))}
                           </SelectGroup_Shadcn_>
