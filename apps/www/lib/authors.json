@@ -547,5 +547,13 @@
     "position": "Lead Developer at Good Tape",
     "author_url": "https://twitter.com/jstoone",
     "author_image_url": "https://pbs.twimg.com/profile_images/1233003191538790400/3OxNooXT_200x200.jpg"
+  },
+  {
+    "author_id": "tim_shedor",
+    "author": "Tim Shedor",
+    "username": "tshedor",
+    "position": "Guest Author",
+    "author_url": "https://github.com/tshedor",
+    "author_image_url": "https://github.com/tshedor.png"
   }
 ]

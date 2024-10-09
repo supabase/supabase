@@ -8,6 +8,12 @@ description: 'Scalable time-series data storage and analysis'
 
 `timescaledb` uses a time-series-aware storage model and indexing techniques to improve performance of PostgreSQL in working with time-series data. The extension divides data into chunks based on time intervals, allowing it to scale efficiently, especially for large data sets. The data is then compressed, optimized for write-heavy workloads, and partitioned for parallel processing. `timescaledb` also includes a set of functions, operators, and indexes that work with time-series data to reduce query times, and make data easier to work with.
 
+<Admonition type="note">
+
+Supabase projects come with [TimescaleDB Apache 2 Edition](https://docs.timescale.com/about/latest/timescaledb-editions/#timescaledb-apache-2-edition). Functionality only available under the Community Edition is not available.
+
+</Admonition>
+
 ## Enable the extension
 
 <Tabs

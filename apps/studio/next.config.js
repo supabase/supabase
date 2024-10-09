@@ -102,6 +102,16 @@ const nextConfig = {
   experimental: {
     webpackBuildWorker: true,
   },
+  async rewrites() {
+    return [
+      {
+        source: `/.well-known/vercel/flags`,
+        // TODO: Replace this with supabase.com/.well-known/vercel/flags once this PR is merged.
+        destination: `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.NEXT_PUBLIC_SITE_URL}${process.env.NEXT_PUBLIC_BASE_PATH}/.well-known/vercel/flags`,
+        basePath: false,
+      },
+    ]
+  },
   async redirects() {
     return [
       ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
@@ -416,6 +426,15 @@ const nextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
+          },
+        ],
+      },
+      {
+        source: '/.well-known/vercel/flags',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'application/json',
           },
         ],
       },

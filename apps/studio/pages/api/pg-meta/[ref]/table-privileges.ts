@@ -4,6 +4,7 @@ import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
 import { delete_, get, post } from 'lib/common/fetch'
 import { PG_META_URL } from 'lib/constants'
+import { getPgMetaRedirectUrl } from './tables'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })
@@ -25,7 +26,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const headers = constructHeaders(req.headers)
-  let response = await get(`${PG_META_URL}/table-privileges`, {
+  let response = await get(getPgMetaRedirectUrl(req, 'table-privileges'), {
     headers,
   })
   if (response.error) {

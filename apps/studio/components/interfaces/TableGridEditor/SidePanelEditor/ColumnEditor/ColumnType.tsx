@@ -278,7 +278,7 @@ const ColumnType = ({
       </Popover_Shadcn_>
 
       {showRecommendation && recommendation !== undefined && (
-        <Alert_Shadcn_ variant="warning">
+        <Alert_Shadcn_ variant="warning" className="mt-2">
           <CriticalIcon />
           <AlertTitle_Shadcn_>
             {' '}

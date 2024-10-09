@@ -49,18 +49,21 @@ import { fetchWithNextOptions } from '~/features/helpers.fetch'
 import { EXAMPLES_DIRECTORY } from '~/lib/docs'
 
 const linesSchema = z.array(z.tuple([z.coerce.number(), z.coerce.number()]))
-const linesValidator = z.string().transform((v, ctx) => {
-  try {
-    const array = JSON.parse(v)
-    return linesSchema.parse(array)
-  } catch (e) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Lines should be an array of [number, number] tuples',
-    })
-    return z.NEVER
-  }
-})
+const linesValidator = z
+  .string()
+  .default('[[1, -1]]')
+  .transform((v, ctx) => {
+    try {
+      const array = JSON.parse(v)
+      return linesSchema.parse(array)
+    } catch (e) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Lines should be an array of [number, number] tuples',
+      })
+      return z.NEVER
+    }
+  })
 
 type AdditionalMeta = {
   parent: Parent

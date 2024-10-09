@@ -7,6 +7,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useFlag } from 'hooks/ui/useFlag'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
@@ -29,6 +30,7 @@ const DatabaseProductMenu = () => {
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
   const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
+  const cronUiEnabled = useFlag('cronUi')
 
   return (
     <>
@@ -38,6 +40,7 @@ const DatabaseProductMenu = () => {
           pgNetExtensionExists,
           pitrEnabled,
           columnLevelPrivileges,
+          cronUiEnabled,
         })}
       />
     </>
