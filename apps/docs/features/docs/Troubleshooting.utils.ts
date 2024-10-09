@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 
 import { DOCS_DIRECTORY } from 'lib/docs'
+import { supabaseAdmin } from '~/lib/supabaseAdmin'
 import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
 import { formatError } from './Troubleshooting.utils.shared'
 
@@ -56,9 +57,9 @@ const TroubleshootingSchema = z
           .strict()
       )
       .optional(),
-    database_id: z.string().uuid().default(uuidv4()),
-    created_at: z.date({ coerce: true }).optional(),
-    updated_at: z.date({ coerce: true }).optional(),
+    database_id: z.string().default(`pseudo-${uuidv4()}`),
+    github_url: z.string().url().optional(),
+    date_created: z.date({ coerce: true }).optional(),
   })
   .strict()
 
@@ -76,10 +77,12 @@ async function getAllTroubleshootingEntriesInternal() {
     const isHidden = entry.startsWith('_')
     if (isHidden) return null
 
-    const isFile = (await stat(join(TROUBLESHOOTING_DIRECTORY, entry))).isFile()
+    const filePath = join(TROUBLESHOOTING_DIRECTORY, entry)
+
+    const isFile = (await stat(filePath)).isFile()
     if (!isFile) return null
 
-    const fileContents = await readFile(join(TROUBLESHOOTING_DIRECTORY, entry), 'utf-8')
+    const fileContents = await readFile(filePath, 'utf-8')
     const { content, data: frontmatter } = matter(fileContents, {
       language: 'toml',
       engines: { toml: toml.parse.bind(toml) },
@@ -117,6 +120,7 @@ async function getAllTroubleshootingEntriesInternal() {
     const contentWithoutJsx = toMarkdown(mdxTree)
 
     return {
+      filePath,
       content,
       contentWithoutJsx,
       data: parseResult.data,
@@ -190,3 +194,27 @@ export function getArticleSlug(entry: ITroubleshootingMetadata) {
   const escapedTitle = encodeURIComponent(slugifiedTitle)
   return escapedTitle
 }
+
+async function getTroubleshootingUpdatedDatesInternal() {
+  const databaseIds = (await getAllTroubleshootingEntries())
+    .map((entry) => entry.data.database_id)
+    .filter((id) => !id.startsWith('pseudo-'))
+
+  const { data, error } = await supabaseAdmin()
+    .from('troubleshooting_entries')
+    .select('id, date_updated')
+    .in('id', databaseIds)
+  if (error) {
+    console.error(error)
+  }
+
+  return (data ?? []).reduce((acc, entry) => {
+    acc.set(entry.id, new Date(entry.date_updated))
+    return acc
+  }, new Map<string, Date>())
+}
+export const getTroubleshootingUpdatedDates = cache_fullProcess_withDevCacheBust(
+  getTroubleshootingUpdatedDatesInternal,
+  TROUBLESHOOTING_DIRECTORY,
+  () => JSON.stringify([])
+)
