@@ -173,7 +173,7 @@ const DeployNewReplicaPanel = ({
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
   )
-  const isProWithSpendCapDisabled =
+  const isProWithSpendCapEnabled =
     subscription?.plan.id === 'pro' && !subscription.usage_billing_enabled
   const isMinimallyOnSmallCompute =
     currentComputeAddon?.variant.identifier !== undefined &&
@@ -186,7 +186,7 @@ const DeployNewReplicaPanel = ({
     isWalgEnabled &&
     currentComputeAddon !== undefined &&
     !hasOverdueInvoices &&
-    !isProWithSpendCapDisabled
+    !isProWithSpendCapEnabled
 
   const computeAddons =
     addons?.available_addons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
@@ -371,7 +371,7 @@ const DeployNewReplicaPanel = ({
               </AlertDescription_Shadcn_>
             )}
           </Alert_Shadcn_>
-        ) : isProWithSpendCapDisabled ? (
+        ) : isProWithSpendCapEnabled ? (
           <Alert_Shadcn_>
             <WarningIcon />
             <AlertTitle_Shadcn_>
