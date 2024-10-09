@@ -9,6 +9,9 @@ import { TextLink } from 'ui'
 import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
 import MenuItem from './MenuItem'
 
+import EventCallout from '~/components/EventCallout'
+import Panel from '~/components/Panel'
+
 import ComparisonsData from 'data/Comparisons'
 import CustomersData from 'data/CustomerStories'
 import SolutionsData from 'data/Solutions'
@@ -84,6 +87,11 @@ const ProductDropdown = () => {
                 </li>
               ))}
             </ul>
+          </div>
+          <div>
+            <Panel outerClassName="rounded-md" innerClassName="bg-surface-100 rounded-md">
+              <EventCallout size="tiny" className="p-3 !gap-0.5 [&_svg]:hidden" />
+            </Panel>
           </div>
         </div>
       </div>
