@@ -78,7 +78,8 @@ const DeployNewReplicaPanel = ({
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled: !['team', 'enterprise'].includes(subscription?.plan.id ?? ''),
+    enabled:
+      subscription !== undefined && !['team', 'enterprise'].includes(subscription?.plan.id ?? ''),
   })
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === project?.organization_id
