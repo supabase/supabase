@@ -51,6 +51,17 @@ import {
 
 You can control whether the dialog is centered by passing `centered={false}` to the `DialogContent` component.
 
+```tsx {3}
+<Dialog>
+  <ContextMenuTrigger>Click here</ContextMenuTrigger>
+  <DialogContent centered={false}>
+    {/*
+     * Content in here
+     */}
+  </DialogContent>
+</Dialog>
+```
+
 <ComponentPreview name="dialog-centered-off" />
 
 ## Notes
@@ -61,7 +72,7 @@ To activate the `Dialog` component from within a `Context Menu` or `Dropdown Men
 ```tsx {14-25}
 <Dialog>
   <ContextMenu>
-    <ContextMenuTrigger>Right click</ContextMenuTrigger>
+    <ContextMenuTrigger>Dialog not centered</ContextMenuTrigger>
     <ContextMenuContent>
       <ContextMenuItem>Open</ContextMenuItem>
       <ContextMenuItem>Download</ContextMenuItem>

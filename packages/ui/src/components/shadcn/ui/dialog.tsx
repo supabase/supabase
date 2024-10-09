@@ -37,8 +37,8 @@ DialogPortal.displayName = DialogPrimitive.Portal.displayName
 
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & { centered: boolean }
->(({ className, centered, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & { centered?: boolean }
+>(({ className, centered = true, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
