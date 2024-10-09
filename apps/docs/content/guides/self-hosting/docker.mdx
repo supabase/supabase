@@ -29,11 +29,22 @@ Follow these steps to start Supabase locally:
 # Get the code
 git clone --depth 1 https://github.com/supabase/supabase
 
-# Go to the docker folder
-cd supabase/docker
+# Make your new supabase project directory
+mkdir supabase-project
+
+# Tree should look like this
+# .
+# ├── supabase
+# └── supabase-project
+
+# Copy the compose files over to your project
+cp -rf supabase/docker/* supabase-project
 
 # Copy the fake env vars
-cp .env.example .env
+cp supabase/docker/.env.example supabase-project/.env
+
+# Switch to your project directory
+cd supabase-project
 
 # Pull the latest images
 docker compose pull
@@ -50,12 +61,24 @@ docker compose up -d
 git clone --filter=blob:none --no-checkout https://github.com/supabase/supabase
 cd supabase
 git sparse-checkout set --cone docker && git checkout master
+cd ..
 
-# Go to the docker folder
-cd docker
+# Make your new supabase project directory
+mkdir supabase-project
+
+# Tree should look like this
+# .
+# ├── supabase
+# └── supabase-project
+
+# Copy the compose files over to your project
+cp -rf supabase/docker/* supabase-project
 
 # Copy the fake env vars
-cp .env.example .env
+cp supabase/docker/.env.example supabase-project/.env
+
+# Switch to your project directory
+cd supabase-project
 
 # Pull the latest images
 docker compose pull
@@ -114,6 +137,14 @@ psql -h 127.0.0.1 -p 5432 -d postgres -U postgres
 ```
 
 The default password is `your-super-secret-and-long-postgres-password`. You should change this as soon as possible using the [instructions below](#update-secrets). By default the database is not accessible from outside the local machine. You can [change this](#exposing-your-postgres-database) by updating the `docker-compose.yml` file.
+
+You will also likely want to connect to your Postgres database via an ORM or another direct method other than `psql`.
+
+For this you can use the standard Postgres connection string.
+You can find the the environment values mentioned below in the `.env` file which will be covered in the next section.
+```
+postgres://postgres:[POSTGRES_PASSWORD]@[your-server-ip]:5432/[POSTGRES_DB]
+```
 
 
 ## Securing your services

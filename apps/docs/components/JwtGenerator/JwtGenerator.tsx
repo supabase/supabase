@@ -70,7 +70,7 @@ export default function JwtGenerator({}) {
     else setToken(anonToken)
   }
   const generate = () => {
-    const signedJWT = KJUR.jws.JWS.sign(null, JWT_HEADER, token, jwtSecret)
+    const signedJWT = KJUR.jws.JWS.sign("HS256", JWT_HEADER, token, jwtSecret)
     setSignedToken(signedJWT)
   }
 
