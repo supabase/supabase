@@ -107,7 +107,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     }
     if (enablePostHogTelemetry && (isLeavingProjectRoute || isLeavingOrgRoute)) {
       sendGroupsReset({
-        reset_organization: isLeavingOrgRoute,
+        reset_organization: isLeavingOrgRoute || isLeavingProjectRoute,
         reset_project: isLeavingProjectRoute,
       })
     }
