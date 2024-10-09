@@ -45,6 +45,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'realtime',
           },
           {
+            label: 'Analytics',
+            icon: 'warehouse',
+            href: '/guides/warehouse',
+            level: 'warehouse',
+          },
+          {
             label: 'AI & Vectors',
             icon: 'ai',
             href: '/guides/ai',
@@ -1461,6 +1467,26 @@ export const realtime: NavMenuConstant = {
       name: 'Debugging',
       url: undefined,
       items: [{ name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] }],
+    },
+  ],
+}
+
+export const warehouse: NavMenuConstant = {
+  icon: 'warehouse',
+  title: 'Analytics',
+  url: '/guides/warehouse',
+  items: [
+    {
+      name: 'Overview & quickstart',
+      url: '/guides/warehouse',
+    },
+    {
+      name: 'Concepts',
+      url: undefined,
+      items: [
+        { name: 'Ingestion', url: '/guides/warehouse/ingestion' },
+        { name: 'BigQuery Backend', url: '/guides/warehouse/backends/bigquery' },
+      ],
     },
   ],
 }

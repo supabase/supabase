@@ -123,6 +123,8 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Platform
     case pathname.startsWith('realtime'):
       return MenuId.Realtime
+    case pathname.startsWith('warehouse'):
+      return MenuId.Warehouse
     case pathname.startsWith('resources'):
       return MenuId.Resources
     case pathname.startsWith('self-hosting'):

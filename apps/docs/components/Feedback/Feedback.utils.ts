@@ -26,6 +26,8 @@ const getNotionTeam = (pathname: string) => {
       return 'team-ai'
     case 'cli':
       return 'team-cli'
+    case 'warehouse':
+      return 'team-analytics'
 
     // Ignoring platform for now because that section is a mix of teams.
     case 'platform':

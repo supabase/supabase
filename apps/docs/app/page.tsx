@@ -68,6 +68,13 @@ const products = [
     description:
       'Globally distributed, server-side functions to execute your code closest to your users for the lowest latency.',
   },
+  {
+    title: 'Analytics',
+    icon: 'database',
+    hasLightIcon: true,
+    href: '/guides/warehouse',
+    description: 'Data analytics for ingesting and querying timeseries events.',
+  },
 ]
 
 const migrationGuides = [

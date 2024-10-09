@@ -49,6 +49,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <IconMenuEdgeFunctions width={width} height={height} className={className} />
     case 'realtime':
       return <IconMenuRealtime width={width} height={height} className={className} />
+    case 'warehouse':
+      return <IconMenuDatabase width={width} height={height} className={className} />
     case 'storage':
       return <IconMenuStorage width={width} height={height} className={className} />
     case 'ai':

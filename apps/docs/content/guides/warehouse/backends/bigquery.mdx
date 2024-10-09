@@ -1,0 +1,73 @@
+---
+id: 'warehouse-bigquery'
+title: 'BigQuery'
+description: 'Learn how to use the BigQuery Backend'
+subtitle: 'Learn how to use the BigQuery Backend'
+sidebar_label: 'BigQuery'
+---
+
+Analytics natively supports the storage of events to BigQuery. Ingested events are **streamed** into BigQuery, and each collection is mapped to a BigQuery table.
+
+## Behavior and Configuration
+
+On table initialization, Analytics sets optimal configuration automatically to ensure that tables are optimized.
+
+### Ingestion
+
+Ingested events are [streamed](https://cloud.google.com/bigquery/docs/streaming-data-into-bigquery) into BigQuery. This allows us to maximize the throughput into BigQuery, allowing Analytics to handle large volumes of events.
+
+### Partitioning and Retention
+
+All tables are partitioned by the `timestamp` field, and are partitioned by **day**. This means that all queries across the BigQuery table must have a filter over the `timestamp` field.
+
+A collection's retention will adjust the BigQuery table's partition expiry, such that data is automatically deleted once the partition expires.
+
+For paid plans, if the retention is not set, the collection will default to **7 days** of retention on creation.
+
+For users on the Free plan, the maximum retention is **3 days**.
+
+#### Deep Dive: Table Partitioning
+
+Table partitioning effectively splits a BigQuery table into many smaller tables.
+When using partitioned tables, BigQuery storage is effectively half priced when the partitioned table is older than 90 days. When a table has not been modified in 90 days, BigQuery will only charge half the normal rate.
+
+When partitioned over time (which Analytics manages automatically), we are able to benefit from the discount by separating out the older and less-queried smaller tables, reducing total effective storage costs.
+
+Furthermore, by partitioning a table, we can then limit queries to scan data across only selected partitioned column/tables, making your queries even more responsive by scanning less data.
+
+When querying against the streaming buffer, the amount of bytes scanned is always zero, allowing near zero-cost queries against it. Should you need to query against the streaming buffer directly, you can use the following query ([source](https://stackoverflow.com/questions/41864257/how-to-query-for-data-in-streaming-buffer-only-in-bigquery)) to do so:
+
+```sql
+select fields from `my_collection` where _PARTITIONTIME is null;
+```
+
+You can read more about partitioned tables in the official Google Cloud [documentation](https://cloud.google.com/bigquery/docs/partitioned-tables).
+
+## Querying
+
+When querying your collections, use BigQuery SQL syntax refer to each collection by name. Analytics will automatically parse and process the query to map it to the correct dataset and table name. You can perform joins across multiple collections as well.
+
+### Unnesting Repeated Records
+
+Nested columns are represeted as repeated `RECORD`s in BigQuery. To query inside a nested record you must UNNEST it like so:
+
+```sql
+select timestamp, req.url, h.cf_cache_status
+from
+  `your_collection` as t
+  cross join UNNEST(t.metadata) as m
+  cross join UNNEST(m.request) as req
+  cross join UNNEST(m.response) as resp
+  cross join UNNEST(resp.headers) as h
+where DATE(timestamp) = "2019-05-09"
+order by timestamp desc
+limit 10;
+```
+
+### Query Result Limit
+
+There is a 1000 row result limit for each query run.
+
+### SELECT only
+
+Analytics only allows `SELECT` queries to be run. DDL statements will be blocked and will result in an error.

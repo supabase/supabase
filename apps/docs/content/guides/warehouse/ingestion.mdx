@@ -1,0 +1,293 @@
+---
+id: 'warehouse-ingestion'
+title: 'Event Ingestion'
+description: 'Learn how to use Supabase to ingest analytics events'
+subtitle: 'Learn how to use Supabase to ingest analytics events'
+sidebar_label: 'Ingestion'
+---
+
+Events are ingested through the ingestion API, where JSON payloads are processed and inserted into the configured backend.
+
+These processed payloads will be inserted into Sources. A **collection** is made of up of many **events**.
+
+If no additional backend is configured and attached to a collection, Analytics will insert into the default Supabase-managed BigQuery backend. This applies to all users, regardless of plan.
+
+## API Endpoints
+
+There are two ways in which you can ingest data, via specifying the collection UUID, or via the collection's name.
+
+```
+POST https://api.warehouse.tech/api/events?collection=9dd9a6f6-8e9b-4fa4-b682-4f2f5cd99da3
+
+POST https://api.warehouse.tech/api/events?collection_name=my.event.collection
+```
+
+<Admonition type="note" label="Use unique collection names when ingesting by name">
+When ingesting by name, ensure that the collection's name is unique, otherwise it will result in an error on ingestion and the event will be discarded.
+
+</Admonition>
+
+## Sending Events
+
+Events may have one or more keys, but will always have 2 standard top-level keys:
+
+| Field           | Description                                           |
+| --------------- | ----------------------------------------------------- |
+| `id`            | An auto-generated UUID                                |
+| `timestamp`     | An auto-generated timestamp. Can be provided by user. |
+| `event_message` | An event message. Aliased with the `message` field.   |
+
+You can ingest events individually, or via a batch. It is recommended to batch your events for faster processing.
+
+To ingest individual events, send your POST request a singular object:
+
+```json
+{
+  "message": "your log event message",
+  "metadata": {...}
+}
+```
+
+To batch ingest, you can send the event as a JSON array:
+
+```json
+[
+  {"message": "your event message 1", "metadata": {...}},
+  {"message": "your event message 2", "metadata": {...}},
+  ...
+]
+```
+
+You can also place the array on the `batch` key of the POST body:
+
+```json
+{
+  "batch": [
+    {"message": "your event message 1", "metadata": {...}},
+    {"message": "your event message 2", "metadata": {...}},
+    ...
+  ]
+}
+```
+
+## Adaptive Schema
+
+As your application needs change, Analytics is able to detect and adjusting the underlying database schema accordingly. This adaptive schema allows you to focus on analyzing your events instead of having to manage your ingestion pipeline manually.
+
+Suppose your initial log events had the following shape:
+
+```json
+{
+  "message": "This is my event",
+  "metadata": { "my": "first event" }
+}
+```
+
+The generated schema would be the following:
+
+```
+id: uuid;
+timestamp: timestamp;
+event_message: string;
+metadata: {
+  my: string;
+}
+```
+
+As your application requirements change, you can add new fields to your events:
+
+```json
+{
+  "message": "This is my new log event",
+  "metadata": {
+    "my": "first log",
+    "counter": 123
+  }
+}
+```
+
+Analytics will then detect the schema change in the event, and add in the new column to the collection's underlying backend.
+
+```
+event_message: string;
+metadata: {
+  my: string;
+  counter: number;
+}
+```
+
+<Admonition type="note" label="Schema sampling on high ingestion volume">
+
+On high ingestion volume, Analytics will sample incoming events instead of checking each event. The sample rate decreases as the ingestion rate increases. The ingestion rate used is based on the individual local server that is performing the ingestion, not the global rate.
+
+| Ingestion Rate (per second) | Sample Ratio |
+| --------------------------- | ------------ |
+| < 10                        | 1.0          |
+| 10-100                      | 0.2          |
+| 100-500                     | 0.1          |
+| 500-1000                    | 0.05         |
+| > 1000                      | 0.01         |
+
+</Admonition>
+
+## Schema
+
+Analytics maintains a schema to perform automatic migrations on the backend. The typings for each field are **strict** and cannot be changed once a new field is created. For example, converting a string column to a number column is not possible.
+
+Always plan your event schema changes to avoid typing errors on ingestion. Rejected events that do not adhere to the correct types required by the backend will receive an ingestion error and get discarded.
+
+### Key Transformation
+
+When ingesting, object keys will be transformed automatically to comply with the respective backend in use. For example, BigQuery column requirements require that names only contain letters (a-z, A-Z), numbers (0-9), or underscores (\_), and it must start with a letter or underscore. This will be automatically handled when ingesting data, such that invalid characters are removed or replaced.
+
+## Additive Changes Only
+
+Schema updates are additive and new columns cannot be removed. We recommend creating a new collection if a new schema is desired, and migrating any existing data manually.
+
+## Ingestion Access Tokens
+
+Ingest access tokens are used for ingesting data only. These keys are meant to be publicly used in client-side code.
+[Analytics Settings](https://supabase.com/dashboard/project/_/settings/warehouse).
+
+<Admonition type="note" label="Not to be confused with personal access tokens">
+
+Ingest access tokens are different from [personal access tokens](https://supabase.com/dashboard/account/tokens). Personal access tokens are used for controlling your Supabase account, whereas Warehouse ingest access tokens are only used for ingesting data into Warehouse.
+
+</Admonition>
+
+We recommend rolling ingest access tokens frequently, as client-side code can be reverse engineered and malicious actors may abuse these ingest access tokens.
+
+To roll ingest access tokens:
+
+1. Create a new ingest access token in [Analytics Settings](https://supabase.com/dashboard/project/_/settings/warehouse).
+2. Deploy code with the new ingest access token.
+3. Revoke the old ingest access token in [Analytics Settings](https://supabase.com/dashboard/project/_/settings/warehouse).
+
+### Authentication
+
+There are 3 supported methods to attach an ingest accees token with the ingestion API:
+
+1. Using the `Authorization` header, with the format `Authorization: Bearer your-access-token-here`
+2. Using the `X-API-KEY` header, with the format `X-API-KEY: your-access-token-here`
+3. Using the `api_key` query parameter, wuth the format `?api_key=your-access-token-here`
+
+## Ingestion Parsers and Configurations
+
+Analytics features ingestion parsers for different types of event formats and processing. These out-of-the-box processors will help to auto-generate certain fields or reformat the payload for storage.
+
+### Generic JSON
+
+The generic JSON parser will perform event stringification to the `event_message` field for ease of visual scanning.
+
+```
+POST https://api.warehouse.tech/api/events/json?source=f6cccd3a-c42e-40f7-9b01-95d3699d3113
+Content-Type: application/json
+Authorization: Bearer XXXXX
+
+{
+  "status": "started"
+}
+```
+
+The corresponding event will be processed and ingested, where ellipsis represent autogenerated fields:
+
+```json
+{
+  "status": "started",
+  "event_message": "{\"status\":\"started\"}",
+  "timestamp": "...",
+  "id": "..."
+}
+```
+
+### Github Webhooks
+
+To ingest Github webhook requests, use the `/api/events/github` route:
+
+```
+https://api.warehouse.tech/api/events/github?api_key=XXXXX&collection=YOUR-COLLECTION-UUID
+```
+
+This parser will drop all keys ending in `_url` so it keeps your Github payloads in check and avoid schema bloat.
+
+### Heroku and Logplex
+
+The Logplex parser will parse syslog events using the Heroku dialect.
+
+To add Analytics to a heroku drain:
+
+```
+heroku drains:add "https://api.warehouse.tech.com/api/events/logplex?api_key=XXXXX&collection=YOUR-COLLECTION-UUID"
+```
+
+### Cloud Event
+
+The supported spec is [v1.0.2](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md).
+
+#### Example
+
+```
+POST https://api.warehouse.tech/api/events/cloud-event?source=f6cccd3a-c42e-40f7-9b01-95d3699d3113
+Content-Type: application/json
+X-API-KEY: XXXXX
+CE-specversion: 1.0
+CE-id: 01HPPC9X0HPKB8E1RSPA5YFZB2
+CE-source: flyd
+CE-type: io.fly.machine.start
+CE-time: 2024-02-15T12:36:45+00:00
+
+{
+  "body": {},
+  "machine_id": "148ed193b95948",
+  "status": "started"
+}
+```
+
+The corresponding event will be processed and ingested, where ellipsis represent autogenerated fields:
+
+```json
+{
+  "cloud_event": {
+    "specversion": "1.0",
+    "id": "01HPPC9X0HPKB8E1RSPA5YFZB2",
+    "source": "flyd",
+    "type": "io.fly.machine.start",
+    "time": "2024-02-15T12:36:45+00:00"
+  },
+  "machine_id": "148ed193b95948",
+  "status": "started",
+  "event_message": "...",
+  "timestamp": "...",
+  "id": "..."
+}
+```
+
+## Best Practices
+
+### Stringify Keys to Avoid Bloated Schemas
+
+Always avoid logging large objects, as each object key (and all nested keys) will result in a new field created in the schema.
+
+To capture all contextual data, consider stringifying certain objects.
+
+For example, given a payload like the following:
+
+```json
+{ "some": { "very": "nested", "value": 123 } }
+```
+
+You can instead stringify the `some` key and set it to `some_str`:
+
+```json
+{ "some_str": "...." }
+```
+
+And you would then be able to query the field as a JSON string using BigQuery [JSON functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/json_functions):
+
+```sql
+select JSON_EXTRACT(t.some_str, "$") as some from `my.collection` as t;
+```
+
+### Always default to using floats
+
+Always default to floats, as certain backends such as BigQuery view floats and integers differently. Explicitly perform type casting to floats on the client where possible.
