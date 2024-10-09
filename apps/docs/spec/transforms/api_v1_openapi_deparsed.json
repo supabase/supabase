@@ -3837,7 +3837,7 @@
     },
     "/v1/projects/{ref}/upgrade/eligibility": {
       "get": {
-        "operationId": "v1-get-postgrest-upgrade-eligibility",
+        "operationId": "v1-get-postgres-upgrade-eligibility",
         "summary": "[Beta] Returns the project's eligibility for upgrades",
         "parameters": [
           {
@@ -3948,7 +3948,7 @@
     },
     "/v1/projects/{ref}/upgrade/status": {
       "get": {
-        "operationId": "v1-get-postgrest-upgrade-status",
+        "operationId": "v1-get-postgres-upgrade-status",
         "summary": "[Beta] Gets the latest status of the project's upgrade",
         "parameters": [
           {
@@ -3959,6 +3959,14 @@
             "schema": {
               "minLength": 20,
               "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "tracking_id",
+            "required": false,
+            "in": "query",
+            "schema": {
               "type": "string"
             }
           }
@@ -4403,10 +4411,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "statement_timeout": {
+                    "effective_cache_size": {
                       "type": "string"
                     },
-                    "effective_cache_size": {
+                    "logical_decoding_work_mem": {
                       "type": "string"
                     },
                     "maintenance_work_mem": {
@@ -4437,6 +4445,9 @@
                       "minimum": 0,
                       "maximum": 1024
                     },
+                    "max_replication_slots": {
+                      "type": "integer"
+                    },
                     "max_slot_wal_keep_size": {
                       "type": "string"
                     },
@@ -4449,6 +4460,9 @@
                     "max_wal_size": {
                       "type": "string"
                     },
+                    "max_wal_senders": {
+                      "type": "integer"
+                    },
                     "max_worker_processes": {
                       "type": "integer",
                       "minimum": 0,
@@ -4457,7 +4471,13 @@
                     "shared_buffers": {
                       "type": "string"
                     },
+                    "statement_timeout": {
+                      "type": "string"
+                    },
                     "wal_keep_size": {
+                      "type": "string"
+                    },
+                    "wal_sender_timeout": {
                       "type": "string"
                     },
                     "work_mem": {
@@ -4506,10 +4526,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "statement_timeout": {
+                  "effective_cache_size": {
                     "type": "string"
                   },
-                  "effective_cache_size": {
+                  "logical_decoding_work_mem": {
                     "type": "string"
                   },
                   "maintenance_work_mem": {
@@ -4540,6 +4560,9 @@
                     "minimum": 0,
                     "maximum": 1024
                   },
+                  "max_replication_slots": {
+                    "type": "integer"
+                  },
                   "max_slot_wal_keep_size": {
                     "type": "string"
                   },
@@ -4552,6 +4575,9 @@
                   "max_wal_size": {
                     "type": "string"
                   },
+                  "max_wal_senders": {
+                    "type": "integer"
+                  },
                   "max_worker_processes": {
                     "type": "integer",
                     "minimum": 0,
@@ -4560,7 +4586,13 @@
                   "shared_buffers": {
                     "type": "string"
                   },
+                  "statement_timeout": {
+                    "type": "string"
+                  },
                   "wal_keep_size": {
+                    "type": "string"
+                  },
+                  "wal_sender_timeout": {
                     "type": "string"
                   },
                   "work_mem": {
@@ -4583,10 +4615,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "statement_timeout": {
+                    "effective_cache_size": {
                       "type": "string"
                     },
-                    "effective_cache_size": {
+                    "logical_decoding_work_mem": {
                       "type": "string"
                     },
                     "maintenance_work_mem": {
@@ -4617,6 +4649,9 @@
                       "minimum": 0,
                       "maximum": 1024
                     },
+                    "max_replication_slots": {
+                      "type": "integer"
+                    },
                     "max_slot_wal_keep_size": {
                       "type": "string"
                     },
@@ -4629,6 +4664,9 @@
                     "max_wal_size": {
                       "type": "string"
                     },
+                    "max_wal_senders": {
+                      "type": "integer"
+                    },
                     "max_worker_processes": {
                       "type": "integer",
                       "minimum": 0,
@@ -4637,7 +4675,13 @@
                     "shared_buffers": {
                       "type": "string"
                     },
+                    "statement_timeout": {
+                      "type": "string"
+                    },
                     "wal_keep_size": {
+                      "type": "string"
+                    },
+                    "wal_sender_timeout": {
                       "type": "string"
                     },
                     "work_mem": {
@@ -11438,10 +11482,10 @@
       "PostgresConfigResponse": {
         "type": "object",
         "properties": {
-          "statement_timeout": {
+          "effective_cache_size": {
             "type": "string"
           },
-          "effective_cache_size": {
+          "logical_decoding_work_mem": {
             "type": "string"
           },
           "maintenance_work_mem": {
@@ -11472,6 +11516,9 @@
             "minimum": 0,
             "maximum": 1024
           },
+          "max_replication_slots": {
+            "type": "integer"
+          },
           "max_slot_wal_keep_size": {
             "type": "string"
           },
@@ -11484,6 +11531,9 @@
           "max_wal_size": {
             "type": "string"
           },
+          "max_wal_senders": {
+            "type": "integer"
+          },
           "max_worker_processes": {
             "type": "integer",
             "minimum": 0,
@@ -11492,7 +11542,13 @@
           "shared_buffers": {
             "type": "string"
           },
+          "statement_timeout": {
+            "type": "string"
+          },
           "wal_keep_size": {
+            "type": "string"
+          },
+          "wal_sender_timeout": {
             "type": "string"
           },
           "work_mem": {
@@ -11507,10 +11563,10 @@
       "UpdatePostgresConfigBody": {
         "type": "object",
         "properties": {
-          "statement_timeout": {
+          "effective_cache_size": {
             "type": "string"
           },
-          "effective_cache_size": {
+          "logical_decoding_work_mem": {
             "type": "string"
           },
           "maintenance_work_mem": {
@@ -11541,6 +11597,9 @@
             "minimum": 0,
             "maximum": 1024
           },
+          "max_replication_slots": {
+            "type": "integer"
+          },
           "max_slot_wal_keep_size": {
             "type": "string"
           },
@@ -11553,6 +11612,9 @@
           "max_wal_size": {
             "type": "string"
           },
+          "max_wal_senders": {
+            "type": "integer"
+          },
           "max_worker_processes": {
             "type": "integer",
             "minimum": 0,
@@ -11561,7 +11623,13 @@
           "shared_buffers": {
             "type": "string"
           },
+          "statement_timeout": {
+            "type": "string"
+          },
           "wal_keep_size": {
+            "type": "string"
+          },
+          "wal_sender_timeout": {
             "type": "string"
           },
           "work_mem": {

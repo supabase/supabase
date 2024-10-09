@@ -16,8 +16,14 @@ export const buildHttpRequestCommand = (
     select
       net.${method === 'GET' ? 'http_get' : 'http_post'}(
           url:='${url}',
-          headers:=jsonb_build_object(${headers.map((v) => `'${v.name}', '${v.value}'`).join(', ')}),
-          body:=jsonb_build_object(${body.map((v) => `'${v.name}', '${v.value}'`).join(', ')}),
+          headers:=jsonb_build_object(${headers
+            .filter((v) => v.name && v.value)
+            .map((v) => `'${v.name}', '${v.value}'`)
+            .join(', ')}),
+          body:=jsonb_build_object(${body
+            .filter((v) => v.name && v.value)
+            .map((v) => `'${v.name}', '${v.value}'`)
+            .join(', ')}),
           timeout_milliseconds:=${timeout}
       );
     $$`
