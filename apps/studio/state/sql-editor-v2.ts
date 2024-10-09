@@ -394,6 +394,7 @@ async function upsertSnippet(id: string, projectRef: string, payload: UpsertCont
 
     const queryClient = getQueryClient()
     await queryClient.invalidateQueries(contentKeys.count(projectRef, 'sql'))
+    await queryClient.invalidateQueries(contentKeys.list(projectRef))
 
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
