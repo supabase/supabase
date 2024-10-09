@@ -74,7 +74,7 @@ interface EventData {
   end_date?: string
   speakers: string
   speakers_label?: string
-  image?: string
+  og_image?: string
   thumb?: string
   thumb_light?: string
   youtubeHero?: string
@@ -155,9 +155,11 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
     event.onDemand ||
     (hadEndDate ? Date.parse(event.end_date!) > Date.now() : Date.parse(event.date) > Date.now())
 
-  const ogImageUrl = encodeURI(
-    `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=events&eventType=${event.type}&title=${event.meta_title ?? event.title}&description=${event.meta_description ?? event.description}&date=${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)}&duration=${event.duration}`
-  )
+  const ogImageUrl = event.og_image
+    ? event.og_image
+    : encodeURI(
+        `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=events&eventType=${event.type}&title=${event.meta_title ?? event.title}&description=${event.meta_description ?? event.description}&date=${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)}&duration=${event.duration}`
+      )
 
   const meta = {
     title: `${event.meta_title ?? event.title} | ${dayjs(event.date)
@@ -205,9 +207,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
           type: 'article',
           images: [
             {
-              url:
-                meta.image ??
-                `${origin}${router.basePath}/images/events/${event.image ? event.image : event.thumb}`,
+              url: meta.image,
               alt: `${event.title} thumbnail`,
               width: 1200,
               height: 627,
