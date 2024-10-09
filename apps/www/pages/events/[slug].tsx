@@ -2,7 +2,6 @@ import React from 'react'
 import Link from 'next/link'
 import NextImage from 'next/image'
 import { useRouter } from 'next/router'
-import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import dayjs from 'dayjs'
@@ -13,7 +12,8 @@ import {
   MicrophoneIcon,
   HandIcon,
 } from '@heroicons/react/solid'
-import { capitalize } from 'lodash'
+import capitalize from 'lodash/capitalize'
+import { ChevronLeft, X as XIcon } from 'lucide-react'
 
 import authors from 'lib/authors.json'
 import { isNotNullOrUndefined } from '~/lib/helpers'
@@ -23,7 +23,6 @@ import { getAllPostSlugs, getPostdata } from '~/lib/posts'
 import { isBrowser, useTelemetryProps } from 'common'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 import gaEvents from '~/lib/gaEvents'
-import { XIcon } from '@heroicons/react/outline'
 
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
@@ -36,7 +35,9 @@ import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
-import { ChevronLeft } from 'lucide-react'
+
+import type { GetStaticProps, InferGetStaticPropsType } from 'next'
+import type Author from '~/types/author'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -148,7 +149,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
     ?.map((speakerId: string) => {
       return authors.find((author) => author.author_id === speakerId)
     })
-    .filter(isNotNullOrUndefined)
+    .filter(isNotNullOrUndefined) as Author[]
   const hadEndDate = event.end_date?.length
 
   const IS_REGISTRATION_OPEN =
@@ -425,6 +426,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                             <p>{speaker?.author}</p>
                             <span className="text-xs text-foreground-light">
                               {speaker?.position}
+                              {speaker?.company ? `, ${speaker?.company}` : ', Supabase'}
                             </span>
                           </div>
                         </Link>
