@@ -44,8 +44,7 @@ const DialogOverlay = React.forwardRef<
     className={cn(
       'bg-black/40 backdrop-blur-sm',
       'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-closed:animate-overlay-hide py-8',
-      !centered &&
-        'flex flex-col flex-startpb-8 pt-8 lg:pt-20 [@media(min-height:720px)]:pt-[15vh] lg:px-5',
+      !centered && 'flex flex-col flex-start pb-8 sm:pt-12 md:pt-20 lg:pt-32 xl:pt-40 px-5',
       className
     )}
     {...props}
@@ -56,7 +55,7 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 const DialogContentVariants = cva(
   cn(
     '',
-    'relative z-50 w-full border shadow-md dark:shadow-sm duration-200',
+    'relative z-50 w-full border shadow-md dark:shadow-sm',
     'data-[state=open]:animate-in data-[state=closed]:animate-out',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
     'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',
