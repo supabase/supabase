@@ -7,6 +7,7 @@ import { useUser } from 'common'
 import { useSendPageMutation } from 'data/telemetry/send-page-mutation'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useSendPageLeaveMutation } from 'data/telemetry/send-page-leave-mutation'
 
 const getAnonId = async (id: string) => {
   const hash = new Sha256()
@@ -23,6 +24,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const snap = useAppStateSnapshot()
 
   const { mutate: sendPage } = useSendPageMutation()
+  const { mutateAsync: sendPageLeave } = useSendPageLeaveMutation()
 
   useEffect(() => {
     const consent =
@@ -74,6 +76,15 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     // if an error happens, continue without setting a sentry id
     setSentryId().catch((e) => console.error(e))
   }, [user?.id])
+
+  useEffect(() => {
+    const handleBeforeUnload = async () => await sendPageLeave()
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [])
 
   const handlePageTelemetry = async (route: string) => {
     if (IS_PLATFORM) sendPage({ url: route })

@@ -6,7 +6,6 @@ import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
 type SendPageLeaveBody = components['schemas']['TelemetryPageLeaveBody']
-export type SendPageLeaveVariables = {}
 
 export async function sendPageLeave(body: SendPageLeaveBody) {
   const { data, error } = await post(`/platform/telemetry/page-leave`, {
@@ -23,33 +22,28 @@ export const useSendPageLeaveMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<
-  UseMutationOptions<SendPageLeaveData, ResponseError, SendPageLeaveVariables>,
-  'mutationFn'
-> = {}) => {
+}: Omit<UseMutationOptions<SendPageLeaveData, ResponseError>, 'mutationFn'> = {}) => {
   const router = useRouter()
+  const url = typeof window !== 'undefined' ? window.location.href : ''
   const title = typeof document !== 'undefined' ? document?.title : ''
 
   const body = {
-    page_url: window.location.href,
+    page_url: url,
     page_title: title,
     pathname: router.pathname,
   } as SendPageLeaveBody
 
-  return useMutation<SendPageLeaveData, ResponseError, SendPageLeaveVariables>(
-    (vars) => sendPageLeave(body),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          console.error(`Failed to send Telemetry page leave: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SendPageLeaveData, ResponseError>((vars) => sendPageLeave(body), {
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        console.error(`Failed to send Telemetry page leave: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }
