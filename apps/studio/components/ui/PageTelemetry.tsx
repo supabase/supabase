@@ -11,6 +11,7 @@ import { useSendPageMutation } from 'data/telemetry/send-page-mutation'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { usePrevious } from 'hooks/deprecated'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const getAnonId = async (id: string) => {
   const hash = new Sha256()
@@ -27,6 +28,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const snap = useAppStateSnapshot()
 
   const previousPathname = usePrevious(router.pathname)
+  const enablePostHogTelemetry = useFlag('enablePosthogChanges')
 
   const { mutate: sendPage } = useSendPageMutation()
   const { mutateAsync: sendPageLeave } = useSendPageLeaveMutation()
@@ -97,13 +99,13 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     const isLeavingOrgRoute =
       (previousPathname ?? '').includes('[slug]') && !router.pathname.includes('[slug]')
 
-    if (isEnteringProjectRoute || isEnteringOrgRoute) {
+    if (enablePostHogTelemetry && (isEnteringProjectRoute || isEnteringOrgRoute)) {
       sendGroupsIdentify({
         organization_slug: isEnteringOrgRoute ? (slug as string) : undefined,
         project_ref: isEnteringProjectRoute ? (ref as string) : undefined,
       })
     }
-    if (isLeavingProjectRoute || isLeavingOrgRoute) {
+    if (enablePostHogTelemetry && (isLeavingProjectRoute || isLeavingOrgRoute)) {
       sendGroupsReset({
         reset_organization: isLeavingOrgRoute,
         reset_project: isLeavingProjectRoute,
@@ -113,7 +115,9 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   }, [router.pathname])
 
   useEffect(() => {
-    const handleBeforeUnload = async () => await sendPageLeave()
+    const handleBeforeUnload = async () => {
+      if (enablePostHogTelemetry) await sendPageLeave()
+    }
     window.addEventListener('beforeunload', handleBeforeUnload)
 
     return () => {
