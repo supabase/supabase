@@ -440,7 +440,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                     onValueChange={field.onChange}
                   >
                     <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_ placeholder="Select a project">
+                      <SelectValue_Shadcn_ placeholder="Select a severity">
                         {field.value}
                       </SelectValue_Shadcn_>
                     </SelectTrigger_Shadcn_>
