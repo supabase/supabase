@@ -265,7 +265,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               className="
                 relative z-10
                 lg:min-h-[400px] h-full
-                grid grid-cols-1 lg:grid-cols-2
+                grid grid-cols-1 xl:grid-cols-2
                 gap-8
                 text-foreground-light
                 !py-10 md:!py-16
@@ -282,7 +282,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     <span className="">Duration: {event.duration}</span>
                   </div>
 
-                  <h1 className="text-foreground text-3xl lg:text-4xl">{event.title}</h1>
+                  <h1 className="text-foreground text-3xl md:text-4xl xl:pr-9">{event.title}</h1>
                   <p>{event.subtitle}</p>
                   <Button
                     type="primary"
