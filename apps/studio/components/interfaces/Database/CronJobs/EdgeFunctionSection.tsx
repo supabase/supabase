@@ -4,7 +4,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import {
   Button,
   FormControl_Shadcn_,
@@ -38,7 +38,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
   const { ref } = useParams()
   const { data: functions, isSuccess, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
 
-  const edgeFunctions = functions ?? []
+  const edgeFunctions = useMemo(() => functions ?? [], [functions])
 
   useEffect(() => {
     if (isSuccess && edgeFunctions.length > 0) {
@@ -50,7 +50,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
       )
       form.setValue('values.edgeFunctionName', functionUrl)
     }
-  }, [isSuccess])
+  }, [edgeFunctions, form, isSuccess, selectedProject?.ref, selectedProject?.restUrl])
 
   return (
     <SheetSection className="flex flex-col gap-3">

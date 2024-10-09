@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import { ChevronDown, Plus, Trash } from 'lucide-react'
 import { useFieldArray } from 'react-hook-form'
 
@@ -7,6 +6,7 @@ import { FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -22,13 +22,13 @@ import {
 import { CreateCronJobForm } from './CreateCronJobSheet'
 
 interface HTTPHeaderFieldsSectionProps {
-  fieldName: 'values.httpHeaders' | 'values.httpHeaders'
+  variant: 'edge_function' | 'http_request'
 }
 
-export const HTTPHeaderFieldsSection = ({ fieldName }: HTTPHeaderFieldsSectionProps) => {
+export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProps) => {
   // gets the fields through form context
   const { fields, append, remove } = useFieldArray<CreateCronJobForm>({
-    name: fieldName,
+    name: 'values.httpHeaders',
   })
 
   const { ref } = useParams()
@@ -43,7 +43,7 @@ export const HTTPHeaderFieldsSection = ({ fieldName }: HTTPHeaderFieldsSectionPr
         {fields.map((field, index) => (
           <div key={field.id} className="flex items-center space-x-2">
             <FormField_Shadcn_
-              name={`${fieldName}.${index}.name`}
+              name={`values.httpHeaders.${index}.name`}
               render={({ field }) => (
                 <FormItem_Shadcn_ className="flex-1">
                   <FormControl_Shadcn_>
@@ -59,7 +59,7 @@ export const HTTPHeaderFieldsSection = ({ fieldName }: HTTPHeaderFieldsSectionPr
               )}
             />
             <FormField_Shadcn_
-              name={`${fieldName}.${index}.value`}
+              name={`values.httpHeaders.${index}.value`}
               render={({ field }) => (
                 <FormItem_Shadcn_ className="flex-1">
                   <FormControl_Shadcn_>
@@ -89,12 +89,12 @@ export const HTTPHeaderFieldsSection = ({ fieldName }: HTTPHeaderFieldsSectionPr
             type="default"
             size="tiny"
             icon={<Plus />}
-            className={clsx(fieldName === 'values.httpHeaders' && 'rounded-r-none px-3')}
+            className={cn(variant === 'edge_function' && 'rounded-r-none px-3 border-r-0')}
             onClick={() => append({ name: '', value: '' })}
           >
             Add a new header
           </Button>
-          {fieldName === 'values.httpHeaders' && (
+          {variant === 'edge_function' && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="default" className="rounded-l-none px-[4px] py-[5px]">
