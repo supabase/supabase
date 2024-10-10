@@ -2635,6 +2635,7 @@ export interface components {
         | 'RESTORING'
         | 'RESTORE_FAILED'
         | 'PAUSE_FAILED'
+        | 'RESIZING'
     }
     BranchResetResponse: {
       message: string
@@ -3112,6 +3113,8 @@ export interface components {
         | 'UPGRADING'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
+        | 'RESTARTING'
+        | 'RESIZING'
     }
     DatabaseStatusResponse: {
       identifier: string
@@ -3129,6 +3132,8 @@ export interface components {
         | 'UPGRADING'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
+        | 'RESTARTING'
+        | 'RESIZING'
     }
     DatabaseUpgradeStatus: {
       /** @enum {string} */
@@ -4157,6 +4162,7 @@ export interface components {
         | 'RESTORING'
         | 'RESTORE_FAILED'
         | 'PAUSE_FAILED'
+        | 'RESIZING'
       /**
        * @description Supabase organization id
        * @example fly_123456789
@@ -4699,6 +4705,7 @@ export interface components {
         | 'RESTORING'
         | 'RESTORE_FAILED'
         | 'PAUSE_FAILED'
+        | 'RESIZING'
       subscription_id: string
       v2MaintenanceWindow: {
         end?: string
@@ -4938,6 +4945,8 @@ export interface components {
         | 'UPGRADING'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
+        | 'RESTARTING'
+        | 'RESIZING'
     }
     ResetPasswordBody: {
       email: string
@@ -5062,6 +5071,7 @@ export interface components {
         | 'RESTORING'
         | 'RESTORE_FAILED'
         | 'PAUSE_FAILED'
+        | 'RESIZING'
       /**
        * @description Supabase organization id
        * @example fly_123456789
@@ -6198,6 +6208,7 @@ export interface components {
       max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
+      restart_database?: boolean
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
@@ -6637,6 +6648,7 @@ export interface components {
         | 'RESTORING'
         | 'RESTORE_FAILED'
         | 'PAUSE_FAILED'
+        | 'RESIZING'
     }
     V1RestorePitrBody: {
       recovery_time_target_unix: number

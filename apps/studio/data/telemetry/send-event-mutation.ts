@@ -29,7 +29,7 @@ type SendEventPH = {
   ph: {
     language: string
     referrer: string
-    userAgent: string
+    user_agent: string
     search: string
     viewport_height: number
     viewport_width: number
@@ -87,7 +87,7 @@ export const useSendEventMutation = ({
         ph: {
           referrer,
           language: router?.locale ?? 'en-US',
-          userAgent: navigator.userAgent,
+          user_agent: navigator.userAgent,
           search: window.location.search,
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
