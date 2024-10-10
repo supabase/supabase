@@ -112,6 +112,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/multi-select',
           items: [],
         },
+        // {
+        //   title: 'Multi Select (Old)',
+        //   href: '/docs/fragments/multi-select-old',
+        //   items: [],
+        // },
       ],
     },
     {

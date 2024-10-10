@@ -2,25 +2,42 @@ import { useState } from 'react'
 import {
   MultiSelector,
   MultiSelectorContent,
-  MultiSelectorInput,
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
 export default function MultiSelectDemo() {
-  const [value, setValue] = useState<string[]>([])
+  const [selectedValues, setSelectedValues] = useState<string[]>([])
+
+  const fruits = [
+    'Apple',
+    'Banana',
+    'Cherry',
+    'Date',
+    'Elderberrie',
+    'Fig',
+    'Grape',
+    'Kiwi',
+    'Mango',
+    'Strawberry',
+  ]
 
   return (
-    <MultiSelector values={value} onValuesChange={setValue} size="small">
-      <MultiSelectorTrigger>
-        <MultiSelectorInput placeholder="Select items" />
-      </MultiSelectorTrigger>
-      <MultiSelectorContent>
+    <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
+      <MultiSelectorTrigger
+        className="w-72"
+        label="Select fruits"
+        badgeLimit="wrap"
+        showIcon={false}
+      />
+      <MultiSelectorContent sameWidthAsTrigger>
         <MultiSelectorList>
-          <MultiSelectorItem value="1">Item 1</MultiSelectorItem>
-          <MultiSelectorItem value="2">Item 2</MultiSelectorItem>
-          <MultiSelectorItem value="3">Item 3</MultiSelectorItem>
+          {fruits.map((fruit) => (
+            <MultiSelectorItem key={fruit} value={fruit}>
+              {fruit}
+            </MultiSelectorItem>
+          ))}
         </MultiSelectorList>
       </MultiSelectorContent>
     </MultiSelector>
