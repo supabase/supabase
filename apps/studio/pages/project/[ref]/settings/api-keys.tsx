@@ -16,28 +16,20 @@ import { Separator } from 'ui'
 const AuthSettings: NextPageWithLayout = () => {
   const [apiKeysView] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.API_KEYS_VIEW, undefined)
 
-  const isPermissionsLoaded = usePermissionsLoaded()
+  // const isPermissionsLoaded = usePermissionsLoaded()
   // TODO: check if these permissions cover third party auth as well
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'api_keys')
 
   return (
     <>
-      {!isPermissionsLoaded ? (
-        <GenericSkeletonLoader />
-      ) : !canReadAPIKeys ? (
-        <NoPermission isFullPage resourceText="access your project's API keys" />
-      ) : (
+      {apiKeysView === 'new-keys' ? (
         <>
-          {apiKeysView === 'new-keys' ? (
-            <>
-              <PublishableAPIKeys />
-              <Separator />
-              <SecretAPIKeys />
-            </>
-          ) : (
-            <LegacyAPIKeys />
-          )}
+          <PublishableAPIKeys />
+          <Separator />
+          <SecretAPIKeys />
         </>
+      ) : (
+        <LegacyAPIKeys />
       )}
     </>
   )
