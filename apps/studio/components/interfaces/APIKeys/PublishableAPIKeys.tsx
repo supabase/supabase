@@ -18,6 +18,7 @@ const PublishableAPIKeys = () => {
     [apiKeysData]
   )
 
+  // Gets 1st publishable key
   const apiKey = publishableApiKeys[0]
 
   return (

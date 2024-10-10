@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button } from 'ui'
+import { Button, Skeleton } from 'ui'
 import { ChevronsUpDownIcon } from 'lucide-react'
 import { useParams } from 'common'
 import { useProjectApiQuery } from 'data/config/project-api-query'
@@ -55,21 +55,23 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_API_KEY=${publishableApiKey || ''}
 `
   }
 
+  //   if (false) {
   if (isProjectApiLoading || isApiKeysLoading) {
     return (
-      <div className="bg-alternative px-5 py-3 border-t overflow-hidden">
-        <div className="h-4 w-3/4 bg-foreground-muted animate-pulse rounded mb-2"></div>
-        <div className="h-32 w-full bg-foreground-muted animate-pulse rounded"></div>
+      <div className="bg-alternative px-5 py-3 border-t overflow-hidden flex flex-col gap-0">
+        <div className="flex items-center gap-2 mb-3">
+          <Skeleton className="h-4 w-4 rounded" />
+          <Skeleton className="h-4 w-[48px] rounded" />
+        </div>
+        <Skeleton className="h-[40px] w-3/4 rounded" />
       </div>
     )
   }
 
   if (!projectAPI?.autoApiService.endpoint || !publishableApiKey) {
     return (
-      <div className="bg-alternative px-5 py-3 border-t overflow-hidden">
-        <p className="text-sm text-foreground-light">
-          Unable to load API keys. Please try again later.
-        </p>
+      <div className="bg-alternative px-5 py-3 border-t overflow-hidden flex flex-col gap-0">
+        <p className="text-sm text-foreground-light">Unable to load API keys.</p>
       </div>
     )
   }

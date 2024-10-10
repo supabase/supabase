@@ -18,11 +18,15 @@ import {
 import { useParams } from 'common'
 import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import api from 'pages/api/props/project/[ref]/api'
 
 const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
   const { ref: projectRef } = useParams()
   const isSecret = apiKey.type === 'secret'
   const [shown, setShown] = useState(!isSecret)
+  const [deleteDialogOpen, setDeleteDialogOpenState] = useState(false)
 
   const hiddenKey = useMemo(
     () =>
@@ -44,6 +48,7 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
       {
         onSuccess: () => {
           // onClose(false)
+          setDeleteDialogOpenState(false)
         },
       }
     )
@@ -104,8 +109,7 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
                   className="flex gap-2 !pointer-events-auto"
                   onClick={async (e) => {
                     if (canDeleteAPIKeys) {
-                      e.preventDefault()
-                      onDeleteAPIKeySubmit()
+                      setDeleteDialogOpenState(true)
                     }
                   }}
                 >
@@ -125,6 +129,24 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
             </Tooltip_Shadcn_>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <ConfirmationModal
+          open={deleteDialogOpen}
+          onCancel={() => setDeleteDialogOpenState(!deleteDialogOpen)}
+          variant={'destructive'}
+          visible={true}
+          title={`Delete ${apiKey.description} API key`}
+          description="Are you sure you want to delete this API key?"
+          confirmLabel="Delete key"
+          onConfirm={() => {
+            onDeleteAPIKeySubmit()
+          }}
+          loading={isDeletingAPIKey}
+          alert={{
+            title: 'API secrets cannot be recovered',
+            // description: 'Make sure you are no longer using this secret API key before deleting.',
+          }}
+        />
       </TableCell>
     </TableRow>
   )
