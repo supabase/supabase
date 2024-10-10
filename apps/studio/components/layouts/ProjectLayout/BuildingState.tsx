@@ -13,18 +13,21 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { ArrowRight, Loader2 } from 'lucide-react'
-import { Badge, Button, Separator } from 'ui'
+import { Badge, Button, cn, Separator } from 'ui'
 import ApiKeysNotice from 'components/ui/ApiKeysNotice'
 import PublishableAPIKeys from 'components/interfaces/APIKeys/PublishableAPIKeys'
 import SecretAPIKeys from 'components/interfaces/APIKeys/SecretAPIKeys'
 import QuickKeyCopyWrapper from 'components/interfaces/APIKeys/QuickKeyCopy'
 import { ScaffoldContainer } from '../Scaffold'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const BuildingState = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const queryClient = useQueryClient()
   const checkServerInterval = useRef<number>()
+
+  const newApiKeysFlag = useFlag('newApiKeys')
 
   // TODO: move to react-query
   async function checkServer() {
@@ -54,8 +57,10 @@ const BuildingState = () => {
   if (project === undefined) return null
 
   return (
-    <ScaffoldContainer className="flex flex-col gap-10 max-w-4xl py-20">
-      <div className="flex flex-col gap-5">
+    <ScaffoldContainer
+      className={cn(newApiKeysFlag ? 'max-w-4xl' : 'max-w-7xl', 'flex flex-col gap-10 py-20')}
+    >
+      <div className={'flex flex-col gap-5'}>
         <div className="flex items-center space-x-3">
           <h1 className="text-3xl text-foreground">{project?.name}</h1>
           <Badge variant="default" className="bg-surface-100 bg-opacity-100">
@@ -77,88 +82,94 @@ const BuildingState = () => {
           <p className="text-sm text-foreground-light"> This may take a few minutes</p>
         </div>
       </div>
-
-      <div className="">
-        {/* <ApiKeysNotice /> */}
-        {/* <PublishableAPIKeys /> */}
-        <QuickKeyCopyWrapper />
-        {/* <SecretAPIKeys /> */}
-        {/* <DisplayApiSettings /> */}
-        {/* <DisplayConfigSettings /> */}
-      </div>
-      <Separator />
-      <div className="col-span-12 space-y-12 lg:col-span-4 ">
-        <div>
-          <h4 className="text-base text-foreground">While you wait</h4>
-
-          <ChecklistItem
-            description={
-              <p className="text-sm text-foreground-light">
-                Browse the Supabase{' '}
-                <Link
-                  href="https://supabase.com/docs"
-                  className="mb-0 text-brand transition-colors hover:text-brand-600"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  documentation
-                </Link>
-                .
-              </p>
-            }
-          />
+      <div className={cn(newApiKeysFlag ? 'flex flex-col gap-5' : 'flex flex-row gap-12')}>
+        <div className={cn(!newApiKeysFlag && 'order-last')}>
+          {/* <ApiKeysNotice /> */}
+          {/* <PublishableAPIKeys /> */}
+          {newApiKeysFlag ? (
+            <QuickKeyCopyWrapper />
+          ) : (
+            <>
+              <DisplayApiSettings showNotice={false} />
+              <DisplayConfigSettings />
+            </>
+          )}
+          {/* <SecretAPIKeys /> */}
         </div>
-        <div>
-          <h4 className="text-base text-foreground">Not working?</h4>
-          <ChecklistItem
-            description={
-              <p className="text-sm text-foreground-light">
-                Try refreshing after a couple of minutes.
-              </p>
-            }
-          />
-          <ul>
+        {newApiKeysFlag && <Separator />}
+        <div className="col-span-12 space-y-12 lg:col-span-4 ">
+          <div>
+            <h4 className="text-base text-foreground">While you wait</h4>
+
             <ChecklistItem
               description={
-                <>
-                  <p className="mb-4 text-sm text-foreground-light">
-                    If your dashboard hasn't connected within 2 minutes, you can open a support
-                    ticket.
-                  </p>
-                  <Button asChild type="default">
-                    <Link href="/support/new">Contact support team</Link>
-                  </Button>
-                </>
+                <p className="text-sm text-foreground-light">
+                  Browse the Supabase{' '}
+                  <Link
+                    href="https://supabase.com/docs"
+                    className="mb-0 text-brand transition-colors hover:text-brand-600"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    documentation
+                  </Link>
+                  .
+                </p>
               }
             />
-          </ul>
+          </div>
+          <div>
+            <h4 className="text-base text-foreground">Not working?</h4>
+            <ChecklistItem
+              description={
+                <p className="text-sm text-foreground-light">
+                  Try refreshing after a couple of minutes.
+                </p>
+              }
+            />
+            <ul>
+              <ChecklistItem
+                description={
+                  <>
+                    <p className="mb-4 text-sm text-foreground-light">
+                      If your dashboard hasn't connected within 2 minutes, you can open a support
+                      ticket.
+                    </p>
+                    <Button asChild type="default">
+                      <Link href="/support/new">Contact support team</Link>
+                    </Button>
+                  </>
+                }
+              />
+            </ul>
+          </div>
         </div>
+        {/* 
+        {project.status === PROJECT_STATUS.COMING_UP && (
+          <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
+            <div className="space-y-8">
+              <div className="mx-6">
+                <h5>Client libraries</h5>
+              </div>
+              <div className="mx-6 mb-12 grid gap-12 md:grid-cols-3">
+                {CLIENT_LIBRARIES.map((library) => (
+                  <ClientLibrary key={library.language} {...library} />
+                ))}
+              </div>
+            </div>
+            <div className="space-y-8">
+              <div className="mx-6">
+                <h5>Example projects</h5>
+              </div>
+              <div className="mx-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {EXAMPLE_PROJECTS.map((project) => (
+                  <ExampleProject key={project.url} {...project} />
+                ))}
+              </div>
+            </div>
+          </div>
+        )} */}
       </div>
-
-      {project.status === PROJECT_STATUS.COMING_UP && (
-        <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
-          <div className="space-y-8">
-            <div className="mx-6">
-              <h5>Client libraries</h5>
-            </div>
-            <div className="mx-6 mb-12 grid gap-12 md:grid-cols-3">
-              {CLIENT_LIBRARIES.map((library) => (
-                <ClientLibrary key={library.language} {...library} />
-              ))}
-            </div>
-          </div>
-          <div className="space-y-8">
-            <div className="mx-6">
-              <h5>Example projects</h5>
-            </div>
-            <div className="mx-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {EXAMPLE_PROJECTS.map((project) => (
-                <ExampleProject key={project.url} {...project} />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </ScaffoldContainer>
   )
 }

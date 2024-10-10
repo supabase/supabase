@@ -9,9 +9,18 @@ import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import { AlertCircle, BookOpen, Loader2 } from 'lucide-react'
+import { useFlag } from 'hooks/ui/useFlag'
 
-const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
+const DisplayApiSettings = ({
+  legacy,
+  showNotice = true,
+}: {
+  legacy?: boolean
+  showNotice?: boolean
+}) => {
   const { ref: projectRef } = useParams()
+
+  const newApiKeysFlag = useFlag('newApiKeys')
 
   const {
     data: settings,
@@ -135,16 +144,30 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
             </Panel.Content>
           ))
         )}
-        <Panel.Notice
-          className="border-t"
-          title="API keys have moved"
-          badgeLabel={'Changelog'}
-          description={` 
-\`anon\` and \`service_role\` API keys can now be replaced with \`publishable\` and \`secret\` API keys.   
+        {showNotice ? (
+          newApiKeysFlag ? (
+            <Panel.Notice
+              className="border-t"
+              title="API keys have moved"
+              badgeLabel={'Changelog'}
+              description={` 
+  \`anon\` and \`service_role\` API keys can now be replaced with \`publishable\` and \`secret\` API keys.   
+  `}
+              href="https://github.com/orgs/supabase/discussions/29260"
+              buttonText="Read the announcement"
+            />
+          ) : (
+            <Panel.Notice
+              className="border-t"
+              title="New API keys coming Q4 2024"
+              description={`
+\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.    
 `}
-          href="https://github.com/orgs/supabase/discussions/29260"
-          buttonText="Read the announcement"
-        />
+              href="https://github.com/orgs/supabase/discussions/29260"
+              buttonText="Read the announcement"
+            />
+          )
+        ) : null}
       </Panel>
     </>
   )

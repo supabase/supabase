@@ -16,7 +16,7 @@ const ApiKeysNotice = () => {
       className={cn(
         'relative px-6 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center border rounded-md'
       )}
-      title={'Publisable and Secret API keys are available'}
+      title={'Publishable and Secret API keys are available'}
       description="New API keys are available. They are more secure and easier to manage than legacy API keys."
       badgeLabel={'New feature'}
       action={

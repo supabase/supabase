@@ -5,6 +5,8 @@ import FlagContext from 'components/ui/Flag/FlagContext'
 export function useFlag<T = boolean>(name: string) {
   const store: any = useContext(FlagContext)
 
+  if (name === 'newApiKeys') return true
+
   const isObjectEmpty = (objectName: Object) => {
     return Object.keys(objectName).length === 0
   }

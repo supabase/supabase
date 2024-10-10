@@ -4,7 +4,7 @@ import { ChevronsUpDownIcon } from 'lucide-react'
 import { useParams } from 'common'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import SimpleCodeBlock from 'ui/src/components/SimpleCodeBlock/SimpleCodeBlock'
+import { SimpleCodeBlock } from 'ui/src/components/SimpleCodeBlock'
 
 const frameworkOptions = ['React', 'Vue', 'Angular', 'Svelte'] // Add more as needed
 

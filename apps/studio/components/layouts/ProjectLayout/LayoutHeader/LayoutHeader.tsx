@@ -17,6 +17,7 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import Connect from 'components/interfaces/Home/Connect/Connect'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
@@ -42,71 +43,59 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     }
   }, [orgUsage])
 
+  const SeparatorSlash = () => (
+    <span className="text-border-stronger">
+      <svg
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+        shapeRendering="geometricPrecision"
+      >
+        <path d="M16 3.549L7.12 20.600"></path>
+      </svg>
+    </span>
+  )
+
   return (
     <div
       className={`flex h-12 max-h-12 min-h-12 items-center justify-between py-2 px-5 bg-dash-sidebar ${
         headerBorder ? 'border-b border-default' : ''
       }`}
     >
-      <div className="-ml-2 flex items-center text-sm">
-        {/* Organization is selected */}
-        {projectRef && (
-          <>
-            <OrganizationDropdown />
-
-            {projectRef && (
-              <>
-                <span className="text-border-stronger">
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                    shapeRendering="geometricPrecision"
-                  >
-                    <path d="M16 3.549L7.12 20.600"></path>
-                  </svg>
-                </span>
-
-                <ProjectDropdown />
-
-                {exceedingLimits && (
-                  <div className="ml-2">
-                    <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                      <Badge variant="destructive">Exceeding usage limits</Badge>
-                    </Link>
-                  </div>
-                )}
-              </>
-            )}
-
-            {selectedProject && (
-              <>
-                <span className="text-border-stronger">
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                    shapeRendering="geometricPrecision"
-                  >
-                    <path d="M16 3.549L7.12 20.600"></path>
-                  </svg>
-                </span>
-                {isBranchingEnabled ? <BranchDropdown /> : <EnableBranchingButton />}
-              </>
-            )}
-          </>
-        )}
-
+      <div className="flex items-center gap-3">
+        <div className="-ml-2 flex items-center text-sm">
+          {/* Organization is selected */}
+          {projectRef && (
+            <>
+              <OrganizationDropdown />
+              {projectRef && (
+                <>
+                  <SeparatorSlash />
+                  <ProjectDropdown />
+                  {exceedingLimits && (
+                    <div className="ml-2">
+                      <Link href={`/org/${selectedOrganization?.slug}/usage`}>
+                        <Badge variant="destructive">Exceeding usage limits</Badge>
+                      </Link>
+                    </div>
+                  )}
+                </>
+              )}
+              {selectedProject && (
+                <>
+                  <SeparatorSlash />
+                  {isBranchingEnabled ? <BranchDropdown /> : <EnableBranchingButton />}
+                </>
+              )}
+            </>
+          )}
+        </div>
+        <Connect buttonProps={{ type: 'default', size: 'tiny', className: 'rounded-full' }} />
         {/* Additional breadcrumbs are supplied */}
         <BreadcrumbsView defaultValue={breadcrumbs} />
       </div>

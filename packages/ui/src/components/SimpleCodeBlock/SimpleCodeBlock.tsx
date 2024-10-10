@@ -26,7 +26,7 @@ interface SimpleCodeBlockProps {
   showCopy?: boolean
 }
 
-const SimpleCodeBlock = ({
+export const SimpleCodeBlock = ({
   children,
   parentClassName,
   className: languageClassName,
@@ -92,5 +92,3 @@ const SimpleCodeBlock = ({
     </Highlight>
   )
 }
-
-export default SimpleCodeBlock

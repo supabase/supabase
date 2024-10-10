@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
-import { useState } from 'react'
+import { ComponentProps, useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
@@ -32,7 +32,7 @@ import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
 import Panel from 'components/ui/Panel'
 
-const Connect = () => {
+const Connect = ({ buttonProps }: { buttonProps?: ComponentProps<typeof Button> }) => {
   const { ref: projectRef } = useParams()
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
@@ -165,8 +165,8 @@ const Connect = () => {
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <Button type="primary" icon={<Plug className="rotate-90" />}>
-            <span>Connect</span>
+          <Button type="primary" icon={<Plug className="rotate-90" />} {...buttonProps}>
+            {buttonProps?.children ?? <span>Connect</span>}
           </Button>
         </DialogTrigger>
         <DialogContent className={cn('sm:max-w-5xl p-0')}>

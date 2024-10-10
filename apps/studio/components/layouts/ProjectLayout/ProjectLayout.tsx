@@ -165,7 +165,6 @@ const ProjectLayout = ({
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
-
         <EnableBranchingModal />
         <AISettingsModal />
         <ProjectAPIDocs />

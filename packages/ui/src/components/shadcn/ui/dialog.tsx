@@ -43,7 +43,7 @@ const DialogOverlay = React.forwardRef<
     ref={ref}
     className={cn(
       'bg-black/40 backdrop-blur-sm',
-      'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-closed:animate-overlay-hide',
+      'z-50 fixed inset-0 top-0 grid place-items-center overflow-y-auto data-closed:animate-overlay-hide',
       className
     )}
     {...props}
