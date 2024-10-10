@@ -74,7 +74,7 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
 
         <DialogSectionSeparator />
 
-        <DialogSection className={cn('px-0', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : 'py-2')}>
+        <DialogSection className={cn('px-0', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : '')}>
           {selectedWorkflowRunId === undefined ? (
             <>
               {isWorkflowRunsLoading && <GenericSkeletonLoader className="py-2 px-5" />}
@@ -91,7 +91,9 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
                         >
                           <div className="flex items-center gap-4">
                             <BranchStatusBadge status={workflowRun.status} />
-                            {dayjs(workflowRun.created_at).format('DD MMM, YYYY HH:mm')}
+                            <span className="text-sm">
+                              {dayjs(workflowRun.created_at).format('DD MMM, YYYY HH:mm')}
+                            </span>
                           </div>
                           <ArrowRight size={16} />
                         </button>
@@ -110,13 +112,19 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
                 onClick={() => setSelectedWorkflowRunId(undefined)}
                 type="text"
                 icon={<ArrowLeft />}
-                className="self-start mx-2"
+                className="self-start mx-5"
               >
                 Back to workflow runs
               </Button>
 
               {isWorkflowRunLogsLoading && <GenericSkeletonLoader className="py-2 px-5" />}
-              {isWorkflowRunLogsError && <AlertError error={workflowRunLogsError} />}
+              {isWorkflowRunLogsError && (
+                <AlertError
+                  className="rounded-none"
+                  subject="Failed to retrieve workflow logs"
+                  error={workflowRunLogsError}
+                />
+              )}
               {isWorkflowRunLogsSuccess && (
                 <pre className="whitespace-pre max-h-[500px] overflow-scroll px-5 pb-5">
                   {workflowRunLogs}
