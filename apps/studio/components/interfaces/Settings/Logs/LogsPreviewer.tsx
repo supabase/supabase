@@ -182,15 +182,8 @@ export const LogsPreviewer = ({
     }
   }
 
-  const noResults = logData.length === 0 && !error
-  const footerHeight = noResults ? '0px' : '48px'
-  const navBarHeight = '48px'
-  const filterPanelHeight = '58px'
-  const chartHeight = showChart && !noResults ? '114px' : '0px'
-  const maxHeight = `calc(100vh - ${navBarHeight} - ${filterPanelHeight} - ${footerHeight} - ${chartHeight})`
-
   return (
-    <div>
+    <div className="flex-1 flex flex-col h-full">
       <PreviewFilterPanel
         csvData={logData}
         isLoading={isLoading}
@@ -228,10 +221,10 @@ export const LogsPreviewer = ({
       <div
         className={
           'transition-all duration-500 ' +
-          (showChart && logData.length > 0 ? 'mb-4 h-24 pt-4 opacity-100' : 'h-0 opacity-0')
+          (showChart && logData.length > 0 ? 'mb-4 h-24 pt-3 opacity-100' : 'h-0 opacity-0')
         }
       >
-        <div className={condensedLayout ? 'px-4' : ''}>
+        <div className={condensedLayout ? 'px-3' : ''}>
           {showChart && (
             <LogEventChart
               className={cn({
@@ -249,11 +242,10 @@ export const LogsPreviewer = ({
           )}
         </div>
       </div>
-      <div className="relative flex flex-col flex-grow pt-4">
+      <div className="relative flex flex-col flex-grow flex-1 overflow-auto">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
-            maxHeight={maxHeight}
             projectRef={projectRef}
             isLoading={isLoading}
             data={logData}
@@ -267,11 +259,8 @@ export const LogsPreviewer = ({
         </LoadingOpacity>
       </div>
       {!error && logData.length > 0 && (
-        <div className="border-t flex flex-row justify-between p-2">
+        <div className="border-t flex flex-row items-center gap-3 p-2">
           <Button
-            className={cn({
-              'opacity-0': isLoadingOlder || isLoading,
-            })}
             onClick={loadOlder}
             icon={<Rewind />}
             type="default"
@@ -280,6 +269,9 @@ export const LogsPreviewer = ({
           >
             Load older
           </Button>
+          <div className="text-sm text-foreground-lighter">
+            Showing <span className="font-mono">{logData.length}</span> results
+          </div>
           <div className="flex flex-row justify-end mt-2">
             <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
           </div>
