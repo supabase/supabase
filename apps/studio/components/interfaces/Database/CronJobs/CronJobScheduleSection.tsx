@@ -104,16 +104,6 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                 )}
               </FormMessage_Shadcn_>
             </FormItem_Shadcn_>
-            // <FormItemLayout
-            //   label=""
-            //   layout="vertical"
-            //   className="gap-1 "
-            //   labelOptional="Should be in this format * * * * *"
-            // >
-            //   <FormControl_Shadcn_>
-
-            //   </FormControl_Shadcn_>
-            // </FormItemLayout>
           )
         }}
       />

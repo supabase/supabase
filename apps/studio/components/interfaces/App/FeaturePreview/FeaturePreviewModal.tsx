@@ -1,11 +1,9 @@
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import { useTelemetryProps } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Button, Modal, ScrollArea, cn } from 'ui'
 import APISidePanelPreview from './APISidePanelPreview'
@@ -29,10 +27,9 @@ const FeaturePreviewModal = () => {
     },
   ]
 
-  const router = useRouter()
   const snap = useAppStateSnapshot()
-  const telemetryProps = useTelemetryProps()
   const featurePreviewContext = useFeaturePreviewContext()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const selectedFeaturePreview =
     snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
@@ -53,15 +50,11 @@ const FeaturePreviewModal = () => {
 
   const toggleFeature = () => {
     onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
-    Telemetry.sendEvent(
-      {
-        category: 'ui_feature_previews',
-        action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
-        label: selectedFeatureKey,
-      },
-      telemetryProps,
-      router
-    )
+    sendEvent({
+      category: 'ui_feature_previews',
+      action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
+      label: selectedFeatureKey,
+    })
   }
 
   function handleCloseFeaturePreviewModal() {

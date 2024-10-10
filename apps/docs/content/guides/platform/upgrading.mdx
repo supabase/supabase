@@ -1,18 +1,20 @@
 ---
-id: 'migrating-and-upgrading-projects'
-title: 'Migrating and Upgrading Projects'
-description: 'Upgrade your project to the latest version of Supabase.'
-sidebar_label: 'Migrating and upgrading'
+title: Upgrading
 ---
 
-Supabase ships fast and we endeavor to add all new features to existing projects wherever possible.
-In some cases, access to new features require upgrading or migrating your Supabase project.
+Supabase ships fast and we endeavor to add all new features to existing projects wherever possible. In some cases, access to new features require upgrading or migrating your Supabase project.
 
-## Upgrade your project
+You can upgrade your project using `pg_upgrade` or by pausing and restoring your project.
 
-There are a few methods available to upgrade your project.
+<ShowUntil date="2024-12-17">
+<Admonition type="tip">
 
-### `pg_upgrade`
+The Migrating and Upgrading guide has been divided into two sections. To migrate between Supabase projects, see [Migrating within Supabase](/docs/guides/platform/migrating-within-supabase).
+
+</Admonition>
+</ShowUntil>
+
+## `pg_upgrade`
 
 <Admonition type="note">
 
@@ -29,7 +31,7 @@ Additionally, if a pg_upgrade upgrade should fail, your original DB would be bro
 
 As a rough rule of thumb, pg_upgrade operates at ~100mbps (when executing an upgrade on your data). Using the size of your database, you can use this metric to derive an approximate sense of the downtime window necessary for the upgrade. During this window, you should plan for your DB and associated services to be unavailable.
 
-### Pause + restore
+## Pause and restore
 
 <Admonition type="note">
 
@@ -77,7 +79,7 @@ During the 90-day restore window a paused project can be restored to the platfor
   src="/docs/img/guides/platform/paused-90-day.png"
 />
 
-After the 90-day restore window, you can download your project's backup file from the project dashboard. This backup is compatible with [pg_restore](https://www.postgresql.org/docs/current/app-pgrestore.html). You can extract your data from it, or attempt to manually restore the project.
+After the 90-day restore window, you can download your project's backup file, and Storage objects from the project dashboard. See [restoring a backup locally](#restoring-a-downloaded-backup-locally) for instructions on how to load that backup locally to recover your data.
 
 <Image
   zoomable
@@ -92,6 +94,54 @@ If you upgrade to a paid plan while your project is paused, any expired one-clic
   alt="Project Paused: 90 Days Remaining"
   src="/docs/img/guides/platform/paused-paid-tier.png"
 />
+
+#### Restoring a Downloaded Backup Locally
+
+If the 90 day project restore window has expired but you need to access data contained within your project using SQL, you can attempt to restore the project into a local Postgres instance. Supabase publishes tooling that can be used for that purpose. Be aware that this workflow does not produce a complete Supabase environment with REST/Auth/Storage. Instead, it creates a standalone Postgres instance that is maximally compatible with your project's backup file to assist with recovering your data.
+
+Downloaded backups are plain text SQL files that can be executed in Postgres to restore your project's schema and data. If you need you access data within a backup we recommend restoring into a Postgres instance built using the Supabase open source build tooling to ensure that the local instance is as similar to the original project as possible. Here are the steps to start Supabase Postgres locally and restore the backup:
+
+Install [nix](https://nixos.org/):
+
+```sh
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+```
+
+To identify your project's backup image version, reference the backup's download button following the `PG:` prefix:
+
+<Image
+  zoomable
+  alt="Project Paused: 90 Days Remaining"
+  src="/docs/img/guides/platform/paused-dl-image-version.png"
+/>
+
+Given Postgres version `15.6.1.115`, start Postgres locally with the nix command:
+
+```sh
+nix run 'github:supabase/postgres?ref=15.6.1.115#start-server' 15
+```
+
+where `15` refers to the backup's Postgres major version.
+
+Note that the earliest Supabase Postgres version that supports a direct reference is `15.6.1.115`. If you don't know your roject's Postgres version or it is lower than `15.6.1.115` then omit the `ref` option to build our most recent image:
+
+```sh
+nix run 'github:supabase/postgres#start-server' -- 15
+```
+
+Then restore the backup file from a separate shell session:
+
+```sh
+nix run github:supabase/postgres#start-client -- --file <BACKUP FILE>
+```
+
+Which loads the backup into Postgres and drops you into a [psql](https://www.postgresql.org/docs/current/app-psql.html) prompt. For `start-client` you do not need to provide a reference to the backup's Postgres version.
+
+Once your project has been restored, connect to it with your preferred Postgres tooling using `host=localhost`, `user=postgres`, `port=5432`, and an empty password. This will allow you to inspect your saved data and export whatever is necessary.
+
+Errors encountered during the restore process are logged to the console by the `start-server` process. Review those errors and edit the backup file as needed until the project restores successfully. The backup file is a plain text sequence of SQL statements that recreate your database. To resolve common error classes like `relation "xxx" does not exist`, identify the line raising the exception and shuffle the `create ... "xxx"` statement before it. A failed restore leaves artifacts on the Postgres server so be sure to restart the `start-server` process between restore attempts.
+
+A Postgres database started with `start-server` command is not production ready and should never be used outside a local development workflow.
 
 #### Disk sizing
 
@@ -145,158 +195,3 @@ As part of the upgrade process, maintenance operations such as [vacuuming](https
 #### Post-upgrade validation
 
 Supabase performs extensive pre- and post-upgrade validations to ensure that the database has been correctly upgraded. However, you should plan for your own application-level validations, as there might be changes you might not have anticipated, and this should be budgeted for when planning your downtime window.
-
-## Migrate your project
-
-Migrating projects can be achieved using the Supabase CLI. This is particularly useful for older projects (e.g. to use a newer Postgres version).
-
-### Before you begin
-
-- Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
-- Install the latest version of [Supabase CLI](/docs/guides/cli#installation).
-- Create a new [Supabase project](https://supabase.com/dashboard).
-- Install [Docker Desktop](https://www.docker.com) for your platform.
-- Set environment variables for the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
-  To find the database URL for a project, go to the project's dashboard page [Project Settings/Database](https://supabase.com/dashboard/project/_/settings/database) and look under `Connection string`. If your network provider supports IPv6, you can disable `Use connection pooling`. Otherwise, enable `Use connection pooling`. For the pooler mode, `Transaction` will work.
-
-### Backup your old database
-
-1. Run the following command from your terminal:
-
-```bash
-supabase db dump --db-url "$OLD_DB_URL" -f roles.sql --role-only
-supabase db dump --db-url "$OLD_DB_URL" -f schema.sql
-supabase db dump --db-url "$OLD_DB_URL" -f data.sql --use-copy --data-only
-```
-
-### Restore to your new project
-
-In your new project:
-
-1. Enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks) if you enabled them in your old project.
-2. Enable any [extensions](https://supabase.com/dashboard/project/_/database/extensions) that were enabled in your old project.
-
-If you use [column encryption](/docs/guides/database/column-encryption), first copy the root encryption key to your new project using your [Personal Access Token](https://supabase.com/dashboard/account/tokens).
-
-```bash
-export OLD_PROJECT_REF="<old_project_ref>"
-export NEW_PROJECT_REF="<new_project_ref>"
-export SUPABASE_ACCESS_TOKEN="<personal_access_token>"
-
-curl "https://api.supabase.com/v1/projects/$OLD_PROJECT_REF/pgsodium" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" |
-curl "https://api.supabase.com/v1/projects/$NEW_PROJECT_REF/pgsodium" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  -X PUT --json @-
-```
-
-Then run the following command from your terminal:
-
-```bash
-psql \
-  --single-transaction \
-  --variable ON_ERROR_STOP=1 \
-  --file roles.sql \
-  --file schema.sql \
-  --command 'SET session_replication_role = replica' \
-  --file data.sql \
-  --dbname "$NEW_DB_URL"
-```
-
-Setting the `session_replication_role` to `replica` disables all triggers so that columns are not double encrypted.
-
-Troubleshooting notes:
-
-- If you have created any [custom roles](https://supabase.com/dashboard/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
-- If you run into any permission errors related to `supabase_admin` during restore, edit the `schema.sql` file and comment out any lines containing `ALTER ... OWNER TO "supabase_admin"`.
-
-### Preserving migration history
-
-If you were using Supabase CLI for managing migrations on your old database and would like to preserve the migration history in your newly restored project, you need to insert the migration records separately using the following commands.
-
-```bash
-supabase db dump --db-url "$OLD_DB_URL" -f history_schema.sql --schema supabase_migrations
-supabase db dump --db-url "$OLD_DB_URL" -f history_data.sql --use-copy --data-only --schema supabase_migrations
-psql \
-  --single-transaction \
-  --variable ON_ERROR_STOP=1 \
-  --file history_schema.sql \
-  --file history_data.sql \
-  --dbname "$NEW_DB_URL"
-```
-
-### Schema changes to `auth` and `storage`
-
-If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or RLS policies, you have to restore them separately. The Supabase CLI can help you diff the changes to these schemas using the following commands.
-
-```bash
-supabase link --project-ref "$OLD_PROJECT_REF"
-supabase db diff --linked --schema auth,storage > changes.sql
-```
-
-### Enable publication on tables
-
-Replication for Realtime is disabled for all tables in your new project. On the [Publications](https://supabase.com/dashboard/project/_/database/publications) page in the Dashboard, select your new project and enable replication for tables that were enabled in your old project.
-
-### Migrate storage objects
-
-The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another.
-
-```js
-// npm install @supabase/supabase-js@1
-const { createClient } = require('@supabase/supabase-js')
-
-const OLD_PROJECT_URL = 'https://xxx.supabase.co'
-const OLD_PROJECT_SERVICE_KEY = 'old-project-service-key-xxx'
-
-const NEW_PROJECT_URL = 'https://yyy.supabase.co'
-const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
-
-;(async () => {
-  const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY, {
-    db: {
-      schema: 'storage',
-    },
-  })
-  const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
-  const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)
-
-  // make sure you update max_rows in postgrest settings if you have a lot of objects
-  // or paginate here
-  const { data: oldObjects, error } = await oldSupabaseRestClient.from('objects').select()
-  if (error) {
-    console.log('error getting objects from old bucket')
-    throw error
-  }
-
-  for (const objectData of oldObjects) {
-    console.log(`moving ${objectData.id}`)
-    try {
-      const { data, error: downloadObjectError } = await oldSupabaseClient.storage
-        .from(objectData.bucket_id)
-        .download(objectData.name)
-      if (downloadObjectError) {
-        throw downloadObjectError
-      }
-
-      const { _, error: uploadObjectError } = await newSupabaseClient.storage
-        .from(objectData.bucket_id)
-        .upload(objectData.name, data, {
-          upsert: true,
-          contentType: objectData.metadata.mimetype,
-          cacheControl: objectData.metadata.cacheControl,
-        })
-      if (uploadObjectError) {
-        throw uploadObjectError
-      }
-    } catch (err) {
-      console.log('error moving ', objectData)
-      console.log(err)
-    }
-  }
-})()
-```
-
-### Transfer to a different organization
-
-Note that project migration is for transferring your projects to different regions. If you need to move your project to a different organization without touching the infrastructure, see [project transfers](/docs/guides/platform/project-transfer).

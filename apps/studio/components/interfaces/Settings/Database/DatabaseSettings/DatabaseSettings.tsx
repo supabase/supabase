@@ -1,7 +1,6 @@
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
-import { useParams, useTelemetryProps } from 'common'
+import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
@@ -10,12 +9,11 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { pluckObjectFields } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Input } from 'ui'
-import { WarningIcon } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Input, WarningIcon } from 'ui'
 import {
   DefaultSessionModeNotice,
   IPv4AddonDirectConnectionNotice,
@@ -25,9 +23,7 @@ import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import ResetDbPassword from './ResetDbPassword'
 
 const DatabaseSettings = () => {
-  const router = useRouter()
   const { ref: projectRef, connectionString } = useParams()
-  const telemetryProps = useTelemetryProps()
   const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -57,6 +53,8 @@ const DatabaseSettings = () => {
     isError: isErrorAddons,
     isSuccess: isSuccessAddons,
   } = useProjectAddonsQuery({ projectRef })
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const error = readReplicasError || poolingInfoError || addOnsError
   const isLoading = isLoadingReadReplicas || isLoadingPoolingInfo || isLoadingAddons
   const isError = isErrorReadReplicas || isErrorPoolingInfo || isErrorAddons
@@ -84,15 +82,11 @@ const DatabaseSettings = () => {
     : dbConnectionInfo
 
   const handleCopy = (labelValue?: string) =>
-    Telemetry.sendEvent(
-      {
-        category: 'settings',
-        action: 'copy_connection_string',
-        label: labelValue ? labelValue : '',
-      },
-      telemetryProps,
-      router
-    )
+    sendEvent({
+      category: 'settings',
+      action: 'copy_connection_string',
+      label: labelValue ? labelValue : '',
+    })
 
   useEffect(() => {
     if (connectionString !== undefined && connectionStringsRef.current !== undefined) {
