@@ -13,13 +13,14 @@ import { Button } from 'ui'
 import { SELECT_COLUMN_KEY } from '../../constants'
 import { useTrackedState } from '../../store/Store'
 import type { SupaRow } from '../../types'
+import { PeekRow } from './PeekRow'
 
 export const SelectColumn: CalculatedColumn<any, any> = {
   key: SELECT_COLUMN_KEY,
   name: '',
   idx: 0,
-  width: 65,
-  maxWidth: 65,
+  width: 85,
+  maxWidth: 85,
   resizable: false,
   sortable: false,
   frozen: true,
@@ -126,7 +127,7 @@ function SelectCellFormatter({
   }
 
   return (
-    <div className="sb-grid-select-cell__formatter">
+    <div className="sb-grid-select-cell__formatter group">
       <input
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
@@ -139,7 +140,7 @@ function SelectCellFormatter({
         onClick={onClick}
       />
       {onEditRow && row && (
-        <Tooltip.Root delayDuration={0}>
+        <Tooltip.Root delayDuration={0} open={false}>
           <Tooltip.Trigger asChild>
             <Button
               type="text"
@@ -151,7 +152,7 @@ function SelectCellFormatter({
             />
           </Tooltip.Trigger>
           <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
+            <Tooltip.Content side="right" sideOffset={200}>
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
@@ -165,6 +166,7 @@ function SelectCellFormatter({
           </Tooltip.Portal>
         </Tooltip.Root>
       )}
+      {onEditRow && row && <PeekRow row={row} />}
     </div>
   )
 }
