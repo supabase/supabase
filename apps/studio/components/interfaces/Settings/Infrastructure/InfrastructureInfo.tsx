@@ -42,7 +42,8 @@ const InfrastructureInfo = () => {
     projectRef: ref,
   })
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
-  const { current_app_version, current_app_version_release_channel, latest_app_version } = data || {}
+  const { current_app_version, current_app_version_release_channel, latest_app_version } =
+    data || {}
   const isOnLatestVersion = current_app_version === latest_app_version
   const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
   const isOnNonGenerallyAvailableReleaseChannel =
