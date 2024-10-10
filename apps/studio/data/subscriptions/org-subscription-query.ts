@@ -44,7 +44,6 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
-  console.log({ canReadSubscriptions })
 
   return useQuery<OrgSubscriptionData, OrgSubscriptionError, TData>(
     subscriptionKeys.orgSubscription(orgSlug),
