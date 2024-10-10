@@ -300,6 +300,7 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
           'relative lg:sticky',
           'w-full lg:w-auto',
           'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
+          '[overscroll-behavior:contain]',
           'backdrop-blur backdrop-filter bg-background',
           'flex flex-col flex-grow'
         )}
