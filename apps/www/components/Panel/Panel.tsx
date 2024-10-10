@@ -12,8 +12,8 @@ interface Props {
   hasInnerShimmer?: boolean
   shimmerFromColor?: string
   shimmerToColor?: string
-  style?: any
-  innerStyle?: any
+  style?: React.CSSProperties
+  innerStyle?: React.CSSProperties
   hasMotion?: boolean
 }
 
