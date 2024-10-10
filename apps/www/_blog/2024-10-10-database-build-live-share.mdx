@@ -80,19 +80,33 @@ On the browser side, we establish a persistent Web Socket connection that acts a
 
 From the Postgres client side, we use pg-gateway to handle incoming TCP connections. It handles startup and authentication messages, then routes future messages back through the appropriate Web Socket tunnel to the browser.
 
-[pg-gateway](https://github.com/supabase-community/pg-gateway) is an open source library we developed to speak the Postgres wire protocol from the server-side. It allows us to run a Postgres-native proxy - meaning we can host a single TCP server that understands Postgres wire messages and route connections to multiple downstream databases.
+[pg-gateway](https://github.com/supabase-community/pg-gateway) is an open source library we developed to speak the Postgres wire protocol from the server-side. It allows us to run a Postgres-native proxy - meaning we can host a single TCP server that understands Postgres wire messages and route connections to multiple downstream databases via a wildcard domain (`*.browser.db.build`).
+
+<div>
+  <Img
+    className="border-none"
+    alt="Browser proxy diagram"
+    zoomable={false}
+    src={{
+      light: '/images/blog/database-build-live-share/routing-diagram--light.png',
+      dark: '/images/blog/database-build-live-share/routing-diagram--dark.png',
+    }}
+  />
+</div>
+
+Though you might be thinking - API gateways like nginx and HAProxy already exist to reverse proxy connections. Why can't we use one of these to route Postgres connections?
 
 ### The reverse proxy rabbit hole
-
-API gateways like nginx and HAProxy already exist to reverse proxy connections. Why can't we use one of these to route Postgres connections?
 
 In order to proxy a connection, you need to know its intended destination. With a protocol like HTTP, this is easy: simply read the `HOST` header in the request and forward the connection to the appropriate downstream server. This is often referred to as “virtual hosting” and is how backends are able to serve multiple websites over a single IP/port.
 
 Adding TLS encryption is slightly more complicated, but not too bad. The problem is: how do you read an HTTP `HOST` header if the channel is encrypted? Thankfully a TLS extension called Server Name Indication (SNI) was created to solve this problem, which passes the server name in plain text prior to encrypting the channel. The API gateway can simply read this server name and forward the connection to the appropriate downstream server.
 
-Now back to Postgres. Unlike HTTP, the Postgres wire protocol unfortunately has no `HOST`-like header, so the API gateway has no real way to know which downstream server the request was intended for. _But_ - what if we encrypt the channel via TLS, and then use the same SNI extension to identify the downstream server? This should work - and also means we can just use a regular API gateway like nginx… Right?
+Now back to Postgres. Let's say your Postgres client connects to the host `123.browser.db.build`. We need to retrieve the database ID (`123`) from the host name in order to know which Web Socket tunnel to proxy the connection to. Unfortunately this host name is lost by the time it arrives at the proxy, since your client will first resolve `123.browser.db.build` to an IP address via DNS before establishing the connection. And unlike HTTP, the Postgres wire protocol has no `HOST`-like header, so our gateway has no real way to know which downstream server the request was intended for.
 
-Unfortunately no. While Postgres _does_ support TLS encryption, it must be established as an upgrade mechanism within its wire protocol. This means that, unlike HTTPS where a TLS handshake is established first before any future HTTP messages, Postgres first expects an unencrypted `SSLRequest` message and response prior to establishing the connection, similar to the `STARTTLS` message in other protocols like SMTP and IMAP.
+_But_ - what if we encrypt the Postgres wire channel via TLS, and then just use the same SNI extension to identify the downstream server? This would give us a means to route, and then we can just use an existing API gateway like nginx (which supports TLS + SNI). Right?
+
+Yes and no. While Postgres _does_ support TLS encryption, it must be established as an upgrade mechanism within its wire protocol. This means that, unlike HTTPS where a TLS handshake is established first before any future HTTP messages, Postgres first expects an unencrypted `SSLRequest` message and response prior to establishing the connection, similar to the `STARTTLS` message in other protocols like SMTP and IMAP.
 
 This is where pg-gateway comes in. The library understands not only Postgres-specific startup and authentication messages, but also `SSLRequest` messages. When it receives an `SSLRequest` from the client, it establishes a TLS connection, and importantly, also reads the SNI server name sent by the client. Now we get the best of both worlds - we can encrypt the channel, handle startup and authentication, then forward future messages back through the appropriate Web Socket tunnel based on the ID we pull from the SNI server name.
 
