@@ -56,7 +56,7 @@ Some other tools you might want to connect to this:
 
 - pg_dump: export your in-browser databases to other platforms!
 - ORM: test out your database directly within your app
-- IDE: browse your data using your favourite database IDE
+- IDE: browse your data using your favorite database IDE
 
 _Note PGlite has a single-connection limit which may not work with all clients - see [Limitations](#limitations)._
 
@@ -104,7 +104,7 @@ We considered multiplexing multiple connections over a single PGlite connection,
 
 - Shared transaction state, meaning you need to prevent interleaving messages from multiple clients if any of them is in the middle of a transaction.
 - Multi-message protocols, like the extended query protocol. You will need to prevent interleaving messages from multiple clients until an entire set of extended query messages completes.
-- Any other shared session state between connections that could cause unpredictable behaviour.
+- Any other shared session state between connections that could cause unpredictable behavior.
 
 Be aware that some ORMs like Prisma will create a shadow database and connect to it in parallel in order to generate migrations. This unfortunately will fail with PGlite due to the single-connection limit. If you wish to connect your database with Prisma, you will need to [manually configure your shadow database](https://www.prisma.io/docs/orm/prisma-migrate/understanding-prisma-migrate/shadow-database#manually-configuring-the-shadow-database) to point to another temporary DB.
 
