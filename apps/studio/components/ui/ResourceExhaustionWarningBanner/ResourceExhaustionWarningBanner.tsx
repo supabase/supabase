@@ -1,4 +1,4 @@
-import { AlertTriangle, ExternalLink } from 'lucide-react'
+import { AlertTriangle, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
@@ -7,6 +7,8 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
@@ -14,6 +16,11 @@ const ResourceExhaustionWarningBanner = () => {
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === ref
+  )
+
+  const [bannerAcknowledged, setBannerAcknowledged] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.AUTH_EMAIL_WARNING_BANNER_ACKNOWLEDGE(ref ?? ''),
+    false
   )
 
   // [Joshen] Read only takes higher precedence over multiple resource warnings
@@ -68,19 +75,29 @@ const ResourceExhaustionWarningBanner = () => {
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.metric
 
-  const correctionUrl = (
-    metric === undefined
-      ? undefined
-      : metric === null
-        ? '/project/[ref]/settings/[infra-path]'
-        : metric === 'disk_space' || metric === 'read_only'
-          ? '/project/[ref]/settings/database'
-          : metric === 'auth_email_rate_limit'
-            ? '/project/[ref]/settings/auth'
-            : metric === 'auth_restricted_email_sending'
-              ? `/project/[ref]/settings/auth`
-              : `/project/[ref]/settings/[infra-path]#${metric}`
-  )
+  const correctionUrlVariants = {
+    undefined: undefined,
+    null: '/project/[ref]/settings/[infra-path]',
+    disk_space: '/project/[ref]/settings/database',
+    read_only: '/project/[ref]/settings/database',
+    auth_email_rate_limit: '/project/[ref]/settings/auth',
+    auth_restricted_email_sending: '/project/[ref]/settings/auth',
+    default: (metric: string) => `/project/[ref]/settings/[infra-path]#${metric}`,
+  }
+
+  const isDismissable =
+    RESOURCE_WARNING_MESSAGES[metric as keyof typeof RESOURCE_WARNING_MESSAGES]?.bannerContent
+      .allowDismissable ?? false
+
+  const getCorrectionUrl = (metric: string | undefined | null) => {
+    const variant = metric === undefined ? 'undefined' : metric === null ? 'null' : metric
+    const url =
+      correctionUrlVariants[variant as keyof typeof correctionUrlVariants] ||
+      correctionUrlVariants.default(metric as string)
+    return typeof url === 'function' ? url(metric as string) : url
+  }
+
+  const correctionUrl = getCorrectionUrl(metric)
     ?.replace('[ref]', ref ?? 'default')
     ?.replace('[infra-path]', 'infrastructure')
 
@@ -90,14 +107,49 @@ const ResourceExhaustionWarningBanner = () => {
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.buttonText
 
-  // Don't show banner if no warnings, or on usage/infra page
+  const hasNoWarnings = activeWarnings.length === 0
+  const hasNoWarningContent = warningContent === undefined
+  const isUsageOrInfraPage =
+    router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')
+  const onUsageOrInfraAndNotInReadOnlyMode =
+    isUsageOrInfraPage && !activeWarnings.includes('is_readonly_mode_enabled')
+  const onDatabaseSettingsAndInReadOnlyMode =
+    router.pathname.endsWith('settings/database') &&
+    activeWarnings.includes('is_readonly_mode_enabled')
+
+  // these take precedence over each other, so there's only one active warning to check
+  const activeWarning =
+    RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
+  const restrictToRoutes = activeWarning?.restrictToRoutes
+
+  const isVisible =
+    restrictToRoutes === undefined ||
+    restrictToRoutes.some((route: string) => {
+      // check for exact match with /project/[ref] (project home) first
+      // doing this let's us avoid checking with regex, keeping it simple
+      if (route === '/project/[ref]') {
+        const isExactMatch = router.pathname === '/project/[ref]'
+        return isExactMatch
+      }
+
+      // For other routes, use the original startsWith logic
+      const isMatch = router.pathname.startsWith(route)
+      return isMatch
+    })
+
+  // [Joshen] Only certain warnings should be dismissable, in this case for now,
+  // only the auth email banner should be, everything else should not be dismissable
+  const dismissBanner = () => {
+    setBannerAcknowledged(true)
+  }
+
   if (
-    activeWarnings.length === 0 ||
-    warningContent === undefined ||
-    ((router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')) &&
-      !activeWarnings.includes('is_readonly_mode_enabled')) ||
-    (activeWarnings.includes('is_readonly_mode_enabled') &&
-      router.pathname.endsWith('settings/database'))
+    hasNoWarnings ||
+    hasNoWarningContent ||
+    onUsageOrInfraAndNotInReadOnlyMode ||
+    onDatabaseSettingsAndInReadOnlyMode ||
+    !isVisible ||
+    bannerAcknowledged
   ) {
     return null
   }
@@ -126,6 +178,16 @@ const ResourceExhaustionWarningBanner = () => {
         {correctionUrl !== undefined && (
           <Button asChild type="default">
             <Link href={correctionUrl}>{buttonText ?? 'Check'}</Link>
+          </Button>
+        )}
+        {isDismissable && (
+          <Button
+            type="text"
+            icon={<X />}
+            className="px-1.5 !space-x-0"
+            onClick={() => dismissBanner()}
+          >
+            <span className="sr-only">Close</span>
           </Button>
         )}
       </div>

@@ -1,4 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
 import defaultTheme from '../../lib/theme/defaultTheme'
 import { Alert, AlertVariant } from './Alert'
 

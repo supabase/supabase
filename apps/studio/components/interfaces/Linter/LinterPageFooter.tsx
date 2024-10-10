@@ -39,10 +39,15 @@ const LinterPageFooter = ({
         className={cn(hideDbInspectCTA ? 'w-[35%]' : 'w-[33%]', 'flex flex-col gap-y-1 text-sm')}
       >
         <p>How are these suggestions generated?</p>
-        <Markdown
-          className="text-xs"
-          content="These suggestions use [splinter (Supabase Postgres LINTER)](https://github.com/supabase/splinter)."
-        />
+        <div className="prose text-xs">
+          <p>
+            <span>These suggestions use </span>
+            <a href="https://github.com/supabase/splinter" target="" rel="">
+              splinter (Supabase Postgres LINTER)
+            </a>
+            .
+          </p>
+        </div>
       </div>
 
       {!hideDbInspectCTA && (

@@ -2,7 +2,7 @@ import { Column } from 'react-data-grid'
 import type { LogData } from '../Logs.types'
 import { ResponseCodeFormatter, RowLayout, TextFormatter } from '../LogsFormatters'
 import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 const columns: Column<LogData>[] = [
   {

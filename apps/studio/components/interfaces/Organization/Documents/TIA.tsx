@@ -20,7 +20,7 @@ const TIA = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent className="flex items-center justify-center h-full">
         <a
-          href="https://supabase.com/downloads/docs/Supabase+TIA+240804.pdf"
+          href="https://supabase.com/downloads/docs/Supabase+TIA+241009.pdf"
           target="_blank"
           rel="noreferrer noopener"
           download={true}

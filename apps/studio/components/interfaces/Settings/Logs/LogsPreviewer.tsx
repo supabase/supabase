@@ -36,6 +36,7 @@ interface LogsPreviewerProps {
   filterOverride?: Filters
   condensedLayout?: boolean
   tableName?: LogsTableName
+  EmptyState?: React.ReactNode
 }
 export const LogsPreviewer = ({
   projectRef,
@@ -44,6 +45,7 @@ export const LogsPreviewer = ({
   condensedLayout = false,
   tableName,
   children,
+  EmptyState,
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
   const { s, ite, its, db } = useParams()
@@ -69,7 +71,7 @@ export const LogsPreviewer = ({
     setFilters,
     refresh,
     setParams,
-  } = useLogsPreview(projectRef as string, table, filterOverride)
+  } = useLogsPreview({ projectRef, table, filterOverride })
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
@@ -180,10 +182,11 @@ export const LogsPreviewer = ({
     }
   }
 
-  const footerHeight = '48px'
+  const noResults = logData.length === 0 && !error
+  const footerHeight = noResults ? '0px' : '48px'
   const navBarHeight = '48px'
-  const filterPanelHeight = '54px'
-  const chartHeight = showChart ? '114px' : '0px'
+  const filterPanelHeight = '58px'
+  const chartHeight = showChart && !noResults ? '114px' : '0px'
   const maxHeight = `calc(100vh - ${navBarHeight} - ${filterPanelHeight} - ${footerHeight} - ${chartHeight})`
 
   return (
@@ -259,6 +262,7 @@ export const LogsPreviewer = ({
             onHistogramToggle={() => setShowChart(!showChart)}
             params={params}
             error={error}
+            EmptyState={EmptyState}
           />
         </LoadingOpacity>
       </div>

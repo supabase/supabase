@@ -9,7 +9,7 @@ import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { INSTANCE_MICRO_SPECS } from 'lib/constants'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
-import { ComputeBadge } from 'ui-patterns/ComputeBadge/ComputeBadge'
+import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
 
 const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {

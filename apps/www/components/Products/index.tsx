@@ -22,7 +22,7 @@ interface Props {
   products: SolutionsType
 }
 
-const Products = (props: Props) => {
+const Products: React.FC<Props> = (props) => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
 
@@ -97,7 +97,7 @@ const Products = (props: Props) => {
           </ul>
         }
         onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.DATABASE)}
-        image={<DatabaseVisual />}
+        image={<DatabaseVisual className="hidden sm:block" />}
       />
       <ProductCard
         className="col-span-6 xl:col-span-3"
@@ -108,11 +108,10 @@ const Products = (props: Props) => {
         subtitle={
           <>
             <strong>Add user sign ups and logins</strong>,
-            <br className="inline-block sm:hidden lg:inline-block" />
-            securing your data with Row Level Security.
+            <br className="hidden lg:inline-block" /> securing your data with Row Level Security.
           </>
         }
-        image={<AuthVisual />}
+        image={<AuthVisual className="hidden sm:block" />}
         onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.AUTHENTICATION)}
       />
       <ProductCard
@@ -124,12 +123,12 @@ const Products = (props: Props) => {
         subtitle={
           <>
             Easily write custom code
-            <br className="inline-block sm:hidden lg:inline-block" />{' '}
+            <br className="hidden sm:inline-block" />{' '}
             <strong>without deploying or scaling servers.</strong>
           </>
         }
         onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.FUNCTIONS)}
-        image={<FunctionsVisual />}
+        image={<FunctionsVisual className="hidden sm:block" />}
       />
       <ProductCard
         className="col-span-6 xl:col-span-3"
@@ -140,11 +139,11 @@ const Products = (props: Props) => {
         subtitle={
           <>
             <strong>Store, organize, and serve</strong>
-            <br className="inline-block xl:hidden 2xl:inline-block" /> large files, from videos to
-            images.
+            <br className="hidden sm:inline-block xl:hidden 2xl:inline-block" /> large files, from
+            videos to images.
           </>
         }
-        image={<StorageVisual />}
+        image={<StorageVisual className="hidden sm:block" />}
         onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.STORAGE)}
       />
       <ProductCard
@@ -155,12 +154,11 @@ const Products = (props: Props) => {
         subtitle={
           <>
             <strong>Build multiplayer experiences</strong>
-            <br className="inline-block md:hidden 2xl:inline-block" /> with real-time data
-            synchronization.
+            <br className="hidden sm:inline-block" /> with real-time data synchronization.
           </>
         }
         onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.REALTIME)}
-        image={<RealtimeVisual />}
+        image={<RealtimeVisual className="hidden sm:block" />}
         className="
           col-span-6 pointer-events-none xl:col-span-3
           hover:!cursor-[url('/images/index/products/realtime-cursor-light.svg'),_auto]
@@ -175,7 +173,7 @@ const Products = (props: Props) => {
         title={props.products['vector'].name}
         subtitle={
           <>
-            Integrate your favorite ML-models to <br className="inline-block md:hidden" />
+            Integrate your favorite ML-models to <br className="hidden sm:inline-block md:hidden" />
             <strong>store, index and search vector embeddings</strong>.
           </>
         }
@@ -243,7 +241,7 @@ const Products = (props: Props) => {
           </ul>
         }
         onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.VECTOR)}
-        image={<VectorVisual />}
+        image={<VectorVisual className="hidden sm:block" />}
       />
       <ProductCard
         alignLeft
@@ -253,7 +251,7 @@ const Products = (props: Props) => {
         title={props.products['data-api'].name}
         subtitle={props.products['data-api'].description}
         onClick={() => sendTelemetryEvent('data-api')}
-        image={<DataAPIsVisual />}
+        image={<DataAPIsVisual className="hidden sm:block" />}
       />
       <p className="text-xl sm:text-2xl text-foreground-lighter col-span-full tracking-[-.01rem]">
         <span className="text-foreground">Use one or all.</span> Best of breed products. Integrated
