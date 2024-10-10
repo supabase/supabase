@@ -13,6 +13,7 @@ import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_
 import InformationBox from 'components/ui/InformationBox'
 import { toast } from 'sonner'
 import { useRouter } from 'next/router'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 
 const SupportPage = () => {
   const [sentCategory, setSentCategory] = useState<string>()
@@ -114,26 +115,32 @@ const SupportPage = () => {
                 </p>
                 <p>
                   Please, make sure to{' '}
-                  <span className="text-foreground underline">include your project ID</span> and as
-                  much information as possible.
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="text-foreground underline">include your project ID</span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <ul>
+                        <li>Your projects</li>
+                        {projectsData?.map((project) => (
+                          <li key={project.id} className="cursor-default">
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(`${project.name} - ${project.ref}`)
+                                toast.success('Copied to clipboard')
+                              }}
+                              className="flex py-1.5 gap-x-1 items-center text-foreground"
+                            >
+                              {project.name} - {project.ref}
+                              <ClipboardIcon size="14" className="text-foreground-lighter" />
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>{' '}
+                  and as much information as possible.
                 </p>
-                <ul>
-                  <li>Projects</li>
-                  {projectsData?.map((project) => (
-                    <li key={project.id}>
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(`${project.name} - ${project.ref}`)
-                          toast.success('Copied to clipboard')
-                        }}
-                        className="flex py-1.5 gap-x-1 items-center text-foreground"
-                      >
-                        {project.name} - {project.ref}
-                        <ClipboardIcon size="14" className="text-foreground-lighter" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
               </div>
             }
             defaultVisibility={true}
