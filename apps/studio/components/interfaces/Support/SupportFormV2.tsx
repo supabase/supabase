@@ -52,7 +52,8 @@ import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { detectBrowser } from 'lib/helpers'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
-import { usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -139,6 +140,11 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     searchState: state,
   } = useDocsSearch(supabaseClient)
 
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+
   const {
     data: subscription,
     isLoading: isLoadingSubscription,
@@ -149,6 +155,8 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     },
     { enabled: isPermissionsLoaded }
   )
+
+  console.log({ isPermissionsLoaded, canReadSubscriptions })
 
   const {
     data: allProjects,

@@ -44,6 +44,7 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
+  console.log({ canReadSubscriptions })
 
   return useQuery<OrgSubscriptionData, OrgSubscriptionError, TData>(
     subscriptionKeys.orgSubscription(orgSlug),
@@ -56,14 +57,6 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
 }
 
 export const useHasAccessToProjectLevelPermissions = (slug: string) => {
-  const canReadSubscriptions = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
-  )
-  const { data: subscription } = useOrgSubscriptionQuery(
-    { orgSlug: slug },
-    { enabled: canReadSubscriptions }
-  )
-
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
   return subscription?.plan.id === 'enterprise'
 }
