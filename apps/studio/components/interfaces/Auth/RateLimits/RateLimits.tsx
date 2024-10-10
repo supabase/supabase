@@ -127,6 +127,9 @@ const RateLimits = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess])
 
+  const hasAuthEmailHookEnabled = authConfig?.HOOK_SEND_EMAIL_ENABLED
+
+
   return (
     <div>
       <FormHeader
@@ -152,9 +155,9 @@ const RateLimits = () => {
                     handleReset={() => form.reset()}
                     disabled={!canUpdateConfig}
                     helper={
-                      !canUpdateConfig
-                        ? 'You need additional permissions to update authentication settings'
-                        : undefined
+                    !canUpdateConfig
+                    ? 'You need additional permissions to update authentication settings'
+                    : undefined
                     }
                   />
                 </div>
@@ -204,7 +207,7 @@ const RateLimits = () => {
                               </Button>
                             </AlertDescription_Shadcn_>
                           </Alert_Shadcn_>
-                        ) : !isSmtpEnabled(authConfig) ? (
+                        ) : !(isSmtpEnabled(authConfig) || hasAuthEmailHookEnabled) ? (
                           <Alert_Shadcn_>
                             <WarningIcon />
                             <AlertTitle_Shadcn_>
@@ -441,7 +444,7 @@ const RateLimits = () => {
         </Form_Shadcn_>
       )}
     </div>
-  )
+      )
 }
 
 export default RateLimits
