@@ -102,6 +102,15 @@ To call a read-only Postgres function on Read Replicas through the REST API, use
 
 If you remove all Read Replicas from your project, the load balancer and its endpoint are removed as well. Make sure to redirect requests back to your Primary database before removal.
 
+#### Experimental Routing
+
+The API load balancer offers an experimental routing mode that builds on top of the existing funtionality. It is now possible to use your load balancer endpoint for all Supabase related traffic. The following list summarizes the features that are now accessible.
+
+- Auth requests are sent to the Primary database even when using the load balancer endpoint.
+- Routing of Edge Functions, Storage, and Realtime requests go to the appropriate backend Supabase service.
+
+The experimental features listed can be enabled by sending the header `sb-lb-routing-mode: alpha-all-services` along with any requests. This gives the option to opt-in and try the new features out, but still have the peace of mind that the original behavior is there should it be needed. Please let us know if you have any feedback by [contacting us](https://supabase.com/support).
+
 <Admonition type="caution">
 
 If you use a [custom domain](/docs/guides/platform/custom-domains), requests will not be routed through the load balancer. You should instead use the dedicated endpoints provided in the dashboard.
