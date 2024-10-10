@@ -76,7 +76,7 @@ To make this possible, we developed a [**websocket-to-tcp proxy**](https://githu
   />
 </div>
 
-On the browser side, we establish a persistent Web Socket connection that acts as a reverse tunnel for future messages sent from clients. Since Web Sockets support bidirectional communication, we simply send Postgres client messages in reverse - from our browser proxy back through the Web Socket tunnel to the PGlite instance in the browser. We are running a server from the browser!
+On the browser side, we establish a persistent Web Socket connection that acts as a reverse tunnel for future messages sent from clients. Since Web Sockets support bidirectional communication, we simply send Postgres client messages in reverse - from our proxy back through the Web Socket tunnel to the PGlite instance in the browser. We are running a server from the browser!
 
 From the Postgres client side, we use pg-gateway to handle incoming TCP connections. It handles startup and authentication messages, then routes future messages back through the appropriate Web Socket tunnel to the browser.
 
