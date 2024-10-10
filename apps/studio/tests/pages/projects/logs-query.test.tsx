@@ -27,6 +27,12 @@ beforeAll(() => {
   vi.mock('lib/gotrue', () => ({
     auth: { onAuthStateChange: vi.fn() },
   }))
+  vi.mock('nuqs', async () => {
+    let queryValue = 'example'
+    return {
+      useQueryState: () => [queryValue, (v: string) => (queryValue = v)],
+    }
+  })
 })
 
 test.skip('can display log data', async () => {
