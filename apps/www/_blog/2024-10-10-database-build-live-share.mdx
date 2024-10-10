@@ -114,9 +114,8 @@ Live Share is also limited to the protocol messages that PGlite supports. For ex
 
 For the initial release, we are also enforcing the following limits on the proxy:
 
-• 5-minute idle timeout per TCP client connection
-
-• 1-hour total timeout for the WebSocket server connection
+- 5-minute idle timeout per TCP client connection
+- 1-hour total timeout for the WebSocket server connection
 
 If you hit any of these limits, just reconnect your Live Share session and you can continue on as before.
 
@@ -125,3 +124,11 @@ If you hit any of these limits, just reconnect your Live Share session and you c
 One last thing - we're transitioning postgres.new to a new name: database.build.
 
 Why rename? The term “Postgres” is reserved for official Postgres projects and we don't want to mislead anyone. We're renaming to [database.build](https://database.build/) because, well, that's what this does. This will still be 100% Postgres-focused, just with a different URL.
+
+## Always open source
+
+Below are the repos for the projects mentioned in this post - open source as always. Feel free to give them a star, add an issue, or contribute some code yourself:
+
+- [PGlite](https://github.com/electric-sql/pglite) (Apache 2.0): A WASM build of Postgres.
+- [pg-gateway](https://github.com/supabase-community/pg-gateway) (MIT): Postgres wire protocol for the server-side.
+- [database-build](https://github.com/supabase-community/postgres-new) (Apache 2.0): The frontend and browser proxy for [database.build](https://database.build).
