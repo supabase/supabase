@@ -264,6 +264,53 @@ Depending on your application requirements, data conflicts can arise when an ano
 2. Overwrite the items in the cart with those from the anonymous user
 3. Merge the items in the cart together
 
+### Linking an anonymous user to an existing account
+
+In some cases, you may need to link an anonymous user to an existing account rather than creating a new permanent account. This process requires manual handling of potential conflicts. Here's a general approach:
+
+```javascript
+// 1. Sign in anonymously (assuming the user is already signed in anonymously)
+const { data: anonData, error: anonError } = await supabase.auth.getSession()
+
+// 2. Attempt to update the user with the existing email
+const { data: updateData, error: updateError } = await supabase.auth.updateUser({
+  email: 'existing_user@example.com',
+})
+
+// 3. Handle the error (since the email belongs to an existing user)
+if (updateError) {
+  console.log('This email belongs to an existing user. Please sign in to that account.')
+
+  // 4. Sign in to the existing account
+  const {
+    data: { user: existingUser },
+    error: signInError,
+  } = await supabase.auth.signInWithPassword({
+    email: 'existing_user@example.com',
+    password: 'user_password',
+  })
+
+  if (existingUser) {
+    // 5. Reassign entities tied to the anonymous user
+    // This step will vary based on your specific use case and data model
+    const { data: reassignData, error: reassignError } = await supabase
+      .from('your_table')
+      .update({ user_id: existingUser.id })
+      .eq('user_id', anonData.session.user.id)
+
+    // 6. Implement your chosen conflict resolution strategy
+    // This could involve merging data, overwriting, or other custom logic
+    await resolveDataConflicts(anonData.session.user.id, existingUser.id)
+  }
+}
+
+// Helper function to resolve data conflicts (implement based on your strategy)
+async function resolveDataConflicts(anonymousUserId, existingUserId) {
+  // Implement your conflict resolution logic here
+  // This could involve ignoring the anonymous user's metadata, overwriting the existing user's metadata, or merging the data of both the anonymous and existing user.
+}
+```
+
 ## Abuse prevention and rate limits
 
 Since anonymous users are stored in your database, bad actors can abuse the endpoint to increase your database size drastically. It is strongly recommended to [enable invisible Captcha or Cloudflare Turnstile](/docs/guides/auth/auth-captcha) to prevent abuse for anonymous sign-ins. An IP-based rate limit is enforced at 30 requests per hour which can be modified in your [dashboard](/dashboard/project/_/auth/rate-limits). You can refer to the full list of rate limits [here](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention).
