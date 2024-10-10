@@ -50,6 +50,8 @@ To guard against this:
     >Confirm your signup
   </a>
   ```
+  
+- Or by blocking HTTP HEAD requests, as mentioned [here](docs/guides/auth/server-side/nextjs).
 
   The user should be brought to a page on your site where they can confirm the action by clicking a button.
   The button should contain the actual confirmation link which can be obtained from parsing the `confirmation_url={{ .ConfirmationURL }}` query parameter in the URL.
