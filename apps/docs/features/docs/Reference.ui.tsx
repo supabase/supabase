@@ -111,6 +111,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
         'bg-gradient-to-b from-background from-85% to-transparent to-100%',
         'text-2xl font-medium text-foreground',
         'scroll-mt-[calc(var(--header-height)+1rem)]',
+        'focus:outline-none',
         monoFont && 'font-mono',
         className
       )}
