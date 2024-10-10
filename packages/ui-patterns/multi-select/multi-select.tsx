@@ -113,7 +113,11 @@ function MultiSelector({
           }
         }
       } else if (e.key === 'Enter') {
-        setOpen(true)
+        if (open) {
+          inputValue.length !== 0 && setInputValue('')
+        } else {
+          setOpen(true)
+        }
       } else if (e.key === 'Escape') {
         if (activeIndex !== -1) {
           setActiveIndex(-1)
@@ -255,6 +259,10 @@ const MultiSelectorTrigger = React.forwardRef<
         event.stopPropagation()
         event.preventDefault()
         setOpen(true)
+
+        setTimeout(() => {
+          inlineInputRef.current?.focus()
+        }, 100)
       }
     }
 
@@ -279,7 +287,7 @@ const MultiSelectorTrigger = React.forwardRef<
             ref={badgesRef}
             className={cn(
               'flex gap-1 -ml-1 overflow-hidden',
-              (IS_BADGE_LIMIT_WRAP || IS_INLINE_MODE) && 'flex-wrap',
+              IS_BADGE_LIMIT_WRAP && 'flex-wrap',
               !IS_BADGE_LIMIT_WRAP &&
                 'overflow-x-scroll scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
             )}
@@ -315,8 +323,11 @@ const MultiSelectorTrigger = React.forwardRef<
                 showSearchIcon={false}
                 onValueChange={activeIndex === -1 ? setInputValue : undefined}
                 placeholder={label}
-                wrapperClassName="px-0 min-w-[85px] flex-1 border-none"
-                className="py-0 px-1"
+                wrapperClassName={cn(
+                  'px-0 flex-1 border-none truncate',
+                  IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
+                )}
+                className="py-0 px-1 truncate"
               />
             )}
           </div>

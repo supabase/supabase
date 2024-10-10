@@ -2,7 +2,6 @@ import { useState } from 'react'
 import {
   MultiSelector,
   MultiSelectorContent,
-  MultiSelectorInput,
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
@@ -23,6 +22,7 @@ export default function MultiSelectDemo() {
       />
       <MultiSelectorContent sameWidthAsTrigger>
         <MultiSelectorList>
+          <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
           <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>
           <MultiSelectorItem value="Cherry">Cherry</MultiSelectorItem>
           <MultiSelectorItem value="Date">Date</MultiSelectorItem>
