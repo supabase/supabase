@@ -169,6 +169,14 @@ const nextConfig = {
         basePath: false,
         permanent: false,
       },
+
+      // Redirect Dart Edge docs to Invertase's docs
+      {
+        source: '/docs/guides/functions/dart-edge',
+        destination: 'https://invertase.docs.page/dart_edge/platform/supabase',
+        basePath: false,
+        permanent: true,
+      },
     ]
   },
   typescript: {
