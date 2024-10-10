@@ -1,4 +1,5 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { components } from 'api-types'
 
 import { isBrowser } from 'common'
 import { handleError, post } from 'data/fetchers'
@@ -7,35 +8,8 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
-type SendEventGA = {
-  action: string
-  category: string
-  label: string
-  value: string
-  page_referrer: string
-  page_title: string
-  page_location: string
-  ga: {
-    screen_resolution: string
-    language: string
-  }
-}
-
-type SendEventPH = {
-  action: string
-  page_url: string
-  page_title: string
-  pathname: string
-  ph: {
-    language: string
-    referrer: string
-    userAgent: string
-    search: string
-    viewport_height: number
-    viewport_width: number
-  }
-  custom_properties: { [key: string]: string }
-}
+type SendEventGA = components['schemas']['TelemetryEventBody']
+type SendEventPH = components['schemas']['TelemetryEventBodyV2']
 
 export type SendEventVariables = {
   action: string
@@ -87,7 +61,7 @@ export const useSendEventMutation = ({
         ph: {
           referrer,
           language: router?.locale ?? 'en-US',
-          userAgent: navigator.userAgent,
+          user_agent: navigator.userAgent,
           search: window.location.search,
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
@@ -113,7 +87,7 @@ export const useSendEventMutation = ({
             action,
             ...(payload as Omit<SendEventPH, 'action'>),
             custom_properties: otherVars,
-          } as SendEventPH)
+          } as unknown as SendEventPH)
         : ({ ...vars, ...payload } as SendEventGA)
       return sendEvent(type, body)
     },
