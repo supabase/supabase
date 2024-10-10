@@ -266,7 +266,6 @@ class StorageExplorerStore {
   popOpenedFoldersAtIndex = (index: number) => {
     this.openedFolders = this.openedFolders.slice(0, index + 1)
   }
-
   clearOpenedFolders = () => {
     this.openedFolders = []
   }
@@ -743,26 +742,31 @@ class StorageExplorerStore {
             chunkSize,
             onShouldRetry(error) {
               const status = error.originalResponse ? error.originalResponse.getStatus() : 0
-              const doNotRetryStatuses = [400, 403, 404, 409, 415, 429]
+              const doNotRetryStatuses = [400, 403, 404, 409, 413, 415, 429]
 
               return !doNotRetryStatuses.includes(status)
             },
             onError: (error) => {
               numberOfFilesUploadedFail += 1
-              if (
-                error instanceof tus.DetailedError &&
-                error.originalResponse?.getStatus() === 415
-              ) {
-                // Unsupported mime type
-                toast.error(
-                  capitalize(
-                    error.originalResponse.getBody() ||
-                      `Failed to upload ${file.name}: ${metadata.mimetype} is not allowed`
-                  ),
-                  {
-                    description: `Allowed MIME types: ${this.selectedBucket.allowed_mime_types?.join(', ')}`,
-                  }
-                )
+              if (error instanceof tus.DetailedError) {
+                const status = error.originalResponse?.getStatus()
+                if (status === 415) {
+                  // Unsupported mime type
+                  toast.error(
+                    capitalize(
+                      error?.originalResponse?.getBody() ||
+                        `Failed to upload ${file.name}: ${metadata.mimetype} is not allowed`
+                    ),
+                    {
+                      description: `Allowed MIME types: ${this.selectedBucket.allowed_mime_types?.join(', ')}`,
+                    }
+                  )
+                } else if (status === 413) {
+                  // Payload too large
+                  toast.error(
+                    `Failed to upload ${file.name}: File size exceeds the bucket upload limit.`
+                  )
+                }
               } else {
                 toast.error(`Failed to upload ${file.name}: ${error.message}`)
               }
