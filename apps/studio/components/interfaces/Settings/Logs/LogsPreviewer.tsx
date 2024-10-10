@@ -221,7 +221,7 @@ export const LogsPreviewer = ({
       <div
         className={
           'transition-all duration-500 ' +
-          (showChart && logData.length > 0 ? 'mb-4 h-24 pt-3 opacity-100' : 'h-0 opacity-0')
+          (showChart && logData.length > 0 ? 'mb-4 h-28 pt-3 opacity-100' : 'h-0 opacity-0')
         }
       >
         <div className={condensedLayout ? 'px-3' : ''}>
