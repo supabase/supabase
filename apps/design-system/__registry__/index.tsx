@@ -1820,6 +1820,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "multi-select-disabled": {
+      name: "multi-select-disabled",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-disabled")),
+      source: "",
+      files: ["registry/default/example/multi-select-disabled.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "multi-select-badge-limit-auto": {
       name: "multi-select-badge-limit-auto",
       type: "components:example",
@@ -1871,6 +1882,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/multi-select-deletable-badge")),
       source: "",
       files: ["registry/default/example/multi-select-deletable-badge.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-inline-search-input": {
+      name: "multi-select-inline-search-input",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-inline-search-input")),
+      source: "",
+      files: ["registry/default/example/multi-select-inline-search-input.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

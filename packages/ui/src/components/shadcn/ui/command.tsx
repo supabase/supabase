@@ -42,32 +42,45 @@ const CommandInput = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
     wrapperClassName?: string
     showCloseIcon?: boolean
+    showSearchIcon?: boolean
     handleClose?: () => void
   }
->(({ className, wrapperClassName, showCloseIcon = false, handleClose, ...props }, ref) => (
-  <div className={cn('flex items-center border-b px-3', wrapperClassName)} cmdk-input-wrapper="">
-    <Search className="h-4 w-4 shrink-0 opacity-50" />
-    <CommandPrimitive.Input
-      ref={ref}
-      className={cn(
-        'flex h-9 w-full rounded-md bg-transparent py-3 text-xs text outline-none placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0',
-        className
-      )}
-      {...props}
-    />
-    {showCloseIcon && (
-      <button
-        onClick={handleClose}
+>(
+  (
+    {
+      className,
+      wrapperClassName,
+      showCloseIcon = false,
+      showSearchIcon = true,
+      handleClose,
+      ...props
+    },
+    ref
+  ) => (
+    <div className={cn('flex items-center border-b px-3', wrapperClassName)} cmdk-input-wrapper="">
+      {showSearchIcon && <Search className="h-4 w-4 shrink-0 opacity-50" />}
+      <CommandPrimitive.Input
+        ref={ref}
         className={cn(
-          'text-foreground-lighter hover:text-foreground-light transition-all opacity-0 duration-100',
-          !!props.value?.length && 'opacity-100'
+          'flex h-9 w-full rounded-md bg-transparent py-3 text-xs text outline-none placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0',
+          className
         )}
-      >
-        <RemoveIcon size={14} />
-      </button>
-    )}
-  </div>
-))
+        {...props}
+      />
+      {showCloseIcon && (
+        <button
+          onClick={handleClose}
+          className={cn(
+            'text-foreground-lighter hover:text-foreground-light transition-all opacity-0 duration-100',
+            !!props.value?.length && 'opacity-100'
+          )}
+        >
+          <RemoveIcon size={14} />
+        </button>
+      )}
+    </div>
+  )
+)
 
 CommandInput.displayName = CommandPrimitive.Input.displayName
 

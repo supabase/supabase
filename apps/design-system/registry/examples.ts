@@ -1046,6 +1046,11 @@ export const examples: Registry = [
     files: ['example/multi-select-demo.tsx'],
   },
   {
+    name: 'multi-select-disabled',
+    type: 'components:example',
+    files: ['example/multi-select-disabled.tsx'],
+  },
+  {
     name: 'multi-select-badge-limit-auto',
     type: 'components:example',
     files: ['example/multi-select-badge-limit-auto.tsx'],
@@ -1069,6 +1074,11 @@ export const examples: Registry = [
     name: 'multi-select-deletable-badge',
     type: 'components:example',
     files: ['example/multi-select-deletable-badge.tsx'],
+  },
+  {
+    name: 'multi-select-inline-search-input',
+    type: 'components:example',
+    files: ['example/multi-select-inline-search-input.tsx'],
   },
   {
     name: 'tree-view-demo',
