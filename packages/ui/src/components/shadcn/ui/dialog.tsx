@@ -54,7 +54,6 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const DialogContentVariants = cva(
   cn(
-    '',
     'relative z-50 w-full border shadow-md dark:shadow-sm',
     'data-[state=open]:animate-in data-[state=closed]:animate-out',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
