@@ -20,10 +20,7 @@ export async function upgradeProject({
 }: ProjectUpgradeVariables) {
   const { data, error } = await post('/v1/projects/{ref}/upgrade', {
     params: { path: { ref } },
-    body: {
-      target_version,
-      release_channel,
-    },
+    body: { target_version: target_version.toString(), release_channel },
   })
   if (error) handleError(error)
   return data

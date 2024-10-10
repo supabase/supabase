@@ -15,6 +15,7 @@ import {
   Command_Shadcn_,
   CriticalIcon,
   Input,
+  Label_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -63,12 +64,11 @@ const ColumnType = ({
   showRecommendation = false,
   onOptionSelect = noop,
 }: ColumnTypeProps) => {
+  const [open, setOpen] = useState(false)
   // @ts-ignore
   const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
   const isAvailableType = value ? availableTypes.includes(value) : true
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
-  const [open, setOpen] = useState(false)
-  console.log({ availableTypes })
 
   const getOptionByName = (name: string) => {
     // handle built in types
@@ -183,7 +183,8 @@ const ColumnType = ({
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-y-2">
+      {showLabel && <Label_Shadcn_ className="text-foreground-light">Type</Label_Shadcn_>}
       <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
@@ -191,7 +192,7 @@ const ColumnType = ({
             role="combobox"
             size={'small'}
             aria-expanded={open}
-            className="w-full justify-between"
+            className={cn('w-full justify-between', !value && 'text-foreground-lighter')}
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
           >
             {value ? (
@@ -277,7 +278,7 @@ const ColumnType = ({
       </Popover_Shadcn_>
 
       {showRecommendation && recommendation !== undefined && (
-        <Alert_Shadcn_ variant="warning">
+        <Alert_Shadcn_ variant="warning" className="mt-2">
           <CriticalIcon />
           <AlertTitle_Shadcn_>
             {' '}

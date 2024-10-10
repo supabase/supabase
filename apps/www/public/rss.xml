@@ -5,9 +5,30 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 11 Sep 2024 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 07 Oct 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/offline-first-flutter-apps</guid>
+  <title>Building offline-first mobile apps with Supabase, Flutter and Brick</title>
+  <link>https://supabase.com/blog/offline-first-flutter-apps</link>
+  <description>Brick is an all-in-one data manager for Flutter that handles querying and uploading between Supabase and local caches like SQLite. Using Brick, developers can focus on implementing the application without worrying about translating or storing their data.</description>
+  <pubDate>Mon, 07 Oct 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/lw12-hackathon-winners</guid>
+  <title>Supabase Launch Week 12 Hackathon</title>
+  <link>https://supabase.com/blog/lw12-hackathon-winners</link>
+  <description>Announcing the winners of the Supabase Launch Week 12 Hackathon.</description>
+  <pubDate>Sun, 29 Sep 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/local-first-expo-legend-state</guid>
+  <title>Local-first Realtime Apps with Expo and Legend-State</title>
+  <link>https://supabase.com/blog/local-first-expo-legend-state</link>
+  <description>Build local-first realtime web and mobile apps with Expo, Legend-State, and Supabase.</description>
+  <pubDate>Sun, 22 Sep 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/edge-functions-faster-smaller</guid>
   <title>Edge Functions are now 2x smaller and boot 3x faster</title>
   <link>https://supabase.com/blog/edge-functions-faster-smaller</link>

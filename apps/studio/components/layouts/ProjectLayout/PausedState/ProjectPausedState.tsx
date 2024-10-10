@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { PauseCircle } from 'lucide-react'
+import { ExternalLink, PauseCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -241,6 +241,17 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                                 </span>
                                 . However, your database backup and Storage objects will still be
                                 available for download thereafter.
+                              </AlertDescription_Shadcn_>
+                              <AlertDescription_Shadcn_ className="mt-3">
+                                <Button asChild type="default" icon={<ExternalLink />}>
+                                  <a
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#time-limits"
+                                  >
+                                    More information
+                                  </a>
+                                </Button>
                               </AlertDescription_Shadcn_>
                             </Alert_Shadcn_>
                           </>
