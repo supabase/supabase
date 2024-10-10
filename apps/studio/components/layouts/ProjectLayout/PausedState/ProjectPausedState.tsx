@@ -318,7 +318,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     control={form.control}
                     name="postgresVersionSelection"
                     render={({ field }) => (
-                      <FormItemLayout label="Select the version of Postgres to upgrade to">
+                      <FormItemLayout label="Select the version of Postgres to restore to">
                         <FormControl_Shadcn_>
                           <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                             <SelectTrigger_Shadcn_>
