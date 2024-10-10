@@ -136,7 +136,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     isLoading: isLoadingSubscription,
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({
-    orgSlug: organizationSlug,
+    orgSlug: organizationSlug === 'no-org' ? undefined : organizationSlug,
   })
 
   const {
@@ -200,6 +200,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
 
     const payload = {
       ...values,
+      organizationSlug: values.organizationSlug === 'no-org' ? undefined : values.organizationSlug,
       library:
         values.category === 'Problem' && selectedLibrary !== undefined ? selectedLibrary.key : '',
       message: formatMessage(values.message, attachments),
@@ -256,7 +257,9 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
   useEffect(() => {
     // For prefilling form fields via URL, project ref will taking higher precedence than org slug
     if (isSuccessOrganizations && isSuccessProjects) {
-      if (ref) {
+      if (organizations.length === 0) {
+        form.setValue('organizationSlug', 'no-org')
+      } else if (ref) {
         const selectedProject = allProjects.find((p) => p.ref === ref)
         if (selectedProject !== undefined) {
           form.setValue('organizationSlug', selectedProject.organization_slug)
@@ -323,8 +326,14 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                   <SelectTrigger_Shadcn_ className="w-full">
                     <SelectValue_Shadcn_ asChild placeholder="Select an organization">
                       <div className="flex items-center gap-x-2">
-                        {(organizations ?? []).find((o) => o.slug === field.value)?.name}
-                        {isLoadingSubscription && <Loader2 size={14} className="animate-spin" />}
+                        {organizationSlug === 'no-org' ? (
+                          <span>No specific organization</span>
+                        ) : (
+                          (organizations ?? []).find((o) => o.slug === field.value)?.name
+                        )}
+                        {organizationSlug !== 'no-org' && isLoadingSubscription && (
+                          <Loader2 size={14} className="animate-spin" />
+                        )}
                         {isSuccessSubscription && (
                           <Badge variant="outline" className="capitalize">
                             {subscriptionPlanId}
@@ -338,6 +347,11 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                       {organizations?.map((org) => (
                         <SelectItem_Shadcn_ value={org.slug}>{org.name}</SelectItem_Shadcn_>
                       ))}
+                      {isSuccessOrganizations && (organizations ?? []).length === 0 && (
+                        <SelectItem_Shadcn_ value="no-org">
+                          No specific organization
+                        </SelectItem_Shadcn_>
+                      )}
                     </SelectGroup_Shadcn_>
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
