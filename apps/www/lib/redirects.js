@@ -1265,11 +1265,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/local-development',
-    destination: '/docs/guides/cli/local-development',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/realtime/overview',
     destination: '/docs/guides/realtime',
   },
@@ -2212,11 +2207,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/integrations',
-    destination: '/docs/guides/platform/marketplace',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/integrations/appsmith',
     destination: '/partners/integrations/appsmith',
   },
@@ -2680,12 +2670,20 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/cli/managing-environments',
+    destination: '/docs/guides/deployment/managing-environments',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/cli/:path*',
     destination: '/docs/guides/local-development/cli/:path*',
   },
   {
-    permanent: true,
-    source: '/docs/guides/cli/managing-environments',
+    // Not permanent because I don't want to risk decommissioning this
+    // path entirely, just solving the problem temporarily for people
+    // whose browsers have already cached the wrong redirect above
+    permanent: false,
+    source: '/docs/guides/local-development/cli/managing-environments',
     destination: '/docs/guides/deployment/managing-environments',
   },
   {
