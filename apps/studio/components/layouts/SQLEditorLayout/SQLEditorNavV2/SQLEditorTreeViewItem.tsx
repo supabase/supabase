@@ -117,62 +117,40 @@ export const SQLEditorTreeViewItem = ({
   return (
     <ContextMenu_Shadcn_ modal={false}>
       <ContextMenuTrigger_Shadcn_ asChild>
-        <HoverCard_Shadcn_ openDelay={300}>
-          <HoverCardTrigger_Shadcn_ asChild>
-            <TreeViewItem
-              level={level}
-              xPadding={16}
-              name={element.name}
-              className={className}
-              isExpanded={isExpanded}
-              isBranch={isBranch}
-              isSelected={isSelected || id === element.id}
-              isEditing={isEditing}
-              isLoading={isFetching || isSaving}
-              onEditSubmit={(value) => {
-                if (onEditSave !== undefined) onEditSave(value)
-              }}
-              onClick={(e) => {
-                if (!isBranch) {
-                  if (!e.shiftKey) {
-                    router.push(`/project/${ref}/sql/${element.id}`)
-                  } else if (id !== 'new') {
-                    onMultiSelect?.(element.id)
-                  } else {
-                    router.push(`/project/${ref}/sql/${element.id}`)
-                  }
-                } else {
-                  // Prevent expanding folder while editing text
-                  // as the user may double click to select etc
-                  if (isEditing) {
-                    return
-                  }
+        <TreeViewItem
+          level={level}
+          xPadding={16}
+          name={element.name}
+          className={className}
+          isExpanded={isExpanded}
+          isBranch={isBranch}
+          isSelected={isSelected || id === element.id}
+          isEditing={isEditing}
+          isLoading={isFetching || isSaving}
+          onEditSubmit={(value) => {
+            if (onEditSave !== undefined) onEditSave(value)
+          }}
+          onClick={(e) => {
+            if (!isBranch) {
+              if (!e.shiftKey) {
+                router.push(`/project/${ref}/sql/${element.id}`)
+              } else if (id !== 'new') {
+                onMultiSelect?.(element.id)
+              } else {
+                router.push(`/project/${ref}/sql/${element.id}`)
+              }
+            } else {
+              // Prevent expanding folder while editing text
+              // as the user may double click to select etc
+              if (isEditing) {
+                return
+              }
 
-                  onClick(e)
-                  if (!isExpanded) onOpenFolder(element.id)
-                }
-              }}
-            />
-          </HoverCardTrigger_Shadcn_>
-          <HoverCardContent_Shadcn_ className="w-[500px]" side="right">
-            <ScrollArea className="h-[240px] relative max-w-[475px] pr-8">
-              <SimpleCodeBlock
-                showCopy={false}
-                className="sql"
-                parentClassName="!p-0 [&>div>span]:text-xs"
-              >
-                {snippetContent}
-              </SimpleCodeBlock>
-              <CopyButton
-                iconOnly
-                text={snippetContent}
-                type="text"
-                icon={<Copy />}
-                className="px-1 absolute right-3 top-0"
-              />
-            </ScrollArea>
-          </HoverCardContent_Shadcn_>
-        </HoverCard_Shadcn_>
+              onClick(e)
+              if (!isExpanded) onOpenFolder(element.id)
+            }
+          }}
+        />
       </ContextMenuTrigger_Shadcn_>
       <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
         {isBranch ? (
