@@ -119,9 +119,9 @@ const SupportPage = () => {
                     <TooltipTrigger asChild>
                       <span className="text-foreground underline">include your project ID</span>
                     </TooltipTrigger>
-                    <TooltipContent>
+                    <TooltipContent className="px-0">
                       <ul>
-                        <li>Your projects</li>
+                        <li className="px-2">Your projects</li>
                         {projectsData?.map((project) => (
                           <li key={project.id} className="cursor-default">
                             <button
@@ -129,10 +129,13 @@ const SupportPage = () => {
                                 navigator.clipboard.writeText(`${project.name} - ${project.ref}`)
                                 toast.success('Copied to clipboard')
                               }}
-                              className="flex py-1.5 gap-x-1 items-center text-foreground"
+                              className="py-1.5 px-2 gap-x-1 text-foreground grid grid-cols-2 hover:bg-background-alternative-200"
                             >
-                              {project.name} - {project.ref}
-                              <ClipboardIcon size="14" className="text-foreground-lighter" />
+                              <span className="max-w-40 truncate">{project.name}</span>
+                              <span className="flex gap-x-1 items-center">
+                                {project.ref}
+                                <ClipboardIcon size="14" className="text-foreground-lighter" />
+                              </span>
                             </button>
                           </li>
                         ))}
