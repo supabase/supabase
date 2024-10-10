@@ -432,6 +432,12 @@ export const examples: Registry = [
     files: ['example/dialog-close-button.tsx'],
   },
   {
+    name: 'dialog-centered-off',
+    type: 'components:example',
+    registryDependencies: ['dialog', 'button'],
+    files: ['example/dialog-centered-off.tsx'],
+  },
+  {
     name: 'drawer-demo',
     type: 'components:example',
     registryDependencies: ['drawer'],
