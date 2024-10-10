@@ -39,7 +39,7 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
   return (
     <SheetSection>
       <FormSectionLabel className="lg:!col-span-4">HTTP Headers</FormSectionLabel>
-      <div className="space-y-2">
+      <div className="space-y-3 mt-1">
         {fields.map((field, index) => (
           <div key={field.id} className="flex items-center space-x-2">
             <FormField_Shadcn_
@@ -98,7 +98,7 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="default" className="rounded-l-none px-[4px] py-[5px]">
-                  <ChevronDown />
+                  <ChevronDown size={14} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="bottom">
