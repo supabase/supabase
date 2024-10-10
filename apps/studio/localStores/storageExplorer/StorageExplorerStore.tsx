@@ -567,18 +567,19 @@ class StorageExplorerStore {
           <p className="text-foreground">
             Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
             {numberOfFilesRejected > 1 ? 'their' : 'its'} size
-            {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the upload limit of {value}
+            {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the global upload limit of {value}
             {unit}.
           </p>
           <p className="text-foreground-light">
-            You can change the file size upload limit in{' '}
+            You can change the global file size upload limit in{' '}
             <Link
               className="underline"
               href={`/project/${this.projectRef}/settings/storage`}
               target="_blank"
             >
-              Storage settings.
+              Storage settings
             </Link>
+            .
           </p>
         </div>,
         { duration: 8000 }
