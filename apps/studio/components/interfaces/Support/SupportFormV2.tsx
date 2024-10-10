@@ -52,6 +52,7 @@ import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { detectBrowser } from 'lib/helpers'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
+import { usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -68,7 +69,9 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
   const { profile } = useProfile()
   const supabaseClient = useSupabaseClient()
   const { ref, slug, category: urlCategory, subject: urlSubject, message: urlMessage } = useParams()
+
   const enableFreeSupport = useFlag('enableFreeSupport')
+  const isPermissionsLoaded = usePermissionsLoaded()
 
   const uploadButtonRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -140,9 +143,12 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     data: subscription,
     isLoading: isLoadingSubscription,
     isSuccess: isSuccessSubscription,
-  } = useOrgSubscriptionQuery({
-    orgSlug: organizationSlug === 'no-org' ? undefined : organizationSlug,
-  })
+  } = useOrgSubscriptionQuery(
+    {
+      orgSlug: organizationSlug === 'no-org' ? undefined : organizationSlug,
+    },
+    { enabled: isPermissionsLoaded }
+  )
 
   const {
     data: allProjects,
