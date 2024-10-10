@@ -26,7 +26,7 @@ interface MultiSelectContextProps {
   setInputValue: React.Dispatch<React.SetStateAction<string>>
   activeIndex: number
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>
-  size?: 'small'
+  size: MultiSelectorProps['size']
   disabled?: boolean
 }
 
@@ -90,6 +90,53 @@ function MultiSelector({
     [onValuesChange]
   )
 
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      const moveNext = () => {
+        const nextIndex = activeIndex + 1
+        setActiveIndex(nextIndex > values.length - 1 ? (loop ? 0 : -1) : nextIndex)
+      }
+
+      const movePrev = () => {
+        const prevIndex = activeIndex - 1
+        setActiveIndex(prevIndex < 0 ? values.length - 1 : prevIndex)
+      }
+
+      if ((e.key === 'Backspace' || e.key === 'Delete') && values.length > 0) {
+        if (inputValue.length === 0) {
+          if (activeIndex !== -1 && activeIndex < values.length) {
+            onValuesChange(values.filter((item) => item !== values[activeIndex]))
+            const newIndex = activeIndex - 1 < 0 ? 0 : activeIndex - 1
+            setActiveIndex(newIndex)
+          } else {
+            onValuesChange(values.filter((item) => item !== values[values.length - 1]))
+          }
+        }
+      } else if (e.key === 'Enter') {
+        setOpen(true)
+      } else if (e.key === 'Escape') {
+        if (activeIndex !== -1) {
+          setActiveIndex(-1)
+        } else {
+          setOpen(false)
+        }
+      } else if (dir === 'rtl') {
+        if (e.key === 'ArrowRight') {
+          movePrev()
+        } else if (e.key === 'ArrowLeft' && (activeIndex !== -1 || loop)) {
+          moveNext()
+        }
+      } else {
+        if (e.key === 'ArrowLeft') {
+          movePrev()
+        } else if (e.key === 'ArrowRight' && (activeIndex !== -1 || loop)) {
+          moveNext()
+        }
+      }
+    },
+    [values, inputValue, activeIndex, loop]
+  )
+
   return (
     <MultiSelectContext.Provider
       value={{
@@ -107,7 +154,9 @@ function MultiSelector({
       }}
     >
       <Popover open={open} onOpenChange={setOpen} {...props}>
-        <Command className="w-auto bg-transparent">{children}</Command>
+        <Command onKeyDown={handleKeyDown} className="w-auto bg-transparent">
+          {children}
+        </Command>
       </Popover>
     </MultiSelectContext.Provider>
   )
