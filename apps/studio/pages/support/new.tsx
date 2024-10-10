@@ -1,4 +1,4 @@
-import { Loader2, Wrench } from 'lucide-react'
+import { ClipboardIcon, Loader2, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import SVG from 'react-inlinesvg'
@@ -10,12 +10,18 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import InformationBox from 'components/ui/InformationBox'
+import { toast } from 'sonner'
+import { useRouter } from 'next/router'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 
 const SupportPage = () => {
   const [sentCategory, setSentCategory] = useState<string>()
   const [selectedProject, setSelectedProject] = useState<string>('no-project')
   const { data, isLoading } = usePlatformStatusQuery()
   const isHealthy = data?.isHealthy
+  const router = useRouter()
+  const { ref } = router.query
 
   const { data: projectsData, isLoading: isLoadingProjects } = useProjectsQuery()
 
@@ -89,6 +95,60 @@ const SupportPage = () => {
               />
             )}
           </div>
+
+          <InformationBox
+            title="Having trouble submitting the form?"
+            description={
+              <div className="space-y-4">
+                <p className="flex items-center gap-x-1">
+                  Email us directly at{' '}
+                  <button
+                    className="p-1 font-mono flex gap-1 items-center rounded-md hover:bg-background-alternative-200 text-foreground"
+                    onClick={() => {
+                      navigator.clipboard.writeText('support@supabase.com')
+                      toast.success('Copied to clipboard')
+                    }}
+                  >
+                    support@supabase.com
+                    <ClipboardIcon size="14" className="text-foreground-lighter" />
+                  </button>
+                </p>
+                <p>
+                  Please, make sure to{' '}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="text-foreground underline">include your project ID</span>
+                    </TooltipTrigger>
+                    <TooltipContent className="px-0">
+                      <ul>
+                        <li className="px-2">Your projects</li>
+                        {projectsData?.map((project) => (
+                          <li key={project.id} className="cursor-default">
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(`${project.name} - ${project.ref}`)
+                                toast.success('Copied to clipboard')
+                              }}
+                              className="py-1.5 px-2 gap-x-1 text-foreground grid grid-cols-2 hover:bg-background-alternative-200"
+                            >
+                              <span className="max-w-40 truncate">{project.name}</span>
+                              <span className="flex gap-x-1 items-center">
+                                {project.ref}
+                                <ClipboardIcon size="14" className="text-foreground-lighter" />
+                              </span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>{' '}
+                  and as much information as possible.
+                </p>
+              </div>
+            }
+            defaultVisibility={true}
+            hideCollapse={true}
+          />
         </div>
       </div>
     </div>
