@@ -200,6 +200,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
 
     const payload = {
       ...values,
+      organizationSlug: values.organizationSlug === 'no-org' ? undefined : values.organizationSlug,
       library:
         values.category === 'Problem' && selectedLibrary !== undefined ? selectedLibrary.key : '',
       message: formatMessage(values.message, attachments),
