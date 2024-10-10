@@ -205,7 +205,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
           <Modal.Content className="p-0">
             <Admonition
               type="warning"
-              className="rounded-none"
+              className="rounded-none !mb-0 border-0"
               title="Each preview branch costs $0.32 per day"
               description="Each preview branch costs $0.32 per day until it is removed. This pricing is for Early Access and is subject to change."
             />

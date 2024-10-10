@@ -74,7 +74,7 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
 
         <DialogSectionSeparator />
 
-        <DialogSection className={cn('px-0', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : '')}>
+        <DialogSection className={cn('px-0', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : '!py-0')}>
           {selectedWorkflowRunId === undefined ? (
             <>
               {isWorkflowRunsLoading && <GenericSkeletonLoader className="py-2 px-5" />}
@@ -83,7 +83,7 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
                 (workflowRuns.length > 0 ? (
                   <ul className="divide-y">
                     {workflowRuns.map((workflowRun) => (
-                      <li key={workflowRun.id} className="py-2 px-5">
+                      <li key={workflowRun.id} className="py-3 px-5">
                         <button
                           type="button"
                           onClick={() => setSelectedWorkflowRunId(workflowRun.id)}
@@ -107,7 +107,7 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
                 ))}
             </>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 py-2">
               <Button
                 onClick={() => setSelectedWorkflowRunId(undefined)}
                 type="text"
