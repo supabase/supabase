@@ -116,7 +116,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
           <>
             <FeedbackDropdown />
             <NotificationsPopoverV2 />
-            <HelpPopover />
+            {/* <HelpPopover /> */}
           </>
         )}
       </div>
