@@ -90,7 +90,7 @@ export function LogDrains({
 
   if (!isLoading && logDrains?.length === 0) {
     return (
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid lg:grid-cols-2 gap-3">
         {LOG_DRAIN_TYPES.map((src) => (
           <CardButton
             key={src.value}

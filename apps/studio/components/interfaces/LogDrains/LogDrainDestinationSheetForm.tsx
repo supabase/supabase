@@ -63,6 +63,12 @@ const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('bigquery'),
   }),
+  z.object({
+    type: z.literal('loki'),
+    url: z.string().min(1, { message: 'Loki URL is required' }),
+    header1_key: z.string().min(1, { message: 'Header 1 key is required' }),
+    header1_value: z.string().min(1, { message: 'Header 1 value is required' }),
+  }),
 ])
 
 const formSchema = z
@@ -155,6 +161,8 @@ export function LogDrainDestinationSheetForm({
       url: defaultValues?.config?.url || '',
       api_key: defaultValues?.config?.api_key || '',
       region: defaultValues?.config?.region || '',
+      header1_key: defaultValues?.config?.header1_key || '',
+      header1_value: defaultValues?.config?.header1_value || '',
     },
   })
 
@@ -309,7 +317,6 @@ export function LogDrainDestinationSheetForm({
                                 </FormItem_Shadcn_>
                               </RadioGroupCard>
                             </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
                           </FormItemLayout>
                         )}
                       />
@@ -429,6 +436,30 @@ export function LogDrainDestinationSheetForm({
                     />
                   </div>
                 )}
+                {type === 'loki' && (
+                  <div className="grid gap-4 px-content">
+                    <LogDrainFormItem
+                      type="url"
+                      value="url"
+                      label="Loki URL"
+                      formControl={form.control}
+                      description="The Loki HTTP(S) endpoint to send events."
+                    />
+                    <LogDrainFormItem
+                      type="text"
+                      value="header1_key"
+                      label="Header 1 key"
+                      formControl={form.control}
+                    />
+                    <LogDrainFormItem
+                      type="text"
+                      value="header1_value"
+                      label="Header 1 value"
+                      formControl={form.control}
+                    />
+                  </div>
+                )}
+                <FormMessage_Shadcn_ />
               </div>
             </form>
           </Form_Shadcn_>
