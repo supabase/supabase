@@ -366,7 +366,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                 Cancel
               </Button>
               <Button htmlType="submit" loading={isRestoring}>
-                Confirm upgrade
+                Confirm restore
               </Button>
             </Modal.Content>
           </form>
