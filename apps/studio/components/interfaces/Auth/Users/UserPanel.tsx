@@ -36,7 +36,7 @@ export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
         )
         .reduce((obj, [key, value]) => {
           if (value !== undefined) {
-            obj[key as keyof User] = value as any // Use 'as any' to bypass type check
+            obj[key as keyof User] = value as any
           }
           return obj
         }, {} as Partial<User>)
