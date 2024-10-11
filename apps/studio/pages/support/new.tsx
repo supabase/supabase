@@ -125,7 +125,7 @@ const SupportPage = () => {
                       <span className="text-foreground underline">include your project ID</span>
                     </TooltipTrigger>
                     <TooltipContent className="px-0">
-                      <ul>
+                      <ul className="p-2">
                         <li className="grid pb-1 grid-cols-2 px-2 text-foreground-lighter">
                           <span>Project name</span>
                           <span>ID</span>
@@ -137,7 +137,7 @@ const SupportPage = () => {
                                 navigator.clipboard.writeText(project.ref)
                                 toast.success('Copied to clipboard')
                               }}
-                              className="w-full group py-1.5 px-2 gap-x-1 text-foreground hover:bg-background-alternative-200 grid grid-cols-2 text-left"
+                              className="w-full group py-1.5 px-2 gap-x-1 text-foreground hover:bg-muted grid grid-cols-2 text-left rounded-sm"
                             >
                               <span className="truncate max-w-40">{project.name}</span>
                               <span className="flex w-full gap-x-1 items-center font-mono">
