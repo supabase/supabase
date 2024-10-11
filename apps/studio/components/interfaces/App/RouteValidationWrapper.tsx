@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
@@ -9,10 +8,12 @@ import useLatest from 'hooks/misc/useLatest'
 import { useFlag } from 'hooks/ui/useFlag'
 import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import { usePathname, useRouter } from 'next/navigation'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
+  const pathName = usePathname()
   const { ref, slug, id } = useParams()
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
@@ -37,7 +38,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
    * @returns a boolean
    */
   function isExceptUrl() {
-    return excemptUrls.includes(router?.pathname)
+    return excemptUrls.includes(pathName ?? '')
   }
 
   const { data: organizations, isSuccess: orgsInitialized } = useOrganizationsQuery({
@@ -57,6 +58,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       if (!isValidOrg) {
         toast.error('This organization does not exist')
         router.push(navLayoutV2 ? `/org/${organizations[0].slug}` : DEFAULT_HOME)
+
         return
       }
     }
@@ -113,10 +115,10 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   useEffect(() => {
     if (ref !== undefined && id !== undefined) {
-      if (router.pathname.endsWith('/sql/[id]') && id !== 'new') {
+      if (pathName?.endsWith('/sql/[id]') && id !== 'new') {
         snap.setDashboardHistory(ref, 'sql', id)
       }
-      if (router.pathname.endsWith('/editor/[id]')) {
+      if (pathName?.endsWith('/editor/[id]')) {
         snap.setDashboardHistory(ref, 'editor', id)
       }
     }

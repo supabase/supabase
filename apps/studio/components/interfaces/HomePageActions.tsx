@@ -1,6 +1,6 @@
 import { Filter, Search } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 
 import { IS_PLATFORM } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'

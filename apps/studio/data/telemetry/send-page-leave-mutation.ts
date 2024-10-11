@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { handleError, post } from 'data/fetchers'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import type { ResponseError } from 'types'
 
 type SendPageLeaveBody = components['schemas']['TelemetryPageLeaveBody']
@@ -23,14 +23,14 @@ export const useSendPageLeaveMutation = ({
   onError,
   ...options
 }: Omit<UseMutationOptions<SendPageLeaveData, ResponseError>, 'mutationFn'> = {}) => {
-  const router = useRouter()
+  const pathname = usePathname()
   const url = typeof window !== 'undefined' ? window.location.href : ''
   const title = typeof document !== 'undefined' ? document?.title : ''
 
   const body = {
     page_url: url,
     page_title: title,
-    pathname: router.pathname,
+    pathname: pathname,
   } as SendPageLeaveBody
 
   return useMutation<SendPageLeaveData, ResponseError>((vars) => sendPageLeave(body), {

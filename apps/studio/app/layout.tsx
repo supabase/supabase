@@ -1,3 +1,5 @@
+'use client'
+
 import 'react-data-grid/lib/styles.css'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
@@ -22,7 +24,7 @@ import { TooltipProvider } from '@radix-ui/react-tooltip'
 import * as Sentry from '@sentry/nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
-import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
+// import { HydrationBoundary, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
@@ -35,7 +37,7 @@ import { ErrorInfo, useEffect, useMemo, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { toast } from 'sonner'
 
-import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
+import MetaFaviconsAppRouter from 'common/MetaFavicons/app-router-head'
 import { AppBannerWrapper, RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
@@ -55,6 +57,7 @@ import { AppPropsWithLayout } from 'types'
 import { SonnerToaster } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
+import { ReactQueryProvider } from './react-query-provider'
 import { NextIntlClientProvider } from 'next-intl'
 
 dayjs.extend(customParseFormat)
@@ -80,9 +83,10 @@ loader.config({
 // debugging way too difficult. Ideal scenario is we just have one AppLayout to control the height and scroll areas of
 // the dashboard, all other layout components should not be doing that
 
-function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
+function RootLayout({ children }: { children: React.ReactNode }) {
+  //   const [queryClient] = useState(() => new QueryClient())
+
   const snap = useAppStateSnapshot()
-  const queryClient = useRootQueryClient()
   const consentToastId = useRef<string | number>()
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
@@ -94,8 +98,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
         )
       : undefined
   )
-
-  const getLayout = Component.getLayout ?? ((page) => page)
 
   const AuthContainer = useMemo(
     // eslint-disable-next-line react/display-name
@@ -155,57 +157,59 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
-      <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <AuthContainer>
-            <FlagProvider>
-              <NextIntlClientProvider locale="en">
-                <ProfileProvider>
-                  <Head>
-                    <title>Supabase</title>
-                    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                  </Head>
-                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-                  <PageTelemetry>
-                    <TooltipProvider>
-                      <RouteValidationWrapper>
-                        <ThemeProvider
-                          defaultTheme="system"
-                          themes={['dark', 'light', 'classic-dark']}
-                          enableSystem
-                          disableTransitionOnChange
-                        >
-                          <AppBannerContextProvider>
-                            <CommandProvider>
-                              <AppBannerWrapper>
-                                <FeaturePreviewContextProvider>
-                                  {getLayout(<Component {...pageProps} />)}
-                                  <StudioCommandMenu />
-                                  <GenerateSql />
-                                  <FeaturePreviewModal />
-                                </FeaturePreviewContextProvider>
-                              </AppBannerWrapper>
-                              <SonnerToaster position="top-right" />
-                            </CommandProvider>
-                          </AppBannerContextProvider>
-                        </ThemeProvider>
-                      </RouteValidationWrapper>
-                    </TooltipProvider>
-                  </PageTelemetry>
+    <html lang="en">
+      <Head>
+        <title>Supabase</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      </Head>
+      <body>
+        <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
+          <ReactQueryProvider>
+            <AuthContainer>
+              <FlagProvider>
+                <NextIntlClientProvider locale="en">
+                  <ProfileProvider>
+                    <MetaFaviconsAppRouter applicationName="Supabase Studio" />
+                    <PageTelemetry>
+                      <TooltipProvider>
+                        <RouteValidationWrapper>
+                          <ThemeProvider
+                            defaultTheme="system"
+                            themes={['dark', 'light', 'classic-dark']}
+                            enableSystem
+                            disableTransitionOnChange
+                          >
+                            <AppBannerContextProvider>
+                              <CommandProvider>
+                                <AppBannerWrapper>
+                                  <FeaturePreviewContextProvider>
+                                    {children}
+                                    <StudioCommandMenu />
+                                    <GenerateSql />
+                                    <FeaturePreviewModal />
+                                  </FeaturePreviewContextProvider>
+                                </AppBannerWrapper>
+                                <SonnerToaster position="top-right" />
+                              </CommandProvider>
+                            </AppBannerContextProvider>
+                          </ThemeProvider>
+                        </RouteValidationWrapper>
+                      </TooltipProvider>
+                    </PageTelemetry>
 
-                  {!isTestEnv && <HCaptchaLoadedStore />}
-                  {!isTestEnv && (
-                    <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
-                  )}
-                </ProfileProvider>
-              </NextIntlClientProvider>
-            </FlagProvider>
-          </AuthContainer>
-        </Hydrate>
-      </QueryClientProvider>
-    </ErrorBoundary>
+                    {!isTestEnv && <HCaptchaLoadedStore />}
+                    {!isTestEnv && (
+                      <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+                    )}
+                  </ProfileProvider>
+                </NextIntlClientProvider>
+              </FlagProvider>
+            </AuthContainer>
+          </ReactQueryProvider>
+        </ErrorBoundary>
+      </body>
+    </html>
   )
 }
 
-export default CustomApp
+export default RootLayout

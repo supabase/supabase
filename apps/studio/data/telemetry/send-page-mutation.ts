@@ -4,7 +4,8 @@ import { components } from 'api-types'
 import { isBrowser } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { useFlag } from 'hooks/ui/useFlag'
-import { useRouter } from 'next/router'
+import { useLocale } from 'next-intl'
+import { usePathname } from 'next/navigation'
 import type { ResponseError } from 'types'
 
 type SendPageGA = components['schemas']['TelemetryPageBody']
@@ -34,7 +35,8 @@ export const useSendPageMutation = ({
   onError,
   ...options
 }: Omit<UseMutationOptions<SendPageData, ResponseError, SendPageVariables>, 'mutationFn'> = {}) => {
-  const router = useRouter()
+  const pathname = usePathname()
+  const locale = useLocale()
   const usePostHogParameters = useFlag('enablePosthogChanges')
 
   const title = typeof document !== 'undefined' ? document?.title : ''
@@ -43,10 +45,10 @@ export const useSendPageMutation = ({
   const payload = usePostHogParameters
     ? ({
         page_title: title,
-        pathname: router.pathname,
+        pathname: pathname,
         ph: {
           referrer,
-          language: router?.locale ?? 'en-US',
+          language: locale ?? 'en-US',
           user_agent: navigator.userAgent,
           search: window.location.search,
           viewport_height: isBrowser ? window.innerHeight : 0,
@@ -58,7 +60,7 @@ export const useSendPageMutation = ({
         referrer,
         ga: {
           screen_resolution: isBrowser ? `${window.innerWidth}x${window.innerHeight}` : undefined,
-          language: router?.locale ?? 'en-US',
+          language: locale ?? 'en-US',
         },
       } as SendPageGA)
 

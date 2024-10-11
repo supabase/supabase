@@ -6,7 +6,7 @@ import { handleError, post } from 'data/fetchers'
 import { Profile } from 'data/profile/types'
 import { useFlag } from 'hooks/ui/useFlag'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useRouter } from 'next/router'
+import { useLocale } from 'next-intl'
 import type { ResponseError } from 'types'
 
 type SendIdentifyGA = components['schemas']['TelemetryIdentifyBody']
@@ -47,7 +47,7 @@ export const useSendIdentifyMutation = ({
   UseMutationOptions<SendIdentifyData, ResponseError, SendIdentifyVariables>,
   'mutationFn'
 > = {}) => {
-  const router = useRouter()
+  const locale = useLocale()
   const usePostHogParameters = useFlag('enablePosthogChanges')
 
   const payload = usePostHogParameters
@@ -55,7 +55,7 @@ export const useSendIdentifyMutation = ({
     : ({
         ga: {
           screen_resolution: isBrowser ? `${window.innerWidth}x${window.innerHeight}` : undefined,
-          language: router?.locale ?? 'en-US',
+          language: locale ?? 'en-US',
         },
       } as SendIdentifyGA)
 

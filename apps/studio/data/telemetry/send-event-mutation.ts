@@ -5,7 +5,8 @@ import { isBrowser } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { useFlag } from 'hooks/ui/useFlag'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
+import { useLocale } from 'next-intl'
 import type { ResponseError } from 'types'
 
 type SendEventGA = components['schemas']['TelemetryEventBody']
@@ -47,7 +48,9 @@ export const useSendEventMutation = ({
   UseMutationOptions<SendEventData, ResponseError, SendEventVariables>,
   'mutationFn'
 > = {}) => {
-  const router = useRouter()
+  const pathName = usePathname()
+  const locale = useLocale()
+
   const usePostHogParameters = useFlag('enablePosthogChanges')
 
   const title = typeof document !== 'undefined' ? document?.title : ''
@@ -57,10 +60,10 @@ export const useSendEventMutation = ({
     ? ({
         page_url: window.location.href,
         page_title: title,
-        pathname: router.pathname,
+        pathname: pathName,
         ph: {
           referrer,
-          language: router?.locale ?? 'en-US',
+          language: locale ?? 'en-US',
           user_agent: navigator.userAgent,
           search: window.location.search,
           viewport_height: isBrowser ? window.innerHeight : 0,
@@ -71,10 +74,10 @@ export const useSendEventMutation = ({
     : ({
         page_referrer: referrer,
         page_title: title,
-        page_location: router.asPath.split('#')[0],
+        page_location: pathName?.split('#')[0],
         ga: {
           screen_resolution: isBrowser ? `${window.innerWidth}x${window.innerHeight}` : undefined,
-          language: router?.locale ?? 'en-US',
+          language: locale ?? 'en-US',
         },
       } as SendEventGA)
 
