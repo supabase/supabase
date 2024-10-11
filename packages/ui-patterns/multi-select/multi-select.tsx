@@ -441,7 +441,7 @@ const MultiSelectorItem = React.forwardRef<
   { value: string } & React.ComponentPropsWithoutRef<typeof CommandItem>
 >(({ className, value, children }, ref) => {
   const id = React.useId()
-  const { values: selectedValues, toggleValue, open } = useMultiSelect()
+  const { values: selectedValues, setInputValue, toggleValue, open } = useMultiSelect()
   const isSelected = selectedValues.includes(value)
 
   return (
@@ -449,7 +449,10 @@ const MultiSelectorItem = React.forwardRef<
       ref={ref}
       tabIndex={open ? 0 : -1}
       role="option"
-      onSelect={() => toggleValue(value)}
+      onSelect={() => {
+        toggleValue(value)
+        setInputValue('')
+      }}
       className={cn(
         'relative',
         'text-foreground-lighter text-left',
