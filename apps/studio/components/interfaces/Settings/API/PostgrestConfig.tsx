@@ -308,7 +308,7 @@ export const PostgrestConfig = () => {
                                   disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
                                 >
                                   <MultiSelectorTrigger
-                                    // mode="inline-combobox"
+                                    mode="inline-combobox"
                                     label="Select schemas for Data API..."
                                     badgeLimit="wrap"
                                     showIcon={false}
