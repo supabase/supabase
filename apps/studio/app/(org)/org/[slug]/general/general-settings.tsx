@@ -22,20 +22,29 @@ import OrganizationDeletePanel from '../../../../../components/interfaces/Organi
 
 export function GeneralSettings() {
   const params = useParams()
+  const { slug } = params as { slug: string }
 
   const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
   const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const canUpdateOrganization = useCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations',
+    undefined,
+    slug
+  )
+  const canDeleteOrganization = useCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations',
+    undefined,
+    slug
+  )
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const { name } = selectedOrganization ?? {}
   const formId = 'org-general-settings'
   const isOptedIntoAi = useOrgOptedIntoAi()
   const initialValues = { name: name ?? '', isOptedIntoAi }
-
-  const { slug } = params as { slug: string }
 
   const onUpdateOrganization = async (values: any, { resetForm }: any) => {
     if (!canUpdateOrganization) {

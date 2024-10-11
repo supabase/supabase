@@ -40,12 +40,14 @@ export function TeamSettings() {
   const { data: rolesData } = useOrganizationRolesQuery({ slug: slug as string })
   const { data: members } = useOrganizationMembersQuery({ slug: slug as string })
 
+  console.log(permissions)
+
   const roles = rolesData?.roles ?? []
 
   const { rolesAddable } = useGetRolesManagementPermissions(
     selectedOrganization?.slug,
     roles,
-    permissions ?? []
+    permissions
   )
 
   const [isLeaving, setIsLeaving] = useState(false)
