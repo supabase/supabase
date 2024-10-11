@@ -236,8 +236,8 @@ const MultiSelectorTrigger = React.forwardRef<
 
       if (IS_BADGE_LIMIT_AUTO) {
         calculateVisibleBadges()
-        window.addEventListener('resize', calculateVisibleBadges)
-        return () => window.removeEventListener('resize', calculateVisibleBadges)
+        // window.addEventListener('resize', calculateVisibleBadges)
+        // return () => window.removeEventListener('resize', calculateVisibleBadges)
       } else if (IS_BADGE_LIMIT_WRAP) {
         setVisibleBadges(values)
         setExtraBadgesCount(0)
