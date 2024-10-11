@@ -76,16 +76,13 @@ function MultiSelector({
   const [inputValue, setInputValue] = React.useState<string>('')
   const [activeIndex, setActiveIndex] = React.useState<number>(-1)
 
-  const toggleValue = React.useCallback(
-    (toggledValue: string) => {
-      if (values.includes(toggledValue)) {
-        onValuesChange(values.filter((value) => value !== toggledValue))
-      } else {
-        onValuesChange([...values, toggledValue])
-      }
-    },
-    [values]
-  )
+  const toggleValue = (toggledValue: string) => {
+    if (values.includes(toggledValue)) {
+      onValuesChange(values.filter((value) => value !== toggledValue))
+    } else {
+      onValuesChange([...values, toggledValue])
+    }
+  }
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
