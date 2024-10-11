@@ -2806,6 +2806,14 @@ module.exports = [
     source: '/docs/guides/platform/log-drains',
     destination: '/docs/guides/monitoring-troubleshooting/log-drains',
   },
+  {
+    // [Charis] This is a nice URL and I'm not 100% on permanently
+    // decommissioning it yet (cache-busting a permanent redirect could be a
+    // hassle if we ever resurrect it with new content)
+    permanent: false,
+    source: '/docs/guides/resources/examples',
+    destination: '/docs/guides/getting-started',
+  },
 
   // marketing
 
