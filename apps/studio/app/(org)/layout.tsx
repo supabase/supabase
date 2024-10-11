@@ -11,12 +11,10 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
-// import SettingsLayout from '../SettingsLayout/SettingsLayout'
-// import type { SidebarSection } from './AccountLayout.types'
-
+// import SettingsLayout from '../../components/layouts/SettingsLayout/SettingsLayout'
+import type { SidebarSection } from 'app/(org)/layout.types'
+import WithSidebar from 'app/(org)/with-sidebar'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
-import WithSidebar from 'components/layouts/AccountLayout/WithSidebar'
-import { SidebarSection } from 'components/layouts/AccountLayout/AccountLayout.types'
 
 export interface AccountLayoutProps {
   title: string
@@ -29,6 +27,7 @@ export interface AccountLayoutProps {
 const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
   const pathname = usePathname()
+
   const { data: organizations } = useOrganizationsQuery()
   const selectedOrganization = useSelectedOrganization()
 
@@ -151,9 +150,9 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
       : []),
   ]
 
-  //   if (navLayoutV2) {
-  //     return <SettingsLayout>{children}</SettingsLayout>
-  //   }
+  // if (navLayoutV2) {
+  //   return <SettingsLayout>{children}</SettingsLayout>
+  // }
 
   return (
     <>
@@ -175,6 +174,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   )
 }
 
-// export default withAuth(AccountLayout)
-
 export default AccountLayout
+
+// export default withAuth(AccountLayout)

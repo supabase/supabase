@@ -1,11 +1,11 @@
 'use client'
 
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+// import AccountLayout from 'app/(org)/layout'
 import AlertError from 'components/ui/AlertError'
 import { Loading } from 'components/ui/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -13,10 +13,10 @@ import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
+// import type { NextPageWithLayout } from 'types'
 
 const ProjectsPage = () => {
-  //   const router = useRouter()
+  const router = useRouter()
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<string[]>([
     PROJECT_STATUS.ACTIVE_HEALTHY,
@@ -37,9 +37,9 @@ const ProjectsPage = () => {
       )
       const verifiedSlug = organizations.some((org) => org.slug === localStorageSlug)
 
-      //   if (organizations.length === 0) router.push('/new')
-      //   else if (localStorageSlug && verifiedSlug) router.push(`/org/${localStorageSlug}`)
-      //   else router.push(`/org/${organizations[0].slug}`)
+      if (organizations.length === 0) router.push('/new')
+      else if (localStorageSlug && verifiedSlug) router.push(`/org/${localStorageSlug}`)
+      else router.push(`/org/${organizations[0].slug}`)
     }
 
     if (!navLayoutV2 && isSuccess && hasWindowLoaded) {
@@ -48,7 +48,7 @@ const ProjectsPage = () => {
       const hasShownNewPage = localStorage.getItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN)
       if (hasNoOrg && !hasShownNewPage) {
         localStorage.setItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN, 'true')
-        // router.push('/new')
+        router.push('/new')
       }
     }
   }, [navLayoutV2, isSuccess, hasWindowLoaded])
@@ -92,17 +92,18 @@ const ProjectsPage = () => {
   )
 }
 
-// ProjectsPage.getLayout = (page) =>
-//   // <AccountLayout
-//   //   title="Dashboard"
-//   //   breadcrumbs={[
-//   //     {
-//   //       key: `supabase-projects`,
-//   //       label: 'Projects',
-//   //     },
-//   //   ]}
-//   // >
-//   ({ page })
-//   // </AccountLayout>
+// ProjectsPage.getLayout = (page) => (
+//   <AccountLayout
+//     title="Dashboard"
+//     breadcrumbs={[
+//       {
+//         key: `supabase-projects`,
+//         label: 'Projects',
+//       },
+//     ]}
+//   >
+//     {page}
+//   </AccountLayout>
+// )
 
 export default ProjectsPage

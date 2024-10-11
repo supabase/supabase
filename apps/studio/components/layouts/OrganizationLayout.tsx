@@ -11,7 +11,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, NavMenu, NavMenuItem } from 'ui'
-import AccountLayout from './AccountLayout/AccountLayout'
+import AccountLayout from '../../app/(org)/layout'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
 
