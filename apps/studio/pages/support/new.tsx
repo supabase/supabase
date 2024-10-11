@@ -14,6 +14,7 @@ import InformationBox from 'components/ui/InformationBox'
 import { toast } from 'sonner'
 import { useRouter } from 'next/router'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
+import CopyButton from 'components/ui/CopyButton'
 
 const SupportPage = () => {
   const [sentCategory, setSentCategory] = useState<string>()
@@ -102,16 +103,20 @@ const SupportPage = () => {
               <div className="space-y-4">
                 <p className="flex items-center gap-x-1">
                   Email us directly at{' '}
-                  <button
-                    className="p-1 font-mono flex gap-1 items-center rounded-md hover:bg-background-alternative-200 text-foreground"
-                    onClick={() => {
-                      navigator.clipboard.writeText('support@supabase.com')
-                      toast.success('Copied to clipboard')
-                    }}
+                  <Link
+                    href="mailto:support@supabase.com"
+                    className="p-1 font-mono rounded-md  text-foreground"
                   >
                     support@supabase.com
-                    <ClipboardIcon size="14" className="text-foreground-lighter" />
-                  </button>
+                  </Link>
+                  <CopyButton
+                    type="text"
+                    text="support@supabase.com"
+                    iconOnly
+                    onClick={() => {
+                      toast.success('Copied to clipboard')
+                    }}
+                  />
                 </p>
                 <p>
                   Please, make sure to{' '}
