@@ -19,9 +19,9 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import { Input } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { InviteMemberButton } from './InviteMemberButton'
+import { InviteMemberButton } from './invite-member-button'
 import MembersView from 'app/(org)/org/[slug]/team/members-view'
-import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { hasMultipleOwners, useGetRolesManagementPermissions } from './team-settings.utils'
 
 export function TeamSettings() {
   const params = useParams()

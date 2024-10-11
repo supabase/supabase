@@ -31,7 +31,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { useGetRolesManagementPermissions } from './team-settings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 
 interface MemberActionsProps {

@@ -23,7 +23,7 @@ import {
   getUserDisplayName,
   isInviteExpired,
 } from '../../../../../components/interfaces/Organization/Organization.utils'
-import { MemberActions } from './MemberActions'
+import { MemberActions } from './member-actions'
 import Link from 'next/link'
 
 interface MemberRowProps {
