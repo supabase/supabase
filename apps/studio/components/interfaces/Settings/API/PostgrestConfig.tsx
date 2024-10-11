@@ -120,8 +120,6 @@ export const PostgrestConfig = () => {
     },
   })
 
-  console.log('form', form)
-
   const schema =
     schemas
       ?.filter((x) => {
