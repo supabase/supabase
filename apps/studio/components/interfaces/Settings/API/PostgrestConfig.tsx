@@ -120,6 +120,8 @@ export const PostgrestConfig = () => {
     },
   })
 
+  console.log('form', form)
+
   const schema =
     schemas
       ?.filter((x) => {
@@ -304,13 +306,17 @@ export const PostgrestConfig = () => {
                                 <MultiSelector
                                   onValuesChange={field.onChange}
                                   values={field.value}
-                                  size={'small'}
+                                  size="small"
                                   disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
                                 >
-                                  <MultiSelectorTrigger>
-                                    <MultiSelectorInput placeholder="Select schemas for Data API..." />
-                                  </MultiSelectorTrigger>
-                                  <MultiSelectorContent>
+                                  <MultiSelectorTrigger
+                                    mode="inline-combobox"
+                                    label="Select schemas for Data API..."
+                                    badgeLimit="wrap"
+                                    showIcon={false}
+                                    deletableBadge
+                                  />
+                                  <MultiSelectorContent sameWidthAsTrigger>
                                     {schema.length <= 0 ? (
                                       <MultiSelectorList>
                                         <MultiSelectorItem key={'empty'} value={'no'}>

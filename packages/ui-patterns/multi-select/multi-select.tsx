@@ -51,15 +51,15 @@ const MultiSelectorVariants = cva('', {
   },
 })
 
-type Mode = 'combobox' | 'inline-combobox'
+type MultiSelectorMode = 'combobox' | 'inline-combobox'
 
 type MultiSelectorProps = {
-  mode?: Mode
+  mode?: MultiSelectorMode
   values: string[]
   onValuesChange: React.Dispatch<React.SetStateAction<string[]>>
   loop?: boolean
-  dir?: any
   disabled?: boolean
+  dir?: 'rtl' | 'ltr'
 } & React.ComponentPropsWithoutRef<typeof Popover> &
   VariantProps<typeof MultiSelectorVariants>
 
@@ -158,7 +158,7 @@ function MultiSelector({
       }}
     >
       <Popover open={open} onOpenChange={setOpen} {...props}>
-        <Command onKeyDown={handleKeyDown} className="w-auto bg-transparent">
+        <Command onKeyDown={handleKeyDown} dir={dir} className="w-auto bg-transparent">
           {children}
         </Command>
       </Popover>
@@ -175,7 +175,7 @@ const MultiSelectorTrigger = React.forwardRef<
     badgeLimit?: number | 'auto' | 'wrap'
     deletableBadge?: boolean
     showIcon?: boolean
-    mode?: Mode
+    mode?: MultiSelectorMode
   } & React.ComponentProps<typeof PopoverTrigger>
 >(
   (
