@@ -13,7 +13,8 @@ export async function chatSql(
   openai: OpenAI,
   messages: Message[],
   existingSql?: string,
-  entityDefinitions?: string[]
+  entityDefinitions?: string[],
+  context?: 'rls' | 'functions'
 ): Promise<ReadableStream<Uint8Array>> {
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
@@ -32,6 +33,26 @@ export async function chatSql(
       `,
     },
   ]
+
+  if (context) {
+    // [Joshen] Thinking how we can prompt-engineer to give even better results, what I have below
+    // is definitely not optimal at all, but just to get an idea started
+    const generateInstructionsBasedOnContext = () => {
+      switch (context) {
+        case 'rls':
+          return stripIndent`
+          You're a Supabase Postgres expert in writing row level security policies. Your purpose is to
+          generate a policy with the constraints given by the user. You will be provided a schema
+          on which the policy should be applied.`
+        case 'functions':
+          return stripIndent`
+          You're a Supabase Postgres expert in writing database functions. Your purpose is to generate a
+          database function with the constraints given by the user.
+          `
+      }
+    }
+    initMessages.push({ role: 'user', content: generateInstructionsBasedOnContext() })
+  }
 
   if (entityDefinitions) {
     const definitions = codeBlock`${entityDefinitions.join('\n\n')}`

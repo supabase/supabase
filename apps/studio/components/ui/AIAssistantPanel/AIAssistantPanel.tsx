@@ -1,9 +1,3 @@
-import { useState } from 'react'
-
-import { useChat } from 'ai/react'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
 import { useAppStateSnapshot } from 'state/app-state'
 import { cn, Sheet, SheetContent, SheetHeader } from 'ui'
 import { AIAssistant } from './AIAssistant'
@@ -20,11 +14,14 @@ export const AiAssistantPanel = () => {
   const showEditor = false
 
   const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
-  const { open, editor } = aiAssistantPanel
+  const { open, editor } = aiAssistantPanel || {}
 
   return (
     <Sheet open={open} onOpenChange={() => setAiAssistantPanel({ open: !open, editor: undefined })}>
-      <SheetContent showClose className={cn('flex gap-0', showEditor ? 'w-[1000px]' : 'w-[500px]')}>
+      <SheetContent
+        showClose={true}
+        className={cn('flex gap-0', showEditor ? 'w-[1200px]' : 'w-[600px]')}
+      >
         {/* Assistant */}
         <AIAssistant className={showEditor ? 'border-r w-1/2' : 'w-full'} showEditor={showEditor} />
 

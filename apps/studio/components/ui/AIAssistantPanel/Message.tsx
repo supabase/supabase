@@ -9,6 +9,7 @@ import { AiIconAnimation, Badge, cn, markdownComponents } from 'ui'
 import { useProfile } from 'lib/profile'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { AiMessagePre } from 'components/interfaces/SQLEditor/AiAssistantPanel/AiMessagePre'
+import { useAppStateSnapshot } from 'state/app-state'
 
 interface MessageProps {
   name?: string
@@ -17,8 +18,9 @@ interface MessageProps {
   createdAt?: number
   isDebug?: boolean
   isSelected?: boolean
-  onDiff?: (type: DiffType, s: string) => void
   action?: React.ReactNode
+  context?: { entity: string; schemas: string[] }
+  onDiff?: (type: DiffType, s: string) => void
 }
 
 export const Message = memo(function Message({
@@ -28,9 +30,10 @@ export const Message = memo(function Message({
   createdAt,
   isDebug,
   isSelected = false,
-  onDiff = noop,
+  context,
   children,
   action = <></>,
+  onDiff = noop,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
 
@@ -53,26 +56,44 @@ export const Message = memo(function Message({
     )
   }, [content, profile?.username, role])
 
+  const formattedContext =
+    context !== undefined
+      ? Object.entries(context)
+          .map(([key, value]) => {
+            return `${key.charAt(0).toUpperCase() + key.slice(1)}: ${Array.isArray(value) ? value.join(', ') : value}`
+          })
+          .join(' • ')
+      : undefined
+
   if (!content) return null
 
   return (
     <div className="flex flex-col py-4 gap-4 border-t px-5 text-foreground-light text-sm">
-      <div className="flex flex-row justify-between items-center">
-        <div className="flex flex-row gap-3 items-center">
+      <div className="flex justify-between items-center">
+        <div className="flex gap-x-3 items-center">
           {icon}
 
-          <span className="text-sm">
-            {role === 'assistant' ? 'Assistant' : name ? name : 'You'}
-          </span>
-          {createdAt && (
-            <span className="text-xs text-foreground-muted">{dayjs(createdAt).fromNow()}</span>
-          )}
+          <div className="flex flex-col -gap-y-1">
+            <div className="flex items-center gap-x-3">
+              <span className="text-sm">
+                {role === 'assistant' ? 'Assistant' : name ? name : 'You'}
+              </span>
+              {createdAt && (
+                <span className="text-xs text-foreground-muted">{dayjs(createdAt).fromNow()}</span>
+              )}
+            </div>
+            {role === 'user' && context !== undefined && (
+              <span className="text-xs text-foreground-lighter">{formattedContext}</span>
+            )}
+          </div>
+
           {isDebug && <Badge variant="warning">Debug request</Badge>}
         </div>{' '}
         {action}
       </div>
+
       <ReactMarkdown
-        className="gap-2.5 flex flex-col [&>*>code]:text-xs [&>*>*>code]:text-xs"
+        className="gap-x-2.5 gap-y-3 flex flex-col [&>*>code]:text-xs [&>*>*>code]:text-xs"
         remarkPlugins={[remarkGfm]}
         components={{
           ...markdownComponents,
@@ -88,6 +109,12 @@ export const Message = memo(function Message({
                 {props.children[0].props.children}
               </AiMessagePre>
             )
+          },
+          ol: (props: any) => {
+            return <ol className="flex flex-col gap-y-1">{props.children}</ol>
+          },
+          h3: (props: any) => {
+            return <h3 className="underline">{props.children}</h3>
           },
         }}
       >
