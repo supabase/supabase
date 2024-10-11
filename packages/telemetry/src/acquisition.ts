@@ -37,15 +37,16 @@ export interface request_demo_clicked {
   placement: string
 }
 /**
- * The user submitted the "Request demo" form.
+ * @description The user submitted the "Request demo" form.
  * @group Events
  * @sources client-side www
  */
 export type request_demo_form_submit = never
 /**
- * The user clicked the "Github stars" -button.
+ * @description The user clicked the "Github stars" -button.
  * @group Events
  * @sources client-side www
+ * @deprecated
  */
 export interface github_clicked {
   /**
@@ -55,7 +56,7 @@ export interface github_clicked {
 }
 
 /**
- * The user clicked a plan's CTA -button.
+ * @description The user clicked a plan's CTA -button.
  * @group Events
  * @sources client-side www
  */

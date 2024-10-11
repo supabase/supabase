@@ -1,7 +1,6 @@
 ---
 # https://vitepress.dev/reference/default-theme-home-page
 layout: home
-
 hero:
   actions:
     - theme: alt
@@ -9,18 +8,8 @@ hero:
       link: /docs/
 ---
 
-# Overview
+# Welcome to the Supabase Telemetry documentation!
 
-This documentation contains the types for telemetry-related events.
+Here we can write some awesome instructions in both Vitepress default styles or purely as Markdown.
 
-## Tags
-All events have some tags defined to simplify the understanding of where and how things are going. The tags are as following:
-
-### `@source`
-Which application the event is sent from. The options are:
-```
-client-side, www
-client-side, studio
-client-side, docs
-server-side
-```
+Witepress default theme options can be found [here](https://vitepress.dev/reference/default-theme-home-page)
