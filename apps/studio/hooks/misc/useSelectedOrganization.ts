@@ -1,16 +1,18 @@
-import { useIsLoggedIn, useParams } from 'common'
+import { useIsLoggedIn } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useMemo } from 'react'
-
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProjectByRef } from './useSelectedProject'
+import { useParams } from 'next/navigation'
 
 export function useSelectedOrganization({ enabled = true } = {}) {
   const isLoggedIn = useIsLoggedIn()
+  const params = useParams() || {} // Ensure params is always defined
+  const { ref, slug } = params as { ref?: string; slug?: string }
 
-  const { ref, slug } = useParams()
   const { data } = useOrganizationsQuery({ enabled: isLoggedIn && enabled })
 
+  // Hooks must be called unconditionally
   const selectedProject = useProjectByRef(ref)
 
   const localStorageSlug = useMemo(() => {
