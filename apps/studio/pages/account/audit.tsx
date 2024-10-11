@@ -1,5 +1,5 @@
 import { AuditLogs } from 'components/interfaces/Account'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import OrganizationLayout from 'app/(org)/org/layout'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
@@ -18,18 +18,18 @@ const User: NextPageWithLayout = () => {
   )
 }
 
-User.getLayout = (page) => (
-  <AccountLayout
-    title="Audit Logs"
-    breadcrumbs={[
-      {
-        key: `supabase-settings`,
-        label: 'Audit Logs',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
-)
+// User.getLayout = (page) => (
+//   <AccountLayout
+//     title="Audit Logs"
+//     breadcrumbs={[
+//       {
+//         key: `supabase-settings`,
+//         label: 'Audit Logs',
+//       },
+//     ]}
+//   >
+//     {page}
+//   </AccountLayout>
+// )
 
 export default User

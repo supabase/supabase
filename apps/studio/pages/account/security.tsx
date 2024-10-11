@@ -1,5 +1,5 @@
 import { TOTPFactors } from 'components/interfaces/Account'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import OrganizationLayout from 'app/(org)/org/layout'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { Smartphone } from 'lucide-react'
@@ -56,10 +56,10 @@ const Security: NextPageWithLayout = () => {
   )
 }
 
-Security.getLayout = (page) => (
-  <AccountLayout title="Security" breadcrumbs={[{ key: 'security', label: 'Security' }]}>
-    {page}
-  </AccountLayout>
-)
+// Security.getLayout = (page) => (
+//   <AccountLayout title="Security" breadcrumbs={[{ key: 'security', label: 'Security' }]}>
+//     {page}
+//   </AccountLayout>
+// )
 
 export default Security

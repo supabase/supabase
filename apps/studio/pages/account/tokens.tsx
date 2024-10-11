@@ -6,7 +6,7 @@ import {
   NewAccessTokenButton,
   NewTokenBanner,
 } from 'components/interfaces/Account'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import OrganizationLayout from 'app/(org)/org/layout'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import type { NextPageWithLayout } from 'types'
@@ -65,13 +65,13 @@ const UserAccessTokens: NextPageWithLayout = () => {
   )
 }
 
-UserAccessTokens.getLayout = (page) => (
-  <AccountLayout
-    title="Access Tokens"
-    breadcrumbs={[{ key: 'supabase-account-tokens', label: 'Access Tokens' }]}
-  >
-    {page}
-  </AccountLayout>
-)
+// UserAccessTokens.getLayout = (page) => (
+//   <AccountLayout
+//     title="Access Tokens"
+//     breadcrumbs={[{ key: 'supabase-account-tokens', label: 'Access Tokens' }]}
+//   >
+//     {page}
+//   </AccountLayout>
+// )
 
 export default UserAccessTokens
