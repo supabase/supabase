@@ -14,6 +14,7 @@ import { useProjectStorageConfigQuery } from 'data/config/project-storage-config
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { Alert, Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 export interface CreateBucketModalProps {
   visible: boolean
@@ -38,6 +39,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
 
   const [selectedUnit, setSelectedUnit] = useState<StorageSizeUnits>(StorageSizeUnits.BYTES)
   const [showConfiguration, setShowConfiguration] = useState(false)
+  const [showBYOB, setShowBYOB] = useState(false)
 
   const initialValues = {
     name: '',
@@ -46,6 +48,10 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     allowed_mime_types: '',
     has_file_size_limit: false,
     formatted_size_limit: 0,
+    s3_endpoint: '',
+    s3_region: '',
+    s3_access_key: '',
+    s3_secret: '',
   }
 
   const validate = (values: any) => {
@@ -226,7 +232,65 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   </div>
                 </Collapsible.Content>
               </Collapsible>
+
+              {IS_PLATFORM && (
+                <Collapsible
+                  open={showBYOB}
+                  onOpenChange={() => setShowBYOB((showBYOB) => !showBYOB)}
+                >
+                  <Collapsible.Trigger asChild>
+                    <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-default">
+                      <p className="text-sm">Bring your own bucket</p>
+                      <ChevronDown
+                        size={18}
+                        strokeWidth={2}
+                        className={cn('text-foreground-light', showBYOB && 'rotate-180')}
+                      />
+                    </div>
+                  </Collapsible.Trigger>
+                  <Collapsible.Content className="py-4">
+                    <div className="w-full space-y-5 px-5">
+                      <Admonition
+                        type="note"
+                        title="Provide your own S3-compatible bucket"
+                        description="You can use your own S3-compatible bucket for storage. This is useful if you have an existing bucket that you want to use with Supabase."
+                      />
+
+                      <Input
+                        id="s3_endpoint"
+                        name="s3_endpoint"
+                        layout="vertical"
+                        label="S3-compatible endpoint"
+                        placeholder="http://your-bucket.s3.us-east-1.amazonaws.com"
+                      />
+                      <Input
+                        id="s3_region"
+                        name="s3_region"
+                        layout="vertical"
+                        label="Region"
+                        placeholder="us-east-1"
+                      />
+                      <Input
+                        id="s3_access_key"
+                        name="s3_access_key"
+                        layout="vertical"
+                        label="Access key ID"
+                        placeholder="afda96b7fdca83e7xxxxxx"
+                      />
+                      <Input
+                        id="s3_secret_key"
+                        name="s3_secret_key"
+                        layout="vertical"
+                        label="Secret access key"
+                        placeholder="xxxxxxxxxxxxx"
+                      />
+                    </div>
+                  </Collapsible.Content>
+                </Collapsible>
+              )}
+
               <Modal.Separator />
+
               <Modal.Content className="flex items-center space-x-2 justify-end">
                 <Button
                   type="default"
