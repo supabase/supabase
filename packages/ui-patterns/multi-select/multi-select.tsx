@@ -79,9 +79,10 @@ function MultiSelector({
   const toggleValue = React.useCallback(
     (value: string) => {
       onValuesChange((prevValues: string[]) => {
-        const isSelected = prevValues.includes(value)
+        const isSelected = prevValues?.includes(value)
+
         if (isSelected) {
-          return prevValues.filter((currValue) => currValue !== value)
+          return prevValues?.filter((currValue) => currValue !== value)
         } else {
           return [...prevValues, value]
         }
@@ -125,12 +126,14 @@ function MultiSelector({
           setOpen(false)
         }
       } else if (dir === 'rtl') {
+        !open && setOpen(true)
         if (e.key === 'ArrowRight') {
           movePrev()
         } else if (e.key === 'ArrowLeft' && (activeIndex !== -1 || loop)) {
           moveNext()
         }
       } else {
+        !open && setOpen(true)
         if (e.key === 'ArrowLeft') {
           movePrev()
         } else if (e.key === 'ArrowRight' && (activeIndex !== -1 || loop)) {
