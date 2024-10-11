@@ -50,7 +50,7 @@ sql_paths = ['./seeds/*.sql']
 
 The CLI processes seed files in the order they are declared in the `sql_paths` array. If a glob pattern is used and matches multiple files, those files are sorted in lexicographic order to ensure consistent execution. Additionally:
 
-- The base folder for the pattern matching is `supabase` so `./contries.sql` will search for `supabase/contries.sql`
+- The base folder for the pattern matching is `supabase` so `./countries.sql` will search for `supabase/countries.sql`
 - Files matched by multiple patterns will be deduplicated to prevent redundant seeding.
 - If a pattern does not match any files, a warning will be logged to help you troubleshoot potential configuration issues.
 
