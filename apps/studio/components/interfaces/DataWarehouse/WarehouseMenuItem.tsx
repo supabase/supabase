@@ -26,6 +26,7 @@ type Props = {
     id: number
     token: string
     name: string
+    retention_days: number
   }
 }
 
@@ -120,7 +121,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
         <CollectionForm
           onCancelClick={() => setShowUpdateDialog(false)}
           isLoading={isLoading}
-          initialValues={{ name: item.name }}
+          initialValues={{ name: item.name, retention_days: item.retention_days }}
           onSubmit={({ name, retention_days }) => {
             updateCollection.mutate({
               projectRef,
