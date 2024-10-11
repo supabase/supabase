@@ -12,6 +12,6 @@ const OrgUsage: NextPageWithLayout = () => {
   return <>{selectedOrganization === undefined && isLoadingPermissions ? <Loading /> : <Usage />}</>
 }
 
-OrgUsage.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgUsage.getLayout = (page) => <OrganizationLayout pagesRouter>{page}</OrganizationLayout>
 
 export default OrgUsage

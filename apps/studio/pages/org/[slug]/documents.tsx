@@ -6,6 +6,6 @@ const OrgDocuments: NextPageWithLayout = () => {
   return <Documents />
 }
 
-OrgDocuments.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgDocuments.getLayout = (page) => <OrganizationLayout pagesRouter>{page}</OrganizationLayout>
 
 export default OrgDocuments

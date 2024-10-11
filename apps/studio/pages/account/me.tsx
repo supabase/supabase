@@ -14,6 +14,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
+import AccountLayout from 'app/(org)/layout'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -23,19 +24,19 @@ const User: NextPageWithLayout = () => {
   )
 }
 
-// User.getLayout = (page) => (
-//   <AccountLayout
-//     title="Preferences"
-//     breadcrumbs={[
-//       {
-//         key: `supabase-settings`,
-//         label: 'Preferences',
-//       },
-//     ]}
-//   >
-//     {page}
-//   </AccountLayout>
-// )
+User.getLayout = (page) => (
+  <AccountLayout
+    title="Preferences"
+    breadcrumbs={[
+      {
+        key: `supabase-settings`,
+        label: 'Preferences',
+      },
+    ]}
+  >
+    {page}
+  </AccountLayout>
+)
 
 export default User
 

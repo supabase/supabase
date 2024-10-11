@@ -14,5 +14,5 @@ const OrgOAuthApps: NextPageWithLayout = () => {
   )
 }
 
-OrgOAuthApps.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgOAuthApps.getLayout = (page) => <OrganizationLayout pagesRouter>{page}</OrganizationLayout>
 export default OrgOAuthApps

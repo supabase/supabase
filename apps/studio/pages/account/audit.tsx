@@ -3,6 +3,7 @@ import OrganizationLayout from 'app/(org)/org/layout'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
+import AccountLayout from 'app/(org)/layout'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -18,18 +19,18 @@ const User: NextPageWithLayout = () => {
   )
 }
 
-// User.getLayout = (page) => (
-//   <AccountLayout
-//     title="Audit Logs"
-//     breadcrumbs={[
-//       {
-//         key: `supabase-settings`,
-//         label: 'Audit Logs',
-//       },
-//     ]}
-//   >
-//     {page}
-//   </AccountLayout>
-// )
+User.getLayout = (page) => (
+  <AccountLayout
+    title="Audit Logs"
+    breadcrumbs={[
+      {
+        key: `supabase-settings`,
+        label: 'Audit Logs',
+      },
+    ]}
+  >
+    {page}
+  </AccountLayout>
+)
 
 export default User

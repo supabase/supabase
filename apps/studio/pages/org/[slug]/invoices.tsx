@@ -20,5 +20,5 @@ const OrgInvoices: NextPageWithLayout = () => {
   )
 }
 
-OrgInvoices.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgInvoices.getLayout = (page) => <OrganizationLayout pagesRouter>{page}</OrganizationLayout>
 export default OrgInvoices

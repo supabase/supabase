@@ -5,6 +5,7 @@ import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { Smartphone } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
 import { Badge, cn, Collapsible } from 'ui'
+import AccountLayout from 'app/(org)/layout'
 
 const collapsibleClasses = [
   'bg-surface-100',
@@ -56,10 +57,10 @@ const Security: NextPageWithLayout = () => {
   )
 }
 
-// Security.getLayout = (page) => (
-//   <AccountLayout title="Security" breadcrumbs={[{ key: 'security', label: 'Security' }]}>
-//     {page}
-//   </AccountLayout>
-// )
+Security.getLayout = (page) => (
+  <AccountLayout title="Security" breadcrumbs={[{ key: 'security', label: 'Security' }]}>
+    {page}
+  </AccountLayout>
+)
 
 export default Security

@@ -12,6 +12,7 @@ import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation
 import type { NextPageWithLayout } from 'types'
 import { Alert, Button } from 'ui'
 import { ExternalLink } from 'lucide-react'
+import AccountLayout from 'app/(org)/layout'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
@@ -65,13 +66,13 @@ const UserAccessTokens: NextPageWithLayout = () => {
   )
 }
 
-// UserAccessTokens.getLayout = (page) => (
-//   <AccountLayout
-//     title="Access Tokens"
-//     breadcrumbs={[{ key: 'supabase-account-tokens', label: 'Access Tokens' }]}
-//   >
-//     {page}
-//   </AccountLayout>
-// )
+UserAccessTokens.getLayout = (page) => (
+  <AccountLayout
+    title="Access Tokens"
+    breadcrumbs={[{ key: 'supabase-account-tokens', label: 'Access Tokens' }]}
+  >
+    {page}
+  </AccountLayout>
+)
 
 export default UserAccessTokens

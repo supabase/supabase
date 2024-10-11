@@ -22,7 +22,10 @@ import {
 } from '../../../components/layouts/Scaffold'
 import SettingsLayout from '../../../components/layouts/SettingsLayout/SettingsLayout'
 
-const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
+const OrganizationLayout = ({
+  children,
+  pagesRouter,
+}: PropsWithChildren<{ pagesRouter?: boolean }>) => {
   const selectedOrganization = useSelectedOrganization()
   const currentPath = useCurrentPath()
   const params = useParams()
@@ -83,7 +86,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
 
   const filteredNavMenuItems = navMenuItems.filter((item) => !item.hidden)
 
-  return (
+  const content = (
     <>
       <ScaffoldHeader className="pb-0">
         <ScaffoldContainer id="billing-page-top">
@@ -121,6 +124,19 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
       {children}
     </>
   )
+
+  if (pagesRouter) {
+    return (
+      <AccountLayout
+        title={selectedOrganization?.name ?? 'Supabase'}
+        breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
+      >
+        {content}
+      </AccountLayout>
+    )
+  } else {
+    return content
+  }
 }
 
 export default OrganizationLayout
