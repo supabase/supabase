@@ -115,26 +115,32 @@ const SupportPage = () => {
                 </p>
                 <p>
                   Please, make sure to{' '}
-                  <Tooltip>
+                  <Tooltip open={true}>
                     <TooltipTrigger asChild>
                       <span className="text-foreground underline">include your project ID</span>
                     </TooltipTrigger>
                     <TooltipContent className="px-0">
                       <ul>
-                        <li className="px-2">Your projects</li>
+                        <li className="grid grid-cols-2 px-2 text-foreground-lighter">
+                          <span>Project name</span>
+                          <span>ID</span>
+                        </li>
                         {projectsData?.map((project) => (
                           <li key={project.id} className="cursor-default">
                             <button
                               onClick={() => {
-                                navigator.clipboard.writeText(`${project.name} - ${project.ref}`)
+                                navigator.clipboard.writeText(project.ref)
                                 toast.success('Copied to clipboard')
                               }}
-                              className="py-1.5 px-2 gap-x-1 text-foreground grid grid-cols-2 hover:bg-background-alternative-200"
+                              className="w-full group py-1.5 px-2 gap-x-1 text-foreground hover:bg-background-alternative-200 grid grid-cols-2 text-left"
                             >
-                              <span className="max-w-40 truncate">{project.name}</span>
-                              <span className="flex gap-x-1 items-center">
+                              <span className="truncate max-w-40">{project.name}</span>
+                              <span className="flex w-full gap-x-1 items-center">
                                 {project.ref}
-                                <ClipboardIcon size="14" className="text-foreground-lighter" />
+                                <ClipboardIcon
+                                  size="14"
+                                  className="text-foreground-lighter opacity-0 group-hover:opacity-100 transition-opacity"
+                                />
                               </span>
                             </button>
                           </li>
