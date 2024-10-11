@@ -121,7 +121,7 @@ const SupportPage = () => {
                     </TooltipTrigger>
                     <TooltipContent className="px-0">
                       <ul>
-                        <li className="grid grid-cols-2 px-2 text-foreground-lighter">
+                        <li className="grid pb-1 grid-cols-2 px-2 text-foreground-lighter">
                           <span>Project name</span>
                           <span>ID</span>
                         </li>
