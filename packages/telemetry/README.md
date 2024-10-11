@@ -2,11 +2,28 @@
 
 This documentation contains the types for telemetry-related events.
 
-## Tags
-All events have some tags defined to simplify the understanding of where and how things are going. The tags are as following:
+## Naming conventions
+Some conventions to keep in mind when creating / reviewing events
+- Event names are snake_case
+- We follow a [object]_[verb] structure to create self-explanatory events
+- We aim to use regular past tense verbs
+- We aim to re-use verbs such as
+    - clicked
+    - submitted
+    - created
+    - removed
+    - updated
+- Custom event properties are camelCase
+- Custom event propertties should be self-explanatory
+    - We want to rather be more specific than less, for example `productType` vs `buttonLabel`
+- User / organization / project properties are camelCase
 
-### `@source`
-Which application the event is sent from. The options are:
+## Instructions for creating new events
+
+TBD.
+
+### `@sources`
+Which application the event is sent from. The options are
 ```
 client-side, www
 client-side, studio
