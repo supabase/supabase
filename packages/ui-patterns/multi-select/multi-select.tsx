@@ -206,8 +206,9 @@ const MultiSelectorTrigger = React.forwardRef<
     const IS_BADGE_LIMIT_WRAP = badgeLimit === 'wrap'
     const IS_INLINE_MODE = mode === 'inline-combobox'
 
-    const calculateVisibleBadges = () => {
+    const calculateVisibleBadges = React.useCallback(() => {
       if (!inputRef.current || !badgesRef.current) return
+
       const inputWidth = inputRef.current.offsetWidth
       const badgesContainer = badgesRef.current
       const badges = Array.from(badgesContainer.children) as HTMLElement[]
@@ -229,15 +230,14 @@ const MultiSelectorTrigger = React.forwardRef<
       }
       setVisibleBadges(values.slice(0, visibleCount))
       setExtraBadgesCount(Math.max(0, values.length - visibleCount))
-    }
+    }, [values])
 
     React.useEffect(() => {
       if (!inputRef.current || !badgesRef.current) return
 
       if (IS_BADGE_LIMIT_AUTO) {
         calculateVisibleBadges()
-        // window.addEventListener('resize', calculateVisibleBadges)
-        // return () => window.removeEventListener('resize', calculateVisibleBadges)
+        window.addEventListener('resize', calculateVisibleBadges)
       } else if (IS_BADGE_LIMIT_WRAP) {
         setVisibleBadges(values)
         setExtraBadgesCount(0)
@@ -245,6 +245,8 @@ const MultiSelectorTrigger = React.forwardRef<
         setVisibleBadges(values.slice(0, badgeLimit))
         setExtraBadgesCount(Math.max(0, values.length - badgeLimit))
       }
+
+      return () => window.removeEventListener('resize', calculateVisibleBadges)
     }, [values, badgeLimit])
 
     const badgeClasses = 'rounded shrink-0 px-1.5'
@@ -296,7 +298,7 @@ const MultiSelectorTrigger = React.forwardRef<
               <Badge key={value} className={badgeClasses}>
                 {value}
                 {deletableBadge && (
-                  <button
+                  <div
                     onMouseEnter={() => setIsDeleteHovered(true)}
                     onMouseLeave={() => setIsDeleteHovered(false)}
                     onClick={() => {
@@ -306,7 +308,7 @@ const MultiSelectorTrigger = React.forwardRef<
                     className="ml-1 text-foreground-lighter hover:text-foreground-light transition-colors pointer-events-auto"
                   >
                     <RemoveIcon size={12} />
-                  </button>
+                  </div>
                 )}
               </Badge>
             ))}
@@ -451,7 +453,6 @@ const MultiSelectorItem = React.forwardRef<
       ref={ref}
       tabIndex={open ? 0 : -1}
       role="option"
-      aria-Value={isSelected}
       onSelect={() => toggleValue(value)}
       className={cn(
         'relative',
