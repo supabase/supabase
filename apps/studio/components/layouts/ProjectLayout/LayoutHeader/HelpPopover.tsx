@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter, useSearchParams } from 'next/navigation'
 import SVG from 'react-inlinesvg'
 
 import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'lucide-react'
@@ -16,8 +16,12 @@ import { useProjectContext } from '../ProjectContext'
 
 const HelpPopover = () => {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const queryRef = searchParams?.get('ref')
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH
+
   const { project } = useProjectContext()
-  const projectRef = project?.parent_project_ref ?? router.query.ref
+  const projectRef = project?.parent_project_ref ?? queryRef
   const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
 
   return (
@@ -110,14 +114,14 @@ const HelpPopover = () => {
               >
                 <Image
                   className="absolute left-0 top-0 opacity-50"
-                  src={`${router.basePath}/img/support/discord-bg-small.jpg`}
+                  src={`${basePath}/img/support/discord-bg-small.jpg`}
                   layout="fill"
                   objectFit="cover"
                   alt="discord illustration header"
                 />
                 <Button
                   type="secondary"
-                  icon={<SVG src={`${router.basePath}/img/discord-icon.svg`} className="h-4 w-4" />}
+                  icon={<SVG src={`${basePath}/img/discord-icon.svg`} className="h-4 w-4" />}
                 >
                   <span style={{ color: '#404EED' }}>Join Discord server</span>
                 </Button>
@@ -134,7 +138,7 @@ const HelpPopover = () => {
               >
                 <Image
                   className="absolute left-0 top-0 opacity-50"
-                  src={`${router.basePath}/img/support/github-bg.jpg?v-1`}
+                  src={`${basePath}/img/support/github-bg.jpg?v-1`}
                   layout="fill"
                   objectFit="cover"
                   alt="discord illustration header"
