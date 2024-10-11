@@ -2,32 +2,54 @@ import { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-import { Button } from 'ui'
+import {
+  Button,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+} from 'ui'
 import { motion } from 'framer-motion'
 import Layout from '~/components/Layouts/Default'
 import { CircleAlert, CircleCheck } from 'lucide-react'
+
+// Define FormDataType at the top of your file or import it if defined elsewhere
+interface FormDataType {
+  ref: string | undefined
+  reason: string
+}
 
 const Spam: NextPage = () => {
   const router = useRouter()
   const { ref } = router.query
 
+  // Ensure ref is a string
+  const refString = Array.isArray(ref) ? ref[0] : ref
+
   const [pageLoaded, setPageLoaded] = useState(false)
-  const [formData, setFormData] = useState({ ref })
+  const [formData, setFormData] = useState<FormDataType>({
+    ref: undefined,
+    reason: '',
+  })
   const [submissionMessage, setSubmissionMessage] = useState<string | null>(null)
   const [messageType, setMessageType] = useState<'success' | 'error' | null>(null)
 
   useEffect(() => {
-    if (!ref) return
+    if (!refString) return
 
     const refPattern = /^[a-zA-Z]{20}$/
 
     if (!refPattern.test(ref as string)) {
       setSubmissionMessage('Error: That project reference does not look right.')
       setMessageType('error')
+      return
     }
 
+    setFormData({ ref: refString, reason: '' })
+
     setPageLoaded(true)
-  }, [router, ref])
+  }, [router, refString, ref])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -38,6 +60,7 @@ const Spam: NextPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ reason: formData.reason }),
       })
       const message = await response.text()
 
@@ -82,7 +105,7 @@ const Spam: NextPage = () => {
               </motion.div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="mt-8">
+            <form onSubmit={handleSubmit} className="mt-8 grid gap-4 max-w-xs">
               <input
                 hidden
                 name="ref"
@@ -90,6 +113,42 @@ const Spam: NextPage = () => {
                 onChange={(e) => setFormData({ ...formData, ref: e.target.value })}
                 readOnly
               />
+              <Select_Shadcn_
+                value={formData.reason}
+                onValueChange={(value) => setFormData({ ...formData, reason: value })}
+              >
+                <SelectTrigger_Shadcn_ className="text-sm h-10">
+                  {formData.reason || 'Select reason (optional)'}
+                </SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  <SelectGroup_Shadcn_>
+                    <SelectItem_Shadcn_ value="phishing" className="text-sm">
+                      <p>Phishing</p>
+                      <p className="text-foreground-light text-xs">
+                        Attempt to obtain sensitive information
+                      </p>
+                    </SelectItem_Shadcn_>
+                    <SelectItem_Shadcn_ value="advertisement" className="text-sm">
+                      <p>Advertisement</p>
+                      <p className="text-foreground-light text-xs">Unwanted promotional content</p>
+                    </SelectItem_Shadcn_>
+                    <SelectItem_Shadcn_ value="malware" className="text-sm">
+                      <p>Malware</p>
+                      <p className="text-foreground-light text-xs">Contains harmful software</p>
+                    </SelectItem_Shadcn_>
+                    <SelectItem_Shadcn_ value="scam" className="text-sm">
+                      <p>Scam</p>
+                      <p className="text-foreground-light text-xs">
+                        Fraudulent or deceptive content
+                      </p>
+                    </SelectItem_Shadcn_>
+                    <SelectItem_Shadcn_ value="other" className="text-sm">
+                      <p>Other</p>
+                      <p className="text-foreground-light text-xs">Any other type of spam</p>
+                    </SelectItem_Shadcn_>
+                  </SelectGroup_Shadcn_>
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
               {pageLoaded && (
                 <Button htmlType="submit" size="small">
                   Report

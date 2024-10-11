@@ -2,7 +2,12 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { ref } = req.query
-  console.log('the ref is', ref) // says ref is undefined
+
+  // will be one of dropdown options, or empty
+  // so we can do:  if(reason =='') return "not specified"
+  const { reason } = req.body
+
+  console.log('the ref is', ref, reason)
 
   // Check if ref is provided
   if (!ref) {
