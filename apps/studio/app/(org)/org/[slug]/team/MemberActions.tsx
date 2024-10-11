@@ -3,7 +3,7 @@ import { MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useParams } from 'next/navigation'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
@@ -39,7 +39,9 @@ interface MemberActionsProps {
 }
 
 export const MemberActions = ({ member }: MemberActionsProps) => {
-  const { slug } = useParams()
+  const params = useParams()
+  const { slug } = params as { slug: string }
+
   const { profile } = useProfile()
   const [showAccessModal, setShowAccessModal] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)

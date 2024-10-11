@@ -1,8 +1,7 @@
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
+import { useParams } from 'next/navigation'
 import {
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,
@@ -21,11 +20,12 @@ import { useProfile } from 'lib/profile'
 import { Input } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { InviteMemberButton } from './InviteMemberButton'
-import MembersView from './MembersView'
+import MembersView from 'app/(org)/org/[slug]/team/members-view'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 
-const TeamSettings = () => {
-  const { slug } = useParams()
+export function TeamSettings() {
+  const params = useParams()
+  const { slug } = params as { slug: string }
 
   const {
     organizationMembersCreate: organizationMembersCreationEnabled,
@@ -37,8 +37,8 @@ const TeamSettings = () => {
   const isOwner = selectedOrganization?.is_owner
 
   const { data: permissions } = usePermissionsQuery()
-  const { data: rolesData } = useOrganizationRolesQuery({ slug })
-  const { data: members } = useOrganizationMembersQuery({ slug })
+  const { data: rolesData } = useOrganizationRolesQuery({ slug: slug as string })
+  const { data: members } = useOrganizationMembersQuery({ slug: slug as string })
 
   const roles = rolesData?.roles ?? []
 
@@ -53,6 +53,7 @@ const TeamSettings = () => {
 
   const canAddMembers = rolesAddable.length > 0
   const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
+  const [isLeaveTeamModalOpen, setIsLeaveTeamModalOpen] = useState(false)
 
   const { mutate: deleteMember } = useOrganizationMemberDeleteMutation({
     onSuccess: () => {
@@ -66,13 +67,11 @@ const TeamSettings = () => {
     },
   })
 
-  const [isLeaveTeamModalOpen, setIsLeaveTeamModalOpen] = useState(false)
-
   const leaveTeam = async () => {
     if (!slug) return console.error('Org slug is required')
 
     setIsLeaving(true)
-    deleteMember({ slug, gotrueId: profile!.gotrue_id })
+    deleteMember({ slug: slug as string, gotrueId: profile!.gotrue_id })
   }
 
   return (
@@ -94,7 +93,6 @@ const TeamSettings = () => {
                 canAddMembers &&
                 profile !== undefined &&
                 selectedOrganization !== undefined && <InviteMemberButton />}
-              {/* if organizationMembersDeletionEnabled is false, you also can't delete yourself */}
               {organizationMembersDeletionEnabled && (
                 <>
                   <ButtonTooltip
@@ -155,5 +153,3 @@ const TeamSettings = () => {
     </>
   )
 }
-
-export default TeamSettings

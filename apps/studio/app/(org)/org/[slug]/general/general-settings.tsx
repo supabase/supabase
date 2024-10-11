@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useParams } from 'next/navigation'
 import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { FormActions } from 'components/ui/Forms/FormActions'
@@ -17,24 +17,25 @@ import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from 'lib/constants'
 import { Form, Input, Toggle } from 'ui'
-import OptInToOpenAIToggle from './OptInToOpenAIToggle'
-import OrganizationDeletePanel from './OrganizationDeletePanel'
+import OptInToOpenAIToggle from '../../../../../components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
+import OrganizationDeletePanel from '../../../../../components/interfaces/Organization/GeneralSettings/OrganizationDeletePanel'
 
-const GeneralSettings = () => {
-  const { slug } = useParams()
+export function GeneralSettings() {
+  const params = useParams()
+
   const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
-  const { name } = selectedOrganization ?? {}
+  const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
+  const { name } = selectedOrganization ?? {}
   const formId = 'org-general-settings'
   const isOptedIntoAi = useOrgOptedIntoAi()
   const initialValues = { name: name ?? '', isOptedIntoAi }
 
-  const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
-
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
+  const { slug } = params as { slug: string }
 
   const onUpdateOrganization = async (values: any, { resetForm }: any) => {
     if (!canUpdateOrganization) {
@@ -137,4 +138,4 @@ const GeneralSettings = () => {
   )
 }
 
-export default GeneralSettings
+// export default GeneralSettings
