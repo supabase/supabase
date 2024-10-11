@@ -63,31 +63,31 @@ const ProjectsPage = () => {
         </div>
       )}
 
-      {navLayoutV2 && (
+      {/* {navLayoutV2 && (
         <div className={`flex items-center justify-center h-full`}>
           <Loading />
         </div>
-      )}
-      {!navLayoutV2 && (
-        <div className="p-5">
-          {IS_PLATFORM && projectCreationEnabled && isSuccess && (
-            <HomePageActions
-              search={search}
-              filterStatus={filterStatus}
-              setSearch={setSearch}
-              setFilterStatus={setFilterStatus}
-              organizations={organizations}
-            />
-          )}
-          <div className="my-6 space-y-8">
-            <ProjectList
-              search={search}
-              filterStatus={filterStatus}
-              resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
-            />
-          </div>
+      )} */}
+      {/* {!navLayoutV2 && ( */}
+      <div className="p-5">
+        {IS_PLATFORM && projectCreationEnabled && isSuccess && (
+          <HomePageActions
+            search={search}
+            filterStatus={filterStatus}
+            setSearch={setSearch}
+            setFilterStatus={setFilterStatus}
+            organizations={organizations}
+          />
+        )}
+        <div className="my-6 space-y-8">
+          <ProjectList
+            search={search}
+            filterStatus={filterStatus}
+            resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
+          />
         </div>
-      )}
+      </div>
+      {/* )} */}
     </>
   )
 }
