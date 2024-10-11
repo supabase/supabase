@@ -140,7 +140,7 @@ const SupportPage = () => {
                               className="w-full group py-1.5 px-2 gap-x-1 text-foreground hover:bg-background-alternative-200 grid grid-cols-2 text-left"
                             >
                               <span className="truncate max-w-40">{project.name}</span>
-                              <span className="flex w-full gap-x-1 items-center">
+                              <span className="flex w-full gap-x-1 items-center font-mono">
                                 {project.ref}
                                 <ClipboardIcon
                                   size="14"
