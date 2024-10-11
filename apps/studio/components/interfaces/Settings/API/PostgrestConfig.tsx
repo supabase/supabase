@@ -314,7 +314,7 @@ export const PostgrestConfig = () => {
                                     showIcon={false}
                                     deletableBadge
                                   />
-                                  <MultiSelectorContent sameWidthAsTrigger>
+                                  <MultiSelectorContent>
                                     {schema.length <= 0 ? (
                                       <MultiSelectorList>
                                         <MultiSelectorItem key={'empty'} value={'no'}>

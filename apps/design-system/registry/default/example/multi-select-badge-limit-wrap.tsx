@@ -15,15 +15,9 @@ export default function MultiSelectDemo() {
     'Date',
     'Elderberrie',
   ])
-  const [open, setOpen] = useState(true)
 
   return (
-    <MultiSelector
-      open={open}
-      onOpenChange={setOpen}
-      values={selectedValues}
-      onValuesChange={setSelectedValues}
-    >
+    <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
       <MultiSelectorTrigger
         className="w-72"
         label="Select fruits"

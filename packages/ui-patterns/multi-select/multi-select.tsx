@@ -6,9 +6,11 @@ import { ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 import { VariantProps, cva } from 'class-variance-authority'
 
-import { cn, Badge, Checkbox_Shadcn_ as Checkbox } from 'ui'
+import { Command as CommandPrimitive } from 'cmdk'
+import { cn, Badge, Checkbox_Shadcn_ as Checkbox, Dialog, DialogContent } from 'ui'
 import {
   Command,
+  CommandDialog,
   CommandEmpty,
   CommandInput,
   CommandItem,
@@ -60,15 +62,17 @@ type MultiSelectorProps = {
   loop?: boolean
   disabled?: boolean
   dir?: 'rtl' | 'ltr'
-} & React.ComponentPropsWithoutRef<typeof Popover> &
+} & React.ComponentPropsWithoutRef<typeof Command> &
   VariantProps<typeof MultiSelectorVariants>
 
 function MultiSelector({
   values = [],
   onValuesChange,
-  disabled,
+  className,
   loop = false,
   dir,
+  size = 'small',
+  disabled,
   children,
   ...props
 }: MultiSelectorProps) {
@@ -156,15 +160,23 @@ function MultiSelector({
         setInputValue,
         activeIndex,
         setActiveIndex,
-        size: 'small',
+        size: size || 'small',
         disabled,
       }}
     >
-      <Popover open={open} onOpenChange={setOpen} {...props}>
+      {/* <Popover open={open} onOpenChange={setOpen} {...props}>
         <Command onKeyDown={handleKeyDown} dir={dir} className="w-auto bg-transparent">
           {children}
         </Command>
-      </Popover>
+      </Popover> */}
+      <CommandPrimitive
+        onKeyDown={handleKeyDown}
+        className={cn('relative overflow-visible bg-transparent flex flex-col', className)}
+        dir={dir}
+        {...props}
+      >
+        {children}
+      </CommandPrimitive>
     </MultiSelectContext.Provider>
   )
 }
@@ -272,80 +284,80 @@ const MultiSelectorTrigger = React.forwardRef<
     }
 
     return (
-      <PopoverTrigger asChild ref={ref}>
-        <button
-          ref={inputRef}
-          onClick={handleTriggerClick}
-          role="combobox"
+      // <PopoverTrigger asChild ref={ref}>
+      <button
+        ref={inputRef}
+        onClick={handleTriggerClick}
+        role="combobox"
+        className={cn(
+          'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
+          'border-alternative bg-foreground/[.026] px-3 py-2 text-sm',
+          'ring-offset-background placeholder:text-muted-foreground',
+          'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+          'disabled:cursor-not-allowed disabled:opacity-50',
+          'hover:border-primary transition-colors duration-200',
+          className
+        )}
+        {...props}
+      >
+        <div
+          ref={badgesRef}
           className={cn(
-            'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
-            'border-alternative bg-foreground/[.026] px-3 py-2 text-sm',
-            'ring-offset-background placeholder:text-muted-foreground',
-            'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-            'disabled:cursor-not-allowed disabled:opacity-50',
-            'hover:border-primary transition-colors duration-200',
-            className
+            'flex gap-1 -ml-1 overflow-hidden flex-1',
+            IS_BADGE_LIMIT_WRAP && 'flex-wrap',
+            !IS_BADGE_LIMIT_WRAP &&
+              'overflow-x-scroll scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
           )}
-          {...props}
         >
-          <div
-            ref={badgesRef}
-            className={cn(
-              'flex gap-1 -ml-1 overflow-hidden flex-1',
-              IS_BADGE_LIMIT_WRAP && 'flex-wrap',
-              !IS_BADGE_LIMIT_WRAP &&
-                'overflow-x-scroll scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
-            )}
-          >
-            {visibleBadges.map((value) => (
-              <Badge key={value} className={badgeClasses}>
-                {value}
-                {deletableBadge && (
-                  <div
-                    onMouseEnter={() => setIsDeleteHovered(true)}
-                    onMouseLeave={() => setIsDeleteHovered(false)}
-                    onClick={() => {
-                      toggleValue(value)
-                      setIsDeleteHovered(false)
-                    }}
-                    className="ml-1 text-foreground-lighter hover:text-foreground-light transition-colors pointer-events-auto"
-                  >
-                    <RemoveIcon size={12} />
-                  </div>
-                )}
-              </Badge>
-            ))}
-            {extraBadgesCount > 0 && <Badge className={badgeClasses}>+{extraBadgesCount}</Badge>}
-            {!IS_INLINE_MODE && (persistLabel || values.length === 0) && (
-              <span className="text-foreground-muted whitespace-nowrap leading-[1.375rem] ml-1">
-                {label}
-              </span>
-            )}
-            {IS_INLINE_MODE && (
-              <MultiSelectorInput
-                ref={inlineInputRef}
-                tabIndex={0}
-                showSearchIcon={false}
-                onValueChange={activeIndex === -1 ? setInputValue : undefined}
-                placeholder={label}
-                wrapperClassName={cn(
-                  'px-0 flex-1 border-none truncate',
-                  IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
-                )}
-                className="py-0 px-1 truncate"
-              />
-            )}
-          </div>
-
-          {showIcon && (
-            <ChevronsUpDown
-              size={16}
-              strokeWidth={2}
-              className="text-foreground-lighter shrink-0 ml-1.5"
+          {visibleBadges.map((value) => (
+            <Badge key={value} className={badgeClasses}>
+              {value}
+              {deletableBadge && (
+                <div
+                  onMouseEnter={() => setIsDeleteHovered(true)}
+                  onMouseLeave={() => setIsDeleteHovered(false)}
+                  onClick={() => {
+                    toggleValue(value)
+                    setIsDeleteHovered(false)
+                  }}
+                  className="ml-1 text-foreground-lighter hover:text-foreground-light transition-colors pointer-events-auto"
+                >
+                  <RemoveIcon size={12} />
+                </div>
+              )}
+            </Badge>
+          ))}
+          {extraBadgesCount > 0 && <Badge className={badgeClasses}>+{extraBadgesCount}</Badge>}
+          {!IS_INLINE_MODE && (persistLabel || values.length === 0) && (
+            <span className="text-foreground-muted whitespace-nowrap leading-[1.375rem] ml-1">
+              {label}
+            </span>
+          )}
+          {IS_INLINE_MODE && (
+            <MultiSelectorInput
+              ref={inlineInputRef}
+              tabIndex={0}
+              showSearchIcon={false}
+              onValueChange={activeIndex === -1 ? setInputValue : undefined}
+              placeholder={label}
+              wrapperClassName={cn(
+                'px-0 flex-1 border-none truncate',
+                IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
+              )}
+              className="py-0 px-1 truncate"
             />
           )}
-        </button>
-      </PopoverTrigger>
+        </div>
+
+        {showIcon && (
+          <ChevronsUpDown
+            size={16}
+            strokeWidth={2}
+            className="text-foreground-lighter shrink-0 ml-1.5"
+          />
+        )}
+      </button>
+      // </PopoverTrigger>
     )
   }
 )
@@ -410,13 +422,23 @@ const MultiSelectorContent = React.forwardRef<
   React.PropsWithChildren<
     {
       className?: string
-    } & React.ComponentProps<typeof PopoverContent>
+    } & React.ComponentProps<any>
   >
->(({ children, className, ...props }, ref) => (
-  <PopoverContent ref={ref} className={cn('w-full p-0', className)} {...props}>
-    {children}
-  </PopoverContent>
-))
+>(({ children, className, ...props }, ref) => {
+  const { open } = useMultiSelect()
+
+  return (
+    // <PopoverContent ref={ref} className={cn('w-full p-0', className)} {...props}>
+    //   {children}
+    // </PopoverContent>
+    // <Dialog ref={ref} className={cn('w-full p-0', className)} {...props}>
+    //   <DialogContent>{children}</DialogContent>
+    // </Dialog>
+    <div ref={ref} className={cn('relative', className)} {...props}>
+      {open && children}
+    </div>
+  )
+})
 
 MultiSelectorContent.displayName = 'MultiSelectorContent'
 
