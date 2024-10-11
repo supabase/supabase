@@ -115,7 +115,7 @@ const SupportPage = () => {
                 </p>
                 <p>
                   Please, make sure to{' '}
-                  <Tooltip open={true}>
+                  <Tooltip>
                     <TooltipTrigger asChild>
                       <span className="text-foreground underline">include your project ID</span>
                     </TooltipTrigger>
