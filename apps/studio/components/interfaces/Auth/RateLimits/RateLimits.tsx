@@ -52,7 +52,8 @@ const RateLimits = () => {
     },
   })
 
-  const canUpdateEmailLimit = authConfig?.EXTERNAL_EMAIL_ENABLED && isSmtpEnabled(authConfig)
+  const hasAuthEmailHookEnabled = authConfig?.HOOK_SEND_EMAIL_ENABLED
+  const canUpdateEmailLimit = authConfig?.EXTERNAL_EMAIL_ENABLED && (isSmtpEnabled(authConfig) || hasAuthEmailHookEnabled)
   const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED && !authConfig?.SMS_AUTOCONFIRM
   const canUpdateAnonymousUsersRateLimit = authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED
 
@@ -127,7 +128,6 @@ const RateLimits = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess])
 
-  const hasAuthEmailHookEnabled = authConfig?.HOOK_SEND_EMAIL_ENABLED
 
   return (
     <div>
