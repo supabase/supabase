@@ -286,7 +286,7 @@ const MultiSelectorTrigger = React.forwardRef<
           <div
             ref={badgesRef}
             className={cn(
-              'flex gap-1 -ml-1 overflow-hidden',
+              'flex gap-1 -ml-1 overflow-hidden flex-1',
               IS_BADGE_LIMIT_WRAP && 'flex-wrap',
               !IS_BADGE_LIMIT_WRAP &&
                 'overflow-x-scroll scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
