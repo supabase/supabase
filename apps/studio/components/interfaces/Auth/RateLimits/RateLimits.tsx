@@ -210,12 +210,12 @@ const RateLimits = () => {
                           <Alert_Shadcn_>
                             <WarningIcon />
                             <AlertTitle_Shadcn_>
-                              Custom SMTP provider is required to update this configuration
+                              Custom SMTP provider or Send Email Hook is required to update this configuration
                             </AlertTitle_Shadcn_>
                             <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
                               <p className="!leading-tight">
                                 The built-in email service has a fixed rate limit. You will need to
-                                set up your own custom SMTP provider to update your email rate limit
+                                set up your own custom SMTP provider or a Send Email Hook to update your email rate limit
                               </p>
                               <Button asChild type="default" className="w-min">
                                 <Link href={`/project/${projectRef}/settings/auth`}>
