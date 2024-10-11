@@ -1,5 +1,3 @@
-'use client'
-
 import { useContext } from 'react'
 
 import FlagContext from 'components/ui/Flag/FlagContext'
