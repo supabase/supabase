@@ -129,7 +129,6 @@ const RateLimits = () => {
 
   const hasAuthEmailHookEnabled = authConfig?.HOOK_SEND_EMAIL_ENABLED
 
-
   return (
     <div>
       <FormHeader
@@ -155,9 +154,9 @@ const RateLimits = () => {
                     handleReset={() => form.reset()}
                     disabled={!canUpdateConfig}
                     helper={
-                    !canUpdateConfig
-                    ? 'You need additional permissions to update authentication settings'
-                    : undefined
+                      !canUpdateConfig
+                        ? 'You need additional permissions to update authentication settings'
+                        : undefined
                     }
                   />
                 </div>
@@ -444,7 +443,7 @@ const RateLimits = () => {
         </Form_Shadcn_>
       )}
     </div>
-      )
+  )
 }
 
 export default RateLimits
