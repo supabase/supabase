@@ -1031,16 +1031,6 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
-    name: 'multi-select-old-demo',
-    type: 'components:example',
-    files: ['example/multi-select-old-demo.tsx'],
-  },
-  {
-    name: 'multi-select-old-form',
-    type: 'components:example',
-    files: ['example/multi-select-old-form.tsx'],
-  },
-  {
     name: 'multi-select-demo',
     type: 'components:example',
     files: ['example/multi-select-demo.tsx'],

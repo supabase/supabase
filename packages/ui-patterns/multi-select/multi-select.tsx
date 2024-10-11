@@ -247,7 +247,7 @@ const MultiSelectorTrigger = React.forwardRef<
       }
     }, [values, badgeLimit])
 
-    const badgeClasses = 'rounded'
+    const badgeClasses = 'rounded shrink-0 px-1.5'
 
     const handleTriggerClick = (event: React.MouseEvent<HTMLButtonElement>) => {
       if (isDeleteHovered) {
@@ -293,7 +293,7 @@ const MultiSelectorTrigger = React.forwardRef<
             )}
           >
             {visibleBadges.map((value) => (
-              <Badge key={value} className={cn('shrink-0', badgeClasses)}>
+              <Badge key={value} className={badgeClasses}>
                 {value}
                 {deletableBadge && (
                   <button

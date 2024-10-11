@@ -1787,28 +1787,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "multi-select-old-demo": {
-      name: "multi-select-old-demo",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/multi-select-old-demo")),
-      source: "",
-      files: ["registry/default/example/multi-select-old-demo.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "multi-select-old-form": {
-      name: "multi-select-old-form",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/multi-select-old-form")),
-      source: "",
-      files: ["registry/default/example/multi-select-old-form.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
     "multi-select-demo": {
       name: "multi-select-demo",
       type: "components:example",
