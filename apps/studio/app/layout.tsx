@@ -18,6 +18,7 @@ import 'styles/toast.scss'
 import 'styles/ui.scss'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
+import './fonts.css'
 
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
