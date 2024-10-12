@@ -178,7 +178,7 @@ const DiskUsage = ({
                           </span>
                           <InfoTooltip side="top">
                             <p>{primaryDiskUsage} GB for Primary Database</p>
-                            {replicaDbs.length && (
+                            {replicaDbs.length > 0 && (
                               <>
                                 <p>
                                   {replicaDiskUsage} GB for {replicaDbs.length} Read{' '}
