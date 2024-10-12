@@ -1,16 +1,38 @@
+import { SupportedAssistantEntities, SupportedAssistantQuickPromptTypes } from './AIAssistant.types'
+
+const PLACEHOLDER_PREFIX = `-- Press tab to use this code
+\n&nbsp;\n`
+
+export const generatePlaceholder = () => {
+  return `${PLACEHOLDER_PREFIX}
+CREATE FUNCTION schema.function_name(param_list)\n
+&nbsp;&nbsp;RETURNS return_type\n
+&nbsp;&nbsp;LANGUAGE plpgsql\n
+&nbsp;&nbsp;SECURITY DEFINER\n
+&nbsp;&nbsp;SET search_path = ''\n
+AS $$\n
+DECLARE\n
+&nbsp;&nbsp;-- Variable declarations\n
+BEGIN\n
+&nbsp;&nbsp;-- Function logic\n
+END;\n
+$$;
+`
+}
+
 export const generatePrompt = ({
   type,
   context,
   schemas,
   tables,
 }: {
-  type: 'suggest' | 'examples' | 'ask'
-  context: 'rls-policies' | 'functions'
+  type: SupportedAssistantQuickPromptTypes
+  context: SupportedAssistantEntities
   schemas: string[]
   tables: { schema: string; name: string }[]
 }) => {
   if (type === 'examples') {
-    return `What are some common examples of user-defined database ${context}?`
+    return `What are some common examples of user-defined database ${context}? Give me just three examples will do.`
   } else if (type === 'ask') {
     return `Could you explain to me what are used-defined database ${context}?`
   } else if (type === 'suggest') {

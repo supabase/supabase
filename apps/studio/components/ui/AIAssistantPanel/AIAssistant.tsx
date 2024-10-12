@@ -41,31 +41,36 @@ import {
   TooltipTrigger_Shadcn_,
 } from 'ui'
 import { AssistantChatForm } from 'ui-patterns'
+import { SupportedAssistantEntities, SupportedAssistantQuickPromptTypes } from './AIAssistant.types'
 import { generatePrompt } from './AIAssistant.utils'
 import { ContextBadge } from './ContextBadge'
 import { EntitiesDropdownMenu } from './EntitiesDropdownMenu'
 import { Message } from './Message'
 
-const ASSISTANT_SUPPORT_ENTITIES = [
+const ANIMATION_DURATION = 0.3
+const ASSISTANT_SUPPORT_ENTITIES: {
+  id: SupportedAssistantEntities
+  label: string
+  name: string
+}[] = [
   { id: 'rls-policies', label: 'RLS Policies', name: 'RLS policy' },
   { id: 'functions', label: 'Functions', name: 'database function' },
 ]
-const ANIMATION_DURATION = 0.5
 
 interface AIAssistantProps {
   className?: string
-  showEditor: boolean
 }
 
 // [Joshen] For some reason I'm having issues working with dropdown menu and scroll area
 
-export const AIAssistant = ({ className, showEditor }: AIAssistantProps) => {
+export const AIAssistant = ({ className }: AIAssistantProps) => {
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const { aiAssistantPanel } = useAppStateSnapshot()
   const { editor } = aiAssistantPanel
+  const showEditor = !!editor
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -73,7 +78,9 @@ export const AIAssistant = ({ className, showEditor }: AIAssistantProps) => {
   const [chatId] = useState(uuidv4())
   const [value, setValue] = useState<string>('')
 
-  const [selectedDatabaseEntity, setSelectedDatabaseEntity] = useState('')
+  const [selectedDatabaseEntity, setSelectedDatabaseEntity] = useState<
+    SupportedAssistantEntities | ''
+  >('')
   const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
   const [selectedEntities, setSelectedEntities] = useState<{ schema: string; name: string }[]>([])
   const [contextHistory, setContextHistory] = useState<{
@@ -138,6 +145,19 @@ export const AIAssistant = ({ className, showEditor }: AIAssistantProps) => {
     }
   }
 
+  const onClickQuickPrompt = (type: SupportedAssistantQuickPromptTypes) => {
+    const prompt = generatePrompt({
+      type,
+      context: selectedDatabaseEntity as any,
+      schemas: selectedSchemas,
+      tables: selectedEntities,
+    })
+    if (prompt) {
+      setValue(prompt)
+      append({ role: 'user', createdAt: new Date(), content: prompt })
+    }
+  }
+
   useEffect(() => {
     if (editor) {
       const mode = ASSISTANT_SUPPORT_ENTITIES.find((x) => x.id === editor)
@@ -154,9 +174,7 @@ export const AIAssistant = ({ className, showEditor }: AIAssistantProps) => {
     // Try to scroll on each rerender to the bottom
     setTimeout(
       () => {
-        if (bottomRef.current) {
-          bottomRef.current.scrollIntoView({ behavior: 'smooth' })
-        }
+        if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
       },
       isLoading ? 100 : 500
     )
@@ -184,13 +202,24 @@ export const AIAssistant = ({ className, showEditor }: AIAssistantProps) => {
           />
           <p>Assistant</p>
         </div>
-        <Button
-          type="default"
-          onClick={() => {}}
-          className={cn('transition mr-6', messages.length > 0 ? 'opacity-100' : 'opacity-0')}
-        >
-          Reset conversation
-        </Button>
+        <AnimatePresence>
+          {hasMessages && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 100 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Button
+                type="default"
+                onClick={() => {}}
+                className={cn('transition', showEditor ? '' : 'mr-6')}
+              >
+                Reset conversation
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </SheetHeader>
 
       <SheetSection
@@ -252,6 +281,11 @@ export const AIAssistant = ({ className, showEditor }: AIAssistantProps) => {
                 </Message>
               )
             })}
+            {!isLoading && !pendingReply && (
+              <p className="px-content text-xs text-right text-foreground-lighter pb-2">
+                Please verify all responses as the Assistant can make mistakes
+              </p>
+            )}
             {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
             <div ref={bottomRef} className="h-1" />
           </motion.div>
@@ -331,7 +365,9 @@ export const AIAssistant = ({ className, showEditor }: AIAssistantProps) => {
                       <DropdownMenuSubContent>
                         <DropdownMenuRadioGroup
                           value={selectedDatabaseEntity}
-                          onValueChange={setSelectedDatabaseEntity}
+                          onValueChange={(value) =>
+                            setSelectedDatabaseEntity(value as SupportedAssistantEntities)
+                          }
                         >
                           {ASSISTANT_SUPPORT_ENTITIES.map((x) => (
                             <DropdownMenuRadioItem key={x.id} value={x.id}>
@@ -477,10 +513,14 @@ export const AIAssistant = ({ className, showEditor }: AIAssistantProps) => {
 
               <AssistantChatForm
                 textAreaRef={inputRef}
-                className={cn('[&>textarea]:rounded-none [&>textarea]:border-0')}
+                className={cn(
+                  '[&>textarea]:rounded-none [&>textarea]:border-0 [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+                )}
                 loading={isLoading}
                 disabled={isLoading}
-                placeholder="Some placeholder here"
+                placeholder={
+                  hasMessages ? 'Reply to the assistant...' : 'How can we help you today?'
+                }
                 value={value}
                 onValueChange={(e) => setValue(e.target.value)}
                 onSubmit={(event) => {
@@ -510,54 +550,21 @@ export const AIAssistant = ({ className, showEditor }: AIAssistantProps) => {
                     <Button
                       type="default"
                       icon={<WandSparkles />}
-                      onClick={() => {
-                        const prompt = generatePrompt({
-                          type: 'suggest',
-                          context: selectedDatabaseEntity as any,
-                          schemas: selectedSchemas,
-                          tables: selectedEntities,
-                        })
-                        if (prompt) {
-                          setValue(prompt)
-                          append({ role: 'user', createdAt: new Date(), content: prompt })
-                        }
-                      }}
+                      onClick={() => onClickQuickPrompt('suggest')}
                     >
                       Suggest
                     </Button>
                     <Button
                       type="default"
                       icon={<FileText />}
-                      onClick={() => {
-                        const prompt = generatePrompt({
-                          type: 'examples',
-                          context: selectedDatabaseEntity as any,
-                          schemas: selectedSchemas,
-                          tables: selectedEntities,
-                        })
-                        if (prompt) {
-                          setValue(prompt)
-                          append({ role: 'user', createdAt: new Date(), content: prompt })
-                        }
-                      }}
+                      onClick={() => onClickQuickPrompt('examples')}
                     >
                       Examples
                     </Button>
                     <Button
                       type="default"
                       icon={<MessageCircleMore />}
-                      onClick={() => {
-                        const prompt = generatePrompt({
-                          type: 'ask',
-                          context: selectedDatabaseEntity as any,
-                          schemas: selectedSchemas,
-                          tables: selectedEntities,
-                        })
-                        if (prompt) {
-                          setValue(prompt)
-                          append({ role: 'user', createdAt: new Date(), content: prompt })
-                        }
-                      }}
+                      onClick={() => onClickQuickPrompt('ask')}
                     >
                       Ask
                     </Button>

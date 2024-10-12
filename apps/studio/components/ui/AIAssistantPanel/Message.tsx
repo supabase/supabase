@@ -36,6 +36,7 @@ export const Message = memo(function Message({
   onDiff = noop,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
+  const isUser = role === 'user'
 
   const icon = useMemo(() => {
     return role === 'assistant' ? (
@@ -68,16 +69,19 @@ export const Message = memo(function Message({
   if (!content) return null
 
   return (
-    <div className="flex flex-col py-4 gap-4 border-t px-5 text-foreground-light text-sm">
+    <div
+      className={cn(
+        'flex flex-col py-4 gap-4 px-5 text-foreground-light text-sm border-t first:border-0',
+        isUser && 'bg-default'
+      )}
+    >
       <div className="flex justify-between items-center">
         <div className="flex gap-x-3 items-center">
           {icon}
 
           <div className="flex flex-col -gap-y-1">
             <div className="flex items-center gap-x-3">
-              <span className="text-sm">
-                {role === 'assistant' ? 'Assistant' : name ? name : 'You'}
-              </span>
+              <span className="text-sm">{!isUser ? 'Assistant' : name ? name : 'You'}</span>
               {createdAt && (
                 <span className="text-xs text-foreground-muted">{dayjs(createdAt).fromNow()}</span>
               )}
@@ -93,7 +97,7 @@ export const Message = memo(function Message({
       </div>
 
       <ReactMarkdown
-        className="gap-x-2.5 gap-y-3 flex flex-col [&>*>code]:text-xs [&>*>*>code]:text-xs"
+        className="gap-x-2.5 gap-y-4 flex flex-col [&>*>code]:text-xs [&>*>*>code]:text-xs"
         remarkPlugins={[remarkGfm]}
         components={{
           ...markdownComponents,
@@ -102,7 +106,7 @@ export const Message = memo(function Message({
               <AiMessagePre
                 onDiff={onDiff}
                 className={cn(
-                  'transition',
+                  'transition [&>div>pre]:max-w-full',
                   isSelected ? '[&>div>pre]:!border-stronger [&>div>pre]:!bg-surface-200' : ''
                 )}
               >
@@ -111,7 +115,10 @@ export const Message = memo(function Message({
             )
           },
           ol: (props: any) => {
-            return <ol className="flex flex-col gap-y-1">{props.children}</ol>
+            return <ol className="flex flex-col gap-y-4">{props.children}</ol>
+          },
+          li: (props: any) => {
+            return <li className="[&>pre]:mt-2">{props.children}</li>
           },
           h3: (props: any) => {
             return <h3 className="underline">{props.children}</h3>

@@ -68,9 +68,6 @@ const RLSCodeEditor = ({
     lineNumbersMinChars: 4,
     folding: undefined,
     scrollBeyondLastLine: false,
-    padding: {
-      top: editView === 'conversation' ? 20 : 0,
-    },
   }
 
   const onMount: OnMount = async (editor, monaco) => {

@@ -72,7 +72,7 @@ const CodeEditor = ({
                 .split('\n\n')
                 .join('\n')
                 .replaceAll('*', '')
-                .replaceAll('&nbsp;', ''),
+                .replaceAll('&nbsp;', ' '),
             },
           ])
         },
