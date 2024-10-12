@@ -96,6 +96,11 @@ const nextConfig = {
     // We are already running linting via GH action, this will skip linting during production build on Vercel
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    turbotrace: {
+      logLevel: 'error',
+    },
+  },
 }
 
 // next.config.js.
