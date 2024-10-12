@@ -173,20 +173,17 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
             name: 'Disk size',
             chartPrefix: 'Average',
             unit: 'bytes',
-            description: 'Disk size desc.',
+            description:
+              "Each Supabase project comes with a dedicated disk. Each project gets 8 GB of disk for free. Billing is based on the provisioned disk size and prorated down to the hour (GB-Hrs).\nDisk automatically scales up when you get close to it's size.\nEach hour your project is using more than 8 GB of GP3 disk, it incurs the overages in GB-Hrs, i.e. a 16 GB disk incurs 8 GB-Hrs every hour. Extra disk size costs $0.125/GB/month or $0.000171/GB-Hr.",
             links: [
               {
                 name: 'Documentation',
-                url: 'https://supabase.com/docs/guides/platform/database-size',
+                url: 'https://supabase.com/docs/guides/platform/org-based-billing#disk-size',
               },
-              ...(subscription?.usage_based_billing_project_addons === true
-                ? [
-                    {
-                      name: 'Disk Management',
-                      url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
-                    },
-                  ]
-                : []),
+              {
+                name: 'Disk Management',
+                url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
+              },
             ],
             chartDescription: '',
           },

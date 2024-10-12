@@ -95,6 +95,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   {
     key: PricingMetric.DISK_SIZE_GB_HOURS_GP3,
     name: 'Disk Size',
+    anchor: 'diskSize',
     units: 'absolute',
     unitName: 'GB-Hrs',
     category: 'Database',
@@ -107,6 +108,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   {
     key: PricingMetric.DISK_SIZE_GB_HOURS_IO2,
     name: 'Disk Size IO2',
+    anchor: 'diskSize',
     units: 'absolute',
     unitName: 'GB-Hrs',
     category: 'Database',

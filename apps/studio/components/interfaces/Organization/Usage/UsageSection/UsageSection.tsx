@@ -58,6 +58,7 @@ const UsageSection = ({
             attribute={attribute}
             subscription={subscription}
             currentBillingCycleSelected={currentBillingCycleSelected}
+            usage={usage}
           />
         ) : (
           <AttributeUsage
