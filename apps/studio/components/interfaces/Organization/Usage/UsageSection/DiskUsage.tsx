@@ -69,6 +69,14 @@ const DiskUsage = ({
   const gp3UsageInPeriod = usage?.usages.find((it) => it.metric === PricingMetric.DISK_IOPS_GP3)
   const io2UsageInPeriod = usage?.usages.find((it) => it.metric === PricingMetric.DISK_IOPS_IO2)
 
+  const relevantProjects = useMemo(() => {
+    return diskUsage
+      ? diskUsage.projects
+          .filter((it) => !it.is_branch && it.status !== PROJECT_STATUS.INACTIVE)
+          .filter((it) => it.ref === projectRef || !projectRef)
+      : []
+  }, [diskUsage])
+
   return (
     <div id={attribute.anchor} className="scroll-my-12">
       <SectionContent section={attribute}>
@@ -83,17 +91,19 @@ const DiskUsage = ({
         {isError && <AlertError subject="Failed to retrieve usage data" error={null} />}
         {isSuccess && (
           <div className="space-y-4">
-            {subscription?.usage_billing_enabled === true && hasProjectsExceedingDiskSize && (
-              <Alert_Shadcn_ variant="warning">
-                <CriticalIcon />
-                <AlertTitle_Shadcn_>Projects exceeding quota</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  You have projects that are exceeding 8 GB of provisioned disk size, but do not
-                  allow any overages with the spend cap on. Reduce the disk size or disable the
-                  spend cap.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            )}
+            {currentBillingCycleSelected &&
+              subscription?.usage_billing_enabled === false &&
+              hasProjectsExceedingDiskSize && (
+                <Alert_Shadcn_ variant="warning">
+                  <CriticalIcon />
+                  <AlertTitle_Shadcn_>Projects exceeding quota</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    You have projects that are exceeding 8 GB of provisioned disk size, but do not
+                    allow any overages with the spend cap on. Reduce the disk size or disable the
+                    spend cap.
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
 
             <div>
               <div className="flex items-center justify-between">
@@ -106,7 +116,7 @@ const DiskUsage = ({
                 <p className="text-xs text-foreground-light">
                   Included in {subscription?.plan?.name} Plan
                 </p>
-                <p className="text-xs">8 GB GP3 disk per project</p>
+                <p className="text-xs">First 8 GB GP3 disk per project free</p>
               </div>
 
               <div className="flex items-center justify-between">
@@ -118,82 +128,79 @@ const DiskUsage = ({
               </div>
             </div>
 
-            <div className="space-y-1">
-              <p className="text-sm">Current disk size per project</p>
-              <p className="text-sm text-foreground-light">
-                Breakdown of disk per project. Head to your project's disk management section to see
-                database space used.
-              </p>
-            </div>
-
             {currentBillingCycleSelected ? (
-              <div>
-                {diskUsage.projects
-                  .filter((it) => !it.is_branch && it.status !== PROJECT_STATUS.INACTIVE)
-                  .map((project) => {
-                    const primaryDiskUsage = project.databases
-                      .filter((it) => it.type === 'PRIMARY')
-                      .reduce((acc, curr) => acc + (curr.disk_volume_size_gb ?? 8), 0)
-                    const replicaDbs = project.databases.filter((it) => it.type !== 'PRIMARY')
-                    const replicaDiskUsage = replicaDbs.reduce(
-                      (acc, curr) => acc + (curr.disk_volume_size_gb ?? 8),
-                      0
-                    )
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <p className="text-sm">Current disk size per project</p>
+                  <p className="text-sm text-foreground-light">
+                    Breakdown of disk per project. Head to your project's disk management section to
+                    see database space used.
+                  </p>
+                </div>
+                {relevantProjects.map((project, idx) => {
+                  const primaryDiskUsage = project.databases
+                    .filter((it) => it.type === 'PRIMARY')
+                    .reduce((acc, curr) => acc + (curr.disk_volume_size_gb ?? 8), 0)
+                  const replicaDbs = project.databases.filter((it) => it.type !== 'PRIMARY')
+                  const replicaDiskUsage = replicaDbs.reduce(
+                    (acc, curr) => acc + (curr.disk_volume_size_gb ?? 8),
+                    0
+                  )
 
-                    const totalDiskUsage = primaryDiskUsage + replicaDiskUsage
+                  const totalDiskUsage = primaryDiskUsage + replicaDiskUsage
 
-                    return (
-                      <div className="border-b pb-2">
-                        <div className="flex justify-between">
-                          <span className="text-foreground-light flex items-center gap-2">
-                            {project.name}
+                  return (
+                    <div className={idx !== relevantProjects.length - 1 ? 'border-b pb-2' : ''}>
+                      <div className="flex justify-between">
+                        <span className="text-foreground-light flex items-center gap-2">
+                          {project.name}
+                        </span>
+                        <Button asChild type="default" size={'tiny'}>
+                          <Link href={`/project/${project.ref}/settings/database#disk-management`}>
+                            Manage Disk
+                          </Link>
+                        </Button>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center h-6 gap-3">
+                          <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
+                            <span className="text-foreground font-semibold -mt-[2px]">
+                              <MotionNumber
+                                value={totalDiskUsage}
+                                style={{ lineHeight: 0.8 }}
+                                transition={{
+                                  y: { type: 'spring', duration: 0.35, bounce: 0 },
+                                }}
+                                className="font-mono"
+                              />
+                            </span>{' '}
+                            GB Disk provisioned
                           </span>
-                          <Button asChild type="default" size={'tiny'}>
-                            <Link
-                              href={`/project/${project.ref}/settings/database#disk-management`}
-                            >
-                              Manage Disk
-                            </Link>
-                          </Button>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center h-6 gap-3">
-                            <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-                              <span className="text-foreground font-semibold -mt-[2px]">
-                                <MotionNumber
-                                  value={totalDiskUsage}
-                                  style={{ lineHeight: 0.8 }}
-                                  transition={{
-                                    y: { type: 'spring', duration: 0.35, bounce: 0 },
-                                  }}
-                                  className="font-mono"
-                                />
-                              </span>{' '}
-                              GB Disk provisioned
-                            </span>
-                            <InfoTooltip side="top">
-                              <p>{primaryDiskUsage} GB for Primary Database</p>
-                              {replicaDbs.length && (
-                                <>
-                                  <p>
-                                    {replicaDiskUsage} GB for {replicaDbs.length} Read{' '}
-                                    {replicaDbs.length === 1 ? 'Replica' : 'Replicas'}
-                                  </p>
-                                  <p className="mt-1">
-                                    Read replicas have their own disk and use 25% more disk to
-                                    account for WAL files.
-                                  </p>
-                                </>
-                              )}
-                            </InfoTooltip>
-                          </div>
+                          <InfoTooltip side="top">
+                            <p>{primaryDiskUsage} GB for Primary Database</p>
+                            {replicaDbs.length && (
+                              <>
+                                <p>
+                                  {replicaDiskUsage} GB for {replicaDbs.length} Read{' '}
+                                  {replicaDbs.length === 1 ? 'Replica' : 'Replicas'}
+                                </p>
+                                <p className="mt-1">
+                                  Read replicas have their own disk and use 25% more disk to account
+                                  for WAL files.
+                                </p>
+                              </>
+                            )}
+                          </InfoTooltip>
                         </div>
                       </div>
-                    )
-                  })}
+                    </div>
+                  )
+                })}
               </div>
             ) : (
-              <div>select current billing cycle please</div>
+              <p className="text-foreground-light text-sm">
+                Switch to current billing cycle to see current disk size per project.
+              </p>
             )}
           </div>
         )}
