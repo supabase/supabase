@@ -54,14 +54,16 @@ const SizeAndCounts = ({
   }
 
   return (
-    <UsageSection
-      orgSlug={orgSlug}
-      projectRef={projectRef}
-      categoryKey="sizeCount"
-      chartMeta={chartMeta}
-      subscription={subscription}
-      currentBillingCycleSelected={currentBillingCycleSelected}
-    />
+    <>
+      <UsageSection
+        orgSlug={orgSlug}
+        projectRef={projectRef}
+        categoryKey="sizeCount"
+        chartMeta={chartMeta}
+        subscription={subscription}
+        currentBillingCycleSelected={currentBillingCycleSelected}
+      />
+    </>
   )
 }
 

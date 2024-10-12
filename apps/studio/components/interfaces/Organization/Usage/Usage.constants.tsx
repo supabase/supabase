@@ -100,73 +100,96 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
     name: 'Database & Storage Size',
     description: 'Amount of resources your project is consuming',
     attributes: [
-      {
-        anchor: 'dbSize',
-        key: PricingMetric.DATABASE_SIZE,
-        attributes: [{ key: PricingMetric.DATABASE_SIZE.toLowerCase(), color: 'white' }],
-        name: 'Database size',
-        chartPrefix: 'Average',
-        unit: 'bytes',
-        description:
-          subscription?.usage_based_billing_project_addons === true
-            ? 'Database size refers to the monthly average database space usage, as reported by Postgres. Paid Plans use auto-scaling disks and are billed based on provisioned disk size, rather than database space used.'
-            : 'Database size refers to the monthly average database space usage, as reported by Postgres. Paid Plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
-        links: [
-          {
-            name: 'Documentation',
-            url: 'https://supabase.com/docs/guides/platform/database-size',
+      subscription?.plan.id === 'free' || subscription?.usage_based_billing_project_addons !== true
+        ? {
+            anchor: 'dbSize',
+            key: PricingMetric.DATABASE_SIZE,
+            attributes: [{ key: PricingMetric.DATABASE_SIZE.toLowerCase(), color: 'white' }],
+            name: 'Database size',
+            chartPrefix: 'Average',
+            unit: 'bytes',
+            description:
+              'Database size refers to the monthly average database space usage, as reported by Postgres. Paid Plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
+            links: [
+              {
+                name: 'Documentation',
+                url: 'https://supabase.com/docs/guides/platform/database-size',
+              },
+              ...(subscription?.usage_based_billing_project_addons === true
+                ? [
+                    {
+                      name: 'Disk Management',
+                      url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
+                    },
+                  ]
+                : []),
+            ],
+            chartDescription: 'The data refreshes every 24 hours.',
+            additionalInfo: (usage?: OrgUsageResponse) => {
+              const usageMeta = usage?.usages.find((x) => x.metric === PricingMetric.DATABASE_SIZE)
+              const usageRatio =
+                typeof usageMeta !== 'number'
+                  ? (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
+                  : 0
+              const hasLimit = usageMeta && (usageMeta?.pricing_free_units ?? 0) > 0
+
+              const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
+              const isExceededLimit = hasLimit && usageRatio >= 1
+              const isCapped = usageMeta?.capped
+
+              const onFreePlan = subscription?.plan?.name === 'Free'
+
+              return (
+                <div>
+                  {(isApproachingLimit || isExceededLimit) && isCapped && (
+                    <Alert
+                      withIcon
+                      variant={isExceededLimit ? 'danger' : 'warning'}
+                      title={
+                        isExceededLimit
+                          ? 'Exceeding database size limit'
+                          : 'Nearing database size limit'
+                      }
+                    >
+                      <div className="flex w-full items-center flex-col justify-center space-y-2 md:flex-row md:justify-between">
+                        <div>
+                          When you reach your database size limit, your project can go into
+                          read-only mode.{' '}
+                          {onFreePlan
+                            ? 'Please upgrade your Plan.'
+                            : 'Disable your spend cap to scale seamlessly and pay for over-usage beyond your Plans quota.'}
+                        </div>
+                      </div>
+                    </Alert>
+                  )}
+                </div>
+              )
+            },
+          }
+        : {
+            anchor: 'diskSize',
+            key: 'diskSize',
+            attributes: [],
+            name: 'Disk size',
+            chartPrefix: 'Average',
+            unit: 'bytes',
+            description: 'Disk size desc.',
+            links: [
+              {
+                name: 'Documentation',
+                url: 'https://supabase.com/docs/guides/platform/database-size',
+              },
+              ...(subscription?.usage_based_billing_project_addons === true
+                ? [
+                    {
+                      name: 'Disk Management',
+                      url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
+                    },
+                  ]
+                : []),
+            ],
+            chartDescription: '',
           },
-          ...(subscription?.usage_based_billing_project_addons === true
-            ? [
-                {
-                  name: 'Disk Management',
-                  url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
-                },
-              ]
-            : []),
-        ],
-        chartDescription: 'The data refreshes every 24 hours.',
-        additionalInfo: (usage?: OrgUsageResponse) => {
-          const usageMeta = usage?.usages.find((x) => x.metric === PricingMetric.DATABASE_SIZE)
-          const usageRatio =
-            typeof usageMeta !== 'number'
-              ? (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
-              : 0
-          const hasLimit = usageMeta && (usageMeta?.pricing_free_units ?? 0) > 0
-
-          const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
-          const isExceededLimit = hasLimit && usageRatio >= 1
-          const isCapped = usageMeta?.capped
-
-          const onFreePlan = subscription?.plan?.name === 'Free'
-
-          return (
-            <div>
-              {(isApproachingLimit || isExceededLimit) && isCapped && (
-                <Alert
-                  withIcon
-                  variant={isExceededLimit ? 'danger' : 'warning'}
-                  title={
-                    isExceededLimit
-                      ? 'Exceeding database size limit'
-                      : 'Nearing database size limit'
-                  }
-                >
-                  <div className="flex w-full items-center flex-col justify-center space-y-2 md:flex-row md:justify-between">
-                    <div>
-                      When you reach your database size limit, your project can go into read-only
-                      mode.{' '}
-                      {onFreePlan
-                        ? 'Please upgrade your Plan.'
-                        : 'Disable your spend cap to scale seamlessly and pay for over-usage beyond your Plans quota.'}
-                    </div>
-                  </div>
-                </Alert>
-              )}
-            </div>
-          )
-        },
-      },
       {
         anchor: 'storageSize',
         key: PricingMetric.STORAGE_SIZE,
