@@ -116,7 +116,7 @@ const DiskUsage = ({
                 <p className="text-xs text-foreground-light">
                   Included in {subscription?.plan?.name} Plan
                 </p>
-                <p className="text-xs">First 8 GB GP3 disk per project free</p>
+                <p className="text-xs">8 GB GP3 disk per project</p>
               </div>
 
               <div className="flex items-center justify-between">
