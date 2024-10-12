@@ -7,7 +7,8 @@ const SpamIndex = () => {
   // We don't want anyone landing here directly
   useEffect(() => {
     router.push('/')
-  }, [router])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return null // Optionally, you can return a loading spinner or message
 }
