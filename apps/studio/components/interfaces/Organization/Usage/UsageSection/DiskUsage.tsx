@@ -6,7 +6,6 @@ import { CategoryAttribute } from '../Usage.constants'
 import { useOrgProjectsQuery } from 'data/projects/org-projects'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
-  cn,
   Button,
   Alert_Shadcn_,
   CriticalIcon,
@@ -17,7 +16,6 @@ import MotionNumber from 'motion-number'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import Panel from 'components/ui/Panel'
@@ -45,6 +43,7 @@ const DiskUsage = ({
     isError,
     isLoading,
     isSuccess,
+    error,
   } = useOrgProjectsQuery(
     {
       orgSlug: slug,
@@ -76,7 +75,7 @@ const DiskUsage = ({
           .filter((it) => !it.is_branch && it.status !== PROJECT_STATUS.INACTIVE)
           .filter((it) => it.ref === projectRef || !projectRef)
       : []
-  }, [diskUsage])
+  }, [diskUsage, projectRef])
 
   return (
     <div id={attribute.anchor} className="scroll-my-12">
@@ -88,8 +87,7 @@ const DiskUsage = ({
             <ShimmeringLoader className="w-1/2" />
           </div>
         )}
-        {/* TODO error prop */}
-        {isError && <AlertError subject="Failed to retrieve usage data" error={null} />}
+        {isError && <AlertError subject="Failed to retrieve usage data" error={error} />}
         {isSuccess && (
           <div className="space-y-4">
             {currentBillingCycleSelected &&
