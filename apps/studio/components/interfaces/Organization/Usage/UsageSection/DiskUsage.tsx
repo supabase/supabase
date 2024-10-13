@@ -20,6 +20,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+import Panel from 'components/ui/Panel'
 
 export interface DiskUsageProps {
   slug: string
@@ -137,6 +138,20 @@ const DiskUsage = ({
                     see database space used.
                   </p>
                 </div>
+
+                {relevantProjects.length === 0 && (
+                  <Panel>
+                    <Panel.Content>
+                      <div className="flex flex-col items-center justify-center">
+                        <p className="text-sm">No active projects</p>
+                        <p className="text-sm text-foreground-light">
+                          You don't have any active projects in this organization.
+                        </p>
+                      </div>
+                    </Panel.Content>
+                  </Panel>
+                )}
+
                 {relevantProjects.map((project, idx) => {
                   const primaryDiskUsage = project.databases
                     .filter((it) => it.type === 'PRIMARY')
@@ -198,9 +213,16 @@ const DiskUsage = ({
                 })}
               </div>
             ) : (
-              <p className="text-foreground-light text-sm">
-                Switch to current billing cycle to see current disk size per project.
-              </p>
+              <Panel>
+                <Panel.Content>
+                  <div className="flex flex-col items-center justify-center">
+                    <p className="text-sm">Data not available</p>
+                    <p className="text-sm text-foreground-light">
+                      Switch to current billing cycle to see current disk size per project.
+                    </p>
+                  </div>
+                </Panel.Content>
+              </Panel>
             )}
           </div>
         )}
