@@ -99,7 +99,7 @@ const DiskUsage = ({
                   <AlertTitle_Shadcn_>Projects exceeding quota</AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_>
                     You have projects that are exceeding 8 GB of provisioned disk size, but do not
-                    allow any overages with the spend cap on. Reduce the disk size or disable the
+                    allow any overages with the Spend Cap on. Reduce the disk size or disable the
                     spend cap.
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>

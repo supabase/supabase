@@ -174,7 +174,7 @@ const BillingMetric = ({
             {subscription.usage_billing_enabled === false &&
               relativeToSubscription &&
               (isApproachingLimit || isExceededLimit) && (
-                <div className="mt-2">
+                <div className="my-2">
                   <p className="text-sm">
                     Exceeding your plans included usage will lead to restrictions to your project.
                     Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.
