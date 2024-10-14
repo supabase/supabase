@@ -16,7 +16,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  SheetSection,
 } from 'ui'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
