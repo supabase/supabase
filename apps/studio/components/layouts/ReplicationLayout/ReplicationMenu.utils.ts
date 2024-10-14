@@ -9,6 +9,12 @@ export const generateReplicationMenu = (project: Project): ProductMenuGroup[] =>
       title: 'Configuration',
       items: [
         {
+          name: 'Sources',
+          key: 'sources',
+          url: `/project/${ref}/replication/sources`,
+          items: [],
+        },
+        {
           name: 'Sinks',
           key: 'sinks',
           url: `/project/${ref}/replication/sinks`,
