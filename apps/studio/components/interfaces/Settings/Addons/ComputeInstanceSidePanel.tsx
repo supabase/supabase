@@ -311,9 +311,9 @@ const ComputeInstanceSidePanel = () => {
                           {(subscriptionCompute?.variant.identifier === option.identifier ||
                             (!subscriptionCompute &&
                               option.identifier ===
-                              `ci_${selectedProject?.infra_compute_size}`)) && (
-                              <Badge>Current</Badge>
-                            )}
+                                `ci_${selectedProject?.infra_compute_size}`)) && (
+                            <Badge>Current</Badge>
+                          )}
                           {selectedProject?.infra_compute_size === 'nano' &&
                             option.identifier === 'ci_micro' && <Badge>Free Upgrade</Badge>}
                         </p>

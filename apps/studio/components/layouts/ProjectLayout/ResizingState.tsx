@@ -29,7 +29,8 @@ const ResizingState = () => {
             <div className="space-y-1">
               <p>Restarting...</p>
               <p className="text-sm text-foreground-light">
-                Your project is being restarted to apply compute size changes. It can take a few minutes. Your project will be offline while it is being restarted.
+                Your project is being restarted to apply compute size changes. It can take a few
+                minutes. Your project will be offline while it is being restarted.
               </p>
             </div>
           </div>
