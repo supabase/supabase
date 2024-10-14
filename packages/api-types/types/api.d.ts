@@ -101,6 +101,10 @@ export interface paths {
     /** Updates GoTrue config */
     patch: operations['GoTrueConfigController_updateGoTrueConfig']
   }
+  '/platform/auth/{ref}/config/hooks': {
+    /** Updates GoTrue config hooks */
+    patch: operations['GoTrueConfigController_updateGoTrueConfigHooks']
+  }
   '/platform/auth/{ref}/invite': {
     /** Sends an invite to the given email */
     post: operations['AuthInviteController_sendInvite']
@@ -122,10 +126,24 @@ export interface paths {
     get: operations['TemplateController_getTemplate']
   }
   '/platform/auth/{ref}/users': {
-    /** Gets users */
+    /**
+     * Gets users
+     * @deprecated
+     */
     get: operations['UsersController_getUsers']
-    /** Delete user with given ID */
+    /** Creates user */
+    post: operations['UsersController_createUser']
+    /**
+     * Delete user with given ID
+     * @deprecated
+     */
     delete: operations['UsersController_deleteUser']
+  }
+  '/platform/auth/{ref}/users/{id}': {
+    /** Delete user with given ID */
+    delete: operations['UsersController_deleteUserById']
+    /** Updates user with given ID */
+    patch: operations['UsersController_updateUserById']
   }
   '/platform/auth/{ref}/users/{id}/factors': {
     /** Delete all factors associated to a user */
@@ -456,6 +474,10 @@ export interface paths {
   '/platform/organizations/{slug}/payments/setup-intent': {
     /** Sets up a payment method */
     post: operations['SetupIntentOrgController_setUpPaymentMethod']
+  }
+  '/platform/organizations/{slug}/projects': {
+    /** Gets all projects for the given organization */
+    get: operations['OrganizationProjectsController_getProjects']
   }
   '/platform/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
@@ -1286,6 +1308,10 @@ export interface paths {
     /** Updates GoTrue config */
     patch: operations['GoTrueConfigController_updateGoTrueConfig']
   }
+  '/v0/auth/{ref}/config/hooks': {
+    /** Updates GoTrue config hooks */
+    patch: operations['GoTrueConfigController_updateGoTrueConfigHooks']
+  }
   '/v0/auth/{ref}/invite': {
     /** Sends an invite to the given email */
     post: operations['AuthInviteController_sendInvite']
@@ -1307,10 +1333,24 @@ export interface paths {
     get: operations['TemplateController_getTemplate']
   }
   '/v0/auth/{ref}/users': {
-    /** Gets users */
+    /**
+     * Gets users
+     * @deprecated
+     */
     get: operations['UsersController_getUsers']
-    /** Delete user with given ID */
+    /** Creates user */
+    post: operations['UsersController_createUser']
+    /**
+     * Delete user with given ID
+     * @deprecated
+     */
     delete: operations['UsersController_deleteUser']
+  }
+  '/v0/auth/{ref}/users/{id}': {
+    /** Delete user with given ID */
+    delete: operations['UsersController_deleteUserById']
+    /** Updates user with given ID */
+    patch: operations['UsersController_updateUserById']
   }
   '/v0/auth/{ref}/users/{id}/factors': {
     /** Delete all factors associated to a user */
@@ -3022,12 +3062,54 @@ export interface components {
       table: string
       table_id?: number
     }
+    CreateUserBody: {
+      email: string
+      email_confirm: boolean
+      password: string
+    }
     CreateUserContentFolderResponse: {
       id: string
       name: string
       owner_id: number
       parent_id?: string | null
       project_id: number
+    }
+    CreateUserReponse: {
+      aud?: string
+      banned_until?: string
+      confirmation_sent_at?: string
+      confirmation_token?: string
+      confirmed_at?: string
+      created_at?: string
+      deleted_at?: string
+      email?: string
+      email_change?: string
+      email_change_confirm_status?: number
+      email_change_sent_at?: string
+      email_change_token_current?: string
+      email_change_token_new?: string
+      email_confirmed_at?: string
+      encrypted_password?: string
+      id?: string
+      instance_id?: string
+      invited_at?: string
+      is_anonymous?: boolean
+      is_sso_user?: boolean
+      is_super_admin?: boolean
+      last_sign_in_at?: string
+      phone?: string
+      phone_change?: string
+      phone_change_sent_at?: string
+      phone_change_token?: string
+      phone_confirmed_at?: string
+      raw_app_meta_data?: Record<string, never>
+      raw_user_meta_data?: Record<string, never>
+      reauthentication_sent_at?: string
+      reauthentication_token?: string
+      recovery_sent_at?: string
+      recovery_token?: string
+      role?: string
+      updated_at?: string
     }
     CreateVercelConnectionResponse: {
       env_sync_error?: components['schemas']['SyncVercelEnvError']
@@ -3116,6 +3198,21 @@ export interface components {
         | 'RESTARTING'
         | 'RESIZING'
     }
+    /** @enum {string} */
+    DatabaseStatus:
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'GOING_DOWN'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTORING'
+      | 'UNKNOWN'
+      | 'UPGRADING'
+      | 'INIT_READ_REPLICA'
+      | 'INIT_READ_REPLICA_FAILED'
+      | 'RESTARTING'
+      | 'RESIZING'
     DatabaseStatusResponse: {
       identifier: string
       replicaInitializationStatus?: Record<string, never>
@@ -3135,6 +3232,8 @@ export interface components {
         | 'RESTARTING'
         | 'RESIZING'
     }
+    /** @enum {string} */
+    DatabaseType: 'PRIMARY' | 'READ_REPLICA'
     DatabaseUpgradeStatus: {
       /** @enum {string} */
       error?:
@@ -4169,6 +4268,9 @@ export interface components {
        */
       supabase_org_id: string
     }
+    OrganizationProjectsResponse: {
+      projects: components['schemas']['ProjectWithDatabases'][]
+    }
     OrganizationResponse: {
       billing_email: string | null
       id: number
@@ -4669,6 +4771,19 @@ export interface components {
       release_channel: components['schemas']['ReleaseChannel']
       version: string
     }
+    ProjectDatabase: {
+      cloud_provider: string
+      disk_last_modified_at?: string
+      disk_throughput_mbps?: number
+      /** @enum {string} */
+      disk_type?: 'gp3' | 'io2'
+      disk_volume_size_gb?: number
+      identifier: string
+      infra_compute_size?: components['schemas']['DbInstanceSize']
+      region: string
+      status: components['schemas']['DatabaseStatus']
+      type: components['schemas']['DatabaseType']
+    }
     ProjectDetailResponse: {
       cloud_provider: string
       connectionString: string
@@ -4852,6 +4967,23 @@ export interface components {
       ssl_enforced: boolean
       status: string
     }
+    /** @enum {string} */
+    ProjectStatus:
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'GOING_DOWN'
+      | 'INACTIVE'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTARTING'
+      | 'UNKNOWN'
+      | 'UPGRADING'
+      | 'PAUSING'
+      | 'RESTORING'
+      | 'RESTORE_FAILED'
+      | 'PAUSE_FAILED'
+      | 'RESIZING'
     ProjectUnpauseVersionInfo: {
       postgres_engine: components['schemas']['PostgresEngine']
       release_channel: components['schemas']['ReleaseChannel']
@@ -4875,6 +5007,14 @@ export interface components {
       app_version: string
       postgres_version: components['schemas']['PostgresEngine']
       release_channel: components['schemas']['ReleaseChannel']
+    }
+    ProjectWithDatabases: {
+      databases: components['schemas']['ProjectDatabase'][]
+      is_branch: boolean
+      name: string
+      ref: string
+      region: string
+      status: components['schemas']['ProjectStatus']
     }
     Provider: {
       created_at?: string
@@ -6140,6 +6280,23 @@ export interface components {
       SMTP_USER?: string
       URI_ALLOW_LIST?: string
     }
+    UpdateGoTrueConfigHooksBody: {
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_SECRETS?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_SEND_EMAIL_ENABLED?: boolean
+      HOOK_SEND_EMAIL_SECRETS?: string
+      HOOK_SEND_EMAIL_URI?: string
+      HOOK_SEND_SMS_ENABLED?: boolean
+      HOOK_SEND_SMS_SECRETS?: string
+      HOOK_SEND_SMS_URI?: string
+    }
     UpdateMemberBody: {
       role_id: number
     }
@@ -6357,6 +6514,46 @@ export interface components {
       schema?: string
       table?: string
       table_id?: number
+    }
+    UpdateUserBody: {
+      ban_duration?: string
+    }
+    UpdateUserReponse: {
+      aud?: string
+      banned_until?: string
+      confirmation_sent_at?: string
+      confirmation_token?: string
+      confirmed_at?: string
+      created_at?: string
+      deleted_at?: string
+      email?: string
+      email_change?: string
+      email_change_confirm_status?: number
+      email_change_sent_at?: string
+      email_change_token_current?: string
+      email_change_token_new?: string
+      email_confirmed_at?: string
+      encrypted_password?: string
+      id?: string
+      instance_id?: string
+      invited_at?: string
+      is_anonymous?: boolean
+      is_sso_user?: boolean
+      is_super_admin?: boolean
+      last_sign_in_at?: string
+      phone?: string
+      phone_change?: string
+      phone_change_sent_at?: string
+      phone_change_token?: string
+      phone_confirmed_at?: string
+      raw_app_meta_data?: Record<string, never>
+      raw_user_meta_data?: Record<string, never>
+      reauthentication_sent_at?: string
+      reauthentication_token?: string
+      recovery_sent_at?: string
+      recovery_token?: string
+      role?: string
+      updated_at?: string
     }
     UpdateVercelConnectionsBody: {
       env_sync_targets?: ('production' | 'preview' | 'development')[]
@@ -7078,6 +7275,34 @@ export interface operations {
       }
     }
   }
+  /** Updates GoTrue config hooks */
+  GoTrueConfigController_updateGoTrueConfigHooks: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateGoTrueConfigHooksBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GoTrueConfigResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update GoTrue config hooks */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Sends an invite to the given email */
   AuthInviteController_sendInvite: {
     parameters: {
@@ -7216,7 +7441,10 @@ export interface operations {
       }
     }
   }
-  /** Gets users */
+  /**
+   * Gets users
+   * @deprecated
+   */
   UsersController_getUsers: {
     parameters: {
       query: {
@@ -7245,7 +7473,38 @@ export interface operations {
       }
     }
   }
-  /** Delete user with given ID */
+  /** Creates user */
+  UsersController_createUser: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateUserBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateUserReponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create user */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Delete user with given ID
+   * @deprecated
+   */
   UsersController_deleteUser: {
     parameters: {
       path: {
@@ -7268,6 +7527,57 @@ export interface operations {
         content: never
       }
       /** @description Failed to delete user */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete user with given ID */
+  UsersController_deleteUserById: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete user */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates user with given ID */
+  UsersController_updateUserById: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateUserBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['UpdateUserReponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update user with given ID */
       500: {
         content: never
       }
@@ -9190,6 +9500,29 @@ export interface operations {
         content: never
       }
       /** @description Failed to set up a payment method */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets all projects for the given organization */
+  OrganizationProjectsController_getProjects: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OrganizationProjectsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve projects */
       500: {
         content: never
       }
@@ -12089,6 +12422,9 @@ export interface operations {
         content: {
           'application/json': components['schemas']['UpdateSecretsResponse']
         }
+      }
+      403: {
+        content: never
       }
       /** @description Failed to update project's secrets config */
       500: {
