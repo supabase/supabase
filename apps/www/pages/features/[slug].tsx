@@ -73,17 +73,6 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
           //     height: 627,
           //   },
           // ],
-          // videos: feature.video
-          //   ? [
-          //       {
-          //         // youtube based video meta
-          //         url: feature.video,
-          //         type: 'application/x-shockwave-flash',
-          //         width: 640,
-          //         height: 385,
-          //       },
-          //     ]
-          //   : undefined,
         }}
       />
       <DefaultLayout className="bg-alternative">
@@ -92,7 +81,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
             <SectionContainer className="!py-4 md:flex items-start hidden">
               <Link
                 href="/features"
-                className="text-foreground-lighter border rounded-full px-2 py-1.5 hover:text-foreground flex !leading-3 gap-1 cursor-pointer items-center text-sm transition"
+                className="text-foreground-lighter hover:text-foreground flex !leading-3 gap-1 cursor-pointer items-center text-sm transition"
               >
                 <ChevronLeft className="w-4 h-4" />
                 Back to Features
@@ -102,24 +91,24 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
               className="
                 relative z-10
                 lg:min-h-[400px] h-full
-                flex flex-col items-center md:text-center
+                flex flex-col md:text-center
                 gap-8
                 text-foreground-light
                 !py-10 md:!pb-10 md:!pt-0
               "
             >
               <div className="h-full flex flex-col items-start md:items-center gap-2">
-                <Badge className="capitalize mb-4" size="large">
-                  {feature.products[0]}
-                </Badge>
                 <h1 className="h1 !m-0">{feature.title}</h1>
                 <p>{feature.subtitle}</p>
+                <Badge className="capitalize mt-4" size="large">
+                  {feature.products[0]}
+                </Badge>
               </div>
               <div
                 className="
                 relative w-full aspect-video bg-surface-100 overflow-hidden
                 border shadow-lg rounded-lg
-                z-10 mx-auto max-w-3xl
+                z-10 mx-auto max-w-2xl
                 flex items-center justify-center
                 "
               >
@@ -133,7 +122,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
                     className="absolute inset-0 object-cover object-center"
                   />
                 ) : (
-                  <Icon className="w-8 h-8 text-foreground" />
+                  <Icon className="w-8 h-8 md:w-10 md:h-10 text-foreground" />
                 )}
               </div>
             </SectionContainer>
