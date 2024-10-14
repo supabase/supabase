@@ -3319,6 +3319,10 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/{ref}/sources': {
+    /** Gets replication sources */
+    get: operations['ReplicationSourcesController_getSources']
+  }
   '/platform/reset-password': {
     parameters: {
       query?: never
@@ -10739,6 +10743,20 @@ export interface components {
     }
     RemoveReadReplicaBody: {
       database_identifier: string
+    }
+    ReplicationPostgresConfig: {
+      host: string
+      name: string
+      port: number
+      slot_name: string
+      username: string
+    }
+    ReplicationSourcesResponse: {
+      config: {
+        Postgres?: components['schemas']['ReplicationPostgresConfig']
+      }
+      id: number
+      tenant_id: string
     }
     ReportStatusBody: {
       databaseIdentifier: string
@@ -21532,13 +21550,11 @@ export interface operations {
       }
       /** @description Failed to retrieve project's settings */
       500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
+        content: never
       }
     }
   }
+  /** Reset password for email */
   ResetPasswordController_resetPassword: {
     parameters: {
       query?: never
