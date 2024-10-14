@@ -66,8 +66,12 @@ const DiskUsage = ({
     }
   }, [diskUsage])
 
-  const gp3UsageInPeriod = usage?.usages.find((it) => it.metric === PricingMetric.DISK_IOPS_GP3)
-  const io2UsageInPeriod = usage?.usages.find((it) => it.metric === PricingMetric.DISK_IOPS_IO2)
+  const gp3UsageInPeriod = usage?.usages.find(
+    (it) => it.metric === PricingMetric.DISK_SIZE_GB_HOURS_GP3
+  )
+  const io2UsageInPeriod = usage?.usages.find(
+    (it) => it.metric === PricingMetric.DISK_SIZE_GB_HOURS_IO2
+  )
 
   const relevantProjects = useMemo(() => {
     return diskUsage
