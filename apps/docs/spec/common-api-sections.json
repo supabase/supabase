@@ -394,6 +394,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-project",
+        "title": "Get project",
+        "slug": "v1-get-project",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-services-health",
         "title": "Get services health",
         "slug": "v1-get-services-health",
