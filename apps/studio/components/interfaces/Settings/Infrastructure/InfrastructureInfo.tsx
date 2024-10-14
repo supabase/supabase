@@ -42,9 +42,14 @@ const InfrastructureInfo = () => {
     projectRef: ref,
   })
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
-  const { current_app_version, latest_app_version } = data || {}
+  const { current_app_version, current_app_version_release_channel, latest_app_version } =
+    data || {}
   const isOnLatestVersion = current_app_version === latest_app_version
   const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
+  const isOnNonGenerallyAvailableReleaseChannel =
+    current_app_version_release_channel && current_app_version_release_channel !== 'ga'
+      ? current_app_version_release_channel
+      : undefined
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const isInactive = project?.status === 'INACTIVE'
@@ -106,6 +111,19 @@ const InfrastructureInfo = () => {
                       value={currentPgVersion}
                       label="Postgres version"
                       actions={[
+                        isOnNonGenerallyAvailableReleaseChannel && (
+                          <Tooltip_Shadcn_>
+                            <TooltipTrigger_Shadcn_>
+                              <Badge variant="warning" className="mr-1 capitalize">
+                                {isOnNonGenerallyAvailableReleaseChannel}
+                              </Badge>
+                            </TooltipTrigger_Shadcn_>
+                            <TooltipContent_Shadcn_ side="bottom" className="w-44 text-center">
+                              This project uses a {isOnNonGenerallyAvailableReleaseChannel} database
+                              version release
+                            </TooltipContent_Shadcn_>
+                          </Tooltip_Shadcn_>
+                        ),
                         isOnLatestVersion && (
                           <Tooltip_Shadcn_>
                             <TooltipTrigger_Shadcn_>

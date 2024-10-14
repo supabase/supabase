@@ -95,10 +95,6 @@ export interface paths {
     /** Return quotes for different billing plans for a specific product */
     get: operations['ProductsController_listResources']
   }
-  '/partners/vercel/webhooks': {
-    /** Webhooks endpoint */
-    post: operations['WebhooksController_processWebhook']
-  }
   '/platform/auth/{ref}/config': {
     /** Gets GoTrue config */
     get: operations['GoTrueConfigController_getGoTrueConfig']
@@ -460,6 +456,10 @@ export interface paths {
   '/platform/organizations/{slug}/payments/setup-intent': {
     /** Sets up a payment method */
     post: operations['SetupIntentOrgController_setUpPaymentMethod']
+  }
+  '/platform/organizations/{slug}/projects': {
+    /** Gets all projects for the given organization */
+    get: operations['OrganizationProjectsController_getProjects']
   }
   '/platform/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
@@ -1077,15 +1077,31 @@ export interface paths {
   }
   '/platform/telemetry/event': {
     /** Sends analytics server event */
-    post: operations['TelemetryEventController_sendServerEvent']
+    post: operations['TelemetryEventController_sendServerEventV2']
+  }
+  '/platform/telemetry/groups/identify': {
+    /** Send analytics group identify event */
+    post: operations['TelemetryGroupsController_groupIdentify']
+  }
+  '/platform/telemetry/groups/reset': {
+    /** Send analytics group reset event */
+    post: operations['TelemetryGroupsController_groupReset']
   }
   '/platform/telemetry/identify': {
     /** Send analytics identify event */
-    post: operations['TelemetryIdentifyController_identify']
+    post: operations['TelemetryIdentifyController_identifyV2']
   }
   '/platform/telemetry/page': {
     /** Send server page event */
-    post: operations['TelemetryPageController_sendServerPage']
+    post: operations['TelemetryPageController_sendServerPageV2']
+  }
+  '/platform/telemetry/page-leave': {
+    /** Send analytics page leave event */
+    post: operations['TelemetryPageLeaveController_pageLeave']
+  }
+  '/platform/telemetry/reset': {
+    /** Reset analytics */
+    post: operations['TelemetryResetController_reset']
   }
   '/platform/tos/fly': {
     /** Redirects to Fly sso flow */
@@ -1959,6 +1975,8 @@ export interface paths {
     post: operations['v1-create-a-project']
   }
   '/v1/projects/{ref}': {
+    /** Gets a specific project that belongs to the authenticated user */
+    get: operations['v1-get-project']
     /** Deletes the given project */
     delete: operations['v1-delete-a-project']
   }
@@ -2621,6 +2639,7 @@ export interface components {
         | 'RESTORING'
         | 'RESTORE_FAILED'
         | 'PAUSE_FAILED'
+        | 'RESIZING'
     }
     BranchResetResponse: {
       message: string
@@ -3098,7 +3117,24 @@ export interface components {
         | 'UPGRADING'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
+        | 'RESTARTING'
+        | 'RESIZING'
     }
+    /** @enum {string} */
+    DatabaseStatus:
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'GOING_DOWN'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTORING'
+      | 'UNKNOWN'
+      | 'UPGRADING'
+      | 'INIT_READ_REPLICA'
+      | 'INIT_READ_REPLICA_FAILED'
+      | 'RESTARTING'
+      | 'RESIZING'
     DatabaseStatusResponse: {
       identifier: string
       replicaInitializationStatus?: Record<string, never>
@@ -3115,7 +3151,11 @@ export interface components {
         | 'UPGRADING'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
+        | 'RESTARTING'
+        | 'RESIZING'
     }
+    /** @enum {string} */
+    DatabaseType: 'PRIMARY' | 'READ_REPLICA'
     DatabaseUpgradeStatus: {
       /** @enum {string} */
       error?:
@@ -4143,11 +4183,15 @@ export interface components {
         | 'RESTORING'
         | 'RESTORE_FAILED'
         | 'PAUSE_FAILED'
+        | 'RESIZING'
       /**
        * @description Supabase organization id
        * @example fly_123456789
        */
       supabase_org_id: string
+    }
+    OrganizationProjectsResponse: {
+      projects: components['schemas']['ProjectWithDatabases'][]
     }
     OrganizationResponse: {
       billing_email: string | null
@@ -4649,6 +4693,19 @@ export interface components {
       release_channel: components['schemas']['ReleaseChannel']
       version: string
     }
+    ProjectDatabase: {
+      cloud_provider: string
+      disk_last_modified_at?: string
+      disk_throughput_mbps?: number
+      /** @enum {string} */
+      disk_type?: 'gp3' | 'io2'
+      disk_volume_size_gb?: number
+      identifier: string
+      infra_compute_size?: components['schemas']['DbInstanceSize']
+      region: string
+      status: components['schemas']['DatabaseStatus']
+      type: components['schemas']['DatabaseType']
+    }
     ProjectDetailResponse: {
       cloud_provider: string
       connectionString: string
@@ -4685,6 +4742,7 @@ export interface components {
         | 'RESTORING'
         | 'RESTORE_FAILED'
         | 'PAUSE_FAILED'
+        | 'RESIZING'
       subscription_id: string
       v2MaintenanceWindow: {
         end?: string
@@ -4831,6 +4889,23 @@ export interface components {
       ssl_enforced: boolean
       status: string
     }
+    /** @enum {string} */
+    ProjectStatus:
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'GOING_DOWN'
+      | 'INACTIVE'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTARTING'
+      | 'UNKNOWN'
+      | 'UPGRADING'
+      | 'PAUSING'
+      | 'RESTORING'
+      | 'RESTORE_FAILED'
+      | 'PAUSE_FAILED'
+      | 'RESIZING'
     ProjectUnpauseVersionInfo: {
       postgres_engine: components['schemas']['PostgresEngine']
       release_channel: components['schemas']['ReleaseChannel']
@@ -4854,6 +4929,14 @@ export interface components {
       app_version: string
       postgres_version: components['schemas']['PostgresEngine']
       release_channel: components['schemas']['ReleaseChannel']
+    }
+    ProjectWithDatabases: {
+      databases: components['schemas']['ProjectDatabase'][]
+      is_branch: boolean
+      name: string
+      ref: string
+      region: string
+      status: components['schemas']['ProjectStatus']
     }
     Provider: {
       created_at?: string
@@ -4924,6 +5007,8 @@ export interface components {
         | 'UPGRADING'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
+        | 'RESTARTING'
+        | 'RESIZING'
     }
     ResetPasswordBody: {
       email: string
@@ -5048,6 +5133,7 @@ export interface components {
         | 'RESTORING'
         | 'RESTORE_FAILED'
         | 'PAUSE_FAILED'
+        | 'RESIZING'
       /**
        * @description Supabase organization id
        * @example fly_123456789
@@ -5569,15 +5655,63 @@ export interface components {
       page_title?: string
       value?: string
     }
+    TelemetryEventBodyV2: {
+      action: string
+      custom_properties: Record<string, never>
+      page_title: string
+      page_url: string
+      pathname: string
+      ph: components['schemas']['TelemetryEventPostHog']
+    }
+    TelemetryEventPostHog: {
+      language: string
+      referrer: string
+      search: string
+      user_agent: string
+      viewport_height: number
+      viewport_width: number
+    }
+    TelemetryGroupsIdentityBody: {
+      organization_slug?: string
+      project_ref?: string
+    }
+    TelemetryGroupsResetBody: {
+      reset_organization?: boolean
+      reset_project?: boolean
+    }
     TelemetryIdentifyBody: {
       ga?: components['schemas']['GoogleAnalyticBody']
       user: components['schemas']['IdentifyUserBody']
+    }
+    TelemetryIdentifyBodyV2: {
+      organization_slug?: string
+      project_ref?: string
+      user_id: string
     }
     TelemetryPageBody: {
       ga?: components['schemas']['GoogleAnalyticBody']
       referrer: string
       route?: string
       title: string
+    }
+    TelemetryPageBodyV2: {
+      page_title: string
+      page_url: string
+      pathname: string
+      ph: components['schemas']['TelemetryPagePostHog']
+    }
+    TelemetryPageLeaveBody: {
+      page_title: string
+      page_url: string
+      pathname: string
+    }
+    TelemetryPagePostHog: {
+      language: string
+      referrer: string
+      search: string
+      user_agent: string
+      viewport_height: number
+      viewport_width: number
     }
     ThirdPartyAuth: {
       custom_jwks?: unknown
@@ -6136,6 +6270,7 @@ export interface components {
       max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
+      restart_database?: boolean
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
@@ -6575,6 +6710,7 @@ export interface components {
         | 'RESTORING'
         | 'RESTORE_FAILED'
         | 'PAUSE_FAILED'
+        | 'RESIZING'
     }
     V1RestorePitrBody: {
       recovery_time_target_unix: number
@@ -6955,19 +7091,6 @@ export interface operations {
   ProductsController_listResources: {
     responses: {
       200: {
-        content: never
-      }
-    }
-  }
-  /** Webhooks endpoint */
-  WebhooksController_processWebhook: {
-    parameters: {
-      header: {
-        'x-vercel-signature': string
-      }
-    }
-    responses: {
-      201: {
         content: never
       }
     }
@@ -9129,6 +9252,29 @@ export interface operations {
         content: never
       }
       /** @description Failed to set up a payment method */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets all projects for the given organization */
+  OrganizationProjectsController_getProjects: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OrganizationProjectsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve projects */
       500: {
         content: never
       }
@@ -11950,6 +12096,9 @@ export interface operations {
           'application/json': components['schemas']['PostgresConfigResponse']
         }
       }
+      403: {
+        content: never
+      }
       /** @description Failed to update project's Postgres config */
       500: {
         content: never
@@ -13603,10 +13752,10 @@ export interface operations {
     }
   }
   /** Sends analytics server event */
-  TelemetryEventController_sendServerEvent: {
+  TelemetryEventController_sendServerEventV2: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryEventBody']
+        'application/json': components['schemas']['TelemetryEventBodyV2']
       }
     }
     responses: {
@@ -13619,11 +13768,45 @@ export interface operations {
       }
     }
   }
-  /** Send analytics identify event */
-  TelemetryIdentifyController_identify: {
+  /** Send analytics group identify event */
+  TelemetryGroupsController_groupIdentify: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryIdentifyBody']
+        'application/json': components['schemas']['TelemetryGroupsIdentityBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to send analytics group identify event */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Send analytics group reset event */
+  TelemetryGroupsController_groupReset: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TelemetryGroupsResetBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to send analytics group reset event */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Send analytics identify event */
+  TelemetryIdentifyController_identifyV2: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TelemetryIdentifyBodyV2']
       }
     }
     responses: {
@@ -13637,10 +13820,10 @@ export interface operations {
     }
   }
   /** Send server page event */
-  TelemetryPageController_sendServerPage: {
+  TelemetryPageController_sendServerPageV2: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryPageBody']
+        'application/json': components['schemas']['TelemetryPageBodyV2']
       }
     }
     responses: {
@@ -13648,6 +13831,35 @@ export interface operations {
         content: never
       }
       /** @description Failed to send server page event */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Send analytics page leave event */
+  TelemetryPageLeaveController_pageLeave: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TelemetryPageLeaveBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to send analytics page leave event */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Reset analytics */
+  TelemetryResetController_reset: {
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to reset analytics */
       500: {
         content: never
       }
@@ -14862,6 +15074,26 @@ export interface operations {
         content: {
           'application/json': components['schemas']['V1ProjectResponse']
         }
+      }
+    }
+  }
+  /** Gets a specific project that belongs to the authenticated user */
+  'v1-get-project': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['V1ProjectResponse']
+        }
+      }
+      /** @description Failed to retrieve project */
+      500: {
+        content: never
       }
     }
   }

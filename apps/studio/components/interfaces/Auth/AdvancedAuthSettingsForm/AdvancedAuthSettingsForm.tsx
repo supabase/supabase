@@ -205,7 +205,7 @@ const AdvancedAuthSettingsForm = () => {
 
   return (
     <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
-      {({ handleReset, resetForm, values, initialValues }: any) => {
+      {({ handleReset, resetForm, values, initialValues, setFieldValue }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         // Form is reset once remote data is loaded in store
@@ -292,6 +292,7 @@ const AdvancedAuthSettingsForm = () => {
                     }}
                     formValues={values}
                     disabled={!canUpdateConfig}
+                    setFieldValue={setFieldValue}
                   />
 
                   <InputNumber
@@ -322,6 +323,7 @@ const AdvancedAuthSettingsForm = () => {
                     }}
                     formValues={values}
                     disabled={!canUpdateConfig || !isProPlanAndUp}
+                    setFieldValue={setFieldValue}
                   />
                   {!hasValidMFAProvider && phoneMFAIsEnabled && (
                     <Alert_Shadcn_ variant="warning">
@@ -349,6 +351,7 @@ const AdvancedAuthSettingsForm = () => {
                     }}
                     formValues={values}
                     disabled={!canUpdateConfig || !isProPlanAndUp}
+                    setFieldValue={setFieldValue}
                   />
                   {hasUpgradedPhoneMFA && (
                     <Alert_Shadcn_ variant="warning">

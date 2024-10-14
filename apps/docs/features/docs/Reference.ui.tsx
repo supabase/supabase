@@ -100,7 +100,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
     <h2
       tabIndex={-1} // For programmatic focus on auto-scroll to section
       className={cn(
-        'sticky top-0 z-10',
+        'sticky top-0 z-[1]',
         'w-full',
         // Enough padding to cover the background when stuck to the top,
         // then readjust with negative margin to prevent it looking too
@@ -111,6 +111,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
         'bg-gradient-to-b from-background from-85% to-transparent to-100%',
         'text-2xl font-medium text-foreground',
         'scroll-mt-[calc(var(--header-height)+1rem)]',
+        'focus:outline-none',
         monoFont && 'font-mono',
         className
       )}

@@ -83,10 +83,7 @@ export const PrivacySettings = ({
                 <>
                   By opting in to sending telemetry data, Supabase can improve the overall user
                   experience.{' '}
-                  <Link
-                    href="https://supabase.com/privacy#cookieless-analytics"
-                    className="underline"
-                  >
+                  <Link href="https://supabase.com/privacy" className="underline">
                     Learn more
                   </Link>
                 </>
