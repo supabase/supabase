@@ -98,11 +98,11 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
               "
             >
               <div className="h-full flex flex-col items-start md:items-center gap-2">
-                <h1 className="h1 !m-0">{feature.title}</h1>
-                <p>{feature.subtitle}</p>
-                <Badge className="capitalize mt-4" size="large">
+                <Badge className="capitalize mb-4" size="large">
                   {feature.products[0]}
                 </Badge>
+                <h1 className="h1 !m-0">{feature.title}</h1>
+                <p>{feature.subtitle}</p>
               </div>
               <div
                 className="

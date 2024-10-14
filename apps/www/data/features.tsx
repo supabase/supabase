@@ -82,7 +82,7 @@ export const features: FeatureType[] = [
     description: `
 Supabase provides every project with a fully managed PostgreSQL database, offering unparalleled scalability, reliability, and performance. By leveraging PostgreSQL, developers can harness its powerful features to build robust and complex applications with ease.
 
-Key benefits for users:
+Key benefits:
 1. Advanced data types: Utilize JSON, arrays, and custom types to store complex data structures efficiently.
 2. Powerful indexing: Improve query performance with various indexing options, including B-tree, Hash, and GiST.
 3. Full SQL support: Execute complex queries and leverage advanced SQL features for data manipulation and analysis.
@@ -105,7 +105,7 @@ With Supabase's managed PostgreSQL database, you can focus on building your appl
     description: `
 Supabase's vector database feature empowers users to store and query vector embeddings alongside traditional data, unlocking powerful capabilities for machine learning, natural language processing, and advanced search functionalities. This seamless integration of vector data with your existing database structure opens up a world of possibilities for AI-driven applications.
 
-Key benefits for users:
+Key benefits:
 1. Unified data storage: Keep vector embeddings and relational data in one place, simplifying your data architecture.
 2. Efficient similarity search: Perform fast and accurate similarity searches on high-dimensional data.
 3. Seamless integration: Easily incorporate vector search into existing applications without additional infrastructure.
@@ -135,7 +135,7 @@ This feature democratizes access to advanced AI capabilities, allowing developer
     description: `
 Supabase automatically generates a comprehensive RESTful API from your database schema, powered by PostgREST. This feature dramatically accelerates development by eliminating the need to write boilerplate server-side code for basic CRUD operations.
 
-Key benefits for users:
+Key benefits:
 1. Rapid development: Instantly access your data through a RESTful API without writing any backend code.
 2. Automatic updates: API endpoints automatically reflect changes in your database schema, ensuring consistency.
 3. Flexible querying: Use powerful query parameters to filter, sort, and paginate data directly from API calls.
@@ -167,7 +167,7 @@ The API's adherence to REST principles also ensures broad compatibility with var
     description: `
 Supabase offers lightning-fast GraphQL APIs through its custom-built PostgreSQL GraphQL extension, pg_graphql. This feature allows developers to harness the power of GraphQL without the need for additional servers or complex setups, providing a seamless and efficient way to query and manipulate data.
 
-Key benefits for users:
+Key benefits:
 1. Simplified data fetching: Retrieve exactly the data you need in a single request, reducing over-fetching and under-fetching.
 2. Automatic schema generation: GraphQL schema is automatically derived from your PostgreSQL schema, ensuring consistency.
 3. Real-time updates: Combine with Supabase's real-time features for live data subscriptions.
@@ -199,7 +199,7 @@ Moreover, the tight integration with PostgreSQL ensures that you can leverage th
     description: `
 Supabase ensures the safety and recoverability of your data with comprehensive backup solutions, including daily backups and Point-in-Time Recovery (PITR) options. This robust backup strategy provides peace of mind and data protection for mission-critical applications and valuable information.
 
-Key benefits for users:
+Key benefits:
 1. Data security: Safeguard against accidental deletions, corruptions, or other data loss scenarios.
 2. Business continuity: Minimize downtime and ensure quick recovery in case of unexpected incidents.
 3. Compliance support: Meet regulatory requirements for data retention and disaster recovery.
@@ -233,7 +233,7 @@ By leveraging Supabase's robust backup solutions, developers and businesses can 
     description: `
 Supabase's custom domain feature allows you to use your own domain names for Supabase services, providing a seamless, branded experience for your users. This white-labeling capability enhances your application's professional appearance and strengthens your brand identity.
 
-Key benefits for users:
+Key benefits:
 1. Brand consistency: Maintain a cohesive brand image across all user touchpoints, including API endpoints.
 2. Improved SEO: Use your own domain for better search engine optimization and brand recognition.
 3. Enhanced trust: Increase user confidence by serving content from your trusted domain.
@@ -270,7 +270,7 @@ Moreover, custom domains provide flexibility in managing multiple environments (
     description: `
 Supabase's network restrictions feature allows you to define and control which IP addresses or ranges can access your database. This powerful security measure significantly enhances your application's data protection by creating a robust first line of defense against unauthorized access attempts.
 
-Key benefits for users:
+Key benefits:
 1. Enhanced security: Limit database access to known, trusted IP addresses, reducing the attack surface.
 2. Compliance support: Meet regulatory requirements for data access control in industries like finance and healthcare.
 3. Granular control: Set different access rules for various environments (e.g., development, staging, production).
@@ -349,7 +349,7 @@ Experience the confidence that comes from knowing all your database connections 
     description: `
 Supabase Branches allow developers to create isolated environments for testing and previewing database changes before merging them into the main production environment. This powerful feature streamlines the development process, enhances collaboration, and reduces the risk of introducing errors into live systems.
 
-Key benefits for users:
+Key benefits:
 1. Risk-free experimentation: Test schema changes, new features, or data migrations without affecting the production environment.
 2. Improved collaboration: Enable multiple team members to work on different features simultaneously without conflicts.
 3. Easier code reviews: Facilitate thorough reviews of database changes before they're applied to production.
@@ -393,7 +393,7 @@ Embracing database branching as part of your development workflow can lead to fa
     description: `
 Supabase's Terraform provider empowers developers and DevOps teams to manage their Supabase infrastructure as code, bringing the benefits of Infrastructure as Code (IaC) to your database and backend services. This integration allows for version-controlled, reproducible, and scalable management of your Supabase resources.
 
-Key benefits for users:
+Key benefits:
 1. Version control: Track and manage changes to your Supabase infrastructure alongside your application code.
 2. Reproducibility: Easily recreate entire environments for development, staging, and production.
 3. Automated provisioning: Streamline the setup of new projects or environments with automated scripts.
@@ -438,7 +438,7 @@ Embracing Infrastructure as Code through the Supabase Terraform provider leads t
     description: `
 Supabase's read replicas feature allows you to deploy read-only copies of your database across multiple geographic regions, significantly enhancing the performance and reliability of your application. This powerful capability enables you to serve data to your users with minimal latency, regardless of their location.
 
-Key benefits for users:
+Key benefits:
 1. Improved performance: Serve data from the nearest geographic location, reducing response times for users worldwide.
 2. Increased availability: Distribute read traffic across multiple replicas, enhancing system resilience and uptime.
 3. Scalability: Handle higher read loads by offloading queries to read replicas, freeing up the primary database for write operations.
@@ -481,7 +481,7 @@ Adopting read replicas as part of your database strategy can lead to significant
     description: `
 Supabase's integration with Fly.io allows you to deploy your entire Supabase stack, including the PostgreSQL database, on Fly's global edge network. This powerful combination brings your data closer to your users, dramatically reducing latency and improving application performance worldwide.
 
-Key benefits for users:
+Key benefits:
 1. Global performance: Serve data from edge locations around the world, minimizing latency for all users.
 2. Simplified deployment: Easily deploy your entire Supabase stack with Fly.io's infrastructure.
 3. Scalability: Leverage Fly.io's ability to automatically scale based on demand.
@@ -525,7 +525,7 @@ Adopting Fly Postgres as your deployment strategy can lead to significant improv
     description: `
 Supabase supports a wide array of PostgreSQL extensions, allowing you to supercharge your database with additional functionalities and capabilities. These extensions enable you to tailor your database to your specific needs, whether you're working with geospatial data, full-text search, or advanced analytics.
 
-Key benefits for users:
+Key benefits:
 1. Enhanced functionality: Add specialized features to your database without changing your application architecture.
 2. Optimized performance: Leverage extensions for efficient data processing and querying.
 3. Flexibility: Choose from a vast ecosystem of extensions to meet your specific project requirements.
@@ -574,7 +574,7 @@ Embracing Postgres extensions can significantly accelerate your development proc
     description: `
 Supabase's Postgres Changes feature allows you to receive real-time notifications of database changes through WebSockets. This powerful capability enables you to build responsive, live-updating applications that reflect database changes instantly, without the need for polling or complex pub/sub systems.
 
-Key benefits for users:
+Key benefits:
 1. Real-time updates: Receive instant notifications when data changes, enabling live-updating UIs.
 2. Efficient data syncing: Keep client-side data in sync with the database without constant API calls.
 3. Reduced server load: Eliminate the need for frequent polling, decreasing server load and improving performance.
@@ -609,7 +609,7 @@ By leveraging Postgres Changes, you can create more engaging and responsive appl
     description: `
 Supabase's Broadcast feature enables real-time communication between connected users through WebSockets. This powerful functionality allows you to build interactive, collaborative applications where users can instantly share messages, updates, or any type of data in real-time.
 
-Key benefits for users:
+Key benefits:
 1. Instant communication: Enable real-time messaging and data sharing between users.
 2. Low latency: Achieve near-instantaneous data transmission for time-sensitive applications.
 3. Scalability: Handle large numbers of concurrent users and high message volumes efficiently.
@@ -645,7 +645,7 @@ By leveraging Broadcast, you can create highly interactive and engaging applicat
     description: `
 Supabase's Presence feature allows you to track and synchronize shared state between connected users in real-time. This powerful capability enables you to build collaborative applications where users can see each other's status, actions, or any custom state information instantly.
 
-Key benefits for users:
+Key benefits:
 1. Real-time user tracking: Monitor which users are currently active or online.
 2. Custom state synchronization: Share and update any type of state information in real-time.
 3. Automatic conflict resolution: Handle concurrent updates with built-in conflict resolution.
@@ -682,7 +682,7 @@ By leveraging Presence, you can create highly interactive and collaborative appl
     description: `
 Supabase's Email Login feature provides a secure and customizable way to implement email-based authentication in your applications. This essential functionality allows users to create accounts and sign in using their email addresses, providing a familiar and widely accepted authentication method.
 
-Key benefits for users:
+Key benefits:
 1. Secure authentication: Implement industry-standard security practices for email-based logins.
 2. Customizable workflows: Tailor the signup and login processes to fit your application's needs.
 3. Password reset functionality: Easily implement secure password reset flows.
@@ -719,7 +719,7 @@ By leveraging Email Login, you can quickly implement a robust, secure authentica
     description: `
 Supabase's Social Login feature allows users to authenticate using their existing accounts from popular social platforms and services. This streamlined authentication method enhances user experience by providing quick, password-free access to your application.
 
-Key benefits for users:
+Key benefits:
 1. Simplified onboarding: Reduce friction in the signup process, potentially increasing conversion rates.
 2. Trusted authentication: Leverage the security measures of established platforms.
 3. Rich user profiles: Access additional user information (with permission) from social providers.
@@ -756,7 +756,7 @@ By leveraging Social Login, you can significantly improve your application's use
     description: `
 Supabase's Phone Login feature enables users to authenticate using their phone numbers, providing a convenient and secure alternative to traditional email-based logins. This method is particularly effective for mobile applications and services where phone numbers are a primary means of user identification.
 
-Key benefits for users:
+Key benefits:
 1. Simplified authentication: Allow users to sign up and log in using just their phone number.
 2. Enhanced security: Implement two-factor authentication (2FA) using SMS verification codes.
 3. Reduced friction: Eliminate the need for users to remember complex passwords.
@@ -793,7 +793,7 @@ By leveraging Phone Login, you can create a seamless authentication experience t
     description: `
 Supabase's Passwordless Login via Magic Links feature offers a secure and user-friendly authentication method that eliminates the need for traditional passwords. Instead, users receive a unique, time-limited link via email that instantly logs them into your application.
 
-Key benefits for users:
+Key benefits:
 1. Enhanced security: Eliminate vulnerabilities associated with weak or reused passwords.
 2. Improved user experience: Remove the friction of remembering and entering passwords.
 3. Reduced support overhead: Decrease password-related support requests (resets, account lockouts).
@@ -830,7 +830,7 @@ By leveraging Passwordless Login via Magic Links, you can significantly enhance 
     description: `
 Supabase's Multi-Factor Authentication (MFA) feature provides an additional layer of security for user accounts by requiring two or more verification factors to gain access. This significantly enhances the protection of user accounts against unauthorized access, even if passwords are compromised.
 
-Key benefits for users:
+Key benefits:
 1. Enhanced security: Dramatically reduce the risk of unauthorized account access.
 2. Customizable factors: Support various second factors like SMS, email, or authenticator apps.
 3. User trust: Demonstrate a commitment to protecting user data and privacy.
@@ -868,7 +868,7 @@ By leveraging Multi-Factor Authentication, you significantly enhance the securit
     description: `
 Supabase's Role-Based Access Control (RBAC) feature provides a powerful and flexible way to manage user permissions within your application. RBAC allows you to define roles with specific sets of permissions and assign these roles to users, enabling fine-grained control over who can access what within your system.
 
-Key benefits for users:
+Key benefits:
 1. Granular access control: Define precise permissions for different user types or job functions.
 2. Simplified management: Easily manage permissions by assigning roles rather than individual permissions.
 3. Scalability: Efficiently handle permissions for large numbers of users and resources.
@@ -905,7 +905,7 @@ By leveraging Role-Based Access Control, you can create a secure, scalable, and 
     description: `
 Supabase's Row Level Security (RLS) feature provides a powerful and flexible way to implement fine-grained access control directly at the database level. By using PostgreSQL's native RLS capabilities, you can define security policies that determine which rows in a table a user can access or modify.
 
-Key benefits for users:
+Key benefits:
 1. Data-level security: Control access to individual rows based on user attributes or roles.
 2. Centralized policy management: Define and manage access rules in one place, directly in the database.
 3. Performance optimization: Enforce access control at the database level for improved efficiency.
@@ -942,7 +942,7 @@ By leveraging Row Level Security, you can implement sophisticated access control
     description: `
 Supabase's Captcha protection feature allows you to easily integrate CAPTCHA challenges into your authentication flows, providing an additional layer of security against automated attacks and bot activities.
 
-Key benefits for users:
+Key benefits:
 1. Bot protection: Defend against automated attacks on your authentication endpoints.
 2. Reduced spam: Minimize fake account creation and spam submissions.
 3. Customizable security: Adjust CAPTCHA difficulty based on risk assessment.
@@ -978,7 +978,7 @@ By leveraging Captcha protection, you can significantly enhance the security of 
     description: `
 Supabase's Server-side Auth feature provides a set of helpers and utilities for implementing robust user authentication in popular server-side languages and frameworks. This feature enables developers to securely manage user sessions, verify tokens, and handle authentication flows on the server, complementing client-side auth implementations.
 
-Key benefits for users:
+Key benefits:
 1. Enhanced security: Implement secure token verification and session management on the server.
 2. Framework integration: Easily integrate Supabase auth with popular server-side frameworks like Next.js and SvelteKit.
 3. Simplified development: Use pre-built helpers to handle common auth tasks, reducing boilerplate code.
@@ -1016,7 +1016,7 @@ By utilizing Server-side Auth, you can create more secure and robust application
     description: `
 Supabase Storage provides a robust and scalable solution for storing and serving files in your applications. This feature allows you to easily manage user-generated content, assets, and any other file types directly within your Supabase project.
 
-Key benefits for users:
+Key benefits:
 1. Seamless integration: Store and retrieve files using the same Supabase client you use for database operations.
 2. Scalability: Handle large numbers of files and high traffic loads without infrastructure management.
 3. Security: Implement fine-grained access control using Postgres RLS policies.
@@ -1053,7 +1053,7 @@ By utilizing Supabase Storage, you can easily add robust file management capabil
     description: `
 Supabase's Content Delivery Network (CDN) feature allows you to cache and serve large files efficiently across the globe. By leveraging a distributed network of servers, the CDN ensures that your content is delivered to users quickly, regardless of their geographic location.
 
-Key benefits for users:
+Key benefits:
 1. Improved performance: Reduce latency by serving content from servers closest to the user.
 2. Scalability: Handle high traffic loads and large file serving without straining your main servers.
 3. Bandwidth savings: Reduce the load on your origin servers by serving cached content from the CDN.
@@ -1090,7 +1090,7 @@ By leveraging Supabase's CDN, you can significantly improve the performance and 
     description: `
 Supabase's Smart Content Delivery Network (Smart CDN) takes the traditional CDN concept a step further by automatically revalidating assets at the edge. This advanced feature ensures that your content is not only delivered quickly but also remains up-to-date, providing an optimal balance between performance and content freshness.
 
-Key benefits for users:
+Key benefits:
 1. Content freshness: Ensure users always receive the most recent version of assets without manual invalidation.
 2. Improved cache hit ratio: Intelligently manage cache lifetimes to maximize CDN efficiency.
 3. Reduced origin load: Minimize requests to the origin server by optimizing edge caching strategies.
@@ -1127,7 +1127,7 @@ By leveraging Supabase's Smart CDN, you can ensure that your users always receiv
     description: `
 Supabase's Image Transformations feature allows you to dynamically modify images stored in your Supabase project. This powerful capability enables you to resize, crop, convert, and apply various effects to images on-the-fly, without the need for pre-processing or storing multiple versions of the same image.
 
-Key benefits for users:
+Key benefits:
 1. Dynamic resizing: Serve appropriately sized images for different devices and layouts.
 2. Format conversion: Automatically convert images to optimal formats like WebP for improved performance.
 3. Quality adjustment: Balance image quality and file size for different use cases.
@@ -1164,7 +1164,7 @@ By leveraging Supabase's Image Transformations, you can significantly improve yo
     description: `
 Supabase's Resumable Uploads feature enables the reliable transfer of large files by allowing uploads to be paused and resumed. This advanced functionality ensures that file uploads can be completed successfully even in challenging network conditions or when interrupted.
 
-Key benefits for users:
+Key benefits:
 1. Reliability: Successfully upload large files even with unstable internet connections.
 2. User experience: Allow users to pause and resume uploads at their convenience.
 3. Bandwidth efficiency: Avoid re-uploading already transferred parts of a file after an interruption.
@@ -1201,7 +1201,7 @@ By utilizing Supabase's Resumable Uploads, you can significantly improve the rel
     description: `
 Supabase's S3 compatibility feature allows you to interact with Supabase Storage using tools and libraries that support the Amazon S3 protocol. This powerful capability enables seamless integration with a wide ecosystem of existing S3-compatible tools and workflows.
 
-Key benefits for users:
+Key benefits:
 1. Ecosystem compatibility: Leverage existing S3-compatible tools and libraries with Supabase Storage.
 2. Familiar workflows: Use well-known S3 commands and SDKs for storage operations.
 3. Easy migration: Simplify the process of moving from S3 to Supabase or using both in parallel.
@@ -1239,7 +1239,7 @@ By leveraging Supabase's S3 compatibility, you can seamlessly integrate Supabase
     description: `
 Supabase's Deno Edge Functions feature allows you to deploy and run custom TypeScript functions globally at the edge, bringing your code closer to your users for enhanced performance and reduced latency. This powerful capability enables you to execute custom business logic, handle webhooks, and create dynamic API endpoints with ease.
 
-Key benefits for users:
+Key benefits:
 1. Global distribution: Run your functions closer to users for reduced latency.
 2. TypeScript support: Leverage TypeScript's type safety and modern language features.
 3. Deno runtime: Benefit from Deno's security-first approach and modern JavaScript APIs.
@@ -1277,7 +1277,7 @@ By leveraging Supabase's Deno Edge Functions, you can build more responsive, glo
     description: `
 Supabase's Regional Invocations feature allows you to execute Edge Functions in a region close to your database, optimizing performance for database-intensive operations. This capability ensures low-latency communication between your functions and database, enhancing overall application responsiveness.
 
-Key benefits for users:
+Key benefits:
 1. Reduced latency: Minimize round-trip time between functions and database for faster operations.
 2. Improved performance: Enhance the speed of database queries and updates from your functions.
 3. Data locality: Keep data processing close to where the data is stored for efficiency.
@@ -1314,7 +1314,7 @@ By leveraging Supabase's Regional Invocations, you can significantly enhance the
     description: `
 Supabase's NPM Compatibility feature for Edge Functions allows you to use NPM modules and Node.js built-in APIs directly in your Deno-based Edge Functions. This powerful capability bridges the gap between Deno and the vast Node.js ecosystem, giving you access to a wide range of libraries and familiar APIs.
 
-Key benefits for users:
+Key benefits:
 1. Extensive library access: Leverage the vast NPM ecosystem in your Edge Functions.
 2. Familiar Node.js APIs: Use built-in Node.js modules you're already familiar with.
 3. Code reusability: Easily port existing Node.js code to Supabase Edge Functions.
@@ -1352,7 +1352,7 @@ By leveraging NPM Compatibility in Supabase Edge Functions, you can take advanta
     description: `
 Supabase's AI Integrations feature provides seamless connectivity with leading AI platforms like OpenAI and Hugging Face, allowing you to easily incorporate advanced AI capabilities into your applications. This powerful feature enables developers to leverage state-of-the-art machine learning models and natural language processing directly within their Supabase projects.
 
-Key benefits for users:
+Key benefits:
 1. Easy AI integration: Incorporate advanced AI capabilities without managing complex infrastructure.
 2. Versatile model access: Utilize a wide range of pre-trained models for various AI tasks.
 3. Scalability: Handle AI workloads efficiently with Supabase's managed infrastructure.
@@ -1390,7 +1390,7 @@ By leveraging Supabase's AI Integrations, you can rapidly develop and deploy sop
     description: `
 Supabase's Command Line Interface (CLI) tool provides developers with a powerful and flexible way to manage their Supabase projects directly from the terminal. This feature streamlines the development workflow, allowing for local development, testing, and seamless deployment of Supabase projects.
 
-Key benefits for users:
+Key benefits:
 1. Local development: Set up and run a local Supabase instance for development and testing.
 2. Version control integration: Easily manage database migrations and schema changes with Git-like workflows.
 3. Automated deployments: Deploy changes to your Supabase project with simple CLI commands.
@@ -1427,7 +1427,7 @@ By leveraging the Supabase CLI, you can significantly improve your development w
     description: `
 Supabase's Management API provides a powerful interface for programmatically managing your Supabase projects. This feature allows developers and DevOps teams to automate project creation, configuration, and maintenance tasks, enabling more efficient and scalable project management workflows.
 
-Key benefits for users:
+Key benefits:
 1. Automation: Automate repetitive tasks like project creation and configuration.
 2. Scalability: Easily manage multiple Supabase projects across different environments.
 3. CI/CD integration: Incorporate Supabase project management into your continuous integration and deployment pipelines.
@@ -1465,7 +1465,7 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     description: `
 Supabase Analytics provides comprehensive insights into your project's performance, usage patterns, and overall health. This feature offers a detailed view of various metrics, helping you optimize your application, troubleshoot issues, and make data-driven decisions about resource allocation and scaling.
 
-Key benefits for users:
+Key benefits:
 1. Performance monitoring: Track query performance, API response times, and overall system health.
 2. Usage insights: Understand how your database, storage, and other resources are being utilized.
 3. Cost optimization: Identify opportunities to optimize resource usage and reduce costs.
@@ -1503,7 +1503,7 @@ By leveraging Supabase Analytics, you gain a comprehensive understanding of your
     description: `
 Supabase's SOC 2 Compliance demonstrates its commitment to maintaining the highest standards of security, availability, and confidentiality. This certification assures users that Supabase follows strict information security policies and procedures, encompassing the security, availability, processing, integrity, and confidentiality of customer data.
 
-Key benefits for users:
+Key benefits:
 1. Trust and credibility: Build on a platform that has been independently audited for security practices.
 2. Risk mitigation: Reduce the risk of data breaches and security incidents.
 3. Compliance support: Easier compliance with your own regulatory requirements.
