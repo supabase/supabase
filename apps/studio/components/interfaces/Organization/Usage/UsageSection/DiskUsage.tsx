@@ -66,8 +66,12 @@ const DiskUsage = ({
     }
   }, [diskUsage])
 
-  const gp3UsageInPeriod = usage?.usages.find((it) => it.metric === PricingMetric.DISK_IOPS_GP3)
-  const io2UsageInPeriod = usage?.usages.find((it) => it.metric === PricingMetric.DISK_IOPS_IO2)
+  const gp3UsageInPeriod = usage?.usages.find(
+    (it) => it.metric === PricingMetric.DISK_SIZE_GB_HOURS_GP3
+  )
+  const io2UsageInPeriod = usage?.usages.find(
+    (it) => it.metric === PricingMetric.DISK_SIZE_GB_HOURS_IO2
+  )
 
   const relevantProjects = useMemo(() => {
     return diskUsage
@@ -121,8 +125,10 @@ const DiskUsage = ({
               <div className="flex items-center justify-between">
                 <p className="text-xs text-foreground-light">Overages in period</p>
                 <p className="text-xs">
-                  {gp3UsageInPeriod?.usage ?? 0} GP3 GB-Hrs
-                  {io2UsageInPeriod?.usage ? ` / ${io2UsageInPeriod.usage} IO2 GB-Hrs` : ``}
+                  {(gp3UsageInPeriod?.usage ?? 0).toLocaleString()} GP3 GB-Hrs
+                  {io2UsageInPeriod?.usage
+                    ? ` / ${io2UsageInPeriod.usage.toLocaleString()} IO2 GB-Hrs`
+                    : ``}
                 </p>
               </div>
             </div>
