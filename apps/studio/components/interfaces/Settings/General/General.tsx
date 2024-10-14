@@ -214,7 +214,7 @@ const General = () => {
                   <div className="flex space-x-4">
                     <BarChart2 strokeWidth={2} />
                     <div>
-                      <p className="text-sm">Project usage statistics has been moved</p>
+                      <p className="text-sm">Project usage statistics have been moved</p>
                       <p className="text-foreground-light text-sm">
                         You may view your project's usage under your organization's settings
                       </p>
