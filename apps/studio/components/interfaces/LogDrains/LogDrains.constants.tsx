@@ -1,7 +1,12 @@
 import { BracesIcon } from 'lucide-react'
-import Image from 'next/image'
+import { Datadog, Grafana } from 'icons'
 
-const iconProps = { size: 24, strokeWidth: 1.5, className: 'text-foreground-light' }
+const iconProps = {
+  height: 24,
+  width: 24,
+  strokeWidth: 1.5,
+  className: 'text-foreground-light',
+}
 
 export const LOG_DRAIN_TYPES = [
   {
@@ -14,14 +19,14 @@ export const LOG_DRAIN_TYPES = [
     value: 'datadog',
     name: 'Datadog',
     description: 'Datadog is a monitoring service for cloud-scale applications',
-    icon: <Image src="/img/icons/datadog-icon.svg" height="24" width="24" alt="Datadog" />,
+    icon: <Datadog {...iconProps} />,
   },
   {
     value: 'loki',
     name: 'Loki',
     description:
       'Loki is an open-source log aggregation system designed to store and query logs from multiple sources',
-    icon: <Image src="/img/icons/grafana-icon.svg" height="24" width="24" alt="Loki" />,
+    icon: <Grafana {...iconProps} />,
   },
 ] as const
 
