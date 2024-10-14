@@ -21,11 +21,6 @@ import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-// export const getServerSideProps: GetServerSideProps<SpamPageProps> = async (context) => {
-//   const { ref } = context.params as { ref: string }
-//   return { props: { ref } }
-// }
-
 const formSchema = z.object({
   ref: z.string(),
   reason: z.string().optional(),
@@ -34,8 +29,6 @@ const formSchema = z.object({
 export default function SpamPage() {
   const router = useRouter()
   const ref = router.query.ref as string
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  const [messageType, setMessageType] = useState<'success' | 'error' | null>(null)
   const [formMessage, setFormMessage] = useState<string | null>(null)
   const [submissionType, setSubmissionType] = useState<'success' | 'error' | null>(null)
 
