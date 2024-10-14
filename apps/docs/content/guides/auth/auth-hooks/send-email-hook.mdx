@@ -351,7 +351,7 @@ create table job_queue (
 Create the hook
 
 ```sql
-create or replace function send_email(event jsonb) returns void as $$
+create or replace function send_email(event jsonb) returns jsonb as $$
 declare
     job_data jsonb;
     scheduled_time timestamp;
@@ -373,6 +373,8 @@ begin
 
     insert into job_queue (job_data, priority, scheduled_at, max_retries)
     values (job_data, priority, scheduled_time, 2);
+
+    return '{}'::jsonb;
 end;
 $$ language plpgsql;
 
