@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Skeleton } from 'ui'
+import { Button, Skeleton, WarningIcon } from 'ui'
 import { ChevronsUpDownIcon } from 'lucide-react'
 import { useParams } from 'common'
 import { useProjectApiQuery } from 'data/config/project-api-query'
@@ -39,26 +39,26 @@ const QuickKeyCopyWrapper = () => {
 
 const QuickKeyCopyContent = ({ selectedFramework }: { selectedFramework: string }) => {
   const { ref: projectRef } = useParams()
-  const { data: projectAPI, isLoading: isProjectApiLoading } = useProjectApiQuery({
+  const {
+    data: projectAPI,
+    isLoading: isProjectApiLoading,
+    error: projectApiError,
+  } = useProjectApiQuery({
     projectRef: projectRef as string,
   })
-  const { data: apiKeysData, isLoading: isApiKeysLoading } = useAPIKeysQuery({
+  const {
+    data: apiKeysData,
+    isLoading: isApiKeysLoading,
+    error: apiKeysError,
+  } = useAPIKeysQuery({
     projectRef: projectRef as string,
   })
-
   const publishableApiKey = apiKeysData?.find(({ type }) => type === 'publishable')?.api_key
+  const error = isProjectApiLoading || isApiKeysLoading || projectApiError || apiKeysError
 
-  const getEnvContent = () => {
-    return `
-NEXT_PUBLIC_SUPABASE_URL=${projectAPI?.autoApiService.endpoint || ''}
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_API_KEY=${publishableApiKey || ''}
-`
-  }
-
-  //   if (false) {
   if (isProjectApiLoading || isApiKeysLoading) {
     return (
-      <div className="bg-alternative px-5 py-3 border-t overflow-hidden flex flex-col gap-0">
+      <div className="bg-alternative px-5 py-3 border-t overflow-hidden flex flex-col gap-0 h-20">
         <div className="flex items-center gap-2 mb-3">
           <Skeleton className="h-4 w-4 rounded" />
           <Skeleton className="h-4 w-[48px] rounded" />
@@ -68,12 +68,25 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_API_KEY=${publishableApiKey || ''}
     )
   }
 
-  if (!projectAPI?.autoApiService.endpoint || !publishableApiKey) {
+  if (error) {
     return (
-      <div className="bg-alternative px-5 py-3 border-t overflow-hidden flex flex-col gap-0">
-        <p className="text-sm text-foreground-light">Unable to load API keys.</p>
+      <div className="bg-alternative justify-center px-5 py-3 border-t overflow-hidden flex flex-col gap-1 h-20">
+        <div className="flex items-center gap-2">
+          <WarningIcon />
+          <p className="text-sm text-warning-600">Error loading Secret API Keys</p>
+        </div>
+        <p className="text-warning/75 text-xs">
+          {projectApiError?.message ?? apiKeysError?.message ?? 'Error: Failed to load API keys'}
+        </p>
       </div>
     )
+  }
+
+  const getEnvContent = () => {
+    return `
+NEXT_PUBLIC_SUPABASE_URL=${projectAPI?.autoApiService.endpoint || ''}
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_API_KEY=${publishableApiKey || ''}
+`
   }
 
   return (

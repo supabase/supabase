@@ -6,7 +6,7 @@ import type { ResponseError } from 'types'
 import { apiKeysKeys } from './keys'
 
 export type APIKeyCreateVariables = {
-  projectRef: string
+  projectRef?: string
   description: string
 } & (
   | {
@@ -21,7 +21,7 @@ export type APIKeyCreateVariables = {
 )
 
 export async function createAPIKey(payload: APIKeyCreateVariables) {
-  console.log('about to send')
+  if (!payload.projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post('/v1/projects/{ref}/api-keys', {
     params: { path: { ref: payload.projectRef } },

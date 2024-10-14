@@ -1,25 +1,8 @@
-import { useMemo, useState } from 'react'
-
 import { useParams } from 'common'
-import {
-  useIsProjectActive,
-  useProjectContext,
-} from 'components/layouts/ProjectLayout/ProjectContext'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  AlertDescription_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Card,
-  CardContent,
-  Skeleton,
-  cn,
-} from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
-
-// import Table from 'components/to-be-cleaned/Table'
-
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useMemo } from 'react'
+import { Card, CardContent, Skeleton, WarningIcon, cn } from 'ui'
 import {
   Table,
   TableBody,
@@ -28,31 +11,19 @@ import {
   TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
-
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import NoPermission from 'components/ui/NoPermission'
-import Panel from 'components/ui/Panel'
-
-import CreateSecretAPIKeyModal from './CreateSecretAPIKeyModal'
 import APIKeyRow from './APIKeyRowv2'
-
-import { useAPIKeysQuery, APIKeysData } from 'data/api-keys/api-keys-query'
+import CreateSecretAPIKeyModal from './CreateSecretAPIKeyModal'
 
 const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
-  // const isProjectActive = useIsProjectActive()
-  // const { project, isLoading: projectIsLoading } = useProjectContext()
-
-  // const { data: projectAPI } = useProjectApiQuery({ projectRef: projectRef })
-
-  const { data: apiKeysData, isLoading } = useAPIKeysQuery({ projectRef })
+  const { data: apiKeysData, isLoading, error } = useAPIKeysQuery({ projectRef })
 
   const secretApiKeys = useMemo(
     () => apiKeysData?.filter(({ type }) => type === 'secret') ?? [],
     [apiKeysData]
   )
 
-  const emptyState = secretApiKeys?.length === 0 && !isLoading
+  const empty = secretApiKeys?.length === 0 && !isLoading
 
   const RowLoading = () => (
     <TableRow>
@@ -68,18 +39,18 @@ const SecretAPIKeys = () => {
     </TableRow>
   )
 
-  return (
+  const TableContainer = ({ children }: { children: React.ReactNode }) => (
     <div>
       <FormHeader
         title="Secret keys"
         description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application. Keep secret and never publish."
-        actions={<CreateSecretAPIKeyModal projectRef={projectRef} />}
+        actions={<CreateSecretAPIKeyModal />}
       />
-      <Card className={cn('w-full overflow-hidden', !emptyState && 'bg-surface-100')}>
+      <Card className={cn('w-full overflow-hidden', !empty && 'bg-surface-100')}>
         <CardContent className="p-0">
           <Table className="p-5">
             <TableHeader>
-              <TableRow className={cn('bg-200', emptyState && 'hidden')}>
+              <TableRow className={cn('bg-200', empty && 'hidden')}>
                 <TableHead
                   key=""
                   className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 overflow-hidden"
@@ -89,40 +60,59 @@ const SecretAPIKeys = () => {
                 <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pr-0">
                   API Key
                 </TableHead>
-                {/* <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pl-0">
-            Postgres Role for RLS
-          </TableHead> */}
                 <TableHead
                   className="text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2"
                   key="actions"
                 />
               </TableRow>
             </TableHeader>
-            <TableBody className="">
-              {emptyState ? (
-                <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
-                  <p className="text-sm text-foreground">No secret API keys exist</p>
-                  <p className="text-sm text-foreground-light">
-                    Your project can't be accessed using secret API keys.
-                  </p>
-                </div>
-              ) : isLoading ? (
-                <>
-                  <RowLoading />
-                  <RowLoading />
-                </>
-              ) : (
-                secretApiKeys.map((apiKey) => <APIKeyRow key={apiKey.id} apiKey={apiKey} />)
-              )}
-            </TableBody>
+            <TableBody className="">{children}</TableBody>
           </Table>
         </CardContent>
       </Card>
-      {/* <CreateSecretAPIKeyModal /> */}
-      {/* {secretApiKeys.map((apiKey) => (
-        <APIKeyRow key={apiKey.id} apiKey={apiKey} />
-      ))} */}
     </div>
+  )
+
+  if (isLoading) {
+    return (
+      <TableContainer>
+        <RowLoading />
+        <RowLoading />
+      </TableContainer>
+    )
+  }
+
+  if (error) {
+    return (
+      <TableContainer>
+        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+          <WarningIcon />
+          <p className="text-sm text-warning-600">Error loading Secret API Keys</p>
+          <p className="text-warning/75">{error.message}</p>
+        </div>
+      </TableContainer>
+    )
+  }
+
+  if (empty) {
+    return (
+      <TableContainer>
+        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+          <p className="text-sm text-foreground">No secret API keys exist</p>
+          <p className="text-sm text-foreground-light">
+            Your project can't be accessed using secret API keys.
+          </p>
+        </div>
+      </TableContainer>
+    )
+  }
+
+  return (
+    <TableContainer>
+      {secretApiKeys.map((apiKey) => (
+        <APIKeyRow key={apiKey.id} apiKey={apiKey} />
+      ))}
+    </TableContainer>
   )
 }
 

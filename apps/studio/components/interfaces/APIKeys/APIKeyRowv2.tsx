@@ -21,6 +21,7 @@ import { APIKeysData } from 'data/api-keys/api-keys-query'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import api from 'pages/api/props/project/[ref]/api'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
   const { ref: projectRef } = useParams()
@@ -47,15 +48,27 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
       },
       {
         onSuccess: () => {
-          // onClose(false)
           setDeleteDialogOpenState(false)
         },
       }
     )
   }
 
+  const MotionTableRow = motion(TableRow)
+
   return (
-    <TableRow key={apiKey.id}>
+    <MotionTableRow
+      layout
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{
+        type: 'spring',
+        stiffness: 500,
+        damping: 50,
+        mass: 1,
+      }}
+    >
       <TableCell className="py-2">{apiKey.description || '/'}</TableCell>
       <TableCell className="py-2">
         <div className="flex flex-row gap-2">
@@ -88,8 +101,6 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
           <CopyButton type="default" text={apiKey.api_key} iconOnly className="rounded-full px-2" />
         </div>
       </TableCell>
-
-      {/* {isSecret && <TableCell>{apiKey.created_on ?? ''}</TableCell>} */}
 
       <TableCell className="flex justify-end">
         <DropdownMenu>
@@ -148,7 +159,7 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
           }}
         />
       </TableCell>
-    </TableRow>
+    </MotionTableRow>
   )
 }
 
