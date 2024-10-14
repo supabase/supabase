@@ -457,6 +457,10 @@ export interface paths {
     /** Sets up a payment method */
     post: operations['SetupIntentOrgController_setUpPaymentMethod']
   }
+  '/platform/organizations/{slug}/projects': {
+    /** Gets all projects for the given organization */
+    get: operations['OrganizationProjectsController_getProjects']
+  }
   '/platform/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
     get: operations['OrganizationRolesController_getAllRolesV2']
@@ -3116,6 +3120,21 @@ export interface components {
         | 'RESTARTING'
         | 'RESIZING'
     }
+    /** @enum {string} */
+    DatabaseStatus:
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'GOING_DOWN'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTORING'
+      | 'UNKNOWN'
+      | 'UPGRADING'
+      | 'INIT_READ_REPLICA'
+      | 'INIT_READ_REPLICA_FAILED'
+      | 'RESTARTING'
+      | 'RESIZING'
     DatabaseStatusResponse: {
       identifier: string
       replicaInitializationStatus?: Record<string, never>
@@ -3135,6 +3154,8 @@ export interface components {
         | 'RESTARTING'
         | 'RESIZING'
     }
+    /** @enum {string} */
+    DatabaseType: 'PRIMARY' | 'READ_REPLICA'
     DatabaseUpgradeStatus: {
       /** @enum {string} */
       error?:
@@ -4169,6 +4190,9 @@ export interface components {
        */
       supabase_org_id: string
     }
+    OrganizationProjectsResponse: {
+      projects: components['schemas']['ProjectWithDatabases'][]
+    }
     OrganizationResponse: {
       billing_email: string | null
       id: number
@@ -4669,6 +4693,19 @@ export interface components {
       release_channel: components['schemas']['ReleaseChannel']
       version: string
     }
+    ProjectDatabase: {
+      cloud_provider: string
+      disk_last_modified_at?: string
+      disk_throughput_mbps?: number
+      /** @enum {string} */
+      disk_type?: 'gp3' | 'io2'
+      disk_volume_size_gb?: number
+      identifier: string
+      infra_compute_size?: components['schemas']['DbInstanceSize']
+      region: string
+      status: components['schemas']['DatabaseStatus']
+      type: components['schemas']['DatabaseType']
+    }
     ProjectDetailResponse: {
       cloud_provider: string
       connectionString: string
@@ -4852,6 +4889,23 @@ export interface components {
       ssl_enforced: boolean
       status: string
     }
+    /** @enum {string} */
+    ProjectStatus:
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'GOING_DOWN'
+      | 'INACTIVE'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTARTING'
+      | 'UNKNOWN'
+      | 'UPGRADING'
+      | 'PAUSING'
+      | 'RESTORING'
+      | 'RESTORE_FAILED'
+      | 'PAUSE_FAILED'
+      | 'RESIZING'
     ProjectUnpauseVersionInfo: {
       postgres_engine: components['schemas']['PostgresEngine']
       release_channel: components['schemas']['ReleaseChannel']
@@ -4875,6 +4929,14 @@ export interface components {
       app_version: string
       postgres_version: components['schemas']['PostgresEngine']
       release_channel: components['schemas']['ReleaseChannel']
+    }
+    ProjectWithDatabases: {
+      databases: components['schemas']['ProjectDatabase'][]
+      is_branch: boolean
+      name: string
+      ref: string
+      region: string
+      status: components['schemas']['ProjectStatus']
     }
     Provider: {
       created_at?: string
@@ -9190,6 +9252,29 @@ export interface operations {
         content: never
       }
       /** @description Failed to set up a payment method */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets all projects for the given organization */
+  OrganizationProjectsController_getProjects: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OrganizationProjectsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve projects */
       500: {
         content: never
       }
