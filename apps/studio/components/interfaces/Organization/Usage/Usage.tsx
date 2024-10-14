@@ -57,20 +57,23 @@ const Usage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectRef, isSuccess])
 
-  const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
-  const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
+  const billingCycleStart = useMemo(() => {
+    return dayjs.unix(subscription?.current_period_start ?? 0).utc()
+  }, [subscription])
+
+  const billingCycleEnd = useMemo(() => {
+    return dayjs.unix(subscription?.current_period_end ?? 0).utc()
+  }, [subscription])
 
   const currentBillingCycleSelected = useMemo(() => {
     // Selected by default
-    if (!dateRange?.period_start || !dateRange?.period_end || !subscription) return true
-
-    const { current_period_start, current_period_end } = subscription
+    if (!dateRange?.period_start || !dateRange?.period_end) return true
 
     return (
-      dayjs(dateRange.period_start.date).isSame(new Date(current_period_start * 1000)) &&
-      dayjs(dateRange.period_end.date).isSame(new Date(current_period_end * 1000))
+      dayjs(dateRange.period_start.date).isSame(billingCycleStart) &&
+      dayjs(dateRange.period_end.date).isSame(billingCycleEnd)
     )
-  }, [dateRange, subscription])
+  }, [dateRange, billingCycleStart, billingCycleEnd])
 
   const startDate = useMemo(() => {
     // If end date is in future, set end date to now
