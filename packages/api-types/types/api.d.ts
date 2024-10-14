@@ -1003,6 +1003,10 @@ export interface paths {
      */
     get: operations['PropsSettingsController_getProjectApi']
   }
+  '/platform/replication/{ref}/sources': {
+    /** Gets replication sources */
+    get: operations['ReplicationSourcesController_getSources']
+  }
   '/platform/reset-password': {
     /** Reset password for email */
     post: operations['ResetPasswordController_resetPassword']
@@ -5060,6 +5064,20 @@ export interface components {
     }
     RemoveReadReplicaBody: {
       database_identifier: string
+    }
+    ReplicationPostgresConfig: {
+      host: string
+      name: string
+      port: number
+      slot_name: string
+      username: string
+    }
+    ReplicationSourcesResponse: {
+      config: {
+        Postgres?: components['schemas']['ReplicationPostgresConfig']
+      }
+      id: number
+      tenant_id: string
     }
     ReportStatusBody: {
       databaseIdentifier: string
@@ -13361,6 +13379,26 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's settings */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets replication sources */
+  ReplicationSourcesController_getSources: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ReplicationSourcesResponse'][]
+        }
+      }
+      /** @description Failed to get replication sources */
       500: {
         content: never
       }
