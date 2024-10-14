@@ -22,7 +22,7 @@ const AuthSettings: NextPageWithLayout = () => {
 
   return (
     <>
-      {apiKeysView === 'new-keys' ? (
+      {apiKeysView !== 'legacy-keys' ? (
         <>
           <PublishableAPIKeys />
           <Separator />
