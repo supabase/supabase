@@ -58,7 +58,7 @@ const DiskUsage = ({
       return diskUsage.projects.some((it) =>
         it.databases.some(
           (db) =>
-            db.type !== 'READ_REPLICA' || (db.disk_volume_size_gb && db.disk_volume_size_gb > 8)
+            db.type === 'READ_REPLICA' || (db.disk_volume_size_gb && db.disk_volume_size_gb > 8)
         )
       )
     } else {
