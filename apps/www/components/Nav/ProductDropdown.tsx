@@ -2,7 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, LayoutGrid } from 'lucide-react'
 
 import { useBreakpoint } from 'common'
 import { TextLink } from 'ui'
@@ -39,6 +39,17 @@ const ProductDropdown = () => {
       <div className="bg-surface-75 border-t xl:border-t-0 xl:border-l py-8 px-10 gap-8 grid grid-cols-5 xl:flex xl:flex-col w-full xl:w-[500px]">
         <div className="col-span-3 xl:w-auto">
           <Link
+            href="/features"
+            className="flex group mb-4 items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded focus-visible:ring-foreground-lighter"
+          >
+            <LayoutGrid size={16} strokeWidth={1.3} />
+            <span>Features</span>
+            <ChevronRight
+              strokeWidth={2}
+              className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
+            />
+          </Link>
+          <Link
             href="/customers"
             className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground"
           >
@@ -46,7 +57,7 @@ const ProductDropdown = () => {
             <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
           </Link>
           <ul className="flex flex-col gap-2">
-            {CustomersData.slice(0, isTablet ? 2 : 3).map((customer) => (
+            {CustomersData.slice(0, isTablet ? 1 : 2).map((customer) => (
               <li key={customer.organization}>
                 <Link
                   href={customer.url}
@@ -61,7 +72,7 @@ const ProductDropdown = () => {
                     />
                   </div>
                   <div className="flex flex-col">
-                    <h4 className="text-light group-hover:text-foreground group-focus-visible:text-foreground text-normal mb-0 text-sm">
+                    <h4 className="text-light group-hover:text-foreground group-focus-visible:text-foreground text-normal mb-0 text-sm line-clamp-3">
                       {customer.title}
                     </h4>
                   </div>
