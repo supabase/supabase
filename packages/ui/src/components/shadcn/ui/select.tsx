@@ -12,21 +12,22 @@ const Select = SelectPrimitive.Root
 
 const SelectGroup = SelectPrimitive.Group
 
-// If placeholder is a string, wrap it in a span. This is to avoid page crashes when using Google Translate.
-// https://github.com/radix-ui/primitives/issues/2578#issuecomment-1890801041 for more info.
-const SelectValue = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Value>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Value> &
-    VariantProps<typeof SelectTriggerVariants>
->(({ placeholder, ...props }, ref) => (
-  <SelectPrimitive.Value
-    placeholder={typeof placeholder === 'string' ? <span>{placeholder}</span> : placeholder}
-    {...props}
-    ref={ref}
-  />
-))
+const SelectValue = SelectPrimitive.Value
 
-SelectValue.displayName = SelectPrimitive.Value.displayName
+// // If placeholder is a string, wrap it in a span. This is to avoid page crashes when using Google Translate.
+// // https://github.com/radix-ui/primitives/issues/2578#issuecomment-1890801041 for more info.
+// const SelectValue = React.forwardRef<
+//   React.ElementRef<typeof SelectPrimitive.Value>,
+//   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Value> &
+//     VariantProps<typeof SelectTriggerVariants>
+// >(({ placeholder, ...props }, ref) => (
+//   <SelectPrimitive.Value
+//     ref={ref}
+//     placeholder={typeof placeholder === 'string' ? <span>{placeholder}</span> : placeholder}
+//     {...props}
+//   />
+// ))
+// SelectValue.displayName = SelectPrimitive.Value.displayName
 
 const SelectTriggerVariants = cva('', {
   variants: {
@@ -158,15 +159,19 @@ const SelectItem = React.forwardRef<
     )}
     {...props}
   >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+    {/* <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectPrimitive.ItemIndicator className="h-3.5 w-3.5 bg-foreground rounded-full flex justify-center items-center">
         <Check className="h-2 w-2 text-background-overlay" strokeWidth={6} />
       </SelectPrimitive.ItemIndicator>
+    </span> */}
+
+    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+      <SelectPrimitive.ItemIndicator>
+        <Check className="h-4 w-4" />
+      </SelectPrimitive.ItemIndicator>
     </span>
 
-    <SelectPrimitive.ItemText>
-      {typeof children === 'string' ? <span>{children}</span> : children}
-    </SelectPrimitive.ItemText>
+    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))
 SelectItem.displayName = SelectPrimitive.Item.displayName
