@@ -42,6 +42,10 @@ export default function SpamPage() {
 
   const { register } = form
 
+  // Ensure ref is a string
+  const refString = typeof ref !== 'string'
+  const refPattern = /^[a-zA-Z]{20}$/
+  const refIsInvalid = !refString && !refPattern.test(ref)
   const SelectItemContainerClasses = 'flex flex-col text-sm items-start'
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -58,7 +62,10 @@ export default function SpamPage() {
       })
       const message = await response.text()
 
-      if (response.ok) {
+      if (refIsInvalid) {
+        setFormMessage('Error: Invalid project reference.')
+        setSubmissionType('error')
+      } else if (response.ok) {
         setFormMessage(message)
         setSubmissionType('success')
       } else {
@@ -83,12 +90,6 @@ export default function SpamPage() {
       </>
     )
   }
-
-  // Ensure ref is a string
-  const refString = typeof ref !== 'string'
-  const refPattern = /^[a-zA-Z]{20}$/
-
-  const refIsInvalid = !refString && !refPattern.test(ref)
 
   useEffect(() => {
     form.reset({ ref: ref, reason: '' })

@@ -8,6 +8,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).end('Bad Request: Missing or invalid project reference.')
   }
 
+  const refString = typeof ref !== 'string'
+  const refPattern = /^[a-zA-Z]{20}$/
+  const refIsInvalid = !refString && !refPattern.test(ref)
+
+  if (refIsInvalid) {
+    return res.status(400).end('Bad Request: Missing or invalid project reference.')
+  }
+
   try {
     const response = await fetch(process.env.EMAIL_REPORT_SLACK_WEBHOOK as string, {
       method: 'POST',
