@@ -174,7 +174,9 @@ const TreeViewItem = forwardRef<
             />
           )
         )}
-        <span className={cn(isEditing && 'hidden', 'truncate text-sm')}>{name}</span>
+        <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
+          {name}
+        </span>
         <form autoFocus onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
           <Input
             ref={inputRef}

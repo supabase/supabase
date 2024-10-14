@@ -26,7 +26,7 @@ export function TroubleshootingPreview({ entry }: { entry: ITroubleshootingEntry
       {...attributes}
     >
       <div className="flex flex-wrap items-start gap-x-2 gap-y-4 justify-between">
-        <div className="w-full flex flex-col gap-2">
+        <div className="flex-grow flex flex-col gap-2">
           <Link
             href={`/guides/troubleshooting/${getArticleSlug(entry.data)}`}
             className={cn('visited:text-foreground-lighter', 'before:absolute before:inset-0')}

@@ -238,7 +238,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         validationSchema={provider.validationSchema}
         onSubmit={onSubmit}
       >
-        {({ handleReset, initialValues, values }: any) => {
+        {({ handleReset, initialValues, values, setFieldValue }: any) => {
           const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
@@ -249,6 +249,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                     <FormField
                       key={x}
                       name={x}
+                      setFieldValue={setFieldValue}
                       properties={provider.properties[x]}
                       formValues={values}
                       disabled={
