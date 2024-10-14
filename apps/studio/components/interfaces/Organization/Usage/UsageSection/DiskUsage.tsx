@@ -125,8 +125,10 @@ const DiskUsage = ({
               <div className="flex items-center justify-between">
                 <p className="text-xs text-foreground-light">Overages in period</p>
                 <p className="text-xs">
-                  {gp3UsageInPeriod?.usage ?? 0} GP3 GB-Hrs
-                  {io2UsageInPeriod?.usage ? ` / ${io2UsageInPeriod.usage} IO2 GB-Hrs` : ``}
+                  {(gp3UsageInPeriod?.usage ?? 0).toLocaleString()} GP3 GB-Hrs
+                  {io2UsageInPeriod?.usage
+                    ? ` / ${io2UsageInPeriod.usage.toLocaleString()} IO2 GB-Hrs`
+                    : ``}
                 </p>
               </div>
             </div>
