@@ -14,21 +14,6 @@ const SelectGroup = SelectPrimitive.Group
 
 const SelectValue = SelectPrimitive.Value
 
-// // If placeholder is a string, wrap it in a span. This is to avoid page crashes when using Google Translate.
-// // https://github.com/radix-ui/primitives/issues/2578#issuecomment-1890801041 for more info.
-// const SelectValue = React.forwardRef<
-//   React.ElementRef<typeof SelectPrimitive.Value>,
-//   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Value> &
-//     VariantProps<typeof SelectTriggerVariants>
-// >(({ placeholder, ...props }, ref) => (
-//   <SelectPrimitive.Value
-//     ref={ref}
-//     placeholder={typeof placeholder === 'string' ? <span>{placeholder}</span> : placeholder}
-//     {...props}
-//   />
-// ))
-// SelectValue.displayName = SelectPrimitive.Value.displayName
-
 const SelectTriggerVariants = cva('', {
   variants: {
     size: {
