@@ -157,7 +157,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
                           read-only mode.{' '}
                           {onFreePlan
                             ? 'Please upgrade your Plan.'
-                            : 'Disable your spend cap to scale seamlessly and pay for over-usage beyond your Plans quota.'}
+                            : 'Disable your spend cap to scale seamlessly, and pay for over-usage beyond your Plan's quota.'}
                         </div>
                       </div>
                     </Alert>
