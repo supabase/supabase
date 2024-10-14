@@ -97,7 +97,7 @@ export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
               <Input_Shadcn_
                 autoFocus
                 type="text"
-                placeholder="Search..."
+                placeholder="Filter..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="mr-2"
