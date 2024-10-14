@@ -68,7 +68,7 @@ const ComputeInstanceSidePanel = () => {
         `Successfully updated compute instance to ${selectedCompute?.name}. Your project is currently being restarted to update its instance`,
         { duration: 8000 }
       )
-      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
+      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
       closePanel()
       router.push(`/project/${projectRef}`)
     },
@@ -82,7 +82,7 @@ const ComputeInstanceSidePanel = () => {
         `Successfully updated compute instance. Your project is currently being restarted to update its instance`,
         { duration: 8000 }
       )
-      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
+      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
       closePanel()
       router.push(`/project/${projectRef}`)
     },
@@ -311,9 +311,9 @@ const ComputeInstanceSidePanel = () => {
                           {(subscriptionCompute?.variant.identifier === option.identifier ||
                             (!subscriptionCompute &&
                               option.identifier ===
-                                `ci_${selectedProject?.infra_compute_size}`)) && (
-                            <Badge>Current</Badge>
-                          )}
+                              `ci_${selectedProject?.infra_compute_size}`)) && (
+                              <Badge>Current</Badge>
+                            )}
                           {selectedProject?.infra_compute_size === 'nano' &&
                             option.identifier === 'ci_micro' && <Badge>Free Upgrade</Badge>}
                         </p>

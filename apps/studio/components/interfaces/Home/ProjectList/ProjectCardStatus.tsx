@@ -50,6 +50,7 @@ export const ProjectCardStatus = ({
     if (projectStatus === 'isPaused') return 'Project is paused'
     if (projectStatus === 'isPausing') return 'Project is pausing'
     if (projectStatus === 'isRestarting') return 'Project is restarting'
+    if (projectStatus === 'isResizing') return 'Project is restarting'
     if (projectStatus === 'isComingUp') return 'Project is coming up'
     if (projectStatus === 'isRestoring') return 'Project is restoring'
     if (projectStatus === 'isUpgrading') return 'Project is upgrading'
@@ -70,6 +71,7 @@ export const ProjectCardStatus = ({
     if (projectStatus === 'isPaused') return 'This project will not accept requests until resumed'
     if (projectStatus === 'isPausing') return 'The pause process will complete in a few minutes'
     if (projectStatus === 'isRestarting') return 'Your project will be ready in a few minutes'
+    if (projectStatus === 'isResizing') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isComingUp') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isRestoring') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isUpgrading') return 'Your project will be ready in a few minutes'
@@ -115,7 +117,8 @@ export const ProjectCardStatus = ({
         <PauseCircle strokeWidth={1.5} size={12} />
       ) : projectStatus === 'isRestoring' ||
         projectStatus === 'isComingUp' ||
-        projectStatus === 'isRestarting' ? (
+        projectStatus === 'isRestarting' ||
+        projectStatus === 'isResizing' ? (
         <RefreshCcw strokeWidth={1.5} size={12} />
       ) : (
         <AlertTriangle strokeWidth={1.5} size={12} />
