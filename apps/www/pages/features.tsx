@@ -15,8 +15,9 @@ import { useBreakpoint } from 'common'
 import SectionContainer from '../components/Layouts/SectionContainer'
 import { FeatureProductType, features } from '~/data/features'
 import Panel from '../components/Panel'
-import { Button, Checkbox, Input } from 'ui'
+import { Badge, Button, Checkbox, Input } from 'ui'
 import { Search, X as CloseIcon } from 'lucide-react'
+import debounce from 'lodash/debounce'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts({ directory: '_customers' })
@@ -42,26 +43,28 @@ function FeaturesPage(props: any) {
     (query.products as string)?.split(',') || []
   )
 
-  // Update state based on URL parameters only on initial load
+  // Debounced function to update URL params
+  const updateQueryParamsDebounced = useCallback(
+    debounce(() => {
+      const params = new URLSearchParams()
+      if (searchTerm) params.set('q', searchTerm)
+      if (selectedProducts.length > 0) params.set('products', selectedProducts.join(','))
+
+      router.replace({ pathname: '/features', query: params.toString() }, undefined, {
+        shallow: true,
+      })
+    }, 300),
+    [searchTerm, selectedProducts]
+  )
+
   useEffect(() => {
-    if (query.q) setSearchTerm(query.q as string)
-    if (query.products) setSelectedProducts((query.products as string).split(',') || [])
-  }, [query.q, query.products])
-
-  const updateQueryParams = useCallback(() => {
-    const params = new URLSearchParams()
-    if (searchTerm) params.set('q', searchTerm)
-    if (selectedProducts.length > 0) params.set('products', selectedProducts.join(','))
-
-    router.replace({ pathname: '/features', query: params.toString() }, undefined, {
-      shallow: true,
-    })
-  }, [router, searchTerm, selectedProducts])
+    updateQueryParamsDebounced()
+    return updateQueryParamsDebounced.cancel // Cleanup on unmount
+  }, [searchTerm, selectedProducts, updateQueryParamsDebounced])
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
-    updateQueryParams() // Update URL as soon as search term changes
   }
 
   // Handle product checkbox change
@@ -69,7 +72,6 @@ function FeaturesPage(props: any) {
     setSelectedProducts((prev) =>
       prev.includes(product) ? prev.filter((p) => p !== product) : [...prev, product]
     )
-    updateQueryParams() // Update URL as soon as selected products change
   }
 
   // Filter features based on search term and selected products
@@ -156,35 +158,52 @@ function FeaturesPage(props: any) {
                 )
               }
             />
-            <h2 className="font-semibold mb-2">Filter by Products:</h2>
+            <h2 className="text-sm">Filter by Products:</h2>
             <div className="flex flex-col gap-2">
               {products.map((product) => (
-                <div key={product} className="flex items-center mb-1">
+                <button
+                  key={product}
+                  className="flex items-center mb-1 text-foreground-light hover:text-foreground !cursor-pointer transition-colors"
+                >
                   <Checkbox
                     id={product}
                     checked={selectedProducts.includes(product)}
                     onChange={() => handleProductChange(product)}
-                    className="mr-2"
                   />
-                  <label htmlFor={product} className="text-sm font-medium leading-none">
+                  <label
+                    htmlFor={product}
+                    className="text-sm leading-none capitalize flex-1 text-left"
+                  >
                     {product}
                   </label>
-                </div>
+                </button>
               ))}
             </div>
+            <div className="text-foreground-lighter text-xs">
+              Features found: {filteredFeatures.length}
+            </div>
           </div>
-          <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filteredFeatures.map((feature) => (
               <Panel key={feature.title} hasActiveOnHover>
                 <Link
                   href={`/features/${feature.slug}`}
-                  className="p-4 cursor-pointer transition flex flex-col gap-4"
+                  className="p-2 md:p-4 cursor-pointer transition flex md:flex-col gap-3 sm:gap-4"
                 >
-                  <div className="relative w-full rounded-lg aspect-video bg-alternative flex items-center justify-center">
+                  <div className="relative rounded-lg min-h-[80px] h-full aspect-square md:w-full md:aspect-video bg-alternative flex items-center justify-center">
+                    <div className="absolute right-3 top-3 hidden md:flex gap-0.5">
+                      {feature.products.map((product) => (
+                        <Badge key={product} className="text-xs text-foreground-light capitalize">
+                          {product}
+                        </Badge>
+                      ))}
+                    </div>
                     <feature.icon className="w-5 h-5 text-foreground" />
                   </div>
-                  <div>
-                    <h2 className="text-foreground">{feature.title}</h2>
+                  <div className="flex flex-col gap-1 justify-center">
+                    <h3 className="text-sm md:text-base text-foreground leading-5">
+                      {feature.title}
+                    </h3>
                     <p className="text-foreground-light text-sm">{feature.subtitle}</p>
                   </div>
                 </Link>
