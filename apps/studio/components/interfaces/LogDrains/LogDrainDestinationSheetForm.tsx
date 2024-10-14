@@ -66,8 +66,7 @@ const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('loki'),
     url: z.string().min(1, { message: 'Loki URL is required' }),
-    header1_key: z.string().min(1, { message: 'Header 1 key is required' }),
-    header1_value: z.string().min(1, { message: 'Header 1 value is required' }),
+    headers: z.record(z.string(), z.string()),
   }),
 ])
 
@@ -161,8 +160,6 @@ export function LogDrainDestinationSheetForm({
       url: defaultValues?.config?.url || '',
       api_key: defaultValues?.config?.api_key || '',
       region: defaultValues?.config?.region || '',
-      header1_key: defaultValues?.config?.header1_key || '',
-      header1_value: defaultValues?.config?.header1_value || '',
     },
   })
 
@@ -204,6 +201,16 @@ export function LogDrainDestinationSheetForm({
       form.reset()
     }
   }, [mode, open, form])
+
+  function getHeadersSectionDescription() {
+    if (type === 'webhook') {
+      return 'Set custom headers when draining logs to the Endpoint URL'
+    }
+    if (type === 'loki') {
+      return 'Set custom headers when draining logs to the Loki HTTP(S) endpoint'
+    }
+    return ''
+  }
 
   return (
     <Sheet
@@ -339,36 +346,6 @@ export function LogDrainDestinationSheetForm({
                         </FormItem_Shadcn_>
                       )}
                     />
-
-                    <div className="border-t">
-                      <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
-                        <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
-                        <p className="text-xs text-foreground-lighter">
-                          Set custom headers when draining logs to the Endpoint URL
-                        </p>
-                      </div>
-                      <div className="divide-y">
-                        {hasHeaders &&
-                          Object.keys(headers || {})?.map((headerKey) => (
-                            <div
-                              className="flex text-sm px-content text-foreground items-center font-mono py-1.5 group"
-                              key={headerKey}
-                            >
-                              <div className="w-full">{headerKey}</div>
-                              <div className="w-full truncate" title={headers?.[headerKey]}>
-                                {headers?.[headerKey]}
-                              </div>
-                              <Button
-                                className="justify-self-end opacity-0 group-hover:opacity-100 w-7"
-                                type="text"
-                                title="Remove"
-                                icon={<TrashIcon />}
-                                onClick={() => removeHeader(headerKey)}
-                              ></Button>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
                   </>
                 )}
                 {type === 'datadog' && (
@@ -445,18 +422,6 @@ export function LogDrainDestinationSheetForm({
                       formControl={form.control}
                       description="The Loki HTTP(S) endpoint to send events."
                     />
-                    <LogDrainFormItem
-                      type="text"
-                      value="header1_key"
-                      label="Header 1 key"
-                      formControl={form.control}
-                    />
-                    <LogDrainFormItem
-                      type="text"
-                      value="header1_value"
-                      label="Header 1 value"
-                      formControl={form.control}
-                    />
                   </div>
                 )}
                 <FormMessage_Shadcn_ />
@@ -465,40 +430,73 @@ export function LogDrainDestinationSheetForm({
           </Form_Shadcn_>
 
           {/* This form needs to be outside the <Form_Shadcn_> */}
-          {type === 'webhook' && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                addHeader()
-              }}
-              className="flex border-t py-4 gap-4 items-center px-content"
-            >
-              <label className="sr-only" htmlFor="header-name">
-                Header name
-              </label>
-              <Input_Shadcn_
-                id="header-name"
-                type="text"
-                placeholder="x-header-name"
-                value={newCustomHeader.name}
-                onChange={(e) => setNewCustomHeader({ ...newCustomHeader, name: e.target.value })}
-              />
-              <label className="sr-only" htmlFor="header-value">
-                Header value
-              </label>
-              <Input_Shadcn_
-                id="header-value"
-                type="text"
-                placeholder="Header value"
-                value={newCustomHeader.value}
-                onChange={(e) => setNewCustomHeader({ ...newCustomHeader, value: e.target.value })}
-              />
+          {(type === 'webhook' || type === 'loki') && (
+            <>
+              <div className="border-t mt-4">
+                <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
+                  <h2 className="text-sm text-foreground">Custom Headers</h2>
+                  <p className="text-xs text-foreground-lighter">
+                    {getHeadersSectionDescription()}
+                  </p>
+                </div>
+                <div className="divide-y">
+                  {hasHeaders &&
+                    Object.keys(headers || {})?.map((headerKey) => (
+                      <div
+                        className="flex text-sm px-content text-foreground items-center font-mono py-1.5 group"
+                        key={headerKey}
+                      >
+                        <div className="w-full">{headerKey}</div>
+                        <div className="w-full truncate" title={headers?.[headerKey]}>
+                          {headers?.[headerKey]}
+                        </div>
+                        <Button
+                          className="justify-self-end opacity-0 group-hover:opacity-100 w-7"
+                          type="text"
+                          title="Remove"
+                          icon={<TrashIcon />}
+                          onClick={() => removeHeader(headerKey)}
+                        ></Button>
+                      </div>
+                    ))}
+                </div>
+              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  addHeader()
+                }}
+                className="flex border-t py-4 gap-4 items-center px-content"
+              >
+                <label className="sr-only" htmlFor="header-name">
+                  Header name
+                </label>
+                <Input_Shadcn_
+                  id="header-name"
+                  type="text"
+                  placeholder="x-header-name"
+                  value={newCustomHeader.name}
+                  onChange={(e) => setNewCustomHeader({ ...newCustomHeader, name: e.target.value })}
+                />
+                <label className="sr-only" htmlFor="header-value">
+                  Header value
+                </label>
+                <Input_Shadcn_
+                  id="header-value"
+                  type="text"
+                  placeholder="Header value"
+                  value={newCustomHeader.value}
+                  onChange={(e) =>
+                    setNewCustomHeader({ ...newCustomHeader, value: e.target.value })
+                  }
+                />
 
-              <Button htmlType="submit" type="outline">
-                Add
-              </Button>
-            </form>
+                <Button htmlType="submit" type="outline">
+                  Add
+                </Button>
+              </form>
+            </>
           )}
         </SheetSection>
 
