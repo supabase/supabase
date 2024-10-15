@@ -175,20 +175,21 @@ function FeaturesPage() {
                 }
               />
               <h2 className="text-sm">Filter by Products:</h2>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2.5">
                 {products.map((product) => (
                   <button
                     key={product}
-                    className="flex items-center mb-1 text-foreground-light hover:text-foreground !cursor-pointer transition-colors"
+                    className="flex items-center gap-2 text-foreground-light hover:text-foreground !cursor-pointer transition-colors"
                   >
                     <Checkbox
                       id={product}
                       checked={selectedProducts.includes(product)}
                       onChange={() => handleProductChange(product)}
+                      className="[&_input]:m-0"
                     />
                     <label
                       htmlFor={product}
-                      className="text-sm leading-none capitalize flex-1 text-left"
+                      className="text-sm !leading-none capitalize flex-1 text-left"
                     >
                       {product}
                     </label>
@@ -196,7 +197,7 @@ function FeaturesPage() {
                 ))}
               </div>
               <div className="text-foreground-lighter text-xs">
-                Features found: {filteredFeatures.length}
+                Features selected: {filteredFeatures.length}
               </div>
               <Button
                 block

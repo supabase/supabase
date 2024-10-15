@@ -2,7 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { ChevronRight, LayoutGrid } from 'lucide-react'
+import { ChevronRight, LayoutGrid, Sparkles } from 'lucide-react'
 
 import { useBreakpoint } from 'common'
 import { TextLink } from 'ui'
@@ -50,12 +50,16 @@ const ProductDropdown = () => {
               focus-visible:rounded focus-visible:ring-foreground-lighter
             "
           >
-            {/* <LayoutGrid size={24} strokeWidth={1.3} /> */}
-            <div className="flex flex-col gap-1 !leading-3">
-              <span>Features</span>
-              <span className="text-foreground-lighter text-xs leading-3">
-                Explore everything you can do with Supabase.
-              </span>
+            <div className="flex gap-2 items-center">
+              <div className="shrink-0 bg-surface-200 min-w-8 w-8 h-8 flex items-center justify-center rounded">
+                <Sparkles size={16} strokeWidth={1.3} />
+              </div>
+              <div className="flex flex-col gap-1 !leading-3">
+                <span>Features</span>
+                <span className="text-foreground-lighter text-xs leading-3">
+                  Explore everything you can do with Supabase.
+                </span>
+              </div>
             </div>
             <ChevronRight
               strokeWidth={2}

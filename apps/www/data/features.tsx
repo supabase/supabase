@@ -33,7 +33,8 @@ import { PRODUCT, PRODUCT_SHORTNAMES } from 'shared-data/products'
 import type { LucideIcon } from 'lucide-react'
 
 enum ADDITIONAL_PRODUCTS {
-  PLATFORM = 'Platform',
+  PLATFORM = 'platform',
+  STUDIO = 'studio',
 }
 
 export type FeatureProductType = PRODUCT | ADDITIONAL_PRODUCTS
@@ -428,7 +429,6 @@ By leveraging Fly Postgres, you can achieve improved global performance for your
     docsUrl: 'https://supabase.com/docs/guides/platform/fly-postgres',
     slug: 'fly-postgres',
   },
-  // Extensions
   {
     title: 'Postgres Extensions',
     subtitle: 'Enhance your database with popular Postgres extensions.',
@@ -467,6 +467,27 @@ By leveraging these extensions, you can implement complex features more easily, 
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions',
     slug: 'postgres-extensions',
+  },
+  {
+    title: 'Database Webhooks',
+    subtitle: 'Trigger external payloads on database events.',
+    description: `
+Database Webhooks allow you to send real-time data from your database to another system whenever a table event occurs. You can hook into three table events: INSERT, UPDATE, and DELETE, with all events fired after a database row is changed. This feature provides a convenient way to integrate your Supabase database with external applications and services.
+
+Key benefits:
+1. Real-Time Data Transfer: Automatically send data to external systems in response to database changes, ensuring timely updates.
+2. Flexibility: Configure webhooks for specific tables and events, allowing for tailored integrations based on your application's needs.
+3. Asynchronous Processing: Built on the pg_net extension, webhooks operate asynchronously, preventing long-running network requests from blocking database operations.
+4. Easy Setup: Create webhooks directly from the Supabase Dashboard or through SQL statements, making integration straightforward.
+5. Payload Customization: Automatically generated payloads provide relevant data about the event, including the new and old record states.
+
+This feature is particularly useful for developers looking to automate workflows and integrate their databases with third-party services like payment processors or notification systems.
+`,
+    icon: Cloud,
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/database/webhooks',
+    slug: 'database-webhooks',
   },
   // Realtime
   {
@@ -1361,5 +1382,237 @@ By building on Supabase's SOC 2 compliant platform, you gain a significant advan
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/security/compliance',
     slug: 'soc-2-compliance',
+  },
+  // Studio
+  {
+    title: 'AI-Powered Query Assistance',
+    subtitle: 'Get help crafting complex SQL queries effortlessly.',
+    description: `
+The AI-Powered Query Assistance feature in Supabase provides users with intelligent suggestions for writing SQL queries based on natural language input. This tool is designed to enhance productivity and streamline the development process, making it easier for both novice and experienced developers to interact with their databases. By transforming user queries into optimized SQL commands, it reduces the time spent on query formulation and minimizes errors.
+
+Key benefits:
+1. User-Friendly: Simplifies the query-writing process by allowing users to express their needs in plain language.
+2. Time-Saving: Accelerates development by quickly generating accurate SQL queries.
+3. Learning Tool: Acts as a learning resource for new developers to understand SQL syntax and best practices.
+4. Error Reduction: Minimizes common mistakes in query formulation through intelligent suggestions.
+5. Integration: Seamlessly integrates with existing Supabase projects, enhancing the overall user experience.
+
+This feature is especially beneficial for teams looking to improve their database interaction efficiency while ensuring that all members can contribute effectively, regardless of their SQL expertise.
+`,
+    icon: Brain,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    docsUrl: '',
+    slug: 'ai-query-assistance',
+  },
+  {
+    title: 'Logs & Analytics',
+    subtitle: 'Gain insights into your application’s performance and usage.',
+    description: `
+The Logs & Analytics feature in Supabase provides users with comprehensive logging and analytics capabilities, powered by Logflare. This tool enables developers to track and analyze log events from various Supabase services, such as the API gateway, Postgres databases, Storage, Edge Functions, and more. By leveraging a multi-node Elixir cluster, Supabase processes billions of log events daily, ensuring that users have access to critical insights for optimizing their applications.
+
+Key benefits:
+1. Real-Time Monitoring: Access live data on application performance and user interactions to make informed decisions.
+2. Comprehensive Log Management: Ingest and store logs from multiple sources, allowing for centralized management of application events.
+3. Powerful Querying: Utilize SQL queries through Logflare Endpoints to analyze logs efficiently, enabling users to extract meaningful metrics.
+4. Customizable Dashboards: Create tailored views within Supabase Studio to visualize log data and track key performance indicators (KPIs).
+5. Scalability: Handle large volumes of log data with a robust infrastructure designed for high availability and performance.
+
+This feature is particularly valuable for teams looking to enhance their application's reliability and performance by gaining deeper insights into usage patterns and potential issues.
+`,
+    icon: Activity,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: '',
+    slug: 'logs-analytics',
+  },
+  {
+    title: 'Visual Schema Designer',
+    subtitle: 'Design your database schema with an intuitive interface.',
+    description: `
+The Visual Schema Designer feature allows users to create and modify database schemas through a user-friendly drag-and-drop interface. This tool is aimed at simplifying the database design process, making it accessible for users who may not be familiar with traditional SQL commands. By visualizing relationships between tables and fields, users can efficiently plan their database architecture.
+
+Key benefits:
+1. Intuitive Design: Facilitates easy schema creation through visual representation.
+2. Relationship Mapping: Clearly illustrates how tables are interconnected, aiding in effective database design.
+3. Accessibility: Makes database management approachable for non-technical users.
+4. Real-Time Updates: Automatically reflects changes in the schema, ensuring consistency across the project.
+5. Collaboration: Enhances teamwork by allowing multiple users to contribute to schema design simultaneously.
+
+This feature is particularly valuable for teams engaged in agile development processes where rapid iteration and collaboration are essential.
+`,
+    icon: RectangleEllipsis,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    docsUrl: '',
+    slug: 'visual-schema-designer',
+  },
+  {
+    title: 'Policy Templates',
+    subtitle: 'Quickly implement common security policies.',
+    description: `
+Policy Templates provide a library of predefined security policies that can be easily applied to your Supabase projects. This feature streamlines the process of establishing role-based access control and other security measures, ensuring that best practices are followed consistently across applications.
+
+Key benefits:
+1. Time Efficient: Reduces the time required to set up security policies by offering ready-made templates.
+2. Best Practices: Ensures adherence to industry standards for data security and access control.
+3. Customizable: Allows users to modify templates to fit specific project needs while maintaining a strong security foundation.
+4. User-Friendly: Simplifies policy application through an intuitive interface within the Supabase Studio.
+5. Documentation Support: Each template comes with comprehensive documentation to guide users through implementation.
+
+This feature is essential for organizations looking to maintain robust security protocols without extensive manual configuration efforts.
+`,
+    icon: ShieldPlus,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    docsUrl: '',
+    slug: 'policy-templates',
+  },
+  {
+    title: 'Automated Performance Monitoring',
+    subtitle: 'Keep track of your database performance effortlessly.',
+    description: `
+Automated Performance Monitoring provides users with real-time insights into their database's performance metrics, helping them identify potential bottlenecks and optimize resource utilization. This feature continuously tracks key performance indicators (KPIs) and alerts users when anomalies are detected.
+
+Key benefits:
+1. Proactive Management: Enables early detection of performance issues before they impact application functionality.
+2. Data-Driven Decisions: Provides actionable insights that help inform optimization strategies.
+3. User-Friendly Dashboard: Presents performance data in an easily digestible format within Supabase Studio.
+4. Historical Analysis: Allows users to review past performance trends for informed decision-making.
+5. Integration with Alerts: Users can set up notifications for critical performance thresholds.
+
+This feature is particularly useful for teams managing high-traffic applications that require constant monitoring to ensure optimal performance levels.
+`,
+    icon: Activity,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    docsUrl: '',
+    slug: 'automated-performance-monitoring',
+  },
+  {
+    title: 'Customizable Dashboard Widgets',
+    subtitle: 'Tailor your dashboard for personalized insights.',
+    description: `
+Customizable Dashboard Widgets allow users to create personalized views within their Supabase Studio by adding or removing widgets according to their specific needs. This flexibility enhances user experience by enabling individuals to focus on metrics that matter most to them.
+
+Key benefits:
+1. Personalization: Users can curate their dashboard layout based on personal preferences or project requirements.
+2. Enhanced Visibility: Important metrics are easily accessible at a glance, improving decision-making speed.
+3. Dynamic Updates: Widgets reflect real-time data changes, ensuring users have the latest information available.
+4. User Engagement: Encourages active use of the dashboard by allowing customization that fits individual workflows.
+5. Collaboration Features: Teams can share customized dashboards with colleagues, fostering better communication regarding project status.
+
+This feature is especially beneficial for teams working on diverse projects requiring different metrics and insights tailored to various roles within the organization.
+`,
+    icon: Folders,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    docsUrl: '',
+    slug: 'customizable-dashboard-widgets',
+  },
+  {
+    title: 'Integrated CI/CD Pipelines',
+    subtitle: 'Streamline your deployment workflow seamlessly.',
+    description: `
+Integrated CI/CD Pipelines enable developers to automate their deployment processes directly within Supabase Studio, facilitating continuous integration and delivery of applications without manual intervention. This feature supports a smooth workflow from code changes to production deployment.
+
+Key benefits:
+1. Automation: Reduces manual steps in deployment processes, minimizing human error and increasing efficiency.
+2. Version Control Integration: Works seamlessly with popular version control systems like GitHub for streamlined workflows.
+3. Rollback Capabilities: Easily revert deployments if issues arise, ensuring stability in production environments.
+4. Visibility into Deployments: Provides clear insights into deployment history and current application status within the dashboard.
+5. Team Collaboration: Facilitates better coordination among team members working on deployment tasks.
+
+This feature is particularly valuable for development teams adopting agile methodologies who need rapid iteration cycles without compromising quality or reliability in their deployments.
+`,
+    icon: Cloud,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    docsUrl: '',
+    slug: 'integrated-ci-cd-pipelines',
+  },
+  {
+    title: 'SQL Editor',
+    subtitle: 'A powerful interface for writing and executing SQL queries.',
+    description: `
+The SQL Editor in Supabase Studio provides users with a robust platform for writing, executing, and managing SQL queries directly within their browser. This feature is designed to enhance productivity by offering syntax highlighting, auto-completion, and error detection, making it easier for developers to interact with their databases efficiently.
+
+Key benefits:
+1. User-Friendly Interface: Intuitive design that simplifies the process of writing SQL queries.
+2. Syntax Highlighting: Enhances readability by color-coding SQL syntax, helping users quickly identify errors.
+3. Auto-Completion: Speeds up query writing by suggesting table names, column names, and functions.
+4. Execution History: Keeps track of previously executed queries for easy reference and reuse.
+5. Error Detection: Provides immediate feedback on syntax errors, reducing debugging time.
+
+This feature is particularly valuable for developers looking to streamline their workflow while ensuring accurate and efficient database interactions.
+`,
+    icon: FileCode2,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    docsUrl: '',
+    slug: 'sql-editor',
+  },
+  {
+    title: 'Security & Performance Advisor',
+    subtitle: 'Optimize your database security and performance effortlessly.',
+    description: `
+The Security & Performance Advisor feature in Supabase offers users actionable insights into their database's security posture and performance metrics. By analyzing configurations and usage patterns, this tool identifies potential vulnerabilities and performance bottlenecks, providing recommendations for improvements.
+
+Key benefits:
+1. Proactive Security Checks: Regular assessments of security settings to identify vulnerabilities.
+2. Performance Optimization: Analyzes query performance to recommend optimizations that enhance efficiency.
+3. User-Friendly Dashboard: Presents findings in an easily digestible format within Supabase Studio.
+4. Actionable Recommendations: Provides clear steps for addressing identified issues, empowering users to enhance their database environments.
+5. Ongoing Monitoring: Continuously evaluates changes in database usage to adapt recommendations accordingly.
+
+This feature is essential for organizations aiming to maintain high security standards while ensuring optimal performance across their applications.
+`,
+    icon: ShieldPlus,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/blog/security-performance-advisor',
+    slug: 'security-performance-advisor',
+  },
+  {
+    title: 'Foreign Key Selector',
+    subtitle: 'Easily manage foreign key relationships between tables.',
+    description: `
+The Foreign Key Selector feature simplifies the process of establishing and managing foreign key relationships within your database schema. By providing a visual interface for selecting foreign keys, this tool enhances usability and reduces the likelihood of errors during schema design.
+
+Key benefits:
+1. Visual Management: Allows users to easily visualize and select foreign key relationships between tables.
+2. Error Reduction: Minimizes mistakes associated with manual foreign key configuration.
+3. Streamlined Workflow: Enhances the efficiency of schema design by simplifying complex relationships.
+4. Real-Time Updates: Automatically reflects changes made in the foreign key relationships throughout the project.
+5. Documentation Support: Provides contextual information about foreign keys to guide users during setup.
+
+This feature is particularly beneficial for developers working with complex data models who need a straightforward way to manage relational integrity within their databases.
+`,
+    icon: DatabaseZap,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/blog/supabase-studio-2.0#foreign-key-selector',
+    slug: 'foreign-key-selector',
+  },
+  {
+    title: 'Log Drains',
+    subtitle: 'Export logs to external destinations for enhanced monitoring.',
+    description: `
+Log Drains enable developers to export logs generated by Supabase products—such as the Database, Storage, Realtime, and Auth—to external destinations like Datadog or custom HTTP endpoints. This feature provides a unified view of logs within existing logging and monitoring systems, allowing teams to build robust alerting and observability pipelines.
+
+Key benefits:
+1. Centralized Logging: Consolidate logs from multiple Supabase services into a single location for easier management and analysis.
+2. Custom Alerting: Ingest logs into Security Information and Event Management (SIEM) or Intrusion Detection Systems (IDS) to create tailored alerting rules based on database events.
+3. Extended Retention: Supports longer log retention periods to meet compliance requirements, ensuring data availability for audits and investigations.
+4. Flexible Configuration: Easily set up Log Drains through the project settings, with support for popular destinations like Datadog and custom HTTP endpoints.
+5. Scalable Architecture: Built on Logflare's multi-node Elixir cluster, allowing for efficient and scalable log dispatching to multiple destinations.
+
+This feature is particularly useful for teams seeking to enhance their observability practices while maintaining compliance and security standards across their applications.
+`,
+    icon: Activity,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/blog/log-drains',
+    slug: 'log-drains',
   },
 ]
