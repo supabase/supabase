@@ -45,7 +45,7 @@ const sendEvent = (event: TelemetryEvent, gaProps: TelemetryProps, router: NextR
       ph: {
         referrer,
         language: router?.locale ?? 'en-US',
-        userAgent: navigator.userAgent,
+        user_agent: navigator.userAgent,
         search: window.location.search,
         viewport_height: isBrowser ? window.innerHeight : 0,
         viewport_width: isBrowser ? window.innerWidth : 0,
@@ -56,6 +56,4 @@ const sendEvent = (event: TelemetryEvent, gaProps: TelemetryProps, router: NextR
   )
 }
 
-export default {
-  sendEvent,
-}
+export default { sendEvent }
