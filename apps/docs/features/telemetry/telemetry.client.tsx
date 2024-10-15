@@ -36,7 +36,7 @@ const useSendPageTelemetryWithConsent = () => {
     }).catch((e) => {
       console.error('Problem sending telemetry:', e)
     })
-  }, [hasAcceptedConsent])
+  }, [pathname, hasAcceptedConsent])
 
   return sendPageTelemetry
 }
