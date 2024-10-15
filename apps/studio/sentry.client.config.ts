@@ -3,7 +3,9 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
+import { IS_PLATFORM } from 'common/constants/environment'
+import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
+import { match } from 'path-to-regexp'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
