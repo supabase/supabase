@@ -38,6 +38,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { urlRegex } from '../Auth/Auth.constants'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -133,6 +134,7 @@ export function LogDrainDestinationSheetForm({
   onSubmit: (values: z.infer<typeof formSchema>) => void
   mode: 'create' | 'update'
 }) {
+  const lokiLogDrainsEnabled = useFlag('lokilogdrains')
   const CREATE_DEFAULT_HEADERS = {
     'Content-Type': 'application/json',
   }
@@ -275,16 +277,18 @@ export function LogDrainDestinationSheetForm({
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
                       </SelectTrigger_Shadcn_>
                       <SelectContent_Shadcn_>
-                        {LOG_DRAIN_TYPES.map((type) => (
-                          <SelectItem_Shadcn_
-                            value={type.value}
-                            key={type.value}
-                            id={type.value}
-                            className="text-left"
-                          >
-                            {type.name}
-                          </SelectItem_Shadcn_>
-                        ))}
+                        {LOG_DRAIN_TYPES.map((type) =>
+                          type.value === 'loki' && !lokiLogDrainsEnabled ? null : (
+                            <SelectItem_Shadcn_
+                              value={type.value}
+                              key={type.value}
+                              id={type.value}
+                              className="text-left"
+                            >
+                              {type.name}
+                            </SelectItem_Shadcn_>
+                          )
+                        )}
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
                   </FormItemLayout>
