@@ -7,10 +7,7 @@ import type { ResponseError } from 'types'
 export type SendGroupsResetVariables = components['schemas']['TelemetryGroupsResetBody']
 
 export async function sendGroupsReset(body: SendGroupsResetVariables) {
-  const { data, error } = await post(`/platform/telemetry/groups/reset`, {
-    body,
-    credentials: 'include',
-  })
+  const { data, error } = await post(`/platform/telemetry/groups/reset`, { body })
   if (error) handleError(error)
   return data
 }

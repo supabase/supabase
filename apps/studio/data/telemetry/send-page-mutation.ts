@@ -18,11 +18,7 @@ type SendPagePayload = any
 
 export async function sendPage(type: 'GA' | 'PH', body: SendPagePayload) {
   const headers = type === 'PH' ? { Version: '2' } : undefined
-  const { data, error } = await post(`/platform/telemetry/page`, {
-    body,
-    headers,
-    credentials: 'include',
-  })
+  const { data, error } = await post(`/platform/telemetry/page`, { body, headers })
   if (error) handleError(error)
   return data
 }

@@ -8,10 +8,7 @@ import type { ResponseError } from 'types'
 type SendPageLeaveBody = components['schemas']['TelemetryPageLeaveBody']
 
 export async function sendPageLeave(body: SendPageLeaveBody) {
-  const { data, error } = await post(`/platform/telemetry/page-leave`, {
-    body,
-    credentials: 'include',
-  })
+  const { data, error } = await post(`/platform/telemetry/page-leave`, { body })
   if (error) handleError(error)
   return data
 }

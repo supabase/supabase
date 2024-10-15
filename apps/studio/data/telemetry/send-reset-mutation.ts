@@ -4,7 +4,7 @@ import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
 export async function sendReset() {
-  const { data, error } = await post(`/platform/telemetry/reset`, { credentials: 'include' })
+  const { data, error } = await post(`/platform/telemetry/reset`, {})
   if (error) handleError(error)
   return data
 }

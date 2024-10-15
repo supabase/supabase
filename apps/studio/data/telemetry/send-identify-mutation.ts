@@ -28,11 +28,7 @@ export async function sendIdentify(type: 'GA' | 'PH', body: SendIdentifyPayload)
   if (consent !== 'true') return
 
   const headers = type === 'PH' ? { Version: '2' } : undefined
-  const { data, error } = await post(`/platform/telemetry/identify`, {
-    body,
-    headers,
-    credentials: 'include',
-  })
+  const { data, error } = await post(`/platform/telemetry/identify`, { body, headers })
   if (error) handleError(error)
   return data
 }
