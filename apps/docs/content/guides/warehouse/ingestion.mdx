@@ -140,9 +140,15 @@ Always plan your event schema changes to avoid typing errors on ingestion. Rejec
 
 When ingesting, object keys will be transformed automatically to comply with the respective backend in use. For example, BigQuery column requirements require that names only contain letters (a-z, A-Z), numbers (0-9), or underscores (\_), and it must start with a letter or underscore. This will be automatically handled when ingesting data, such that invalid characters are removed or replaced.
 
-## Additive Changes Only
+### Additive Changes Only
 
 Schema updates are additive and new columns cannot be removed. We recommend creating a new collection if a new schema is desired, and migrating any existing data manually.
+
+## Retention
+
+By default, retention will default to 3 days for the Free plan and 7 days for Pro plan and above.
+
+Desired retention can be adjusted by configuring the specific collection. This is not done automatically on plan upgrade.
 
 ## Ingestion Access Tokens
 
