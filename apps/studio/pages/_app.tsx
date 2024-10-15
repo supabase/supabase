@@ -59,6 +59,7 @@ import { Inter, Roboto_Mono } from 'next/font/google'
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+  weight: ['400', '700'],
 })
 
 const roboto_mono = Roboto_Mono({
