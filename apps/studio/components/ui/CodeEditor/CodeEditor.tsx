@@ -1,7 +1,7 @@
 import Editor, { EditorProps, Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
 import { editor } from 'monaco-editor'
-import { useEffect, useRef, useState } from 'react'
+import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { timeout } from 'lib/helpers'
@@ -38,6 +38,7 @@ interface CodeEditorProps {
     placeholderFill: Omit<CodeEditorActions, 'callback'>
     explainCode: CodeEditorActions
   }>
+  editorRef?: MutableRefObject<editor.IStandaloneCodeEditor | undefined>
   onInputChange?: (value?: string) => void
 }
 
@@ -54,13 +55,15 @@ const CodeEditor = ({
   value,
   placeholder,
   actions = DEFAULT_ACTIONS,
+  editorRef: editorRefProps,
   onInputChange = noop,
 }: CodeEditorProps) => {
   const monaco = useMonaco()
   const project = useSelectedProject()
 
   const hasValue = useRef<any>()
-  const editorRef = useRef<editor.IStandaloneCodeEditor>()
+  const ref = useRef<editor.IStandaloneCodeEditor>()
+  const editorRef = editorRefProps || ref
   const monacoRef = useRef<Monaco>()
 
   const { runQuery, placeholderFill, formatDocument, explainCode } = {

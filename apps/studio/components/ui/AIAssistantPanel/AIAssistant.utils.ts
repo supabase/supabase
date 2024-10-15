@@ -73,3 +73,20 @@ export const generatePrompt = ({
     return basePrompt
   }
 }
+
+// [Joshen] This is just very basic validation, but possible can extend perhaps
+export const validateQuery = (editor: SupportedAssistantEntities, query: string) => {
+  const formattedQuery = query.toLowerCase().replaceAll('\n', ' ')
+
+  switch (editor) {
+    case 'functions':
+      return (
+        formattedQuery.includes('create function') ||
+        formattedQuery.includes('create or replace function')
+      )
+    case 'rls-policies':
+      return true
+    default:
+      return true
+  }
+}

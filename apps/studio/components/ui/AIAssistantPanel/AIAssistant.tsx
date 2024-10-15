@@ -46,26 +46,27 @@ import { generatePrompt } from './AIAssistant.utils'
 import { ContextBadge } from './ContextBadge'
 import { EntitiesDropdownMenu } from './EntitiesDropdownMenu'
 import { Message } from './Message'
+import { ASSISTANT_SUPPORT_ENTITIES } from './AiAssistant.constants'
+import { MessageWithDebug } from 'components/interfaces/SQLEditor/AiAssistantPanel'
+import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 
 const ANIMATION_DURATION = 0.3
-const ASSISTANT_SUPPORT_ENTITIES: {
-  id: SupportedAssistantEntities
-  label: string
-  name: string
-}[] = [
-  { id: 'rls-policies', label: 'RLS Policies', name: 'RLS policy' },
-  { id: 'functions', label: 'Functions', name: 'database function' },
-]
 
 interface AIAssistantProps {
   id: string
   className?: string
+  debugThread: MessageWithDebug[]
   onResetConversation: () => void
 }
 
 // [Joshen] For some reason I'm having issues working with dropdown menu and scroll area
 
-export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantProps) => {
+export const AIAssistant = ({
+  id,
+  className,
+  debugThread,
+  onResetConversation,
+}: AIAssistantProps) => {
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
@@ -123,7 +124,7 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
 
   const {
     messages: chatMessages,
-    isLoading,
+    isLoading: isChatLoading,
     append,
   } = useChat({
     id,
@@ -131,18 +132,27 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
     body: { entityDefinitions },
   })
 
+  const { isLoading: isDebugSqlLoading } = useSqlDebugMutation()
+  const isLoading = isChatLoading || isDebugSqlLoading
+
   const messages = useMemo(() => {
-    const merged = [...chatMessages.map((m) => ({ ...m, isDebug: false }))]
+    const merged = [...debugThread, ...chatMessages.map((m) => ({ ...m, isDebug: false }))]
 
     return merged.sort(
       (a, b) =>
         (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0) ||
         a.role.localeCompare(b.role)
     )
-  }, [chatMessages])
+  }, [chatMessages, debugThread])
 
   const hasMessages = messages.length > 0
-  const pendingReply = isLoading && last(messages)?.role === 'user'
+  const lastMessage = last(messages)
+  const pendingChatReply = isLoading && lastMessage?.role === 'user'
+  const pendingDebugReply =
+    lastMessage?.isDebug &&
+    lastMessage?.role === 'assistant' &&
+    lastMessage.content === 'Thinking...'
+  const pendingReply = pendingChatReply || pendingDebugReply
 
   const toggleSchema = (schema: string) => {
     if (selectedSchemas.includes(schema)) {
@@ -191,7 +201,6 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
       if (inputRef.current) inputRef.current.focus()
     }
 
-    // Try to scroll on each rerender to the bottom
     setTimeout(
       () => {
         if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
@@ -199,6 +208,10 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
       isLoading ? 100 : 500
     )
   }, [isLoading])
+
+  useEffect(() => {
+    if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   useEffect(() => {
     const lastMessage = last(messages)
@@ -312,7 +325,7 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
                 Please verify all responses as the Assistant can make mistakes
               </p>
             )}
-            {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
+            {pendingChatReply && <Message key="thinking" role="assistant" content="Thinking..." />}
             <div ref={bottomRef} className="h-1" />
           </motion.div>
         )}
