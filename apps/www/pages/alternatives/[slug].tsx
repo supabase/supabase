@@ -59,7 +59,7 @@ export async function getStaticProps({ params }: any) {
   }
 }
 
-function BlogPostPage(props: any) {
+function BlogPostPage(props: CSSProperties) {
   // @ts-ignore
   // const content = hydrate(props.blog.content, { components })
   // const content = props.blog.content

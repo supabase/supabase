@@ -11,7 +11,7 @@ const src = (
   />
 )
 
-function IconMicSolid(props: any) {
+function IconMicSolid(props: CSSProperties) {
   return <IconBase src={src} stroke="none" {...props} />
 }
 

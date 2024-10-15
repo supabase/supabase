@@ -9,7 +9,7 @@ const src = (
   />
 )
 
-function IconProductHunt(props: any) {
+function IconProductHunt(props: CSSProperties) {
   return <IconBase src={src} stroke="none" {...props} />
 }
 

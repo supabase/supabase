@@ -6,7 +6,7 @@ import { useBreakpoint } from 'common'
 import { Button } from 'ui'
 import Panel from './Panel'
 
-function ExampleCard(props: any) {
+function ExampleCard(props: CSSProperties) {
   const isXs = useBreakpoint()
   const [mounted, setMounted] = useState(false)
 

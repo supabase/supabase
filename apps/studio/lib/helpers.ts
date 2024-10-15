@@ -103,7 +103,7 @@ export const tryParseInt = (str: string) => {
 }
 
 // Used as checker for memoized components
-export const propsAreEqual = (prevProps: any, nextProps: any) => {
+export const propsAreEqual = (prevprops: CSSProperties, nextprops: CSSProperties) => {
   try {
     Object.keys(prevProps).forEach((key) => {
       if (typeof prevProps[key] !== 'function') {

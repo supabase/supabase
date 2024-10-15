@@ -17,7 +17,7 @@ export const ErrorState = (args: any) => <InputNumber {...args} />
 
 export const WithIcon = (args: any) => <InputNumber {...args} />
 
-export const Controlled = (props: any) => {
+export const Controlled = (props: CSSProperties) => {
   const [state, setState] = useState(() => undefined)
 
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {

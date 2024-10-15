@@ -10,7 +10,7 @@ const src = (
   />
 )
 
-function IconBriefcase2(props: any) {
+function IconBriefcase2(props: CSSProperties) {
   return <IconBase src={src} stroke="none" {...props} />
 }
 

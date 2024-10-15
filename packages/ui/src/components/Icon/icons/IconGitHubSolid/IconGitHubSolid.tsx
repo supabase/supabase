@@ -10,7 +10,7 @@ const src = (
   />
 )
 
-function IconGitHubSolid(props: any) {
+function IconGitHubSolid(props: CSSProperties) {
   return <IconBase src={src} stroke="none" {...props} />
 }
 

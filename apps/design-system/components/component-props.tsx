@@ -2,7 +2,7 @@ import fs from 'fs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 // import { parse } from 'react-docgen'
 
-export function ComponentProps(props: any) {
+export function ComponentProps(props: CSSProperties) {
   // map through all props types for this component DropdownMenu
   // return a table with the prop name, type, default value, and description
 

@@ -13,7 +13,7 @@ import MenuIconPicker from './MenuIconPicker'
 import * as NavItems from './NavigationMenu.constants'
 import { deepFilterSections } from './NavigationMenu.utils'
 
-const HeaderLink = memo(function HeaderLink(props: any) {
+const HeaderLink = memo(function HeaderLink(props: CSSProperties) {
   return (
     <span className={['text-base text-brand-600 ', !props.title && 'capitalize'].join(' ')}>
       {props.title ?? props.id}

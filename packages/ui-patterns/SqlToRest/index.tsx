@@ -448,7 +448,7 @@ export default function SqlToRest({
                       <Markdown
                         className="text-sm"
                         components={{
-                          code: (props: any) => <CodeBlock hideLineNumbers {...props} />,
+                          code: (props: CSSProperties) => <CodeBlock hideLineNumbers {...props} />,
                         }}
                       >
                         {faq.answer}

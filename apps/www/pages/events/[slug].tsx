@@ -174,12 +174,12 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
   }
 
   const eventIcons = {
-    conference: (props: any) => <VideoCameraIcon {...props} />,
-    hackathon: (props: any) => <DesktopComputerIcon {...props} />,
-    launch_week: (props: any) => <VideoCameraIcon {...props} />,
-    meetup: (props: any) => <HandIcon {...props} />,
-    talk: (props: any) => <MicrophoneIcon {...props} />,
-    webinar: (props: any) => <VideoCameraIcon {...props} />,
+    conference: (props: CSSProperties) => <VideoCameraIcon {...props} />,
+    hackathon: (props: CSSProperties) => <DesktopComputerIcon {...props} />,
+    launch_week: (props: CSSProperties) => <VideoCameraIcon {...props} />,
+    meetup: (props: CSSProperties) => <HandIcon {...props} />,
+    talk: (props: CSSProperties) => <MicrophoneIcon {...props} />,
+    webinar: (props: CSSProperties) => <VideoCameraIcon {...props} />,
   }
 
   const Icon = eventIcons[event.type]
