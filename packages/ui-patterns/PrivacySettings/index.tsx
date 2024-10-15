@@ -6,7 +6,6 @@ import { PropsWithChildren, useEffect, useState } from 'react'
 import { Modal, Toggle } from 'ui'
 
 import { useConsentValue } from '../ConsentToast'
-import { post } from 'common/fetchWrappers'
 
 export const PrivacySettings = ({
   children,
