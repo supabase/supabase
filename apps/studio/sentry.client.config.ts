@@ -26,12 +26,12 @@ Sentry.init({
     return null
   },
   integrations: [
-    new Sentry.BrowserTracing({
+    Sentry.browserTracingIntegration({
       // TODO: update gotrue + api to support Access-Control-Request-Headers: authorization,baggage,sentry-trace,x-client-info
       // then remove these options
       traceFetch: false,
       traceXHR: false,
-      beforeNavigate: (context) => {
+      beforeStartSpan: (context) => {
         return {
           ...context,
           name: standardiseRouterUrl(location.pathname),
