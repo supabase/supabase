@@ -22,6 +22,18 @@ import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION, IS_PREVIEW } from '~/lib/c
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
+import { Inter, Roboto_Mono } from 'next/font/google'
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+})
+
+const roboto_mono = Roboto_Mono({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-roboto',
+})
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -86,6 +98,12 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <>
+      <style jsx global>{`
+        :root {
+          --font-inter: ${inter.style.fontFamily};
+          --font-roboto-mono: ${roboto_mono.style.fontFamily};
+        }
+      `}</style>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>

@@ -30,6 +30,7 @@
     "@mdx-js/loader": "^2.1.5",
     "@mdx-js/react": "^2.3.0",
     "@next/bundle-analyzer": "^14.2.3",
+    "@next/font": "^14.2.15",
     "@next/mdx": "^14.2.3",
     "@octokit/auth-app": "^6.0.3",
     "@octokit/core": "^5.1.0",

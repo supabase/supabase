@@ -361,9 +361,15 @@ const uiConfig = ui({
         xs: '480px',
       },
       fontFamily: {
-        sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-        mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
+        // sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        sans: ['var(--font-inter)'],
+        mono: ['var(--font-roboto-mono)'],
+        // mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
       },
+      // fontFamily: {
+      //   sans: ['var(--font-inter)'],
+      //   mono: ['var(--font-roboto-mono)'],
+      // },
 
       // shadcn defaults START
       keyframes: {

@@ -54,6 +54,18 @@ import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { Inter, Roboto_Mono } from 'next/font/google'
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+})
+
+const roboto_mono = Roboto_Mono({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-roboto-mono',
+})
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -123,52 +135,62 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
-      <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <AuthContainer>
-            <FlagProvider>
-              <ProfileProvider>
-                <Head>
-                  <title>Supabase</title>
-                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                </Head>
-                <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-                <PageTelemetry>
-                  <TooltipProvider>
-                    <RouteValidationWrapper>
-                      <ThemeProvider
-                        defaultTheme="system"
-                        themes={['dark', 'light', 'classic-dark']}
-                        enableSystem
-                        disableTransitionOnChange
-                      >
-                        <AppBannerContextProvider>
-                          <CommandProvider>
-                            <AppBannerWrapper>
-                              <FeaturePreviewContextProvider>
-                                {getLayout(<Component {...pageProps} />)}
-                                <StudioCommandMenu />
-                                <GenerateSql />
-                                <FeaturePreviewModal />
-                              </FeaturePreviewContextProvider>
-                            </AppBannerWrapper>
-                            <SonnerToaster position="top-right" />
-                          </CommandProvider>
-                        </AppBannerContextProvider>
-                      </ThemeProvider>
-                    </RouteValidationWrapper>
-                  </TooltipProvider>
-                </PageTelemetry>
+    <>
+      <style jsx global>{`
+        :root {
+          --font-inter: ${inter.style.fontFamily};
+          --font-roboto-mono: ${roboto_mono.style.fontFamily};
+        }
+      `}</style>
+      <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
+        <QueryClientProvider client={queryClient}>
+          <Hydrate state={pageProps.dehydratedState}>
+            <AuthContainer>
+              <FlagProvider>
+                <ProfileProvider>
+                  <Head>
+                    <title>Supabase</title>
+                    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                  </Head>
+                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
+                  <PageTelemetry>
+                    <TooltipProvider>
+                      <RouteValidationWrapper>
+                        <ThemeProvider
+                          defaultTheme="system"
+                          themes={['dark', 'light', 'classic-dark']}
+                          enableSystem
+                          disableTransitionOnChange
+                        >
+                          <AppBannerContextProvider>
+                            <CommandProvider>
+                              <AppBannerWrapper>
+                                <FeaturePreviewContextProvider>
+                                  {getLayout(<Component {...pageProps} />)}
+                                  <StudioCommandMenu />
+                                  <GenerateSql />
+                                  <FeaturePreviewModal />
+                                </FeaturePreviewContextProvider>
+                              </AppBannerWrapper>
+                              <SonnerToaster position="top-right" />
+                            </CommandProvider>
+                          </AppBannerContextProvider>
+                        </ThemeProvider>
+                      </RouteValidationWrapper>
+                    </TooltipProvider>
+                  </PageTelemetry>
 
-                {!isTestEnv && <HCaptchaLoadedStore />}
-                {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
-              </ProfileProvider>
-            </FlagProvider>
-          </AuthContainer>
-        </Hydrate>
-      </QueryClientProvider>
-    </ErrorBoundary>
+                  {!isTestEnv && <HCaptchaLoadedStore />}
+                  {!isTestEnv && (
+                    <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+                  )}
+                </ProfileProvider>
+              </FlagProvider>
+            </AuthContainer>
+          </Hydrate>
+        </QueryClientProvider>
+      </ErrorBoundary>
+    </>
   )
 }
 

@@ -12,6 +12,21 @@ import { GlobalProviders } from '~/features/app.providers'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
 
+import { Inter, Roboto_Mono } from 'next/font/google'
+
+// If loading a variable font, you don't need to specify the font weight
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+})
+
+const roboto_mono = Roboto_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto-mono',
+})
+
 const metadata: Metadata = {
   applicationName: 'Supabase Docs',
   title: 'Supabase Docs',
@@ -45,7 +60,7 @@ const viewport: Viewport = {
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${roboto_mono.variable}`}>
       <body>
         <GlobalProviders>
           <TopNavSkeleton>{children}</TopNavSkeleton>

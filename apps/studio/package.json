@@ -31,6 +31,7 @@
     "@hookform/resolvers": "^3.1.1",
     "@monaco-editor/react": "^4.6.0",
     "@next/bundle-analyzer": "^14.2.3",
+    "@next/font": "^14.2.15",
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@sentry/nextjs": "^7.108.0",
