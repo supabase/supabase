@@ -39,7 +39,7 @@ const PageLayout: NextPageWithLayout = () => {
                 title="Replication Enabled"
                 ctaButtonLabel={'Configure replication'}
                 onClickCta={() => {
-                  router.push(`/project/${ref}/replication/sinks`)
+                  router.push(`/project/${ref}/replication/publications`)
                 }}
               >
                 <p className="text-sm text-foreground-light">
