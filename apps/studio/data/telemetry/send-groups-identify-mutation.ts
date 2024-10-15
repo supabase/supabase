@@ -2,12 +2,24 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import type { ResponseError } from 'types'
 
 export type SendGroupsIdentifyVariables = components['schemas']['TelemetryGroupsIdentityBody']
 
-export async function sendGroupsIdentify(body: SendGroupsIdentifyVariables) {
-  const { data, error } = await post(`/platform/telemetry/groups/identify`, { body })
+export async function sendGroupsIdentify({
+  consent,
+  body,
+}: {
+  consent: boolean
+  body: SendGroupsIdentifyVariables
+}) {
+  if (!consent) return undefined
+
+  const { data, error } = await post(`/platform/telemetry/groups/identify`, {
+    body,
+    credentials: 'include',
+  })
   if (error) handleError(error)
   return data
 }
@@ -22,8 +34,13 @@ export const useSendGroupsIdentifyMutation = ({
   UseMutationOptions<SendGroupsIdentifyData, ResponseError, SendGroupsIdentifyVariables>,
   'mutationFn'
 > = {}) => {
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH)
+      : null) === 'true'
+
   return useMutation<SendGroupsIdentifyData, ResponseError, SendGroupsIdentifyVariables>(
-    (vars) => sendGroupsIdentify(vars),
+    (vars) => sendGroupsIdentify({ consent, body: vars }),
     {
       async onSuccess(data, variables, context) {
         await onSuccess?.(data, variables, context)
