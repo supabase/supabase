@@ -35,10 +35,11 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const consentToastId = useRef<string | number>()
   const previousPathname = usePrevious(router.pathname)
   const enablePostHogTelemetry = useFlag('enablePosthogChanges')
-  const consent =
-    typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null
+
+  const consentFlag = enablePostHogTelemetry
+    ? LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH
+    : LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT
+  const consent = typeof window !== 'undefined' ? localStorage.getItem(consentFlag) : null
   const trackTelemetryPH = enablePostHogTelemetry && consent === 'true'
 
   const { mutate: sendPage } = useSendPageMutation()
@@ -49,12 +50,12 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   useEffect(() => {
     if (typeof window !== 'undefined' && enablePostHogTelemetry !== undefined) {
       const onAcceptConsent = () => {
-        snap.setIsOptedInTelemetry(true)
+        snap.setIsOptedInTelemetry(true, consentFlag)
         if (consentToastId.current) toast.dismiss(consentToastId.current)
       }
 
       const onOptOut = () => {
-        snap.setIsOptedInTelemetry(false)
+        snap.setIsOptedInTelemetry(false, consentFlag)
         if (consentToastId.current) toast.dismiss(consentToastId.current)
       }
 
@@ -63,7 +64,12 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
           ? LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH
           : LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT
       )
-      snap.setIsOptedInTelemetry(hasAcknowledgedConsent === 'true')
+      snap.setIsOptedInTelemetry(
+        typeof hasAcknowledgedConsent === 'string'
+          ? hasAcknowledgedConsent === 'true'
+          : hasAcknowledgedConsent,
+        consentFlag
+      )
 
       if (IS_PLATFORM && hasAcknowledgedConsent === null) {
         setTimeout(() => {
