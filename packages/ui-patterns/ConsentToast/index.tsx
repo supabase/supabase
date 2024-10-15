@@ -22,10 +22,10 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
   const isMobile = useBreakpoint(639)
 
   return (
-    <div className="space-y-3 py-1 flex flex-col w-full">
+    <div className="py-1 flex flex-col gap-y-3 w-full">
       <div>
-        <p className="text-foreground">
-          We only collect analytics essential to ensuring smooth operation of our services.{' '}
+        <p className="text-sm text-foreground">
+          We use first-party cookies to improve our services.
           <Link
             className="inline sm:hidden underline text-light"
             target="_blank"

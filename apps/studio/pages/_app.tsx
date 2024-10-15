@@ -54,7 +54,6 @@ import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { ConsentToast } from 'ui-patterns/ConsentToast'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -118,36 +117,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
     console.error(error.stack)
   }
-
-  useEffect(() => {
-    // Check for telemetry consent
-    if (typeof window !== 'undefined') {
-      const onAcceptConsent = () => {
-        snap.setIsOptedInTelemetry(true)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
-      }
-
-      const onOptOut = () => {
-        snap.setIsOptedInTelemetry(false)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
-      }
-
-      const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      if (IS_PLATFORM && hasAcknowledgedConsent === null) {
-        setTimeout(() => {
-          consentToastId.current = toast(
-            <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
-            {
-              id: 'consent-toast',
-              position: 'bottom-right',
-              duration: Infinity,
-            }
-          )
-        }, 300)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   useThemeSandbox()
 
