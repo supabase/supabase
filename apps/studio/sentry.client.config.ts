@@ -1,12 +1,18 @@
+// This file configures the initialization of Sentry on the client.
+// The config you add here will be used whenever a users loads a page in their browser.
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+
 import * as Sentry from '@sentry/nextjs'
-import { IS_PLATFORM } from 'common/constants/environment'
-import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
-import { match } from 'path-to-regexp'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 0.01,
+
+  // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+
   beforeSend(event, hint) {
     const consent =
       typeof window !== 'undefined'
@@ -25,6 +31,7 @@ Sentry.init({
     }
     return null
   },
+
   integrations: [
     Sentry.browserTracingIntegration({
       // TODO: update gotrue + api to support Access-Control-Request-Headers: authorization,baggage,sentry-trace,x-client-info
