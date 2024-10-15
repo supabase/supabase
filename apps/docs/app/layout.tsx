@@ -4,12 +4,13 @@ import '../styles/main.scss'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
-import { genFaviconData } from 'common/MetaFavicons/app-router'
 import { type Metadata, type Viewport } from 'next'
 
-import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
+import { genFaviconData } from 'common/MetaFavicons/app-router'
+
 import { GlobalProviders } from '~/features/app.providers'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
+import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
 
 const metadata: Metadata = {
   applicationName: 'Supabase Docs',

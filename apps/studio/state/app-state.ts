@@ -36,11 +36,16 @@ export const appState = proxy({
   },
 
   isOptedInTelemetry: false,
-  setIsOptedInTelemetry: (value: boolean) => {
-    appState.isOptedInTelemetry = value
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
+  setIsOptedInTelemetry: (value: boolean | null, flag = LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT) => {
+    appState.isOptedInTelemetry = value === null ? false : value
+    if (typeof window !== 'undefined' && value !== null) {
+      localStorage.setItem(flag, value.toString())
     }
+    // [Joshen] Eventually once we completely move to PH, we should just set local storage
+    // directly here, but since currently it's dependent on a feature flag, will need to pass in as a prop
+    // if (typeof window !== 'undefined') {
+    //   localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
+    // }
   },
   showEnableBranchingModal: false,
   setShowEnableBranchingModal: (value: boolean) => {

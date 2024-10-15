@@ -26,7 +26,7 @@ Most significantly, Brick focuses on offline-first data parity: an app should fu
 
 ### Why Offline?
 
-The worst version of your app is always the unusable one. People use their phones on subways, airplanes, and on sub-3 G connections. Building for offline-first provides the best user experience when you can’t guarantee steady bandwidth.
+The worst version of your app is always the unusable one. People use their phones on subways, airplanes, and on sub-3G connections. Building for offline-first provides the best user experience when you can’t guarantee steady bandwidth.
 
 Even if you’re online-only, Brick’s round trip time is drastically shorter because all data [from Supabase is stored in a local cache](https://getdutchie.github.io/brick/#/offline_first/offline_first_with_supabase_repository). When you query the same data again, your app retrieves the local copy, reducing the time and expense of a round trip. And, if SQLite isn’t performant enough, Brick also offers a third cache in memory. When requests are made while the app is offline, they’ll be [continually retried until the app comes online](https://getdutchie.github.io/brick/#/offline_first/offline_queue), ensuring that your local state syncs up to your remote state.
 
@@ -75,11 +75,11 @@ import 'package:uuid/uuid.dart';
   supabaseConfig: SupabaseSerializable(tableName: 'users'),
 )
 class User extends OfflineFirstWithSupabaseModel {
-	final String name;
+  final String name;
 
-	// Be sure to specify an index that **is not** auto incremented in your table.
-	// An offline-first strategy requires distributed clients to create
-	// indexes without fear of collision.
+  // Be sure to specify an index that **is not** auto incremented in your table.
+  // An offline-first strategy requires distributed clients to create
+  // indexes without fear of collision.
   @Supabase(unique: true)
   @Sqlite(index: true, unique: true)
   final String id;
@@ -141,11 +141,11 @@ class Repository extends OfflineFirstWithSupabaseRepository {
       databaseFactory: databaseFactory,
     );
 
-		await Supabase.initialize(
-			url: supabaseUrl,
-			anonKey: supabaseAnonKey,
-			httpClient: client,
-		);
+    await Supabase.initialize(
+      url: supabaseUrl,
+      anonKey: supabaseAnonKey,
+      httpClient: client,
+    );
 
     final provider = SupabaseProvider(
       Supabase.instance.client,
@@ -246,7 +246,7 @@ class Order extends OfflineFirstWithSupabaseModel {
   // is possible but only necessary if there are joins
   // with multiple foreign keys
   // @Supabase(foreignKey: 'user_id')
-	final User user;
+  final User user;
 
   @Supabase(unique: true)
   @Sqlite(index: true, unique: true)

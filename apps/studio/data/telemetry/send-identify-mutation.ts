@@ -1,4 +1,5 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useRouter } from 'next/router'
 
 import { components } from 'api-types'
 import { isBrowser } from 'common'
@@ -6,7 +7,6 @@ import { handleError, post } from 'data/fetchers'
 import { Profile } from 'data/profile/types'
 import { useFlag } from 'hooks/ui/useFlag'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
 type SendIdentifyGA = components['schemas']['TelemetryIdentifyBody']
@@ -20,19 +20,19 @@ export type SendIdentifyVariables = {
 
 type SendIdentifyPayload = any
 
-export async function sendIdentify(type: 'GA' | 'PH', body: SendIdentifyPayload) {
-  const consent =
-    typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null
-  if (consent !== 'true') return
+export async function sendIdentify({
+  consent,
+  type,
+  body,
+}: {
+  consent: boolean
+  type: 'GA' | 'PH'
+  body: SendIdentifyPayload
+}) {
+  if (!consent) return undefined
 
   const headers = type === 'PH' ? { Version: '2' } : undefined
-  const { data, error } = await post(`/platform/telemetry/identify`, {
-    body,
-    headers,
-    credentials: 'include',
-  })
+  const { data, error } = await post(`/platform/telemetry/identify`, { body, headers })
   if (error) handleError(error)
   return data
 }
@@ -50,6 +50,15 @@ export const useSendIdentifyMutation = ({
   const router = useRouter()
   const usePostHogParameters = useFlag('enablePosthogChanges')
 
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(
+          usePostHogParameters
+            ? LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH
+            : LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT
+        )
+      : null) === 'true'
+
   const payload = usePostHogParameters
     ? ({} as SendIdentifyPH)
     : ({
@@ -66,12 +75,12 @@ export const useSendIdentifyMutation = ({
       const type = usePostHogParameters ? 'PH' : 'GA'
       const body = usePostHogParameters
         ? ({
-            user_id: user.id.toString(),
+            user_id: user.gotrue_id,
             organization_slug: slug,
             project_ref: ref,
           } as SendIdentifyPH)
         : ({ user: userInfo, ...payload } as SendIdentifyGA)
-      return sendIdentify(type, body)
+      return sendIdentify({ consent, type, body })
     },
     {
       async onSuccess(data, variables, context) {
