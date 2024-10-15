@@ -30,13 +30,13 @@ const useSendTelemetryEvent = () => {
       body: {
         pathname,
         action: event.action,
-        page_url: window.location.href,
+        page_url: isBrowser ? window.location.href : '',
         page_title: title,
         ph: {
           referrer,
           language: navigator.language ?? 'en-US',
           user_agent: navigator.userAgent,
-          search: window.location.search,
+          search: isBrowser ? window.location.search : '',
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
