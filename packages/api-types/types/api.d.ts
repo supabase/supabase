@@ -3322,6 +3322,8 @@ export interface paths {
   '/platform/replication/{ref}/sources': {
     /** Gets replication sources */
     get: operations['ReplicationSourcesController_getSources']
+    /** Creates a replication source */
+    post: operations['ReplicationSourcesController_createSource']
   }
   '/platform/reset-password': {
     parameters: {
@@ -8641,6 +8643,9 @@ export interface components {
        */
       name: string
       value: string
+    }
+    CreateSourceResponse: {
+      id: number
     }
     CreateStorageBucketBody: {
       allowed_mime_types: string[]
@@ -21549,6 +21554,46 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's settings */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets replication sources */
+  ReplicationSourcesController_getSources: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ReplicationSourcesResponse'][]
+        }
+      }
+      /** @description Failed to get replication sources */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates a replication source */
+  ReplicationSourcesController_createSource: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateSourceResponse']
+        }
+      }
+      /** @description Failed to create replication source */
       500: {
         content: never
       }
