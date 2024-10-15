@@ -40,13 +40,26 @@ const ProductDropdown = () => {
         <div className="col-span-3 xl:w-auto">
           <Link
             href="/features"
-            className="flex group mb-4 items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded focus-visible:ring-foreground-lighter"
+            className="
+              flex items-center justify-between group text-sm
+              p-3 mb-4 gap-2
+              rounded-lg border
+              bg-background text-foreground-light
+              hover:text-foreground hover:border-foreground-muted
+              focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-none
+              focus-visible:rounded focus-visible:ring-foreground-lighter
+            "
           >
-            <LayoutGrid size={16} strokeWidth={1.3} />
-            <span>Features</span>
+            {/* <LayoutGrid size={24} strokeWidth={1.3} /> */}
+            <div className="flex flex-col gap-1 !leading-3">
+              <span>Features</span>
+              <span className="text-foreground-lighter text-xs leading-3">
+                Explore everything you can do with Supabase.
+              </span>
+            </div>
             <ChevronRight
               strokeWidth={2}
-              className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
+              className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-80 group-hover:translate-x-0 group-hover:opacity-100"
             />
           </Link>
           <Link

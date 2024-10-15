@@ -133,16 +133,16 @@ function FeaturesPage() {
         }}
       />
       <DefaultLayout>
-        <SectionContainer>
+        <SectionContainer className="border rounded-xl bg-alternative my-4 py-8">
           <div className="mx-auto relative z-10">
             <motion.div
-              className="mx-auto sm:max-w-2xl text-center flex flex-col items-center"
+              className="mx-auto sm:max-w-xl text-center flex flex-col items-center gap-3"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
             >
-              <h1 className="h1 text-foreground mb-3 text-3xl">Features</h1>
-              <p className="text-foreground-light text-base sm:text-xl">
-                Everything you need to build your next project
+              <h1 className="h1 text-foreground !m-0">Supabase Features</h1>
+              <p className="text-foreground-light text-base sm:text-lg">
+                Everything you need to build and ship your next project.
               </p>
             </motion.div>
           </div>
@@ -232,16 +232,18 @@ function FeaturesPage() {
                       >
                         <Link
                           href={`/features/${feature.slug}`}
-                          className="p-2 cursor-pointer transition flex md:flex-col gap-3 sm:gap-2 h-full items-start"
+                          className="p-2 group cursor-pointer transition flex md:flex-col gap-3 sm:gap-2 h-full items-start"
                         >
-                          <div className="relative rounded-lg min-h-[80px] max-h-[140px] h-full aspect-square md:w-full md:!aspect-video bg-alternative flex items-center justify-center shadow-inner border border-muted">
-                            <feature.icon className="w-5 h-5 text-foreground-light" />
+                          <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:!aspect-video bg-alternative flex items-center justify-center shadow-inner border border-muted">
+                            <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
                           </div>
-                          <div className="p-3 pt-1 flex flex-col flex-grow gap-1.5 justify-center md:justify-start">
+                          <div className="md:p-3 md:pt-1 flex flex-col h-full md:h-auto flex-grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
                             <h3 className="text-sm md:text-base text-foreground !leading-5">
                               {feature.title}
                             </h3>
-                            <p className="text-foreground-light text-sm">{feature.subtitle}</p>
+                            <p className="text-foreground-light text-sm line-clamp-2">
+                              {feature.subtitle}
+                            </p>
                           </div>
                         </Link>
                       </Panel>

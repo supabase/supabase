@@ -1,9 +1,9 @@
-import { ChevronLeft, LucideIcon } from 'lucide-react'
+import { ChevronLeft, ChevronRight, LucideIcon } from 'lucide-react'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge, TextLink } from 'ui'
+import { Badge, Button, TextLink } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import { features } from '~/data/features'
 import type { FeatureType } from '~/data/features'
@@ -91,13 +91,13 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
               className="
                 relative z-10
                 lg:min-h-[400px] h-full
-                flex flex-col md:text-center
+                flex flex-col
                 gap-8
                 text-foreground-light
                 !py-10 md:!pb-10 md:!pt-0
               "
             >
-              <div className="h-full flex flex-col items-start md:items-center gap-2">
+              <div className="h-full flex flex-col items-start gap-2 w-full max-w-2xl mx-auto">
                 <Badge className="capitalize mb-4" size="large">
                   {feature.products[0]}
                 </Badge>
@@ -132,7 +132,12 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
               <div className="prose prose-docs">
                 <ReactMarkdown>{feature.description}</ReactMarkdown>
               </div>
-              {feature.docsUrl && <TextLink label="Read documentation" url={feature.docsUrl} />}
+              {/* {feature.docsUrl && <TextLink label="Read documentation" url={feature.docsUrl} />} */}
+              {feature.docsUrl && (
+                <Button type="default" iconRight={<ChevronRight />} asChild>
+                  <Link href={feature.docsUrl}>Read Documentation</Link>
+                </Button>
+              )}
               <div className="w-full flex text-foreground-lighter flex-col text-sm border-t pt-4 mt-4">
                 <span>Share on</span>
                 <ShareArticleActions title={meta.title} slug={meta.url} basePath="" />
