@@ -311,9 +311,10 @@ export const AiAssistantPanel = ({
               createdAt: new Date(),
             })
             sendEvent({
-              category: 'sql_editor_ai_assistant',
               action: 'ai_suggestion_asked',
-              label: 'sql-editor-ai-assistant',
+              properties: {
+                assistantType: 'sql-editor-ai-assistant',
+              },
             })
           }}
         />

@@ -94,6 +94,7 @@
     "remark-math": "^6.0.0",
     "server-only": "^0.0.1",
     "shared-data": "*",
+    "telemetry": "*",
     "toml": "^3.0.0",
     "ui": "*",
     "ui-patterns": "*",

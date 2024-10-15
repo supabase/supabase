@@ -76,9 +76,10 @@ const SQLTemplates = () => {
               onClick={(sql, title) => {
                 handleNewQuery(sql, title)
                 sendEvent({
-                  category: 'scripts',
-                  action: 'script_clicked',
-                  label: x.title,
+                  action: 'sql_template_script_clicked',
+                  properties: {
+                    title: x.title,
+                  },
                 })
               }}
             />

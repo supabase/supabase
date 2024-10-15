@@ -66,7 +66,7 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
 
   function onDownloadCSV() {
     csvRef.current?.link.click()
-    sendEvent({ category: 'sql_editor', action: 'sql_download_csv', label: '' })
+    sendEvent({ action: 'sql_download_csv_clicked' })
   }
 
   function onCopyAsMarkdown() {
@@ -86,7 +86,7 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
 
       copyToClipboard(markdownData, () => {
         toast.success('Copied results to clipboard')
-        sendEvent({ category: 'sql_editor', action: 'sql_copy_as_markdown', label: '' })
+        sendEvent({ action: 'sql_copy_as_markdown_clicked' })
       })
     }
   }
@@ -99,7 +99,9 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
 
       copyToClipboard(JSON.stringify(result.rows, null, 2), () => {
         toast.success('Copied results to clipboard')
-        sendEvent({ category: 'sql_editor', action: 'sql_copy_as_json', label: '' })
+        sendEvent({
+          action: 'sql_copy_as_json_clicked',
+        })
       })
     }
   }

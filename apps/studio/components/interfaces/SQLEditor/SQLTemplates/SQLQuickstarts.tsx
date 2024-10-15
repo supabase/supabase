@@ -76,9 +76,10 @@ const SQLQuickstarts = () => {
               onClick={(sql, title) => {
                 handleNewQuery(sql, title)
                 sendEvent({
-                  category: 'quickstart',
-                  action: 'quickstart_clicked',
-                  label: x.title,
+                  action: 'sql_quickstart_clicked',
+                  properties: {
+                    title: x.title,
+                  },
                 })
               }}
             />

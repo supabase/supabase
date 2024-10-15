@@ -100,9 +100,10 @@ function Feedback({ className }: { className?: string }) {
 
   function handleVote(response: Response) {
     sendTelemetryEvent({
-      category: 'docs',
       action: 'feedback_voted',
-      label: response,
+      properties: {
+        isDocHelpful: response === 'yes',
+      },
     })
     sendFeedbackVote(response)
     dispatch({ event: 'VOTED', response })

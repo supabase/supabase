@@ -4,30 +4,10 @@
  */
 
 /**
- * The subscription is canceled.
- *
- * @group Events
- * @source server-side
- */
-export interface subscription_canceled {
-  /**
-   * The name of the canceled plan.
-   */
-  canceledPlanName: 'free' | 'pro' | 'team' | 'enterprise'
-  /**
-   * The value of the canceled plan. In dollars.
-   */
-  canceledPlanValue: number
-  /**
-   * The billing cycle of the canceled plan.
-   */
-  canceledPlanBillingCycle: 'monthly' | 'yearly'
-}
-
-/**
  * The subscription is upgraded or downgraded.
  * @group Events
  * @source client-side, studio
+ * @notimplemented
  */
 
 export interface subscription_updated {
@@ -66,6 +46,7 @@ export interface subscription_updated {
  *
  * @group Events
  * @source client-side, studio
+ * @notimplemented
  */
 
 export interface upgrade_cta_clicked {
@@ -85,7 +66,6 @@ export interface upgrade_cta_clicked {
  * @hidden
  */
 export type RevenueEvents = {
-  subscription_canceled: subscription_canceled
   subscription_updated: subscription_updated
   upgrade_cta_clicked: upgrade_cta_clicked
 }

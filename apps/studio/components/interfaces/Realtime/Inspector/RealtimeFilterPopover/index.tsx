@@ -201,9 +201,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
         onCancel={() => setApplyConfigOpen(false)}
         onConfirm={() => {
           sendEvent({
-            category: 'realtime_inspector',
-            action: 'applied_filters',
-            label: 'realtime_inspector_config',
+            action: 'realtime_filters_applied',
           })
           onChangeConfig(tempConfig)
           setApplyConfigOpen(false)

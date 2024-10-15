@@ -511,9 +511,10 @@ export const AIPolicyEditorPanel = memo(function ({
                             setIncomingChange(undefined)
                             setSelectedDiff(undefined)
                             sendEvent({
-                              category: 'rls_editor',
                               action: 'ai_suggestion_discarded',
-                              label: 'rls-ai-assistant',
+                              properties: {
+                                assistantType: 'rls-ai-assistant',
+                              },
                             })
                           }}
                         >
@@ -525,9 +526,10 @@ export const AIPolicyEditorPanel = memo(function ({
                             acceptChange()
                             setSelectedDiff(undefined)
                             sendEvent({
-                              category: 'rls_editor',
                               action: 'ai_suggestion_accepted',
-                              label: 'rls-ai-assistant',
+                              properties: {
+                                assistantType: 'rls-ai-assistant',
+                              },
                             })
                           }}
                         >

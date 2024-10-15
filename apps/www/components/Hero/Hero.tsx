@@ -4,14 +4,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import { Telemetry } from 'telemetry'
+import { TELEMETRY_EVENTS } from '~/lib/telemetry/constants'
+import telemetry from '~/lib/telemetry/utils'
 
 const Hero = () => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
+  const sendTelemetryEvent = async (event: Telemetry.EventWithProperties) => {
+    await telemetry.sendEvent(event, telemetryProps, router)
   }
 
   return (
@@ -38,7 +39,9 @@ const Hero = () => {
                     <Link
                       href="https://supabase.com/dashboard"
                       as="https://supabase.com/dashboard"
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}
+                      onClick={() =>
+                        sendTelemetryEvent(TELEMETRY_EVENTS['www_hp_hero_startProject'])
+                      }
                     >
                       Start your project
                     </Link>
@@ -47,7 +50,9 @@ const Hero = () => {
                     <Link
                       href="/contact/sales"
                       as="/contact/sales"
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_requestDemo'])}
+                      onClick={() =>
+                        sendTelemetryEvent(TELEMETRY_EVENTS['www_hp_hero_requestDemo'])
+                      }
                     >
                       Request a demo
                     </Link>

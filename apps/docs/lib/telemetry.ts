@@ -4,11 +4,7 @@ import { useConsent } from 'ui-patterns/ConsentToast'
 
 import { unauthedAllowedPost } from './fetch/fetchWrappers'
 
-type TelemetryEvent = {
-  action: string
-  category: string
-  label: string
-}
+import { Telemetry } from 'telemetry'
 
 const noop = () => {}
 
@@ -23,11 +19,13 @@ const useSendTelemetryEvent = () => {
 
   if (!hasAcceptedConsent) return noop
 
-  return (event: TelemetryEvent) =>
+  return (event: Telemetry.EventWithProperties) =>
     unauthedAllowedPost('/platform/telemetry/event', {
       // @ts-ignore - endpoint will accept this just fine
       body: {
-        ...event,
+        action: event.action,
+        // @ts-ignore To be fixed for PH
+        custom_properties: event.properties,
         page_title: document?.title,
         // @ts-ignore [JOSHEN] To be fixed for PH
         page_location: pathname,

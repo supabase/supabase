@@ -9,8 +9,9 @@ import { Button, Select, cn } from 'ui'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 import { Organization } from '~/data/organizations'
 import Solutions from '~/data/Solutions'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import { Telemetry } from 'telemetry'
+import { TELEMETRY_EVENTS } from '~/lib/telemetry/constants'
+import telemetry from '~/lib/telemetry/utils'
 import UpgradePlan from './UpgradePlan'
 
 const MobileHeader = ({
@@ -34,8 +35,8 @@ const MobileHeader = ({
 }) => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
+  const sendTelemetryEvent = async (event: Telemetry.EventWithProperties) => {
+    await telemetry.sendEvent(event, telemetryProps, router)
   }
 
   const selectedPlan = plans.find((p) => p.name === plan)!
@@ -63,7 +64,7 @@ const MobileHeader = ({
           organizations={organizations}
           onClick={() =>
             sendTelemetryEvent(
-              gaEvents[`www_pricing_comparison_${plan.toLowerCase()}_mobile_upgrade`]
+              TELEMETRY_EVENTS[`www_pricing_comparison_${plan.toLowerCase()}_mobile_upgrade`]
             )
           }
           size="medium"
@@ -73,7 +74,9 @@ const MobileHeader = ({
           <Link
             href={selectedPlan.href}
             onClick={() =>
-              sendTelemetryEvent(gaEvents[`www_pricing_comparison_${plan.toLowerCase()}_mobile`])
+              sendTelemetryEvent(
+                TELEMETRY_EVENTS[`www_pricing_comparison_${plan.toLowerCase()}_mobile`]
+              )
             }
           >
             {selectedPlan.cta}
@@ -97,8 +100,8 @@ const PricingComparisonTable = ({
   const telemetryProps = useTelemetryProps()
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
+  const sendTelemetryEvent = async (event: Telemetry.EventWithProperties) => {
+    await telemetry.sendEvent(event, telemetryProps, router)
   }
 
   return (
@@ -399,7 +402,7 @@ const PricingComparisonTable = ({
                             organizations={organizations}
                             onClick={() =>
                               sendTelemetryEvent(
-                                gaEvents[
+                                TELEMETRY_EVENTS[
                                   `www_pricing_comparison_${plan.name.toLowerCase()}_upgrade`
                                 ]
                               )
@@ -417,7 +420,9 @@ const PricingComparisonTable = ({
                               href={plan.href}
                               onClick={() =>
                                 sendTelemetryEvent(
-                                  gaEvents[`www_pricing_comparison_${plan.name.toLowerCase()}`]
+                                  TELEMETRY_EVENTS[
+                                    `www_pricing_comparison_${plan.name.toLowerCase()}`
+                                  ]
                                 )
                               }
                             >

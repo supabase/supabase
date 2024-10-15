@@ -83,9 +83,10 @@ const QueryError = ({
                   onClick={() => {
                     onSelectDebug()
                     sendEvent({
-                      category: 'rls_editor',
                       action: 'ai_debugger_requested',
-                      label: 'rls-ai-assistant',
+                      properties: {
+                        assistantType: 'rls-ai-assistant',
+                      },
                     })
                   }}
                 >

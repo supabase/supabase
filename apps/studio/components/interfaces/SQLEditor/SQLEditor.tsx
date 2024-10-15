@@ -477,9 +477,11 @@ const SQLEditor = () => {
       }
 
       sendEvent({
-        category: 'sql_editor',
         action: 'ai_suggestion_accepted',
-        label: debugSolution ? 'debug_snippet' : 'edit_snippet',
+        properties: {
+          assistantType: 'sql-editor-ai-assistant',
+          labelType: debugSolution ? 'debug_snippet' : 'edit_snippet',
+        }
       })
 
       setSelectedMessage(undefined)
@@ -504,9 +506,11 @@ const SQLEditor = () => {
 
   const discardAiHandler = useCallback(() => {
     sendEvent({
-      category: 'sql_editor',
       action: 'ai_suggestion_rejected',
-      label: debugSolution ? 'debug_snippet' : 'edit_snippet',
+      properties: {
+        assistantType: 'sql-editor-ai-assistant',
+        labelType: debugSolution ? 'debug_snippet' : 'edit_snippet',
+      },
     })
 
     setSelectedMessage(undefined)

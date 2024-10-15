@@ -51,9 +51,7 @@ export const RealtimeInspector = () => {
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
           sendEvent({
-            category: 'realtime_inspector',
-            action: 'send_broadcast_message',
-            label: 'realtime_inspector_results',
+            action: 'realtime_broadcast_message_sent',
           })
           sendMessage(v.message, v.payload, () => setSendMessageShown(false))
         }}

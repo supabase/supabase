@@ -115,6 +115,7 @@
     "sonner": "^1.5.0",
     "sql-formatter": "^13.1.0",
     "sqlstring": "^2.3.2",
+    "telemetry": "*",
     "tus-js-client": "^4.1.0",
     "ui": "*",
     "ui-patterns": "*",

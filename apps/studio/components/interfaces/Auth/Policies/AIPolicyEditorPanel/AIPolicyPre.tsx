@@ -72,9 +72,10 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
               onClick={() => {
                 onDiff(formatted)
                 sendEvent({
-                  category: 'rls_editor',
                   action: 'ai_suggestion_diffed',
-                  label: 'rls-ai-assistant',
+                  properties: {
+                    assistantType: 'rls-ai-assistant',
+                  },
                 })
               }}
             >
@@ -104,9 +105,10 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
               onClick={() => {
                 handleCopy(formatted)
                 sendEvent({
-                  category: 'rls_editor',
                   action: 'ai_suggestion_copied',
-                  label: 'rls-ai-assistant',
+                  properties: {
+                    assistantType: 'rls-ai-assistant',
+                  },
                 })
               }}
             >

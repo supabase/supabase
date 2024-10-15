@@ -51,9 +51,10 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
   const onSubmit = () => {
     setOpen(false)
     sendEvent({
-      category: 'realtime_inspector',
-      action: 'started_listening_to_channel_in_input_channel_popover',
-      label: 'realtime_inspector_config',
+      action: 'realtime_start_listening_to_channel_clicked',
+      properties: {
+        type: 'popover',
+      },
     })
     onChangeConfig({
       ...config,

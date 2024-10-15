@@ -51,9 +51,12 @@ const FeaturePreviewModal = () => {
   const toggleFeature = () => {
     onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
     sendEvent({
-      category: 'ui_feature_previews',
-      action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
-      label: selectedFeatureKey,
+      action: isSelectedFeatureEnabled
+        ? 'ui_feature_previews_disabled'
+        : 'ui_feature_previews_enabled',
+      properties: {
+        featureName: selectedFeatureKey,
+      },
     })
   }
 

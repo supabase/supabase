@@ -103,9 +103,10 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const handleCopy = (id: string) => {
     const labelValue = CONNECTION_TYPES.find((type) => type.id === id)?.label
     sendEvent({
-      category: 'settings',
-      action: 'copy_connection_string',
-      label: labelValue ? labelValue : '',
+      action: 'database_connection_string_copied',
+      properties: {
+        label: labelValue ? labelValue : '',
+      },
     })
   }
 
