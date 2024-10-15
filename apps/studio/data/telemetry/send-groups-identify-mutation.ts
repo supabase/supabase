@@ -7,10 +7,7 @@ import type { ResponseError } from 'types'
 export type SendGroupsIdentifyVariables = components['schemas']['TelemetryGroupsIdentityBody']
 
 export async function sendGroupsIdentify(body: SendGroupsIdentifyVariables) {
-  const { data, error } = await post(`/platform/telemetry/groups/identify`, {
-    body,
-    credentials: 'include',
-  })
+  const { data, error } = await post(`/platform/telemetry/groups/identify`, { body })
   if (error) handleError(error)
   return data
 }

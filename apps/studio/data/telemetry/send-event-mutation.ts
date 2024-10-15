@@ -28,11 +28,7 @@ export async function sendEvent(type: 'GA' | 'PH', body: SendEventPayload) {
   if (consent !== 'true') return
 
   const headers = type === 'PH' ? { Version: '2' } : undefined
-  const { data, error } = await post(`/platform/telemetry/event`, {
-    body,
-    headers,
-    credentials: 'include',
-  })
+  const { data, error } = await post(`/platform/telemetry/event`, { body, headers })
   if (error) handleError(error)
   return data
 }

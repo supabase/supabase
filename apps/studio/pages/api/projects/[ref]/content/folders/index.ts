@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
 import type { UserContent } from 'types'
+import { extractResponse } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -12,26 +13,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return handleGetAll(req, res)
     case 'POST':
       return handlePost(req, res)
-    case 'PATCH':
-      return handlePatch(req, res)
-    case 'PUT':
-      return handlePut(req, res)
+    case 'DELETE':
+      return handleDelete(req, res)
     default:
-      res.setHeader('Allow', ['GET', 'POST', 'PATCH', 'PUT'])
+      res.setHeader('Allow', ['GET', 'POST', 'DELETE'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
 
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
+type GetResponseData = extractResponse<'/platform/projects/{ref}/content/folders', 'get'>
+
+const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
   // Platform specific endpoint
-  const snippets: UserContent[] = [
+  const snippets = [
     {
       id: '1',
       owner_id: 1,
       name: 'SQL Query',
       description: '',
-      type: 'sql',
-      visibility: 'user',
+      type: 'sql' as const,
+      visibility: 'user' as const,
       content: {
         content_id: '1.0',
         sql: `select * from
@@ -40,9 +41,18 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
         schema_version: '1',
         favorite: false,
       },
+      inserted_at: '',
+      updated_at: '',
+      project_id: 0,
+      favorite: false,
     },
   ]
-  return res.status(200).json({ data: snippets })
+  return res.status(200).json({
+    data: {
+      folders: [],
+      contents: snippets,
+    },
+  })
 }
 
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -50,13 +60,7 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   return res.status(200).json({})
 }
 
-const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
   return res.status(200).json({})
-}
-
-const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  const snippet: UserContent = req.body
-  return res.status(200).json({ data: snippet })
 }
