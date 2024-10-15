@@ -12,7 +12,7 @@ import { useRouter } from 'next/router'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref } = useParams()
-  // const router = useRouter()
+  const router = useRouter()
 
   const { data, error, isLoading, isError, isSuccess } = useReplicationSourcesQuery({
     projectRef: ref,
@@ -20,9 +20,8 @@ const PageLayout: NextPageWithLayout = () => {
   let replicationEnabled = data?.length !== 0
 
   const { mutate: createSource, isLoading: isCreating } = useCreateSourceMutation({
-    onSuccess: (res) => {
+    onSuccess: () => {
       toast.success(`Successfully enabled replication`)
-      // router.push(`/project/${ref}/replication/sinks`)
     },
   })
 
@@ -36,10 +35,20 @@ const PageLayout: NextPageWithLayout = () => {
         {isSuccess && (
           <>
             {replicationEnabled ? (
-              <div>Replication is Enabled</div>
+              <ProductEmptyState
+                title="Replication Enabled"
+                ctaButtonLabel={'Configure replication'}
+                onClickCta={() => {
+                  router.push(`/project/${ref}/replication/sinks`)
+                }}
+              >
+                <p className="text-sm text-foreground-light">
+                  Replication is enabled for this project. You can configure it now.
+                </p>
+              </ProductEmptyState>
             ) : (
               <ProductEmptyState
-                title="Replication"
+                title="Replication Not Enabled"
                 ctaButtonLabel={'Enable replication'}
                 onClickCta={() => {
                   if (!ref) return console.error('Project ref is required')
