@@ -78,26 +78,24 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
       <DefaultLayout className="bg-alternative">
         <div className="flex flex-col w-full">
           <header className="relative w-full overflow-hidden">
-            <SectionContainer className="!py-4 md:flex items-start hidden">
-              <Link
-                href="/features"
-                className="text-foreground-lighter hover:text-foreground flex !leading-3 gap-1 cursor-pointer items-center text-sm transition"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Back to Features
-              </Link>
-            </SectionContainer>
             <SectionContainer
               className="
                 relative z-10
                 lg:min-h-[400px] h-full
                 flex flex-col
-                gap-8
+                gap-4 xl:gap-8
                 text-foreground-light
-                !py-10 md:!pb-10 md:!pt-0
+                !py-10
               "
             >
-              <div className="h-full flex flex-col items-start gap-2 w-full max-w-2xl mx-auto">
+              <div className="relative h-full flex flex-col items-start gap-2 w-full max-w-2xl mx-auto">
+                <Link
+                  href="/features"
+                  className="absolute right-0 xl:pt-0 xl:right-auto xl:-left-56 2xl:-left-[354px] top-1 text-foreground-lighter hover:text-foreground flex !leading-3 gap-1 cursor-pointer items-center text-sm transition"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Back to Features
+                </Link>
                 <Badge className="capitalize mb-4" size="large">
                   {feature.products[0]}
                 </Badge>
