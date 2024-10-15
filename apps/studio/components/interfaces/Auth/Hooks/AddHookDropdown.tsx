@@ -16,7 +16,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  SheetSection,
 } from 'ui'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
@@ -38,7 +37,7 @@ export const AddHookDropdown = ({
     { enabled: IS_PLATFORM }
   )
   const { data: authConfig } = useAuthConfigQuery({ projectRef })
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateAuthHook = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
 
   const hooks: Hook[] = HOOKS_DEFINITIONS.map((definition) => {
     return {
@@ -57,7 +56,7 @@ export const AddHookDropdown = ({
   const isTeamsOrEnterprisePlan =
     subscription?.plan.id === 'team' || subscription?.plan.id === 'enterprise'
 
-  if (!canUpdateConfig) {
+  if (!canUpdateAuthHook) {
     return (
       <ButtonTooltip
         disabled
@@ -78,7 +77,7 @@ export const AddHookDropdown = ({
           {buttonText}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-76 p-0" align="end">
+      <DropdownMenuContent className="w-76" align="end">
         <div>
           {nonEnterpriseHookOptions.map((h) => (
             <DropdownMenuItem key={h.title} onClick={() => onSelectHook(h.title)}>
@@ -87,7 +86,7 @@ export const AddHookDropdown = ({
           ))}
         </div>
 
-        <DropdownMenuSeparator className="my-0" />
+        <DropdownMenuSeparator />
 
         {!isTeamsOrEnterprisePlan && (
           <DropdownMenuLabel className="grid gap-1 bg-surface-200">
