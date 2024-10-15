@@ -9,6 +9,8 @@ export function useTelemetryProps() {
 
   return {
     screenResolution: isBrowser ? `${window.innerWidth}x${window.innerHeight}` : undefined,
+    viewport_height: window.innerHeight,
+    viewport_width: window.innerWidth,
     language: locale ?? 'en-US',
   }
 }
