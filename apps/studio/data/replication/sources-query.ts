@@ -6,7 +6,10 @@ import { replicationKeys } from './keys'
 
 type ReplicationSourcesParams = { projectRef?: string }
 
-async function fetchReplicationSources({ projectRef }: ReplicationSourcesParams, signal?: AbortSignal) {
+async function fetchReplicationSources(
+  { projectRef }: ReplicationSourcesParams,
+  signal?: AbortSignal
+) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get('/platform/replication/{ref}/sources', {
@@ -14,11 +17,7 @@ async function fetchReplicationSources({ projectRef }: ReplicationSourcesParams,
     signal,
   })
   if (error) {
-    if ((error as ResponseError)?.message?.includes('Replication sources not found')) {
-      return []
-    } else {
-      handleError(error)
-    }
+    handleError(error)
   }
 
   return data
