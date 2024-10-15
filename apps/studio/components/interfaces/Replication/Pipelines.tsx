@@ -1,3 +1,3 @@
 export const ReplicationPipelines = () => {
-    return (<div>Pipelines</div>)
+  return <div>Pipelines</div>
 }

@@ -6,12 +6,25 @@ import type { NextPageWithLayout } from 'types'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import ReplicationLayout from 'components/layouts/ReplicationLayout/ReplicationLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useCreateSourceMutation } from 'data/replication/create-source-mutation'
+import { toast } from 'sonner'
+import { useRouter } from 'next/router'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref } = useParams()
+  // const router = useRouter()
 
-  const { data, error, isLoading, isError, isSuccess } = useReplicationSourcesQuery( { projectRef: ref })
+  const { data, error, isLoading, isError, isSuccess } = useReplicationSourcesQuery({
+    projectRef: ref,
+  })
   let replicationEnabled = data?.length !== 0
+
+  const { mutate: createSource, isLoading: isCreating } = useCreateSourceMutation({
+    onSuccess: (res) => {
+      toast.success(`Successfully enabled replication`)
+      // router.push(`/project/${ref}/replication/sinks`)
+    },
+  })
 
   return (
     <>
@@ -23,13 +36,20 @@ const PageLayout: NextPageWithLayout = () => {
         {isSuccess && (
           <>
             {replicationEnabled ? (
-                <div>Filled State</div>
+              <div>Replication is Enabled</div>
             ) : (
-                <ProductEmptyState title="Replication" ctaButtonLabel={'Enable replication'}>
-                    <p className="text-sm text-foreground-light">
-                        Replication is not enabled for this project.
-                    </p>
-                </ProductEmptyState>
+              <ProductEmptyState
+                title="Replication"
+                ctaButtonLabel={'Enable replication'}
+                onClickCta={() => {
+                  if (!ref) return console.error('Project ref is required')
+                  createSource({ projectRef: ref })
+                }}
+              >
+                <p className="text-sm text-foreground-light">
+                  Replication is not enabled for this project.
+                </p>
+              </ProductEmptyState>
             )}
           </>
         )}

@@ -10,16 +10,8 @@ export interface ReplicationLayoutProps {
 }
 
 const ReplicationLayout = ({ title, children }: PropsWithChildren<ReplicationLayoutProps>) => {
-  const project = useSelectedProject()
-
-  const router = useRouter()
-  const page = router.pathname.split('/')[4]
-
   return (
-    <ProjectLayout
-      title={title}
-      product="Replication"
-    >
+    <ProjectLayout title={title} product="Replication">
       {children}
     </ProjectLayout>
   )
