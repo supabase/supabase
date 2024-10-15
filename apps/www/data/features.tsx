@@ -23,9 +23,7 @@ import {
   Activity,
   BarChart,
   Brain,
-  Globe2,
   Puzzle,
-  Shield,
   DatabaseBackup,
   ShieldPlus,
 } from 'lucide-react'
@@ -33,7 +31,7 @@ import { PRODUCT, PRODUCT_SHORTNAMES } from 'shared-data/products'
 import type { LucideIcon } from 'lucide-react'
 
 enum ADDITIONAL_PRODUCTS {
-  PLATFORM = 'platform',
+  PLATFORM = 'platform management',
   STUDIO = 'studio',
 }
 

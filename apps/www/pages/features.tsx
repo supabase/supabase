@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { motion } from 'framer-motion'
@@ -9,7 +8,7 @@ import debounce from 'lodash/debounce'
 import fs from 'fs'
 
 import { useBreakpoint } from 'common'
-import { Badge, Button, Checkbox, cn, Input } from 'ui'
+import { Button, Checkbox, cn, Input } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
@@ -133,7 +132,13 @@ function FeaturesPage() {
         }}
       />
       <DefaultLayout>
-        <SectionContainer className="border rounded-xl bg-alternative my-4 py-8">
+        <SectionContainer
+          className="
+          border border-muted rounded-xl bg-alternative my-4 py-8 bg-center bg-cover
+          bg-[url('/images/features/features-cover-light.svg')]
+          dark:bg-[url('/images/features/features-cover-dark.svg')]
+        "
+        >
           <div className="mx-auto relative z-10">
             <motion.div
               className="mx-auto sm:max-w-xl text-center flex flex-col items-center gap-3"
@@ -174,12 +179,12 @@ function FeaturesPage() {
                   )
                 }
               />
-              <h2 className="text-sm">Filter by Products:</h2>
+              <h2 className="text-sm text-foreground-lighter">Filter by Category:</h2>
               <div className="flex flex-col gap-2.5">
                 {products.map((product) => (
                   <button
                     key={product}
-                    className="flex items-center gap-2 text-foreground-light hover:text-foreground !cursor-pointer transition-colors"
+                    className="flex items-center gap-2 text-foreground-light hover:text-foreground !cursor-pointer hover:!cursor-pointer transition-colors"
                   >
                     <Checkbox
                       id={product}
@@ -222,7 +227,10 @@ function FeaturesPage() {
               </p>
             ) : (
               Object.entries(groupedFeatures).map(([product, productFeatures]) => (
-                <div key={product} className="flex flex-col gap-4 border-t pt-4">
+                <div
+                  key={product}
+                  className="flex flex-col gap-4 border-t first:border-t-0 pt-4 first:pt-0"
+                >
                   <h2 className="text-foreground-light capitalize">{product}</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {productFeatures.map((feature) => (
