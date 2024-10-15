@@ -7,16 +7,17 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
+import { Telemetry } from 'telemetry'
 
 type SendEventGA = components['schemas']['TelemetryEventBody']
-type SendEventPH = components['schemas']['TelemetryEventBodyV2']
+type _SendEventPH = components['schemas']['TelemetryEventBodyV2']
 
-export type SendEventVariables = {
-  action: string
-  category: string
-  label: string
-  value?: string
+type SendEventPH<K extends Telemetry.EventName> = _SendEventPH & {
+  action: K
+  custom_properties?: Telemetry.EventProperties<K>
 }
+
+export type SendEventVariables = Telemetry.EventWithProperties
 
 type SendEventPayload = any
 
@@ -63,7 +64,7 @@ export const useSendEventMutation = ({
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
   const payload = usePostHogParameters
-    ? ({
+    ? {
         page_url: window.location.href,
         page_title: title,
         pathname: router.pathname,
@@ -75,8 +76,7 @@ export const useSendEventMutation = ({
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
-        custom_properties: {},
-      } as SendEventPH)
+      }
     : ({
         page_referrer: referrer,
         page_title: title,
@@ -94,9 +94,9 @@ export const useSendEventMutation = ({
       const body = usePostHogParameters
         ? ({
             action,
-            ...(payload as Omit<SendEventPH, 'action'>),
-            custom_properties: otherVars,
-          } as unknown as SendEventPH)
+            ...payload,
+            custom_properties: otherVars.properties ?? {},
+          } as SendEventPH<typeof action>)
         : ({ ...vars, ...payload } as SendEventGA)
       return sendEvent({ consent, type, body })
     },

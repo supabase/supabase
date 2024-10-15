@@ -18,5 +18,10 @@ export namespace Telemetry {
     GeneralEvents &
     RevenueEvents
   export type EventName = keyof Events
-  export type EventProps<K extends EventName> = Events[K]
+  export type EventProperties<K extends EventName> = Events[K]
+
+  export type EventWithProperties = {
+    action: EventName
+    properties?: EventProperties<EventName>
+  }
 }

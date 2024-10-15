@@ -43,9 +43,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   useEffect(() => {
     if (isMounted.current) {
       sendEvent({
-        category: 'realtime_inspector',
-        action: 'changed_database_role',
-        label: 'realtime_inspector_config',
+        action: 'realtime_database_role_changed',
       })
     }
     isMounted.current = true

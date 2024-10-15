@@ -68,9 +68,10 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
               onClick={() => {
                 onDiff(DiffType.Addition, formatted)
                 sendEvent({
-                  category: 'sql_editor_ai_assistant',
                   action: 'ai_suggestion_inserted',
-                  label: 'sql-editor-ai-assistant',
+                  properties: {
+                    assistantType: 'sql-editor-ai-assistant',
+                  },
                 })
               }}
             >
@@ -90,9 +91,10 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
               onClick={() => {
                 onDiff(DiffType.Modification, formatted)
                 sendEvent({
-                  category: 'sql_editor_ai_assistant',
                   action: 'ai_suggestion_replaced',
-                  label: 'sql-editor-ai-assistant',
+                  properties: {
+                    assistantType: 'sql-editor-ai-assistant',
+                  },
                 })
               }}
             >
@@ -112,9 +114,10 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
               onClick={() => {
                 handleCopy(formatted)
                 sendEvent({
-                  category: 'sql_editor_ai_assistant',
                   action: 'ai_suggestion_copied',
-                  label: 'sql-editor-ai-assistant',
+                  properties: {
+                    assistantType: 'sql-editor-ai-assistant',
+                  },
                 })
               }}
             >

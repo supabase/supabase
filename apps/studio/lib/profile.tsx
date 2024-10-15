@@ -34,7 +34,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
     async onSuccess() {
-      sendEvent({ category: 'conversion', action: 'sign_up', label: '' })
+      sendEvent({ action: 'sign_up' })
     },
     onError() {
       toast.error('Failed to create your profile. Please refresh to try again.')

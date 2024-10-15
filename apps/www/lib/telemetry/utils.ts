@@ -2,20 +2,18 @@ import { LOCAL_STORAGE_KEYS, TelemetryProps } from 'common'
 import { API_URL, IS_PREVIEW, IS_PROD } from 'lib/constants'
 import { NextRouter } from 'next/router'
 import { post } from '~/lib/fetchWrapper'
-
-export interface TelemetryEvent {
-  category: string
-  action: string
-  label: string
-  value?: string
-}
+import { Telemetry } from 'telemetry'
 
 const noop = () => {}
 
 // This event is the same as in studio/lib/telemetry.tx
 // but uses different ENV variables for www
 
-const sendEvent = (event: TelemetryEvent, telemetryProps: TelemetryProps, router: NextRouter) => {
+const sendEvent = (
+  event: Telemetry.EventWithProperties,
+  telemetryProps: TelemetryProps,
+  router: NextRouter
+) => {
   const consent =
     typeof window !== 'undefined'
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
@@ -26,7 +24,7 @@ const sendEvent = (event: TelemetryEvent, telemetryProps: TelemetryProps, router
 
   if (blockEvent) return noop
 
-  const { category, action, label, value } = event
+  const { action, properties } = event
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
@@ -36,7 +34,7 @@ const sendEvent = (event: TelemetryEvent, telemetryProps: TelemetryProps, router
     `${API_URL}/telemetry/event`,
     {
       page_url,
-      action: action,
+      action,
       page_title: title,
       pathname: router.pathname,
       ph: {
@@ -47,10 +45,12 @@ const sendEvent = (event: TelemetryEvent, telemetryProps: TelemetryProps, router
         viewport_width,
         user_agent: navigator.userAgent,
       },
-      custom_properties: { category, label, value } as any,
+      custom_properties: properties,
     },
     { headers: { Version: '2' }, credentials: 'include' }
   )
 }
 
-export default { sendEvent }
+const telemetry = { sendEvent }
+
+export default telemetry

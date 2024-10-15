@@ -21,8 +21,9 @@ import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata } from '~/lib/posts'
 import { isBrowser, useTelemetryProps } from 'common'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
-import gaEvents from '~/lib/gaEvents'
+import { Telemetry } from 'telemetry'
+import { TELEMETRY_EVENTS } from '~/lib/telemetry/constants'
+import telemetry from '~/lib/telemetry/utils'
 
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
@@ -186,8 +187,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
 
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
+  const sendTelemetryEvent = async (event: Telemetry.EventWithProperties) => {
+    await telemetry.sendEvent(event, telemetryProps, router)
   }
 
   const origin = isBrowser
@@ -295,7 +296,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     <Link
                       href={event.main_cta?.url ?? '#'}
                       target={event.main_cta?.target ? event.main_cta?.target : undefined}
-                      onClick={() => sendTelemetryEvent(gaEvents['www_event'])}
+                      onClick={() => sendTelemetryEvent(TELEMETRY_EVENTS['www_event'])}
                     >
                       {IS_REGISTRATION_OPEN
                         ? event.main_cta?.label

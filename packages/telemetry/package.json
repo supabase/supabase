@@ -1,8 +1,9 @@
 {
   "name": "telemetry",
-  "private": true,
-  "version": "0.0.1",
-  "license": "UNLICENSED",
+  "version": "0.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "license": "MIT",
   "scripts": {
     "typedoc": "typedoc --options typedoc.json",
     "dev": "npm run typedoc && vitepress dev",
@@ -10,12 +11,12 @@
     "preview": "vitepress preview"
   },
   "dependencies": {
-    "npm": "^10.8.3",
+    "npm": "^10.9.0",
     "ts-node": "^10.9.2",
-    "typedoc": "^0.26.7",
+    "typedoc": "^0.26.9",
     "typedoc-plugin-markdown": "^4.2.9",
     "typedoc-vitepress-theme": "^1.0.2",
-    "vitepress": "^1.3.4",
-    "zx": "^8.1.8"
+    "vitepress": "^1.4.1",
+    "zx": "^8.1.9"
   }
 }

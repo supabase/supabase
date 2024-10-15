@@ -40,7 +40,7 @@ const SignInMfaForm = () => {
     isSuccess,
   } = useMfaChallengeAndVerifyMutation({
     onSuccess: async () => {
-      sendEvent({ category: 'account', action: 'sign_in', label: '' })
+      sendEvent({ action: 'sign_in' })
       await queryClient.resetQueries()
       router.push(getReturnToPath())
     },
@@ -145,9 +145,8 @@ const SignInMfaForm = () => {
                 onClick={() =>
                   setSelectedFactor(factors.totp.find((f) => f.id !== selectedFactor?.id)!)
                 }
-              >{`Authenticate using ${
-                factors.totp.find((f) => f.id !== selectedFactor?.id)?.friendly_name
-              }?`}</a>
+              >{`Authenticate using ${factors.totp.find((f) => f.id !== selectedFactor?.id)
+                ?.friendly_name}?`}</a>
             </li>
           )}
           <li>

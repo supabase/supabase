@@ -74,9 +74,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
                 title="Copy log to clipboard"
                 onClick={() => {
                   sendEvent({
-                    category: 'realtime_inspector',
-                    action: 'copied_message',
-                    label: 'realtime_inspector_results',
+                    action: 'realtime_message_copied',
                   })
                 }}
               />

@@ -41,7 +41,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
-            sendEvent({ category: 'account', action: 'sign_in', label: '' })
+            sendEvent({ action: 'sign_in' })
             await queryClient.resetQueries()
             router.push(getReturnToPath())
             return

@@ -202,9 +202,10 @@ export const AIPolicyChat = ({
             event.preventDefault()
             onSubmit(value)
             sendEvent({
-              category: 'rls_editor',
               action: 'ai_suggestion_asked',
-              label: 'rls-ai-assistant',
+              properties: {
+                assistantType: 'rls-ai-assistant',
+              },
             })
           }}
         />

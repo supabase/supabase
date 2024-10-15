@@ -5,8 +5,9 @@ import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import { pickFeatures, pickFooter, plans } from 'shared-data/plans'
 import { Button, cn } from 'ui'
 import { Organization } from '~/data/organizations'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import { Telemetry } from 'telemetry'
+import { TELEMETRY_EVENTS } from '~/lib/telemetry/constants'
+import telemetry from '~/lib/telemetry/utils'
 import UpgradePlan from './UpgradePlan'
 import { Check } from 'lucide-react'
 
@@ -19,8 +20,8 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
 
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
+  const sendTelemetryEvent = async (event: Telemetry.EventWithProperties) => {
+    await telemetry.sendEvent(event, telemetryProps, router)
   }
 
   return (
@@ -35,7 +36,9 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
             const footer = pickFooter(plan)
 
             const sendPricingEvent = () => {
-              sendTelemetryEvent(gaEvents[`www_pricing_hero_plan_${plan.name.toLowerCase()}`])
+              sendTelemetryEvent(
+                TELEMETRY_EVENTS[`www_pricing_hero_plan_${plan.name.toLowerCase()}`]
+              )
             }
 
             return (

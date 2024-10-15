@@ -13,8 +13,8 @@ import VectorVisual from './VectorVisual'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry from '~/lib/telemetry'
+import { TELEMETRY_EVENTS } from '~/lib/telemetry/constants'
+import telemetry from '~/lib/telemetry/utils'
 
 import type { SolutionsType } from '~/data/Solutions'
 
@@ -29,44 +29,44 @@ const Products: React.FC<Props> = (props) => {
   const sendTelemetryEvent = async (product: PRODUCT_SHORTNAMES | 'data-api') => {
     switch (product) {
       case PRODUCT_SHORTNAMES.DATABASE:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_database'],
+        return await telemetry.sendEvent(
+          TELEMETRY_EVENTS['www_hp_subhero_products_database'],
           telemetryProps,
           router
         )
       case PRODUCT_SHORTNAMES.AUTHENTICATION:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_auth'],
+        return await telemetry.sendEvent(
+          TELEMETRY_EVENTS['www_hp_subhero_products_auth'],
           telemetryProps,
           router
         )
       case PRODUCT_SHORTNAMES.STORAGE:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_storage'],
+        return await telemetry.sendEvent(
+          TELEMETRY_EVENTS['www_hp_subhero_products_storage'],
           telemetryProps,
           router
         )
       case PRODUCT_SHORTNAMES.FUNCTIONS:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_edgeFunctions'],
+        return await telemetry.sendEvent(
+          TELEMETRY_EVENTS['www_hp_subhero_products_edgeFunctions'],
           telemetryProps,
           router
         )
       case PRODUCT_SHORTNAMES.REALTIME:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_realtime'],
+        return await telemetry.sendEvent(
+          TELEMETRY_EVENTS['www_hp_subhero_products_realtime'],
           telemetryProps,
           router
         )
       case PRODUCT_SHORTNAMES.VECTOR:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_vector'],
+        return await telemetry.sendEvent(
+          TELEMETRY_EVENTS['www_hp_subhero_products_vector'],
           telemetryProps,
           router
         )
       case 'data-api':
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_data-api'],
+        return await telemetry.sendEvent(
+          TELEMETRY_EVENTS['www_hp_subhero_products_data-api'],
           telemetryProps,
           router
         )

@@ -3,11 +3,7 @@ import { usePathname } from 'next/navigation'
 import { useConsent } from 'ui-patterns/ConsentToast'
 import { unauthedAllowedPost } from './fetch/fetchWrappers'
 
-type TelemetryEvent = {
-  action: string
-  category: string
-  label: string
-}
+import { Telemetry } from 'telemetry'
 
 const noop = () => {}
 
@@ -25,7 +21,7 @@ const useSendTelemetryEvent = () => {
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
-  return (event: TelemetryEvent) =>
+  return (event: Telemetry.EventWithProperties) =>
     unauthedAllowedPost('/platform/telemetry/event', {
       body: {
         pathname,
@@ -40,10 +36,7 @@ const useSendTelemetryEvent = () => {
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
-        custom_properties: {
-          category: event.category,
-          label: event.label,
-        } as any,
+        custom_properties: (event.properties ?? {}) as any,
       },
       headers: { Version: '2' },
       credentials: 'include',

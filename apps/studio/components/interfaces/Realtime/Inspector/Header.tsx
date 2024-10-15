@@ -35,9 +35,10 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
                 if (!config.enabled) {
                   // the user has clicked to start listening
                   sendEvent({
-                    category: 'realtime_inspector',
-                    action: 'started_listening',
-                    label: 'realtime_inspector_config',
+                    action: 'realtime_start_listening_to_channel_clicked',
+                    properties: {
+                      type: 'header',
+                    }
                   })
                 }
               }}

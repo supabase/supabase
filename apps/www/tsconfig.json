@@ -34,6 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".contentlayer/generated",
-    "./../../packages/ui/src/**/*.d.ts"
+    "./../../packages/ui/src/**/*.d.ts",
+    "./../../packages/telemetry/src/*"
   ]
 }

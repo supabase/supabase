@@ -83,9 +83,10 @@ const DatabaseSettings = () => {
 
   const handleCopy = (labelValue?: string) =>
     sendEvent({
-      category: 'settings',
-      action: 'copy_connection_string',
-      label: labelValue ? labelValue : '',
+      action: 'database_connection_string_copied',
+      properties: {
+        label: labelValue ? labelValue : '',
+      },
     })
 
   useEffect(() => {

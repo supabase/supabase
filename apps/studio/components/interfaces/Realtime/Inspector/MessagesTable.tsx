@@ -185,9 +185,7 @@ const MessagesTable = ({
                       selectedCellIdx={undefined}
                       onClick={() => {
                         sendEvent({
-                          category: 'realtime_inspector',
-                          action: 'focused-specific-message',
-                          label: 'realtime_inspector_results',
+                          action: 'realtime_message_clicked',
                         })
                         setFocusedLog(row)
                       }}
