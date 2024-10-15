@@ -50,24 +50,20 @@ For deployments with Netlify, set the `SITE_URL` to your official site URL. Add 
 
 ## Vercel preview URLs
 
-For deployments with Vercel, set the `SITE_URL` to your official site URL. Add the following additional redirect URLs for local development and deployment previews:
+For deployments with Vercel, [add](https://supabase.com/dashboard/project/_/auth/url-configuration) the following additional redirect URLs for local development and deployment previews:
 
 - `http://localhost:3000/**`
 - `https://*-<team-or-account-slug>.vercel.app/**`
 
-Vercel provides an environment variable for the URL of the deployment called `NEXT_PUBLIC_VERCEL_URL`. See the [Vercel docs](https://vercel.com/docs/concepts/projects/environment-variables#system-environment-variables) for more details. You can use this variable to dynamically redirect depending on the environment. You should also set the value of the environment variable called NEXT_PUBLIC_SITE_URL, this should be set to your site URL in production environment to ensure that redirects function correctly.
+Vercel provides an environment variable to determine the environment of the current deployment (production, preview, or development) called `VERCEL_ENV`. Furthermore, they also provide `VERCEL_PROJECT_PRODUCTION_URL` which is the production url, and `VERCEL_URL` which is the generated deployment URL for previews. You can use a combination of these variables to dynamically redirect depending on the environment. See the [Vercel docs](https://vercel.com/docs/concepts/projects/environment-variables#system-environment-variables) for more details.
 
-```js
-const getURL = () => {
-  let url =
-    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
-    process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
-    'http://localhost:3000/'
-  // Make sure to include `https://` when not localhost.
-  url = url.startsWith('http') ? url : `https://${url}`
-  // Make sure to include a trailing `/`.
-  url = url.endsWith('/') ? url : `${url}/`
-  return url
+```ts
+const getURL = (input: string = '') => {
+  return process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+   ? `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}${input}`
+   : process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}${input}`
+    : `http://localhost:${process.env.PORT}${input}`
 }
 
 const { data, error } = await supabase.auth.signInWithOAuth({
@@ -76,6 +72,9 @@ const { data, error } = await supabase.auth.signInWithOAuth({
     redirectTo: getURL(),
   },
 })
+
+// Note: You can use getURL in other places as well like:
+//   revalidatePath(getURL('/blog/4'))
 ```
 
 ## Email templates when using `redirectTo`
