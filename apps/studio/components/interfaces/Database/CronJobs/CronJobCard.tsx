@@ -77,15 +77,15 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                   <Button type="default" icon={<MoreVertical />} className="px-1.5" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-36">
+                  <DropdownMenuItem onClick={() => onEditCronJob(job)}>
+                    Edit cron job
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link
                       href={`/project/${ref}/sql/new?content=${encodeURIComponent(generateJobDetailsSQL(job.jobid))}`}
                     >
                       View previous runs
                     </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onEditCronJob(job)}>
-                    Edit cron job
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => onDeleteCronJob(job)}>
@@ -137,7 +137,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
       >
         <p className="text-sm text-foreground-light">
           <span>{`Are you sure you want to ${job.active ? 'disable' : 'enable'} the`}</span>{' '}
-          <span className="text-brand">{`${job?.jobname}`}</span>
+          <span className="font-bold">{`${job?.jobname}`}</span>
           <span> cron job?</span>
         </p>
       </ConfirmationModal>
