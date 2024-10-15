@@ -20,16 +20,20 @@ export async function chatSql(
     {
       role: 'system',
       content: stripIndent`
-      The generated SQL (must be valid SQL).
-      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
-      - Prefer creating foreign key references in the create statement
-      - Prefer 'text' over 'varchar'
-      - Prefer 'timestamp with time zone' over 'date'
-      - Use vector(384) data type for any embedding/vector related query
+      The generated SQL (must be valid SQL), and must adhere to the following:
       - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
       - Always use semicolons
       - Output as markdown
       - Always include code snippets if available
+      - Use vector(384) data type for any embedding/vector related query
+
+      When generating tables, do the following:
+      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
+      - Prefer creating foreign key references in the create statement
+      - Prefer 'text' over 'varchar'
+      - Prefer 'timestamp with time zone' over 'date'
+
+      Feel free to suggest corrections for suspected typos.
       `,
     },
   ]
@@ -47,7 +51,8 @@ export async function chatSql(
         case 'functions':
           return stripIndent`
           You're a Supabase Postgres expert in writing database functions. Your purpose is to generate a
-          database function with the constraints given by the user.
+          database function with the constraints given by the user. The output may also include a database trigger
+          if the function returns a type of trigger.
           `
       }
     }
@@ -69,6 +74,7 @@ export async function chatSql(
       content: codeBlock`
         Here is the existing SQL I wrote for reference:
         ${sqlBlock}
+        Any SQL output should follow the casing of the existing SQL that I've written.
       `.trim(),
     })
   }
@@ -78,6 +84,8 @@ export async function chatSql(
   }
 
   try {
+    console.log({ initMessages })
+
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini-2024-07-18',
       messages: initMessages,

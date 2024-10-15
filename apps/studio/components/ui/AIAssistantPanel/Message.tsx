@@ -19,7 +19,7 @@ interface MessageProps {
   isDebug?: boolean
   isSelected?: boolean
   action?: React.ReactNode
-  context?: { entity: string; schemas: string[] }
+  context?: { entity: string; schemas: string[]; tables: string[] }
   onDiff?: (type: DiffType, s: string) => void
 }
 
@@ -122,6 +122,9 @@ export const Message = memo(function Message({
           },
           h3: (props: any) => {
             return <h3 className="underline">{props.children}</h3>
+          },
+          code: (props: any) => {
+            return <code className={cn('text-xs', props.className)}>{props.children}</code>
           },
         }}
       >

@@ -1,3 +1,4 @@
+import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
@@ -90,9 +91,9 @@ export const appState = proxy({
 
   aiAssistantPanel: { open: false, editor: undefined } as {
     open: boolean
-    editor?: 'rls-policies' | 'functions'
+    editor?: SupportedAssistantEntities
   },
-  setAiAssistantPanel: (value: { open: boolean; editor?: 'rls-policies' | 'functions' }) =>
+  setAiAssistantPanel: (value: { open: boolean; editor?: SupportedAssistantEntities }) =>
     (appState.aiAssistantPanel = value),
 })
 

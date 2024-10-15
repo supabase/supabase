@@ -3,7 +3,13 @@ import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/exec
 import { CREATE_PG_GET_TABLEDEF_SQL } from './database-query-constants'
 import { databaseKeys } from './keys'
 
-export const getEntityDefinitionsQuery = (schemas: string[], limit = 100) => {
+export const getEntityDefinitionsQuery = ({
+  schemas,
+  limit = 100,
+}: {
+  schemas: string[]
+  limit?: number
+}) => {
   const sql = /* SQL */ `
 ${CREATE_PG_GET_TABLEDEF_SQL}
 
@@ -99,7 +105,7 @@ export const useEntityDefinitionsQuery = <
     {
       projectRef,
       connectionString,
-      sql: getEntityDefinitionsQuery(schemas, limit),
+      sql: getEntityDefinitionsQuery({ schemas, limit }),
       queryKey: databaseKeys.entityDefinitions(projectRef, schemas),
     },
     {

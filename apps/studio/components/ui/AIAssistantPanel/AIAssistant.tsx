@@ -5,11 +5,11 @@ import { Check, FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-r
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useChat } from 'ai/react'
+import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   AiIconAnimation,
@@ -58,12 +58,14 @@ const ASSISTANT_SUPPORT_ENTITIES: {
 ]
 
 interface AIAssistantProps {
+  id: string
   className?: string
+  onResetConversation: () => void
 }
 
 // [Joshen] For some reason I'm having issues working with dropdown menu and scroll area
 
-export const AIAssistant = ({ className }: AIAssistantProps) => {
+export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantProps) => {
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
@@ -75,23 +77,22 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
 
-  const [chatId] = useState(uuidv4())
   const [value, setValue] = useState<string>('')
 
   const [selectedDatabaseEntity, setSelectedDatabaseEntity] = useState<
     SupportedAssistantEntities | ''
   >('')
   const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
-  const [selectedEntities, setSelectedEntities] = useState<{ schema: string; name: string }[]>([])
+  const [selectedTables, setSelectedTables] = useState<{ schema: string; name: string }[]>([])
   const [contextHistory, setContextHistory] = useState<{
-    [key: string]: { entity: string; schemas: string[] }
+    [key: string]: { entity: string; schemas: string[]; tables: string[] }
   }>({})
 
   const entityContext = ASSISTANT_SUPPORT_ENTITIES.find((x) => x.id === selectedDatabaseEntity)
   const noContextAdded =
     selectedDatabaseEntity.length === 0 &&
     selectedSchemas.length === 0 &&
-    selectedEntities.length === 0
+    selectedTables.length === 0
 
   const { data: schemaDatas } = useSchemasQuery({
     projectRef: project?.ref,
@@ -99,16 +100,35 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   })
   const schemas = (schemaDatas || []).sort((a, b) => a.name.localeCompare(b.name))
 
+  const { data } = useEntityDefinitionsQuery(
+    {
+      schemas: selectedSchemas,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: includeSchemaMetadata }
+  )
+
+  const entityDefinitions = includeSchemaMetadata
+    ? selectedTables.length === 0
+      ? data?.map((def) => def.sql.trim())
+      : data
+          ?.filter((def) => {
+            return selectedTables.some((table) => {
+              return def.sql.startsWith(`CREATE  TABLE ${table.schema}.${table.name}`)
+            })
+          })
+          .map((def) => def.sql.trim())
+    : undefined
+
   const {
     messages: chatMessages,
     isLoading,
     append,
   } = useChat({
-    id: chatId,
+    id,
     api: `${BASE_PATH}/api/ai/sql/generate-v2`,
-    body: {
-      entityDefinitions: isOptedInToAI || !IS_PLATFORM ? undefined : undefined,
-    },
+    body: { entityDefinitions },
   })
 
   const messages = useMemo(() => {
@@ -134,14 +154,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }
 
   const toggleEntity = ({ schema, name }: { schema: string; name: string }) => {
-    const isExisting = selectedEntities.find((x) => x.schema === schema && x.name === name)
+    const isExisting = selectedTables.find((x) => x.schema === schema && x.name === name)
     if (isExisting) {
-      setSelectedEntities(selectedEntities.filter((x) => !(x.schema === schema && x.name === name)))
+      setSelectedTables(selectedTables.filter((x) => !(x.schema === schema && x.name === name)))
     } else {
-      const newSelectedEntities = [...selectedEntities, { schema, name }].sort(
+      const newselectedTables = [...selectedTables, { schema, name }].sort(
         (a, b) => a.schema.localeCompare(b.schema) || a.name.localeCompare(b.name)
       )
-      setSelectedEntities(newSelectedEntities)
+      setSelectedTables(newselectedTables)
     }
   }
 
@@ -150,7 +170,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       type,
       context: selectedDatabaseEntity as any,
       schemas: selectedSchemas,
-      tables: selectedEntities,
+      tables: selectedTables,
     })
     if (prompt) {
       setValue(prompt)
@@ -186,7 +206,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       const entity = entityContext?.label ?? selectedDatabaseEntity
       setContextHistory({
         ...contextHistory,
-        [lastMessage.id]: { entity, schemas: selectedSchemas },
+        [lastMessage.id]: {
+          entity,
+          schemas: selectedSchemas,
+          tables: selectedTables.map((x) =>
+            selectedSchemas.length > 1 ? `${x.schema}.${x.name}` : x.name
+          ),
+        },
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -212,7 +238,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             >
               <Button
                 type="default"
-                onClick={() => {}}
+                onClick={() => onResetConversation()}
                 className={cn('transition', showEditor ? '' : 'mr-6')}
               >
                 Reset conversation
@@ -317,7 +343,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       </span>
                     </>
                   ) : (
-                    'today'
+                    ' today'
                   )}
                   ?
                 </p>
@@ -439,7 +465,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                         <DropdownMenuSubContent className="p-0 w-52">
                           <EntitiesDropdownMenu
                             selectedSchemas={selectedSchemas}
-                            selectedEntities={selectedEntities}
+                            selectedEntities={selectedTables}
                             onToggleEntity={toggleEntity}
                           />
                         </DropdownMenuSubContent>
@@ -462,7 +488,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     value={`${selectedSchemas.slice(0, 2).join(', ')}${selectedSchemas.length > 2 ? ` and ${selectedSchemas.length - 2} other${selectedSchemas.length > 3 ? 's' : ''}` : ''}`}
                     onRemove={() => {
                       setSelectedSchemas([])
-                      setSelectedEntities([])
+                      setSelectedTables([])
                     }}
                     tooltip={
                       selectedSchemas.length > 2 ? (
@@ -481,24 +507,24 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   />
                 )}
 
-                {selectedEntities.length > 0 && (
+                {selectedTables.length > 0 && (
                   <ContextBadge
                     label="Tables"
-                    value={`${selectedEntities
+                    value={`${selectedTables
                       .slice(0, 2)
                       .map((x) => x.name)
                       .join(
                         ', '
-                      )}${selectedEntities.length > 2 ? ` and ${selectedEntities.length - 2} other${selectedEntities.length > 3 ? 's' : ''}` : ''}`}
-                    onRemove={() => setSelectedEntities([])}
+                      )}${selectedTables.length > 2 ? ` and ${selectedTables.length - 2} other${selectedTables.length > 3 ? 's' : ''}` : ''}`}
+                    onRemove={() => setSelectedTables([])}
                     tooltip={
-                      selectedEntities.length > 2 ? (
+                      selectedTables.length > 2 ? (
                         <>
                           <p className="text-foreground-light">
-                            {selectedEntities.length} tables selected:
+                            {selectedTables.length} tables selected:
                           </p>
                           <ul className="list-disc pl-4">
-                            {selectedEntities.map((x) => (
+                            {selectedTables.map((x) => (
                               <li key={`${x.schema}.${x.name}`}>
                                 {x.schema}.{x.name}
                               </li>
