@@ -18,11 +18,7 @@ type SendPagePayload = any
 
 export async function sendPage(type: 'GA' | 'PH', body: SendPagePayload) {
   const headers = type === 'PH' ? { Version: '2' } : undefined
-  const { data, error } = await post(`/platform/telemetry/page`, {
-    body,
-    headers,
-    credentials: 'include',
-  })
+  const { data, error } = await post(`/platform/telemetry/page`, { body, headers })
   if (error) handleError(error)
   return data
 }
@@ -47,7 +43,7 @@ export const useSendPageMutation = ({
         ph: {
           referrer,
           language: router?.locale ?? 'en-US',
-          userAgent: navigator.userAgent,
+          user_agent: navigator.userAgent,
           search: window.location.search,
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,

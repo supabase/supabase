@@ -637,7 +637,7 @@ let { data, error } = await supabase.auth.verifyOtp({
       code: `
 curl -X POST '${endpoint}/auth/v1/invite' \\
 -H "apikey: ${apiKey}" \\
--H "Authorization: Bearer USER_TOKEN" \\
+-H "Authorization: Bearer SERVICE_ROLE_KEY" \\
 -H "Content-Type: application/json" \\
 -d '{
   "email": "someone@email.com"

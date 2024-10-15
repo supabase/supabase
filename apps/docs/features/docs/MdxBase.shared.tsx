@@ -38,6 +38,7 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 import { CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import * as CH from '~/features/ui/CodeHike'
+import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 
 const components = {
@@ -78,6 +79,7 @@ const components = {
   RealtimeLimitsEstimator,
   RegionsList,
   SharedData,
+  ShowUntil,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
   SqlToRest,

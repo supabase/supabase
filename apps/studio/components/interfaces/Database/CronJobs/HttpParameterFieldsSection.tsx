@@ -13,13 +13,13 @@ import {
 import { CreateCronJobForm } from './CreateCronJobSheet'
 
 interface HTTPParameterFieldsSectionProps {
-  fieldName: 'values.httpParameters' | 'values.httpParameters'
+  variant: 'edge_function' | 'http_request'
 }
 
-export const HTTPParameterFieldsSection = ({ fieldName }: HTTPParameterFieldsSectionProps) => {
+export const HTTPParameterFieldsSection = ({ variant }: HTTPParameterFieldsSectionProps) => {
   // gets the fields through form context
   const { fields, append, remove } = useFieldArray<CreateCronJobForm>({
-    name: fieldName,
+    name: 'values.httpParameters',
   })
 
   return (
@@ -29,7 +29,7 @@ export const HTTPParameterFieldsSection = ({ fieldName }: HTTPParameterFieldsSec
         {fields.map((field, index) => (
           <div key={field.id} className="flex items-center space-x-2">
             <FormField_Shadcn_
-              name={`${fieldName}.${index}.name`}
+              name={`values.httpParameters.${index}.name`}
               render={({ field }) => (
                 <FormItem_Shadcn_ className="flex-1">
                   <FormControl_Shadcn_>
@@ -45,7 +45,7 @@ export const HTTPParameterFieldsSection = ({ fieldName }: HTTPParameterFieldsSec
               )}
             />
             <FormField_Shadcn_
-              name={`${fieldName}.${index}.value`}
+              name={`values.httpParameters.${index}.value`}
               render={({ field }) => (
                 <FormItem_Shadcn_ className="flex-1">
                   <FormControl_Shadcn_>

@@ -52,6 +52,7 @@ export const get: typeof _get = async (url, init) => {
   }
 
   return await _get(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -67,6 +68,7 @@ export const post: typeof _post = async (url, init) => {
   }
 
   return await _post(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -82,6 +84,7 @@ export const put: typeof _put = async (url, init) => {
   }
 
   return await _put(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -97,6 +100,7 @@ export const patch: typeof _patch = async (url, init) => {
   }
 
   return await _patch(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -112,6 +116,7 @@ export const del: typeof _del = async (url, init) => {
   }
 
   return await _del(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -127,6 +132,7 @@ export const head: typeof _head = async (url, init) => {
   }
 
   return await _head(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -136,6 +142,7 @@ export const trace: typeof _trace = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
 
   return await _trace(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -145,6 +152,7 @@ export const options: typeof _options = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
 
   return await _options(url, {
+    credentials: 'include',
     ...init,
     headers,
   })

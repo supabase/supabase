@@ -53,7 +53,7 @@ export const CronJobsListing = () => {
     }
   }, [isError, pgCronExtensionInstalled, refetch])
 
-  // this avoid showing loading screen when the extension is not installed. Otherwise, we';; have to wait for three
+  // this avoid showing loading screen when the extension is not installed. Otherwise, we'll have to wait for three
   // retries (which are sure to fail because the extension is not installed)
   if (isLoadingExtensions) return <GenericSkeletonLoader />
   if (!pgCronExtensionInstalled) return <CronJobsDisabledState />
