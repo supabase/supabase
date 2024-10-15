@@ -35,7 +35,7 @@ const useSendTelemetryEvent = () => {
         ph: {
           referrer,
           language: navigator.language ?? 'en-US',
-          userAgent: navigator.userAgent,
+          user_agent: navigator.userAgent,
           search: window.location.search,
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
