@@ -32,11 +32,7 @@ export async function sendIdentify({
   if (!consent) return undefined
 
   const headers = type === 'PH' ? { Version: '2' } : undefined
-  const { data, error } = await post(`/platform/telemetry/identify`, {
-    body,
-    headers,
-    credentials: 'include',
-  })
+  const { data, error } = await post(`/platform/telemetry/identify`, { body, headers })
   if (error) handleError(error)
   return data
 }

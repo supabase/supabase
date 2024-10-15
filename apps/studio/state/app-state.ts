@@ -38,7 +38,6 @@ export const appState = proxy({
   isOptedInTelemetry: false,
   setIsOptedInTelemetry: (value: boolean | null, flag = LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT) => {
     appState.isOptedInTelemetry = value === null ? false : value
-    console.log('setIsOptedInTelemetry', value)
     if (typeof window !== 'undefined' && value !== null) {
       localStorage.setItem(flag, value.toString())
     }
