@@ -59,12 +59,6 @@ export const generateProjectIntegrationsMenu = (
           items: [],
           label: 'BETA',
         },
-        {
-          name: 'API Docs',
-          key: 'vault',
-          url: `/project/${ref}/integrations/vault/secrets`,
-          items: [],
-        },
       ],
     },
   ]
