@@ -3339,6 +3339,8 @@ export interface paths {
   '/platform/replication/{ref}/sources': {
     /** Gets replication sources */
     get: operations['ReplicationSourcesController_getSources']
+    /** Creates a replication source */
+    post: operations['ReplicationSourcesController_createSource']
   }
   '/platform/reset-password': {
     parameters: {
@@ -8385,6 +8387,34 @@ export interface components {
       algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
       /** @enum {string} */
       status?: 'in_use' | 'standby'
+    }
+    CreateSourceResponse: {
+      id: number
+    }
+    CreateStorageBucketBody: {
+      allowed_mime_types: string[]
+      file_size_limit: number
+      id: string
+      public: boolean
+    }
+    CreateStorageCredentialBody: {
+      description: string
+    }
+    CreateStorageCredentialResponse: {
+      access_key: string
+      description: string
+      id: string
+      secret_key: string
+    }
+    CreateTableBody: {
+      comment?: string
+      name: string
+      schema?: string
+    }
+    CreateTaxIdBody: {
+      country?: string
+      type: string
+      value: string
     }
     CreateThirdPartyAuthBody: {
       custom_jwks?: Record<string, never>
@@ -18594,6 +18624,46 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's settings */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets replication sources */
+  ReplicationSourcesController_getSources: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ReplicationSourcesResponse'][]
+        }
+      }
+      /** @description Failed to get replication sources */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates a replication source */
+  ReplicationSourcesController_createSource: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateSourceResponse']
+        }
+      }
+      /** @description Failed to create replication source */
       500: {
         content: never
       }
