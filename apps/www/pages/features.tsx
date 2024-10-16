@@ -19,10 +19,6 @@ const products = Array.from(new Set(features.flatMap((feature) => feature.produc
 function FeaturesPage() {
   const router = useRouter()
   const { basePath, query } = router
-  const isMobile = useBreakpoint(1023)
-
-  // Initialize state from query parameters
-  const [showSearchInput, setShowSearchInput] = useState<boolean>(false)
   const [searchTerm, setSearchTerm] = useState<string>((query.q as string) || '')
   const [selectedProducts, setSelectedProducts] = useState<string[]>(
     (query.products as string)?.split(',') || []
@@ -128,21 +124,7 @@ function FeaturesPage() {
                 placeholder="Search features"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="w-full"
-                actions={
-                  isMobile && (
-                    <Button
-                      type="link"
-                      onClick={() => {
-                        setSearchTerm('')
-                        setShowSearchInput(false)
-                      }}
-                      className="text-foreground-light hover:text-foreground hover:bg-selection"
-                    >
-                      <CloseIcon size="14" />
-                    </Button>
-                  )
-                }
+                className="w-full [&_input]:text-base [&_input]:md:text-sm [&_input]:!leading-4"
               />
               <div className="hidden md:flex flex-col gap-4">
                 <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
