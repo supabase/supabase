@@ -41,6 +41,7 @@ export async function post(url: string, data: DataProps, options?: RequestInit) 
   return fetch(url, {
     method: 'POST',
     headers,
+    credentials: 'include',
     referrerPolicy: 'no-referrer-when-downgrade',
     body: JSON.stringify(data),
     ...otherOptions,
