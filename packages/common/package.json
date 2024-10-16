@@ -25,8 +25,8 @@
     "typescript": "~5.5.0"
   },
   "peerDependencies": {
-    "@supabase/supabase-js": "*",
     "@supabase/auth-js": "^2.63.0",
+    "@supabase/supabase-js": "*",
     "next": "*",
     "react": "*",
     "react-dom": "*"

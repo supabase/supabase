@@ -84,6 +84,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@hookform/resolvers": "^3.1.1",
     "@types/animejs": "^3.1.12",
     "@types/classnames": "^2.3.1",
     "@types/common-tags": "^1.8.4",
@@ -97,11 +98,14 @@
     "@types/react-dom": "^18.2.8",
     "@types/react-syntax-highlighter": "^15.5.6",
     "@types/three": "^0.169.0",
+    "@types/uuid": "^9.0.8",
     "api-types": "*",
     "autoprefixer": "^10.4.14",
-    "config": "*",
     "postcss": "^8.4.31",
-    "tsconfig": "*"
+    "react-hook-form": "^7.45.0",
+    "tsconfig": "*",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
   },
   "license": "MIT"
 }

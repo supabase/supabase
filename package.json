@@ -44,7 +44,8 @@
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
     "supabase": "^1.151.1",
-    "turbo": "2.0.4"
+    "turbo": "2.0.4",
+    "typescript": "~5.5.0"
   },
   "repository": {
     "type": "git",

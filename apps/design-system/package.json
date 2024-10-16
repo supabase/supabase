@@ -15,10 +15,9 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
-    "@radix-ui/react-alert-dialog": "^1.0.5",
     "contentlayer2": "0.4.6",
     "eslint-config-supabase": "*",
-    "fs": "^0.0.1-security",
+    "icons": "*",
     "jotai": "^2.8.0",
     "lodash.template": "4.5.0",
     "lucide-react": "*",
@@ -60,6 +59,7 @@
     "shiki": "^1.1.7",
     "tailwindcss": "^3.3.0",
     "tsconfig": "*",
+    "tsx": "^4.7.0",
     "typescript": "~5.5.0",
     "unist-builder": "3.0.0"
   }
