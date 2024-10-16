@@ -371,7 +371,7 @@ begin
     -- Assign priority dynamically (example logic: higher priority for earlier scheduled time)
     priority := extract('epoch' from (scheduled_time - now()))::int;
 
-    insert into job_queue (job_data, priority, scheduled_at, max_retries)
+    insert into public.job_queue (job_data, priority, scheduled_at, max_retries)
     values (job_data, priority, scheduled_time, 2);
 
     return '{}'::jsonb;
