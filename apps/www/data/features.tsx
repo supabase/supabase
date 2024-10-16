@@ -798,7 +798,7 @@ Supabase's Row Level Security (RLS) feature allows you to implement granular aut
 Supabase's RLS feature provides a powerful tool for implementing sophisticated access control patterns with minimal application code, enhancing security while simplifying development.
 `,
     icon: Lock,
-    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    products: [PRODUCT_SHORTNAMES.DATABASE, PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/row-level-security',
     slug: 'row-level-security',

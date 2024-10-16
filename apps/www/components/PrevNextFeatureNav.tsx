@@ -43,7 +43,7 @@ const PrevNextFeatureNav: React.FC<Props> = ({
   >
     <div
       className={cn(
-        'absolute top-10 w-fit pointer-events-auto flex items-center text-sm gap-1 text-foreground-light right-8 md:right-0',
+        'absolute top-9 w-fit pointer-events-auto flex items-center text-sm gap-1 text-foreground-light right-8 md:right-0',
         className
       )}
     >

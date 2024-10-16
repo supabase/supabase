@@ -5,7 +5,6 @@ import { NextSeo } from 'next-seo'
 import { motion } from 'framer-motion'
 import { Search, X as CloseIcon } from 'lucide-react'
 import debounce from 'lodash/debounce'
-import fs from 'fs'
 
 import { useBreakpoint } from 'common'
 import { Button, Checkbox, cn, Input } from 'ui'
@@ -13,21 +12,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
 
-import { generateRss } from '~/lib/rss'
-import { getSortedPosts } from '~/lib/posts'
 import { features } from '~/data/features'
-
-export async function getStaticProps() {
-  const allPostsData = getSortedPosts({ directory: '_customers' })
-  const rss = generateRss(allPostsData)
-  fs.writeFileSync('./public/customers-rss.xml', rss)
-
-  return {
-    props: {
-      blogs: allPostsData,
-    },
-  }
-}
 
 const products = Array.from(new Set(features.flatMap((feature) => feature.products)))
 
@@ -100,9 +85,9 @@ function FeaturesPage() {
 
   const meta = {
     title: 'Supabase Features',
-    image: `${basePath}/images/customers/og/customer-stories.jpg`,
+    // image: `${basePath}/images/features/og.jpg`,
     description:
-      'Check out all the Supabase features. From authentication to storage, everything you need to build your next project.',
+      'From authentication to storage, everything you need to build and ship your next project.',
   }
 
   return (
@@ -114,7 +99,7 @@ function FeaturesPage() {
           title: meta.title,
           description: meta.description,
           url: `${basePath}/customers`,
-          images: [{ url: meta.image }],
+          // images: [{ url: meta.image }],
         }}
       />
       <DefaultLayout>
@@ -212,40 +197,32 @@ function FeaturesPage() {
                 No features found with these filters
               </p>
             ) : (
-              Object.entries(groupedFeatures).map(([product, productFeatures]) => (
-                <div
-                  key={product}
-                  className="flex flex-col gap-4 border-t first:border-t-0 pt-4 first:pt-0"
-                >
-                  <h2 className="text-foreground-light capitalize">{product}</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {productFeatures.map((feature) => (
-                      <Panel
-                        key={feature.title}
-                        hasActiveOnHover
-                        innerClassName="flex flex-col justify-start items-stretch"
-                      >
-                        <Link
-                          href={`/features/${feature.slug}`}
-                          className="p-2 group cursor-pointer transition flex md:flex-col gap-3 sm:gap-2 h-full items-start"
-                        >
-                          <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:!aspect-video bg-alternative flex items-center justify-center shadow-inner border border-muted">
-                            <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
-                          </div>
-                          <div className="md:p-3 md:pt-1 flex flex-col h-full md:h-auto flex-grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
-                            <h3 className="text-sm md:text-base text-foreground !leading-5">
-                              {feature.title}
-                            </h3>
-                            <p className="text-foreground-light text-sm line-clamp-2">
-                              {feature.subtitle}
-                            </p>
-                          </div>
-                        </Link>
-                      </Panel>
-                    ))}
-                  </div>
-                </div>
-              ))
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredFeatures.map((feature) => (
+                  <Panel
+                    key={feature.title}
+                    hasActiveOnHover
+                    innerClassName="flex flex-col justify-start items-stretch"
+                  >
+                    <Link
+                      href={`/features/${feature.slug}`}
+                      className="p-2 group cursor-pointer transition flex md:flex-col gap-3 sm:gap-2 h-full items-start"
+                    >
+                      <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:!aspect-video bg-alternative flex items-center justify-center shadow-inner border border-muted">
+                        <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
+                      </div>
+                      <div className="md:p-3 md:pt-1 flex flex-col h-full md:h-auto flex-grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                        <h3 className="text-sm md:text-base text-foreground !leading-5">
+                          {feature.title}
+                        </h3>
+                        <p className="text-foreground-light text-sm line-clamp-2">
+                          {feature.subtitle}
+                        </p>
+                      </div>
+                    </Link>
+                  </Panel>
+                ))}
+              </div>
             )}
           </div>
         </SectionContainer>
