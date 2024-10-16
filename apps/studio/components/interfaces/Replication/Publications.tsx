@@ -3,8 +3,42 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Plus } from 'lucide-react'
 import Table from 'components/to-be-cleaned/Table'
+import { useReplicationSourcesQuery } from 'data/replication/sources-query'
+import { useParams } from 'common'
+import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
+import { Button } from 'ui'
 
 export const ReplicationPublications = () => {
+  const { ref } = useParams()
+  const { data } = useReplicationSourcesQuery({
+    projectRef: ref,
+  })
+
+  const sources = data ?? []
+  let publication_source_id = null
+
+  for (let i = 0; i < sources.length; i++) {
+    const source = sources[i]
+    if (source.config.Postgres!.host.startsWith(`db.${ref}`)) {
+      if (publication_source_id === null) {
+        publication_source_id = source.id
+      } else {
+        throw new Error(`multiple sources for ref ${ref}`)
+      }
+    }
+  }
+
+  if (publication_source_id === null) {
+    throw new Error(`no sources for ref ${ref}`)
+  }
+
+  const { data: pub_data } = useReplicationPublicationsQuery({
+    projectRef: ref,
+    sourceId: publication_source_id,
+  })
+
+  const publications = pub_data ?? []
+
   return (
     <>
       <ScaffoldContainer>
@@ -29,14 +63,33 @@ export const ReplicationPublications = () => {
               <div className="my-4 w-full">
                 <Table
                   head={[
-                    <Table.th key="icon" className="!px-0" />,
                     <Table.th key="name">Name</Table.th>,
-                    <Table.th key="tables" className="hidden xl:table-cell">
+                    <Table.th key="tables">
                       Num Tables
                     </Table.th>,
-                    <Table.th key="buttons">Edit</Table.th>,
+                    <Table.th key="edit">Edit</Table.th>,
+                    <Table.th key="delete">Delete</Table.th>,
                   ]}
-                  body={<div>No publications</div>}
+                  body={
+                    publications.length === 0 ? (
+                      <Table.tr>
+                        <Table.td colSpan={4}>No publications</Table.td>
+                      </Table.tr>
+                    ) : (
+                      publications.map((pub) => (
+                        <Table.tr key={pub.name}>
+                          <Table.td>{pub.name}</Table.td>
+                          <Table.td>{pub.tables.length}</Table.td>
+                          <Table.td>
+                            <Button>Edit</Button>
+                          </Table.td>
+                          <Table.td>
+                            <Button>Delete</Button>
+                          </Table.td>
+                        </Table.tr>
+                      ))
+                    )
+                  }
                 ></Table>
               </div>
             </div>
