@@ -106,9 +106,11 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               <div className="relative h-full flex flex-col items-start gap-2 w-full max-w-2xl mx-auto">
                 <div className="flex gap-1 flex-wrap mb-2">
                   {feature.products.map((product) => (
-                    <Badge key={product} className="capitalize" size="small">
-                      {product}
-                    </Badge>
+                    <Link href={`/features?products=${product}`} passHref>
+                      <Badge key={product} className="capitalize" size="small">
+                        {product}
+                      </Badge>
+                    </Link>
                   ))}
                 </div>
                 <h1 className="h1 !m-0">{feature.title}</h1>
@@ -138,7 +140,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
             </SectionContainer>
           </header>
           <SectionContainer className="!pt-0">
-            <main className="max-w-xl mx-auto flex flex-col items-start gap-4">
+            <main className="max-w-xl mx-auto flex flex-col items-start gap-8">
               <div className="prose prose-docs">
                 <ReactMarkdown>{feature.description}</ReactMarkdown>
               </div>
@@ -147,7 +149,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                   <Link href={feature.docsUrl}>Read Documentation</Link>
                 </Button>
               )}
-              <div className="w-full flex items-center justify-between text-foreground-lighter text-sm border-y py-4 mt-4 lg:mt-8">
+              <div className="w-full flex items-center justify-between text-foreground-lighter text-sm border-y py-4">
                 <span>Share</span>
                 <ShareArticleActions
                   title={meta.title}
@@ -157,7 +159,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                   className="m-0"
                 />
               </div>
-              <div className="w-full flex justify-between gap-8 mt-8 text-sm text-foreground-light">
+              <div className="w-full flex justify-between gap-8 mt-4 text-sm text-foreground-light">
                 {prevFeature && (
                   <Link
                     href={`/features/${prevFeature.slug}`}

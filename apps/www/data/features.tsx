@@ -27,6 +27,7 @@ import {
   DatabaseBackup,
   ShieldPlus,
   Terminal,
+  Zap,
 } from 'lucide-react'
 import { PRODUCT, PRODUCT_SHORTNAMES } from 'shared-data/products'
 import type { LucideIcon } from 'lucide-react'
@@ -487,6 +488,48 @@ This feature is particularly useful for developers looking to automate workflows
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/database/webhooks',
     slug: 'database-webhooks',
+  },
+  {
+    title: 'Vault',
+    subtitle: 'Manage secrets safely in Postgres.',
+    description: `
+Vault is a Postgres extension and accompanying Supabase UI that simplifies the secure storage of encrypted secrets and other sensitive data in your database. This feature allows developers to utilize Postgres in innovative ways beyond its standard capabilities.
+
+## Key benefits:
+1. Secure Storage: Secrets are stored on disk in an encrypted format, ensuring they remain protected even in backups or replication streams.
+2. Easy Management: The Supabase dashboard UI makes it simple to store and manage secrets, including environment variables and API keys.
+3. Flexible Encryption: Users can create custom encryption keys for different purposes, enhancing data security.
+4. Seamless Access: Secrets can be accessed from SQL as easily as querying a table, facilitating their use in Postgres Functions, Triggers, and Webhooks.
+5. Robust Security Features: The Vault employs authenticated encryption to ensure that secrets cannot be forged or decrypted without proper authorization.
+
+This feature is particularly useful for teams looking to enhance their security posture by managing sensitive data directly within their database environment.
+`,
+    icon: Lock,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/database/vault',
+    slug: 'vault',
+  },
+  {
+    title: 'Supavisor',
+    subtitle: 'A scalable connection pooler for Postgres.',
+    description: `
+Supavisor is a cloud-native connection pooler designed for Postgres, built to handle millions of connections efficiently. It was developed in Elixir and integrates advanced features such as query load balancing, named prepared statement support, and query cancellation. Supavisor enhances the performance of Postgres by managing connections effectively, ensuring that applications can scale seamlessly under heavy loads.
+
+## Key benefits:
+1. Scalable Architecture: Supports high concurrency and rapid I/O, making it suitable for applications with significant connection demands.
+2. Query Load Balancing: Automatically distributes read requests across primary and replica servers to optimize performance.
+3. Named Prepared Statements: Allows clients to reuse query plans across connections, improving efficiency and reducing overhead.
+4. Query Cancellation: Provides the ability to cancel long-running queries easily, enhancing user experience during database interactions.
+5. Easy Integration: New Supabase projects come with a Supavisor connection string by default, simplifying setup for developers.
+
+This feature is particularly valuable for teams looking to optimize their database interactions and ensure robust performance as their applications scale.
+`,
+    icon: Zap,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
+    slug: 'supavisor',
   },
   // Realtime
   {

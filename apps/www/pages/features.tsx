@@ -28,22 +28,26 @@ function FeaturesPage() {
 
   // Debounced function to update URL params
   const updateQueryParamsDebounced = useCallback(
-    debounce(() => {
-      const params = new URLSearchParams()
-      if (searchTerm) params.set('q', searchTerm)
-      if (selectedProducts.length > 0) params.set('products', selectedProducts.join(','))
-
-      router.replace({ pathname: '/features', query: params.toString() }, undefined, {
-        shallow: true,
-      })
-    }, 300),
+    debounce(() => updateQueryParams(), 300),
     [searchTerm, selectedProducts]
   )
+
+  const updateQueryParams = () => {
+    const params = new URLSearchParams()
+    if (searchTerm) params.set('q', searchTerm)
+    if (selectedProducts.length > 0) params.set('products', selectedProducts.join(','))
+
+    router.replace({ pathname: '/features', query: params.toString() }, undefined, {
+      shallow: true,
+    })
+  }
 
   useEffect(() => {
     updateQueryParamsDebounced()
     return updateQueryParamsDebounced.cancel // Cleanup on unmount
   }, [searchTerm, selectedProducts, updateQueryParamsDebounced])
+
+  useEffect(() => {}, [])
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,16 +76,16 @@ function FeaturesPage() {
   })
 
   // Group features by product
-  const groupedFeatures = filteredFeatures.reduce(
-    (acc, feature) => {
-      feature.products.forEach((product) => {
-        if (!acc[product]) acc[product] = []
-        acc[product].push(feature)
-      })
-      return acc
-    },
-    {} as Record<string, typeof features>
-  )
+  // const groupedFeatures = filteredFeatures.reduce(
+  //   (acc, feature) => {
+  //     feature.products.forEach((product) => {
+  //       if (!acc[product]) acc[product] = []
+  //       acc[product].push(feature)
+  //     })
+  //     return acc
+  //   },
+  //   {} as Record<string, typeof features>
+  // )
 
   const meta = {
     title: 'Supabase Features',
@@ -150,7 +154,7 @@ function FeaturesPage() {
                   )
                 }
               />
-              <h2 className="text-sm text-foreground-lighter">Filter by Category:</h2>
+              <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
               <div className="flex flex-col gap-2.5">
                 {products.map((product) => (
                   <button
@@ -211,7 +215,7 @@ function FeaturesPage() {
                       <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:!aspect-video bg-alternative flex items-center justify-center shadow-inner border border-muted">
                         <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
                       </div>
-                      <div className="md:p-3 md:pt-1 flex flex-col h-full md:h-auto flex-grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                      <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto flex-grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
                         <h3 className="text-sm md:text-base text-foreground !leading-5">
                           {feature.title}
                         </h3>
