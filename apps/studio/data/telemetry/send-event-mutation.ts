@@ -10,7 +10,10 @@ import type { ResponseError } from 'types'
 import { Telemetry } from 'telemetry'
 
 type SendEventGA = components['schemas']['TelemetryEventBody']
-type _SendEventPH = components['schemas']['TelemetryEventBodyV2']
+type _SendEventPH = Omit<
+  components['schemas']['TelemetryEventBodyV2'],
+  'action' | 'custom_properties'
+>
 
 type SendEventPH<K extends Telemetry.EventName> = _SendEventPH & {
   action: K
