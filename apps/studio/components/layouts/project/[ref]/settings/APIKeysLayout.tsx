@@ -105,8 +105,9 @@ const ApiKeysLayout = ({ children }: PropsWithChildren) => {
         </Tabs_Shadcn_> */}
         {/* <ApiKeysNotice /> */}
       </ScaffoldContainer>
+
       <ScaffoldContainer className="flex flex-col gap-10 py-8" bottomPadding>
-        {/* <Separator /> */}
+        <Separator />
         {children}
       </ScaffoldContainer>
     </>

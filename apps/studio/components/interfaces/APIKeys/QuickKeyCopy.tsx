@@ -1,10 +1,12 @@
-import { useState } from 'react'
-import { Button, Skeleton, WarningIcon } from 'ui'
+import React, { useState } from 'react'
+import { Button, EyeIcon, EyeOffIcon, Skeleton, WarningIcon } from 'ui'
 import { ChevronsUpDownIcon } from 'lucide-react'
 import { useParams } from 'common'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { SimpleCodeBlock } from 'ui/src/components/SimpleCodeBlock'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const frameworkOptions = ['React', 'Vue', 'Angular', 'Svelte'] // Add more as needed
 
@@ -53,10 +55,17 @@ const QuickKeyCopyContent = ({ selectedFramework }: { selectedFramework: string 
   } = useAPIKeysQuery({
     projectRef: projectRef as string,
   })
-  const publishableApiKey = apiKeysData?.find(({ type }) => type === 'publishable')?.api_key
-  const error = isProjectApiLoading || isApiKeysLoading || projectApiError || apiKeysError
+  const isPermissionsLoading = !usePermissionsLoaded()
+  const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
 
-  if (isProjectApiLoading || isApiKeysLoading) {
+  const publishableApiKey = apiKeysData?.find(({ type }) => type === 'publishable')?.api_key
+  const dataErrors = projectApiError || apiKeysError
+  const permissionErrors = !canReadAPIKeys && !isPermissionsLoading
+
+  console.log('canReadAPIKeys', canReadAPIKeys)
+  console.log('isPermissionsLoading', isPermissionsLoading)
+
+  if (isProjectApiLoading || isApiKeysLoading || isPermissionsLoading) {
     return (
       <div className="bg-alternative px-5 py-3 border-t overflow-hidden flex flex-col gap-0 h-20">
         <div className="flex items-center gap-2 mb-3">
@@ -68,9 +77,33 @@ const QuickKeyCopyContent = ({ selectedFramework }: { selectedFramework: string 
     )
   }
 
-  if (error) {
+  const EmptyContainer = ({ children }: { children: React.ReactNode }) => {
     return (
       <div className="bg-alternative justify-center px-5 py-3 border-t overflow-hidden flex flex-col gap-1 h-20">
+        {children}
+      </div>
+    )
+  }
+
+  // if (!canReadAPIKeys) {
+  //   return (
+  //     <EmptyContainer>
+  //       <div className="flex items-center gap-2">
+  //         <EyeOffIcon />
+  //         <p className="text-sm text-foreground">You do not have permission to read API Keys</p>
+  //       </div>
+  //       <p className="text-foreground-light text-xs">
+  //         Please contact your project admin/owner to request access.
+  //       </p>
+  //     </EmptyContainer>
+  //   )
+  // }
+
+  // TO DO : this needs to be changed to just if(error)
+  // currently it's not working as API returns an error.
+  if (dataErrors) {
+    return (
+      <EmptyContainer>
         <div className="flex items-center gap-2">
           <WarningIcon />
           <p className="text-sm text-warning-600">Error loading Secret API Keys</p>
@@ -78,14 +111,14 @@ const QuickKeyCopyContent = ({ selectedFramework }: { selectedFramework: string 
         <p className="text-warning/75 text-xs">
           {projectApiError?.message ?? apiKeysError?.message ?? 'Error: Failed to load API keys'}
         </p>
-      </div>
+      </EmptyContainer>
     )
   }
 
   const getEnvContent = () => {
     return `
 NEXT_PUBLIC_SUPABASE_URL=${projectAPI?.autoApiService.endpoint || ''}
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_API_KEY=${publishableApiKey || ''}
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_API_KEY=${!canReadAPIKeys ? 'You do not have permission to read the Publishable API key' : publishableApiKey || ''}
 `
   }
 

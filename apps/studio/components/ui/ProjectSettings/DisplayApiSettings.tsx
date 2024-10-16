@@ -36,6 +36,8 @@ const DisplayApiSettings = ({
 
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
 
+  console.log('old canReadAPIKeys', canReadAPIKeys)
+
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
   // Get the API service

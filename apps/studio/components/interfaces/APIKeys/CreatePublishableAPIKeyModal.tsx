@@ -24,6 +24,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
+import { useParams } from 'next/navigation'
 
 const FORM_ID = 'create-publishable-api-key'
 const SCHEMA = z.object({
@@ -34,7 +35,10 @@ export interface CreatePublishableAPIKeyModalProps {
   projectRef: string
 }
 
-const CreatePublishableAPIKeyModal = ({ projectRef }: any) => {
+function CreatePublishableAPIKeyModal() {
+  const params = useParams()
+  const projectRef = params?.ref as string
+
   const [visible, setVisible] = useState(false)
 
   const onClose = (value: boolean) => {

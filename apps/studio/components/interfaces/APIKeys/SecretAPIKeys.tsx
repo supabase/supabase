@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useMemo } from 'react'
-import { Card, CardContent, Skeleton, WarningIcon, cn } from 'ui'
+import { Card, CardContent, EyeOffIcon, Skeleton, WarningIcon, cn } from 'ui'
 import {
   Table,
   TableBody,
@@ -13,17 +13,22 @@ import {
 } from 'ui/src/components/shadcn/ui/table'
 import APIKeyRow from './APIKeyRowv2'
 import CreateSecretAPIKeyModal from './CreateSecretAPIKeyModal'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
-  const { data: apiKeysData, isLoading, error } = useAPIKeysQuery({ projectRef })
+  const { data: apiKeysData, isLoading: isLoadingApiKeys, error } = useAPIKeysQuery({ projectRef })
+
+  const isLoadingPermissions = !usePermissionsLoaded()
+  const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
 
   const secretApiKeys = useMemo(
     () => apiKeysData?.filter(({ type }) => type === 'secret') ?? [],
     [apiKeysData]
   )
 
-  const empty = secretApiKeys?.length === 0 && !isLoading
+  const empty = secretApiKeys?.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
 
   const RowLoading = () => (
     <TableRow>
@@ -73,11 +78,27 @@ const SecretAPIKeys = () => {
     </div>
   )
 
-  if (isLoading) {
+  if (isLoadingApiKeys || isLoadingPermissions) {
     return (
       <TableContainer>
         <RowLoading />
         <RowLoading />
+      </TableContainer>
+    )
+  }
+
+  if (!canReadAPIKeys) {
+    return (
+      <TableContainer>
+        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+          <EyeOffIcon />
+          <p className="text-sm text-foreground">
+            You do not have permission to read API Secret Keys
+          </p>
+          <p className="text-foreground-light">
+            Contact your organization owner/admin to request access.
+          </p>
+        </div>
       </TableContainer>
     )
   }

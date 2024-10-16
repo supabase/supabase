@@ -1,24 +1,28 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { Link } from 'lucide-react'
 import { useMemo } from 'react'
-import { cn, Input_Shadcn_, Separator, Skeleton, WarningIcon } from 'ui'
+import { cn, EyeOffIcon, Input_Shadcn_, Separator, Skeleton, WarningIcon } from 'ui'
 import ShowPublicJWTsDialogComposer from '../JwtSecrets/ShowPublicJWTsDialogComposer'
 import QuickKeyCopyWrapper from './QuickKeyCopy'
-import { ResponseError } from 'types'
+// import CreatePublishableAPIKeyModal from './CreatePublishableAPIKeyModal'
 
 const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
-
   const { data: apiKeysData, isLoading: isLoadingApiKeys, error } = useAPIKeysQuery({ projectRef })
 
   const publishableApiKeys = useMemo(
     () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],
     [apiKeysData]
   )
+
+  const isPermissionsLoading = !usePermissionsLoaded()
+  const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
 
   // The default publisahble key will always be the first one
   const apiKey = publishableApiKeys[0]
@@ -34,8 +38,9 @@ const PublishableAPIKeys = () => {
           <div className="bg-surface-100 px-5 py-2 flex items-center gap-5 first:rounded-t-md border">
             <span className="text-sm">Default publishable key</span>
             <div className="flex items-center gap-2">
-              {renderApiKeyInput(isLoadingApiKeys, apiKey, error)}
+              <ApiKeyInput />
               <CopyButton
+                disabled={isPermissionsLoading || isLoadingApiKeys || !canReadAPIKeys}
                 type="default"
                 text={apiKey?.api_key}
                 iconOnly
@@ -44,7 +49,7 @@ const PublishableAPIKeys = () => {
               />
             </div>
           </div>
-          {error ? (
+          {error && canReadAPIKeys ? (
             <div className="text-xs bg-warning-200 last:rounded-b-md border border-warning-400 px-5 text-foreground-lighter py-1">
               <div className="text-warning">Failed to load publishable key: {error?.message}</div>
             </div>
@@ -62,20 +67,42 @@ const PublishableAPIKeys = () => {
           <ShowPublicJWTsDialogComposer />
         </div>
 
+        {/* <CreatePublishableAPIKeyModal /> */}
+
         <QuickKeyCopyWrapper />
       </div>
     </div>
   )
 }
 
-const renderApiKeyInput = (isLoading: boolean, apiKey: any, error: ResponseError | null) => {
-  const baseClasses = 'flex-1 grow gap-1 rounded-full min-w-60 truncate'
+function ApiKeyInput() {
+  const { ref: projectRef } = useParams()
+  const { data: apiKeysData, isLoading: isApiKeysLoading, error } = useAPIKeysQuery({ projectRef })
+  const publishableApiKeys = useMemo(
+    () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],
+    [apiKeysData]
+  )
+  const isPermissionsLoading = !usePermissionsLoaded()
+  const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
+  // The default publisahble key will always be the first one
+  const apiKey = publishableApiKeys[0]
+
+  const baseClasses = 'flex-1 grow gap-1 rounded-full min-w-[300px] truncate'
   const size = 'tiny'
 
-  if (isLoading) {
+  if (isApiKeysLoading || isPermissionsLoading) {
     return (
       <div className={cn(InputVariants({ size }), baseClasses, 'items-center')}>
         <Skeleton className="h-2 w-48 rounded-full bg-foreground-muted" />
+      </div>
+    )
+  }
+
+  if (!canReadAPIKeys) {
+    return (
+      <div className={cn(InputVariants({ size }), baseClasses, 'items-center gap-2 font-normal')}>
+        <EyeOffIcon />
+        You do not have permission to read API Key
       </div>
     )
   }
