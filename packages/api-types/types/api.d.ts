@@ -3342,6 +3342,10 @@ export interface paths {
     /** Creates a replication source */
     post: operations['ReplicationSourcesController_createSource']
   }
+  '/platform/replication/{ref}/sources/{source_id}/publications': {
+    /** Gets source publications */
+    get: operations['ReplicationSourcesController_getPublications']
+  }
   '/platform/reset-password': {
     parameters: {
       query?: never
@@ -8786,6 +8790,28 @@ export interface components {
       id: string
       saml?: components['schemas']['SamlDescriptor']
       updated_at?: string
+    }
+    Publication: {
+      name: string
+      tables: components['schemas']['Table'][]
+    }
+    PublicUrlOptions: {
+      download?: boolean
+      downloadName?: string
+      transform?: components['schemas']['StorageObjectTransformOptions']
+    }
+    PublicUrlResponse: {
+      publicUrl: string
+    }
+    PutOAuthAppResponse: {
+      client_id: string
+      client_secret_alias: string
+      created_at: string
+      icon?: string
+      id: string
+      name: string
+      redirect_uris: string[]
+      website: string
     }
     ReadOnlyStatusResponse: {
       enabled: boolean
@@ -18664,6 +18690,28 @@ export interface operations {
         }
       }
       /** @description Failed to create replication source */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets source publications */
+  ReplicationSourcesController_getPublications: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Source id */
+        source_id: number
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Publication'][]
+        }
+      }
+      /** @description Failed to get source publications */
       500: {
         content: never
       }
