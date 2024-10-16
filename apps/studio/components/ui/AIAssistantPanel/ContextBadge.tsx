@@ -6,7 +6,7 @@ interface ContextBadgeProps {
   label: string
   value: string
   tooltip?: ReactNode
-  onRemove: () => void
+  onRemove?: () => void
 }
 
 export const ContextBadge = ({ label, value, tooltip, onRemove }: ContextBadgeProps) => {
@@ -18,11 +18,13 @@ export const ContextBadge = ({ label, value, tooltip, onRemove }: ContextBadgePr
             <span className="text-foreground-lighter text-xs">{label}</span>
             <span className="text-xs">{value}</span>
           </div>
-          <X
-            size={12}
-            className="text-foreground-light hover:text-foreground transition cursor-pointer"
-            onClick={() => onRemove()}
-          />
+          {onRemove !== undefined && (
+            <X
+              size={12}
+              className="text-foreground-light hover:text-foreground transition cursor-pointer"
+              onClick={() => onRemove()}
+            />
+          )}
         </div>
       </TooltipTrigger_Shadcn_>
       {tooltip !== undefined && <TooltipContent_Shadcn_>{tooltip}</TooltipContent_Shadcn_>}

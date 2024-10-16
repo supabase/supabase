@@ -74,6 +74,17 @@ export const generatePrompt = ({
   }
 }
 
+export const retrieveDocsUrl = (editor?: SupportedAssistantEntities) => {
+  switch (editor) {
+    case 'functions':
+      return 'https://supabase.com/docs/guides/database/functions'
+    case 'rls-policies':
+      return 'https://supabase.com/docs/guides/database/postgres/row-level-security'
+    default:
+      return undefined
+  }
+}
+
 // [Joshen] This is just very basic validation, but possible can extend perhaps
 export const validateQuery = (editor: SupportedAssistantEntities, query: string) => {
   const formattedQuery = query.toLowerCase().replaceAll('\n', ' ')

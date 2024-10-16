@@ -21,6 +21,7 @@ import { Button, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface FunctionsListProps {
   createFunction: () => void
@@ -37,7 +38,9 @@ const FunctionsList = ({
   const { search } = useParams()
   const { project } = useProjectContext()
   const { setAiAssistantPanel } = useAppStateSnapshot()
+  const enableFunctionsAssistant = useIsDatabaseFunctionsAssistantEnabled()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+
   const filterString = search ?? ''
 
   const setFilterString = (str: string) => {
@@ -125,18 +128,14 @@ const FunctionsList = ({
             </div>
 
             <div className="flex items-center gap-x-2">
-              <Button
-                type="default"
-                className="px-1.5"
-                onClick={() => setAiAssistantPanel({ open: true, editor: 'functions' })}
-              >
-                🧑‍💻
-              </Button>
-
               {!isLocked && (
                 <ButtonTooltip
                   disabled={!canCreateFunctions}
-                  onClick={() => createFunction()}
+                  onClick={() =>
+                    enableFunctionsAssistant
+                      ? setAiAssistantPanel({ open: true, editor: 'functions' })
+                      : createFunction()
+                  }
                   tooltip={{
                     content: {
                       side: 'bottom',

@@ -52,7 +52,8 @@ export async function chatSql(
           return stripIndent`
           You're a Supabase Postgres expert in writing database functions. Your purpose is to generate a
           database function with the constraints given by the user. The output may also include a database trigger
-          if the function returns a type of trigger.
+          if the function returns a type of trigger. If the function returns a trigger type, ensure that it uses
+          security definer, otherwise default to security invoker.
           `
       }
     }

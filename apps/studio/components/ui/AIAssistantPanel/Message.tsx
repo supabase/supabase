@@ -6,10 +6,9 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { AiIconAnimation, Badge, cn, markdownComponents } from 'ui'
 
-import { useProfile } from 'lib/profile'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import { AiMessagePre } from 'components/interfaces/SQLEditor/AiAssistantPanel/AiMessagePre'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useProfile } from 'lib/profile'
+import { MessagePre } from './MessagePre'
 
 interface MessageProps {
   name?: string
@@ -103,7 +102,7 @@ export const Message = memo(function Message({
           ...markdownComponents,
           pre: (props: any) => {
             return (
-              <AiMessagePre
+              <MessagePre
                 onDiff={onDiff}
                 className={cn(
                   'transition [&>div>pre]:max-w-full',
@@ -111,7 +110,7 @@ export const Message = memo(function Message({
                 )}
               >
                 {props.children[0].props.children}
-              </AiMessagePre>
+              </MessagePre>
             )
           },
           ol: (props: any) => {

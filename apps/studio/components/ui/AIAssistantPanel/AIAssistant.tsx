@@ -1,10 +1,12 @@
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { Check, FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
+import { Check, ExternalLink, FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useChat } from 'ai/react'
+import { MessageWithDebug } from 'components/interfaces/SQLEditor/AiAssistantPanel'
+import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
@@ -41,14 +43,13 @@ import {
   TooltipTrigger_Shadcn_,
 } from 'ui'
 import { AssistantChatForm } from 'ui-patterns'
+import { ASSISTANT_SUPPORT_ENTITIES } from './AiAssistant.constants'
 import { SupportedAssistantEntities, SupportedAssistantQuickPromptTypes } from './AIAssistant.types'
-import { generatePrompt } from './AIAssistant.utils'
+import { generatePrompt, retrieveDocsUrl } from './AIAssistant.utils'
 import { ContextBadge } from './ContextBadge'
 import { EntitiesDropdownMenu } from './EntitiesDropdownMenu'
 import { Message } from './Message'
-import { ASSISTANT_SUPPORT_ENTITIES } from './AiAssistant.constants'
-import { MessageWithDebug } from 'components/interfaces/SQLEditor/AiAssistantPanel'
-import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
+import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 
 const ANIMATION_DURATION = 0.3
 
@@ -56,6 +57,7 @@ interface AIAssistantProps {
   id: string
   className?: string
   debugThread: MessageWithDebug[]
+  onDiff: ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => void
   onResetConversation: () => void
 }
 
@@ -65,6 +67,7 @@ export const AIAssistant = ({
   id,
   className,
   debugThread,
+  onDiff,
   onResetConversation,
 }: AIAssistantProps) => {
   const project = useSelectedProject()
@@ -79,7 +82,6 @@ export const AIAssistant = ({
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const [value, setValue] = useState<string>('')
-
   const [selectedDatabaseEntity, setSelectedDatabaseEntity] = useState<
     SupportedAssistantEntities | ''
   >('')
@@ -89,6 +91,7 @@ export const AIAssistant = ({
     [key: string]: { entity: string; schemas: string[]; tables: string[] }
   }>({})
 
+  const docsUrl = retrieveDocsUrl(selectedDatabaseEntity as SupportedAssistantEntities)
   const entityContext = ASSISTANT_SUPPORT_ENTITIES.find((x) => x.id === selectedDatabaseEntity)
   const noContextAdded =
     selectedDatabaseEntity.length === 0 &&
@@ -287,8 +290,8 @@ export const AIAssistant = ({
                   createdAt={new Date(m.createdAt || new Date()).getTime()}
                   isDebug={m.isDebug}
                   context={contextHistory[m.id]}
+                  onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
                   // isSelected={selectedMessage === m.id}
-                  // onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
                 >
                   {isFirstUserMessage && !includeSchemaMetadata && true && (
                     <Alert_Shadcn_>
@@ -392,30 +395,32 @@ export const AIAssistant = ({
                       you need help with
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger>
-                        <div className="flex flex-col gap-y-1">
-                          <p>Database Entity</p>
-                          <p className="text-foreground-lighter">
-                            Inform about what you're working with
-                          </p>
-                        </div>
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuSubContent>
-                        <DropdownMenuRadioGroup
-                          value={selectedDatabaseEntity}
-                          onValueChange={(value) =>
-                            setSelectedDatabaseEntity(value as SupportedAssistantEntities)
-                          }
-                        >
-                          {ASSISTANT_SUPPORT_ENTITIES.map((x) => (
-                            <DropdownMenuRadioItem key={x.id} value={x.id}>
-                              {x.label}
-                            </DropdownMenuRadioItem>
-                          ))}
-                        </DropdownMenuRadioGroup>
-                      </DropdownMenuSubContent>
-                    </DropdownMenuSub>
+                    {editor === undefined && (
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                          <div className="flex flex-col gap-y-1">
+                            <p>Database Entity</p>
+                            <p className="text-foreground-lighter">
+                              Inform about what you're working with
+                            </p>
+                          </div>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          <DropdownMenuRadioGroup
+                            value={selectedDatabaseEntity}
+                            onValueChange={(value) =>
+                              setSelectedDatabaseEntity(value as SupportedAssistantEntities)
+                            }
+                          >
+                            {ASSISTANT_SUPPORT_ENTITIES.map((x) => (
+                              <DropdownMenuRadioItem key={x.id} value={x.id}>
+                                {x.label}
+                              </DropdownMenuRadioItem>
+                            ))}
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    )}
                     <DropdownMenuSub>
                       <DropdownMenuSubTrigger className="gap-x-2">
                         <div className="flex flex-col gap-y-1">
@@ -491,7 +496,9 @@ export const AIAssistant = ({
                   <ContextBadge
                     label="Entity"
                     value={entityContext.label}
-                    onRemove={() => setSelectedDatabaseEntity('')}
+                    onRemove={
+                      editor === undefined ? () => setSelectedDatabaseEntity('') : undefined
+                    }
                   />
                 )}
 
@@ -586,27 +593,65 @@ export const AIAssistant = ({
                       entityContext !== undefined ? 'opacity-100' : 'opacity-0'
                     )}
                   >
-                    <Button
-                      type="default"
-                      icon={<WandSparkles />}
-                      onClick={() => onClickQuickPrompt('suggest')}
-                    >
-                      Suggest
-                    </Button>
-                    <Button
-                      type="default"
-                      icon={<FileText />}
-                      onClick={() => onClickQuickPrompt('examples')}
-                    >
-                      Examples
-                    </Button>
-                    <Button
-                      type="default"
-                      icon={<MessageCircleMore />}
-                      onClick={() => onClickQuickPrompt('ask')}
-                    >
-                      Ask
-                    </Button>
+                    <Tooltip_Shadcn_>
+                      <TooltipTrigger_Shadcn_ asChild>
+                        <Button
+                          type="default"
+                          icon={<WandSparkles />}
+                          onClick={() => onClickQuickPrompt('suggest')}
+                        >
+                          Suggest
+                        </Button>
+                      </TooltipTrigger_Shadcn_>
+                      <TooltipContent_Shadcn_ side="bottom">
+                        Suggest some{' '}
+                        {entityContext?.id === 'rls-policies'
+                          ? entityContext.label
+                          : `database ${entityContext?.label.toLowerCase()}`}
+                      </TooltipContent_Shadcn_>
+                    </Tooltip_Shadcn_>
+                    <Tooltip_Shadcn_>
+                      <TooltipTrigger_Shadcn_ asChild>
+                        <Button
+                          type="default"
+                          icon={<FileText />}
+                          onClick={() => onClickQuickPrompt('examples')}
+                        >
+                          Examples
+                        </Button>
+                      </TooltipTrigger_Shadcn_>
+                      <TooltipContent_Shadcn_ side="bottom">
+                        Provide some examples of{' '}
+                        {entityContext?.id === 'rls-policies'
+                          ? entityContext.label
+                          : `database ${entityContext?.label.toLowerCase()}`}
+                      </TooltipContent_Shadcn_>
+                    </Tooltip_Shadcn_>
+                    <Tooltip_Shadcn_>
+                      <TooltipTrigger_Shadcn_ asChild>
+                        <Button
+                          type="default"
+                          icon={<MessageCircleMore />}
+                          onClick={() => onClickQuickPrompt('ask')}
+                        >
+                          Ask
+                        </Button>
+                      </TooltipTrigger_Shadcn_>
+                      <TooltipContent_Shadcn_ side="bottom">
+                        What are{' '}
+                        {entityContext?.id === 'rls-policies'
+                          ? entityContext.label
+                          : `database ${entityContext?.label.toLowerCase()}`}
+                        ?
+                      </TooltipContent_Shadcn_>
+                    </Tooltip_Shadcn_>
+                    {docsUrl !== undefined && (
+                      <Button asChild type="default" icon={<ExternalLink />}>
+                        <a href={docsUrl} target="_blank" rel="noreferrer">
+                          Documentation
+                        </a>
+                      </Button>
+                    )}
                   </div>
                 </motion.div>
               )}

@@ -110,9 +110,9 @@ export const Admonition = forwardRef<
       >
         {(showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
           <WarningIcon />
-        ) : (
+        ) : showIcon ? (
           <InfoIcon />
-        )}
+        ) : null}
         {label || title ? (
           <>
             <AlertTitle_Shadcn_
