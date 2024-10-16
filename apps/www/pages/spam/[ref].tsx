@@ -53,7 +53,7 @@ export default function SpamPage() {
       setSubmissionType(null)
       setFormMessage('Submitting...')
 
-      const response = await fetch(`/api/spam/${data.ref}`, {
+      const response = await fetch(`/api-v2/spam/${data.ref}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
