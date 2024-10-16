@@ -6,9 +6,9 @@
   "license": "MIT",
   "scripts": {
     "typedoc": "typedoc --options typedoc.json",
-    "dev": "npm run typedoc && vitepress dev",
-    "build": "npm run typedoc && vitepress build",
-    "preview": "vitepress preview"
+    "dev": "npm run typedoc && npx vitepress dev",
+    "build": "npm run typedoc && npx vitepress build",
+    "preview": "npx vitepress preview"
   },
   "dependencies": {
     "npm": "^10.9.0",
