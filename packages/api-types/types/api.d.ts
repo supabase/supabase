@@ -101,6 +101,10 @@ export interface paths {
     /** Updates GoTrue config */
     patch: operations['GoTrueConfigController_updateGoTrueConfig']
   }
+  '/platform/auth/{ref}/config/hooks': {
+    /** Updates GoTrue config hooks */
+    patch: operations['GoTrueConfigController_updateGoTrueConfigHooks']
+  }
   '/platform/auth/{ref}/invite': {
     /** Sends an invite to the given email */
     post: operations['AuthInviteController_sendInvite']
@@ -122,10 +126,24 @@ export interface paths {
     get: operations['TemplateController_getTemplate']
   }
   '/platform/auth/{ref}/users': {
-    /** Gets users */
+    /**
+     * Gets users
+     * @deprecated
+     */
     get: operations['UsersController_getUsers']
-    /** Delete user with given ID */
+    /** Creates user */
+    post: operations['UsersController_createUser']
+    /**
+     * Delete user with given ID
+     * @deprecated
+     */
     delete: operations['UsersController_deleteUser']
+  }
+  '/platform/auth/{ref}/users/{id}': {
+    /** Delete user with given ID */
+    delete: operations['UsersController_deleteUserById']
+    /** Updates user with given ID */
+    patch: operations['UsersController_updateUserById']
   }
   '/platform/auth/{ref}/users/{id}/factors': {
     /** Delete all factors associated to a user */
@@ -895,6 +913,13 @@ export interface paths {
     /** Get disk utilization */
     get: operations['DiskController_getDiskUtilization']
   }
+  '/platform/projects/{ref}/events': {
+    /**
+     * Gets project's events
+     * @description Gets project's events
+     */
+    get: operations['get-project-events']
+  }
   '/platform/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
     get: operations['InfraMonitoringController_getUsageMetrics']
@@ -1223,7 +1248,7 @@ export interface paths {
      * Create a function
      * @description Creates a function and adds it to the specified project.
      */
-    post: operations['SystemFunctionsController_createFunction']
+    post: operations['v1-create-a-function']
     /** Deletes all Edge Functions from a project */
     delete: operations['SystemFunctionsController_systemDeleteAllFunctions']
   }
@@ -1290,6 +1315,10 @@ export interface paths {
     /** Updates GoTrue config */
     patch: operations['GoTrueConfigController_updateGoTrueConfig']
   }
+  '/v0/auth/{ref}/config/hooks': {
+    /** Updates GoTrue config hooks */
+    patch: operations['GoTrueConfigController_updateGoTrueConfigHooks']
+  }
   '/v0/auth/{ref}/invite': {
     /** Sends an invite to the given email */
     post: operations['AuthInviteController_sendInvite']
@@ -1311,10 +1340,24 @@ export interface paths {
     get: operations['TemplateController_getTemplate']
   }
   '/v0/auth/{ref}/users': {
-    /** Gets users */
+    /**
+     * Gets users
+     * @deprecated
+     */
     get: operations['UsersController_getUsers']
-    /** Delete user with given ID */
+    /** Creates user */
+    post: operations['UsersController_createUser']
+    /**
+     * Delete user with given ID
+     * @deprecated
+     */
     delete: operations['UsersController_deleteUser']
+  }
+  '/v0/auth/{ref}/users/{id}': {
+    /** Delete user with given ID */
+    delete: operations['UsersController_deleteUserById']
+    /** Updates user with given ID */
+    patch: operations['UsersController_updateUserById']
   }
   '/v0/auth/{ref}/users/{id}/factors': {
     /** Delete all factors associated to a user */
@@ -2101,7 +2144,7 @@ export interface paths {
      * Create a function
      * @description Creates a function and adds it to the specified project.
      */
-    post: operations['FunctionsController_createFunction']
+    post: operations['v1-create-a-function']
   }
   '/v1/projects/{ref}/functions/{function_slug}': {
     /**
@@ -2727,7 +2770,7 @@ export interface components {
       description?: string
       name: string
       /** @enum {string} */
-      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic'
     }
     CreateBranchBody: {
       branch_name: string
@@ -3026,12 +3069,54 @@ export interface components {
       table: string
       table_id?: number
     }
+    CreateUserBody: {
+      email: string
+      email_confirm: boolean
+      password: string
+    }
     CreateUserContentFolderResponse: {
       id: string
       name: string
       owner_id: number
       parent_id?: string | null
       project_id: number
+    }
+    CreateUserReponse: {
+      aud?: string
+      banned_until?: string
+      confirmation_sent_at?: string
+      confirmation_token?: string
+      confirmed_at?: string
+      created_at?: string
+      deleted_at?: string
+      email?: string
+      email_change?: string
+      email_change_confirm_status?: number
+      email_change_sent_at?: string
+      email_change_token_current?: string
+      email_change_token_new?: string
+      email_confirmed_at?: string
+      encrypted_password?: string
+      id?: string
+      instance_id?: string
+      invited_at?: string
+      is_anonymous?: boolean
+      is_sso_user?: boolean
+      is_super_admin?: boolean
+      last_sign_in_at?: string
+      phone?: string
+      phone_change?: string
+      phone_change_sent_at?: string
+      phone_change_token?: string
+      phone_confirmed_at?: string
+      raw_app_meta_data?: Record<string, never>
+      raw_user_meta_data?: Record<string, never>
+      reauthentication_sent_at?: string
+      reauthentication_token?: string
+      recovery_sent_at?: string
+      recovery_token?: string
+      role?: string
+      updated_at?: string
     }
     CreateVercelConnectionResponse: {
       env_sync_error?: components['schemas']['SyncVercelEnvError']
@@ -3945,7 +4030,7 @@ export interface components {
       name: string
       token: string
       /** @enum {string} */
-      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic'
       user_id: number
     }
     LFEndpoint: {
@@ -6202,6 +6287,23 @@ export interface components {
       SMTP_USER?: string
       URI_ALLOW_LIST?: string
     }
+    UpdateGoTrueConfigHooksBody: {
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_SECRETS?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_SEND_EMAIL_ENABLED?: boolean
+      HOOK_SEND_EMAIL_SECRETS?: string
+      HOOK_SEND_EMAIL_URI?: string
+      HOOK_SEND_SMS_ENABLED?: boolean
+      HOOK_SEND_SMS_SECRETS?: string
+      HOOK_SEND_SMS_URI?: string
+    }
     UpdateMemberBody: {
       role_id: number
     }
@@ -6419,6 +6521,46 @@ export interface components {
       schema?: string
       table?: string
       table_id?: number
+    }
+    UpdateUserBody: {
+      ban_duration?: string
+    }
+    UpdateUserReponse: {
+      aud?: string
+      banned_until?: string
+      confirmation_sent_at?: string
+      confirmation_token?: string
+      confirmed_at?: string
+      created_at?: string
+      deleted_at?: string
+      email?: string
+      email_change?: string
+      email_change_confirm_status?: number
+      email_change_sent_at?: string
+      email_change_token_current?: string
+      email_change_token_new?: string
+      email_confirmed_at?: string
+      encrypted_password?: string
+      id?: string
+      instance_id?: string
+      invited_at?: string
+      is_anonymous?: boolean
+      is_sso_user?: boolean
+      is_super_admin?: boolean
+      last_sign_in_at?: string
+      phone?: string
+      phone_change?: string
+      phone_change_sent_at?: string
+      phone_change_token?: string
+      phone_confirmed_at?: string
+      raw_app_meta_data?: Record<string, never>
+      raw_user_meta_data?: Record<string, never>
+      reauthentication_sent_at?: string
+      reauthentication_token?: string
+      recovery_sent_at?: string
+      recovery_token?: string
+      role?: string
+      updated_at?: string
     }
     UpdateVercelConnectionsBody: {
       env_sync_targets?: ('production' | 'preview' | 'development')[]
@@ -7140,6 +7282,34 @@ export interface operations {
       }
     }
   }
+  /** Updates GoTrue config hooks */
+  GoTrueConfigController_updateGoTrueConfigHooks: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateGoTrueConfigHooksBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GoTrueConfigResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update GoTrue config hooks */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Sends an invite to the given email */
   AuthInviteController_sendInvite: {
     parameters: {
@@ -7278,7 +7448,10 @@ export interface operations {
       }
     }
   }
-  /** Gets users */
+  /**
+   * Gets users
+   * @deprecated
+   */
   UsersController_getUsers: {
     parameters: {
       query: {
@@ -7307,7 +7480,38 @@ export interface operations {
       }
     }
   }
-  /** Delete user with given ID */
+  /** Creates user */
+  UsersController_createUser: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateUserBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateUserReponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create user */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Delete user with given ID
+   * @deprecated
+   */
   UsersController_deleteUser: {
     parameters: {
       path: {
@@ -7330,6 +7534,57 @@ export interface operations {
         content: never
       }
       /** @description Failed to delete user */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete user with given ID */
+  UsersController_deleteUserById: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete user */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates user with given ID */
+  UsersController_updateUserById: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateUserBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['UpdateUserReponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update user with given ID */
       500: {
         content: never
       }
@@ -9826,19 +10081,11 @@ export interface operations {
       }
     }
   }
-  /**
-   * Create a function
-   * @description Creates a function and adds it to the specified project.
-   */
+  /** Creates project pg.function */
   FunctionsController_createFunction: {
     parameters: {
-      query?: {
-        slug?: string
-        name?: string
-        verify_jwt?: boolean
-        import_map?: boolean
-        entrypoint_path?: string
-        import_map_path?: string
+      header: {
+        'x-connection-encrypted': string
       }
       path: {
         /** @description Project ref */
@@ -9847,20 +10094,19 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['V1CreateFunctionBody']
-        'application/vnd.denoland.eszip': components['schemas']['V1CreateFunctionBody']
+        'application/json': components['schemas']['CreateFunctionBody']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['FunctionResponse']
+          'application/json': components['schemas']['PostgresFunction']
         }
       }
       403: {
         content: never
       }
-      /** @description Failed to create project's function */
+      /** @description Failed to create pg.function */
       500: {
         content: never
       }
@@ -12175,6 +12421,9 @@ export interface operations {
           'application/json': components['schemas']['UpdateSecretsResponse']
         }
       }
+      403: {
+        content: never
+      }
       /** @description Failed to update project's secrets config */
       500: {
         content: never
@@ -12713,6 +12962,27 @@ export interface operations {
         content: never
       }
       /** @description Failed to get disk utilization */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Gets project's events
+   * @description Gets project's events
+   */
+  'get-project-events': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to get project's events */
       500: {
         content: never
       }
@@ -14500,7 +14770,7 @@ export interface operations {
    * Create a function
    * @description Creates a function and adds it to the specified project.
    */
-  SystemFunctionsController_createFunction: {
+  'v1-create-a-function': {
     parameters: {
       query?: {
         slug?: string
