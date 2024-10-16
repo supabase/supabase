@@ -116,10 +116,10 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               </div>
               <div
                 className="
-                relative w-full aspect-video bg-surface-100 overflow-hidden
-                border shadow-lg rounded-lg
-                mx-auto max-w-2xl
-                flex items-center justify-center
+                  relative w-full aspect-video bg-surface-100 overflow-hidden
+                  border shadow-lg rounded-lg
+                  mx-auto max-w-2xl
+                  flex items-center justify-center
                 "
               >
                 {!!feature.heroImage ? (
@@ -147,26 +147,32 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                   <Link href={feature.docsUrl}>Read Documentation</Link>
                 </Button>
               )}
-              <div className="w-full flex text-foreground-lighter flex-col text-sm border-t pt-4 mt-4">
-                <span>Share on</span>
-                <ShareArticleActions title={meta.title} slug={meta.url} basePath="" />
+              <div className="w-full flex items-center justify-between text-foreground-lighter text-sm border-y py-4 mt-4 lg:mt-8">
+                <span>Share</span>
+                <ShareArticleActions
+                  title={meta.title}
+                  slug={meta.url}
+                  basePath=""
+                  iconSize={18}
+                  className="m-0"
+                />
               </div>
-              <div className="w-full flex flex-col md:flex-row justify-between gap-8 mt-8 text-sm text-foreground-light">
+              <div className="w-full flex justify-between gap-8 mt-8 text-sm text-foreground-light">
                 {prevFeature && (
                   <Link
                     href={`/features/${prevFeature.slug}`}
-                    className="w-full md:w-auto flex items-center gap-1 transition-colors hover:text-foreground"
+                    className="w-1/2 flex items-center gap-1 transition-colors hover:text-foreground"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    <span>{prevFeature.title}</span>
+                    <span className="truncate">{prevFeature.title}</span>
                   </Link>
                 )}
                 {nextFeature && (
                   <Link
                     href={`/features/${nextFeature.slug}`}
-                    className="w-full md:w-auto flex items-center justify-end gap-1 transition-colors hover:text-foreground text-right"
+                    className="w-1/2 flex items-center justify-end gap-1 transition-colors hover:text-foreground text-right"
                   >
-                    <span>{nextFeature.title}</span>
+                    <span className="truncate">{nextFeature.title}</span>
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                 )}

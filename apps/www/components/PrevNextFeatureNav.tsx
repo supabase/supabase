@@ -61,7 +61,7 @@ const PrevNextFeatureNav: React.FC<Props> = ({
               href="/features"
               className="group/link flex items-center gap-2 px-2 py-1.5 w-full hover:text-foreground"
             >
-              <span className="line-clamp-1 flex-grow">All Features</span>
+              <span className="truncate flex-grow">All Features</span>
               <ChevronRight className="w-3 h-3 text-foreground-lighter group-hover/link:text-foreground transition-colors" />
             </Link>
           </DropdownMenuLabel>
