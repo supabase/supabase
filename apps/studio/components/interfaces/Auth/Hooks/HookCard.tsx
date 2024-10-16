@@ -1,18 +1,20 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, Webhook } from 'lucide-react'
 import { Badge, Input } from 'ui'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
 import { Hook } from './hooks.constants'
 
 interface HookCardProps {
   hook: Hook
-  canUpdateConfig: boolean
-  onToggle: (enabled: boolean) => void
   onSelect: () => void
 }
 
-export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCardProps) => {
+export const HookCard = ({ hook, onSelect }: HookCardProps) => {
+  const canUpdateAuthHook = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
+
   return (
     <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
       <div className="">
@@ -93,7 +95,7 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
         <div className="flex flex-row gap-2">
           <ButtonTooltip
             type="default"
-            disabled={!canUpdateConfig}
+            disabled={!canUpdateAuthHook}
             onClick={() => onSelect()}
             tooltip={{
               content: {
