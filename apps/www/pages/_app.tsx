@@ -57,7 +57,7 @@ export default function App({ Component, pageProps }: AppProps) {
           search,
           viewport_height,
           viewport_width,
-          userAgent: navigator.userAgent,
+          user_agent: navigator.userAgent,
         },
       },
       { headers: { Version: '2' }, credentials: 'include' }
