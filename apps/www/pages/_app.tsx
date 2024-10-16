@@ -64,6 +64,14 @@ export default function App({ Component, pageProps }: AppProps) {
     )
   }
 
+  function handlePageLeaveTelemetry(url: string) {
+    return post(`${API_URL}/telemetry/page-leave`, {
+      page_url: url,
+      page_title: title,
+      pathname: router.pathname,
+    })
+  }
+
   useEffect(() => {
     if (blockEvents) return
 
@@ -87,6 +95,19 @@ export default function App({ Component, pageProps }: AppProps) {
       handlePageTelemetry(window.location.href)
     }
   }, [router.isReady, consentValue])
+
+  useEffect(() => {
+    if (blockEvents) return
+
+    const handleBeforeUnload = async () => {
+      await handlePageLeaveTelemetry(window.location.href)
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [])
 
   const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
   const { basePath } = useRouter()
