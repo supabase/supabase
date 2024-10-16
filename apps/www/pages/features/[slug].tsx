@@ -3,17 +3,22 @@ import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge, Button, TextLink } from 'ui'
+import ReactMarkdown from 'react-markdown'
+
+import { Badge, Button } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
+import ShareArticleActions from '~/components/Blog/ShareArticleActions'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import CTABanner from '~/components/CTABanner'
+import PrevNextFeatureNav from '~/components/PrevNextFeatureNav'
+
 import { features } from '~/data/features'
 import type { FeatureType } from '~/data/features'
-import ShareArticleActions from '../../components/Blog/ShareArticleActions'
-import SectionContainer from '../../components/Layouts/SectionContainer'
-import CTABanner from '../../components/CTABanner'
-import ReactMarkdown from 'react-markdown'
 
 interface FeaturePageProps {
   feature: FeatureType
+  prevFeature: FeatureType | null
+  nextFeature: FeatureType | null
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -26,26 +31,31 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { slug } = params as { slug: string }
-  const feature = features.find((feature) => feature.slug === slug)
+  const featureIndex = features.findIndex((feature) => feature.slug === slug)
 
-  if (!feature) {
+  if (featureIndex === -1) {
     return { notFound: true }
   }
 
+  const feature = features[featureIndex]
+  const prevFeature = featureIndex > 0 ? features[featureIndex - 1] : features[features.length - 1]
+  const nextFeature = featureIndex < features.length - 1 ? features[featureIndex + 1] : features[0]
+
   // Destructure the icon property out, and add the icon name to props instead
   const { icon, ...featureWithoutIcon } = feature
+  const { icon: _prevIcon, ...prevFeatureWithoutIcon } = prevFeature
+  const { icon: _nextIcon, ...nextFeatureWithoutIcon } = nextFeature
 
   return {
     props: {
-      feature: {
-        ...featureWithoutIcon,
-        // iconName: icon.name, // Adjust this if your icon property is different
-      },
+      feature: featureWithoutIcon,
+      prevFeature: prevFeatureWithoutIcon,
+      nextFeature: nextFeatureWithoutIcon,
     },
   }
 }
 
-const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
+const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFeature }) => {
   const meta = {
     title: `${feature.title} | Supabase Features`,
     description: feature.subtitle,
@@ -76,29 +86,31 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
         }}
       />
       <DefaultLayout className="bg-alternative">
-        <div className="flex flex-col w-full">
+        <div className="relative flex flex-col w-full h-full">
+          <PrevNextFeatureNav
+            currentFeature={feature}
+            prevLink={`/features/${prevFeature?.slug}`}
+            nextLink={`/features/${nextFeature?.slug}`}
+          />
           <header className="relative w-full overflow-hidden">
             <SectionContainer
               className="
-                relative z-10
+                relative
                 lg:min-h-[400px] h-full
                 flex flex-col
-                gap-4 xl:gap-8
+                gap-4 md:gap-8
                 text-foreground-light
                 !py-10
               "
             >
               <div className="relative h-full flex flex-col items-start gap-2 w-full max-w-2xl mx-auto">
-                <Link
-                  href="/features"
-                  className="absolute right-0 xl:pt-0 xl:right-auto xl:-left-56 2xl:-left-[354px] top-1 text-foreground-lighter hover:text-foreground flex !leading-3 gap-1 cursor-pointer items-center text-sm transition"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Back to Features
-                </Link>
-                <Badge className="capitalize mb-4" size="large">
-                  {feature.products[0]}
-                </Badge>
+                <div className="flex gap-1 flex-wrap mb-2">
+                  {feature.products.map((product) => (
+                    <Badge key={product} className="capitalize" size="small">
+                      {product}
+                    </Badge>
+                  ))}
+                </div>
                 <h1 className="h1 !m-0">{feature.title}</h1>
                 <p>{feature.subtitle}</p>
               </div>
@@ -106,7 +118,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
                 className="
                 relative w-full aspect-video bg-surface-100 overflow-hidden
                 border shadow-lg rounded-lg
-                z-10 mx-auto max-w-2xl
+                mx-auto max-w-2xl
                 flex items-center justify-center
                 "
               >
@@ -125,12 +137,11 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
               </div>
             </SectionContainer>
           </header>
-          <SectionContainer className="!pt-4">
+          <SectionContainer className="!pt-0">
             <main className="max-w-xl mx-auto flex flex-col items-start gap-4">
               <div className="prose prose-docs">
                 <ReactMarkdown>{feature.description}</ReactMarkdown>
               </div>
-              {/* {feature.docsUrl && <TextLink label="Read documentation" url={feature.docsUrl} />} */}
               {feature.docsUrl && (
                 <Button type="default" iconRight={<ChevronRight />} asChild>
                   <Link href={feature.docsUrl}>Read Documentation</Link>
@@ -140,10 +151,30 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature }) => {
                 <span>Share on</span>
                 <ShareArticleActions title={meta.title} slug={meta.url} basePath="" />
               </div>
+              <div className="w-full flex flex-col md:flex-row justify-between gap-8 mt-8 text-sm text-foreground-light">
+                {prevFeature && (
+                  <Link
+                    href={`/features/${prevFeature.slug}`}
+                    className="w-full md:w-auto flex items-center gap-1 transition-colors hover:text-foreground"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>{prevFeature.title}</span>
+                  </Link>
+                )}
+                {nextFeature && (
+                  <Link
+                    href={`/features/${nextFeature.slug}`}
+                    className="w-full md:w-auto flex items-center justify-end gap-1 transition-colors hover:text-foreground text-right"
+                  >
+                    <span>{nextFeature.title}</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </Link>
+                )}
+              </div>
             </main>
           </SectionContainer>
-          <CTABanner />
         </div>
+        <CTABanner />
       </DefaultLayout>
     </>
   )

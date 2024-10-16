@@ -36,13 +36,13 @@ const ProductDropdown = () => {
           </NavigationMenuLink>
         ))}
       </ul>
-      <div className="bg-surface-75 border-t xl:border-t-0 xl:border-l py-8 px-10 gap-8 grid grid-cols-5 xl:flex xl:flex-col w-full xl:w-[500px]">
-        <div className="col-span-3 xl:w-auto">
+      <div className="bg-surface-75 border-t xl:border-t-0 xl:border-l p-8 gap-8 grid grid-cols-5 xl:flex xl:flex-col w-full xl:w-[500px]">
+        <div className="col-span-3 flex flex-col gap-8 xl:w-auto">
           <Link
             href="/features"
             className="
               flex items-center justify-between group text-sm
-              p-3 mb-4 gap-2
+              p-3 gap-2
               rounded-lg border
               bg-background text-foreground-light
               hover:text-foreground hover:border-foreground-muted
@@ -66,41 +66,43 @@ const ProductDropdown = () => {
               className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-80 group-hover:translate-x-0 group-hover:opacity-100"
             />
           </Link>
-          <Link
-            href="/customers"
-            className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground"
-          >
-            Customer Stories
-            <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
-          </Link>
-          <ul className="flex flex-col gap-2">
-            {CustomersData.slice(0, isTablet ? 1 : 2).map((customer) => (
-              <li key={customer.organization}>
-                <Link
-                  href={customer.url}
-                  className="group flex items-center gap-3 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded"
-                >
-                  <div className="relative rounded-md bg-background p-2 border group-hover:border-foreground-muted/50 h-16 w-32 flex-shrink-0 overflow-auto">
-                    <Image
-                      src={`${basePath}/${customer.imgUrl}`}
-                      alt={customer.title}
-                      fill
-                      className="!p-4 object-contain brightness-70 contrast-[.35] filter"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <h4 className="text-light group-hover:text-foreground group-focus-visible:text-foreground text-normal mb-0 text-sm line-clamp-3">
-                      {customer.title}
-                    </h4>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div>
+            <Link
+              href="/customers"
+              className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-4 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground"
+            >
+              Customer Stories
+              <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
+            </Link>
+            <ul className="flex flex-col gap-2">
+              {CustomersData.slice(0, isTablet ? 2 : 2).map((customer) => (
+                <li key={customer.organization}>
+                  <Link
+                    href={customer.url}
+                    className="group flex items-center gap-3 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded"
+                  >
+                    <div className="relative rounded-md bg-background border group-hover:border-foreground-muted/50 h-14 w-28 xl:h-16 xl:w-32 flex-shrink-0 overflow-auto">
+                      <Image
+                        src={`${basePath}/${customer.imgUrl}`}
+                        alt={customer.title}
+                        fill
+                        className="!p-4 object-contain brightness-70 contrast-[.35] filter"
+                      />
+                    </div>
+                    <div className="flex flex-col">
+                      <h4 className="text-light group-hover:text-foreground group-focus-visible:text-foreground text-normal mb-0 text-sm line-clamp-3">
+                        {customer.title}
+                      </h4>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
         <div className="col-span-2 grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-2">
           <div>
-            <p className="text-foreground-lighter text-xs uppercase tracking-widest font-mono mb-6">
+            <p className="text-foreground-lighter text-xs uppercase tracking-widest font-mono mb-3">
               {ComparisonsData.label}
             </p>
             <ul className="flex flex-col gap-2">
