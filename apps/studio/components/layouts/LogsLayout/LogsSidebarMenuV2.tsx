@@ -6,6 +6,7 @@ import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/Warehouse
 import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
+import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
 import { useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -80,9 +81,9 @@ export function LogsSidebarMenuV2() {
   const [searchText, setSearchText] = useState('')
   const [createCollectionOpen, setCreateCollectionOpen] = useState(false)
   const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
-
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
+  const { data: tenantData } = useWarehouseTenantQuery({ projectRef: ref })
   const {
     projectAuthAll: authEnabled,
     projectStorageAll: storageEnabled,
@@ -91,7 +92,7 @@ export function LogsSidebarMenuV2() {
   const warehouseEnabled = useFlag('warehouse')
   const { data: whCollections, isLoading: whCollectionsLoading } = useWarehouseCollectionsQuery(
     { projectRef: ref },
-    { enabled: IS_PLATFORM && warehouseEnabled }
+    { enabled: IS_PLATFORM && warehouseEnabled && !!tenantData }
   )
 
   const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery(ref)
@@ -156,6 +157,12 @@ export function LogsSidebarMenuV2() {
           items: [],
         }
       : null,
+    {
+      name: 'Edge Functions',
+      key: 'edge-functions-logs',
+      url: `/project/${ref}/logs/edge-functions-logs`,
+      items: [],
+    },
   ]
 
   const filteredLogs = BASE_COLLECTIONS.filter((collection) => {

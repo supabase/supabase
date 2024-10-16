@@ -35,6 +35,7 @@ import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
+import { LogsTableEmptyState } from './LogsTableEmptyState'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -53,7 +54,7 @@ interface Props {
   className?: string
   collectionName?: string // Used for warehouse queries
   warehouseError?: string
-  emptyState?: ReactNode
+  EmptyState?: ReactNode
   showHeader?: boolean
   showHistogramToggle?: boolean
 }
@@ -79,7 +80,7 @@ const LogTable = ({
   maxHeight,
   className,
   collectionName,
-  emptyState,
+  EmptyState,
   showHeader = true,
   showHistogramToggle = true,
 }: Props) => {
@@ -341,22 +342,8 @@ const LogTable = ({
   }
 
   const RenderNoResultAlert = () => {
-    if (emptyState) return emptyState
-    else
-      return (
-        <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100 h-full">
-          <div className="flex flex-col gap-1">
-            <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
-            <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
-          </div>
-          <div className="flex flex-col gap-1 px-5">
-            <h3 className="text-lg text-foreground">No results found</h3>
-            <p className="text-sm text-foreground-lighter">
-              Try another search or adjust the filters
-            </p>
-          </div>
-        </div>
-      )
+    if (EmptyState) return EmptyState
+    else return <LogsTableEmptyState />
   }
 
   if (!data) return null
@@ -399,10 +386,10 @@ const LogTable = ({
             renderers={{
               renderRow: RowRenderer,
               noRowsFallback: !isLoading ? (
-                <div className="">
+                <>
                   {logDataRows.length === 0 && !error && <RenderNoResultAlert />}
                   {error && <RenderErrorAlert />}
-                </div>
+                </>
               ) : null,
             }}
           />

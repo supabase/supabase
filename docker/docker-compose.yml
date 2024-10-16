@@ -5,7 +5,6 @@
 #   Destroy:        docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
 
 name: supabase
-version: "3.8"
 
 services:
   studio:
@@ -344,7 +343,7 @@ services:
     environment:
       LOGFLARE_NODE_HOST: 127.0.0.1
       DB_USERNAME: supabase_admin
-      DB_DATABASE: ${POSTGRES_DB}
+      DB_DATABASE: _supabase
       DB_HOSTNAME: ${POSTGRES_HOST}
       DB_PORT: ${POSTGRES_PORT}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
@@ -355,7 +354,7 @@ services:
       LOGFLARE_MIN_CLUSTER_SIZE: 1
 
       # Comment variables to use Big Query backend for analytics
-      POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/_supabase
       POSTGRES_BACKEND_SCHEMA: _analytics
       LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
       # Uncomment to use Big Query backend for analytics
@@ -383,9 +382,6 @@ services:
       - -c
       - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
     restart: unless-stopped
-    ports:
-      # Pass down internal port because it's set dynamically by other services
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     environment:
       POSTGRES_HOST: /var/run/postgresql
       PGPORT: ${POSTGRES_PORT}
@@ -406,8 +402,12 @@ services:
       - ./volumes/db/jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:Z
       # PGDATA directory is persisted between restarts
       - ./volumes/db/data:/var/lib/postgresql/data:Z
+      # Changes required for internal supabase data such as _analytics
+      - ./volumes/db/_supabase.sql:/docker-entrypoint-initdb.d/migrations/97-_supabase.sql:Z
       # Changes required for Analytics support
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
+      # Changes required for Pooler support
+      - ./volumes/db/pooler.sql:/docker-entrypoint-initdb.d/migrations/99-pooler.sql:Z
       # Use named volume to persist pgsodium decryption key between restarts
       - db-config:/etc/postgresql-custom
 
@@ -434,6 +434,48 @@ services:
     environment:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
     command: [ "--config", "etc/vector/vector.yml" ]
+
+  # Update the DATABASE_URL if you are using an external Postgres database
+  supavisor:
+    container_name: supabase-pooler
+    image: supabase/supavisor:1.1.56
+    healthcheck:
+      test: curl -sSfL --head -o /dev/null "http://127.0.0.1:4000/api/health"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      db:
+        condition: service_healthy
+      analytics:
+        condition: service_healthy
+    command:
+      - /bin/sh
+      - -c
+      - /app/bin/migrate && /app/bin/supavisor eval "$$(cat /etc/pooler/pooler.exs)" && /app/bin/server
+    restart: unless-stopped
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+      - ${POOLER_PROXY_PORT_TRANSACTION}:${POOLER_PROXY_PORT_TRANSACTION}
+    environment:
+      - PORT=4000
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DATABASE_URL=ecto://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/_supabase
+      - CLUSTER_POSTGRES=true
+      - SECRET_KEY_BASE=UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
+      - VAULT_ENC_KEY=your-encryption-key-32-chars-min
+      - API_JWT_SECRET=${JWT_SECRET}
+      - METRICS_JWT_SECRET=${JWT_SECRET}
+      - REGION=local
+      - ERL_AFLAGS=-proto_dist inet_tcp
+      - POOLER_TENANT_ID=your-tenant-id
+      - POOLER_DEFAULT_POOL_SIZE=${POOLER_DEFAULT_POOL_SIZE}
+      - POOLER_MAX_CLIENT_CONN=${POOLER_MAX_CLIENT_CONN}
+      - POOLER_POOL_MODE=transaction
+    volumes:
+      - ./volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro
 
 volumes:
   db-config:

@@ -51,8 +51,7 @@ export default {
     title: (
       <>
         <span className="text-foreground">Stay productive and manage your app</span>
-        <br className="hidden md:block" />
-        without leaving the dashboard
+        <br className="hidden sm:block" /> without leaving the dashboard
       </>
     ),
     tabs: [

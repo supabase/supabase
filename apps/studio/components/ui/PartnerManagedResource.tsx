@@ -42,7 +42,7 @@ function PartnerManagedResource({ partner, resource, cta }: PartnerManagedResour
       </AlertTitle_Shadcn_>
 
       {ctaEnabled && (
-        <Button asChild iconRight={<ExternalLink />} disabled={isLoading || isError}>
+        <Button asChild type="default" iconRight={<ExternalLink />} disabled={isLoading || isError}>
           <a href={ctaUrl} target="_blank" rel="noopener noreferrer">
             {cta.message || `View ${resource} on ${PARTNER_TO_NAME[partner]}`}
           </a>

@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import { format } from 'sql-formatter'
 
 import { Separator } from '@ui/components/SidePanel/SidePanel'
-import { useParams, useTelemetryProps } from 'common'
+import { useParams } from 'common'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
@@ -19,6 +19,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
@@ -29,7 +30,6 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
@@ -89,7 +89,6 @@ const DiffEditor = dynamic(
 const SQLEditor = () => {
   const { ref, id: urlId } = useParams()
   const router = useRouter()
-  const telemetryProps = useTelemetryProps()
 
   // generate an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
@@ -163,6 +162,8 @@ const SQLEditor = () => {
     id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
   )
   const isLoading = urlId === 'new' ? false : snippetIsLoading
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
@@ -475,15 +476,11 @@ const SQLEditor = () => {
         }
       }
 
-      Telemetry.sendEvent(
-        {
-          category: 'sql_editor',
-          action: 'ai_suggestion_accepted',
-          label: debugSolution ? 'debug_snippet' : 'edit_snippet',
-        },
-        telemetryProps,
-        router
-      )
+      sendEvent({
+        category: 'sql_editor',
+        action: 'ai_suggestion_accepted',
+        label: debugSolution ? 'debug_snippet' : 'edit_snippet',
+      })
 
       setSelectedMessage(undefined)
       setSelectedDiffType(DiffType.Modification)
@@ -499,7 +496,6 @@ const SQLEditor = () => {
     handleNewQuery,
     generateSqlTitle,
     debugSolution,
-    telemetryProps,
     router,
     id,
     pendingTitle,
@@ -507,21 +503,17 @@ const SQLEditor = () => {
   ])
 
   const discardAiHandler = useCallback(() => {
-    Telemetry.sendEvent(
-      {
-        category: 'sql_editor',
-        action: 'ai_suggestion_rejected',
-        label: debugSolution ? 'debug_snippet' : 'edit_snippet',
-      },
-      telemetryProps,
-      router
-    )
+    sendEvent({
+      category: 'sql_editor',
+      action: 'ai_suggestion_rejected',
+      label: debugSolution ? 'debug_snippet' : 'edit_snippet',
+    })
 
     setSelectedMessage(undefined)
     setDebugSolution(undefined)
     setSourceSqlDiff(undefined)
     setPendingTitle(undefined)
-  }, [debugSolution, telemetryProps, router])
+  }, [debugSolution, router])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

@@ -12,10 +12,20 @@ export interface ProjectCardWarningsProps {
 }
 
 export const ProjectCardStatus = ({
-  resourceWarnings,
+  resourceWarnings: allResourceWarnings,
   projectStatus,
 }: ProjectCardWarningsProps) => {
   const showResourceExhaustionWarnings = false
+
+  // [Terry] temp to remove auth_restricted_email_sending property from resourceWarnings
+  // set auth_restricted_email_sending from 'warning' to null so it doesn't show up in the warning banner
+  // [Joshen] Can remove this eventually once the auth email thing is resolved (Nov 2024)
+  const resourceWarnings = allResourceWarnings
+    ? {
+        ...allResourceWarnings,
+        auth_restricted_email_sending: null,
+      }
+    : undefined
 
   // [Joshen] Read only takes higher precedence over multiple resource warnings
   const activeWarnings = resourceWarnings?.is_readonly_mode_enabled

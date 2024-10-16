@@ -1,6 +1,21 @@
 import { PRODUCT_NAMES } from 'shared-data/products'
 
-export default [
+export type Example = {
+  type: string
+  tags: string[]
+  products: PRODUCT_NAMES[]
+  title: string
+  description: string
+  author?: string
+  author_url?: string
+  author_img?: string
+  repo_name?: string
+  repo_url?: string
+  vercel_deploy_url?: string
+  demo_url?: string
+}
+
+const Examples: Example[] = [
   {
     type: 'example',
     tags: ['Next.js', 'Stripe', 'Vercel'],
@@ -287,3 +302,5 @@ export default [
       'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/file-upload-storage',
   },
 ]
+
+export default Examples

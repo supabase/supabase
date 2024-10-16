@@ -382,15 +382,15 @@
         "type": "operation"
       },
       {
-        "id": "v1-get-postgrest-upgrade-eligibility",
-        "title": "Get postgrest upgrade eligibility",
-        "slug": "v1-get-postgrest-upgrade-eligibility",
+        "id": "v1-get-postgres-upgrade-eligibility",
+        "title": "Get postgres upgrade eligibility",
+        "slug": "v1-get-postgres-upgrade-eligibility",
         "type": "operation"
       },
       {
-        "id": "v1-get-postgrest-upgrade-status",
-        "title": "Get postgrest upgrade status",
-        "slug": "v1-get-postgrest-upgrade-status",
+        "id": "v1-get-postgres-upgrade-status",
+        "title": "Get postgres upgrade status",
+        "slug": "v1-get-postgres-upgrade-status",
         "type": "operation"
       },
       {

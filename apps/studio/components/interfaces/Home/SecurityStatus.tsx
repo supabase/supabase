@@ -1,19 +1,18 @@
 import { CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 import {
   Button,
   PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  PopoverSeparator_Shadcn_,
   cn,
 } from 'ui'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import Link from 'next/link'
-
 import { LINTER_LEVELS, LINT_TABS } from '../Linter/Linter.constants'
-import { useParams } from 'common'
 
 export const SecurityStatus = () => {
   const { ref } = useParams()

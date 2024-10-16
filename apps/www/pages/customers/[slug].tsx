@@ -115,12 +115,12 @@ function CaseStudyPage(props: any) {
       <DefaultLayout>
         <div
           className="
-            container mx-auto px-8 py-16 sm:px-16
+            container mx-auto p-8 sm:py-16 sm:px-16
             xl:px-20
           "
         >
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 mb-2 xl:col-span-2">
+            <div className="hidden xl:block col-span-12 mb-2 xl:col-span-2">
               {/* Back button */}
               <Link
                 href="/customers"
@@ -131,15 +131,14 @@ function CaseStudyPage(props: any) {
               </Link>
             </div>
 
-            <div
-              className="col-span-12 lg:col-span-8
-
-          "
-            >
+            <div className="col-span-12 lg:col-span-8">
               <div>
                 <article className="flex flex-col gap-8">
-                  <div className="flex flex-col gap-8 max-w-xxl">
-                    <Link href="/customers" className="text-brand hover:text-brand-600 mb-2 mt-0">
+                  <div className="flex flex-col gap-4 sm:gap-8 max-w-xxl">
+                    <Link
+                      href="/customers"
+                      className="text-brand hover:text-brand-600 sm:mb-2 mt-0"
+                    >
                       Customer Stories
                     </Link>
                     <h1 className="text-foreground text-4xl font-semibold xl:text-5xl">{title}</h1>

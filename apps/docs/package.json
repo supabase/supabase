@@ -76,6 +76,7 @@
     "next-plugin-yaml": "^1.0.1",
     "next-seo": "^6.5.0",
     "next-themes": "^0.3.0",
+    "nuqs": "^1.19.1",
     "openai": "^4.20.1",
     "openapi-fetch": "^0.8.2",
     "react": "^18.2.0",

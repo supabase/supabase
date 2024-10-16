@@ -1,11 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PlayCircle, StopCircle } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
-import { Button } from 'ui'
 
-import { useTelemetryProps } from 'common'
-import Telemetry from 'lib/telemetry'
-import { useRouter } from 'next/router'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { Button } from 'ui'
 import { ChooseChannelPopover } from './ChooseChannelPopover'
 import { RealtimeFilterPopover } from './RealtimeFilterPopover'
 import { RealtimeTokensPopover } from './RealtimeTokensPopover'
@@ -17,8 +15,7 @@ interface HeaderProps {
 }
 
 export const Header = ({ config, onChangeConfig }: HeaderProps) => {
-  const telemetryProps = useTelemetryProps()
-  const router = useRouter()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   return (
     <div className="flex flex-row h-14 gap-2.5 items-center px-4">
@@ -37,15 +34,11 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
                 onChangeConfig({ ...config, enabled: !config.enabled })
                 if (!config.enabled) {
                   // the user has clicked to start listening
-                  Telemetry.sendEvent(
-                    {
-                      category: 'realtime_inspector',
-                      action: 'started_listening',
-                      label: 'realtime_inspector_config',
-                    },
-                    telemetryProps,
-                    router
-                  )
+                  sendEvent({
+                    category: 'realtime_inspector',
+                    action: 'started_listening',
+                    label: 'realtime_inspector_config',
+                  })
                 }
               }}
             >
