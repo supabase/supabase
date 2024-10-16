@@ -14,7 +14,7 @@ import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import FunctionSelector from 'components/ui/FunctionSelector'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { AuthConfigResponse } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
@@ -42,10 +42,10 @@ import { extractMethod, getRevokePermissionStatements, isValidHook } from './hoo
 
 interface CreateHookSheetProps {
   visible: boolean
-  onClose: () => void
-  onDelete: () => void
   title: HOOK_DEFINITION_TITLE | null
   authConfig: AuthConfigResponse
+  onClose: () => void
+  onDelete: () => void
 }
 
 export function generateAuthHookSecret() {
@@ -109,14 +109,13 @@ const FormSchema = z
 
 export const CreateHookSheet = ({
   visible,
-  onClose,
-  onDelete,
   title,
   authConfig,
+  onClose,
+  onDelete,
 }: CreateHookSheetProps) => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
   const httpsAuthHooksEnabled = useFlag('httpsAuthHooksEnabled')
 
   const definition = useMemo(
@@ -154,6 +153,79 @@ export const CreateHookSheet = ({
       },
     },
   })
+
+  const values = form.watch()
+
+  const statements = useMemo(() => {
+    let permissionChanges: string[] = []
+    if (hook.method.type === 'postgres') {
+      if (
+        hook.method.schema !== '' &&
+        hook.method.functionName !== '' &&
+        hook.method.functionName !== values.postgresValues.functionName
+      ) {
+        permissionChanges = getRevokePermissionStatements(
+          hook.method.schema,
+          hook.method.functionName
+        )
+      }
+    }
+
+    if (values.postgresValues.functionName !== '') {
+      permissionChanges = [
+        ...permissionChanges,
+        `-- Grant access to function to supabase_auth_admin\ngrant execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} to supabase_auth_admin;`,
+        `-- Grant access to schema to supabase_auth_admin\ngrant usage on schema ${values.postgresValues.schema} to supabase_auth_admin;`,
+        `-- Revoke function permissions from authenticated, anon and public\nrevoke execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} from authenticated, anon, public;`,
+      ]
+    }
+    return permissionChanges
+  }, [hook, values.postgresValues.schema, values.postgresValues.functionName])
+
+  const { mutate: updateAuthHooks, isLoading: isUpdatingAuthHooks } = useAuthHooksUpdateMutation({
+    onSuccess: () => {
+      toast.success(`Successfully created ${values.hookType}.`)
+      if (statements.length > 0) {
+        executeSql({
+          projectRef,
+          connectionString: project!.connectionString,
+          sql: statements.join('\n'),
+        })
+      }
+      onClose()
+    },
+    onError: (error) => {
+      toast.error(`Failed to create hook: ${error.message}`)
+    },
+  })
+
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+    if (!project) return console.error('Project is required')
+    const definition = HOOKS_DEFINITIONS.find((d) => values.hookType === d.title)
+
+    if (!definition) {
+      return
+    }
+
+    const enabledLabel = definition.enabledKey
+    const uriLabel = definition.uriKey
+    const secretsLabel = definition.secretsKey
+
+    let url = ''
+    if (values.selectedType === 'postgres') {
+      url = `pg-functions://postgres/${values.postgresValues.schema}/${values.postgresValues.functionName}`
+    } else {
+      url = values.httpsValues.url
+    }
+
+    const payload = {
+      [enabledLabel]: values.enabled,
+      [uriLabel]: url,
+      [secretsLabel]: values.selectedType === 'https' ? values.httpsValues.secret : null,
+    }
+
+    updateAuthHooks({ projectRef: projectRef!, config: payload })
+  }
 
   useEffect(() => {
     if (visible) {
@@ -193,81 +265,6 @@ export const CreateHookSheet = ({
       }
     }
   }, [authConfig, title, visible, definition])
-
-  const values = form.watch()
-
-  const statements = useMemo(() => {
-    let permissionChanges: string[] = []
-    if (hook.method.type === 'postgres') {
-      if (
-        hook.method.schema !== '' &&
-        hook.method.functionName !== '' &&
-        hook.method.functionName !== values.postgresValues.functionName
-      ) {
-        permissionChanges = getRevokePermissionStatements(
-          hook.method.schema,
-          hook.method.functionName
-        )
-      }
-    }
-
-    if (values.postgresValues.functionName !== '') {
-      permissionChanges = [
-        ...permissionChanges,
-        `-- Grant access to function to supabase_auth_admin\ngrant execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} to supabase_auth_admin;`,
-        `-- Grant access to schema to supabase_auth_admin\ngrant usage on schema ${values.postgresValues.schema} to supabase_auth_admin;`,
-        `-- Revoke function permissions from authenticated, anon and public\nrevoke execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} from authenticated, anon, public;`,
-      ]
-    }
-    return permissionChanges
-  }, [hook, values.postgresValues.schema, values.postgresValues.functionName])
-
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
-    if (!project) return console.error('Project is required')
-    const definition = HOOKS_DEFINITIONS.find((d) => values.hookType === d.title)
-
-    if (!definition) {
-      return
-    }
-
-    const enabledLabel = definition.enabledKey
-    const uriLabel = definition.uriKey
-    const secretsLabel = definition.secretsKey
-
-    let url = ''
-    if (values.selectedType === 'postgres') {
-      url = `pg-functions://postgres/${values.postgresValues.schema}/${values.postgresValues.functionName}`
-    } else {
-      url = values.httpsValues.url
-    }
-
-    const payload = {
-      [enabledLabel]: values.enabled,
-      [uriLabel]: url,
-      [secretsLabel]: values.selectedType === 'https' ? values.httpsValues.secret : null,
-    }
-
-    updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
-      {
-        onSuccess: () => {
-          toast.success(`Successfully created ${values.hookType}.`)
-          if (statements.length > 0) {
-            executeSql({
-              projectRef,
-              connectionString: project.connectionString,
-              sql: statements.join('\n'),
-            })
-          }
-          onClose()
-        },
-        onError: (error) => {
-          toast.error(`Failed to create hook: ${error.message}`)
-          onClose()
-        },
-      }
-    )
-  }
 
   return (
     <Sheet open={visible} onOpenChange={() => onClose()}>
@@ -492,16 +489,16 @@ export const CreateHookSheet = ({
             </div>
           )}
 
-          <Button disabled={isUpdatingConfig} type="default" onClick={() => onClose()}>
+          <Button disabled={isUpdatingAuthHooks} type="default" onClick={() => onClose()}>
             Cancel
           </Button>
           <Button
             form={FORM_ID}
             htmlType="submit"
-            disabled={isUpdatingConfig}
-            loading={isUpdatingConfig}
+            disabled={isUpdatingAuthHooks}
+            loading={isUpdatingAuthHooks}
           >
-            {isCreating ? 'Create' : 'Update'}
+            {isCreating ? 'Create hook' : 'Update hook'}
           </Button>
         </SheetFooter>
       </SheetContent>
