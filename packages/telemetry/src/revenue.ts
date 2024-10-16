@@ -4,60 +4,21 @@
  */
 
 /**
- * The subscription is upgraded or downgraded.
- * @group Events
- * @source client-side, studio
- * @notimplemented
- */
-
-export interface subscription_updated {
-  /**
-   * The direction of the change.
-   */
-  directionOfChange: 'upgrade' | 'downgrade'
-  /**
-   * The name of the old plan.
-   */
-  oldPlanName: 'free' | 'pro' | 'team' | 'enterprise'
-  /**
-   * The value of the old plan. In dollars.
-   */
-  oldPlanValue: number
-  /**
-   * The billing cycle of the old plan.
-   */
-  oldPlanBillingCycle: 'monthly' | 'yearly'
-  /**
-   * The name of the new plan.
-   */
-  newPlanName: 'free' | 'pro' | 'team' | 'enterprise'
-  /**
-   * The value of the new plan. In dollars.
-   */
-  newPlanValue: number
-  /**
-   * The billing cycle of the new plan.
-   */
-  newPlanBillingCycle: 'monthly' | 'yearly'
-}
-
-/**
- * The upgrade view is opened.
+ * A plan upgrade button is clicked.
  *
  * @group Events
- * @source client-side, studio
- * @notimplemented
+ * @source client-side studio
  */
 
-export interface upgrade_cta_clicked {
+export interface plan_upgrade_cta_clicked {
   /**
-   * The placement of the upgrade CTA.
+   * The name of the user's current plan.
    */
-  placement: string
+  currentPlan?: 'free' | 'pro' | 'team' | 'enterprise'
   /**
-   * The name of the plan.
+   * The name of the add-on that the user is upgrading to.
    */
-  plan: 'free' | 'pro' | 'team' | 'enterprise'
+  addon?: 'pitr' | 'customDomain' | 'computeInstance'
 }
 
 /**
@@ -66,6 +27,5 @@ export interface upgrade_cta_clicked {
  * @hidden
  */
 export type RevenueEvents = {
-  subscription_updated: subscription_updated
-  upgrade_cta_clicked: upgrade_cta_clicked
+  plan_upgrade_cta_clicked: plan_upgrade_cta_clicked
 }

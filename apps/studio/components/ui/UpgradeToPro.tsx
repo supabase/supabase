@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ReactNode } from 'react'
 
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -30,6 +31,7 @@ const UpgradeToPro = ({
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const { mutate: sendEvent } = useSendEventMutation()
   const plan = subscription?.plan?.id
 
   const canUpdateSubscription = useCheckPermissions(
@@ -76,6 +78,15 @@ const UpgradeToPro = ({
               asChild
               type="primary"
               disabled={!canUpdateSubscription || projectUpdateDisabled || disabled}
+              onClick={() =>
+                sendEvent({
+                  action: 'plan_upgrade_cta_clicked',
+                  properties: {
+                    currentPlan: plan,
+                    addon,
+                  },
+                })
+              }
             >
               <Link
                 href={
