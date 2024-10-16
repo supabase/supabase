@@ -1,38 +1,42 @@
 'use client'
 
-import { useTelemetryProps } from 'common'
+import { isBrowser } from 'common'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect } from 'react'
 import { useConsent } from 'ui-patterns/ConsentToast'
-import { BASE_PATH, IS_PLATFORM } from '~/lib/constants'
+import { IS_PLATFORM } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
 
 const useSendPageTelemetryWithConsent = () => {
+  const pathname = usePathname()
   const { hasAcceptedConsent } = useConsent()
-  const telemetryProps = useTelemetryProps()
 
-  const sendPageTelemetry = useCallback(
-    (route: string) => {
-      if (!(IS_PLATFORM && hasAcceptedConsent)) return
+  const sendPageTelemetry = useCallback(() => {
+    if (!(IS_PLATFORM && hasAcceptedConsent)) return
 
-      unauthedAllowedPost('/platform/telemetry/page', {
-        body: {
-          // @ts-ignore [JOSHEN] To be fixed for PH
-          referrer: document.referrer,
-          title: document.title,
-          route: `${BASE_PATH}${route}`,
-          ga: {
-            screen_resolution: telemetryProps?.screenResolution,
-            language: telemetryProps?.language,
-            session_id: '',
-          },
+    const title = typeof document !== 'undefined' ? document?.title : ''
+    const referrer = typeof document !== 'undefined' ? document?.referrer : ''
+
+    unauthedAllowedPost('/platform/telemetry/page', {
+      body: {
+        pathname,
+        page_url: isBrowser ? window.location.href : '',
+        page_title: title,
+        ph: {
+          referrer,
+          language: navigator.language ?? 'en-US',
+          user_agent: navigator.userAgent,
+          search: isBrowser ? window.location.search : '',
+          viewport_height: isBrowser ? window.innerHeight : 0,
+          viewport_width: isBrowser ? window.innerWidth : 0,
         },
-      }).catch((e) => {
-        console.error('Problem sending telemetry:', e)
-      })
-    },
-    [telemetryProps, hasAcceptedConsent]
-  )
+      },
+      headers: { Version: '2' },
+      credentials: 'include',
+    }).catch((e) => {
+      console.error('Problem sending telemetry:', e)
+    })
+  }, [pathname, hasAcceptedConsent])
 
   return sendPageTelemetry
 }
@@ -42,9 +46,7 @@ const PageTelemetry = () => {
   const sendPageTelemetry = useSendPageTelemetryWithConsent()
 
   useEffect(() => {
-    if (pathname) {
-      sendPageTelemetry(pathname)
-    }
+    if (pathname) sendPageTelemetry()
   }, [pathname, sendPageTelemetry])
 
   return null
