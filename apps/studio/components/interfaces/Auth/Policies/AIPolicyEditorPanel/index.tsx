@@ -788,16 +788,18 @@ export const AIPolicyEditorPanel = memo(function ({
                           incomingChange !== undefined
                         }
                         onClick={() => {
-                          const sql = editorOneRef.current?.getValue().trim()
-                          if (!sql) return onSelectCancel()
-                          executeMutation({
-                            sql: sql,
-                            projectRef: selectedProject?.ref,
-                            connectionString: selectedProject?.connectionString,
-                            handleError: (error) => {
-                              throw error
-                            },
-                          })
+                          if (editView === 'conversation') {
+                            const sql = editorOneRef.current?.getValue().trim()
+                            if (!sql) return onSelectCancel()
+                            executeMutation({
+                              sql: sql,
+                              projectRef: selectedProject?.ref,
+                              connectionString: selectedProject?.connectionString,
+                              handleError: (error) => {
+                                throw error
+                              },
+                            })
+                          }
                         }}
                         tooltip={{
                           content: {
