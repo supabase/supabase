@@ -29,6 +29,8 @@ const formSchema = z.object({
 export default function SpamPage() {
   const router = useRouter()
   const ref = router.query.ref as string
+  const email = router.query.email as string | undefined
+
   const [formMessage, setFormMessage] = useState<string | null>(null)
   const [submissionType, setSubmissionType] = useState<'success' | 'error' | null>(null)
 
@@ -58,7 +60,7 @@ export default function SpamPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ reason: data.reason }),
+        body: JSON.stringify({ reason: data.reason, email: email }),
       })
       const message = await response.text()
 

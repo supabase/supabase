@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL as string
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY as string
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export async function POST(req: NextRequest, { params }: { params: { ref: string } }) {
   const ref = params.ref
-
-  const { reason } = await req.json()
+  const { reason, email } = await req.json()
 
   if (!ref) {
     return NextResponse.json(
@@ -23,6 +28,12 @@ export async function POST(req: NextRequest, { params }: { params: { ref: string
   }
 
   try {
+    const { error: supabaseError } = await supabase
+      .from('table_name') // update with table name
+      .insert([{ ref, reason, email }])
+
+    if (supabaseError) throw new Error(`Supabase error: ${supabaseError.message}`)
+
     const response = await fetch(process.env.EMAIL_REPORT_SLACK_WEBHOOK as string, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
