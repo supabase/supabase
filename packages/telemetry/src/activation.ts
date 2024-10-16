@@ -5,11 +5,16 @@
 /**
  * New user signs up successfully.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export type sign_up = never
 
-export type database_connection_string_copied = {
+/**
+ * The user copied the database connection string.
+ * @group Events
+ * @source studio
+ */
+export interface database_connection_string_copied {
   /**
    * label of the connection string
    */

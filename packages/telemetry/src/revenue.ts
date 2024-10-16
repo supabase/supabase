@@ -5,18 +5,19 @@
 
 /**
  * A plan upgrade button is clicked.
- *
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 
 export interface plan_upgrade_cta_clicked {
   /**
    * The name of the user's current plan.
+   * @optional
    */
   currentPlan?: 'free' | 'pro' | 'team' | 'enterprise'
   /**
    * The name of the add-on that the user is upgrading to.
+   * @optional
    */
   addon?: 'pitr' | 'customDomain' | 'computeInstance'
 }

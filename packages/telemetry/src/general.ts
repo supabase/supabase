@@ -5,9 +5,8 @@
 
 /**
  * A user leaves the application.
- *
  * @group Events
- * @source client-side www, studio, docs
+ * @source www, studio, docs
  */
 export interface $pageleave {
   /**
@@ -22,9 +21,8 @@ export interface $pageleave {
 
 /**
  * Any page is viewed by a user.
- *
  * @group Events
- * @source client-side www, studio, docs
+ * @source www, studio, docs
  */
 export interface $pageview {
   /**

@@ -6,31 +6,38 @@
 /**
  * A user succesfully signs in to the dashboard.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export type sign_in = never
+
 /**
  * User enter and submitted a query in our AI assistant.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
-
 export interface ai_debugger_requested {
   /**
    * The type of the assisant.
    */
   assistantType: 'sql-editor-ai-assistant' | 'rls-ai-assistant'
 }
+
+/**
+ * User asked for a suggestion from our AI assistant.
+ * @group Events
+ * @source studio
+ */
 export interface ai_suggestion_asked {
   /**
    * The type of the assisant.
    */
   assistantType: 'sql-editor-ai-assistant' | 'rls-ai-assistant'
 }
+
 /**
  * User accepted a suggestion from our AI assistant.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export interface ai_suggestion_accepted {
   /**
@@ -43,10 +50,11 @@ export interface ai_suggestion_accepted {
    */
   labelType?: 'debug_snippet' | 'edit_snippet'
 }
+
 /**
  * User copied a suggestion from our AI assistant.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export interface ai_suggestion_copied {
   /**
@@ -55,6 +63,11 @@ export interface ai_suggestion_copied {
   assistantType: 'sql-editor-ai-assistant' | 'rls-ai-assistant'
 }
 
+/**
+ * User diffed a suggestion from our AI assistant.
+ * @group Events
+ * @source studio
+ */
 export interface ai_suggestion_diffed {
   /**
    * The type of the assisant.
@@ -62,6 +75,11 @@ export interface ai_suggestion_diffed {
   assistantType: 'sql-editor-ai-assistant' | 'rls-ai-assistant'
 }
 
+/**
+ * User discarded a suggestion from our AI assistant.
+ * @group Events
+ * @source studio
+ */
 export interface ai_suggestion_discarded {
   /**
    * The type of the assisant.
@@ -72,7 +90,7 @@ export interface ai_suggestion_discarded {
 /**
  * Insert code suggestion from our AI assistant.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export interface ai_suggestion_inserted {
   /**
@@ -80,10 +98,11 @@ export interface ai_suggestion_inserted {
    */
   assistantType: 'sql-editor-ai-assistant' | 'rls-ai-assistant'
 }
+
 /**
  * User rejected a suggestion from our AI assistant.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export interface ai_suggestion_rejected {
   /**
@@ -95,10 +114,11 @@ export interface ai_suggestion_rejected {
    */
   labelType: 'debug_snippet' | 'edit_snippet'
 }
+
 /**
  * User replaced a suggestion from our AI assistant.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export interface ai_suggestion_replaced {
   /**
@@ -106,10 +126,11 @@ export interface ai_suggestion_replaced {
    */
   assistantType: 'sql-editor-ai-assistant' | 'rls-ai-assistant'
 }
+
 /**
  * Voted Yes or No in docs feedback on Is this helpful?
  * @group Events
- * @source client-side docs
+ * @source docs
  */
 export interface feedback_voted {
   /**
@@ -117,30 +138,34 @@ export interface feedback_voted {
    */
   isDocHelpful: boolean
 }
+
 /**
  * Clicked copy as JSON button in SQL editor in dashboard.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export type sql_copy_as_json_clicked = never
+
 /**
  * Clicked copy as Markdown button in SQL editor in dashboard.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export type sql_copy_as_markdown_clicked = never
+
 /**
  * Clicked download CSV button in SQL editor in dashboard.
  *
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export type sql_download_csv_clicked = never
+
 /**
  * Clicked on a SQL quickstart card in studio, title will be in label.
  *
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export interface sql_quickstart_clicked {
   /**
@@ -148,11 +173,12 @@ export interface sql_quickstart_clicked {
    */
   title: string
 }
+
 /**
  * Clicked on a SQL template card in studio, title will be in label.
  *
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export interface sql_template_script_clicked {
   /**
@@ -160,25 +186,26 @@ export interface sql_template_script_clicked {
    */
   title: string
 }
+
 /**
  * Clicked on a specific message in realtime inspector in dashboard.
  *
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export type realtime_message_clicked = never
 
 /**
  * Copied a message in realtime inspector in dashboard.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export type realtime_message_copied = never
 
 /**
  * Select and started listening to a channel in realtime.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export type realtime_start_listening_to_channel_clicked = {
   /**
@@ -190,21 +217,21 @@ export type realtime_start_listening_to_channel_clicked = {
 /**
  * Sent a broadcast message in realtime inspector in dashboard.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export type realtime_broadcast_message_sent = never
 
 /**
  * Applied filters in realtime inspector in dashboard.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export type realtime_filters_applied = never
 
 /**
  * Changed the role of a database in realtime inspector in dashboard.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 
 export type realtime_database_role_changed = never
@@ -212,7 +239,7 @@ export type realtime_database_role_changed = never
 /**
  * Enabled a feature preview in the dashboard.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export interface ui_feature_previews_enabled {
   /**
@@ -224,7 +251,7 @@ export interface ui_feature_previews_enabled {
 /**
  * Disabled a feature preview in the dashboard.
  * @group Events
- * @source client-side studio
+ * @source studio
  */
 export interface ui_feature_previews_disabled {
   /**

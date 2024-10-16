@@ -6,7 +6,7 @@
 /**
  * The user clicked the "Start project" -button.
  * @group Events
- * @sources client-side www
+ * @sources www
  */
 export interface start_project_clicked {
   /**
@@ -14,10 +14,11 @@ export interface start_project_clicked {
    */
   location: 'hp_hero' | 'hp_subhero' | 'pricing_hero' | 'pricing_comparison' | 'event_page'
 }
+
 /**
  * The user clicked the "See documentation" -button.
  * @group Events
- * @sources client-side www
+ * @sources www
  */
 export interface see_documentation_clicked {
   /**
@@ -29,7 +30,7 @@ export interface see_documentation_clicked {
 /**
  * @description The user clicked a plan's CTA -button.
  * @group Events
- * @sources client-side www
+ * @sources www
  */
 export interface plan_cta_clicked {
   /**
@@ -42,6 +43,11 @@ export interface plan_cta_clicked {
   plan: 'free' | 'pro' | 'team' | 'enterprise'
 }
 
+/**
+ * A framework button is clicked.
+ * @group Events
+ * @sources www
+ */
 export interface framework_clicked {
   /**
    * The framework that was clicked.
@@ -66,7 +72,7 @@ export interface framework_clicked {
 /**
  * A subhero product card is clicked. The type is passed as a property
  * @group Events
- * @sources client-side www
+ * @sources www
  */
 export interface product_card_clicked {
   /**
@@ -78,10 +84,11 @@ export interface product_card_clicked {
    */
   location: 'hp_subhero'
 }
+
 /**
  * The CTA-button on the event page is clicked.
  * @group Events
- * @sources client-side www
+ * @sources www
  */
 export interface event_cta_clicked {
   /**

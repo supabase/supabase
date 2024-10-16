@@ -25,9 +25,8 @@ TBD.
 ### `@sources`
 Which application the event is sent from. The options are
 ```
-client-side, www
-client-side, studio
-client-side, docs
-server-side
+www
+studio
+docs
 ```
 

@@ -12,7 +12,7 @@ import type { GeneralEvents } from './general'
 import type { RevenueEvents } from './revenue'
 
 export namespace Telemetry {
-  export type Events = AcquisitionEvents &
+  type Events = AcquisitionEvents &
     ActivationEvents &
     AdoptionEvents &
     GeneralEvents &
