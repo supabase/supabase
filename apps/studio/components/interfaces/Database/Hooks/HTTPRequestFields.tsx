@@ -115,7 +115,7 @@ const HTTPRequestFields = ({
             id="timeout_ms"
             name="timeout_ms"
             label="Timeout"
-            labelOptional="Between 1000ms to 5000ms"
+            labelOptional="Between 1000ms to 10,000ms"
             type="number"
             actions={<p className="text-foreground-light pr-2">ms</p>}
           />

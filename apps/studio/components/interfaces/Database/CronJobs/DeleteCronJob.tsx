@@ -37,7 +37,7 @@ const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps) => {
 
   return (
     <TextConfirmModal
-      variant="warning"
+      variant="destructive"
       visible={visible}
       onCancel={() => onClose()}
       onConfirm={handleDelete}

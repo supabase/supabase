@@ -14,4 +14,6 @@ export const projectKeys = {
   ) => ['projects', 'transfer', projectRef, targetOrganizationSlug, 'preview'] as const,
   pauseStatus: (projectRef: string | undefined) =>
     ['projects', projectRef, 'pause-status'] as const,
+
+  orgProjects: (slug: string | undefined) => ['projects', 'org', slug] as const,
 }

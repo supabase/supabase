@@ -1,13 +1,8 @@
-import { post } from '~/lib/fetchWrapper'
-import { API_URL, IS_PROD, IS_PREVIEW } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS, TelemetryProps } from 'common'
+import { API_URL, IS_PREVIEW, IS_PROD } from 'lib/constants'
 import { NextRouter } from 'next/router'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { post } from '~/lib/fetchWrapper'
 import { Telemetry } from 'telemetry'
-
-export interface TelemetryProps {
-  screenResolution?: string
-  language: string
-}
 
 const noop = () => {}
 
@@ -16,7 +11,7 @@ const noop = () => {}
 
 const sendEvent = (
   event: Telemetry.EventWithProperties,
-  gaProps: TelemetryProps,
+  telemetryProps: TelemetryProps,
   router: NextRouter
 ) => {
   const consent =
@@ -30,22 +25,32 @@ const sendEvent = (
   if (blockEvent) return noop
 
   const { action, properties } = event
+  const title = typeof document !== 'undefined' ? document?.title : ''
+  const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
-  return post(`${API_URL}/telemetry/event`, {
-    action,
-    page_referrer: document?.referrer,
-    page_title: document?.title,
-    page_location: router.asPath,
-    ga: {
-      screen_resolution: gaProps?.screenResolution,
-      language: gaProps?.language,
+  const { page_url, search, language, viewport_height, viewport_width } = telemetryProps
+
+  return post(
+    `${API_URL}/telemetry/event`,
+    {
+      page_url,
+      action,
+      page_title: title,
+      pathname: router.pathname,
+      ph: {
+        search,
+        referrer,
+        language,
+        viewport_height,
+        viewport_width,
+        user_agent: navigator.userAgent,
+      },
+      custom_properties: properties,
     },
-    custom_properties: properties,
-  })
+    { headers: { Version: '2' }, credentials: 'include' }
+  )
 }
 
-const telemetry = {
-  sendEvent,
-}
+const telemetry = { sendEvent }
 
 export default telemetry

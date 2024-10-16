@@ -8,6 +8,7 @@ import type { ResponseError } from 'types'
 import { configKeys } from './keys'
 import { components } from 'api-types'
 
+export type ProjectUpgradeTargetVersion = components['schemas']['ProjectVersion']
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }
 export type ProjectUpgradeEligibilityResponse =
   components['schemas']['ProjectUpgradeEligibilityResponse']

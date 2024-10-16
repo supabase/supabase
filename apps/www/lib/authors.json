@@ -359,6 +359,13 @@
     "author_image_url": "https://github.com/kevcodez.png"
   },
   {
+    "author_id": "kevinbrolly",
+    "author": "Kevin Brolly",
+    "position": "Head of Customer Success",
+    "author_url": "https://twitter.com/kevinbrolly",
+    "author_image_url": "https://pbs.twimg.com/profile_images/1292938696912756736/_DO9_Evo_200x200.jpg"
+  },
+  {
     "author_id": "benediktmueller",
     "author": "Benedikt Müller",
     "username": "bndkt",
@@ -490,7 +497,8 @@
     "author_id": "khajvandi",
     "author": "Cyrus Khajvandi",
     "username": "khajvandi",
-    "position": "Co-Founder & CEO, Humata",
+    "position": "Co-Founder & CEO",
+    "company": "Humata",
     "author_url": "https://www.linkedin.com/in/khajvandi/",
     "author_image_url": "https://media.licdn.com/dms/image/v2/D5603AQGZst2tvV47PA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1694666298155?e=1728518400&v=beta&t=Jkt6ii4cV8FsvU4qONEGFVUADw-Zc_WI1h-pSrenxGg"
   },
@@ -535,11 +543,27 @@
     "author_image_url": "https://github.com/nyannyacha.png"
   },
   {
+    "author_id": "jstoone",
+    "author": "Jakob Steinn",
+    "position": "Co-founder & Tech Lead",
+    "company": "Good Tape",
+    "author_url": "https://twitter.com/jstoone",
+    "author_image_url": "https://pbs.twimg.com/profile_images/1233003191538790400/3OxNooXT_200x200.jpg"
+  },
+  {
     "author_id": "tim_shedor",
     "author": "Tim Shedor",
     "username": "tshedor",
     "position": "Guest Author",
     "author_url": "https://github.com/tshedor",
     "author_image_url": "https://github.com/tshedor.png"
+  },
+  {
+    "author_id": "jgoux",
+    "author": "Julien Goux",
+    "username": "jgoux",
+    "position": "Engineering",
+    "author_url": "https://github.com/jgoux",
+    "author_image_url": "https://github.com/jgoux.png"
   }
 ]

@@ -31,9 +31,8 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { ErrorInfo, useEffect, useMemo, useRef, useState } from 'react'
+import { ErrorInfo, useMemo, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { toast } from 'sonner'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { AppBannerWrapper, RouteValidationWrapper } from 'components/interfaces/App'
@@ -47,14 +46,12 @@ import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { AuthProvider } from 'lib/auth'
-import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { ConsentToast } from 'ui-patterns/ConsentToast'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -80,9 +77,7 @@ loader.config({
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
-  const snap = useAppStateSnapshot()
   const queryClient = useRootQueryClient()
-  const consentToastId = useRef<string | number>()
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
   const [supabase] = useState(() =>
@@ -118,36 +113,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
     console.error(error.stack)
   }
-
-  useEffect(() => {
-    // Check for telemetry consent
-    if (typeof window !== 'undefined') {
-      const onAcceptConsent = () => {
-        snap.setIsOptedInTelemetry(true)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
-      }
-
-      const onOptOut = () => {
-        snap.setIsOptedInTelemetry(false)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
-      }
-
-      const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      if (IS_PLATFORM && hasAcknowledgedConsent === null) {
-        setTimeout(() => {
-          consentToastId.current = toast(
-            <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
-            {
-              id: 'consent-toast',
-              position: 'bottom-right',
-              duration: Infinity,
-            }
-          )
-        }, 300)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   useThemeSandbox()
 

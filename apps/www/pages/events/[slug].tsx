@@ -2,7 +2,6 @@ import React from 'react'
 import Link from 'next/link'
 import NextImage from 'next/image'
 import { useRouter } from 'next/router'
-import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import dayjs from 'dayjs'
@@ -13,7 +12,8 @@ import {
   MicrophoneIcon,
   HandIcon,
 } from '@heroicons/react/solid'
-import { capitalize } from 'lodash'
+import capitalize from 'lodash/capitalize'
+import { ChevronLeft, X as XIcon } from 'lucide-react'
 
 import authors from 'lib/authors.json'
 import { isNotNullOrUndefined } from '~/lib/helpers'
@@ -24,7 +24,6 @@ import { isBrowser, useTelemetryProps } from 'common'
 import { Telemetry } from 'telemetry'
 import { TELEMETRY_EVENTS } from '~/lib/telemetry/constants'
 import telemetry from '~/lib/telemetry/utils'
-import { XIcon } from '@heroicons/react/outline'
 
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
@@ -37,7 +36,9 @@ import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
-import { ChevronLeft } from 'lucide-react'
+
+import type { GetStaticProps, InferGetStaticPropsType } from 'next'
+import type Author from '~/types/author'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -149,7 +150,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
     ?.map((speakerId: string) => {
       return authors.find((author) => author.author_id === speakerId)
     })
-    .filter(isNotNullOrUndefined)
+    .filter(isNotNullOrUndefined) as Author[]
   const hadEndDate = event.end_date?.length
 
   const IS_REGISTRATION_OPEN =
@@ -266,7 +267,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               className="
                 relative z-10
                 lg:min-h-[400px] h-full
-                grid grid-cols-1 lg:grid-cols-2
+                grid grid-cols-1 xl:grid-cols-2
                 gap-8
                 text-foreground-light
                 !py-10 md:!py-16
@@ -283,7 +284,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     <span className="">Duration: {event.duration}</span>
                   </div>
 
-                  <h1 className="text-foreground text-3xl lg:text-4xl">{event.title}</h1>
+                  <h1 className="text-foreground text-3xl md:text-4xl xl:pr-9">{event.title}</h1>
                   <p>{event.subtitle}</p>
                   <Button
                     type="primary"
@@ -338,21 +339,15 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
           <SectionContainer className="grid lg:grid-cols-3 gap-12 !py-10 md:!py-16">
             {event.company && (
               <div className="order-first lg:col-span-full flex items-center gap-4 md:gap-6 lg:mb-4">
-                <figure className="h-6">
-                  <NextImage
-                    src={supabaseLogoWordmarkLight}
+                <figure className="h-6 [&_.next-image--dynamic-fill_img]:!h-full">
+                  <Image
+                    src={{ dark: supabaseLogoWordmarkDark, light: supabaseLogoWordmarkLight }}
+                    alt="Supabase Logo"
                     width={160}
                     height={30}
-                    alt="Supabase Logo"
-                    className="object-contain dark:hidden"
-                    priority
-                  />
-                  <NextImage
-                    src={supabaseLogoWordmarkDark}
-                    width={160}
-                    height={30}
-                    alt="Supabase Logo"
-                    className="object-contain hidden dark:block"
+                    sizes="100%"
+                    className="!relative object-contain object-left"
+                    containerClassName="h-full object-contain object-left !rounded-none !border-none"
                     priority
                   />
                 </figure>
@@ -360,22 +355,16 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 <Link
                   href={event.company?.website_url ?? '#'}
                   target="_blank"
-                  className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90"
+                  className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90 [&_.next-image--dynamic-fill_img]:!h-full"
                 >
-                  <NextImage
-                    src={event.company?.logo}
+                  <Image
+                    src={{ dark: event.company?.logo, light: event.company?.logo_light }}
                     alt={`${event.company?.name} Logo`}
-                    fill
+                    width={160}
+                    height={30}
                     sizes="100%"
-                    className="!relative object-contain object-left hidden dark:block"
-                    priority
-                  />
-                  <NextImage
-                    src={event.company?.logo_light}
-                    alt={`${event.company?.name} Logo`}
-                    fill
-                    sizes="100%"
-                    className="!relative object-contain object-left dark:hidden"
+                    className="!relative object-contain object-left"
+                    containerClassName="h-full object-contain object-left !rounded-none !border-none"
                     priority
                   />
                 </Link>
@@ -438,6 +427,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                             <p>{speaker?.author}</p>
                             <span className="text-xs text-foreground-light">
                               {speaker?.position}
+                              {speaker?.company ? `, ${speaker?.company}` : ', Supabase'}
                             </span>
                           </div>
                         </Link>

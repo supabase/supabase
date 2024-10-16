@@ -1,4 +1,5 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { components } from 'api-types'
 
 import { isBrowser } from 'common'
 import { handleError, post } from 'data/fetchers'
@@ -8,53 +9,31 @@ import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 import { Telemetry } from 'telemetry'
 
-type SendEventGA = {
-  action: string
-  category: string
-  label: string
-  value: string
-  page_referrer: string
-  page_title: string
-  page_location: string
-  ga: {
-    screen_resolution: string
-    language: string
-  }
-}
+type SendEventGA = components['schemas']['TelemetryEventBody']
+type _SendEventPH = components['schemas']['TelemetryEventBodyV2']
 
-type SendEventPH<K extends Telemetry.EventName> = {
+type SendEventPH<K extends Telemetry.EventName> = _SendEventPH & {
   action: K
-  page_url: string
-  page_title: string
-  pathname: string
-  ph: {
-    language: string
-    referrer: string
-    userAgent: string
-    search: string
-    viewport_height: number
-    viewport_width: number
-  }
-  custom_properties: Telemetry.EventProperties<K>
+  custom_properties?: Telemetry.EventProperties<K>
 }
 
 export type SendEventVariables = Telemetry.EventWithProperties
 
 type SendEventPayload = any
 
-export async function sendEvent(type: 'GA' | 'PH', body: SendEventPayload) {
-  const consent =
-    typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null
-  if (consent !== 'true') return
+export async function sendEvent({
+  consent,
+  type,
+  body,
+}: {
+  consent: boolean
+  type: 'GA' | 'PH'
+  body: SendEventPayload
+}) {
+  if (!consent) return undefined
 
   const headers = type === 'PH' ? { Version: '2' } : undefined
-  const { data, error } = await post(`/platform/telemetry/event`, {
-    body,
-    headers,
-    credentials: 'include',
-  })
+  const { data, error } = await post(`/platform/telemetry/event`, { body, headers })
   if (error) handleError(error)
   return data
 }
@@ -72,6 +51,15 @@ export const useSendEventMutation = ({
   const router = useRouter()
   const usePostHogParameters = useFlag('enablePosthogChanges')
 
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(
+          usePostHogParameters
+            ? LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH
+            : LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT
+        )
+      : null) === 'true'
+
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
@@ -83,7 +71,7 @@ export const useSendEventMutation = ({
         ph: {
           referrer,
           language: router?.locale ?? 'en-US',
-          userAgent: navigator.userAgent,
+          user_agent: navigator.userAgent,
           search: window.location.search,
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
@@ -107,10 +95,10 @@ export const useSendEventMutation = ({
         ? ({
             action,
             ...payload,
-            custom_properties: otherVars.properties,
+            custom_properties: otherVars.properties ?? {},
           } as SendEventPH<typeof action>)
         : ({ ...vars, ...payload } as SendEventGA)
-      return sendEvent(type, body)
+      return sendEvent({ consent, type, body })
     },
     {
       async onSuccess(data, variables, context) {
