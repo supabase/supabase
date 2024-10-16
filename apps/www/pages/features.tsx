@@ -29,20 +29,6 @@ export async function getStaticProps() {
   }
 }
 
-declare global {
-  interface Array<T> {
-    sortBy(property: keyof T): Array<T>
-  }
-}
-
-Array.prototype.sortBy = function (property) {
-  return this.sort((a, b) => {
-    if (a[property] < b[property]) return -1
-    if (a[property] > b[property]) return 1
-    return 0
-  })
-}
-
 const products = Array.from(new Set(features.flatMap((feature) => feature.products)))
 
 function FeaturesPage() {

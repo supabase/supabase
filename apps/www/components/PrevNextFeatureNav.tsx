@@ -1,6 +1,6 @@
-import { useState, PropsWithChildren } from 'react'
+import { PropsWithChildren } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, List } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronRight, List } from 'lucide-react'
 import {
   cn,
   DropdownMenu,
@@ -20,14 +20,6 @@ interface Props {
   currentFeature: FeatureType
   prevLink: string
   nextLink: string
-}
-
-Array.prototype.sortBy = function (property) {
-  return this.sort((a, b) => {
-    if (a[property] < b[property]) return -1
-    if (a[property] > b[property]) return 1
-    return 0
-  })
 }
 
 const buttonClassName =
@@ -75,18 +67,24 @@ const PrevNextFeatureNav: React.FC<Props> = ({
           </DropdownMenuLabel>
           <DropdownMenuSeparator className="mb-0" />
           <DropdownMenuGroup className="max-h-[400px] overflow-y-scroll py-1">
-            {features.sortBy('title').map((feature) => (
-              <DropdownMenuItem key={feature.slug} className="p-0">
-                <Link
-                  href={`/features/${feature.slug}`}
-                  className="group/link flex items-center gap-2 px-2 py-1.5 w-full hover:text-foreground"
-                >
-                  <feature.icon className="w-3 h-3 text-foreground-lighter group-hover:text-foreground transition-colors" />
-                  <span className="line-clamp-1 flex-grow">{feature.title}</span>
-                  <ChevronRight className="w-3 h-3 transition-opacity opacity-0 group-hover/link:opacity-100" />
-                </Link>
-              </DropdownMenuItem>
-            ))}
+            {features
+              .sort((a, b) => {
+                if (a['title'] < b['title']) return -1
+                if (a['title'] > b['title']) return 1
+                return 0
+              })
+              .map((feature) => (
+                <DropdownMenuItem key={feature.slug} className="p-0">
+                  <Link
+                    href={`/features/${feature.slug}`}
+                    className="group/link flex items-center gap-2 px-2 py-1.5 w-full hover:text-foreground"
+                  >
+                    <feature.icon className="w-3 h-3 text-foreground-lighter group-hover:text-foreground transition-colors" />
+                    <span className="line-clamp-1 flex-grow">{feature.title}</span>
+                    <ChevronRight className="w-3 h-3 transition-opacity opacity-0 group-hover/link:opacity-100" />
+                  </Link>
+                </DropdownMenuItem>
+              ))}
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
