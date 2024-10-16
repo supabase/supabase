@@ -102,21 +102,22 @@ function FeaturesPage() {
         }}
       />
       <DefaultLayout>
-        <SectionContainer className="border border-muted rounded-xl bg-alternative my-4 py-8 bg-center bg-cover bg-[url('/images/features/features-cover-light.svg')] dark:bg-[url('/images/features/features-cover-dark.svg')]">
-          <div className="mx-auto relative z-10">
+        <SectionContainer className="!py-0 sm:!px-0">
+          <div className="border border-muted rounded-xl bg-alternative my-4 px-6 py-8 md:py-10 lg:px-16 lg:py-20 xl:px-20 bg-center bg-cover bg-[url('/images/features/features-cover-light.svg')] dark:bg-[url('/images/features/features-cover-dark.svg')]">
             <motion.div
               className="mx-auto sm:max-w-xl text-center flex flex-col items-center gap-3"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
             >
               <h1 className="h1 text-foreground !m-0">Supabase Features</h1>
-              <p className="text-foreground-light text-base sm:text-lg">
-                Everything you need to build and ship your next project.
+              <p className="text-foreground-light text-base">
+                Everything you need <br className="md:hidden" /> to build and ship your next
+                project.
               </p>
             </motion.div>
           </div>
         </SectionContainer>
-        <SectionContainer className="relative grid md:grid-cols-4 gap-4 !pt-0">
+        <SectionContainer className="relative grid md:grid-cols-4 md:gap-4 !pt-0">
           <div className="relative w-full h-full">
             <div className="mb-4 flex flex-col gap-4 sticky top-20">
               <Input
@@ -143,30 +144,32 @@ function FeaturesPage() {
                   )
                 }
               />
-              <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
-              <div className="flex flex-col gap-2.5">
-                {products.map((product) => (
-                  <button
-                    key={product}
-                    className="flex items-center gap-2 text-foreground-light hover:text-foreground !cursor-pointer hover:!cursor-pointer transition-colors"
-                  >
-                    <Checkbox
-                      id={product}
-                      checked={selectedProducts.includes(product)}
-                      onChange={() => handleProductChange(product)}
-                      className="[&_input]:m-0"
-                    />
-                    <label
-                      htmlFor={product}
-                      className="text-sm !leading-none capitalize flex-1 text-left"
+              <div className="hidden md:flex flex-col gap-4">
+                <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
+                <div className="flex flex-col gap-2.5">
+                  {products.map((product) => (
+                    <button
+                      key={product}
+                      className="flex items-center gap-2 text-foreground-light hover:text-foreground !cursor-pointer hover:!cursor-pointer transition-colors"
                     >
-                      {product}
-                    </label>
-                  </button>
-                ))}
-              </div>
-              <div className="text-foreground-lighter text-xs">
-                Features selected: {filteredFeatures.length}
+                      <Checkbox
+                        id={product}
+                        checked={selectedProducts.includes(product)}
+                        onChange={() => handleProductChange(product)}
+                        className="[&_input]:m-0"
+                      />
+                      <label
+                        htmlFor={product}
+                        className="text-sm !leading-none capitalize flex-1 text-left"
+                      >
+                        {product}
+                      </label>
+                    </button>
+                  ))}
+                </div>
+                <div className="text-foreground-lighter text-xs">
+                  Features selected: {filteredFeatures.length}
+                </div>
               </div>
               <Button
                 block
@@ -176,8 +179,8 @@ function FeaturesPage() {
                   setSearchTerm('')
                 }}
                 className={cn(
-                  'opacity-0 transition-opacity',
-                  (selectedProducts.length || searchTerm.length) && 'opacity-100'
+                  'opacity-0 transition-opacity hidden md:block',
+                  (selectedProducts.length || searchTerm.length) && '!block opacity-100'
                 )}
               >
                 Clear all filters
@@ -190,7 +193,7 @@ function FeaturesPage() {
                 No features found with these filters
               </p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
                 {filteredFeatures.map((feature) => (
                   <Panel
                     key={feature.title}
