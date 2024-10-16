@@ -4,11 +4,15 @@ import Breadcrumbs from '~/components/Breadcrumbs'
 import { Feedback } from '~/components/Feedback'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { MDXRemoteBase } from './MdxBase'
-import { type ITroubleshootingEntry } from './Troubleshooting.utils'
+import { getTroubleshootingUpdatedDates, type ITroubleshootingEntry } from './Troubleshooting.utils'
 import Link from 'next/link'
 import { formatError, serializeTroubleshootingSearchParams } from './Troubleshooting.utils.shared'
 
-export default function TroubleshootingPage({ entry }: { entry: ITroubleshootingEntry }) {
+export default async function TroubleshootingPage({ entry }: { entry: ITroubleshootingEntry }) {
+  const dateUpdated = entry.data.database_id.startsWith('pseudo-')
+    ? new Date()
+    : (await getTroubleshootingUpdatedDates()).get(entry.data.database_id)
+
   return (
     <SidebarSkeleton
       hideSideNav
@@ -18,9 +22,9 @@ export default function TroubleshootingPage({ entry }: { entry: ITroubleshooting
         <Breadcrumbs minLength={1} forceDisplayOnMobile />
         <article className="prose max-w-none mt-4">
           <h1>{entry.data.title}</h1>
-          {entry.data.updated_at && (
+          {dateUpdated && (
             <p className="text-sm text-foreground-lighter">
-              Last edited: {entry.data.updated_at.toLocaleString()}
+              Last edited: {dateUpdated.toLocaleDateString()}
             </p>
           )}
           <hr className="my-7" aria-hidden />
