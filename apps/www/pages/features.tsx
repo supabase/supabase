@@ -20,6 +20,8 @@ function FeaturesPage() {
   const router = useRouter()
   const { basePath, query } = router
   const isMobile = useBreakpoint(1023)
+
+  // Initialize state from query parameters
   const [showSearchInput, setShowSearchInput] = useState<boolean>(false)
   const [searchTerm, setSearchTerm] = useState<string>((query.q as string) || '')
   const [selectedProducts, setSelectedProducts] = useState<string[]>(
@@ -42,12 +44,19 @@ function FeaturesPage() {
     })
   }
 
+  // Apply filters based on initial URL params on mount
   useEffect(() => {
     updateQueryParamsDebounced()
     return updateQueryParamsDebounced.cancel // Cleanup on unmount
   }, [searchTerm, selectedProducts, updateQueryParamsDebounced])
 
-  useEffect(() => {}, [])
+  // Sync state with query parameters when they change
+  useEffect(() => {
+    if (query.q !== searchTerm) setSearchTerm((query.q as string) || '')
+    if (query.products !== selectedProducts.join(',')) {
+      setSelectedProducts((query.products as string)?.split(',') || [])
+    }
+  }, [query.q, query.products])
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,21 +84,8 @@ function FeaturesPage() {
     return matchesSearch && matchesProduct
   })
 
-  // Group features by product
-  // const groupedFeatures = filteredFeatures.reduce(
-  //   (acc, feature) => {
-  //     feature.products.forEach((product) => {
-  //       if (!acc[product]) acc[product] = []
-  //       acc[product].push(feature)
-  //     })
-  //     return acc
-  //   },
-  //   {} as Record<string, typeof features>
-  // )
-
   const meta = {
     title: 'Supabase Features',
-    // image: `${basePath}/images/features/og.jpg`,
     description:
       'From authentication to storage, everything you need to build and ship your next project.',
   }
@@ -103,17 +99,10 @@ function FeaturesPage() {
           title: meta.title,
           description: meta.description,
           url: `${basePath}/customers`,
-          // images: [{ url: meta.image }],
         }}
       />
       <DefaultLayout>
-        <SectionContainer
-          className="
-          border border-muted rounded-xl bg-alternative my-4 py-8 bg-center bg-cover
-          bg-[url('/images/features/features-cover-light.svg')]
-          dark:bg-[url('/images/features/features-cover-dark.svg')]
-        "
-        >
+        <SectionContainer className="border border-muted rounded-xl bg-alternative my-4 py-8 bg-center bg-cover bg-[url('/images/features/features-cover-light.svg')] dark:bg-[url('/images/features/features-cover-dark.svg')]">
           <div className="mx-auto relative z-10">
             <motion.div
               className="mx-auto sm:max-w-xl text-center flex flex-col items-center gap-3"
