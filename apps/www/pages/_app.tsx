@@ -64,14 +64,6 @@ export default function App({ Component, pageProps }: AppProps) {
     )
   }
 
-  function handlePageLeaveTelemetry(url: string) {
-    return post(`${API_URL}/telemetry/page-leave`, {
-      page_url: url,
-      page_title: title,
-      pathname: router.pathname,
-    })
-  }
-
   useEffect(() => {
     if (blockEvents) return
 
@@ -100,7 +92,11 @@ export default function App({ Component, pageProps }: AppProps) {
     if (blockEvents) return
 
     const handleBeforeUnload = async () => {
-      await handlePageLeaveTelemetry(window.location.href)
+      await post(`${API_URL}/telemetry/page-leave`, {
+        page_url: window.location.href,
+        page_title: title,
+        pathname: router.pathname,
+      })
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
 
