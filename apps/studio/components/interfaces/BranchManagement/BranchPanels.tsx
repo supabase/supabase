@@ -38,7 +38,6 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
-import WorkflowLogs from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
   header: string
@@ -234,7 +233,13 @@ export const BranchRow = ({
                     View Repository
                   </Link>
                 </Button>
-                {branchingWorkflowLogsEnabled && <WorkflowLogs projectRef={branch.project_ref} />}
+                {branchingWorkflowLogsEnabled && (
+                  <Button type="default" asChild>
+                    <Link href={`/project/${branch.project_ref}/logs/workflow-run-logs`}>
+                      View Logs
+                    </Link>
+                  </Button>
+                )}
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <Button type="text" icon={<MoreVertical />} className="px-1" />
@@ -289,7 +294,11 @@ export const BranchRow = ({
                 </Link>
               </Button>
             ) : (
-              <WorkflowLogs projectRef={branch.project_ref} />
+              <Button type="default" asChild>
+                <Link href={`/project/${branch.project_ref}/logs/workflow-run-logs`}>
+                  View Logs
+                </Link>
+              </Button>
             )}
 
             <DropdownMenu modal={false}>

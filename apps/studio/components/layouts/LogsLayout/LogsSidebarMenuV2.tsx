@@ -163,6 +163,12 @@ export function LogsSidebarMenuV2() {
       url: `/project/${ref}/logs/edge-functions-logs`,
       items: [],
     },
+    {
+      name: 'Workflow Run Logs',
+      key: 'workflow-run-logs',
+      url: `/project/${ref}/logs/workflow-run-logs`,
+      items: [],
+    },
   ]
 
   const filteredLogs = BASE_COLLECTIONS.filter((collection) => {
