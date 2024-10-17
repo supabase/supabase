@@ -48,6 +48,8 @@ import { z, type SafeParseError } from 'zod'
 import { fetchWithNextOptions } from '~/features/helpers.fetch'
 import { EXAMPLES_DIRECTORY } from '~/lib/docs'
 
+const ALLOW_LISTED_GITHUB_ORGS = ['supabase'] as [string, ...string[]]
+
 const linesSchema = z.array(z.tuple([z.coerce.number(), z.coerce.number()]))
 const linesValidator = z
   .string()
@@ -73,7 +75,9 @@ type AdditionalMeta = {
 
 const codeSampleExternalSchema = z.object({
   external: z.coerce.boolean().refine((v) => v === true),
-  org: z.string(),
+  org: z.enum(ALLOW_LISTED_GITHUB_ORGS, {
+    errorMap: () => ({ message: 'Org must be one of: ' + ALLOW_LISTED_GITHUB_ORGS.join(', ') }),
+  }),
   repo: z.string(),
   commit: z.string(),
   path: z.string().transform((v) => (v.startsWith('/') ? v : `/${v}`)),
