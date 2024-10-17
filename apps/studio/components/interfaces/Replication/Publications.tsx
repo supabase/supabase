@@ -7,34 +7,37 @@ import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useParams } from 'common'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { Button } from 'ui'
+import { useState } from 'react'
+import CreatePublicationModal from './CreatePublicationModal'
 
 export const ReplicationPublications = () => {
   const { ref } = useParams()
   const { data } = useReplicationSourcesQuery({
     projectRef: ref,
   })
+  const [showCreatePublicationModal, setShowCreatePublicationModal] = useState(false)
 
   const sources = data ?? []
-  let publication_source_id = null
+  let source_id = null
 
   for (let i = 0; i < sources.length; i++) {
     const source = sources[i]
     if (source.config.Postgres!.host.startsWith(`db.${ref}`)) {
-      if (publication_source_id === null) {
-        publication_source_id = source.id
+      if (source_id === null) {
+        source_id = source.id
       } else {
         throw new Error(`multiple sources for ref ${ref}`)
       }
     }
   }
 
-  if (publication_source_id === null) {
+  if (source_id === null) {
     throw new Error(`no sources for ref ${ref}`)
   }
 
   const { data: pub_data } = useReplicationPublicationsQuery({
     projectRef: ref,
-    sourceId: publication_source_id,
+    sourceId: source_id,
   })
 
   const publications = pub_data ?? []
@@ -56,6 +59,7 @@ export const ReplicationPublications = () => {
                       text: 'Create a publication',
                     },
                   }}
+                  onClick={() => setShowCreatePublicationModal(true)}
                 >
                   New Publication
                 </ButtonTooltip>
@@ -64,9 +68,7 @@ export const ReplicationPublications = () => {
                 <Table
                   head={[
                     <Table.th key="name">Name</Table.th>,
-                    <Table.th key="tables">
-                      Num Tables
-                    </Table.th>,
+                    <Table.th key="tables">Num Tables</Table.th>,
                     <Table.th key="edit">Edit</Table.th>,
                     <Table.th key="delete">Delete</Table.th>,
                   ]}
@@ -96,6 +98,11 @@ export const ReplicationPublications = () => {
           </div>
         </ScaffoldSection>
       </ScaffoldContainer>
+      <CreatePublicationModal
+        visible={showCreatePublicationModal}
+        sourceId={source_id}
+        onClose={() => setShowCreatePublicationModal(false)}
+      />
     </>
   )
 }

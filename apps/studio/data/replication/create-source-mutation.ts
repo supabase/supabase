@@ -1,8 +1,6 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-// import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 import { handleError, post } from 'data/fetchers'
@@ -10,16 +8,6 @@ import { handleError, post } from 'data/fetchers'
 export type CreateSourceParams = {
   projectRef: string
 }
-
-// export async function createSource({ projectRef }: CreateSourceParams) {
-//   if (!projectRef) throw new Error('projectRef is required')
-
-//   const response = await post(`${API_URL}/storage/${projectRef}/buckets`, {
-//     id,
-//   })
-//   if (response.error) throw response.error
-//   return response
-// }
 
 async function createSource({ projectRef }: CreateSourceParams, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
