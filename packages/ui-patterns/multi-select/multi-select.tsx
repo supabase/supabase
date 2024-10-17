@@ -29,8 +29,6 @@ interface MultiSelectContextProps {
   disabled?: boolean
 }
 
-type OnValuesChangeType = (value: string[]) => void
-
 const MultiSelectContext = React.createContext<MultiSelectContextProps | null>(null)
 
 function useMultiSelect() {
@@ -53,6 +51,7 @@ const MultiSelectorVariants = cva('', {
 })
 
 type MultiSelectorMode = 'combobox' | 'inline-combobox'
+type OnValuesChangeType = (value: string[]) => void
 
 type MultiSelectorProps = {
   mode?: MultiSelectorMode

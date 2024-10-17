@@ -307,33 +307,33 @@ export const PostgrestConfig = () => {
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
                                 >
-                                  <MultiSelector.Trigger
+                                  <MultiSelectorTrigger
                                     mode="inline-combobox"
                                     label="Select schemas for Data API..."
                                     badgeLimit="wrap"
                                     showIcon={false}
                                     deletableBadge
                                   />
-                                  <MultiSelector.Content>
-                                    {schema.length <= 0 ? (
-                                      <MultiSelector.List>
-                                        <MultiSelector.Item key="empty" value="no">
+                                  <MultiSelectorContent>
+                                    <MultiSelectorList>
+                                      {schema?.length <= 0 ? (
+                                        <MultiSelectorItem key="empty" value="no">
                                           no
-                                        </MultiSelector.Item>
-                                      </MultiSelector.List>
-                                    ) : (
-                                      <MultiSelector.List>
-                                        {schema.map((x, i) => (
-                                          <MultiSelector.Item
-                                            key={x.id + '-' + x.name}
-                                            value={x.name}
-                                          >
-                                            {x.name}
-                                          </MultiSelector.Item>
-                                        ))}
-                                      </MultiSelector.List>
-                                    )}
-                                  </MultiSelector.Content>
+                                        </MultiSelectorItem>
+                                      ) : (
+                                        <>
+                                          {schema?.map((x, i) => (
+                                            <MultiSelectorItem
+                                              key={x.id + '-' + x.name}
+                                              value={x.name}
+                                            >
+                                              {x.name}
+                                            </MultiSelectorItem>
+                                          ))}
+                                        </>
+                                      )}
+                                    </MultiSelectorList>
+                                  </MultiSelectorContent>
                                 </MultiSelector>
                               )}
 
