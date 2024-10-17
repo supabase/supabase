@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
@@ -18,6 +19,7 @@ import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { GB } from 'lib/constants'
 import {
@@ -57,13 +59,13 @@ import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
+import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
+import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import {
   DiskManagementDiskSizeReadReplicas,
   DiskManagementIOPSReadReplicas,
   DiskManagementThroughputReadReplicas,
 } from './DiskManagementReadReplicas'
-import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
-import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 
 export function DiskManagementPanelForm() {
@@ -73,6 +75,8 @@ export function DiskManagementPanelForm() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [remainingTime, setRemainingTime] = useState(0)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
+
+  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
@@ -112,9 +116,8 @@ export function DiskManagementPanelForm() {
     })
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const currentCompute = (addons?.selected_addons ?? []).find(
-    (x) => x.type === 'compute_instance'
-  )?.variant
+  const currentCompute = (addons?.selected_addons ?? []).find((x) => x.type === 'compute_instance')
+    ?.variant
   const maxIopsBasedOnCompute =
     COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
   const maxThroughputBasedOnCompute =
@@ -164,7 +167,11 @@ export function DiskManagementPanelForm() {
   const watchedIOPS = watch('provisionedIOPS')
   const { dirtyFields } = formState // Destructure dirtyFields from formState
   const isAllocatedStorageDirty = !!dirtyFields.totalSize // Check if 'allocatedStorage' is dirty
-  const disableInput = isRequestingChanges || isPlanUpgradeRequired || isWithinCooldownWindow
+  const disableInput =
+    isRequestingChanges ||
+    isPlanUpgradeRequired ||
+    isWithinCooldownWindow ||
+    !canUpdateDiskConfiguration
 
   const { includedDiskGB: includedDiskGBMeta } =
     PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
