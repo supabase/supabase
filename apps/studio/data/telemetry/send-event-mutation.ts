@@ -20,19 +20,19 @@ export type SendEventVariables = {
 
 type SendEventPayload = any
 
-export async function sendEvent(type: 'GA' | 'PH', body: SendEventPayload) {
-  const consent =
-    typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null
-  if (consent !== 'true') return
+export async function sendEvent({
+  consent,
+  type,
+  body,
+}: {
+  consent: boolean
+  type: 'GA' | 'PH'
+  body: SendEventPayload
+}) {
+  if (!consent) return undefined
 
   const headers = type === 'PH' ? { Version: '2' } : undefined
-  const { data, error } = await post(`/platform/telemetry/event`, {
-    body,
-    headers,
-    credentials: 'include',
-  })
+  const { data, error } = await post(`/platform/telemetry/event`, { body, headers })
   if (error) handleError(error)
   return data
 }
@@ -49,6 +49,15 @@ export const useSendEventMutation = ({
 > = {}) => {
   const router = useRouter()
   const usePostHogParameters = useFlag('enablePosthogChanges')
+
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(
+          usePostHogParameters
+            ? LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH
+            : LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT
+        )
+      : null) === 'true'
 
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
@@ -89,7 +98,7 @@ export const useSendEventMutation = ({
             custom_properties: otherVars,
           } as unknown as SendEventPH)
         : ({ ...vars, ...payload } as SendEventGA)
-      return sendEvent(type, body)
+      return sendEvent({ consent, type, body })
     },
     {
       async onSuccess(data, variables, context) {
