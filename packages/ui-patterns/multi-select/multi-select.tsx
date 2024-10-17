@@ -81,7 +81,7 @@ function MultiSelector({
 
   const toggleValue = (toggledValue: string) => {
     if (values.includes(toggledValue)) {
-      onValuesChange(values.filter((value) => value !== toggledValue))
+      onValuesChange(values.filter((value) => value !== toggledValue) || [])
     } else {
       onValuesChange([...values, toggledValue])
     }

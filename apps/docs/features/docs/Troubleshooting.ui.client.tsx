@@ -38,7 +38,7 @@ function useTroubleshootingSearchState() {
   const setSelectedProducts = useCallback(
     (products: string[]) => {
       _setState({
-        products: products.length === 0 ? null : products,
+        products: products.length === 0 ? [] : products,
       })
     },
     [_setState]
@@ -46,7 +46,7 @@ function useTroubleshootingSearchState() {
   const setSelectedErrorCodes = useCallback(
     (errorCodes: string[]) => {
       _setState({
-        errorCodes: errorCodes.length === 0 ? null : errorCodes,
+        errorCodes: errorCodes.length === 0 ? [] : errorCodes,
       })
     },
     [_setState]
@@ -54,7 +54,7 @@ function useTroubleshootingSearchState() {
   const setSelectedTags = useCallback(
     (tags: string[]) => {
       _setState({
-        tags: tags.length === 0 ? null : tags,
+        tags: tags.length === 0 ? [] : tags,
       })
     },
     [_setState]
@@ -185,9 +185,6 @@ function TroubleshootingFilterInternal({
     reset,
   } = useTroubleshootingSearchState()
 
-  const [productsOpen, _setProductsOpen] = useState(false)
-  const [errorsOpen, _setErrorsOpen] = useState(false)
-  const [tagsOpen, _setTagsOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement | null>(null)
 
   const allEntries = useRef<HTMLElement[]>([])
@@ -203,40 +200,6 @@ function TroubleshootingFilterInternal({
     allEntries.current = entries
   }, [])
 
-  const setProductsOpen = useCallback(
-    (open: boolean) => {
-      _setProductsOpen(open)
-      if (open) {
-        allEntries.current?.forEach((entry) => (entry.inert = true))
-      } else {
-        allEntries.current?.forEach((entry) => (entry.inert = false))
-      }
-    },
-    [_setProductsOpen]
-  )
-  const setErrorsOpen = useCallback(
-    (open: boolean) => {
-      _setErrorsOpen(open)
-      if (open) {
-        allEntries.current?.forEach((entry) => (entry.inert = true))
-      } else {
-        allEntries.current?.forEach((entry) => (entry.inert = false))
-      }
-    },
-    [_setErrorsOpen]
-  )
-  const setTagsOpen = useCallback(
-    (open: boolean) => {
-      _setTagsOpen(open)
-      if (open) {
-        allEntries.current?.forEach((entry) => (entry.inert = true))
-      } else {
-        allEntries.current?.forEach((entry) => (entry.inert = false))
-      }
-    },
-    [_setTagsOpen]
-  )
-
   const convertToItem = useCallback(
     (arr: string[], { capitalize = false }: { capitalize?: boolean } = {}) =>
       arr.map((item) => item),
@@ -248,42 +211,48 @@ function TroubleshootingFilterInternal({
       <h2 className="sr-only">Search and filter</h2>
       <div className={cn('flex flex-wrap gap-2 items-center', className)}>
         <MultiSelector
-          // open={productsOpen}
-          // onOpenChange={setProductsOpen}
           values={convertToItem(selectedProducts, { capitalize: true })}
           onValuesChange={setSelectedProducts}
         >
-          <MultiSelector.Trigger className="w-48" label="Products" />
+          <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Products" />
           <MultiSelector.Content>
-            {products?.map((product) => (
-              <MultiSelector.Item key={`product-${product}`} value={product} />
-            ))}
+            <MultiSelector.List>
+              {products?.map((product) => (
+                <MultiSelector.Item key={`product-${product}`} value={product}>
+                  {product}
+                </MultiSelector.Item>
+              ))}
+            </MultiSelector.List>
           </MultiSelector.Content>
         </MultiSelector>
         <MultiSelector
-          // open={errorsOpen}
-          // onOpenChange={setErrorsOpen}
           values={convertToItem(selectedErrorCodes, { capitalize: true })}
           onValuesChange={setSelectedErrorCodes}
         >
-          <MultiSelector.Trigger className="w-48" label="Error codes" />
+          <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Error codes" />
           <MultiSelector.Content>
-            {errors?.map((error) => (
-              <MultiSelector.Item key={`error-${error.code}`} value={error.message} />
-            ))}
+            <MultiSelector.List>
+              {errors?.map((error) => (
+                <MultiSelector.Item key={`error-${error.code}`} value={error.code}>
+                  {error.code}
+                </MultiSelector.Item>
+              ))}
+            </MultiSelector.List>
           </MultiSelector.Content>
         </MultiSelector>
         <MultiSelector
-          // open={tagsOpen}
-          // onOpenChange={setTagsOpen}
           values={convertToItem(selectedTags, { capitalize: true })}
           onValuesChange={setSelectedTags}
         >
-          <MultiSelector.Trigger className="w-48" label="Tags" />
+          <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Tags" />
           <MultiSelector.Content>
-            {keywords?.map((keyword) => (
-              <MultiSelector.Item key={`keyword-${keyword}`} value={keyword} />
-            ))}
+            <MultiSelector.List>
+              {keywords?.map((keyword) => (
+                <MultiSelector.Item key={`keyword-${keyword}`} value={keyword}>
+                  {keyword}
+                </MultiSelector.Item>
+              ))}
+            </MultiSelector.List>
           </MultiSelector.Content>
         </MultiSelector>
         <div className="relative">

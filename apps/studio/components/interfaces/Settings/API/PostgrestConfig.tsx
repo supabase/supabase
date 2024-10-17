@@ -302,35 +302,38 @@ export const PostgrestConfig = () => {
                                 </div>
                               ) : (
                                 <MultiSelector
-                                  onValuesChange={field.onChange}
+                                  onValuesChange={(values) => field.onChange(values ?? [])}
                                   values={field.value}
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
                                 >
-                                  <MultiSelectorTrigger
+                                  <MultiSelector.Trigger
                                     mode="inline-combobox"
                                     label="Select schemas for Data API..."
                                     badgeLimit="wrap"
                                     showIcon={false}
                                     deletableBadge
                                   />
-                                  <MultiSelectorContent>
+                                  <MultiSelector.Content>
                                     {schema.length <= 0 ? (
-                                      <MultiSelectorList>
-                                        <MultiSelectorItem key={'empty'} value={'no'}>
+                                      <MultiSelector.List>
+                                        <MultiSelector.Item key="empty" value="no">
                                           no
-                                        </MultiSelectorItem>
-                                      </MultiSelectorList>
+                                        </MultiSelector.Item>
+                                      </MultiSelector.List>
                                     ) : (
-                                      <MultiSelectorList>
+                                      <MultiSelector.List>
                                         {schema.map((x, i) => (
-                                          <MultiSelectorItem key={x.id + '-' + i} value={x.name}>
+                                          <MultiSelector.Item
+                                            key={x.id + '-' + x.name}
+                                            value={x.name}
+                                          >
                                             {x.name}
-                                          </MultiSelectorItem>
+                                          </MultiSelector.Item>
                                         ))}
-                                      </MultiSelectorList>
+                                      </MultiSelector.List>
                                     )}
-                                  </MultiSelectorContent>
+                                  </MultiSelector.Content>
                                 </MultiSelector>
                               )}
 
