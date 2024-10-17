@@ -833,8 +833,9 @@ const EXTERNAL_PROVIDER_GOOGLE = {
       type: 'boolean',
     },
     EXTERNAL_GOOGLE_CLIENT_ID: {
-      title: 'Client ID (for OAuth)',
-      description: 'Client ID to use with the OAuth flow on the web.',
+      title: 'Client IDs',
+      description:
+        'Comma-separated list of client IDs for OAuth, Android apps, One Tap, and Chrome extensions.',
       type: 'string',
     },
     EXTERNAL_GOOGLE_SECRET: {
@@ -843,78 +844,31 @@ const EXTERNAL_PROVIDER_GOOGLE = {
       type: 'string',
       isSecret: true,
     },
-    EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: {
-      title: 'Authorized Client IDs (for Android, One Tap, and Chrome extensions)',
-      description:
-        'Comma separated list of client IDs of Android apps, One Tap or Chrome extensions that are allowed to log in to your project.',
-      type: 'string',
-    },
     EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: {
       title: 'Skip nonce checks',
       description:
-        "Allows ID tokens with any nonce to be accepted, which is less secure. Useful in situations where you don't have access to the nonce used to issue the ID token, such with iOS.",
+        "Allows ID tokens with any nonce to be accepted, which is less secure. Useful in situations where you don't have access to the nonce used to issue the ID token, such as with iOS.",
       type: 'boolean',
     },
   },
   validationSchema: object().shape({
     EXTERNAL_GOOGLE_ENABLED: boolean().required(),
-    EXTERNAL_GOOGLE_SECRET: string()
-      .when(['EXTERNAL_GOOGLE_ENABLED', 'EXTERNAL_GOOGLE_CLIENT_ID'], {
-        is: (EXTERNAL_GOOGLE_ENABLED: boolean, EXTERNAL_GOOGLE_CLIENT_ID: string) => {
-          return EXTERNAL_GOOGLE_ENABLED && !!EXTERNAL_GOOGLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema
-            .matches(
-              /^[a-z0-9.\/_-]*$/i,
-              'Invalid characters. Google OAuth Client Secrets usually contain letters, numbers, dots, dashes and underscores.'
-            )
-            .required('Client Secret is required when using the OAuth flow.'),
-      })
-      .when(
-        [
-          'EXTERNAL_GOOGLE_ENABLED',
-          'EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS',
-          'EXTERNAL_GOOGLE_CLIENT_ID',
-        ],
-        {
-          is: (
-            EXTERNAL_GOOGLE_ENABLED: boolean,
-            EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string,
-            EXTERNAL_GOOGLE_CLIENT_ID: string
-          ) => {
-            return (
-              EXTERNAL_GOOGLE_ENABLED &&
-              !!EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS &&
-              !EXTERNAL_GOOGLE_CLIENT_ID
-            )
-          },
-          then: (schema) =>
-            schema.matches(
-              /^$/,
-              'Client Secret should only be set when Client ID for OAuth is set.'
-            ),
-        }
-      ),
-    EXTERNAL_GOOGLE_CLIENT_ID: string().matches(
-      /^([a-z0-9-]+([.][a-z0-9-]+)+)?$/i,
-      'Invalid characters. Google OAuth Client IDs are usually a domain-name (e.g. 01234567890-abcdefghijklmnopqrstuvwxyz012345.apps.googleusercontent.com).'
-    ),
-    EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string()
+    EXTERNAL_GOOGLE_CLIENT_ID: string()
       .matches(
         /^([a-z0-9-]+([.][a-z0-9-]+)*(,\s*[a-z0-9-]+([.][a-z0-9-]+)*)*,*\s*)?$/i,
-        'Invalid characters. Google Client IDs are usually a domain-name style string (e.g. com.example.com.app or *.apps.googleusercontent.com).'
+        'Invalid characters. Google Client IDs should be a comma-separated list of domain-like strings.'
       )
-
-      .when(['EXTERNAL_GOOGLE_ENABLED', 'EXTERNAL_GOOGLE_CLIENT_ID'], {
-        is: (EXTERNAL_GOOGLE_ENABLED: boolean, EXTERNAL_GOOGLE_CLIENT_ID: string) => {
-          return EXTERNAL_GOOGLE_ENABLED && !EXTERNAL_GOOGLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema.required(
-            'At least one Authorized Client ID is required when not using the OAuth flow.'
+      .required('At least one Client ID is required when Google sign-in is enabled.'),
+    EXTERNAL_GOOGLE_SECRET: string().when('EXTERNAL_GOOGLE_ENABLED', {
+      is: true,
+      then: (schema) =>
+        schema
+          .required('Client Secret is required when using the OAuth flow.')
+          .matches(
+            /^[a-z0-9.\/_-]*$/i,
+            'Invalid characters. Google OAuth Client Secrets usually contain letters, numbers, dots, dashes, and underscores.'
           ),
-      }),
+    }),
     EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean().required(),
   }),
   misc: {
@@ -923,7 +877,8 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     helper: `Register this callback URL when using Sign-in with Google on the web using OAuth.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-google#configure-your-services-id)`,
   },
-}
+};
+
 
 const EXTERNAL_PROVIDER_KAKAO = {
   $schema: JSON_SCHEMA_VERSION,
