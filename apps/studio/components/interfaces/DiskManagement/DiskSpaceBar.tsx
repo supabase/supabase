@@ -188,7 +188,7 @@ export default function DiskSpaceBar({
         </div>
       </div>
       <p className="text-xs text-foreground-lighter mt-4">
-        <span className="font-semibold">Note:</span> Disk size refers to the total space your
+        <span className="font-semibold">Note:</span> Disk Size refers to the total space your
         project occupies on disk, including the database itself, additional files like the
         write-ahead log (WAL), and other internal resources.
       </p>
