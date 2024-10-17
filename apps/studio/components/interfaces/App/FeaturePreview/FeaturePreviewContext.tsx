@@ -5,25 +5,29 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
+import { FunctionsAssistantPreview } from './FunctionsAssistantPreview'
 
 export const FEATURE_PREVIEWS = [
+  {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT,
+    name: 'Database Functions Assistant',
+    content: <FunctionsAssistantPreview />,
+    discussionsUrl: undefined,
+    isNew: true,
+  },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
     name: 'Project API documentation',
     content: <APISidePanelPreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
+    isNew: false,
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
     name: 'Column-level privileges',
     content: <CLSPreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT,
-    name: 'Database Functions Assistant',
-    content: null,
-    discussionsUrl: undefined,
+    isNew: false,
   },
 ]
 

@@ -5,34 +5,84 @@ const PLACEHOLDER_PREFIX = `-- Press tab to use this code
 
 const PLACEHOLDER_LIMIT = `Just three examples will do.`
 
-export const generateTitle = (editor?: SupportedAssistantEntities) => {
-  if (editor === 'functions') return 'Create a new function'
-  return 'SQL Scratch Pad'
+export const generateTitle = (editor?: SupportedAssistantEntities | null) => {
+  switch (editor) {
+    case 'functions':
+      return 'Create a new function'
+    case 'rls-policies':
+      return 'Create a new RLS policy'
+    default:
+      return 'SQL Scratch Pad'
+  }
 }
 
-export const generateCTA = (editor?: SupportedAssistantEntities) => {
-  if (editor === 'functions') return 'Save function'
-  return 'Run query'
+export const generateCTA = (editor?: SupportedAssistantEntities | null) => {
+  switch (editor) {
+    case 'functions':
+      return 'Save function'
+    case 'rls-policies':
+      return 'Save policy'
+    default:
+      return 'Run query'
+  }
 }
 
-export const generatePlaceholder = (editor?: SupportedAssistantEntities) => {
-  if (editor === 'functions') {
-    return `${PLACEHOLDER_PREFIX}
-CREATE FUNCTION schema.function_name(param1 type, param2 type)\n
-&nbsp;&nbsp;RETURNS return_type\n
-&nbsp;&nbsp;LANGUAGE plpgsql\n
+export const generatePlaceholder = (editor?: SupportedAssistantEntities | null) => {
+  switch (editor) {
+    case 'functions':
+      return `${PLACEHOLDER_PREFIX}
+CREATE FUNCTION *schema*.*function_name*(*param1 type*, *param2 type*)\n
+&nbsp;&nbsp;RETURNS *return_type*\n
+&nbsp;&nbsp;LANGUAGE *plpgsql*\n
 &nbsp;&nbsp;SECURITY DEFINER\n
-&nbsp;&nbsp;SET search_path = ''\n
+&nbsp;&nbsp;SET *search_path = ''*\n
 AS $$\n
 DECLARE\n
-&nbsp;&nbsp;-- Variable declarations\n
+&nbsp;&nbsp;*-- Variable declarations*\n
 BEGIN\n
-&nbsp;&nbsp;-- Function logic\n
+&nbsp;&nbsp;*-- Function logic*\n
 END;\n
 $$;
 `
-  } else {
-    return undefined
+    case 'rls-policies':
+      return `${PLACEHOLDER_PREFIX}
+CREATE POLICY *name* ON *table_name*\n
+AS PERMISSIVE -- PERMISSIVE | RESTRICTIVE\n
+FOR ALL -- ALL | SELECT | INSERT | UPDATE | DELETE\n
+TO *role_name* -- Default: public\n
+USING ( *using_expression* )\n
+WITH CHECK ( *check_expression* );
+`
+    default:
+      return undefined
+  }
+}
+
+export const retrieveDocsUrl = (editor?: SupportedAssistantEntities | null) => {
+  switch (editor) {
+    case 'functions':
+      return 'https://supabase.com/docs/guides/database/functions'
+    case 'rls-policies':
+      return 'https://supabase.com/docs/guides/database/postgres/row-level-security'
+    default:
+      return undefined
+  }
+}
+
+// [Joshen] This is just very basic validation, but possible can extend perhaps
+export const validateQuery = (editor: SupportedAssistantEntities | null, query: string) => {
+  const formattedQuery = query.toLowerCase().replaceAll('\n', ' ')
+
+  switch (editor) {
+    case 'functions':
+      return (
+        formattedQuery.includes('create function') ||
+        formattedQuery.includes('create or replace function')
+      )
+    case 'rls-policies':
+      return formattedQuery.includes('create policy')
+    default:
+      return true
   }
 }
 
@@ -71,33 +121,5 @@ export const generatePrompt = ({
     }
 
     return basePrompt
-  }
-}
-
-export const retrieveDocsUrl = (editor?: SupportedAssistantEntities) => {
-  switch (editor) {
-    case 'functions':
-      return 'https://supabase.com/docs/guides/database/functions'
-    case 'rls-policies':
-      return 'https://supabase.com/docs/guides/database/postgres/row-level-security'
-    default:
-      return undefined
-  }
-}
-
-// [Joshen] This is just very basic validation, but possible can extend perhaps
-export const validateQuery = (editor: SupportedAssistantEntities, query: string) => {
-  const formattedQuery = query.toLowerCase().replaceAll('\n', ' ')
-
-  switch (editor) {
-    case 'functions':
-      return (
-        formattedQuery.includes('create function') ||
-        formattedQuery.includes('create or replace function')
-      )
-    case 'rls-policies':
-      return true
-    default:
-      return true
   }
 }

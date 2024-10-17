@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Button, Modal, ScrollArea, cn } from 'ui'
+import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 
 const FeaturePreviewModal = () => {
@@ -84,8 +84,11 @@ const FeaturePreviewModal = () => {
           </div>
           <div className="flex-grow max-h-[550px] p-4 space-y-3 overflow-y-auto">
             <div className="flex items-center justify-between">
-              <p>{selectedFeature?.name}</p>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-x-2">
+                <p>{selectedFeature?.name}</p>
+                {selectedFeature?.isNew && <Badge color="green">New</Badge>}
+              </div>
+              <div className="flex items-center gap-x-2">
                 {selectedFeature?.discussionsUrl !== undefined && (
                   <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <Link href={selectedFeature.discussionsUrl} target="_blank" rel="noreferrer">

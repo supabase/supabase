@@ -10,6 +10,12 @@ const EMPTY_DASHBOARD_HISTORY: {
   editor: undefined,
 }
 
+type AiAssistantPanelType = {
+  open: boolean
+  editor?: SupportedAssistantEntities | null
+  content?: string
+}
+
 export const appState = proxy({
   // [Joshen] Last visited "entity" for any page that we wanna track
   dashboardHistory: EMPTY_DASHBOARD_HISTORY,
@@ -89,12 +95,10 @@ export const appState = proxy({
     appState.navigationPanelJustClosed = value
   },
 
-  aiAssistantPanel: { open: false, editor: undefined } as {
-    open: boolean
-    editor?: SupportedAssistantEntities
+  aiAssistantPanel: { open: false, editor: null, content: '' } as AiAssistantPanelType,
+  setAiAssistantPanel: (value: AiAssistantPanelType) => {
+    appState.aiAssistantPanel = { ...appState.aiAssistantPanel, ...value }
   },
-  setAiAssistantPanel: (value: { open: boolean; editor?: SupportedAssistantEntities }) =>
-    (appState.aiAssistantPanel = value),
 })
 
 export const getAppStateSnapshot = () => snapshot(appState)

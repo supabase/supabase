@@ -78,7 +78,7 @@ export default function ComboboxDropdownMenu() {
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>No label found.</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
-                      <ScrollArea className="h-20">
+                      <ScrollArea className="h-24">
                         {labels.map((label) => (
                           <CommandItem_Shadcn_
                             key={label}

@@ -1,5 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Command, CornerDownLeft, Loader2, PanelRightOpen, X } from 'lucide-react'
+import { uniqBy } from 'lodash'
+import { Command, CornerDownLeft, Loader2, X } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -15,11 +17,12 @@ import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { sqlKeys } from 'data/sql/keys'
+import { usePrevious } from 'hooks/deprecated'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { SqlEditor } from 'icons'
 import { BASE_PATH, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS, uuidv4 } from 'lib/helpers'
-import { uniqBy } from 'lodash'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
@@ -40,11 +43,14 @@ import { ASSISTANT_SUPPORT_ENTITIES } from './AiAssistant.constants'
 
 export const AiAssistantPanel = () => {
   const os = detectOS()
+  const router = useRouter()
   const { ref } = useParams()
   const project = useSelectedProject()
   const queryClient = useQueryClient()
   const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
-  const { open, editor } = aiAssistantPanel
+
+  const { open, editor, content } = aiAssistantPanel
+  const previousEditor = usePrevious(editor)
 
   const [isAcknowledged, setIsAcknowledged] = useLocalStorage(
     LOCAL_STORAGE_KEYS.SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED,
@@ -57,13 +63,15 @@ export const AiAssistantPanel = () => {
   const [showResults, setShowResults] = useState(false)
   const [showWarning, setShowWarning] = useState<boolean>(false)
   const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
-  const [showAssistant, setShowAssistant] = useState(true) // Not sure if want to make this expandable
 
-  const showEditor = true // !!editor
+  // [Joshen] JFYI I'm opting to just have the assistant always show and not toggle-able
+  // I don't really see any negatives of keeping it open (or benefits from hiding) tbh
+  // const [showAssistant, setShowAssistant] = useState(true)
   const title = generateTitle(editor)
   const placeholder = generatePlaceholder(editor)
   const ctaText = generateCTA(editor)
   const editorRef = useRef<IStandaloneCodeEditor | undefined>()
+  const editorModel = editorRef.current?.getModel()
 
   const numResults = (results ?? []).length
   const [errorHeader, ...errorContent] =
@@ -75,7 +83,7 @@ export const AiAssistantPanel = () => {
       // [Joshen] If in a specific editor context mode, assume that intent was to create/update
       // a database entity - so close it once success. Otherwise it's in Quick SQL mode and we
       // show the results. Currently though it assumes we're "creating", thinking need to support "updating" too
-      if (editor !== undefined) {
+      if (editor !== null) {
         switch (editor) {
           case 'functions':
             await queryClient.invalidateQueries(sqlKeys.query(ref, ['functions-list']))
@@ -182,7 +190,6 @@ export const AiAssistantPanel = () => {
 
   const updateEditorWithCheckForDiff = useCallback(
     ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => {
-      const editorModel = editorRef.current?.getModel()
       if (!editorModel) return
 
       const existingValue = editorRef.current?.getValue() ?? ''
@@ -204,27 +211,40 @@ export const AiAssistantPanel = () => {
         ])
       }
     },
-    []
+    [editorModel]
   )
 
   useEffect(() => {
-    // setShowAssistant(open && editor === undefined)
     if (open) {
-      // [Joshen] Should we reset the conversation here?
-      setChatId(uuidv4())
-      setError(undefined)
-      setShowWarning(false)
-      setDebugThread([])
-      setResults(undefined)
-      setShowResults(false)
+      // [Joshen] Only reset the assistant if the editor changed
+      if (previousEditor !== editor) {
+        setChatId(uuidv4())
+        setError(undefined)
+        setShowWarning(false)
+        setDebugThread([])
+        setResults(undefined)
+        setShowResults(false)
+      } else {
+        // [Joshen] Repopulate the code editor with the content from where the user left off
+        // setTimeout is just to give time for the editorRef to get associated
+        setTimeout(() => {
+          const editorModel = editorRef.current?.getModel()
+          if (content && editorModel) {
+            editorRef.current?.executeEdits('apply-ai-message', [
+              { text: content, range: editorModel.getFullModelRange() },
+            ])
+          }
+        }, 100)
+      }
     }
-  }, [open, editor])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
   // [Joshen] Just to test the concept of a universal assistant of sorts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.metaKey && e.code === 'KeyI') {
-        setAiAssistantPanel({ open: true })
+        setAiAssistantPanel({ open: true, editor: null })
       }
     }
     if (project !== undefined) window.addEventListener('keydown', handler)
@@ -239,182 +259,178 @@ export const AiAssistantPanel = () => {
   }, [error, showWarning, isExecuting, numResults, showResults])
 
   return (
-    <Sheet open={open} onOpenChange={() => setAiAssistantPanel({ open: !open, editor: undefined })}>
-      <SheetContent
-        showClose={true}
-        className={cn('flex gap-0', showEditor ? 'w-[1200px]' : 'w-[600px]')}
-      >
+    <Sheet
+      open={open}
+      onOpenChange={() => {
+        if (open) {
+          // [Joshen] Save the code content when closing - should allow users to continue from
+          // where they left off IF they are opening the assistant again in the same "editor" context
+          const existingValue = editorRef.current?.getValue() ?? ''
+          setAiAssistantPanel({ open: false, content: existingValue })
+        } else {
+          setAiAssistantPanel({ open: true })
+        }
+      }}
+    >
+      <SheetContent showClose={true} className={cn('flex gap-0 w-[1200px]')}>
         {/* Assistant */}
         <AIAssistant
           id={chatId}
-          className={showEditor ? 'border-r w-1/2' : 'w-full'}
+          className="border-r w-1/2"
           debugThread={debugThread}
           onDiff={updateEditorWithCheckForDiff}
           onResetConversation={() => setChatId(uuidv4())}
         />
 
         {/* Editor */}
-        {showEditor && (
-          <div className={cn('flex flex-col grow w-1/2')}>
-            <SheetHeader className="flex items-center gap-x-3 py-3">
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_>
-                  <PanelRightOpen
-                    size={16}
-                    className="transition text-foreground-light hover:text-foreground cursor-pointer"
-                  />
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="bottom">Open Assistant</TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
-              {title}
-            </SheetHeader>
-            {editor === undefined && !isAcknowledged && (
-              <Admonition
-                showIcon={false}
-                type="default"
-                title="This is a quick access SQL editor to run queries on your database"
-                className="relative m-0 rounded-none border-x-0 border-t-0 [&>div]:m-0"
-              >
-                <span>
-                  Queries written here will not be saved and results are limited up to only 100 rows
-                </span>
+        <div className={cn('flex flex-col grow w-1/2')}>
+          <SheetHeader className="flex items-center justify-between py-3 pr-12">
+            {title}
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <Button
-                  type="text"
-                  icon={<X />}
-                  className="px-1.5 absolute top-2 right-2"
-                  onClick={() => setIsAcknowledged(true)}
+                  type="outline"
+                  icon={<SqlEditor />}
+                  className="px-1"
+                  onClick={() => {
+                    const content = editorRef.current?.getValue() ?? ''
+                    router.push(`/project/${ref}/sql/new?content=${encodeURIComponent(content)}`)
+                    setAiAssistantPanel({ open: false })
+                  }}
                 />
-              </Admonition>
-            )}
-            {showEditor && (
-              <div className="flex flex-col h-full justify-between">
-                <div className="relative flex-grow block">
-                  <CodeEditor
-                    id="assistant-code-editor"
-                    language="pgsql"
-                    editorRef={editorRef}
-                    placeholder={placeholder}
-                    actions={{
-                      runQuery: { enabled: true, callback: () => onExecuteSql() },
-                      explainCode: { enabled: true, callback: onExplainSql },
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col">
-                  {error !== undefined && (
-                    <Admonition
-                      type="warning"
-                      className="m-0 rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
-                      title={errorHeader || 'Error running SQL query'}
-                      description={
-                        <>
-                          <div>
-                            {errorContent.length > 0 ? (
-                              errorContent.map((errorText: string, i: number) => (
-                                <pre
-                                  key={`err-${i}`}
-                                  className="font-mono text-xs whitespace-pre-wrap"
-                                >
-                                  {errorText}
-                                </pre>
-                              ))
-                            ) : (
-                              <p className="font-mono text-xs">{error.error}</p>
-                            )}
-                          </div>
-                          <Button
-                            type="default"
-                            className="w-min"
-                            onClick={() => onFixWithAssistant()}
-                          >
-                            Fix with Assistant
-                          </Button>
-                        </>
-                      }
-                    />
-                  )}
-                  {showWarning && (
-                    <Admonition
-                      type="default"
-                      className="m-0 rounded-none border-x-0 border-b-0 [&>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
-                      title={`Your query doesn't seem to be relevant to ${
-                        entityContext?.id === 'rls-policies'
-                          ? entityContext?.label
-                          : `Database ${entityContext?.label}`
-                      }`}
-                      description={
-                        <>
-                          <p>Are you sure you want to run this query?</p>
-                          <Button
-                            type="default"
-                            className="w-min"
-                            onClick={() => onExecuteSql(true)}
-                          >
-                            Confirm run query
-                          </Button>
-                        </>
-                      }
-                    />
-                  )}
-                  {results !== undefined && results.length > 0 && (
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom">Open in SQL Editor</TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
+          </SheetHeader>
+          {editor === undefined && !isAcknowledged && (
+            <Admonition
+              showIcon={false}
+              type="default"
+              title="This is a quick access SQL editor to run queries on your database"
+              className="relative m-0 rounded-none border-x-0 border-t-0 [&>div]:m-0"
+            >
+              <span>
+                Queries written here will not be saved and results are limited up to only 100 rows
+              </span>
+              <Button
+                type="text"
+                icon={<X />}
+                className="px-1.5 absolute top-2 right-2"
+                onClick={() => setIsAcknowledged(true)}
+              />
+            </Admonition>
+          )}
+          <div className="flex flex-col h-full justify-between">
+            <div className="relative flex-grow block">
+              <CodeEditor
+                id="assistant-code-editor"
+                language="pgsql"
+                editorRef={editorRef}
+                placeholder={placeholder}
+                actions={{
+                  runQuery: { enabled: true, callback: () => onExecuteSql() },
+                  explainCode: { enabled: true, callback: onExplainSql },
+                }}
+              />
+            </div>
+            <div className="flex flex-col">
+              {error !== undefined && (
+                <Admonition
+                  type="warning"
+                  className="m-0 rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
+                  title={errorHeader || 'Error running SQL query'}
+                  description={
                     <>
-                      <div className={cn(showResults ? 'h-72 border-t' : 'h-0')}>
-                        <Results rows={results} />
-                      </div>
-                      <div className="flex items-center justify-between border-t bg-surface-100 py-2 pl-2 pr-5">
-                        <p className="text-xs text-foreground-light">
-                          {results.length} rows
-                          {results.length >= 100 && ` (Limited to only 100 rows)`}
-                        </p>
-                        <Button
-                          size="tiny"
-                          type="default"
-                          onClick={() => setShowResults(!showResults)}
-                        >
-                          {showResults ? 'Hide' : 'Show'} results
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                  {results !== undefined && results.length === 0 && (
-                    <div className="flex items-center justify-between border-t bg-surface-100 py-2 pl-2 pr-5">
-                      <p className="text-xs text-foreground-light">Success. No rows returned.</p>
-                    </div>
-                  )}
-                  <SheetFooter className="bg-surface-100 flex items-center !justify-end px-5 py-4 w-full border-t">
-                    <Button
-                      type="default"
-                      disabled={isExecuting}
-                      onClick={() => setAiAssistantPanel({ open: false })}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      loading={isExecuting}
-                      onClick={() => onExecuteSql()}
-                      iconRight={
-                        isExecuting ? (
-                          <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
+                      <div>
+                        {errorContent.length > 0 ? (
+                          errorContent.map((errorText: string, i: number) => (
+                            <pre key={`err-${i}`} className="font-mono text-xs whitespace-pre-wrap">
+                              {errorText}
+                            </pre>
+                          ))
                         ) : (
-                          <div className="flex items-center space-x-1">
-                            {os === 'macos' ? (
-                              <Command size={10} strokeWidth={1.5} />
-                            ) : (
-                              <p className="text-xs text-foreground-light">CTRL</p>
-                            )}
-                            <CornerDownLeft size={10} strokeWidth={1.5} />
-                          </div>
-                        )
-                      }
-                    >
-                      {ctaText}
+                          <p className="font-mono text-xs">{error.error}</p>
+                        )}
+                      </div>
+                      <Button type="default" className="w-min" onClick={() => onFixWithAssistant()}>
+                        Fix with Assistant
+                      </Button>
+                    </>
+                  }
+                />
+              )}
+              {showWarning && (
+                <Admonition
+                  type="default"
+                  className="m-0 rounded-none border-x-0 border-b-0 [&>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
+                  title={`Your query doesn't seem to be relevant to ${
+                    entityContext?.id === 'rls-policies'
+                      ? entityContext?.label
+                      : `Database ${entityContext?.label}`
+                  }`}
+                  description={
+                    <>
+                      <p>Are you sure you want to run this query?</p>
+                      <Button type="default" className="w-min" onClick={() => onExecuteSql(true)}>
+                        Confirm run query
+                      </Button>
+                    </>
+                  }
+                />
+              )}
+              {results !== undefined && results.length > 0 && (
+                <>
+                  <div className={cn(showResults ? 'h-72 border-t' : 'h-0')}>
+                    <Results rows={results} />
+                  </div>
+                  <div className="flex items-center justify-between border-t bg-surface-100 py-2 pl-2 pr-5">
+                    <p className="text-xs text-foreground-light">
+                      {results.length} rows
+                      {results.length >= 100 && ` (Limited to only 100 rows)`}
+                    </p>
+                    <Button size="tiny" type="default" onClick={() => setShowResults(!showResults)}>
+                      {showResults ? 'Hide' : 'Show'} results
                     </Button>
-                  </SheetFooter>
+                  </div>
+                </>
+              )}
+              {results !== undefined && results.length === 0 && (
+                <div className="flex items-center justify-between border-t bg-surface-100 py-2 pl-2 pr-5">
+                  <p className="text-xs text-foreground-light">Success. No rows returned.</p>
                 </div>
-              </div>
-            )}
+              )}
+              <SheetFooter className="bg-surface-100 flex items-center !justify-end px-5 py-4 w-full border-t">
+                <Button
+                  type="default"
+                  disabled={isExecuting}
+                  onClick={() => setAiAssistantPanel({ open: false })}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  loading={isExecuting}
+                  onClick={() => onExecuteSql()}
+                  iconRight={
+                    isExecuting ? (
+                      <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
+                    ) : (
+                      <div className="flex items-center space-x-1">
+                        {os === 'macos' ? (
+                          <Command size={10} strokeWidth={1.5} />
+                        ) : (
+                          <p className="text-xs text-foreground-light">CTRL</p>
+                        )}
+                        <CornerDownLeft size={10} strokeWidth={1.5} />
+                      </div>
+                    )
+                  }
+                >
+                  {ctaText}
+                </Button>
+              </SheetFooter>
+            </div>
           </div>
-        )}
+        </div>
       </SheetContent>
     </Sheet>
   )

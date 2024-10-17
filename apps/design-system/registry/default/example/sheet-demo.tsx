@@ -9,6 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
+import ComboboxDropdownMenu from './combobox-dropdown-menu'
 
 export default function SheetDemo() {
   return (
@@ -35,6 +36,9 @@ export default function SheetDemo() {
               Username
             </Label_Shadcn_>
             <Input_Shadcn_ id="username" value="@peduarte" className="col-span-3" />
+          </div>
+          <div className="px-4">
+            <ComboboxDropdownMenu />
           </div>
         </div>
         <SheetFooter>
