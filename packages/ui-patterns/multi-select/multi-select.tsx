@@ -93,58 +93,55 @@ function MultiSelector({
     }
   })
 
-  const handleKeyDown = React.useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
-      const moveNext = () => {
-        const nextIndex = activeIndex + 1
-        setActiveIndex(nextIndex > values.length - 1 ? (loop ? 0 : -1) : nextIndex)
-      }
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const moveNext = () => {
+      const nextIndex = activeIndex + 1
+      setActiveIndex(nextIndex > values.length - 1 ? (loop ? 0 : -1) : nextIndex)
+    }
 
-      const movePrev = () => {
-        const prevIndex = activeIndex - 1
-        setActiveIndex(prevIndex < 0 ? values.length - 1 : prevIndex)
-      }
+    const movePrev = () => {
+      const prevIndex = activeIndex - 1
+      setActiveIndex(prevIndex < 0 ? values.length - 1 : prevIndex)
+    }
 
-      if ((e.key === 'Backspace' || e.key === 'Delete') && values.length > 0) {
-        if (inputValue.length === 0) {
-          if (activeIndex !== -1 && activeIndex < values.length) {
-            onValuesChange(values.filter((item) => item !== values[activeIndex]))
-            const newIndex = activeIndex - 1 < 0 ? 0 : activeIndex - 1
-            setActiveIndex(newIndex)
-          } else {
-            onValuesChange(values.filter((item) => item !== values[values.length - 1]))
-          }
-        }
-      } else if (e.key === 'Enter') {
-        if (open) {
-          inputValue.length !== 0 && setInputValue('')
+    if ((e.key === 'Backspace' || e.key === 'Delete') && values.length > 0) {
+      if (inputValue.length === 0) {
+        if (activeIndex !== -1 && activeIndex < values.length) {
+          onValuesChange(values.filter((item) => item !== values[activeIndex]))
+          const newIndex = activeIndex - 1 < 0 ? 0 : activeIndex - 1
+          setActiveIndex(newIndex)
         } else {
-          setOpen(true)
+          onValuesChange(values.filter((item) => item !== values[values.length - 1]))
         }
-      } else if (e.key === 'Escape') {
-        if (activeIndex !== -1) {
-          setActiveIndex(-1)
-        } else {
-          setOpen(false)
-        }
-      } else if (dir === 'rtl') {
-        !open && setOpen(true)
-        if (e.key === 'ArrowRight') {
-          movePrev()
-        } else if (e.key === 'ArrowLeft' && (activeIndex !== -1 || loop)) {
-          moveNext()
-        }
+      }
+    } else if (e.key === 'Enter') {
+      if (open) {
+        inputValue.length !== 0 && setInputValue('')
       } else {
-        !open && setOpen(true)
-        if (e.key === 'ArrowLeft') {
-          movePrev()
-        } else if (e.key === 'ArrowRight' && (activeIndex !== -1 || loop)) {
-          moveNext()
-        }
+        setOpen(true)
       }
-    },
-    [values, inputValue, activeIndex, loop]
-  )
+    } else if (e.key === 'Escape') {
+      if (activeIndex !== -1) {
+        setActiveIndex(-1)
+      } else {
+        setOpen(false)
+      }
+    } else if (dir === 'rtl') {
+      // !open && setOpen(true)
+      if (e.key === 'ArrowRight') {
+        movePrev()
+      } else if (e.key === 'ArrowLeft' && (activeIndex !== -1 || loop)) {
+        moveNext()
+      }
+    } else {
+      // !open && setOpen(true)
+      if (e.key === 'ArrowLeft') {
+        movePrev()
+      } else if (e.key === 'ArrowRight' && (activeIndex !== -1 || loop)) {
+        moveNext()
+      }
+    }
+  }
 
   return (
     <MultiSelectContext.Provider
@@ -200,7 +197,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     },
     ref
   ) => {
-    const { activeIndex, values, setInputValue, toggleValue, disabled, setOpen } = useMultiSelect()
+    const { activeIndex, values, setInputValue, toggleValue, disabled, open, setOpen } =
+      useMultiSelect()
 
     const inputRef = React.useRef<HTMLButtonElement>(null)
 
@@ -217,7 +215,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     const IS_BADGE_LIMIT_WRAP = badgeLimit === 'wrap'
     const IS_INLINE_MODE = mode === 'inline-combobox'
 
-    const calculateVisibleBadges = React.useCallback(() => {
+    const calculateVisibleBadges = () => {
       if (!inputRef?.current || !badgesRef.current) return
 
       const inputWidth = inputRef.current.offsetWidth
@@ -242,7 +240,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       }
       setVisibleBadges(values.slice(0, visibleCount))
       setExtraBadgesCount(Math.max(0, values.length - visibleCount))
-    }, [values])
+    }
 
     React.useEffect(() => {
       if (!inputRef?.current || !badgesRef.current) return
@@ -265,17 +263,17 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
-        setOpen(true)
-
         if (isDeleteHovered) {
           event.stopPropagation()
           event.preventDefault()
+          setOpen(open)
         }
+
+        setOpen(true)
 
         if (IS_INLINE_MODE) {
           event.stopPropagation()
           event.preventDefault()
-          setOpen(true)
 
           setTimeout(() => {
             inlineInputRef.current?.focus()
@@ -288,7 +286,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     return (
       <button
         ref={inputRef}
-        onClick={handleTriggerClick}
+        onClick={(e) => !isDeleteHovered && handleTriggerClick(e)}
         disabled={disabled}
         role="combobox"
         className={cn(
@@ -338,10 +336,10 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           {IS_INLINE_MODE && (
             <MultiSelectorInput
               ref={inlineInputRef}
-              tabIndex={0}
               showSearchIcon={false}
               onValueChange={activeIndex === -1 ? setInputValue : undefined}
               placeholder={label}
+              autoFocus={false}
               wrapperClassName={cn(
                 'px-0 flex-1 border-none truncate',
                 IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
