@@ -26,7 +26,7 @@ export default function MultiSelectDemo() {
         showIcon={false}
         deletableBadge={false}
       />
-      <MultiSelectorContent sameWidthAsTrigger>
+      <MultiSelectorContent>
         <MultiSelectorList>
           <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
           <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>

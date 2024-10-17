@@ -31,7 +31,7 @@ export default function MultiSelectDemo() {
         badgeLimit="wrap"
         showIcon={false}
       />
-      <MultiSelectorContent sameWidthAsTrigger>
+      <MultiSelectorContent>
         <MultiSelectorList>
           {fruits.map((fruit) => (
             <MultiSelectorItem key={fruit} value={fruit}>

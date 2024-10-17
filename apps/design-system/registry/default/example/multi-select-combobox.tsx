@@ -14,7 +14,7 @@ export default function MultiSelectDemo() {
   return (
     <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
       <MultiSelectorTrigger className="w-72" label="Select fruits" badgeLimit="auto" />
-      <MultiSelectorContent sameWidthAsTrigger>
+      <MultiSelectorContent>
         <MultiSelectorInput placeholder="Search fruits" showCloseIcon />
         <MultiSelectorList>
           <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>

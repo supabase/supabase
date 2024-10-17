@@ -15,6 +15,14 @@ import {
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 import { MultiSelect } from '~/components/MultiSelect.client'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorInput,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
 import {
   formatError,
@@ -231,10 +239,7 @@ function TroubleshootingFilterInternal({
 
   const convertToItem = useCallback(
     (arr: string[], { capitalize = false }: { capitalize?: boolean } = {}) =>
-      arr.map((item) => ({
-        value: item,
-        label: capitalize ? item[0].toUpperCase() + item.slice(1) : item,
-      })),
+      arr.map((item) => item),
     []
   )
 
@@ -242,65 +247,45 @@ function TroubleshootingFilterInternal({
     <>
       <h2 className="sr-only">Search and filter</h2>
       <div className={cn('flex flex-wrap gap-2 items-center', className)}>
-        <MultiSelect
-          open={productsOpen}
-          onOpenChange={setProductsOpen}
-          selected={convertToItem(selectedProducts, { capitalize: true })}
-          onSelectedChange={(newItemsOrCreateNewItems) => {
-            const newItems =
-              typeof newItemsOrCreateNewItems === 'function'
-                ? newItemsOrCreateNewItems(convertToItem(selectedProducts, { capitalize: true }))
-                : newItemsOrCreateNewItems
-            setSelectedProducts(newItems.map((item) => item.value))
-          }}
+        <MultiSelector
+          // open={productsOpen}
+          // onOpenChange={setProductsOpen}
+          values={convertToItem(selectedProducts, { capitalize: true })}
+          onValuesChange={setSelectedProducts}
         >
-          <MultiSelect.Trigger className="w-48" label="Products" />
-          <MultiSelect.Content sameWidthAsTrigger>
-            {products.map((product) => (
-              <MultiSelect.Item
-                item={{ value: product, label: product[0].toUpperCase() + product.slice(1) }}
-              />
+          <MultiSelector.Trigger className="w-48" label="Products" />
+          <MultiSelector.Content>
+            {products?.map((product) => (
+              <MultiSelector.Item key={`product-${product}`} value={product} />
             ))}
-          </MultiSelect.Content>
-        </MultiSelect>
-        <MultiSelect
-          open={errorsOpen}
-          onOpenChange={setErrorsOpen}
-          selected={convertToItem(selectedErrorCodes, { capitalize: true })}
-          onSelectedChange={(newItemsOrCreateNewItems) => {
-            const newItems =
-              typeof newItemsOrCreateNewItems === 'function'
-                ? newItemsOrCreateNewItems(convertToItem(selectedErrorCodes, { capitalize: true }))
-                : newItemsOrCreateNewItems
-            setSelectedErrorCodes(newItems.map((item) => item.value))
-          }}
+          </MultiSelector.Content>
+        </MultiSelector>
+        <MultiSelector
+          // open={errorsOpen}
+          // onOpenChange={setErrorsOpen}
+          values={convertToItem(selectedErrorCodes, { capitalize: true })}
+          onValuesChange={setSelectedErrorCodes}
         >
-          <MultiSelect.Trigger className="w-48" label="Error codes" />
-          <MultiSelect.Content sameWidthAsTrigger>
-            {errors.map((error) => (
-              <MultiSelect.Item item={{ value: formatError(error), label: formatError(error) }} />
+          <MultiSelector.Trigger className="w-48" label="Error codes" />
+          <MultiSelector.Content>
+            {errors?.map((error) => (
+              <MultiSelector.Item key={`error-${error.code}`} value={error.message} />
             ))}
-          </MultiSelect.Content>
-        </MultiSelect>
-        <MultiSelect
-          open={tagsOpen}
-          onOpenChange={setTagsOpen}
-          selected={convertToItem(selectedTags, { capitalize: true })}
-          onSelectedChange={(newItemsOrCreateNewItems) => {
-            const newItems =
-              typeof newItemsOrCreateNewItems === 'function'
-                ? newItemsOrCreateNewItems(convertToItem(selectedTags, { capitalize: true }))
-                : newItemsOrCreateNewItems
-            setSelectedTags(newItems.map((item) => item.value))
-          }}
+          </MultiSelector.Content>
+        </MultiSelector>
+        <MultiSelector
+          // open={tagsOpen}
+          // onOpenChange={setTagsOpen}
+          values={convertToItem(selectedTags, { capitalize: true })}
+          onValuesChange={setSelectedTags}
         >
-          <MultiSelect.Trigger className="w-48" label="Tags" />
-          <MultiSelect.Content sameWidthAsTrigger>
-            {keywords.map((keyword) => (
-              <MultiSelect.Item item={{ value: keyword, label: keyword }} />
+          <MultiSelector.Trigger className="w-48" label="Tags" />
+          <MultiSelector.Content>
+            {keywords?.map((keyword) => (
+              <MultiSelector.Item key={`keyword-${keyword}`} value={keyword} />
             ))}
-          </MultiSelect.Content>
-        </MultiSelect>
+          </MultiSelector.Content>
+        </MultiSelector>
         <div className="relative">
           <Input_Shadcn_
             id="troubleshooting-search"

@@ -28,7 +28,7 @@ export default function MultiSelectDemo() {
       </div>
       <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
         <MultiSelectorTrigger className="w-72" label="Select fruits" badgeLimit={limit} />
-        <MultiSelectorContent sameWidthAsTrigger>
+        <MultiSelectorContent>
           <MultiSelectorList>
             <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
             <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>

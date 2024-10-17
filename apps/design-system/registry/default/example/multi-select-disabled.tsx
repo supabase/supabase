@@ -11,8 +11,8 @@ export default function MultiSelectDemo() {
   const [selectedValues, setSelectedValues] = useState<string[]>([])
 
   return (
-    <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
-      <MultiSelectorTrigger className="w-72" label="Select fruits" disabled={true} />
+    <MultiSelector values={selectedValues} onValuesChange={setSelectedValues} disabled={true}>
+      <MultiSelectorTrigger className="w-72" label="Select fruits" />
     </MultiSelector>
   )
 }

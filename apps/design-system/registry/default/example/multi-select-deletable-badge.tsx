@@ -19,7 +19,7 @@ export default function MultiSelectDemo() {
         badgeLimit="wrap"
         showIcon={false}
       />
-      <MultiSelectorContent sameWidthAsTrigger>
+      <MultiSelectorContent>
         <MultiSelectorList>
           <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>
           <MultiSelectorItem value="Cherry">Cherry</MultiSelectorItem>
