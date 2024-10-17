@@ -3328,6 +3328,12 @@ export interface paths {
   '/platform/replication/{ref}/sources/{source_id}/publications': {
     /** Gets source publications */
     get: operations['ReplicationSourcesController_getPublications']
+    /** Creates a publication */
+    post: operations['ReplicationSourcesController_createPublication']
+  }
+  '/platform/replication/{ref}/sources/{source_id}/tables': {
+    /** Gets source tables */
+    get: operations['ReplicationSourcesController_getTables']
   }
   '/platform/reset-password': {
     parameters: {
@@ -8636,6 +8642,30 @@ export interface components {
       publish_update?: boolean
       tables?: string[] | null
     }
+    CreatePublicationResponse: Record<string, never>
+    CreateReplicationPublicationBody: {
+      /** @description Publication name */
+      name: string
+      /** @description Publication tables */
+      tables: components['schemas']['ReplicationTable'][]
+    }
+    CreateRoleBody: {
+      admins?: string[]
+      can_bypass_rls?: boolean
+      can_create_db?: boolean
+      can_create_role?: boolean
+      can_login?: boolean
+      config?: Record<string, never>
+      connection_limit?: number
+      inherit_role?: boolean
+      is_replication_role?: boolean
+      is_superuser?: boolean
+      member_of?: string[]
+      members?: string[]
+      name: string
+      password?: string
+      valid_until?: string
+    }
     CreateSchemaBody: {
       name: string
       owner: string
@@ -10709,10 +10739,6 @@ export interface components {
       saml?: components['schemas']['SamlDescriptor']
       updated_at?: string
     }
-    Publication: {
-      name: string
-      tables: components['schemas']['Table'][]
-    }
     PublicUrlOptions: {
       download?: boolean
       downloadName?: string
@@ -10764,12 +10790,20 @@ export interface components {
       slot_name: string
       username: string
     }
+    ReplicationPublication: {
+      name: string
+      tables: components['schemas']['ReplicationTable'][]
+    }
     ReplicationSourcesResponse: {
       config: {
         Postgres?: components['schemas']['ReplicationPostgresConfig']
       }
       id: number
       tenant_id: string
+    }
+    ReplicationTable: {
+      name: string
+      schema: string
     }
     ReportStatusBody: {
       databaseIdentifier: string
@@ -21620,10 +21654,59 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['Publication'][]
+          'application/json': components['schemas']['ReplicationPublication'][]
         }
       }
       /** @description Failed to get source publications */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates a publication */
+  ReplicationSourcesController_createPublication: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Source id */
+        source_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationPublicationBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreatePublicationResponse']
+        }
+      }
+      /** @description Failed to create publication */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets source tables */
+  ReplicationSourcesController_getTables: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Source id */
+        source_id: number
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ReplicationTable'][]
+        }
+      }
+      /** @description Failed to get source tables */
       500: {
         content: never
       }
