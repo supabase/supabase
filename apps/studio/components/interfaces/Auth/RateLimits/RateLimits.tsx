@@ -408,7 +408,7 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        Number of sign up and sign-in requests that can be made per IP address
+                        Number of sign up and sign-in requests that can be made in a 5 minute interval per IP address
                         (excludes anonymous users).
                       </p>
                     }
