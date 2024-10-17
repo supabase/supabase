@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+
 import { DEFAULT_QUERY_PARAMS } from 'components/interfaces/Reports/Reports.constants'
 import {
   BaseReportParams,
@@ -39,10 +40,10 @@ const useDbQuery = ({
   const state = useDatabaseSelectorStateSnapshot()
 
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
-  const connectionString = project?.is_read_replicas_enabled
-    ? (databases || []).find((db) => db.identifier === state.selectedDatabaseId)?.connectionString
-    : project?.connectionString
-  const identifier = project?.is_read_replicas_enabled ? state.selectedDatabaseId : project?.ref
+  const connectionString = (databases || []).find(
+    (db) => db.identifier === state.selectedDatabaseId
+  )?.connectionString
+  const identifier = state.selectedDatabaseId
 
   const resolvedSql = typeof sql === 'function' ? sql([]) : sql
 

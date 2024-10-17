@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
@@ -19,7 +19,7 @@ const DropReplicaConfirmationModal = ({
 }: DropReplicaConfirmationModalProps) => {
   const { ref: projectRef } = useParams()
   const formattedId = formatDatabaseID(selectedReplica?.identifier ?? '')
-  const { mutateAsync: removeReadReplica, isLoading: isRemoving } = useReadReplicaRemoveMutation({
+  const { mutate: removeReadReplica, isLoading: isRemoving } = useReadReplicaRemoveMutation({
     onSuccess: () => {
       toast.success(`Tearing down read replica (ID: ${formattedId})`)
       onSuccess()
@@ -31,7 +31,7 @@ const DropReplicaConfirmationModal = ({
     if (!projectRef) return console.error('Project is required')
     if (selectedReplica === undefined) return toast.error('No replica selected')
 
-    await removeReadReplica({
+    removeReadReplica({
       projectRef,
       identifier: selectedReplica.identifier,
       invalidateReplicaQueries: true,

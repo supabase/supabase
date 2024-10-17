@@ -2,7 +2,6 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useState } from 'react'
 import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AreaChart from 'components/ui/Charts/AreaChart'
 import BarChart from 'components/ui/Charts/BarChart'
 import { AnalyticsInterval } from 'data/analytics/constants'
@@ -10,10 +9,13 @@ import {
   InfraMonitoringAttribute,
   useInfraMonitoringQuery,
 } from 'data/analytics/infra-monitoring-query'
-import { useProjectDailyStatsQuery } from 'data/analytics/project-daily-stats-query'
+import {
+  ProjectDailyStatsAttribute,
+  useProjectDailyStatsQuery,
+} from 'data/analytics/project-daily-stats-query'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import type { ChartData } from './ChartHandler.types'
 
 interface ChartHandlerProps {
@@ -63,17 +65,15 @@ const ChartHandler = ({
   const router = useRouter()
   const { ref } = router.query
 
-  const { project } = useProjectContext()
-  const isReadReplicasEnabled = project?.is_read_replicas_enabled
   const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
 
-  const databaseIdentifier = isReadReplicasEnabled ? state.selectedDatabaseId : undefined
+  const databaseIdentifier = state.selectedDatabaseId
 
   const { data: dailyStatsData, isLoading: isFetchingDailyStats } = useProjectDailyStatsQuery(
     {
       projectRef: ref as string,
-      attribute: attribute as InfraMonitoringAttribute,
+      attribute: attribute as ProjectDailyStatsAttribute,
       startDate,
       endDate,
       interval: interval as AnalyticsInterval,
@@ -170,6 +170,9 @@ const ChartHandler = ({
       </div>
       {chartStyle === 'bar' ? (
         <BarChart
+          YAxisProps={{
+            width: 1,
+          }}
           data={(chartData?.data ?? []) as any}
           format={format || chartData?.format}
           xAxisKey={'period_start'}

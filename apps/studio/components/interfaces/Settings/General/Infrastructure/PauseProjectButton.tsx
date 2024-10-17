@@ -1,20 +1,21 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { Pause } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import {
   useIsProjectActive,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROJECT_STATUS } from 'lib/constants'
-import { Button, IconPause, Modal } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const PauseProjectButton = () => {
@@ -55,44 +56,30 @@ const PauseProjectButton = () => {
 
   return (
     <>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger asChild>
-          <Button
-            type="default"
-            icon={<IconPause />}
-            onClick={() => setIsModalOpen(true)}
-            loading={isPausing}
-            disabled={buttonDisabled}
-          >
-            Pause Project
-          </Button>
-        </Tooltip.Trigger>
-        {buttonDisabled ? (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                  'border border-background', //border
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  {isPaused
-                    ? 'Your project is already paused'
-                    : !canPauseProject
-                      ? 'You need additional permissions to pause this project'
-                      : !isProjectActive
-                        ? 'Unable to pause project as project is not active'
-                        : !isFreePlan
-                          ? 'Projects on a paid plan will always be running'
-                          : ''}
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        ) : null}
-      </Tooltip.Root>
+      <ButtonTooltip
+        type="default"
+        icon={<Pause />}
+        onClick={() => setIsModalOpen(true)}
+        loading={isPausing}
+        disabled={buttonDisabled}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: isPaused
+              ? 'Your project is already paused'
+              : !canPauseProject
+                ? 'You need additional permissions to pause this project'
+                : !isProjectActive
+                  ? 'Unable to pause project as project is not active'
+                  : !isFreePlan
+                    ? 'Projects on a paid plan will always be running'
+                    : undefined,
+          },
+        }}
+      >
+        Pause project
+      </ButtonTooltip>
+
       <ConfirmationModal
         variant={'destructive'}
         visible={isModalOpen}

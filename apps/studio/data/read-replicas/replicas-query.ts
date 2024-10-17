@@ -3,9 +3,11 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
+
+export const MAX_REPLICAS_BELOW_XL = 2
+export const MAX_REPLICAS_ABOVE_XL = 5
 
 export type ReadReplicasVariables = {
   projectRef?: string
@@ -32,17 +34,11 @@ export const useReadReplicasQuery = <TData = ReadReplicasData>(
   { projectRef }: ReadReplicasVariables,
   { enabled = true, ...options }: UseQueryOptions<ReadReplicasData, ReadReplicasError, TData> = {}
 ) => {
-  const { data } = useProjectDetailQuery({ ref: projectRef })
-
   return useQuery<ReadReplicasData, ReadReplicasError, TData>(
     replicaKeys.list(projectRef),
     ({ signal }) => getReadReplicas({ projectRef }, signal),
     {
-      enabled:
-        enabled &&
-        IS_PLATFORM &&
-        data?.is_read_replicas_enabled &&
-        typeof projectRef !== 'undefined',
+      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
       ...options,
     }
   )

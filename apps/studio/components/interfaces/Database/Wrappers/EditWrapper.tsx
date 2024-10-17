@@ -4,44 +4,32 @@ import { isEmpty } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormPanel,
-  FormsContainer,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import { FormsContainer } from 'components/ui/Forms/FormsContainer'
 import { Loading } from 'components/ui/Loading'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
-import { useCheckPermissions, useImmutableValue } from 'hooks'
-import {
-  Button,
-  Form,
-  IconArrowLeft,
-  IconEdit,
-  IconExternalLink,
-  IconLoader,
-  IconTrash,
-  Input,
-} from 'ui'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useImmutableValue } from 'hooks/misc/useImmutableValue'
+import { ArrowLeft, Edit, ExternalLink, Loader, Trash } from 'lucide-react'
+import { Button, Form, Input } from 'ui'
 import InputField from './InputField'
-import { WRAPPERS } from './Wrappers.constants'
+import WrapperTableEditor from './WrapperTableEditor'
 import {
   convertKVStringArrayToJson,
   formatWrapperTables,
+  getWrapperMetaForWrapper,
   makeValidateRequired,
 } from './Wrappers.utils'
-import WrapperTableEditor from './WrapperTableEditor'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
 
 const EditWrapper = () => {
   const formId = 'edit-wrapper-form'
@@ -64,7 +52,7 @@ const EditWrapper = () => {
   const foundWrapper = wrappers.find((w) => Number(w.id) === Number(id))
   // this call to useImmutableValue should be removed if the redirect after update is also removed
   const wrapper = useImmutableValue(foundWrapper)
-  const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
+  const wrapperMeta = getWrapperMetaForWrapper(wrapper)
 
   const { mutate: updateFDW, isLoading: isSaving } = useFDWUpdateMutation({
     onSuccess: () => {
@@ -113,7 +101,7 @@ const EditWrapper = () => {
       return (
         <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
           <div className="flex items-center space-x-4">
-            <IconLoader className="animate-spin" size={16} />
+            <Loader className="animate-spin" size={16} />
             <p className="text-sm">Updating wrapper</p>
           </div>
         </div>
@@ -240,7 +228,7 @@ const EditWrapper = () => {
                         connectionString: project?.connectionString,
                         id: secret.id,
                       })
-                      return { [option.name]: value[0].decrypted_secret }
+                      return { [option.name]: value[0]?.decrypted_secret ?? '' }
                     } else {
                       return { [option.name]: '' }
                     }
@@ -310,14 +298,16 @@ const EditWrapper = () => {
                   header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
                 >
                   <FormSectionContent loading={false}>
-                    {wrapperMeta.server.options.map((option) => (
-                      <InputField
-                        key={option.name}
-                        option={option}
-                        loading={option.encrypted ? loadingSecrets : false}
-                        error={formErrors[option.name]}
-                      />
-                    ))}
+                    {wrapperMeta.server.options
+                      .filter((option) => !option.hidden)
+                      .map((option) => (
+                        <InputField
+                          key={option.name}
+                          option={option}
+                          loading={option.encrypted ? loadingSecrets : false}
+                          error={formErrors[option.name]}
+                        />
+                      ))}
                   </FormSectionContent>
                 </FormSection>
                 <FormSection
@@ -341,7 +331,6 @@ const EditWrapper = () => {
                     ) : (
                       <div className="space-y-2">
                         {wrapperTables.map((table, i) => {
-                          const label = wrapperMeta.tables[table.index]?.label
                           const target = table?.table ?? table.object
 
                           return (
@@ -365,7 +354,7 @@ const EditWrapper = () => {
                                 <Button
                                   type="default"
                                   className="px-1"
-                                  icon={<IconEdit />}
+                                  icon={<Edit />}
                                   onClick={() => {
                                     setIsEditingTable(true)
                                     setSelectedTableToEdit({ ...table, tableIndex: i })
@@ -374,7 +363,7 @@ const EditWrapper = () => {
                                 <Button
                                   type="default"
                                   className="px-1"
-                                  icon={<IconTrash />}
+                                  icon={<Trash />}
                                   onClick={() => {
                                     setWrapperTables((prev) => prev.filter((_, j) => j !== i))
                                   }}

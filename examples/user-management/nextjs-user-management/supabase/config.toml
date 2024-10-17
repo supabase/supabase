@@ -58,6 +58,14 @@ double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
 enable_confirmations = false
 
+[auth.email.template.confirmation]
+subject = "Confirm Your Email"
+content_path = "./supabase/auth/email/confirmation.html"
+
+[auth.email.template.magic_link]
+subject = "Your Magic Link"
+content_path = "./supabase/auth/email/magic-link.html"
+
 # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `twitch`, `twitter`, `slack`, `spotify`.
 [auth.external.apple]

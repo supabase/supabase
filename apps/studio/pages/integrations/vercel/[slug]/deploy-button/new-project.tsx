@@ -3,7 +3,7 @@ import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
@@ -17,10 +17,11 @@ import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import { useSelectedOrganization } from 'hooks'
-import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
-import { passwordStrength } from 'lib/helpers'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
+import passwordStrength from 'lib/password-strength'
+import { AWS_REGIONS } from 'shared-data'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout } from 'types'
 
@@ -60,7 +61,7 @@ const CreateProject = () => {
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
-  const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region)
+  const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region.displayName)
 
   const snapshot = useIntegrationInstallationSnapshot()
 
@@ -68,25 +69,18 @@ const CreateProject = () => {
     debounce((value: string) => checkPasswordStrength(value), 300)
   ).current
 
-  const {
-    slug,
-    configurationId,
-    next,
-    currentProjectId: foreignProjectId,
-    externalId,
-  } = useParams()
+  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
-  const { mutateAsync: createConnections, isLoading: isLoadingCreateConnections } =
-    useIntegrationVercelConnectionsCreateMutation()
+  const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation()
   const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
 
-  const { data: organizationData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery()
+  const { data: organizationData } = useOrganizationsQuery()
   const organization = organizationData?.find((x) => x.slug === slug)
 
   /**
    * array of integrations installed
    */
-  const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery()
+  const { data: integrationData } = useIntegrationsQuery()
 
   /**
    * the vercel integration installed for organization chosen
@@ -102,11 +96,6 @@ const CreateProject = () => {
     },
     { enabled: organizationIntegration !== undefined }
   )
-
-  const canSubmit =
-    projectName != '' &&
-    passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion != undefined
 
   function onProjectNameChange(e: ChangeEvent<HTMLInputElement>) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -139,6 +128,8 @@ const CreateProject = () => {
     delayedCheckPasswordStrength(password)
   }
 
+  const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
+
   const { mutate: createProject } = useProjectCreateMutation({
     onSuccess: (res) => {
       setNewProjectRef(res.ref)
@@ -149,12 +140,10 @@ const CreateProject = () => {
     },
   })
 
-  const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
   async function onCreateProject() {
     if (!organizationIntegration) return console.error('No organization installation details found')
     if (!organizationIntegration?.id) return console.error('No organization installation ID found')
     if (!foreignProjectId) return console.error('No foreignProjectId ID set')
-    if (!configurationId) return console.error('No configurationId ID set')
     if (!organization) return console.error('No organization ID set')
 
     snapshot.setLoading(true)
@@ -172,10 +161,8 @@ const CreateProject = () => {
       dbPass,
       dbRegion,
       dbSql,
-      configurationId,
     })
   }
-  const isInstallingRef = useRef(false)
 
   // Wait for the new project to be created before creating the connection
   useProjectApiQuery(
@@ -189,16 +176,9 @@ const CreateProject = () => {
       async onSuccess(data) {
         const isReady = data.autoApiService.service_api_keys.length > 0
 
-        if (
-          !isReady ||
-          !organizationIntegration ||
-          !foreignProjectId ||
-          !newProjectRef ||
-          isInstallingRef.current
-        ) {
+        if (!isReady || !organizationIntegration || !foreignProjectId || !newProjectRef) {
           return
         }
-        isInstallingRef.current = true
 
         const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
 
@@ -280,7 +260,7 @@ const CreateProject = () => {
             descriptionText="Select a region close to your users for the best performance."
           >
             {Object.keys(AWS_REGIONS).map((option: string, i) => {
-              const label = Object.values(AWS_REGIONS)[i]
+              const label = Object.values(AWS_REGIONS)[i].displayName
               return (
                 <Listbox.Option
                   key={option}

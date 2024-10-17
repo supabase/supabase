@@ -24,7 +24,7 @@ Today, we're excited to announce the general availability of Realtime's multipla
 Here are the key takeaways:
 
 - We've added [Broadcast](https://supabase.com/docs/guides/realtime/broadcast) and [Presence](https://supabase.com/docs/guides/realtime/presence) to our Realtime server. You can use these features with the new [supabase-js](https://supabase.com/docs/reference/javascript/next) release.
-- All active Supabase projects on the free plan have access to the these features.
+- All active Supabase projects on the Free Plan have access to the these features.
 - All new Supabase projects created from August 18th have access to these features.
 - We will work with all other projects to migrate to the new Realtime over the next few weeks. If you want immediate access, [reach out](https://supabase.com/dashboard/support/new).
 - [Chris McCord](https://twitter.com/chris_mccord), the creator of Phoenix Framework, is now a technical advisor.
@@ -89,16 +89,14 @@ const MOUSE_EVENT = 'cursor'
 // Subscribe to mouse events.
 // Our second parameter filters only for mouse events.
 channel
-.on(
-  'broadcast',
-  { event: MOUSE_EVENT },
-  (event) => { receivedCursorPosition(event) }
-)
-.subscribe()
+  .on('broadcast', { event: MOUSE_EVENT }, (event) => {
+    receivedCursorPosition(event)
+  })
+  .subscribe()
 
 // Handle a mouse event.
-const receivedCursorPosition({ event, payload }) => {
-	console.log(`
+const receivedCursorPosition = ({ event, payload }) => {
+  console.log(`
 		User: ${payload.userId}
 		x Position: ${payload.x}
 		y Position: ${payload.y}
@@ -106,14 +104,13 @@ const receivedCursorPosition({ event, payload }) => {
 }
 
 // Helper function for sending our own mouse position.
-const sendMousePosition(channel, userId, x, y) => {
-	return channel.send({
-		type: 'broadcast',
-		event: MOUSE_EVENT,
-		payload: { userId, x, y }
-	})
+const sendMousePosition = (channel, userId, x, y) => {
+  return channel.send({
+    type: 'broadcast',
+    event: MOUSE_EVENT,
+    payload: { userId, x, y },
+  })
 }
-
 ```
 
 ### Presence Example

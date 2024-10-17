@@ -1,5 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 type GetTableConstraintsVariables = {
   schema?: string
@@ -45,7 +45,7 @@ export type TableConstraintsVariables = GetTableConstraintsVariables & {
 }
 
 export type TableConstraintsData = Constraint[]
-export type TableConstraintsError = unknown
+export type TableConstraintsError = ExecuteSqlError
 
 export const useTableConstraintsQuery = <TData extends TableConstraintsData = TableConstraintsData>(
   { projectRef, connectionString, schema, table }: TableConstraintsVariables,

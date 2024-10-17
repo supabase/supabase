@@ -1,17 +1,6 @@
+import { ArrowRight, Check, ChevronUp, Globe, Trash, X } from 'lucide-react'
 import React, { useReducer, useState } from 'react'
-import {
-  Button,
-  IconArrowRight,
-  IconCheck,
-  IconChevronUp,
-  IconGlobe,
-  IconTrash,
-  IconX,
-  Input,
-  InputNumber,
-  Tabs,
-  Toggle,
-} from '../../../../'
+import { Button, Input, InputNumber, Tabs, Toggle } from '../../../../'
 import { Form } from './../'
 
 import { Collapsible } from '../../Collapsible'
@@ -52,12 +41,12 @@ const DocsButton = () => {
         <p className="text-brand mt-2 flex items-center gap-1 text-xs">
           See Documenation
           <span className="transition group-hover:translate-x-1">
-            <IconArrowRight strokeWidth={2} width={12} />
+            <ArrowRight strokeWidth={2} width={12} />
           </span>
         </p>
       </div>
       <div className="text-foreground-muted">
-        <IconX />
+        <X />
       </div>
     </button>
   )
@@ -309,7 +298,7 @@ const AuthForm = () => {
               w-full items-center justify-between rounded p-3 px-6"
           >
             <div className="flex items-center gap-3">
-              <IconChevronUp
+              <ChevronUp
                 className="text-border-stronger data-open-parent:rotate-0 data-closed-parent:rotate-180 transition"
                 strokeWidth={2}
               />
@@ -327,7 +316,7 @@ const AuthForm = () => {
               {active ? (
                 <div className="bg-brand-200 border-brand-400 text-brand flex items-center gap-1 rounded-full border py-1 px-1 text-xs">
                   <span className="bg-brand text-brand-200 rounded-full p-0.5 text-xs">
-                    <IconCheck strokeWidth={2} size={12} />
+                    <Check strokeWidth={2} size={12} />
                   </span>
                   <span className="px-1">Enabled</span>
                 </div>
@@ -649,13 +638,13 @@ const DomainsForm = () => {
               >
                 <div className="flex items-center gap-2 font-mono">
                   <span className="text-foreground-muted">
-                    <IconGlobe strokeWidth={2} size={14} />
+                    <Globe strokeWidth={2} size={14} />
                   </span>
                   {domain}
                 </div>
                 <Button
                   type="default"
-                  icon={<IconTrash />}
+                  icon={<Trash />}
                   onClick={() => {
                     setSelected(domain)
                     setDeleteOpen(true)
@@ -1104,12 +1093,12 @@ export function WholeForm() {
                 <p className="text-brand mt-2 flex items-center gap-1 text-xs">
                   See Documenation
                   <span className="transition group-hover:translate-x-1">
-                    <IconArrowRight strokeWidth={2} width={12} />
+                    <ArrowRight strokeWidth={2} width={12} />
                   </span>
                 </p>
               </div>
               <div className="text-foreground-muted">
-                <IconX />
+                <X />
               </div>
             </button>
             <div className="border-muted border-t"></div>

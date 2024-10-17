@@ -90,7 +90,7 @@ export const constructConnStringSyntax = (
   if (selectedTab === 'uri' || selectedTab === 'nodejs') {
     if (isMd5) {
       return [
-        { value: 'postgres://', tooltip: undefined },
+        { value: 'postgresql://', tooltip: undefined },
         { value: '[user]', tooltip: DB_USER_DESC },
         { value: ':', tooltip: undefined },
         { value: '[password]', tooltip: DB_PASS_DESC },
@@ -109,7 +109,7 @@ export const constructConnStringSyntax = (
       ]
     } else {
       return [
-        { value: 'postgres://', tooltip: undefined },
+        { value: 'postgresql://', tooltip: undefined },
         { value: '[user]', tooltip: DB_USER_DESC },
         ...(usePoolerConnection
           ? [

@@ -1,28 +1,36 @@
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { getContentById } from 'data/content/content-id-query'
+import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { isError } from 'data/utils/error-check'
-import { useSelectedOrganization } from 'hooks'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 
 export interface RenameQueryModalProps {
-  snippet: SqlSnippet
+  snippet?: SqlSnippet | Snippet
   visible: boolean
   onCancel: () => void
   onComplete: () => void
 }
 
-const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQueryModalProps) => {
+const RenameQueryModal = ({
+  snippet = {} as any,
+  visible,
+  onCancel,
+  onComplete,
+}: RenameQueryModalProps) => {
   const { ref } = useParams()
   const organization = useSelectedOrganization()
-  const snap = useSqlEditorStateSnapshot()
+
+  const snapV2 = useSqlEditorV2StateSnapshot()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const isSQLSnippet = snippet.type === 'sql'
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -32,9 +40,29 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
   const [nameInput, setNameInput] = useState(name)
   const [descriptionInput, setDescriptionInput] = useState(description)
 
-  useEffect(() => {
-    setNameInput(name)
-  }, [name])
+  const { mutate: titleSql, isLoading: isTitleGenerationLoading } = useSqlTitleGenerateMutation({
+    onSuccess: (data) => {
+      const { title, description } = data
+      setNameInput(title)
+      if (!descriptionInput) setDescriptionInput(description)
+    },
+    onError: (error) => {
+      toast.error(`Failed to rename query: ${error.message}`)
+    },
+  })
+
+  const generateTitle = async () => {
+    if ('content' in snippet && isSQLSnippet) {
+      titleSql({ sql: snippet.content.sql })
+    } else {
+      try {
+        const { content } = await getContentById({ projectRef: ref, id: snippet.id })
+        titleSql({ sql: content.sql })
+      } catch (error) {
+        toast.error('Unable to generate title based on query contents')
+      }
+    }
+  }
 
   const validate = () => {
     const errors: any = {}
@@ -48,18 +76,25 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
 
     setSubmitting(true)
     try {
-      snap.renameSnippet(id, nameInput, descriptionInput)
+      // [Joshen] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
+      if (!('content' in snippet)) {
+        // [Joshen] I feel like there's definitely some optimization we can do here but will involve changes to API
+        const snippet = await getContentById({ projectRef: ref, id })
+        snapV2.addSnippet({ projectRef: ref, snippet })
+      }
+      snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
+
       if (onComplete) onComplete()
-      return Promise.resolve()
     } catch (error: any) {
+      // [Joshen] We probably need some rollback cause all the saving is async
       toast.error(`Failed to rename query: ${error.message}`)
     }
   }
 
-  const { mutateAsync: titleSql, isLoading: isTitleGenerationLoading } =
-    useSqlTitleGenerateMutation()
-
-  const isAiButtonVisible = !!snippet.content.sql
+  useEffect(() => {
+    setNameInput(name)
+    setDescriptionInput(description)
+  }, [snippet.id])
 
   return (
     <Modal visible={visible} onCancel={onCancel} hideFooter header="Rename" size="small">
@@ -74,8 +109,8 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
         onSubmit={onSubmit}
       >
         {({ isSubmitting }: { isSubmitting: boolean }) => (
-          <div className="space-y-4 py-4">
-            <Modal.Content>
+          <>
+            <Modal.Content className="space-y-4">
               <Input
                 label="Name"
                 id="name"
@@ -84,27 +119,10 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                 onChange={(e) => setNameInput(e.target.value)}
               />
               <div className="flex w-full justify-end mt-2">
-                {!hasHipaaAddon && isAiButtonVisible && (
+                {!hasHipaaAddon && (
                   <Button
                     type="default"
-                    onClick={async () => {
-                      try {
-                        const { title, description } = await titleSql({
-                          sql: snippet.content.sql,
-                        })
-
-                        setNameInput(title)
-
-                        // Only update description if it was empty
-                        if (!descriptionInput) {
-                          setDescriptionInput(description)
-                        }
-                      } catch (error: unknown) {
-                        if (isError(error)) {
-                          toast.error(`Failed to rename query: ${error.message}`)
-                        }
-                      }
-                    }}
+                    onClick={() => generateTitle()}
                     size="tiny"
                     disabled={isTitleGenerationLoading}
                   >
@@ -117,8 +135,6 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                   </Button>
                 )}
               </div>
-            </Modal.Content>
-            <Modal.Content>
               <Input.TextArea
                 label="Description"
                 id="description"
@@ -130,17 +146,15 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
               />
             </Modal.Content>
             <Modal.Separator />
-            <Modal.Content>
-              <div className="flex items-center justify-end gap-2">
-                <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
-                  Cancel
-                </Button>
-                <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
-                  Rename query
-                </Button>
-              </div>
+            <Modal.Content className="flex items-center justify-end gap-2">
+              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
+                Cancel
+              </Button>
+              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+                Rename query
+              </Button>
             </Modal.Content>
-          </div>
+          </>
         )}
       </Form>
     </Modal>

@@ -2,7 +2,7 @@ import pgMeta from '@supabase/pg-meta'
 import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { ExecuteSqlData, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 
 export type DatabaseRolesVariables = {
@@ -15,7 +15,7 @@ export type PgRole = z.infer<typeof pgMeta.roles.zod>
 const pgMetaRolesList = pgMeta.roles.list()
 
 export type DatabaseRolesData = z.infer<typeof pgMetaRolesList.zod>
-export type DatabaseRolesError = unknown
+export type DatabaseRolesError = ExecuteSqlError
 
 export const useDatabaseRolesQuery = <TData = DatabaseRolesData>(
   { projectRef, connectionString }: DatabaseRolesVariables,

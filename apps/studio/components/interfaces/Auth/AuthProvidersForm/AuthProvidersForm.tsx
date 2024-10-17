@@ -1,20 +1,20 @@
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+
 import { useParams } from 'common'
-import { FormHeader } from 'components/ui/Forms'
-import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconAlertCircle,
+  WarningIcon,
 } from 'ui'
-import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import ProviderForm from './ProviderForm'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
-import Link from 'next/link'
-import { ExternalLink } from 'lucide-react'
 
 const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
@@ -47,7 +47,7 @@ const AuthProvidersForm = () => {
                   We have detected that you have enabled the email provider with the OTP expiry set
                   to more than an hour. It is recommended to set this value to less than an hour.
                 </p>
-                <Button asChild type="default" className="w-min" icon={<ExternalLink size={14} />}>
+                <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
                   <Link href="https://supabase.com/docs/guides/platform/going-into-prod#security">
                     View security recommendations
                   </Link>
@@ -57,28 +57,34 @@ const AuthProvidersForm = () => {
           </Alert_Shadcn_>
         )}
         {isLoading &&
-          PROVIDERS_SCHEMAS.map((provider) => (
-            <div
-              key={`provider_${provider.title}`}
-              className={[...ProviderCollapsibleClasses, 'px-6 py-3'].join(' ')}
-            >
-              <HorizontalShimmerWithIcon />
-            </div>
-          ))}
+          PROVIDERS_SCHEMAS.map((provider) => {
+            return (
+              <div
+                key={`provider_${provider.title}`}
+                className={[...ProviderCollapsibleClasses, 'px-6 py-3'].join(' ')}
+              >
+                <HorizontalShimmerWithIcon />
+              </div>
+            )
+          })}
         {isError && (
           <Alert_Shadcn_ variant="destructive">
-            <IconAlertCircle strokeWidth={2} />
+            <WarningIcon />
             <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
         {isSuccess &&
           PROVIDERS_SCHEMAS.map((provider) => {
+            const providerSchema =
+              provider.title === 'Phone'
+                ? { ...provider, validationSchema: getPhoneProviderValidationSchema(authConfig) }
+                : provider
             return (
               <ProviderForm
-                key={`provider_${provider.title}`}
+                key={`provider_${providerSchema.title}`}
                 config={authConfig}
-                provider={provider as any}
+                provider={providerSchema as any}
               />
             )
           })}

@@ -13,7 +13,14 @@ Postgres includes several built-in foreign data wrappers, such as [`postgres_fdw
 
 Wrappers introduce some new terminology and different workflows.
 
-![FDW](/docs/img/database/fdw-light.png)
+<Image
+  alt="Foreign Data Wrappers (FDW)"
+  zoomable
+  src={{
+    dark: '/docs/img/database/foreign-data-wrappers/extracting-data.png',
+    light: '/docs/img/database/foreign-data-wrappers/extracting-data--light.png',
+  }}
+/>
 
 ### Remote servers
 
@@ -35,7 +42,7 @@ Examples:
 - A `subscriptions` table which maps to your Stripe subscriptions.
 - A `collections` table which maps to a Firebase collection.
 
-Although a Foreign Table behaves like any other table, the data is not stored inside your database. The data remains inside the Remote Server.
+Although a foreign table behaves like any other table, the data is not stored inside your database. The data remains inside the Remote Server.
 
 ### ETL with Wrappers
 
@@ -105,15 +112,108 @@ select cron.schedule(
 );
 ```
 
-![FDW](/docs/img/database/fdw-qetl-light.png)
+<Image
+  alt="FDW with pg_cron"
+  zoomable
+  src={{
+    dark: '/docs/img/database/foreign-data-wrappers/extracting-data-pgcron.png',
+    light: '/docs/img/database/foreign-data-wrappers/extracting-data-pgcron--light.png',
+  }}
+/>
 
 This process can be taxing on your database if you are moving large amounts of data. Often, it's better to use an external tool for batch ETL, such as [Fivetran](https://fivetran.com/) or [Airbyte](https://airbyte.io/).
 
+### WebAssembly Wrappers
+
+WebAssembly (Wasm) is a binary instruction format that enables high-performance execution of code on the web. Wrappers now includes a Wasm runtime, which provides a sandboxed execution environment, to run Wasm foreign data wrappers. Combined Wrappers with Wasm, developing and distributing new FDW becomes much easier and you can even build your own Wasm FDW and use it on Supabase platform.
+
+To learn more about Wasm FDW, visit [Wrappers official documentation](https://supabase.github.io/wrappers/).
+
 ## Security
 
-Foreign Data Wrappers do not provide Row Level Security. We do not advise exposing them via your API. Wrappers should _always_ be stored in a private schema. For example, if you are connecting to your Stripe account, you should create a `stripe` schema to store all of your Foreign Tables inside. This schema should _not_ be added to the “Additional Schemas” setting in the API section.
+Foreign Data Wrappers do not provide Row Level Security, thus it is not advised to expose them via your API. Wrappers should _always_ be stored in a private schema. For example, if you are connecting to your Stripe account, you should create a `stripe` schema to store all of your foreign tables inside. This schema should _not_ be added to the “Additional Schemas” setting in the API section.
 
-If you want to expose any of the columns to your public API, create a [View](https://supabase.com/docs/guides/database/tables#views) in the `public` schema. You can also interact with your Foreign Tables inside a [Database Function](https://supabase.com/docs/guides/database/functions).
+If you want to expose any of the foreign table columns to your public API, you can create a [Database Function with security definer](https://supabase.com/docs/guides/database/functions#security-definer-vs-invoker) in the `public` schema, and then you can interact with your foreign table through API. For better access control, the function should have appropriate filters on the foreign table to apply security rules based on your business needs.
+
+As an example, go to [SQL Editor](https://supabase.com/dashboard/project/_/sql/new) and then follow below steps,
+
+1. Create a Stripe Products foreign table:
+
+   ```sql
+   create foreign table stripe.stripe_products (
+     id text,
+     name text,
+     active bool,
+     default_price text,
+     description text,
+     created timestamp,
+     updated timestamp,
+     attrs jsonb
+   )
+     server stripe_fdw_server
+     options (
+       object 'products',
+       rowid_column 'id'
+     );
+   ```
+
+2. Create a security definer function that queries the foreign table and filters on the name prefix parameter:
+
+   ```sql
+   create function public.get_stripe_products(name_prefix text)
+   returns table (
+     id text,
+     name text,
+     active boolean,
+     default_price text,
+     description text
+   )
+   language plpgsql
+   security definer set search_path = ''
+   as $$
+   begin
+     return query
+     select
+       t.id,
+       t.name,
+       t.active,
+       t.default_price,
+       t.description
+     from
+       stripe.stripe_products t
+     where
+       t.name like name_prefix || '%'
+     ;
+   end;
+   $$;
+   ```
+
+3. Restrict the function execution to a specific role only, for example, the authenticated users:
+
+   <Admonition type="danger">
+     By default, the function created can be executed by any roles like `anon`, that means the
+     foreign table is public accessible. Always limit the function execution permission to
+     appropriate roles.
+   </Admonition>
+
+   ```sql
+   -- revoke public execute permission
+   revoke execute on function public.get_stripe_products from public;
+   revoke execute on function public.get_stripe_products from anon;
+
+   -- grant execute permission to a specific role only
+   grant execute on function public.get_stripe_products to authenticated;
+   ```
+
+Once the preceding steps are finished, the function can be invoked from Supabase client to query the foreign table:
+
+```js
+const { data, error } = await supabase
+  .rpc('get_stripe_products', { name_prefix: 'Test' })
+  .select('*')
+if (error) console.error(error)
+else console.log(data)
+```
 
 ## Resources
 

@@ -1,8 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { GitBranch, RotateCcw, Shield } from 'lucide-react'
+import { Check, ChevronDown, GitBranch, RotateCcw, Shield } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
+import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -20,37 +31,36 @@ import {
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   Form_Shadcn_,
-  IconCheck,
-  IconChevronDown,
   Input_Shadcn_,
   Label_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   Switch,
+  WarningIcon,
   cn,
 } from 'ui'
-import * as z from 'zod'
-
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
-import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
-import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 interface GitHubIntegrationConnectionFormProps {
+  disabled?: boolean
   connection: IntegrationProjectConnection
 }
 
-const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnectionFormProps) => {
+const GitHubIntegrationConnectionForm = ({
+  disabled,
+  connection,
+}: GitHubIntegrationConnectionFormProps) => {
   const org = useSelectedOrganization()
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
   const comboBoxRef = useRef<HTMLButtonElement>(null)
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
+
+  const canUpdateGitHubConnection = useCheckPermissions(
+    PermissionAction.UPDATE,
+    'integrations.github_connections'
+  )
 
   const { data: githubBranches, isLoading: isLoadingBranches } = useGitHubBranchesQuery(
     {
@@ -160,7 +170,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
                 loading={isUpdatingProdBranch || isLoadingBranches}
                 iconRight={
                   <span className="grow flex justify-end">
-                    <IconChevronDown className={''} />
+                    <ChevronDown size={14} />
                   </span>
                 }
               >
@@ -198,7 +208,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
                             )}
                             {branch.name}
                           </div>
-                          {branch.name === productionPreviewBranch?.git_branch && <IconCheck />}
+                          {branch.name === productionPreviewBranch?.git_branch && <Check />}
                         </CommandItem_Shadcn_>
                       )
                     })}
@@ -212,7 +222,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
         <Alert_Shadcn_ className="w-full mb-0" variant="warning">
           <WarningIcon />
           <div>
-            <AlertTitle_Shadcn_ className="text-sm">Braching is not enabled</AlertTitle_Shadcn_>
+            <AlertTitle_Shadcn_ className="text-sm">Branching is not enabled</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_ className="text-xs">
               This integration has no effect without Branching feature being active.
               <br />
@@ -233,11 +243,12 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
                 <FormDescription_Shadcn_ className="text-xs text-foreground-lighter !mt-0 !mb-1">
                   Total number of branches that can be automatically created for this connection.
                 </FormDescription_Shadcn_>
-                <FormControl_Shadcn_ className="flex gap-3">
+                <FormControl_Shadcn_ className="flex gap-3 items-center">
                   <div className="relative">
                     <Input_Shadcn_
                       {...field}
                       className="w-80"
+                      disabled={!canUpdateGitHubConnection}
                       onKeyPress={(event) => {
                         if (event.key === 'Escape') form.reset()
                       }}
@@ -286,10 +297,11 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
                   Path in your repository where <code>supabase</code> directory for this connection
                   lives.
                 </FormDescription_Shadcn_>
-                <FormControl_Shadcn_ className="flex gap-3">
+                <FormControl_Shadcn_ className="flex gap-3 items-center">
                   <div className="relative">
                     <Input_Shadcn_
                       {...field}
+                      disabled={!canUpdateGitHubConnection}
                       className="w-80"
                       onKeyPress={(event) => {
                         if (event.key === 'Escape') form.reset()
@@ -337,6 +349,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
                 <FormControl_Shadcn_>
                   <Switch
                     className="mt-1"
+                    disabled={!canUpdateGitHubConnection}
                     checked={field.value}
                     onCheckedChange={(e) => {
                       field.onChange(e)

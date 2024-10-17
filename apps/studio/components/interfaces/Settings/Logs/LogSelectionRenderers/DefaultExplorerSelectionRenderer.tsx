@@ -12,10 +12,10 @@ const DefaultExplorerSelectionRenderer = ({ log }: any) => {
     code?: boolean
   }) => {
     return (
-      <div className="grid grid-cols-12">
-        <span className="text-foreground-lighter text-sm col-span-4">{label}</span>
+      <div className="flex gap-2 flex-wrap">
+        <span className="text-foreground-lighter text-sm col-span-3">{label}</span>
         <span
-          className={`text-foreground text-sm col-span-8 overflow-x-auto ${
+          className={`text-foreground text-sm col-span-9 overflow-x-auto ${
             code && 'text-xs font-mono'
           }`}
         >
@@ -33,10 +33,7 @@ const DefaultExplorerSelectionRenderer = ({ log }: any) => {
     <div className="overflow-hidden overflow-x-auto space-y-6">
       {Object.entries(log).map(([key, value], index) => {
         return (
-          <div
-            key={`${key}-${index}`}
-            className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}
-          >
+          <div key={`${key}-${index}`} className="px-4 pb-4">
             {value && typeof value === 'object' ? (
               <DetailedJsonRow label={key} value={value} />
             ) : (

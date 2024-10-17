@@ -16,6 +16,9 @@ interface SqlEditorProps {
   readOnly?: boolean
 }
 
+/**
+ * @deprecated Use CodeEditor instead
+ */
 const SqlEditor = ({
   queryId,
   language = 'pgsql',

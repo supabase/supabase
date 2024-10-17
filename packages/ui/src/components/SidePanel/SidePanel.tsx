@@ -1,9 +1,9 @@
 'use client'
 
 import * as Dialog from '@radix-ui/react-dialog'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
-import { Button } from '../../../index'
+import { Button } from '../../components/Button/Button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../components/shadcn/ui/tooltip'
 import styleHandler from '../../lib/theme/styleHandler'
 
 export type SidePanelProps = RadixProps & CustomProps
@@ -73,9 +73,9 @@ const SidePanel = ({
         </Button>
       </div>
       {onConfirm !== undefined && (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
-            <div>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="inline-block">
               <Button
                 htmlType="submit"
                 disabled={disabled || loading}
@@ -84,24 +84,10 @@ const SidePanel = ({
               >
                 {confirmText}
               </Button>
-            </div>
-          </Tooltip.Trigger>
-          {tooltip !== undefined && (
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">{tooltip}</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          )}
-        </Tooltip.Root>
+            </span>
+          </TooltipTrigger>
+          {tooltip !== undefined && <TooltipContent side="bottom">{tooltip}</TooltipContent>}
+        </Tooltip>
       )}
     </div>
   )

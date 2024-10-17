@@ -4,14 +4,19 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useParams } from 'common'
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
-import DatePickers from './Logs.DatePickers'
-import { FILTER_OPTIONS, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
-import LogsFilterPopover from './LogsFilterPopover'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
+import DatePickers from './Logs.DatePickers'
+import {
+  FILTER_OPTIONS,
+  LOG_ROUTES_WITH_REPLICA_SUPPORT,
+  LogsTableName,
+  PREVIEWER_DATEPICKER_HELPERS,
+} from './Logs.constants'
+import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
+import LogsFilterPopover from './LogsFilterPopover'
 
 interface PreviewFilterPanelProps {
   defaultSearchValue?: string
@@ -58,14 +63,13 @@ const PreviewFilterPanel = ({
   onSelectedDatabaseChange,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
+  const { ref } = useParams()
   const [search, setSearch] = useState('')
-  const { project } = useProjectContext()
 
-  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: project?.ref })
+  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
   // [Joshen] These are the routes tested that can show replica logs
-  const showDatabaseSelector =
-    project?.is_read_replicas_enabled && LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
+  const showDatabaseSelector = LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
 
   const hasEdits = search !== defaultSearchValue
 
@@ -210,7 +214,7 @@ const PreviewFilterPanel = ({
         <div className="flex items-center justify-center gap-x-2">
           <Tooltip_Shadcn_ delayDuration={100}>
             <TooltipTrigger_Shadcn_ asChild>
-              <Button asChild className="px-1" type="default" icon={<Terminal />}>
+              <Button asChild className="px-1.5" type="default" icon={<Terminal />}>
                 <Link href={queryUrl} />
               </Button>
             </TooltipTrigger_Shadcn_>
@@ -223,7 +227,7 @@ const PreviewFilterPanel = ({
             additionalOptions={
               table === LogsTableName.EDGE
                 ? (loadBalancers ?? []).length > 0
-                  ? [{ id: `${project.ref}-all`, name: 'API Load Balancer' }]
+                  ? [{ id: `${ref}-all`, name: 'API Load Balancer' }]
                   : []
                 : []
             }

@@ -66,7 +66,7 @@ export function ExpandableVideo({
           before:transition-opacity
         "
       >
-        <Play strokeWidth={2} size="small" className="w-5 h-5" />
+        <Play strokeWidth={2} className="w-5 h-5" />
         <p className="text-sm">{imgOverlayText ?? 'Watch video guide'}</p>
       </div>
       <Image

@@ -1,12 +1,12 @@
 # To be run in the root of the turbo monorepo
 # NOTE: It's highly recommended to use the new builder, Buildkit. https://docs.docker.com/build/buildkit/
 ## USAGE:
-# Build:        docker build . -f studio/Dockerfile --target production -t studio:latest
+# Build:        docker build . -f apps/studio/Dockerfile --target production -t studio:latest
 # Run:          docker run -p 3000:3000 supabase/studio
 # Deploy:       docker push supabase/studio:latest
 # Clean build:
 #    docker builder prune
-#    docker build . -f studio/Dockerfile --target production -t studio:latest --no-cache
+#    docker build . -f apps/studio/Dockerfile --target production -t studio:latest --no-cache
 
 FROM node:20-slim as base
 
@@ -27,7 +27,7 @@ WORKDIR /app
 FROM base as turbo
 COPY . .
 
-RUN npx turbo@1.13.2 prune --scope=studio --docker
+RUN npx turbo@2.0.4 prune studio --docker
 
 # Install dev dependencies (only if needed)
 FROM base as deps
@@ -47,7 +47,7 @@ CMD ["npm", "run", "dev:studio"]
 # Compile Next.js
 FROM dev as builder
 
-RUN npx turbo run build --scope=studio --include-dependencies --no-deps
+RUN npx turbo@2.0.4 run build --filter studio -- --no-lint
 
 # Copy only compiled code and dependencies
 FROM base as production

@@ -1,4 +1,3 @@
-import { useUrlState } from 'hooks'
 import update from 'immutability-helper'
 import { isEqual } from 'lodash'
 import { FilterIcon, Plus } from 'lucide-react'
@@ -6,6 +5,7 @@ import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
 
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -15,6 +15,7 @@ import {
 } from 'ui'
 import { FilterOperatorOptions } from './Filter.constants'
 import FilterRow from './FilterRow'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface FilterPopoverProps {
   table: SupaTable
@@ -24,6 +25,7 @@ export interface FilterPopoverProps {
 
 const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
   const [open, setOpen] = useState(false)
+  const snap = useTableEditorStateSnapshot()
 
   const btnText =
     (filters || []).length > 0
@@ -31,6 +33,7 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
       : 'Filter'
 
   const onApplyFilters = (appliedFilters: Filter[]) => {
+    snap.setEnforceExactCount(false)
     setParams((prevParams) => {
       return {
         ...prevParams,
@@ -48,10 +51,7 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type={(filters || []).length > 0 ? 'link' : 'text'}
-          icon={<FilterIcon strokeWidth={1.5} className="text-foreground-light" />}
-        >
+        <Button type={(filters || []).length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
@@ -110,8 +110,19 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: Filte
     )
   }, [])
 
+  const onSelectApplyFilters = () => {
+    // [Joshen] Trim empty spaces in input for only UUID type columns
+    const formattedFilters = filters.map((f) => {
+      const column = table.columns.find((c) => c.name === f.column)
+      if (column?.format === 'uuid') return { ...f, value: f.value.trim() }
+      else return f
+    })
+    setFilters(formattedFilters)
+    onApplyFilters(formattedFilters)
+  }
+
   function handleEnterKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') onApplyFilters(filters)
+    if (event.key === 'Enter') onSelectApplyFilters()
   }
 
   return (
@@ -143,7 +154,7 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: Filte
         <Button
           disabled={isEqual(filters, initialFilters)}
           type="default"
-          onClick={() => onApplyFilters(filters)}
+          onClick={() => onSelectApplyFilters()}
         >
           Apply filter
         </Button>

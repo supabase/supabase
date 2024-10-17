@@ -17,14 +17,18 @@ export const isValidAddress = (address: string) => {
 }
 
 export const checkIfPrivate = (type: 'IPv4' | 'IPv6', cidr: string) => {
-  if (type === 'IPv4') {
-    const address = IPv4CidrRange.fromCidr(`${cidr}/32`)
-    const res = privateIPv4Ranges.map((range) => address.inside(range))
-    return res.includes(true)
-  } else {
-    const address = IPv6CidrRange.fromCidr(`${cidr}/128`)
-    const res = privateIPv6Ranges.map((range) => address.inside(range))
-    return res.includes(true)
+  try {
+    if (type === 'IPv4') {
+      const address = IPv4CidrRange.fromCidr(`${cidr}/32`)
+      const res = privateIPv4Ranges.map((range) => address.inside(range))
+      return res.includes(true)
+    } else {
+      const address = IPv6CidrRange.fromCidr(`${cidr}/128`)
+      const res = privateIPv6Ranges.map((range) => address.inside(range))
+      return res.includes(true)
+    }
+  } catch (error) {
+    return false
   }
 }
 

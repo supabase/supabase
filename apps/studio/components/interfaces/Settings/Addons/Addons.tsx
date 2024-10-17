@@ -1,22 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { capitalize } from 'lodash'
+import { AlertCircle, ChevronRight, ExternalLink, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconChevronRight,
-  IconExternalLink,
-  IconInfo,
-} from 'ui'
 
 import {
   getAddons,
@@ -41,11 +30,15 @@ import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
-import { useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
-import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { useAddonsPagePanel } from 'state/addons-page'
+import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
@@ -53,8 +46,8 @@ import PITRSidePanel from './PITRSidePanel'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
-  const { ref: projectRef, panel } = useParams()
-  const snap = useSubscriptionPageStateSnapshot()
+  const { ref: projectRef } = useParams()
+  const { setPanel } = useAddonsPagePanel()
   const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
   const selectedOrg = useSelectedOrganization()
@@ -63,10 +56,6 @@ const Addons = () => {
   const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
   const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
-  const allowedPanelValues = ['computeInstance', 'pitr', 'customDomain']
-  if (panel && typeof panel === 'string' && allowedPanelValues.includes(panel)) {
-    snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
-  }
 
   const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -120,21 +109,12 @@ const Addons = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <div className="mx-auto flex flex-col gap-10 py-6">
-          <div>
-            <p className="text-xl">Add ons</p>
-            <p className="text-sm text-foreground-light">Level up your project with add-ons</p>
-          </div>
-        </div>
-      </ScaffoldContainer>
-
       <ScaffoldDivider />
 
       {isBranch && (
         <ScaffoldContainer>
           <Alert_Shadcn_ variant="default" className="mt-6">
-            <IconAlertCircle strokeWidth={2} />
+            <AlertCircle strokeWidth={2} />
             <AlertTitle_Shadcn_>
               You are currently on a preview branch of your project
             </AlertTitle_Shadcn_>
@@ -175,7 +155,7 @@ const Addons = () => {
           {selectedProject?.infra_compute_size === 'nano' && subscription?.plan.id !== 'free' && (
             <ScaffoldContainer className="mt-4">
               <Alert_Shadcn_ variant="default">
-                <IconInfo strokeWidth={2} />
+                <Info strokeWidth={2} />
                 <AlertTitle_Shadcn_>Free compute upgrade to Micro</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   Paid Plans include a free upgrade to Micro compute. Your project is ready to
@@ -199,7 +179,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About compute add-ons</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -211,7 +191,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">Connection Pooler</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -243,11 +223,12 @@ const Addons = () => {
                     {isLoading || (computeInstance === undefined && isLoadingProject) ? (
                       <ShimmeringLoader className="w-32" />
                     ) : (
-                      <p>
-                        {computeInstance?.variant.name ??
-                          capitalize(selectedProject?.infra_compute_size) ??
-                          'Micro'}
-                      </p>
+                      <div className="flex py-3">
+                        <ComputeBadge
+                          infraComputeSize={selectedProject?.infra_compute_size}
+                          size={'large'}
+                        />
+                      </div>
                     )}
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}
@@ -257,7 +238,7 @@ const Addons = () => {
                       <Button
                         type="default"
                         className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('computeInstance')}
+                        onClick={() => setPanel('computeInstance')}
                         disabled={
                           isBranch ||
                           !isProjectActive ||
@@ -312,7 +293,7 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Memory
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -327,7 +308,7 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             CPU
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -353,7 +334,7 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Max Disk Throughput
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -370,7 +351,7 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Baseline Disk Throughput
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -404,7 +385,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About IPv4 deprecation</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -444,7 +425,7 @@ const Addons = () => {
                           <Button
                             type="default"
                             className="mt-2 pointer-events-auto"
-                            onClick={() => snap.setPanelKey('ipv4')}
+                            onClick={() => setPanel('ipv4')}
                             disabled={
                               isBranch ||
                               !isProjectActive ||
@@ -499,7 +480,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About PITR backups</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -573,7 +554,7 @@ const Addons = () => {
                         <Button
                           type="default"
                           className="mt-2 pointer-events-auto"
-                          onClick={() => snap.setPanelKey('pitr')}
+                          onClick={() => setPanel('pitr')}
                           disabled={
                             isBranch ||
                             !isProjectActive ||
@@ -609,7 +590,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About custom domains</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -650,7 +631,7 @@ const Addons = () => {
                       <Button
                         type="default"
                         className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('customDomain')}
+                        onClick={() => setPanel('customDomain')}
                         disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
                         Change custom domain

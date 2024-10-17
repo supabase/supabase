@@ -6,13 +6,16 @@ export type TicketState = 'registration' | 'ticket' | 'loading' | 'game'
 export type UserData = {
   id?: string
   email?: string
-  ticketNumber?: number
   username?: string
   name?: string
+  ticket_number?: number
   platinum?: boolean
   golden?: boolean
   referrals?: number
   bg_image_id?: number
+  role?: string
+  company?: string
+  location?: string
   metadata?: {
     role?: string
     company?: string
@@ -20,9 +23,10 @@ export type UserData = {
     hasSecretTicket?: boolean
     hasSharedSecret?: boolean
     hideAvatar?: boolean
+    hideMetadata?: boolean
   }
-  sharedOnTwitter?: string
-  sharedOnLinkedIn?: string
+  shared_on_twitter?: string
+  shared_on_linkedin?: string
   secret?: boolean
 }
 

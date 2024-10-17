@@ -4,9 +4,12 @@ import './Input.css'
 
 export const SIZES = ['small', 'medium']
 
+/**
+ * @deprecated Use ./Input_shadcn_ with type="number" instead or ./ui-patterns/data-inputs/input with type="number"
+ */
 const Input = ({
   className = '',
-  type='text',
+  type = 'text',
   size = 'medium',
   isError = false,
   children,

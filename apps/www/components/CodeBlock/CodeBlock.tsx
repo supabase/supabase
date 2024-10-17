@@ -1,14 +1,15 @@
-import { Button, IconCheck, IconCopy, IconFile, IconTerminal, cn } from 'ui'
+import { Check, Copy, File, Terminal } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
+import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
-import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
+import { Button, cn } from 'ui'
 import monokaiCustomTheme from './CodeBlock.utils'
 
 export type LANG = 'js' | 'sql' | 'py' | 'bash' | 'ts' | 'tsx' | 'kotlin' | 'yaml'
@@ -95,9 +96,9 @@ function CodeBlock(props: CodeBlockProps) {
             "
         >
           {lang === 'bash' ? (
-            <IconTerminal size={12} strokeWidth={2} />
+            <Terminal size={12} strokeWidth={2} />
           ) : (
-            <IconFile size={12} strokeWidth={2} />
+            <File size={12} strokeWidth={2} />
           )}
           <span className="text-xs">{filename ?? 'index.js'}</span>
         </div>
@@ -143,10 +144,10 @@ function CodeBlock(props: CodeBlockProps) {
                 icon={
                   copied ? (
                     <span className="text-brand">
-                      <IconCheck strokeWidth={3} />
+                      <Check strokeWidth={3} />
                     </span>
                   ) : (
-                    <IconCopy />
+                    <Copy />
                   )
                 }
                 onClick={() => handleCopy()}

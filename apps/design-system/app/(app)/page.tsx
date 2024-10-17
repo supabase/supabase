@@ -1,8 +1,5 @@
-import { DesignSystemMarks } from '@/components/design-system-marks'
 import { HomepageSvgHandler } from '@/components/homepage-svg-handler'
-import Image from 'next/image'
 import Link from 'next/link'
-import { Separator } from 'ui'
 
 export default function Home() {
   return (

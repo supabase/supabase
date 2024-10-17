@@ -12,11 +12,11 @@ import {
   TableEditor,
 } from 'icons'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
-import { Settings, FileText, List } from 'lucide-react'
+import { Settings, FileText, List, Lightbulb } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}/building`
+  const buildingUrl = `/project/${ref}`
 
   return [
     {
@@ -40,8 +40,9 @@ export const generateProductRoutes = (
   project?: Project,
   features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; realtime?: boolean }
 ): Route[] => {
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}/building`
+  const buildingUrl = `/project/${ref}`
 
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
@@ -53,7 +54,13 @@ export const generateProductRoutes = (
       key: 'database',
       label: 'Database',
       icon: <Database size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/database/tables`),
+      link:
+        ref &&
+        (isProjectBuilding
+          ? buildingUrl
+          : isProjectActive
+            ? `/project/${ref}/database/tables`
+            : `/project/${ref}/database/backups/scheduled`),
     },
     ...(authEnabled
       ? [
@@ -100,9 +107,15 @@ export const generateProductRoutes = (
 
 export const generateOtherRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}/building`
+  const buildingUrl = `/project/${ref}`
 
   return [
+    {
+      key: 'advisors',
+      label: 'Advisors',
+      icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
+    },
     ...(IS_PLATFORM
       ? [
           {

@@ -1,17 +1,17 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { includes, without } from 'lodash'
 import { useReducer, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import type { OrgSubscription } from 'data/subscriptions/types'
-import { useFlag } from 'hooks'
+import { useFlag } from 'hooks/ui/useFlag'
 import { Alert, Button, Input, Modal } from 'ui'
+import type { ProjectInfo } from '../../../../../data/projects/projects-query'
 import { CANCELLATION_REASONS } from '../BillingSettings.constants'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
-import type { ProjectInfo } from '../../../../../data/projects/projects-query'
 
 export interface ExitSurveyModalProps {
   visible: boolean
@@ -20,7 +20,7 @@ export interface ExitSurveyModalProps {
   onClose: (success?: boolean) => void
 }
 
-// [Joshen] For context - Exit survey is only when going to free plan from a paid plan
+// [Joshen] For context - Exit survey is only when going to Free Plan from a paid plan
 const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurveyModalProps) => {
   const { slug } = useParams()
   const captchaRef = useRef<HCaptcha>(null)
@@ -30,14 +30,16 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
   const [selectedReasons, dispatchSelectedReasons] = useReducer(reducer, [])
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { mutateAsync: sendExitSurvey, isLoading: isSubmittingFeedback } =
-    useSendDowngradeFeedbackMutation()
-  const { mutateAsync: updateOrgSubscription, isLoading: isUpdating } =
-    useOrgSubscriptionUpdateMutation({
+  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+    {
       onError: (error) => {
+        resetCaptcha()
         toast.error(`Failed to downgrade project: ${error.message}`)
       },
-    })
+    }
+  )
+  const { mutateAsync: sendExitSurvey, isLoading: isSubmittingFeedback } =
+    useSendDowngradeFeedbackMutation()
   const isSubmitting = isUpdating || isSubmittingFeedback
 
   const projectsWithComputeDowngrade = projects.filter((project) => {
@@ -87,33 +89,35 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
     // If compute instance is present within the existing subscription, then a restart will be triggered
     if (!slug) return console.error('Slug is required')
 
-    try {
-      await updateOrgSubscription({ slug, tier: 'tier_free' })
-      resetCaptcha()
-    } finally {
-    }
-
-    try {
-      await sendExitSurvey({
-        orgSlug: slug,
-        reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-        message,
-        exitAction: 'downgrade',
-      })
-    } finally {
-    }
-
-    toast.success(
-      willPlanDowngradeHappenImmediately
-        ? hasProjectsWithComputeDowngrade
-          ? 'Successfully downgraded organization to the Free plan. Your projects are currently restarting to update their compute instances.'
-          : 'Successfully downgraded organization to the Free plan'
-        : 'Your organization is scheduled for the downgrade at the end of your current billing cycle',
-      { duration: hasProjectsWithComputeDowngrade ? 8000 : 4000 }
+    updateOrgSubscription(
+      { slug, tier: 'tier_free' },
+      {
+        onSuccess: async () => {
+          resetCaptcha()
+          try {
+            await sendExitSurvey({
+              orgSlug: slug,
+              reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+              message,
+              exitAction: 'downgrade',
+            })
+          } catch (error) {
+            // [Joshen] In this case we don't raise any errors if the exit survey fails to send since it shouldn't block the user
+          } finally {
+            toast.success(
+              willPlanDowngradeHappenImmediately
+                ? hasProjectsWithComputeDowngrade
+                  ? 'Successfully downgraded organization to the Free Plan. Your projects are currently restarting to update their compute instances.'
+                  : 'Successfully downgraded organization to the Free Plan'
+                : 'Your organization is scheduled for the downgrade at the end of your current billing cycle',
+              { duration: hasProjectsWithComputeDowngrade ? 8000 : 4000 }
+            )
+            onClose(true)
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+          }
+        },
+      }
     )
-
-    onClose(true)
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 
   return (
@@ -143,10 +147,10 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
         size="xlarge"
         visible={visible}
         onCancel={onClose}
-        header="We're sad that you're leaving"
+        header="Help us improve."
       >
         <Modal.Content>
-          <div className="py-6 space-y-4">
+          <div className="space-y-4">
             <p className="text-sm text-foreground-light">
               We always strive to improve Supabase as much as we can. Please let us know the reasons
               you are canceling your subscription so that we can improve in the future.

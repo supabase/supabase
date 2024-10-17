@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 
-import _announcement from './data/Announcement.json'
-import { IconX } from 'ui'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
-import Link from 'next/link'
+import _announcement from './data/Announcement.json'
+import { X } from 'lucide-react'
 
 export interface AnnouncementProps {
   show: boolean
@@ -65,7 +65,7 @@ const Announcement = ({
             className="absolute z-50 right-4 flex h-full items-center opacity-100 text-white transition-opacity hover:opacity-90"
             onClick={handleClose}
           >
-            <IconX size={16} />
+            <X size={16} />
           </div>
         )}
         {children}

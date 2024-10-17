@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
-import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
+
+import type { DatetimeHelper, FilterTableSet, LogTemplate } from './Logs.types'
 
 export const LOGS_EXPLORER_DOCS_URL =
   'https://supabase.com/docs/guides/platform/logs#querying-with-the-logs-explorer'
@@ -361,6 +362,7 @@ export enum LogsTableName {
   STORAGE = 'storage_logs',
   POSTGREST = 'postgrest_logs',
   SUPAVISOR = 'supavisor_logs',
+  WAREHOUSE = 'warehouse_logs',
 }
 
 export const LOGS_TABLES = {
@@ -373,6 +375,7 @@ export const LOGS_TABLES = {
   storage: LogsTableName.STORAGE,
   postgrest: LogsTableName.POSTGREST,
   supavisor: LogsTableName.SUPAVISOR,
+  warehouse: LogsTableName.WAREHOUSE,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -385,6 +388,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.STORAGE]: 'Object storage logs',
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
   [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
+  [LogsTableName.WAREHOUSE]: 'Logs obtained from a data warehouse collection',
 }
 
 export const genQueryParams = (params: { [k: string]: string }) => {

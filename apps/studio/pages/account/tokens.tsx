@@ -1,16 +1,17 @@
+import Link from 'next/link'
 import { useState } from 'react'
-import type { NextPageWithLayout } from 'types'
-import { FormHeader } from 'components/ui/Forms'
-import { AccountLayout } from 'components/layouts'
+
 import {
   AccessTokenList,
-  NewTokenBanner,
   NewAccessTokenButton,
+  NewTokenBanner,
 } from 'components/interfaces/Account'
+import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
-
-import Link from 'next/link'
-import { Alert, Button, IconExternalLink } from 'ui'
+import type { NextPageWithLayout } from 'types'
+import { Alert, Button } from 'ui'
+import { ExternalLink } from 'lucide-react'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
@@ -26,7 +27,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
         </div>
         <div className="flex items-center space-x-4 mb-6">
           <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
                 href="https://supabase.com/docs/reference/api/introduction"
                 target="_blank"
@@ -35,7 +36,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
                 API Docs
               </Link>
             </Button>
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
                 href="https://supabase.com/docs/reference/cli/start"
                 target="_blank"

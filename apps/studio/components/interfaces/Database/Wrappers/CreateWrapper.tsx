@@ -4,24 +4,28 @@ import { isEmpty } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-  FormsContainer,
-} from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import { FormsContainer } from 'components/ui/Forms/FormsContainer'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
-import { useCheckPermissions } from 'hooks'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
-import { Button, Form, IconArrowLeft, IconEdit, IconTrash, Input } from 'ui'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { ArrowLeft, Edit, ExternalLink, Trash } from 'lucide-react'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  Input,
+  WarningIcon,
+} from 'ui'
 import InputField from './InputField'
 import WrapperTableEditor from './WrapperTableEditor'
 import { WRAPPERS } from './Wrappers.constants'
@@ -91,36 +95,8 @@ const CreateWrapper = () => {
     )
   }
 
-  if (!hasRequiredVersion) {
-    const databaseNeedsUpgrading =
-      wrappersExtension?.installed_version !== wrappersExtension?.default_version
-
-    return (
-      <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
-        <div className="space-y-2 flex flex-col items-center w-[400px]">
-          <p>Your extension version is outdated for this wrapper.</p>
-          <p className="text-sm text-center text-foreground-light">
-            The wrapper type {type} requires a minimum extension version of{' '}
-            {wrapperMeta.minimumExtensionVersion}. You have version{' '}
-            {wrappersExtension?.installed_version} installed. Please{' '}
-            {databaseNeedsUpgrading && 'upgrade your database then '}reinstall the extension to
-            create this wrapper.
-          </p>
-        </div>
-        <Button asChild type="default">
-          <Link
-            href={
-              databaseNeedsUpgrading
-                ? `/project/${ref}/settings/infrastructure`
-                : `/project/${ref}/database/extensions?filter=wrappers`
-            }
-          >
-            {databaseNeedsUpgrading ? 'Upgrade Database' : 'Reinstall Extension'}
-          </Link>
-        </Button>
-      </div>
-    )
-  }
+  const databaseNeedsUpgrading =
+    wrappersExtension?.installed_version !== wrappersExtension?.default_version
 
   const onUpdateTable = (values: any) => {
     setNewTables((prev) => {
@@ -183,135 +159,173 @@ const CreateWrapper = () => {
           </div>
         </div>
 
-        <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
-          {({ handleReset, values, initialValues }: any) => {
-            const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-            return (
-              <FormPanel
-                disabled={!canCreateWrapper}
-                footer={
-                  <div className="flex px-8 py-4">
-                    <FormActions
-                      form={formId}
-                      isSubmitting={isCreating}
-                      hasChanges={hasChanges}
-                      handleReset={handleReset}
-                      disabled={!canCreateWrapper}
-                      helper={
-                        !canCreateWrapper
-                          ? 'You need additional permissions to create a foreign data wrapper'
-                          : undefined
-                      }
-                    />
-                  </div>
-                }
-              >
-                <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
-                  <FormSectionContent loading={false}>
-                    <Input
-                      id="wrapper_name"
-                      label="Wrapper Name"
-                      error={formErrors.wrapper_name}
-                      descriptionText={
-                        (values?.wrapper_name ?? '').length > 0 ? (
-                          <>
-                            Your wrapper's server name will be{' '}
-                            <code className="text-xs">{values.wrapper_name}_server</code>
-                          </>
-                        ) : (
-                          ''
-                        )
-                      }
-                    />
-                  </FormSectionContent>
-                </FormSection>
-                <FormSection
-                  header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
-                >
-                  <FormSectionContent loading={false}>
-                    {wrapperMeta.server.options.map((option) => (
-                      <InputField
-                        key={option.name}
-                        option={option}
-                        loading={false}
-                        error={formErrors[option.name]}
+        {hasRequiredVersion ? (
+          <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
+            {({ handleReset, values, initialValues }: any) => {
+              const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+              return (
+                <FormPanel
+                  disabled={!canCreateWrapper}
+                  footer={
+                    <div className="flex px-8 py-4">
+                      <FormActions
+                        form={formId}
+                        isSubmitting={isCreating}
+                        hasChanges={hasChanges}
+                        handleReset={handleReset}
+                        disabled={!canCreateWrapper}
+                        helper={
+                          !canCreateWrapper
+                            ? 'You need additional permissions to create a foreign data wrapper'
+                            : undefined
+                        }
                       />
-                    ))}
-                  </FormSectionContent>
-                </FormSection>
-                <FormSection
-                  header={
-                    <FormSectionLabel>
-                      <p>Foreign Tables</p>
-                      <p className="text-foreground-light mt-2 w-[90%]">
-                        You can query your data from these foreign tables after the wrapper is
-                        created
-                      </p>
-                    </FormSectionLabel>
+                    </div>
                   }
                 >
-                  <FormSectionContent loading={false}>
-                    {newTables.length === 0 ? (
-                      <div className="flex justify-end translate-y-4">
-                        <Button type="default" onClick={() => setIsEditingTable(true)}>
-                          Add foreign table
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {newTables.map((table, i) => (
-                          <div
-                            key={`${table.schema_name}.${table.table_name}`}
-                            className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
-                          >
-                            <div>
-                              <p className="text-sm">
-                                {table.schema_name}.{table.table_name}
-                              </p>
-                              <p className="text-sm text-foreground-light">
-                                Columns:{' '}
-                                {table.columns.map((column: any) => column.name).join(', ')}
-                              </p>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<IconEdit />}
-                                onClick={() => {
-                                  setIsEditingTable(true)
-                                  setSelectedTableToEdit({ ...table, tableIndex: i })
-                                }}
-                              />
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<IconTrash />}
-                                onClick={() => {
-                                  setNewTables((prev) => prev.filter((_, j) => j !== i))
-                                }}
-                              />
-                            </div>
-                          </div>
+                  <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
+                    <FormSectionContent loading={false}>
+                      <Input
+                        id="wrapper_name"
+                        label="Wrapper Name"
+                        error={formErrors.wrapper_name}
+                        descriptionText={
+                          (values?.wrapper_name ?? '').length > 0 ? (
+                            <>
+                              Your wrapper's server name will be{' '}
+                              <code className="text-xs">{values.wrapper_name}_server</code>
+                            </>
+                          ) : (
+                            ''
+                          )
+                        }
+                      />
+                    </FormSectionContent>
+                  </FormSection>
+                  <FormSection
+                    header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
+                  >
+                    <FormSectionContent loading={false}>
+                      {wrapperMeta.server.options
+                        .filter((option) => !option.hidden)
+                        .map((option) => (
+                          <InputField
+                            key={option.name}
+                            option={option}
+                            loading={false}
+                            error={formErrors[option.name]}
+                          />
                         ))}
-                      </div>
-                    )}
-                    {newTables.length > 0 && (
-                      <div className="flex justify-end">
-                        <Button type="default" onClick={() => setIsEditingTable(true)}>
-                          Add foreign table
-                        </Button>
-                      </div>
-                    )}
-                    {newTables.length === 0 && formErrors.tables && (
-                      <p className="text-sm text-right text-red-900">{formErrors.tables}</p>
-                    )}
-                  </FormSectionContent>
-                </FormSection>
-              </FormPanel>
-            )
-          }}
-        </Form>
+                    </FormSectionContent>
+                  </FormSection>
+                  <FormSection
+                    header={
+                      <FormSectionLabel>
+                        <p>Foreign Tables</p>
+                        <p className="text-foreground-light mt-2 w-[90%]">
+                          You can query your data from these foreign tables after the wrapper is
+                          created
+                        </p>
+                      </FormSectionLabel>
+                    }
+                  >
+                    <FormSectionContent loading={false}>
+                      {newTables.length === 0 ? (
+                        <div className="flex justify-end translate-y-4">
+                          <Button type="default" onClick={() => setIsEditingTable(true)}>
+                            Add foreign table
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {newTables.map((table, i) => (
+                            <div
+                              key={`${table.schema_name}.${table.table_name}`}
+                              className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
+                            >
+                              <div>
+                                <p className="text-sm">
+                                  {table.schema_name}.{table.table_name}
+                                </p>
+                                <p className="text-sm text-foreground-light">
+                                  Columns:{' '}
+                                  {table.columns.map((column: any) => column.name).join(', ')}
+                                </p>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Button
+                                  type="default"
+                                  className="px-1"
+                                  icon={<Edit />}
+                                  onClick={() => {
+                                    setIsEditingTable(true)
+                                    setSelectedTableToEdit({ ...table, tableIndex: i })
+                                  }}
+                                />
+                                <Button
+                                  type="default"
+                                  className="px-1"
+                                  icon={<Trash />}
+                                  onClick={() => {
+                                    setNewTables((prev) => prev.filter((_, j) => j !== i))
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {newTables.length > 0 && (
+                        <div className="flex justify-end">
+                          <Button type="default" onClick={() => setIsEditingTable(true)}>
+                            Add foreign table
+                          </Button>
+                        </div>
+                      )}
+                      {newTables.length === 0 && formErrors.tables && (
+                        <p className="text-sm text-right text-red-900">{formErrors.tables}</p>
+                      )}
+                    </FormSectionContent>
+                  </FormSection>
+                </FormPanel>
+              )
+            }}
+          </Form>
+        ) : (
+          <Alert_Shadcn_ variant="warning">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Your extension version is outdated for this wrapper.
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
+              <p>
+                The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
+                {wrapperMeta.minimumExtensionVersion}. You have version{' '}
+                {wrappersExtension?.installed_version} installed. Please{' '}
+                {databaseNeedsUpgrading && 'upgrade your database then '}update the extension by
+                disabling and enabling the <code className="text-xs">wrappers</code> extension to
+                create this wrapper.
+              </p>
+              <p className="text-warning">
+                Warning: Before reinstalling the wrapper extension, you must first remove all
+                existing wrappers. Afterward, you can recreate the wrappers.
+              </p>
+            </AlertDescription_Shadcn_>
+            <AlertDescription_Shadcn_ className="mt-3">
+              <Button asChild type="default">
+                <Link
+                  href={
+                    databaseNeedsUpgrading
+                      ? `/project/${ref}/settings/infrastructure`
+                      : `/project/${ref}/database/extensions?filter=wrappers`
+                  }
+                >
+                  {databaseNeedsUpgrading ? 'Upgrade database' : 'View wrappers extension'}
+                </Link>
+              </Button>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
       </div>
 
       <WrapperTableEditor

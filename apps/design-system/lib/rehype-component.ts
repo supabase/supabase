@@ -7,12 +7,12 @@ import { visit } from 'unist-util-visit'
 import { Index } from '../__registry__'
 import { styles } from '../registry/styles'
 
-import { parse } from 'react-docgen'
+// import { parse } from 'react-docgen'
 
-import * as reactDocgenTypescript from 'react-docgen-typescript'
+// import * as reactDocgenTypescript from 'react-docgen-typescript'
 
-import { Column, IColumnProps } from './sample-component'
-import React, { ComponentType } from 'react'
+// import { Column, IColumnProps } from './sample-component'
+import React from 'react' // ComponentType
 
 function inspectComponentProps<T>(component: React.ComponentType<T>): void {
   // Assert the component's props type

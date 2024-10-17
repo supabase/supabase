@@ -127,7 +127,7 @@ export function ComponentPreview({
       <div className={cn('mt-4 mb-12', wideClasses)}>
         <div
           className={cn(
-            'relative rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio overflow-hidden'
+            'relative rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio'
           )}
         >
           {showGrid && (
@@ -170,9 +170,7 @@ export function ComponentPreview({
   return (
     <div className={cn('mt-4 mb-12', wideClasses)}>
       <div
-        className={cn(
-          'relative rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio overflow-hidden'
-        )}
+        className={cn('relative rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio')}
       >
         {showGrid && (
           <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,hsla(var(--foreground-default)/0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>

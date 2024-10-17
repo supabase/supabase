@@ -2,7 +2,7 @@ import type { PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { Query } from 'components/grid/query/Query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -507,7 +507,7 @@ export const createTable = async ({
 }: {
   projectRef: string
   connectionString: string | undefined
-  toastId: string
+  toastId: string | number
   payload: {
     name: string
     schema: string
@@ -688,7 +688,7 @@ export const updateTable = async ({
 }: {
   projectRef: string
   connectionString: string | undefined
-  toastId: string
+  toastId: string | number
   table: PostgresTable
   payload: any
   columns: ColumnField[]

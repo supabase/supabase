@@ -1,7 +1,7 @@
 import { CodeBlock } from 'ui'
 import Param from '~/components/Params'
+import { Tabs, TabPanel } from '~/features/ui/Tabs'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
-import { Tabs, TabPanel } from '~/components/Tabs'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 const ApiOperationSection = (props) => {

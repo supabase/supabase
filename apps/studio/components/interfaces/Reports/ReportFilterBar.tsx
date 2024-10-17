@@ -2,7 +2,7 @@ import { ChevronDown, Database, Plus, X } from 'lucide-react'
 import { ComponentProps, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useParams } from 'common'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Auth, Realtime, Storage } from 'icons'
@@ -85,10 +85,8 @@ const ReportFilterBar = ({
   onRemoveFilters,
   datepickerHelpers,
 }: ReportFilterBarProps) => {
-  const { project } = useProjectContext()
-  const showReadReplicasUI = project?.is_read_replicas_enabled
-
-  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: project?.ref })
+  const { ref } = useParams()
+  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
   const filterKeys = [
     'request.path',
@@ -220,7 +218,7 @@ const ReportFilterBar = ({
                 size="tiny"
                 className="!p-0 !space-x-0"
                 onClick={() => onRemoveFilters([filter])}
-                icon={<X size={14} className="text-foreground-light" />}
+                icon={<X className="text-foreground-light" />}
               >
                 <span className="sr-only">Remove</span>
               </Button>
@@ -300,21 +298,18 @@ const ReportFilterBar = ({
             asChild
             type="default"
             size="tiny"
-            icon={<Plus size={14} className={`text-foreground-light `} />}
+            icon={<Plus className={`text-foreground-light `} />}
           >
             <span>Add filter</span>
           </Button>
         </Popover>
       </div>
-      {showReadReplicasUI && (
-        <DatabaseSelector
-          additionalOptions={
-            (loadBalancers ?? []).length > 0
-              ? [{ id: `${project.ref}-all`, name: 'API Load Balancer' }]
-              : []
-          }
-        />
-      )}
+
+      <DatabaseSelector
+        additionalOptions={
+          (loadBalancers ?? []).length > 0 ? [{ id: `${ref}-all`, name: 'API Load Balancer' }] : []
+        }
+      />
     </div>
   )
 }

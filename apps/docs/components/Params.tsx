@@ -8,7 +8,7 @@ type IParamProps = any
 const Param = ({ name, isOptional, type, description, children, isPrimitive }: IParamProps) => {
   return (
     <div className="border-t border-b py-5 flex flex-col gap-3 debugger">
-      <div className="flex gap-3 items-center">
+      <div className="flex gap-3 items-center flex-wrap">
         {!isPrimitive && (
           <span className="text-sm text-foreground font-mono font-medium">{name ?? 'no-name'}</span>
         )}

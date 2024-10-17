@@ -7,7 +7,7 @@ import { UPLOAD_FILE_EXTENSIONS } from './SpreadsheetImport.constants'
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 
 export const parseSpreadsheetText: any = (text: string) => {
-  const columnTypeMap: any = {}
+  const columnTypeMap: Record<any, any> = {}
   let previewRows: any[] = []
   return new Promise((resolve) => {
     Papa.parse(text, {
@@ -49,7 +49,7 @@ export const parseSpreadsheet = (
   let rowCount = 0
   let previewRows: any[] = []
 
-  const columnTypeMap: any = {}
+  const columnTypeMap: Record<any, any> = {}
   const errors: any[] = []
 
   return new Promise((resolve) => {

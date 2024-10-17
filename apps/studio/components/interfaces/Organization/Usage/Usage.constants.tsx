@@ -47,7 +47,7 @@ export interface CategoryAttribute {
   key: string // Property from organization usage
   attributes: Attribute[] // For querying against stats-daily / infra-monitoring
   name: string
-  unit: 'bytes' | 'absolute' | 'percentage' | 'hours'
+  unit: 'bytes' | 'absolute' | 'percentage' | 'hours' | 'gigabytes'
   links?: {
     name: string
     url: string
@@ -56,7 +56,7 @@ export interface CategoryAttribute {
   chartPrefix?: 'Max' | 'Average' | 'Cumulative'
   chartSuffix?: string
   chartDescription: string
-  additionalInfo?: (subscription?: OrgSubscription, usage?: OrgUsageResponse) => JSX.Element | null
+  additionalInfo?: (usage?: OrgUsageResponse) => JSX.Element | null
 }
 
 export type CategoryMetaKey = 'bandwidth' | 'sizeCount' | 'activity' | 'compute'
@@ -68,7 +68,9 @@ export interface CategoryMeta {
   attributes: CategoryAttribute[]
 }
 
-export const USAGE_CATEGORIES: CategoryMeta[] = [
+export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[] = (
+  subscription
+) => [
   {
     key: 'bandwidth',
     name: 'Bandwidth',
@@ -88,73 +90,103 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         name: 'Total Egress',
         unit: 'bytes',
         description:
-          'Contains any outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor) from your database.\nBilling is based on the total sum of egress in GB throughout your billing period.',
+          'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor and Log Drains.\nBilling is based on the total sum of egress in GB throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
       },
     ],
   },
   {
     key: 'sizeCount',
-    name: 'Size & Counts',
+    name: 'Database & Storage Size',
     description: 'Amount of resources your project is consuming',
     attributes: [
-      {
-        anchor: 'dbSize',
-        key: PricingMetric.DATABASE_SIZE,
-        attributes: [{ key: PricingMetric.DATABASE_SIZE.toLowerCase(), color: 'white' }],
-        name: 'Database size',
-        chartPrefix: 'Average',
-        unit: 'bytes',
-        description:
-          'Database size refers to the monthly average storage usage, as reported by Postgres. Paid plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
-        links: [
-          {
-            name: 'Documentation',
-            url: 'https://supabase.com/docs/guides/platform/database-size',
+      subscription?.plan.id === 'free' || subscription?.usage_based_billing_project_addons !== true
+        ? {
+            anchor: 'dbSize',
+            key: PricingMetric.DATABASE_SIZE,
+            attributes: [{ key: PricingMetric.DATABASE_SIZE.toLowerCase(), color: 'white' }],
+            name: 'Database size',
+            chartPrefix: 'Average',
+            unit: 'bytes',
+            description:
+              'Database size refers to the monthly average database space usage, as reported by Postgres. Paid Plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
+            links: [
+              {
+                name: 'Documentation',
+                url: 'https://supabase.com/docs/guides/platform/database-size',
+              },
+              ...(subscription?.usage_based_billing_project_addons === true
+                ? [
+                    {
+                      name: 'Disk Management',
+                      url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
+                    },
+                  ]
+                : []),
+            ],
+            chartDescription: 'The data refreshes every 24 hours.',
+            additionalInfo: (usage?: OrgUsageResponse) => {
+              const usageMeta = usage?.usages.find((x) => x.metric === PricingMetric.DATABASE_SIZE)
+              const usageRatio =
+                typeof usageMeta !== 'number'
+                  ? (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
+                  : 0
+              const hasLimit = usageMeta && (usageMeta?.pricing_free_units ?? 0) > 0
+
+              const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
+              const isExceededLimit = hasLimit && usageRatio >= 1
+              const isCapped = usageMeta?.capped
+
+              const onFreePlan = subscription?.plan?.name === 'Free'
+
+              return (
+                <div>
+                  {(isApproachingLimit || isExceededLimit) && isCapped && (
+                    <Alert
+                      withIcon
+                      variant={isExceededLimit ? 'danger' : 'warning'}
+                      title={
+                        isExceededLimit
+                          ? 'Exceeding database size limit'
+                          : 'Nearing database size limit'
+                      }
+                    >
+                      <div className="flex w-full items-center flex-col justify-center space-y-2 md:flex-row md:justify-between">
+                        <div>
+                          When you reach your database size limit, your project can go into
+                          read-only mode.{' '}
+                          {onFreePlan
+                            ? 'Please upgrade your Plan.'
+                            : "Disable your spend cap to scale seamlessly, and pay for over-usage beyond your Plan's quota."}
+                        </div>
+                      </div>
+                    </Alert>
+                  )}
+                </div>
+              )
+            },
+          }
+        : {
+            anchor: 'diskSize',
+            key: 'diskSize',
+            attributes: [],
+            name: 'Disk size',
+            chartPrefix: 'Average',
+            unit: 'bytes',
+            description:
+              "Each Supabase project comes with a dedicated disk. Each project gets 8 GB of disk for free. Billing is based on the provisioned disk size. Disk automatically scales up when you get close to it's size.\nEach hour your project is using more than 8 GB of GP3 disk, it incurs the overages in GB-Hrs, i.e. a 16 GB disk incurs 8 GB-Hrs every hour. Extra disk size costs $0.125/GB/month ($0.000171/GB-Hr).",
+            links: [
+              {
+                name: 'Documentation',
+                url: 'https://supabase.com/docs/guides/platform/org-based-billing#disk-size',
+              },
+              {
+                name: 'Disk Management',
+                url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
+              },
+            ],
+            chartDescription: '',
           },
-        ],
-        chartDescription: 'The data refreshes every 24 hours.',
-        additionalInfo: (subscription?: OrgSubscription, usage?: OrgUsageResponse) => {
-          const usageMeta = usage?.usages.find((x) => x.metric === PricingMetric.DATABASE_SIZE)
-          const usageRatio =
-            typeof usageMeta !== 'number'
-              ? (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
-              : 0
-          const hasLimit = usageMeta && (usageMeta?.pricing_free_units ?? 0) > 0
-
-          const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
-          const isExceededLimit = hasLimit && usageRatio >= 1
-          const isCapped = usageMeta?.capped
-
-          const onFreePlan = subscription?.plan?.name === 'Free'
-
-          return (
-            <div>
-              {(isApproachingLimit || isExceededLimit) && isCapped && (
-                <Alert
-                  withIcon
-                  variant={isExceededLimit ? 'danger' : 'warning'}
-                  title={
-                    isExceededLimit
-                      ? 'Exceeding database size limit'
-                      : 'Nearing database size limit'
-                  }
-                >
-                  <div className="flex w-full items-center flex-col justify-center space-y-2 md:flex-row md:justify-between">
-                    <div>
-                      When you reach your database size limit, your project can go into read-only
-                      mode.{' '}
-                      {onFreePlan
-                        ? 'Please upgrade your plan.'
-                        : 'Disable your spend cap to scale seamlessly and pay for over-usage beyond your plans quota.'}
-                    </div>
-                  </div>
-                </Alert>
-              )}
-            </div>
-          )
-        },
-      },
       {
         anchor: 'storageSize',
         key: PricingMetric.STORAGE_SIZE,
@@ -163,7 +195,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         chartPrefix: 'Average',
         unit: 'bytes',
         description:
-          'Sum of all objects in your storage buckets.\nBilling is based on the average daily size in GB throughout your billing period.',
+          'Sum of all objects in your storage buckets.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
         chartDescription: 'The data refreshes every 24 hours.',
         links: [
           {
@@ -171,17 +203,6 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
             url: 'https://supabase.com/docs/guides/storage',
           },
         ],
-      },
-      {
-        anchor: 'funcCount',
-        key: PricingMetric.FUNCTION_COUNT,
-        attributes: [{ key: PricingMetric.FUNCTION_COUNT.toLowerCase(), color: 'white' }],
-        name: 'Edge Function Count',
-        chartPrefix: 'Max',
-        unit: 'absolute',
-        description:
-          'Number of serverless functions in your project.\nBilling is based on the maximum amount of functions at any point in time throughout your billing period.',
-        chartDescription: 'The data refreshes every 24 hours.',
       },
     ],
   },

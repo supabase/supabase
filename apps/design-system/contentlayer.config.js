@@ -50,6 +50,9 @@ const NestedProperties = defineNestedType(() => ({
     inputOtp: {
       type: 'boolean',
     },
+    reactAccessibleTreeview: {
+      type: 'boolean',
+    },
   },
 }))
 

@@ -4,7 +4,7 @@ import { Attribute, COLOR_MAP } from './Usage.constants'
 
 export interface SingleAttributeTooltipContentProps {
   name: string
-  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours' | 'gigabytes'
   value: any
   isAfterToday: boolean
   tooltipFormatter?: (value: any) => any
@@ -37,7 +37,7 @@ export interface MultiAttributeTooltipContentProps {
   values: Payload<ValueType, string | number>[]
   isAfterToday: boolean
   tooltipFormatter?: (value: any) => any
-  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours' | 'gigabytes'
 }
 
 const AttributeContent = ({
@@ -51,7 +51,7 @@ const AttributeContent = ({
   attributeMeta?: Payload<ValueType, string | number>
   sumValue: number
   tooltipFormatter?: (value: any) => any
-  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours' | 'gigabytes'
 }) => {
   const attrValue = Number(attributeMeta?.value ?? 0)
   const percentageContribution = ((attrValue / sumValue) * 100).toFixed(1)

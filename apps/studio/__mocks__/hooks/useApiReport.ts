@@ -1,4 +1,6 @@
-export const useApiReport = jest.fn().mockReturnValue({
+import { vi } from 'vitest'
+
+export const useApiReport = vi.fn().mockReturnValue({
   data: {
     totalRequests: [{ count: 4, timestamp: '2024-05-09T04:00:00.000Z' }],
     topRoutes: [
@@ -17,16 +19,11 @@ export const useApiReport = jest.fn().mockReturnValue({
       sql: '',
     },
   },
-  error: {
-    totalRequests: null,
-    topRoutes: null,
-    topErrorRoutes: null,
-  },
   filters: [],
   isLoading: false,
-  mergeParams: jest.fn(),
-  addFilter: jest.fn(),
-  removeFilter: jest.fn(),
-  removeFilters: jest.fn(),
-  refresh: jest.fn(),
+  mergeParams: vi.fn(),
+  addFilter: vi.fn(),
+  removeFilter: vi.fn(),
+  removeFilters: vi.fn(),
+  refresh: vi.fn(),
 })

@@ -1,13 +1,14 @@
 import { useParams } from 'common'
+import { Save } from 'lucide-react'
 import Link from 'next/link'
-import { IconSave, Loading } from 'ui'
 
-import { LogsSavedQueriesItem } from 'components/interfaces/Settings/Logs'
-import { LogsLayout } from 'components/layouts'
+import LogsSavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import { useContentQuery } from 'data/content/content-query'
 import type { NextPageWithLayout } from 'types'
+import { Loading } from 'ui'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -45,7 +46,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
       )}
       {saved.length === 0 && (
         <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
-          <IconSave className="animate-bounce" />
+          <Save className="animate-bounce" />
           <h3 className="text-lg text-foreground">No Saved Queries Yet</h3>
           <p className="text-sm text-foreground-lighter">
             Saved queries will appear here. Queries can be saved from the{' '}

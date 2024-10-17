@@ -1,7 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronRight } from 'lucide-react'
+import { AlertCircle, BarChart2, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import Panel from 'components/ui/Panel'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -11,24 +23,9 @@ import {
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
   Form,
-  IconAlertCircle,
-  IconBarChart2,
   Input,
+  WarningIcon,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import { useCheckPermissions, useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 
@@ -38,7 +35,7 @@ const General = () => {
 
   // Also doubles up as a feature flag to enable display of the related alert,
   // another dedicated flag would be redundant.
-  const v2AnnouncementUrl = useFlag('v2AnnouncementUrl')
+  const v2AnnouncementUrl = useFlag('v2AnnouncementUrl') as string
 
   const v2MaintenanceWindow = project?.v2MaintenanceWindow
   const v2MaintenanceDate = v2MaintenanceWindow?.start
@@ -58,24 +55,27 @@ const General = () => {
     },
   })
 
-  const { mutateAsync: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
+  const { mutate: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
 
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!project?.ref) return console.error('Ref is required')
-    try {
-      const { name } = await updateProject({ ref: project.ref, name: values.name.trim() })
-      resetForm({ values: { name }, initialValues: { name } })
-      toast.success('Successfully saved settings')
-    } catch (error) {}
+
+    updateProject(
+      { ref: project.ref, name: values.name.trim() },
+      {
+        onSuccess: ({ name }) => {
+          resetForm({ values: { name }, initialValues: { name } })
+          toast.success('Successfully saved settings')
+        },
+      }
+    )
   }
 
   return (
     <div>
-      <FormHeader title="Project Settings" description="" />
-
       {isBranch && (
         <Alert_Shadcn_ variant="default" className="mb-6">
-          <IconAlertCircle strokeWidth={2} />
+          <WarningIcon />
           <AlertTitle_Shadcn_>
             You are currently on a preview branch of your project
           </AlertTitle_Shadcn_>
@@ -140,7 +140,7 @@ const General = () => {
                   v2MaintenanceEndTime &&
                   v2AnnouncementUrl !== 'https://' && (
                     <Alert_Shadcn_ variant="warning" className="mb-4">
-                      <IconAlertCircle strokeWidth={2} />
+                      <AlertCircle strokeWidth={2} />
                       <AlertTitle_Shadcn_>Upcoming project restart scheduled</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_ className="flex flex-col gap-3">
                         This project will automatically restart on {v2MaintenanceDate} between{' '}
@@ -212,9 +212,9 @@ const General = () => {
               <Panel.Content>
                 <div className="flex justify-between">
                   <div className="flex space-x-4">
-                    <IconBarChart2 strokeWidth={2} />
+                    <BarChart2 strokeWidth={2} />
                     <div>
-                      <p className="text-sm">Project usage statistics has been moved</p>
+                      <p className="text-sm">Project usage statistics have been moved</p>
                       <p className="text-foreground-light text-sm">
                         You may view your project's usage under your organization's settings
                       </p>

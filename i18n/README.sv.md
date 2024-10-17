@@ -200,7 +200,7 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
 
 ## Märken
 
-![Made with Supabase](./apps/www/public/badge-made-with-supabase.svg)
+![Made with Supabase](../apps/www/public/badge-made-with-supabase.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
@@ -217,7 +217,7 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
 </a>
 ```
 
-![Made with Supabase (dark)](./apps/www/public/badge-made-with-supabase-dark.svg)
+![Made with Supabase (dark)](../apps/www/public/badge-made-with-supabase-dark.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)

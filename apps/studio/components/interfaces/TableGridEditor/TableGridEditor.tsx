@@ -2,14 +2,15 @@ import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supab
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
 import { find, isUndefined } from 'lodash'
+import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { parseSupaTable, SupabaseGrid, SupaTable } from 'components/grid'
-import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
+import { SupabaseGrid } from 'components/grid/SupabaseGrid'
+import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { Loading } from 'components/ui/Loading'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import {
   ForeignKeyConstraint,
@@ -18,17 +19,21 @@ import {
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { useCheckPermissions, useLatest, useUrlState } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useEntityType from 'hooks/misc/useEntityType'
+import useLatest from 'hooks/misc/useLatest'
 import type { TableLike } from 'hooks/misc/useTable'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary, SchemaView } from 'types'
+import { Button } from 'ui'
 import GridHeaderActions from './GridHeaderActions'
+import { TableGridSkeletonLoader } from './LoadingState'
 import NotFoundState from './NotFoundState'
-import { SidePanelEditor } from './SidePanelEditor'
+import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import { useEncryptedColumns } from './SidePanelEditor/SidePanelEditor.utils'
 import TableDefinition from './TableDefinition'
 
@@ -133,7 +138,7 @@ const TableGridEditor = ({
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable) {
-    return <Loading />
+    return <TableGridSkeletonLoader />
   }
 
   if (isUndefined(selectedTable)) {
@@ -230,7 +235,27 @@ const TableGridEditor = ({
 
     const configuration = { identifiers }
     if (Object.keys(identifiers).length === 0) {
-      toast.error(ERROR_PRIMARY_KEY_NOTFOUND)
+      return toast('Unable to update row as table has no primary keys', {
+        description: (
+          <div>
+            <p className="text-sm text-foreground-light">
+              Add a primary key column to your table first to serve as a unique identifier for each
+              row before updating or deleting the row.
+            </p>
+            <div className="mt-3">
+              <Button asChild type="outline" icon={<ExternalLink />}>
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://supabase.com/docs/guides/database/tables#primary-keys"
+                >
+                  Documentation
+                </a>
+              </Button>
+            </div>
+          </div>
+        ),
+      })
     }
 
     mutateUpdateTableRow({
@@ -260,14 +285,10 @@ const TableGridEditor = ({
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={
-          isTableSelected || isViewSelected || canEditViaTableEditor ? (
-            <GridHeaderActions
-              table={selectedTable as PostgresTable}
-              canEditViaTableEditor={canEditViaTableEditor}
-              isViewSelected={isViewSelected}
-              isTableSelected={isTableSelected}
-            />
-          ) : null
+          <GridHeaderActions
+            table={selectedTable as TableLike}
+            canEditViaTableEditor={canEditViaTableEditor}
+          />
         }
         onAddColumn={snap.onAddColumn}
         onEditColumn={onSelectEditColumn}
@@ -278,7 +299,7 @@ const TableGridEditor = ({
         onImportData={snap.onImportData}
         onError={onError}
         onExpandJSONEditor={(column, row) => {
-          snap.onExpandJSONEditor({ column, row, jsonString: JSON.stringify(row[column]) || '' })
+          snap.onExpandJSONEditor({ column, row, value: JSON.stringify(row[column]) || '' })
         }}
         onExpandTextEditor={(column, row) => {
           snap.onExpandTextEditor(column, row)
@@ -299,13 +320,11 @@ const TableGridEditor = ({
         {(isViewSelected || isTableSelected) && <TableDefinition id={selectedTable?.id} />}
       </SupabaseGrid>
 
-      {snap.selectedSchemaName !== undefined && (
-        <SidePanelEditor
-          editable={!isReadOnly && canEditViaTableEditor}
-          selectedTable={selectedTable as PostgresTable}
-          onTableCreated={onTableCreated}
-        />
-      )}
+      <SidePanelEditor
+        editable={!isReadOnly && canEditViaTableEditor}
+        selectedTable={selectedTable as PostgresTable}
+        onTableCreated={onTableCreated}
+      />
     </>
   )
 }

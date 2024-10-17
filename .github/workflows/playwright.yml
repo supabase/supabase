@@ -36,10 +36,10 @@ jobs:
       - name: Run Playwright tests
         run: npm run test:playwright
         # mark the action as succeeded even if the tests failed. This is temporarily until we make the tests more stable.
-        continue-on-error: true
-    # - uses: actions/upload-artifact@v3
-    #   if: always()
-    #   with:
-    #     name: playwright-report
-    #     path: playwright-report/
-    #     retention-days: 30
+        # continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-tests/playwright-report/
+          retention-days: 7

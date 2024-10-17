@@ -1,7 +1,21 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams, useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
+import { ChevronDown, ExternalLink } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+
+import { useParams } from 'common'
+import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import AlertError from 'components/ui/AlertError'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
+import Panel from 'components/ui/Panel'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { pluckObjectFields } from 'lib/helpers'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
   Button,
   CollapsibleContent_Shadcn_,
@@ -10,29 +24,22 @@ import {
   Input,
   Separator,
   Tabs,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import AlertError from 'components/ui/AlertError'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
-import Panel from 'components/ui/Panel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { pluckObjectFields } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
-import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
+import {
+  DefaultSessionModeNotice,
+  IPv4AddonDirectConnectionNotice,
+  IPv4DeprecationNotice,
+} from '../DatabaseConnectionNotices'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import {
   constructConnStringSyntax,
   getConnectionStrings,
   getPoolerTld,
 } from './DatabaseSettings.utils'
-import { ChevronDown, ExternalLink } from 'lucide-react'
 
 const CONNECTION_TYPES = [
   { id: 'uri', label: 'URI' },
@@ -40,7 +47,7 @@ const CONNECTION_TYPES = [
   { id: 'golang', label: 'Golang' },
   { id: 'jdbc', label: 'JDBC' },
   { id: 'dotnet', label: '.NET' },
-  { id: 'nodejs', label: 'Nodejs' },
+  { id: 'nodejs', label: 'Node.js' },
   { id: 'php', label: 'PHP' },
   { id: 'python', label: 'Python' },
 ]
@@ -50,16 +57,14 @@ interface DatabaseConnectionStringProps {
 }
 
 export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStringProps) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
+  const project = useSelectedProject()
   const { ref: projectRef, connectionString } = useParams()
   const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
   const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
-  const readReplicasEnabled = projectDetails?.is_read_replicas_enabled
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
-  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session'>('transaction')
   const [selectedTab, setSelectedTab] = useState<
     'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
   >('uri')
@@ -67,17 +72,8 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const { data: poolingInfo, isSuccess: isSuccessPoolingInfo } = usePoolingConfigurationQuery({
     projectRef,
   })
-  const poolingConfiguration = readReplicasEnabled
-    ? poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
-    : poolingInfo?.find((x) => x.database_type === 'PRIMARY')
-
-  const {
-    data,
-    error: projectSettingsError,
-    isLoading: isLoadingProjectSettings,
-    isError: isErrorProjectSettings,
-    isSuccess: isSuccessProjectSettings,
-  } = useProjectSettingsQuery({ projectRef })
+  const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+  const defaultPoolingMode = poolingConfiguration?.pool_mode
 
   const {
     data: databases,
@@ -87,21 +83,18 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
     isSuccess: isSuccessReadReplicas,
   } = useReadReplicasQuery({ projectRef })
 
-  const error = readReplicasEnabled ? readReplicasError : projectSettingsError
-  const isLoading = readReplicasEnabled ? isLoadingReadReplicas : isLoadingProjectSettings
-  const isError = readReplicasEnabled ? isErrorReadReplicas : isErrorProjectSettings
-  const isSuccess = readReplicasEnabled ? isSuccessReadReplicas : isSuccessProjectSettings
-
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
   )
 
-  const { project } = data ?? {}
+  const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery({ projectRef })
+  const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
+
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
-  const connectionInfo = readReplicasEnabled
-    ? pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
-    : pluckObjectFields(project || emptyState, DB_FIELDS)
+  const connectionInfo = pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
   const connectionTld =
     projectDetails?.restUrl !== undefined
       ? new URL(projectDetails?.restUrl ?? '').hostname.split('.').pop() ?? 'co'
@@ -109,15 +102,11 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
 
   const handleCopy = (id: string) => {
     const labelValue = CONNECTION_TYPES.find((type) => type.id === id)?.label
-    Telemetry.sendEvent(
-      {
-        category: 'settings',
-        action: 'copy_connection_string',
-        label: labelValue ? labelValue : '',
-      },
-      telemetryProps,
-      router
-    )
+    sendEvent({
+      category: 'settings',
+      action: 'copy_connection_string',
+      label: labelValue ? labelValue : '',
+    })
   }
 
   const connectionStrings =
@@ -149,11 +138,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
       : []
 
   useEffect(() => {
-    if (
-      readReplicasEnabled &&
-      connectionString !== undefined &&
-      connectionStringsRef.current !== undefined
-    ) {
+    if (connectionString !== undefined && connectionStringsRef.current !== undefined) {
       state.setSelectedDatabaseId(connectionString)
       connectionStringsRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
@@ -170,9 +155,8 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
       <Panel
         className={cn(
           '!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)]:!p-0',
-          appearance === 'minimal' && 'border-0 shadow-none'
+          appearance === 'minimal' && 'border-0 shadow-none bg-transparent'
         )}
-        bodyClassName={cn(appearance === 'minimal' && 'bg-transparent')}
         titleClasses={cn(appearance === 'minimal' && 'bg-transparent')}
         title={
           <div
@@ -196,7 +180,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                   appearance === 'minimal' ? 'absolute -top-1 right-0' : ''
                 )}
               >
-                {readReplicasEnabled && <DatabaseSelector />}
+                <DatabaseSelector />
                 <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                   <a
                     target="_blank"
@@ -226,18 +210,28 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
         }
       >
         <Panel.Content className={appearance === 'minimal' && 'px-0'}>
-          {isLoading && <ShimmeringLoader className="h-8 w-full" />}
-          {isError && <AlertError error={error} subject="Failed to retrieve database settings" />}
-          {isSuccess && (
+          {isLoadingReadReplicas && <ShimmeringLoader className="h-8 w-full" />}
+          {isErrorReadReplicas && (
+            <AlertError error={readReplicasError} subject="Failed to retrieve database settings" />
+          )}
+          {isSuccessReadReplicas && (
             <div className="flex flex-col gap-y-4 pt-2">
               <UsePoolerCheckbox
                 id="connection-string"
                 checked={snap.usePoolerConnection}
                 poolingMode={poolingMode}
+                ipv4AddonAdded={!!ipv4Addon}
                 onCheckedChange={snap.setUsePoolerConnection}
                 onSelectPoolingMode={setPoolingMode}
               />
-              {!snap.usePoolerConnection && <IPv4DeprecationNotice />}
+              {defaultPoolingMode === 'session' && poolingMode === 'transaction' && (
+                <DefaultSessionModeNotice />
+              )}
+              {isSuccessAddons &&
+                poolingMode === 'session' &&
+                ipv4Addon !== undefined &&
+                snap.usePoolerConnection && <IPv4AddonDirectConnectionNotice />}
+              {ipv4Addon === undefined && !snap.usePoolerConnection && <IPv4DeprecationNotice />}
               <Input
                 copy
                 readOnly
@@ -276,34 +270,22 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                       You can use the following URI format to switch to a different database or user
                       {snap.usePoolerConnection ? ' when using connection pooling' : ''}.
                     </p>
-                    <p className="text-sm font-mono tracking-tight text-foreground-lighter">
+                    <p className="text-sm tracking-tight text-foreground-lighter">
                       {poolerConnStringSyntax.map((x, idx) => {
                         if (x.tooltip) {
                           return (
-                            <Tooltip.Root key={`syntax-${idx}`} delayDuration={0}>
-                              <Tooltip.Trigger asChild>
-                                <span className="text-foreground text-xs">{x.value}</span>
-                              </Tooltip.Trigger>
-                              <Tooltip.Portal>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                        'border border-background',
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-foreground">{x.tooltip}</span>
-                                    </div>
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Portal>
-                            </Tooltip.Root>
+                            <Tooltip_Shadcn_ key={`syntax-${idx}`}>
+                              <TooltipTrigger_Shadcn_ asChild>
+                                <span className="text-foreground text-xs font-mono">{x.value}</span>
+                              </TooltipTrigger_Shadcn_>
+                              <TooltipContent_Shadcn_ side="bottom">
+                                {x.tooltip}
+                              </TooltipContent_Shadcn_>
+                            </Tooltip_Shadcn_>
                           )
                         } else {
                           return (
-                            <span key={`syntax-${idx}`} className="text-xs">
+                            <span key={`syntax-${idx}`} className="text-xs font-mono">
                               {x.value}
                             </span>
                           )

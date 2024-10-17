@@ -2,7 +2,7 @@ import pgMeta from '@supabase/pg-meta'
 import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { ExecuteSqlData, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 
 export type SchemasVariables = {
@@ -15,7 +15,7 @@ export type Schema = z.infer<typeof pgMeta.schemas.zod>
 const pgMetaSchemasList = pgMeta.schemas.list()
 
 export type SchemasData = z.infer<typeof pgMetaSchemasList.zod>
-export type SchemasError = unknown
+export type SchemasError = ExecuteSqlError
 
 export const useSchemasQuery = <TData = SchemasData>(
   { projectRef, connectionString }: SchemasVariables,

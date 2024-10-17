@@ -1,24 +1,24 @@
 import { useMonaco } from '@monaco-editor/react'
-import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 
-import { useFunctionsQuery } from 'data/database/functions-query'
+import { useParams } from 'common/hooks/useParams'
+import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
+import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
+import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
+import { useContentIdQuery } from 'data/content/content-id-query'
+import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import type { NextPageWithLayout } from 'types'
-
-import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
-import { SQLEditorLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
-import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
-import { useLocalStorageQuery } from 'hooks'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import type { NextPageWithLayout } from 'types'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -26,15 +26,31 @@ const SqlEditor: NextPageWithLayout = () => {
   const { id, ref, content } = useParams()
 
   const { project } = useProjectContext()
-  const snap = useSqlEditorStateSnapshot()
   const appSnap = useAppStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const snippets = useSnippets(ref)
+  const snippets = useSnippets(ref!)
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
+  )
+
+  useContentIdQuery(
+    { projectRef: ref, id },
+    {
+      // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
+      // the snapV2 valtio store for some reason hence why the added typeof check here
+      retry: false,
+      enabled: Boolean(id !== 'new' && typeof snapV2.addSnippet === 'function'),
+      onSuccess: (data) => {
+        snapV2.addSnippet({ projectRef: ref as string, snippet: data })
+      },
+      onError: () => {
+        // [Joshen] Thinking if we need some error handler - it'll error out here when a new snippet is created from quickstart/templates
+      },
+    }
   )
 
   async function formatPgsql(value: string) {
@@ -59,7 +75,7 @@ const SqlEditor: NextPageWithLayout = () => {
     },
     { enabled: intellisenseEnabled }
   )
-  const { data: functions, isSuccess: isFunctionsSuccess } = useFunctionsQuery(
+  const { data: functions, isSuccess: isFunctionsSuccess } = useDatabaseFunctionsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -99,7 +115,7 @@ const SqlEditor: NextPageWithLayout = () => {
     pgInfoRef.current.tableColumns = tableColumns?.result
     pgInfoRef.current.schemas = schemas
     pgInfoRef.current.keywords = keywords?.result
-    pgInfoRef.current.functions = functions?.result
+    pgInfoRef.current.functions = functions
   }
 
   useEffect(() => {
@@ -116,7 +132,7 @@ const SqlEditor: NextPageWithLayout = () => {
         async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
           const formatted = await formatPgsqlRef.current(value)
-          if (id) snap.setSql(id, formatted)
+          if (id) snapV2.setSql(id, formatted)
           return [{ range: model.getFullModelRange(), text: formatted }]
         },
       })

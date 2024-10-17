@@ -437,7 +437,7 @@ module.exports = {
 },
 "background-selection": {
   cssVariable: "var(--background-selection)",
-  value: "hsl(0, 0%, 25.9%)"
+  value: "hsl(0, 0%, 19.2%)"
 },
 "background-control": {
   cssVariable: "var(--background-control)",
@@ -479,9 +479,21 @@ module.exports = {
   cssVariable: "var(--background-button-default)",
   value: "hsl(0, 0%, 18%)"
 },
+"background-dialog-DEFAULT": {
+  cssVariable: "var(--background-dialog-default)",
+  value: "hsl(0, 0%, 7.1%)"
+},
+"background-dash-sidebar": {
+  cssVariable: "var(--background-dash-sidebar)",
+  value: "hsl(0, 0%, 9%)"
+},
+"background-dash-canvas": {
+  cssVariable: "var(--background-dash-canvas)",
+  value: "hsl(0, 0%, 7.1%)"
+},
 "border-DEFAULT": {
   cssVariable: "var(--border-default)",
-  value: "hsl(0, 0%, 16.1%)"
+  value: "hsl(0, 0%, 18%)"
 },
 "border-muted": {
   cssVariable: "var(--border-muted)",
@@ -505,11 +517,11 @@ module.exports = {
 },
 "border-strong": {
   cssVariable: "var(--border-strong)",
-  value: "hsl(0, 0%, 20%)"
+  value: "hsl(0, 0%, 21.2%)"
 },
 "border-stronger": {
   cssVariable: "var(--border-stronger)",
-  value: "hsl(0, 0%, 22%)"
+  value: "hsl(0, 0%, 27.1%)"
 },
 "border-button-DEFAULT": {
   cssVariable: "var(--border-button-default)",

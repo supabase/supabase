@@ -4,8 +4,6 @@ import { Button, Checkbox_Shadcn_, Form_Shadcn_, FormControl_Shadcn_, FormField_
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import { InfoTooltip } from 'ui-patterns/InfoTooltip/InfoTooltip'
-
 const FormSchema = z.object({
   items: z.array(z.string()).refine((value) => value.some((item) => item), {
     message: 'You have to select at least one item.',
@@ -63,7 +61,6 @@ export default function FormItemLayoutDemo() {
               label="Sidebar"
               description="Select the items you want to display in the sidebar."
               layout="horizontal"
-              afterLabel={<InfoTooltip side="right">Please give me info</InfoTooltip>}
             >
               {items.map((item) => (
                 <FormField_Shadcn_

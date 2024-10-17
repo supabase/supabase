@@ -1,16 +1,18 @@
-import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
+import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Button, IconEye, IconEyeOff, Input, InputNumber, Listbox, Toggle } from 'ui'
 
+import { DatePicker } from 'components/ui/DatePicker'
 import { BASE_PATH } from 'lib/constants'
+import { Button, Input, InputNumber, Listbox, Toggle } from 'ui'
 import type { Enum } from './AuthProvidersForm.types'
 
 interface FormFieldProps {
   name: string
   properties: any
   formValues: any
+  setFieldValue: (field: string, v: any) => any
   disabled?: boolean
 }
 
@@ -18,7 +20,13 @@ function formatDate(date: Date): string {
   return dayjs(date).format('dddd, MMMM D, YYYY HH:mm:ss Z')
 }
 
-const FormField = ({ name, properties, formValues, disabled = false }: FormFieldProps) => {
+const FormField = ({
+  name,
+  properties,
+  formValues,
+  disabled = false,
+  setFieldValue,
+}: FormFieldProps) => {
   const [hidden, setHidden] = useState(!!properties.isSecret)
   const [dateAsText, setDateAsText] = useState(
     formValues[name] ? formatDate(new Date(formValues[name])) : ''
@@ -26,7 +34,7 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
 
   useEffect(() => {
     if (properties.show && properties.show.key && !formValues[properties.show.key]) {
-      formValues[name] = ''
+      setFieldValue(name, '')
       setDateAsText('')
     }
   }, [properties.show && properties.show.key && !formValues[properties.show.key]])
@@ -75,11 +83,11 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
               to={formValues[name]}
               onChange={(date) => {
                 if (date && date.to) {
-                  formValues[name] = date.to
+                  setFieldValue(name, date.to)
                   setDateAsText(formatDate(new Date(date.to)))
                 } else {
                   setDateAsText('')
-                  formValues[name] = ''
+                  setFieldValue(name, '')
                 }
               }}
             >
@@ -116,7 +124,7 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
           actions={
             !!properties.isSecret ? (
               <Button
-                icon={hidden ? <IconEye /> : <IconEyeOff />}
+                icon={hidden ? <Eye /> : <EyeOff />}
                 type="default"
                 onClick={() => setHidden(!hidden)}
               />
@@ -159,7 +167,7 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
           actions={
             !!properties.isSecret ? (
               <Button
-                icon={hidden ? <IconEye /> : <IconEyeOff />}
+                icon={hidden ? <Eye /> : <EyeOff />}
                 type="default"
                 onClick={() => setHidden(!hidden)}
               />

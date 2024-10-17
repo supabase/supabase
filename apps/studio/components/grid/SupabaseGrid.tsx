@@ -1,13 +1,13 @@
-import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useUrlState } from 'hooks'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -17,15 +17,15 @@ import {
   getStorageKey,
   saveStorageDebounced,
 } from './SupabaseGrid.utils'
-import { Shortcuts } from './components/common'
+import { Shortcuts } from './components/common/Shortcuts'
 import Footer from './components/footer/Footer'
-import { Grid } from './components/grid'
+import { Grid } from './components/grid/Grid'
 import Header from './components/header/Header'
 import { RowContextMenu } from './components/menu'
-import { StoreProvider, useDispatch, useTrackedState } from './store'
-import type { SupabaseGridProps } from './types'
-import { InitialStateType } from './store/reducers'
 import { STORAGE_KEY_PREFIX } from './constants'
+import { StoreProvider, useDispatch, useTrackedState } from './store/Store'
+import { InitialStateType } from './store/reducers'
+import type { SupabaseGridProps } from './types'
 import { getGridColumns } from './utils/gridColumns'
 
 function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
@@ -133,7 +133,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   const [{ sort, filter }, setParams] = useUrlState({
     arrayKeys: ['sort', 'filter'],
   })
-  const sorts = formatSortURLParams(sort as string[])
+  const sorts = formatSortURLParams(props.table.name, sort as string[] | undefined)
   const filters = formatFilterURLParams(filter as string[])
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
@@ -241,7 +241,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   }, [state.table, props.table, props.schema])
 
   return (
-    <div className="sb-grid">
+    <div className="sb-grid h-full flex flex-col">
       <Header
         table={props.table}
         sorts={sorts}
@@ -271,7 +271,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
             onImportData={onImportData}
             onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
           />
-          <Footer isLoading={isLoading} isRefetching={isRefetching} />
+          <Footer isRefetching={isRefetching} />
           <Shortcuts gridRef={gridRef} />
         </>
       )}

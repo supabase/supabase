@@ -1,12 +1,13 @@
 import clsx from 'clsx'
+import { Check } from 'lucide-react'
 import { PricingInformation } from 'shared-data'
-import { Button, IconCheck } from 'ui'
 import { pickFeatures } from 'shared-data/plans'
+import { Button } from 'ui'
 
 export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
-  billingPartner: 'fly' | 'aws' | undefined
+  billingPartner: 'fly' | 'aws' | 'vercel_marketplace' | undefined
 }
 
 const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardProps) => {
@@ -53,7 +54,7 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardP
               key={typeof feature === 'string' ? feature : feature[0]}
               className="flex items-center py-2 first:mt-0"
             >
-              <IconCheck className="text-brand h-4 w-4" aria-hidden="true" strokeWidth={3} />
+              <Check className="text-brand h-4 w-4" aria-hidden="true" strokeWidth={3} />
               <span className="text-foreground mb-0 ml-3 ">
                 {typeof feature === 'string' ? feature : feature[0]}
               </span>

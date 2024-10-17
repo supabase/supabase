@@ -1,7 +1,7 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
@@ -20,16 +20,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Form,
-  IconEdit,
-  IconExternalLink,
-  IconUpload,
   Input,
   Modal,
   SidePanel,
+  Upload,
   cn,
 } from 'ui'
 import AuthorizeRequesterDetails from '../AuthorizeRequesterDetails'
 import { ScopesPanel } from './Scopes'
+import { Edit, ExternalLink } from 'lucide-react'
 
 export interface PublishAppSidePanelProps {
   visible: boolean
@@ -237,7 +236,7 @@ const PublishAppSidePanel = ({
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button type="default" className="px-1">
-                                      <IconEdit />
+                                      <Edit />
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end" side="bottom">
@@ -274,7 +273,7 @@ const PublishAppSidePanel = ({
                                   (uploadButtonRef.current as any).click()
                               }}
                             >
-                              <IconUpload size={18} strokeWidth={1.5} className="text-foreground" />
+                              <Upload size={18} strokeWidth={1.5} className="text-foreground" />
                               <p className="text-xs text-foreground-light">Upload logo</p>
                             </div>
                           )}
@@ -338,7 +337,7 @@ const PublishAppSidePanel = ({
                             of its projects.
                           </span>
                         </div>
-                        <Button asChild type="default" icon={<IconExternalLink />}>
+                        <Button asChild type="default" icon={<ExternalLink />}>
                           <Link
                             href="https://supabase.com/docs/guides/platform/oauth-apps/oauth-scopes"
                             target="_blank"
@@ -383,33 +382,29 @@ const PublishAppSidePanel = ({
                   onCancel={() => setShowPreview(false)}
                 >
                   <Modal.Content>
-                    <div className="pt-4 pb-2 px-2 flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                       <p>Authorize API access for {values.name}</p>
                       <Badge variant="brand">Preview</Badge>
                     </div>
                   </Modal.Content>
                   <Modal.Separator />
                   <Modal.Content>
-                    <div className="px-2 py-4">
-                      <AuthorizeRequesterDetails
-                        icon={iconUrl || null}
-                        name={values.name}
-                        domain={values.website}
-                        scopes={scopes}
-                      />
-                      <div className="pt-4 space-y-2">
-                        <p className="prose text-sm">
-                          Select an organization to grant API access to
-                        </p>
-                        <div className="border border-control text-foreground-light rounded px-4 py-2 text-sm bg-surface-200">
-                          Organizations that you have access to will be listed here
-                        </div>
+                    <AuthorizeRequesterDetails
+                      icon={iconUrl || null}
+                      name={values.name}
+                      domain={values.website}
+                      scopes={scopes}
+                    />
+                    <div className="pt-4 space-y-2">
+                      <p className="prose text-sm">Select an organization to grant API access to</p>
+                      <div className="border border-control text-foreground-light rounded px-4 py-2 text-sm bg-surface-200">
+                        Organizations that you have access to will be listed here
                       </div>
                     </div>
                   </Modal.Content>
                   <Modal.Separator />
                   <Modal.Content>
-                    <div className="pt-2 pb-3 flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                       <p className="prose text-xs">
                         This is what your users will see when authorizing with your app
                       </p>

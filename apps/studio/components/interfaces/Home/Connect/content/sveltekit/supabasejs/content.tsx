@@ -6,7 +6,7 @@ import {
   ConnectTabTrigger,
   ConnectTabContent,
 } from 'components/interfaces/Home/Connect/ConnectTabs'
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -33,7 +33,7 @@ SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
         `}

@@ -1,12 +1,8 @@
 import { Column } from 'react-data-grid'
 import type { LogData } from '../Logs.types'
-import {
-  RowLayout,
-  SeverityFormatter,
-  TextFormatter,
-  TimestampLocalFormatter,
-} from '../LogsFormatters'
+import { RowLayout, SeverityFormatter, TextFormatter } from '../LogsFormatters'
 import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 const columns: Column<LogData>[] = [
   {
@@ -18,7 +14,7 @@ const columns: Column<LogData>[] = [
       }
       return (
         <RowLayout>
-          <TimestampLocalFormatter value={props.row.timestamp!} />
+          <TimestampInfo value={props.row.timestamp!} />
           {props.row.event_type === 'uncaughtException' ? (
             <SeverityFormatter value={props.row.event_type} uppercase={false} />
           ) : (

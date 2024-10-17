@@ -33,6 +33,9 @@ interface GroupProps {
   labelsLayout?: 'horizontal' | 'vertical'
 }
 
+/**
+ * @deprecated Use ./RadioGroup_Shadcn_ instead
+ */
 function RadioGroup({
   id,
   layout,
@@ -146,6 +149,9 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   children?: React.ReactNode
 }
 
+/**
+ * @deprecated Use ./RadioGroupItem_Shadcn_ instead
+ */
 function Radio({
   id = generateUID(),
   disabled,

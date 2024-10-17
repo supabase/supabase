@@ -97,3 +97,34 @@ import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
 ```
 
 See also the [Radix UI documentation](https://www.radix-ui.com/docs/primitives/components/navigation-menu#with-client-side-routing) for handling client side routing.
+
+### With horizontal scroll
+
+We can wrap a the `<NavigationMenuList />` in a `<ScrollArea />` component to make the menu scroll.
+
+However, then we must also make sure the `<NavigationMenuContent />` is positioned correctly and rendered outside the scroll area.
+We set `renderViewport={false}` on the `<NavigationMenu />` component to prevent the viewport from being rendered.
+And then add our own Viewport with `<NavigationMenuViewport />`.
+
+Then all our content panels will render themselves outside the scroll area and inside the viewport.
+
+You can also add props to `<NavigationMenuViewport />` to style it as you like, including the `containerProps` prop to add classes to the container div element inside the viewport.
+
+```tsx {1, 2, 11-13}
+<NavigationMenu renderViewport={false}>
+  <ScrollArea>
+    <NavigationMenuList>
+      <NavigationMenuItem>
+        <NavigationMenuTrigger>Item One</NavigationMenuTrigger>
+        <NavigationMenuContent>
+          <NavigationMenuLink>Link</NavigationMenuLink>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+    </NavigationMenuList>
+    <ScrollBar />
+  </ScrollArea>
+  <NavigationMenuViewport containerProps={{ className: 'w-full' }} />
+</NavigationMenu>
+```
+
+<ComponentPreview name="navigation-menu-responsive" />

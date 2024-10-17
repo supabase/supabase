@@ -1,11 +1,11 @@
-import { IconDatabase } from 'ui'
+import { Database } from 'lucide-react'
 
 const FeatureSection = (props: any) => {
   return (
     <div className="grid grid-cols-12">
       <div className="col-span-3">
         <p className="mb-4">
-          <IconDatabase />
+          <Database />
         </p>
         <h4>Write less code</h4>
         <p>
@@ -21,7 +21,7 @@ const FeatureSection = (props: any) => {
       </div>
       <div className="col-span-3 col-start-5">
         <p className="mb-4">
-          <IconDatabase />
+          <Database />
         </p>
         <h4>Blazing fast</h4>
         <p>
@@ -37,7 +37,7 @@ const FeatureSection = (props: any) => {
       </div>
       <div className="col-span-3 col-start-9">
         <p className="mb-4">
-          <IconDatabase />
+          <Database />
         </p>
         <h4>Dependable</h4>
         <p>

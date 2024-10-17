@@ -10,7 +10,7 @@ import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
 import { Button } from '../Button'
 import { useFormContext } from '../Form/FormContext'
-import { IconCopy } from '../Icon/icons/IconCopy'
+import { Copy } from 'lucide-react'
 
 export interface Props
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {
@@ -36,6 +36,9 @@ export interface Props
   validation?: (x: any) => void
 }
 
+/**
+ * @deprecated Use ./Input_shadcn_ instead or ./ui-patterns/data-inputs/input
+ */
 function Input({
   autoComplete,
   autoFocus,
@@ -179,7 +182,7 @@ function Input({
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}
             {copy && !(reveal && hidden) ? (
-              <Button size="tiny" type="default" icon={<IconCopy />} onClick={() => _onCopy(value)}>
+              <Button size="tiny" type="default" icon={<Copy />} onClick={() => _onCopy(value)}>
                 {copyLabel}
               </Button>
             ) : null}
@@ -196,6 +199,9 @@ function Input({
   )
 }
 
+/**
+ * @deprecated Use ./TextArea_Shadcn_ instead
+ */
 export interface TextAreaProps
   extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
   textAreaClassName?: string
@@ -344,12 +350,7 @@ function TextArea({
             <div className={__styles['textarea_actions_container_items']}>
               {error && <InputErrorIcon size={size} />}
               {copy && (
-                <Button
-                  size="tiny"
-                  type="default"
-                  onClick={() => _onCopy(value)}
-                  icon={<IconCopy />}
-                >
+                <Button size="tiny" type="default" onClick={() => _onCopy(value)} icon={<Copy />}>
                   {copyLabel}
                 </Button>
               )}

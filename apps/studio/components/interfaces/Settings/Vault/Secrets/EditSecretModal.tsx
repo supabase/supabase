@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -8,8 +8,9 @@ import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
 import type { VaultSecret } from 'types'
-import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
+import { Button, Form, Input, Modal } from 'ui'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
+import { EyeOff, Eye } from 'lucide-react'
 
 interface EditSecretModalProps {
   selectedSecret: VaultSecret | undefined
@@ -47,44 +48,48 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
   const onUpdateSecret = async (values: any, { setSubmitting }: any) => {
     if (!project) return console.error('Project is required')
 
-    const payload: Partial<VaultSecret> = {}
-    if (values.name !== selectedSecret?.name) payload.name = values.name
-    if (values.description !== selectedSecret?.description) payload.description = values.description
-    if (selectedKeyId !== selectedSecret?.key_id) {
-      let encryptionKeyId = selectedKeyId
-      if (values.keyId === 'create-new') {
-        const addKeyRes = await addKeyMutation({
-          projectRef: project?.ref!,
+    try {
+      const payload: Partial<VaultSecret> = {}
+      if (values.name !== selectedSecret?.name) payload.name = values.name
+      if (values.description !== selectedSecret?.description)
+        payload.description = values.description
+      if (selectedKeyId !== selectedSecret?.key_id) {
+        let encryptionKeyId = selectedKeyId
+        if (values.keyId === 'create-new') {
+          const addKeyRes = await addKeyMutation({
+            projectRef: project?.ref!,
+            connectionString: project?.connectionString,
+            name: values.keyName || undefined,
+          })
+          if (addKeyRes.error) {
+            return toast.error(`Failed to create new key: ${addKeyRes.error.message}`)
+          } else {
+            encryptionKeyId = addKeyRes[0].id
+          }
+        }
+
+        payload.key_id = encryptionKeyId
+      }
+      payload.secret = values.secret
+
+      if (!isEmpty(payload) && selectedSecret) {
+        setSubmitting(true)
+        const res = await updateSecret({
+          projectRef: project.ref,
           connectionString: project?.connectionString,
-          name: values.keyName || undefined,
+          id: selectedSecret.id,
+          ...payload,
         })
-        if (addKeyRes.error) {
-          return toast.error(`Failed to create new key: ${addKeyRes.error.message}`)
+        if (!res.error) {
+          toast.success('Successfully updated secret')
+          setSubmitting(false)
+          onClose()
         } else {
-          encryptionKeyId = addKeyRes[0].id
+          toast.error(`Failed to update secret: ${res.error.message}`)
+          setSubmitting(false)
         }
       }
-
-      payload.key_id = encryptionKeyId
-    }
-    payload.secret = values.secret
-
-    if (!isEmpty(payload) && selectedSecret) {
-      setSubmitting(true)
-      const res = await updateSecret({
-        projectRef: project.ref,
-        connectionString: project?.connectionString,
-        id: selectedSecret.id,
-        ...payload,
-      })
-      if (!res.error) {
-        toast.success('Successfully updated secret')
-        setSubmitting(false)
-        onClose()
-      } else {
-        toast.error(`Failed to update secret: ${res.error.message}`)
-        setSubmitting(false)
-      }
+    } finally {
     }
   }
 
@@ -125,56 +130,50 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
           )
 
           return isLoadingSecretValue ? (
-            <div className="p-4">
+            <Modal.Content>
               <GenericSkeletonLoader />
-            </div>
+            </Modal.Content>
           ) : (
-            <div className="py-4">
-              <Modal.Content>
-                <div className="space-y-4 pb-4">
-                  <Input id="name" label="Name" />
-                  <Input id="description" label="Description" labelOptional="Optional" />
-                  <Input
-                    id="secret"
-                    type={showSecretValue ? 'text' : 'password'}
-                    label="Secret value"
-                    actions={
-                      <div className="mr-1">
-                        <Button
-                          type="default"
-                          icon={showSecretValue ? <IconEyeOff /> : <IconEye />}
-                          onClick={() => setShowSecretValue(!showSecretValue)}
-                        />
-                      </div>
-                    }
-                  />
-                </div>
+            <>
+              <Modal.Content className="space-y-4">
+                <Input id="name" label="Name" />
+                <Input id="description" label="Description" labelOptional="Optional" />
+                <Input
+                  id="secret"
+                  type={showSecretValue ? 'text' : 'password'}
+                  label="Secret value"
+                  actions={
+                    <div className="mr-1">
+                      <Button
+                        type="default"
+                        icon={showSecretValue ? <EyeOff /> : <Eye />}
+                        onClick={() => setShowSecretValue(!showSecretValue)}
+                      />
+                    </div>
+                  }
+                />
               </Modal.Content>
               <Modal.Separator />
-              <Modal.Content>
-                <div className="py-4 space-y-4">
-                  <EncryptionKeySelector
-                    id="keyId"
-                    nameId="keyName"
-                    label="Select a key to encrypt your secret with"
-                    labelOptional="Optional"
-                    selectedKeyId={selectedKeyId}
-                    onSelectKey={setSelectedKeyId}
-                  />
-                </div>
+              <Modal.Content className="space-y-4">
+                <EncryptionKeySelector
+                  id="keyId"
+                  nameId="keyName"
+                  label="Select a key to encrypt your secret with"
+                  labelOptional="Optional"
+                  selectedKeyId={selectedKeyId}
+                  onSelectKey={setSelectedKeyId}
+                />
               </Modal.Content>
               <Modal.Separator />
-              <Modal.Content>
-                <div className="flex items-center justify-end space-x-2">
-                  <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
-                    Cancel
-                  </Button>
-                  <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
-                    Update secret
-                  </Button>
-                </div>
+              <Modal.Content className="flex items-center justify-end space-x-2">
+                <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+                  Cancel
+                </Button>
+                <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
+                  Update secret
+                </Button>
               </Modal.Content>
-            </div>
+            </>
           )
         }}
       </Form>

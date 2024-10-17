@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { uuidv4 } from 'lib/helpers'
@@ -14,14 +14,12 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconPlus,
-  IconTrash,
   Input,
   Listbox,
   SidePanel,
 } from 'ui'
 import { HTTPArgument } from './EditHookPanel'
+import { Trash, Plus, ChevronDown } from 'lucide-react'
 
 interface HTTPRequestFieldsProps {
   type: 'http_request' | 'supabase_function'
@@ -55,9 +53,7 @@ const HTTPRequestFields = ({
 
   const edgeFunctions = functions ?? []
   const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'service_role key')
-    ? apiService.serviceApiKey
-    : '[YOUR API KEY]'
+  const apiKey = apiService?.serviceApiKey ?? '[YOUR API KEY]'
 
   return (
     <>
@@ -119,7 +115,7 @@ const HTTPRequestFields = ({
             id="timeout_ms"
             name="timeout_ms"
             label="Timeout"
-            labelOptional="Between 1000ms to 5000ms"
+            labelOptional="Between 1000ms to 10,000ms"
             type="number"
             actions={<p className="text-foreground-light pr-2">ms</p>}
           />
@@ -150,7 +146,7 @@ const HTTPRequestFields = ({
                 <Button
                   type="default"
                   size="medium"
-                  icon={<IconTrash size="tiny" />}
+                  icon={<Trash size="14" />}
                   className="px-[10px] py-[9px]"
                   onClick={() => onRemoveHeader(idx)}
                 />
@@ -160,7 +156,7 @@ const HTTPRequestFields = ({
               <Button
                 type="default"
                 size="tiny"
-                icon={<IconPlus />}
+                icon={<Plus />}
                 className={clsx(type === 'supabase_function' && 'rounded-r-none px-3')}
                 onClick={onAddHeader}
               >
@@ -170,7 +166,7 @@ const HTTPRequestFields = ({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button type="default" className="rounded-l-none px-[4px] py-[5px]">
-                      <IconChevronDown />
+                      <ChevronDown />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" side="bottom">
@@ -180,7 +176,7 @@ const HTTPRequestFields = ({
                         onAddHeader({
                           id: uuidv4(),
                           name: 'Authorization',
-                          value: `Bearer ${anonKey}`,
+                          value: `Bearer ${apiKey}`,
                         })
                       }
                     >
@@ -241,14 +237,14 @@ const HTTPRequestFields = ({
                 <Button
                   type="default"
                   size="medium"
-                  icon={<IconTrash size="tiny" />}
+                  icon={<Trash size="14" />}
                   className="px-[10px] py-[9px]"
                   onClick={() => onRemoveParameter(idx)}
                 />
               </div>
             ))}
             <div>
-              <Button type="default" size="tiny" icon={<IconPlus />} onClick={onAddParameter}>
+              <Button type="default" size="tiny" icon={<Plus />} onClick={onAddParameter}>
                 Add a new parameter
               </Button>
             </div>

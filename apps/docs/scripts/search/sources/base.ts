@@ -1,13 +1,4 @@
-export type Json = Record<
-  string,
-  string | number | boolean | null | Json[] | { [key: string]: Json }
->
-
-export type Section = {
-  content: string
-  heading?: string
-  slug?: string
-}
+import type { Json, Section } from '../../helpers.mdx'
 
 export abstract class BaseLoader {
   type: string

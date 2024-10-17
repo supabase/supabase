@@ -550,7 +550,7 @@ const NewFeaturesAndIntegrations = () => {
                   </a>{' '}
                   (and{' '}
                   <a
-                    href="/docs/gotrue/server/about#endpoints"
+                    href="/docs/guides/auth/architecture#client-layer"
                     target="_blank"
                     className="text-brand hover:text-brand"
                   >
@@ -692,7 +692,7 @@ const BetaPricing = () => (
             </li>
           </ul>
           <p>
-            The Supabase Base plan is now called the Supabase Pro plan as per the{' '}
+            The Supabase Base plan is now called the Supabase Pro Plan as per the{' '}
             <a href="https://supabase.com/pricing" className="text-brand hover:text-brand">
               pricing page
             </a>
@@ -965,7 +965,7 @@ const Beta = (props: Props) => {
           },
           images: [
             {
-              url: 'https://supabase.com/og/og-image-v2.jpg',
+              url: 'https://supabase.com/og/supabase-og.png',
             },
           ],
         }}

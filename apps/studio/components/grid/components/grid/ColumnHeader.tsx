@@ -1,14 +1,14 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import type { XYCoord } from 'dnd-core'
+import { ArrowRight, Key, Link, Lock } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { useDrag, useDrop } from 'react-dnd'
+
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import type { XYCoord } from 'dnd-core'
-import * as React from 'react'
-import { useDrag, useDrop } from 'react-dnd'
-import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'
-import { useDispatch, useTrackedState } from '../../store'
+import { useDispatch, useTrackedState } from '../../store/Store'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
-import { useEffect } from 'react'
 
 export function ColumnHeader<R>({
   column,
@@ -18,7 +18,7 @@ export function ColumnHeader<R>({
   format,
   foreignKey,
 }: ColumnHeaderProps<R>) {
-  const ref = React.useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
   const dispatch = useDispatch()
   const columnIdx = column.idx
   const columnKey = column.key
@@ -129,7 +129,7 @@ export function ColumnHeader<R>({
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
                 <div className="sb-grid-column-header__inner__primary-key">
-                  <IconKey size="tiny" strokeWidth={2} />
+                  <Key size={14} strokeWidth={2} />
                 </div>
               </Tooltip.Trigger>
               <Tooltip.Portal>
@@ -154,7 +154,7 @@ export function ColumnHeader<R>({
           {isEncrypted && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
-                <IconLock size="tiny" strokeWidth={2} />
+                <Lock size={14} strokeWidth={2} />
               </Tooltip.Trigger>
               <Tooltip.Portal>
                 <Tooltip.Content side="bottom">
@@ -188,7 +188,7 @@ function renderColumnIcon(
       return (
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
-            <IconLink size="tiny" strokeWidth={2} />
+            <Link size={14} strokeWidth={2} />
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
@@ -203,7 +203,7 @@ function renderColumnIcon(
                   <p className="text-xs text-foreground-light">Foreign key relation:</p>
                   <div className="flex items-center space-x-1">
                     <p className="text-xs text-foreground">{name}</p>
-                    <IconArrowRight size="tiny" strokeWidth={1.5} />
+                    <ArrowRight size={14} strokeWidth={1.5} />
                     <p className="text-xs text-foreground">
                       {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
                       {foreignKey?.targetColumnName}

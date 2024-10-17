@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "image_search"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 matplotlib = "^3.7.1"
 vecs = "^0.4.3"
 boto3 = "^1.34.59"

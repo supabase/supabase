@@ -1,5 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 export type DatabaseKeyword = { word: string }
 
@@ -17,7 +17,7 @@ export type KeywordsVariables = {
 }
 
 export type KeywordsData = { result: string[] }
-export type KeywordsError = unknown
+export type KeywordsError = ExecuteSqlError
 
 export const useKeywordsQuery = <TData extends KeywordsData = KeywordsData>(
   { projectRef, connectionString }: KeywordsVariables,

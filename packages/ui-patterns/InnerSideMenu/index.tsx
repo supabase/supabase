@@ -1,7 +1,4 @@
-import {
-  // ChevronRight,
-  Search,
-} from 'lucide-react'
+import { ChevronsDown, Search } from 'lucide-react'
 import Link from 'next/link'
 import { ElementRef, forwardRef } from 'react'
 import {
@@ -13,7 +10,6 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  IconChevronsDown,
   Input_Shadcn_,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
@@ -155,7 +151,7 @@ const InnerSideBarFilterSortDropdown = forwardRef<
           )}
         >
           <TooltipTrigger_Shadcn_>
-            <IconChevronsDown size={18} strokeWidth={1} />
+            <ChevronsDown size={18} strokeWidth={1} />
           </TooltipTrigger_Shadcn_>
         </DropdownMenuTrigger>
         <TooltipContent_Shadcn_ side="bottom">Sort By</TooltipContent_Shadcn_>
@@ -220,7 +216,10 @@ const InnerSideBarEmptyPanel = forwardRef<
 })
 
 export {
+  InnerSideBarEmptyPanel,
   InnerSideBarFilterSearchInput,
+  InnerSideBarFilterSortDropdown,
+  InnerSideBarFilterSortDropdownItem,
   InnerSideBarFilters,
   InnerSideBarShimmeringLoaders,
   InnerSideMenuCollapsible,
@@ -228,7 +227,4 @@ export {
   InnerSideMenuCollapsibleTrigger,
   InnerSideMenuItem,
   InnerSideMenuSeparator,
-  InnerSideBarFilterSortDropdown,
-  InnerSideBarFilterSortDropdownItem,
-  InnerSideBarEmptyPanel,
 }

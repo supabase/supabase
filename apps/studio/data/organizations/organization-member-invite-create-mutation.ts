@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -12,6 +12,8 @@ export type OrganizationMemberInviteCreateVariables = {
   ownerId: number
   roleId: number
 }
+
+// [Joshen TODO] Should be deprecated now - double check before deleting
 
 export async function createOrganizationMemberInvite({
   slug,

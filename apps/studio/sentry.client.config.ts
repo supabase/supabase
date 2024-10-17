@@ -1,17 +1,46 @@
+// This file configures the initialization of Sentry on the client.
+// The config you add here will be used whenever a users loads a page in their browser.
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+
 import * as Sentry from '@sentry/nextjs'
+import { IS_PLATFORM } from 'common/constants/environment'
+import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { match } from 'path-to-regexp'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 0.01,
+
+  // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+
+  beforeSend(event, hint) {
+    const consent =
+      typeof window !== 'undefined'
+        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+        : null
+
+    if (IS_PLATFORM && consent === 'true') {
+      // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
+      const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
+        `Failed to construct 'URL': Invalid URL`
+      )
+      if (isInvalidUrlEvent && Math.random() > 0.01) {
+        return null
+      }
+      return event
+    }
+    return null
+  },
+
   integrations: [
-    new Sentry.BrowserTracing({
+    Sentry.browserTracingIntegration({
       // TODO: update gotrue + api to support Access-Control-Request-Headers: authorization,baggage,sentry-trace,x-client-info
       // then remove these options
       traceFetch: false,
       traceXHR: false,
-      beforeNavigate: (context) => {
+      beforeStartSpan: (context) => {
         return {
           ...context,
           name: standardiseRouterUrl(location.pathname),
@@ -22,6 +51,8 @@ Sentry.init({
   ignoreErrors: [
     // Used exclusively in Monaco Editor.
     'ResizeObserver',
+    's.getModifierState is not a function',
+    /^Uncaught NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope'/,
     // [Joshen] We currently use stripe-js for customers to save their credit card data
     // I'm unable to reproduce this error on local, staging nor prod across chrome, safari or firefox
     // Based on https://github.com/stripe/stripe-js/issues/26, it seems like this error is safe to ignore,
@@ -41,6 +72,14 @@ Sentry.init({
     // Error thrown by `sql-formatter` lexer when given invalid input
     // Original format: new Error(`Parse error: Unexpected "${text}" at line ${line} column ${col}`)
     /^Parse error: Unexpected ".+" at line \d+ column \d+$/,
+    // [Joshen] IMO, should be caught on API if there's anything to handle - FE shouldn't dupe this alert
+    /504 Gateway Time-out/,
+    // [Joshen] This is the one caused by Google translate in the browser + 3rd party extensions
+    'Node.insertBefore: Child to insert before is not a child of this node',
+    // [Joshen] This one sprung up recently and I've no idea where this is coming from
+    'r.default.setDefaultLevel is not a function',
+    // [Joshen] Safe to ignore, it an error from the copyToClipboard
+    'The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.',
   ],
 })
 
@@ -49,7 +88,7 @@ Sentry.init({
 function standardiseRouterUrl(url: string) {
   let finalUrl = url
 
-  const orgMatch = match('/org/:slug/(.*)', { decode: decodeURIComponent })
+  const orgMatch = match('/org/:slug{/*path}', { decode: decodeURIComponent })
   const orgMatchResult = orgMatch(finalUrl)
   if (orgMatchResult) {
     finalUrl = finalUrl.replace((orgMatchResult.params as any).slug, '[slug]')
@@ -61,7 +100,7 @@ function standardiseRouterUrl(url: string) {
     finalUrl = finalUrl.replace((newOrgMatchResult.params as any).slug, '[slug]')
   }
 
-  const projectMatch = match('/project/:ref/(.*)', { decode: decodeURIComponent })
+  const projectMatch = match('/project/:ref{/*path}', { decode: decodeURIComponent })
   const projectMatchResult = projectMatch(finalUrl)
   if (projectMatchResult) {
     finalUrl = finalUrl.replace((projectMatchResult.params as any).ref, '[ref]')

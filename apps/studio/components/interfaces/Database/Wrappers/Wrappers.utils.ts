@@ -1,4 +1,5 @@
-import { WRAPPER_HANDLERS } from './Wrappers.constants'
+import { FDW } from 'data/fdw/fdws-query'
+import { WRAPPERS, WRAPPER_HANDLERS } from './Wrappers.constants'
 import type { WrapperMeta } from './Wrappers.types'
 
 export const makeValidateRequired = (options: { name: string; required: boolean }[]) => {
@@ -95,4 +96,20 @@ export const formatWrapperTables = (wrapper: any, wrapperMeta?: WrapperMeta) => 
 
 export const convertKVStringArrayToJson = (values: string[]) => {
   return Object.fromEntries(values.map((value) => value.split('=')))
+}
+
+export function wrapperMetaComparator(wrapperMeta: WrapperMeta, wrapper: FDW | undefined) {
+  if (wrapperMeta.handlerName === 'wasm_fdw_handler') {
+    const serverOptions = convertKVStringArrayToJson(wrapper?.server_options ?? [])
+    return (
+      wrapperMeta.server.options.find((option) => option.name === 'fdw_package_name')
+        ?.defaultValue === serverOptions['fdw_package_name']
+    )
+  }
+
+  return wrapperMeta.handlerName === wrapper?.handler
+}
+
+export function getWrapperMetaForWrapper(wrapper: FDW | undefined) {
+  return WRAPPERS.find((w) => wrapperMetaComparator(w, wrapper))
 }

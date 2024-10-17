@@ -1,24 +1,11 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL, IS_PLATFORM } from 'lib/constants'
+import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionVariables = {
   projectRef?: string
   slug?: string
-}
-
-export type EdgeFunctionResponse = {
-  id: string
-  slug: string
-  name: string
-  status: string
-  created_at: number
-  updated_at: number
-  verify_jwt: boolean
-  import_map: boolean
-  version: number
-  import_map_path: string
 }
 
 export async function getEdgeFunction(
@@ -28,11 +15,13 @@ export async function getEdgeFunction(
   if (!projectRef) throw new Error('projectRef is required')
   if (!slug) throw new Error('slug is required')
 
-  const response = await get(`${API_ADMIN_URL}/projects/${projectRef}/functions/${slug}`, {
+  const { data, error } = await get(`/v1/projects/{ref}/functions/{function_slug}`, {
+    params: { path: { ref: projectRef, function_slug: slug } },
     signal,
   })
-  if (response.error) throw response.error
-  return response as EdgeFunctionResponse
+
+  if (error) handleError(error)
+  return data
 }
 
 export type EdgeFunctionData = Awaited<ReturnType<typeof getEdgeFunction>>

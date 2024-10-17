@@ -8,7 +8,7 @@ import ApiSchema from '~/components/ApiSchema'
 
 const MgmtApiOperationSection = (props) => {
   const operation = props.spec.operations.find((x: any) => x.operationId === props.funcData.id)
-  const bodyContentTypes = Object.keys(operation.requestBody?.content ?? {})
+  const bodyContentTypes = Object.keys(operation?.requestBody?.content ?? {})
   const [selectedContentType, setSelectedContentType] = useState(bodyContentTypes[0] || undefined)
 
   const hasBodyArray =

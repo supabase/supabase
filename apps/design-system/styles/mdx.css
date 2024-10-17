@@ -33,7 +33,7 @@
 }
 
 [data-rehype-pretty-code-fragment] [data-line-numbers] > .line::before {
-  @apply text-zinc-50/40 text-xs;
+  @apply text-foreground-muted text-xs;
   counter-increment: line;
   content: counter(line);
   display: inline-block;
@@ -43,7 +43,11 @@
 }
 
 [data-rehype-pretty-code-fragment] .line--highlighted {
-  @apply bg-surface-200 dark:bg-surface-100;
+  @apply relative bg-surface-200 dark:bg-surface-100;
+}
+
+[data-rehype-pretty-code-fragment] .line--highlighted {
+  @apply border-foreground-muted border-l-2;
 }
 
 [data-rehype-pretty-code-fragment] .line-highlighted span {

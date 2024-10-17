@@ -1,4 +1,4 @@
-import { parseQuery } from 'libpg-query'
+import chalk from 'chalk'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import type { Code } from 'mdast-util-from-markdown/lib'
 import { format } from 'sql-formatter'
@@ -7,14 +7,6 @@ declare global {
   interface ReadableStream<R = any> {
     [Symbol.asyncIterator](): AsyncIterableIterator<R>
   }
-}
-
-export type PolicyInfo = {
-  name: string
-  table: string
-  command?: string
-  usingExpression?: string
-  checkExpression?: string
 }
 
 /**
@@ -56,50 +48,43 @@ export function extractMarkdownSql(markdown: string) {
 }
 
 /**
- * Parses a Postgres SQL policy.
+ * Prints the provided metadata along with any assertion errors.
+ * Works both synchronously and asynchronously.
  *
- * @returns Information about the policy, including its name, table, command, and expressions.
+ * Useful for providing extra context for failed tests.
  */
-export async function getPolicyInfo(sql: string) {
-  const result = await parseQuery(sql)
+export function withMetadata<T extends void | Promise<void>>(
+  metadata: Record<string, string>,
+  fn: () => T
+): T {
+  /**
+   * Prepends metadata to an Error's stack trace.
+   */
+  function modifyError(err: unknown) {
+    if (err instanceof Error && err.stack) {
+      const formattedMetadata = Object.entries(metadata).map(
+        ([key, value]) => `${chalk.bold.dim(key)}:\n\n${chalk.green.dim(value)}`
+      )
+      err.stack = `${formattedMetadata.join('\n\n')}\n\n${err.stack}`
+    }
 
-  if (result.stmts.length === 0) {
-    throw new Error('Expected a statement, but received none')
+    return err
   }
 
-  if (result.stmts.length > 1) {
-    throw new Error('Expected a single statement, but received multiple')
+  // Execute the function and handle both
+  // synchronous or asynchronous scenarios
+  try {
+    const maybePromise = fn()
+
+    if (maybePromise instanceof Promise) {
+      return maybePromise.catch((err) => {
+        // Re-throw the error
+        throw modifyError(err)
+      }) as T
+    }
+    return maybePromise
+  } catch (err) {
+    // Re-throw the error
+    throw modifyError(err)
   }
-
-  const [{ stmt }] = result.stmts
-
-  const createPolicyStatement = stmt.CreatePolicyStmt
-
-  if (!createPolicyStatement) {
-    throw new Error('Expected a create policy statement')
-  }
-
-  const formattedSql = formatSql(sql)
-
-  const usingMatch = formattedSql.match(/using\s*\((.*)\)/is)
-  let usingExpression
-  if (usingMatch) {
-    usingExpression = usingMatch[1]
-  }
-
-  const withCheckMatch = formattedSql.match(/with check\s*\((.*)\)/is)
-  let checkExpression
-  if (withCheckMatch) {
-    checkExpression = withCheckMatch[1]
-  }
-
-  const policyInfo: PolicyInfo = {
-    name: createPolicyStatement.policy_name,
-    table: createPolicyStatement.table.relname,
-    command: createPolicyStatement.cmd_name,
-    usingExpression,
-    checkExpression,
-  }
-
-  return policyInfo
 }

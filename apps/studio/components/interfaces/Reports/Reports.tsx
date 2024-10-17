@@ -2,30 +2,22 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { groupBy, isNull } from 'lodash'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { Loading } from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { useContentQuery } from 'data/content/content-query'
 import { useContentUpdateMutation } from 'data/content/content-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { ArrowRight, Plus, Save, Settings } from 'lucide-react'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import GridResize from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
@@ -36,8 +28,6 @@ const DEFAULT_CHART_ROW_COUNT = 4
 const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
-  const { project } = useProjectContext()
-  const hasReadReplicasEnabled = project?.is_read_replicas_enabled
 
   const [config, setConfig] = useState<any>(undefined)
   const [startDate, setStartDate] = useState<any>(null)
@@ -45,9 +35,13 @@ const Reports = () => {
   const [hasEdits, setHasEdits] = useState<any>(false)
 
   const { data: userContents, isLoading } = useContentQuery(ref)
-  const { mutateAsync: saveReport, isLoading: isSaving } = useContentUpdateMutation({
+  const { mutate: saveReport, isLoading: isSaving } = useContentUpdateMutation({
     onSuccess: () => {
+      setHasEdits(false)
       toast.success('Successfully saved report!')
+    },
+    onError: (error) => {
+      toast.error(`Failed to update report: ${error.message}`)
     },
   })
   const currentReport = userContents?.content.find((report) => report.id === id)
@@ -117,10 +111,7 @@ const Reports = () => {
   const onSaveReport = async () => {
     if (ref === undefined) return console.error('Project ref is required')
     if (id === undefined) return console.error('Report ID is required')
-
-    await saveReport({ projectRef: ref, id, type: 'report', content: config })
-
-    setHasEdits(false)
+    saveReport({ projectRef: ref, id, type: 'report', content: config })
   }
 
   function handleChartSelection({ metric, value }: any) {
@@ -205,7 +196,7 @@ const Reports = () => {
   }
 
   if (!canReadReport) {
-    return <NoPermission isFullPage resourceText="access this project's report" />
+    return <NoPermission isFullPage resourceText="access this custom report" />
   }
 
   return (
@@ -272,19 +263,22 @@ const Reports = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button disabled type="default" iconRight={<Settings size={14} />}>
-                  Add / Remove charts
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom" className="w-56 text-center" align="end">
-                You need additional permissions to update this project's report
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+            <ButtonTooltip
+              disabled
+              type="default"
+              iconRight={<Settings size={14} />}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  className: 'w-56 text-center',
+                  text: 'You need additional permissions to update custom reports',
+                },
+              }}
+            >
+              Add / Remove charts
+            </ButtonTooltip>
           )}
-
-          {hasReadReplicasEnabled && <DatabaseSelector />}
+          <DatabaseSelector />
         </div>
       </div>
 
@@ -315,6 +309,7 @@ const Reports = () => {
               endDate={endDate}
               interval={config.interval}
               editableReport={config}
+              disableUpdate={!canUpdateReport}
               onRemoveChart={popChart}
               setEditableReport={setConfig}
             />

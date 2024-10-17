@@ -2,7 +2,6 @@ import * as Sentry from '@sentry/nextjs'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
-import { canSendTelemetry } from 'lib/telemetry'
 import createClient from 'openapi-fetch'
 import type { paths } from './api' // generated from openapi-typescript
 
@@ -53,6 +52,7 @@ export const get: typeof _get = async (url, init) => {
   }
 
   return await _get(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -68,6 +68,7 @@ export const post: typeof _post = async (url, init) => {
   }
 
   return await _post(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -83,6 +84,7 @@ export const put: typeof _put = async (url, init) => {
   }
 
   return await _put(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -98,6 +100,7 @@ export const patch: typeof _patch = async (url, init) => {
   }
 
   return await _patch(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -113,6 +116,7 @@ export const del: typeof _del = async (url, init) => {
   }
 
   return await _del(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -128,6 +132,7 @@ export const head: typeof _head = async (url, init) => {
   }
 
   return await _head(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -137,6 +142,7 @@ export const trace: typeof _trace = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
 
   return await _trace(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -146,28 +152,27 @@ export const options: typeof _options = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
 
   return await _options(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
 }
 
 export const handleError = (error: any): never => {
-  if (error && error.msg) {
-    throw new Error(error.msg)
+  if (error && typeof error.msg === 'string') {
+    throw new Error(error.msg || 'API error happened while trying to communicate with the server.')
   }
 
-  if (error && error.message) {
-    throw new Error(error.message)
+  if (error && typeof error.message === 'string') {
+    throw new Error(
+      error.message || 'API error happened while trying to communicate with the server.'
+    )
   }
 
   console.error(error.stack)
-  if (canSendTelemetry()) {
-    // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
-    // add handling for it.
-    Sentry.captureMessage(
-      `Unable to throw an object as error. The object has the following keys: ${Object.keys(error)}.`
-    )
-  }
+  // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
+  // add handling for it.
+  Sentry.captureException(error)
 
   // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
   // up in the UI.

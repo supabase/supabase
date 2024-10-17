@@ -27,7 +27,7 @@ const BlogGridItem = ({ post }: Props) => {
   return (
     <Link
       href={post.path}
-      className="group inline-block min-w-full p-2 sm:p-4 h-full border border-transparent hover:border-overlay transition-all hover:bg-overlay rounded-xl"
+      className="group inline-block min-w-full p-2 sm:p-4 h-full border border-transparent transition-all hover:bg-surface-200 dark:hover:bg-surface-75 rounded-xl"
     >
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
