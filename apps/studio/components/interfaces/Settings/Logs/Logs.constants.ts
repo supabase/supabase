@@ -391,6 +391,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
   [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
   [LogsTableName.WAREHOUSE]: 'Logs obtained from a data warehouse collection',
+  [LogsTableName.WORKFLOW_RUN]: 'Logs obtained from workflow runs',
 }
 
 export const genQueryParams = (params: { [k: string]: string }) => {
