@@ -854,6 +854,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
   validationSchema: object().shape({
     EXTERNAL_GOOGLE_ENABLED: boolean().required(),
     EXTERNAL_GOOGLE_CLIENT_ID: string()
+      .matches(/^\S+$/, 'Client IDs should not contain spaces.')
       .matches(
         /^([a-z0-9-]+([.][a-z0-9-]+)*(,\s*[a-z0-9-]+([.][a-z0-9-]+)*)*,*\s*)?$/i,
         'Invalid characters. Google Client IDs should be a comma-separated list of domain-like strings.'
@@ -877,8 +878,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     helper: `Register this callback URL when using Sign-in with Google on the web using OAuth.
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-google#configure-your-services-id)`,
   },
-};
-
+}
 
 const EXTERNAL_PROVIDER_KAKAO = {
   $schema: JSON_SCHEMA_VERSION,
