@@ -363,6 +363,7 @@ export enum LogsTableName {
   POSTGREST = 'postgrest_logs',
   SUPAVISOR = 'supavisor_logs',
   WAREHOUSE = 'warehouse_logs',
+  WORKFLOW_RUN = 'workflow_run_logs',
 }
 
 export const LOGS_TABLES = {
@@ -376,6 +377,7 @@ export const LOGS_TABLES = {
   postgrest: LogsTableName.POSTGREST,
   supavisor: LogsTableName.SUPAVISOR,
   warehouse: LogsTableName.WAREHOUSE,
+  workflow_run: LogsTableName.WORKFLOW_RUN,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
