@@ -1,11 +1,12 @@
 'use client'
 
 import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { DialogProps } from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import * as React from 'react'
 
-import { cn } from '../../../lib/utils/cn'
 import { VariantProps, cva } from 'class-variance-authority'
+import { cn } from '../../../lib/utils/cn'
 
 export const DIALOG_PADDING_Y_SMALL = 'py-4'
 export const DIALOG_PADDING_X_SMALL = 'px-5'
@@ -208,13 +209,14 @@ DialogSectionSeparator.displayName = 'DialogSectionSeparator'
 
 export {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
-  DialogClose,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger,
   DialogSection,
   DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+  type DialogProps,
 }

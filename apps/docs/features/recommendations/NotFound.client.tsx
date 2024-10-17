@@ -2,18 +2,18 @@
 
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { type SupabaseClient } from '@supabase/supabase-js'
-import { X } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
-import { useCommandMenu } from '@ui-patterns/Cmdk'
-import { GenericSkeletonLoader } from '@ui-patterns/ShimmeringLoader'
 import { type DocsSearchResult } from 'common'
 import { Button, cn } from 'ui'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import ButtonCard from '~/components/ButtonCard'
 
 function SearchButton() {
-  const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
+  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   return (
     <Button type="primary" size="small" onClick={() => setCommandMenuOpen(true)}>
@@ -39,29 +39,38 @@ async function getRecommendations(page: string, supabase: SupabaseClient) {
   }
 }
 
-function Recommendations({ page }: { page: string }) {
+function Recommendations() {
+  const pathname = usePathname()
   const supabase = useSupabaseClient()
+
+  const [loading, setLoading] = useState(true)
   const [recommendations, setRecommendations] = useState(
     [] as Array<Omit<DocsSearchResult, 'sections'>>
   )
 
-  const fetched = useRef(false)
-
   useEffect(() => {
-    getRecommendations(page, supabase).then((data) => {
-      if (!fetched.current) {
+    if (!pathname) return
+
+    let stale = false
+
+    getRecommendations(pathname, supabase).then((data) => {
+      if (!stale) {
         setRecommendations(data)
-        fetched.current = true
+        setLoading(false)
       }
     })
-  }, [page, supabase])
+
+    return () => {
+      stale = true
+    }
+  }, [pathname, supabase])
 
   return (
     <section aria-labelledby="empty-page-recommendations" className="min-h-96 mt-20">
       <h2 id="empty-page-recommendations">Are you looking for...?</h2>
-      {!fetched.current && <LoadingState />}
-      {fetched.current && recommendations.length === 0 && <NoResults />}
-      {fetched.current && recommendations.length > 0 && (
+      {loading && <LoadingState />}
+      {!loading && recommendations.length === 0 && <NoResults />}
+      {!loading && recommendations.length > 0 && (
         <RecommendationsList recommendations={recommendations} />
       )}
     </section>
@@ -98,4 +107,4 @@ function RecommendationsList({
   )
 }
 
-export { SearchButton, Recommendations }
+export { Recommendations, SearchButton }

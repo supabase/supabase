@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
@@ -193,21 +193,6 @@ const ReportsMenu = () => {
               ) : null}
             </div>
           ))}
-
-          {/* [Joshen] Temp notice while we shift some pages on 040424 - can probably remove in 3 months perhaps */}
-          <Alert_Shadcn_>
-            <AlertTitle_Shadcn_ className="text-sm">
-              Query Performance and Project Linter reports have been shifted
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="text-xs">
-              <p className="mb-2">They can now be found in the menu under the database section.</p>
-              <Button asChild type="default" size="tiny">
-                <Link href={`/project/${ref}/database/query-performance`}>
-                  Head over to Database
-                </Link>
-              </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
 
           <UpdateCustomReportModal
             onCancel={() => setSelectedReportToUpdate(undefined)}

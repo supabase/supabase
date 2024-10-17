@@ -50,7 +50,9 @@ Projects must meet these requirements to use Read Replicas:
 
 ## Getting started
 
-To add a Read Replica, go to the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure) in your dashboard. Each project can deploy up to two Read Replicas and all Read Replicas inherit the compute size of their Primary database.
+To add a Read Replica, go to the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure) in your dashboard.
+
+Projects on an XL compute add-on or larger can create up to five Read Replicas. Projects on compute add-ons smaller than XL can create up to two Read Replicas. All Read Replicas inherit the compute size of their Primary database.
 
 ### Deploying a Read Replica
 
@@ -99,6 +101,65 @@ The load balancer uses a round-robin strategy to route `GET` requests to all ava
 To call a read-only Postgres function on Read Replicas through the REST API, use the `get: true` [option](/docs/reference/javascript/rpc?queryGroups=example&example=call-a-read-only-postgres-function).
 
 If you remove all Read Replicas from your project, the load balancer and its endpoint are removed as well. Make sure to redirect requests back to your Primary database before removal.
+
+#### Experimental routing
+
+The API load balancer offers an experimental routing mode that builds on top of the existing functionality. It is now possible to use a load balancer endpoint for all Supabase services (Auth, Edge Functions, Realtime, and Storage) meaning there is no need to worry about which endpoint to use in which situations.
+
+<Admonition type="note">
+
+Due to the requirements of the Auth service, all Auth requests are handled by the Primary, even when sent over the load balancer endpoint. This is similar to how non-Read requests for the Data API (PostgREST) are exclusively handled by the Primary.
+
+</Admonition>
+
+The experimental routing mode can be enabled by sending the header `sb-lb-routing-mode: alpha-all-services` along with requests. This gives the option to opt-in and try out the new routing, but still have the peace of mind that the original behavior is there should it be needed.
+
+What follows is an example of using the `supabase-js` library to create a new client with the appropriate headers and make an Auth request to create a new user.
+
+```ts ./create-user.ts
+import { createClient } from '@supabase/supabase-js'
+import * as dotenv from 'dotenv'
+
+// Load environment variables from .env file
+dotenv.config()
+
+// Supabase credentials
+const supabaseUrl = process.env.SUPABASE_URL as string
+const supabaseKey = process.env.SUPABASE_KEY as string
+
+// Initialize the Supabase client with custom headers
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  global: {
+    headers: {
+      'sb-lb-routing-mode': 'alpha-all-services',
+    },
+  },
+})
+
+/**
+ * @description simple user creation function
+ */
+async function createUser() {
+  // Make the Auth call to create a user
+  const { data, error } = await supabase.auth.signUp({
+    email: 'my-new-user@example.com',
+    password: 'my--really-strong-password',
+  })
+
+  // Throw on an error
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  // Output the response
+  console.dir(data)
+}
+
+// Register a random user
+createUser()
+```
+
+The client creation function, with experimental routing header, can be used throughout an application to take advantage of load balancer experimental routing.
 
 <Admonition type="caution">
 
@@ -186,3 +247,24 @@ We combine it with streaming replication to reduce replication lag. Once WAL-G f
 Replication lag for a specific Read Replica can be monitored through the dashboard. On the [Database Reports page](/dashboard/project/_/reports/database) Read Replicas will have an additional chart under `Replica Information` displaying historical replication lag in seconds. Realtime replication lag in seconds can be observed on the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure). This is the value on top of the Read Replica. Do note that there is no single threshold to indicate when replication lag should be addressed. It would be fully dependent on the requirements of your project.
 
 If you are already ingesting your [project's metrics](/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment, you can also keep track of replication lag and set alarms accordingly with the metric: `physical_replication_lag_physical_replica_lag_seconds`.
+
+Some common sources of high replication lag include:
+
+1. Exclusive locks on tables on the Primary.
+   Operations such as `drop table`, `reindex` (amongst others) take an Access Exclusive lock on the table. This can result in increasing replication lag for the duration of the lock.
+1. Resource Constraints on the database
+   Heavy utilization on the primary or the replica, if run on an under-resourced project, can result in high replication lag. This includes the characteristics of the disk being utilized (IOPS, Throughput).
+1. Long-running transactions on the Primary.
+   Transactions that run for a long-time on the primary can also result in high replication lag. You can use the `pg_stat_activity` view to identify and terminate such transactions if needed. `pg_stat_activity` is a live view, and does not offer historical data on transactions that might have been active for a long time in the past.
+
+High replication lag can result in stale data being returned for queries being executed against the affected read replicas.
+
+You can [consult](https://cloud.google.com/sql/docs/postgres/replication/replication-lag) [additional](https://repost.aws/knowledge-center/rds-postgresql-replication-lag) [resources](https://severalnines.com/blog/what-look-if-your-postgresql-replication-lagging/) on the subject as well.
+
+## Misc
+
+### Restart or compute add-on change behaviour
+
+When a project that utilizes Read Replicas is restarted, or the compute add-on size is changed, the Primary database gets restarted first. During this period, the Read Replicas remain available.
+
+Once the Primary database has completed restarting (or resizing, in case of a compute add-on change) and become available for usage, all the Read Replicas are restarted (and resized, if needed) concurrently.

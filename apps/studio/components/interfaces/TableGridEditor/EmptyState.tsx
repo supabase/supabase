@@ -5,6 +5,7 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 
@@ -12,7 +13,8 @@ export interface EmptyStateProps {}
 
 const EmptyState = ({}: EmptyStateProps) => {
   const snap = useTableEditorStateSnapshot()
-  const isProtectedSchema = EXCLUDED_SCHEMAS.includes(snap.selectedSchemaName)
+  const { selectedSchema } = useQuerySchemaState()
+  const isProtectedSchema = EXCLUDED_SCHEMAS.includes(selectedSchema)
   const canCreateTables =
     useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') && !isProtectedSchema
 
@@ -25,7 +27,7 @@ const EmptyState = ({}: EmptyStateProps) => {
   const { data } = useEntityTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: snap.selectedSchemaName,
+    schema: selectedSchema,
     sort,
   })
 

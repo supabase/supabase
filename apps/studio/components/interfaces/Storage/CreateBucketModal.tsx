@@ -1,7 +1,8 @@
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
@@ -12,18 +13,7 @@ import {
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { IS_PLATFORM } from 'lib/constants'
-import {
-  Alert,
-  Button,
-  Collapsible,
-  Form,
-  IconChevronDown,
-  Input,
-  Listbox,
-  Modal,
-  Toggle,
-  cn,
-} from 'ui'
+import { Alert, Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
 
 export interface CreateBucketModalProps {
   visible: boolean
@@ -156,7 +146,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                 <Collapsible.Trigger asChild>
                   <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-default">
                     <p className="text-sm">Additional configuration</p>
-                    <IconChevronDown
+                    <ChevronDown
                       size={18}
                       strokeWidth={2}
                       className={cn('text-foreground-light', showConfiguration && 'rotate-180')}
@@ -210,14 +200,14 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                           {IS_PLATFORM && (
                             <div className="col-span-12">
                               <p className="text-foreground-light text-sm">
-                                Note: The{' '}
+                                Note: Individual bucket uploads will still be capped at the{' '}
                                 <Link
                                   href={`/project/${ref}/settings/storage`}
-                                  className="text-brand opacity-80 hover:opacity-100 transition"
+                                  className="font-bold underline"
                                 >
                                   global upload limit
                                 </Link>{' '}
-                                takes precedence over this value ({formattedGlobalUploadLimit})
+                                of {formattedGlobalUploadLimit}
                               </p>
                             </div>
                           )}

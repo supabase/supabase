@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Alert, Button, Modal } from 'ui'
 
 import { useOrganizationPaymentMethodDeleteMutation } from 'data/organizations/organization-payment-method-delete-mutation'

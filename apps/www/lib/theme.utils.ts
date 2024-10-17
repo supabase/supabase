@@ -1,14 +1,14 @@
 import { useEffect } from 'react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
+import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 
 export function useForceDeepDark() {
   const router = useRouter()
   const { resolvedTheme, theme } = useTheme()
 
   const isDarkTheme = resolvedTheme?.includes('dark')
-  const forceDarkMode = router.pathname === '/' || router.pathname.startsWith('/launch-week')
-  const isGaSection = router.pathname.includes('/ga-week') || router.pathname === '/ga'
+  const forceDarkMode = useDarkLaunchWeeks()
 
   useEffect(() => {
     const handleDocumentLoad = () => {

@@ -47,6 +47,7 @@ const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
 const GITHUB_API_URL = 'https://api.github.com'
 const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
 const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
+const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'
@@ -55,7 +56,7 @@ const PUSHER_URL_WS = 'wss://*.pusher.com'
 const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL}`
 const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL}`
 const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`
-const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL}`
+const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL} ${GOOGLE_USER_AVATAR_URL}`
 const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 
@@ -100,6 +101,16 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     webpackBuildWorker: true,
+  },
+  async rewrites() {
+    return [
+      {
+        source: `/.well-known/vercel/flags`,
+        // TODO: Replace this with supabase.com/.well-known/vercel/flags once this PR is merged.
+        destination: `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.NEXT_PUBLIC_SITE_URL}${process.env.NEXT_PUBLIC_BASE_PATH}/.well-known/vercel/flags`,
+        basePath: false,
+      },
+    ]
   },
   async redirects() {
     return [
@@ -419,6 +430,15 @@ const nextConfig = {
         ],
       },
       {
+        source: '/.well-known/vercel/flags',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'application/json',
+          },
+        ],
+      },
+      {
         source: '/img/:slug*',
         headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
       },
@@ -431,11 +451,31 @@ const nextConfig = {
   images: {
     // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
     dangerouslyAllowSVG: true,
-    domains: [
-      'github.com',
-      'avatars.githubusercontent.com',
-      'api-frameworks.vercel.sh',
-      'vercel.com',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'github.com',
+        port: '',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        port: '',
+        pathname: '/u/*',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api-frameworks.vercel.sh',
+        port: '',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'vercel.com',
+        port: '',
+        pathname: '**',
+      },
     ],
   },
   transpilePackages: [
@@ -480,29 +520,36 @@ const nextConfig = {
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-    ? withSentryConfig(
-        withBundleAnalyzer(nextConfig),
-        {
-          silent: true,
+    ? withSentryConfig(withBundleAnalyzer(nextConfig), {
+        silent: true,
+
+        // For all available options, see:
+        // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+        // Upload a larger set of source maps for prettier stack traces (increases build time)
+        widenClientFileUpload: true,
+
+        // Automatically annotate React components to show their full name in breadcrumbs and session replay
+        reactComponentAnnotation: {
+          enabled: true,
         },
-        {
-          // For all available options, see:
-          // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-          // Upload a larger set of source maps for prettier stack traces (increases build time)
-          widenClientFileUpload: true,
+        // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+        // This can increase your server load as well as your hosting bill.
+        // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+        // side errors will fail.
+        tunnelRoute: '/monitoring',
 
-          // Transpiles SDK to be compatible with IE11 (increases bundle size)
-          transpileClientSDK: false,
+        // Hides source maps from generated client bundles
+        hideSourceMaps: true,
 
-          // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-          tunnelRoute: '/monitoring',
+        // Automatically tree-shake Sentry logger statements to reduce bundle size
+        disableLogger: true,
 
-          // Hides source maps from generated client bundles
-          hideSourceMaps: true,
-
-          // Automatically tree-shake Sentry logger statements to reduce bundle size
-          disableLogger: true,
-        }
-      )
+        // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+        // See the following for more information:
+        // https://docs.sentry.io/product/crons/
+        // https://vercel.com/docs/cron-jobs
+        automaticVercelMonitors: true,
+      })
     : nextConfig

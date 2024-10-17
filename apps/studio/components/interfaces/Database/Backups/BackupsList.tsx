@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { Clock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Panel from 'components/ui/Panel'

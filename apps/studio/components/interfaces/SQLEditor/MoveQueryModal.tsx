@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Code, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
@@ -10,7 +10,7 @@ import { getContentById } from 'data/content/content-id-query'
 import { useContentUpsertV2Mutation } from 'data/content/content-upsert-v2-mutation'
 import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
 import { Snippet, SnippetDetail } from 'data/content/sql-folders-query'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useSnippetFolders, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -65,17 +65,29 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
   const { mutateAsync: createFolder, isLoading: isCreatingFolder } =
     useSQLSnippetFolderCreateMutation()
-  const {
-    mutate: moveSnippet,
-    mutateAsync: moveSnippetAsync,
-    isLoading: isMovingSnippet,
-  } = useContentUpsertV2Mutation({
+  const { mutateAsync: moveSnippetAsync, isLoading: isMovingSnippet } = useContentUpsertV2Mutation({
     onError: (error) => {
       toast.error(`Failed to move query: ${error.message}`)
     },
   })
 
-  const FormSchema = z.object({ name: z.string() })
+  const getFormSchema = () => {
+    if (selectedId === 'new-folder') {
+      return z
+        .object({
+          name: z.string().min(1, 'Please provide a name for the folder'),
+        })
+        .refine((data) => !snapV2.allFolderNames.includes(data.name), {
+          message: 'This folder name already exists',
+          path: ['name'],
+        })
+    } else {
+      return z.object({})
+    }
+  }
+
+  const FormSchema = getFormSchema()
+
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
@@ -83,7 +95,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
     defaultValues: { name: '' },
   })
 
-  const folders = Object.values(snapV2.folders).map((x) => x.folder)
+  const folders = useSnippetFolders(ref as string)
   const selectedFolder =
     selectedId === 'root'
       ? 'Root of the editor'
@@ -103,8 +115,11 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
     try {
       let folderId = selectedId
 
-      if (selectedId === 'new-folder') {
-        const { id } = await createFolder({ projectRef: ref, name: values.name })
+      if (selectedId === 'new-folder' && 'name' in values) {
+        const { id } = await createFolder({
+          projectRef: ref,
+          name: values.name,
+        })
         folderId = id
       }
 
@@ -205,7 +220,12 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                       </div>
                     </Button>
                   </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="start">
+                  <PopoverContent_Shadcn_
+                    className="p-0"
+                    side="bottom"
+                    align="start"
+                    sameWidthAsTrigger
+                  >
                     <Command_Shadcn_>
                       <CommandInput_Shadcn_ placeholder="Find folder..." />
                       <CommandList_Shadcn_>

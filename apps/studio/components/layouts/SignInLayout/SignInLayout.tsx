@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { FileText } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
@@ -9,7 +10,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'
-import { Button, IconFileText } from 'ui'
+import { Button } from 'ui'
 
 type SignInLayoutProps = {
   heading: string
@@ -108,7 +109,7 @@ const SignInLayout = ({
             </div>
 
             <div className="items-center hidden space-x-3 md:ml-10 md:flex md:pr-4">
-              <Button asChild type="default" icon={<IconFileText />}>
+              <Button asChild type="default" icon={<FileText />}>
                 <Link href="https://supabase.com/docs" target="_blank" rel="noreferrer">
                   Documentation
                 </Link>

@@ -1,15 +1,12 @@
-import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import { initial, last } from 'lodash'
 import { Dispatch, SetStateAction } from 'react'
 
-import { useTelemetryProps } from 'common'
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { QueryResponseError } from 'data/sql/execute-sql-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import Telemetry from 'lib/telemetry'
-import { useRouter } from 'next/router'
 import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -31,16 +28,15 @@ const QueryError = ({
   setOpen: Dispatch<SetStateAction<boolean>>
   onSelectDebug: () => void
 }) => {
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
-  const formattedError =
-    (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
-
   // Customers on HIPAA plans should not have access to Supabase AI
   const organization = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
+
+  const { mutate: sendEvent } = useSendEventMutation()
+
+  const formattedError =
+    (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
   return (
     <div className="flex flex-col gap-y-3 px-5">
@@ -76,7 +72,7 @@ const QueryError = ({
                   {open ? 'Hide error details' : 'Show error details'}
                 </Button>
               </CollapsibleTrigger_Shadcn_>
-              {!hasHipaaAddon && isAiAssistantEnabled && (
+              {!hasHipaaAddon && (
                 <Button
                   size="tiny"
                   type="default"
@@ -86,15 +82,11 @@ const QueryError = ({
                   )}
                   onClick={() => {
                     onSelectDebug()
-                    Telemetry.sendEvent(
-                      {
-                        category: 'rls_editor',
-                        action: 'ai_debugger_requested',
-                        label: 'rls-ai-assistant',
-                      },
-                      telemetryProps,
-                      router
-                    )
+                    sendEvent({
+                      category: 'rls_editor',
+                      action: 'ai_debugger_requested',
+                      label: 'rls-ai-assistant',
+                    })
                   }}
                 >
                   Fix with Assistant

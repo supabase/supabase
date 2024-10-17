@@ -185,7 +185,6 @@ const NavigationMenuRefListItems = ({
       <div className="flex items-center gap-3 my-3">
         <MenuIconPicker icon={menu.icon} width={21} height={21} />
         <HeaderLink title={menu.title} url={menu.url} id={id} />
-        <RevVersionDropdown />
       </div>
       <ul className="function-link-list flex flex-col gap-2 pb-5">
         {filteredSections.map((section) => {

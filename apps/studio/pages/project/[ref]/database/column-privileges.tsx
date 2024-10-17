@@ -1,8 +1,8 @@
 import { useParams } from 'common'
-import { XIcon } from 'lucide-react'
+import { AlertCircle, ExternalLink, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
@@ -24,18 +24,12 @@ import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-quer
 import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconExternalLink,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
@@ -48,7 +42,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const { flags } = featurePreviewContext
   const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
 
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<string | undefined>(paramTable)
   const [selectedRole, setSelectedRole] = useState<string>('authenticated')
 
@@ -234,7 +228,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                 <a
                   href="https://supabase.com/docs/guides/auth/column-level-security"
                   target="_blank"
@@ -250,7 +244,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
             <>
               {!diffWarningDismissed && (
                 <Alert_Shadcn_ variant="warning">
-                  <IconAlertCircle strokeWidth={2} />
+                  <AlertCircle strokeWidth={2} />
                   <AlertTitle_Shadcn_>
                     Changes to column privileges will not be reflected in migrations when running{' '}
                     <code className="text-xs">supabase db diff</code>.
@@ -275,7 +269,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
               {!selectStarWarningDismissed && (
                 <Alert_Shadcn_ variant="warning">
-                  <IconAlertCircle strokeWidth={2} />
+                  <AlertCircle strokeWidth={2} />
                   <AlertTitle_Shadcn_>
                     Changing column privileges can break existing queries.
                   </AlertTitle_Shadcn_>

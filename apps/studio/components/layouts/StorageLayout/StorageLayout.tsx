@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { ReactNode, useEffect } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'

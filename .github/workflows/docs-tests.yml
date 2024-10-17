@@ -20,6 +20,7 @@ jobs:
         with:
           sparse-checkout: |
             apps/docs
+            examples
             packages
 
       - name: Use Node.js

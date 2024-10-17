@@ -2,6 +2,8 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
+import { useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
 
@@ -33,13 +35,13 @@ export type ProjectApiError = ResponseError
 export const useProjectApiQuery = <TData = ProjectApiData>(
   { projectRef }: ProjectApiVariables,
   { enabled = true, ...options }: UseQueryOptions<ProjectApiData, ProjectApiError, TData> = {}
-) =>
-  useQuery<ProjectApiData, ProjectApiError, TData>(
+) => {
+  return useQuery<ProjectApiData, ProjectApiError, TData>(
     configKeys.api(projectRef),
     ({ signal }) => getProjectApi({ projectRef }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
-      refetchInterval(data, query) {
+      refetchInterval(data) {
         if (!data) {
           return false
         }
@@ -54,3 +56,4 @@ export const useProjectApiQuery = <TData = ProjectApiData>(
       ...options,
     }
   )
+}

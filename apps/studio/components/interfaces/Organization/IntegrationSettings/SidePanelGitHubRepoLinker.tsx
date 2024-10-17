@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'

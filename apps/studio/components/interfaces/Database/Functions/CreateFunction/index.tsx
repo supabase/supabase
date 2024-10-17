@@ -3,7 +3,7 @@ import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
 import { Plus, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import z from 'zod'
 
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'

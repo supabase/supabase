@@ -15,11 +15,9 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useFlag } from 'hooks/ui/useFlag'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import type { NextPageWithLayout } from 'types'
 
 const SqlEditor: NextPageWithLayout = () => {
@@ -29,11 +27,9 @@ const SqlEditor: NextPageWithLayout = () => {
 
   const { project } = useProjectContext()
   const appSnap = useAppStateSnapshot()
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const snippets = useSnippets(ref)
-  const enableFolders = useFlag('sqlFolderOrganization')
+  const snippets = useSnippets(ref!)
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
@@ -47,7 +43,7 @@ const SqlEditor: NextPageWithLayout = () => {
       // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
       // the snapV2 valtio store for some reason hence why the added typeof check here
       retry: false,
-      enabled: Boolean(enableFolders && id !== 'new' && typeof snapV2.addSnippet === 'function'),
+      enabled: Boolean(id !== 'new' && typeof snapV2.addSnippet === 'function'),
       onSuccess: (data) => {
         snapV2.addSnippet({ projectRef: ref as string, snippet: data })
       },
@@ -136,7 +132,7 @@ const SqlEditor: NextPageWithLayout = () => {
         async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
           const formatted = await formatPgsqlRef.current(value)
-          if (id) snap.setSql(id, formatted)
+          if (id) snapV2.setSql(id, formatted)
           return [{ range: model.getFullModelRange(), text: formatted }]
         },
       })

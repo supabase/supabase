@@ -1,8 +1,9 @@
+import { ChevronRight } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
-import { CodeBlock, IconChevronRight } from 'ui'
+import { CodeBlock } from 'ui'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
-import { Tabs, TabPanel } from '~/features/ui/Tabs'
+import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import spec from '~/spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import RefDetailCollapse from './RefDetailCollapse'
@@ -93,7 +94,7 @@ const CliCommandSection = (props) => {
                   {command.subcommands.map((subcommand) => (
                     <li key={subcommand} className="flex items-center gap-3">
                       <div className="text-foreground-muted">
-                        <IconChevronRight size={14} strokeWidth={2} />
+                        <ChevronRight size={14} strokeWidth={2} />
                       </div>
                       <a
                         href={`#${subcommand}`}

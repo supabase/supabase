@@ -1,4 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
+import { ChevronRight } from 'lucide-react'
 
 import { useParams } from 'common'
 import { ColumnList } from 'components/interfaces/Database'
@@ -8,7 +9,6 @@ import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import useTable from 'hooks/misc/useTable'
-import { ChevronRight } from 'lucide-react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'

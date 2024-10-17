@@ -69,10 +69,10 @@ const LWXStickyNav: FC = () => {
 
   return (
     <div className="absolute inset-0 pointer-events-none w-full h-full">
-      <nav className="sticky z-30 top-0 bg-alternative/90 backdrop-blur-sm pointer-events-auto w-full border-t border-b dark:border-[#111718] h-[60px] flex items-center">
+      <nav className="sticky z-30 top-0 bg-alternative/90 backdrop-blur-sm pointer-events-auto w-full border-b border-muted h-[60px] flex items-center">
         <SectionContainer className="!max-w-none !py-0 lg:!container flex items-center justify-between font-mono gap-4 md:gap-8 text-sm">
           <div className="flex items-center gap-4 md:gap-8">
-            <ul className="lwx-sticky-nav hidden md:flex items-center gap-2 md:gap-4 text-foreground-muted">
+            <ul className="lwx-sticky-nav flex items-center gap-2 md:gap-4 text-foreground-muted">
               {days.map((day: WeekDayProps) => (
                 <li key={day.id}>
                   <Link

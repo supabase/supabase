@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -20,8 +20,8 @@ import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useImmutableValue } from 'hooks/misc/useImmutableValue'
-import { ArrowLeft, Edit, ExternalLink, Trash } from 'lucide-react'
-import { Button, Form, IconLoader, Input } from 'ui'
+import { ArrowLeft, Edit, ExternalLink, Loader, Trash } from 'lucide-react'
+import { Button, Form, Input } from 'ui'
 import InputField from './InputField'
 import WrapperTableEditor from './WrapperTableEditor'
 import {
@@ -101,7 +101,7 @@ const EditWrapper = () => {
       return (
         <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
           <div className="flex items-center space-x-4">
-            <IconLoader className="animate-spin" size={16} />
+            <Loader className="animate-spin" size={16} />
             <p className="text-sm">Updating wrapper</p>
           </div>
         </div>

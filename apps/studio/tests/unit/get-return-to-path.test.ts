@@ -1,4 +1,5 @@
 import { getReturnToPath } from 'lib/gotrue'
+import { describe, it, expect } from 'vitest'
 
 describe(`getReturnToPath`, () => {
   it(`returns to /projects when no fallback is provided`, () => {

@@ -58,7 +58,7 @@ export async function chatSql(
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
+      model: 'gpt-4o-mini-2024-07-18',
       messages: initMessages,
       max_tokens: 1024,
       temperature: 0,

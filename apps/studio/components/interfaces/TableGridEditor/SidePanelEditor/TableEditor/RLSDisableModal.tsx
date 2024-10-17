@@ -1,5 +1,6 @@
+import { AlertOctagon, BookOpen, Lock, ShieldOff } from 'lucide-react'
 import Link from 'next/link'
-import { Alert, Button, IconAlertOctagon, IconBookOpen, IconLock, IconShieldOff } from 'ui'
+import { Alert, Button } from 'ui'
 
 export default function RLSDisableModalContent() {
   return (
@@ -16,17 +17,17 @@ export default function RLSDisableModalContent() {
           </Alert>
           <ul className="mt-4 space-y-5">
             <li className="flex gap-3">
-              <IconAlertOctagon />
+              <AlertOctagon />
               <span>All requests to this table will be accepted.</span>
             </li>
 
             <li className="flex gap-3">
-              <IconShieldOff />
+              <ShieldOff />
               <span>Auth policies will not be enforced.</span>
             </li>
 
             <li className="flex gap-3">
-              <IconLock w={14} className="flex-shrink-0" />
+              <Lock size={14} className="flex-shrink-0" />
               <div>
                 <strong>Before you turn off Row Level Security, consider:</strong>
                 <ul className="space-y-2 mt-2">
@@ -44,7 +45,7 @@ export default function RLSDisableModalContent() {
 
         <div className="mt-3">
           <p className="mt-2">
-            <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<BookOpen strokeWidth={1.5} />}>
               <Link
                 href="https://supabase.com/docs/guides/auth/row-level-security"
                 target="_blank"

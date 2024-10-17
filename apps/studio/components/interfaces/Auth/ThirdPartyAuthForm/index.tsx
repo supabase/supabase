@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -21,9 +21,9 @@ import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDia
 import { CreateFirebaseAuthIntegrationDialog } from './CreateFirebaseAuthDialog'
 import { IntegrationCard } from './IntegrationCard'
 import {
-  INTEGRATION_TYPES,
   getIntegrationType,
   getIntegrationTypeLabel,
+  INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
 
 export const ThirdPartyAuthForm = () => {
@@ -62,14 +62,23 @@ export const ThirdPartyAuthForm = () => {
     <div className="pb-4">
       <FormHeader
         title="Third Party Auth"
+        className="mb-1"
         description="Use third-party authentication (TPA) systems based on JWTs to access your project."
         actions={
           integrations.length !== 0 ? (
             <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
           ) : null
         }
+        docsUrl="https://supabase.com/docs/guides/auth/third-party/overview"
       />
-
+      <div className="prose text-sm mb-6 max-w-full">
+        <span>
+          Billing is based on the number of monthly active users (MAUs) requesting your API
+          throughout the billing period (50 included then you'll be charged{' '}
+        </span>
+        <span className="text-brand">$0.00325</span>
+        <span> per MAU).</span>
+      </div>
       {isLoading && (
         <div
           className={cn(
@@ -87,7 +96,7 @@ export const ThirdPartyAuthForm = () => {
               'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4'
             )}
           >
-            <p className="text-sm text-foreground-light">No integrations configured yet</p>
+            <p className="text-sm text-foreground-light">No providers configured yet</p>
             <AddIntegrationDropdown
               buttonText="Add a new integration"
               onSelectIntegrationType={setSelectedIntegration}

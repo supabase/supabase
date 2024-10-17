@@ -1,6 +1,7 @@
 import React from 'react'
 // @ts-ignore
 import defaultTheme from '../../theme/defaultTheme'
+import { cn } from '../../utils'
 // @ts-ignore
 // import FormLayoutStyles from './FormLayout.module.css'
 
@@ -148,7 +149,7 @@ export function FormLayout({
         >
           {labelled && (
             <label
-              className={[__styles.label.base, __styles.label.size[size]].join(' ')}
+              className={cn(__styles.label.base, __styles.label.size[size], 'break-all')}
               htmlFor={id}
             >
               {beforeLabel && (

@@ -1351,7 +1351,7 @@ export default {
     option: `
       w-listbox
       transition cursor-pointer select-none relative py-2 pl-3 pr-9
-      text-foreground-muted
+      text-foreground-light
       text-sm
       hover:bg-border-overlay
       focus:bg-border-overlay
@@ -1360,7 +1360,7 @@ export default {
       focus:outline-none
     `,
     option_active: `text-foreground bg-selection`,
-    option_disabled: `cursor-not-allowed opacity-50`,
+    option_disabled: `cursor-not-allowed opacity-60`,
     option_inner: `flex items-center space-x-3`,
     option_check: `absolute inset-y-0 right-0 flex items-center pr-3 text-brand`,
     option_check_active: `text-brand`,

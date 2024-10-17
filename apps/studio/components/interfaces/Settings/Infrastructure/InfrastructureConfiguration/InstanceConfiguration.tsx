@@ -19,7 +19,7 @@ import {
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { timeout } from 'lib/helpers'
 import { type AWS_REGIONS_KEYS } from 'shared-data'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Button,
   DropdownMenu,
@@ -46,7 +46,7 @@ const InstanceConfigurationUI = () => {
   const { ref: projectRef } = useParams()
   const numTransition = useRef<number>()
   const { project, isLoading: isLoadingProject } = useProjectContext()
-  const snap = useSubscriptionPageStateSnapshot()
+  const { setPanel } = useAddonsPagePanel()
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
@@ -207,7 +207,7 @@ const InstanceConfigurationUI = () => {
   }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
 
   return (
-    <>
+    <div className="nowheel">
       <div
         className={`h-[500px] w-full relative ${
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
@@ -247,7 +247,7 @@ const InstanceConfigurationUI = () => {
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-52 *:space-x-2">
-                      <DropdownMenuItem onClick={() => snap.setPanelKey('computeInstance')}>
+                      <DropdownMenuItem onClick={() => setPanel('computeInstance')}>
                         <div>Resize databases</div>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -342,7 +342,7 @@ const InstanceConfigurationUI = () => {
       />
 
       <ComputeInstanceSidePanel />
-    </>
+    </div>
   )
 }
 

@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, IconEye, IconEyeOff, IconHelpCircle, IconLoader, Input } from 'ui'
+import { Button, Input } from 'ui'
 
 import type { ServerOption } from './Wrappers.types'
+import { HelpCircle, Loader, Eye, EyeOff } from 'lucide-react'
 
 interface InputFieldProps {
   option: ServerOption
@@ -28,7 +29,7 @@ const InputField = ({ option, loading, error }: InputFieldProps) => {
               <p>{option.label}</p>
               {option.urlHelper !== undefined && (
                 <Link href={option.urlHelper} target="_blank" rel="noreferrer">
-                  <IconHelpCircle
+                  <HelpCircle
                     strokeWidth={2}
                     size={14}
                     className="text-foreground-light hover:text-foreground cursor-pointer transition"
@@ -54,7 +55,7 @@ const InputField = ({ option, loading, error }: InputFieldProps) => {
             <p>{option.label}</p>
             {option.urlHelper !== undefined && (
               <Link href={option.urlHelper} target="_blank" rel="noreferrer">
-                <IconHelpCircle
+                <HelpCircle
                   strokeWidth={2}
                   size={14}
                   className="text-foreground-light hover:text-foreground cursor-pointer transition"
@@ -71,13 +72,13 @@ const InputField = ({ option, loading, error }: InputFieldProps) => {
         actions={
           loading ? (
             <div className="flex items-center justify-center mr-1">
-              <Button disabled type="default" icon={<IconLoader className="animate-spin" />} />
+              <Button disabled type="default" icon={<Loader className="animate-spin" />} />
             </div>
           ) : option.secureEntry ? (
             <div className="flex items-center justify-center mr-1">
               <Button
                 type="default"
-                icon={showHidden ? <IconEye /> : <IconEyeOff />}
+                icon={showHidden ? <Eye /> : <EyeOff />}
                 onClick={() => setShowHidden(!showHidden)}
               />
             </div>

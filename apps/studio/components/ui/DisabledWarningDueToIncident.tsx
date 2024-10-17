@@ -1,6 +1,5 @@
-import { IconAlertCircle } from 'ui'
-
 import InformationBox from 'components/ui/InformationBox'
+import { AlertCircle } from 'lucide-react'
 
 interface DisabledWarningDueToIncidentProps {
   title: string
@@ -9,7 +8,7 @@ interface DisabledWarningDueToIncidentProps {
 const DisabledWarningDueToIncident = ({ title }: DisabledWarningDueToIncidentProps) => {
   return (
     <InformationBox
-      icon={<IconAlertCircle size={20} strokeWidth={1.5} />}
+      icon={<AlertCircle size={20} strokeWidth={1.5} />}
       defaultVisibility={true}
       hideCollapse
       title={title}

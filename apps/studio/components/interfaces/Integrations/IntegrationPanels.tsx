@@ -11,9 +11,9 @@ import type {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ExternalLink, Github } from 'lucide-react'
 import Link from 'next/link'
-import { Badge, Button, IconArrowRight, IconExternalLink, IconGitHub, cn } from 'ui'
+import { Badge, Button, cn } from 'ui'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -29,10 +29,10 @@ type HandleIconType = Integration['integration']['name'] | 'Supabase'
 const HandleIcon = ({ type, className }: { type: HandleIconType; className?: string }) => {
   switch (type) {
     case 'GitHub':
-      return <IconGitHub strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
+      return <Github strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
     // case 'Netlify':
-    //   return <IconSquare strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
+    //   return <Square strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
     //   break
     case 'Vercel':
       return (
@@ -118,7 +118,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
           </div>
         </div>
 
-        <Button asChild disabled={disabled} type="default" iconRight={<IconExternalLink />}>
+        <Button asChild disabled={disabled} type="default" iconRight={<ExternalLink />}>
           {disabled ? (
             <p>Manage</p>
           ) : (
@@ -180,7 +180,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
                 </span>
               </div>
 
-              <IconArrowRight
+              <ArrowRight
                 size={14}
                 className="flex-shrink-0 text-foreground-lighter"
                 strokeWidth={1.5}

@@ -13,8 +13,8 @@ import {
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
+  CommandList_Shadcn_,
   Command_Shadcn_,
-  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -37,7 +37,7 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
     return (
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger asChild>
-          <Button disabled type="primary" icon={<IconPlus strokeWidth={1.5} />}>
+          <Button disabled type="primary" icon={<Plus strokeWidth={1.5} />}>
             {buttonText}
           </Button>
         </Tooltip.Trigger>
@@ -75,32 +75,34 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
       <PopoverContent_Shadcn_ className="w-[200px] p-0" align={align}>
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search wrappers..." />
-          <CommandEmpty_Shadcn_ className="py-3">No wrappers found</CommandEmpty_Shadcn_>
-          <CommandGroup_Shadcn_>
-            <ScrollArea className="max-h-[270px] overflow-scroll">
-              {WRAPPERS.map((wrapper) => (
-                <CommandItem_Shadcn_
-                  key={wrapper.name}
-                  value={wrapper.name}
-                  onSelect={() => {
-                    setOpen(false)
-                    router.push(
-                      `/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`
-                    )
-                  }}
-                  className="gap-2 cursor-pointer"
-                >
-                  <Image
-                    width={20}
-                    height={20}
-                    src={wrapper.icon}
-                    alt={`${wrapper.name} wrapper icon`}
-                  />
-                  {wrapper.label}
-                </CommandItem_Shadcn_>
-              ))}
-            </ScrollArea>
-          </CommandGroup_Shadcn_>
+          <CommandList_Shadcn_>
+            <CommandEmpty_Shadcn_ className="py-3">No wrappers found...</CommandEmpty_Shadcn_>
+            <CommandGroup_Shadcn_>
+              <ScrollArea className="max-h-[270px] overflow-scroll">
+                {WRAPPERS.map((wrapper) => (
+                  <CommandItem_Shadcn_
+                    key={wrapper.name}
+                    value={wrapper.name}
+                    onSelect={() => {
+                      setOpen(false)
+                      router.push(
+                        `/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`
+                      )
+                    }}
+                    className="gap-2 cursor-pointer"
+                  >
+                    <Image
+                      width={20}
+                      height={20}
+                      src={wrapper.icon}
+                      alt={`${wrapper.name} wrapper icon`}
+                    />
+                    {wrapper.label}
+                  </CommandItem_Shadcn_>
+                ))}
+              </ScrollArea>
+            </CommandGroup_Shadcn_>
+          </CommandList_Shadcn_>
         </Command_Shadcn_>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

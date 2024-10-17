@@ -172,6 +172,25 @@ for select using (
     command: 'SELECT',
     roles: [],
   },
+  {
+    id: 'policy-9',
+    preview: false,
+    templateName: 'Allow users to only view their own data',
+    description: 'Restrict users to reading only their own data.',
+    statement: `
+create policy "Enable users to view their own data only"
+on "${schema}"."${table}"
+for select
+to authenticated
+using (
+  (select auth.uid()) = user_id
+);`.trim(),
+    name: 'Enable users to view their own data only',
+    definition: '(select auth.uid()) = user_id',
+    check: '',
+    command: 'SELECT',
+    roles: ['authenticated'],
+  },
 ]
 
 export const getRealtimePolicyTemplates = (): PolicyTemplate[] => {

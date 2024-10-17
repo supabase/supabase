@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { organizationKeys } from 'data/organization-members/keys'

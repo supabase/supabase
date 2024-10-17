@@ -12,7 +12,7 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import ProviderForm from './ProviderForm'
 
@@ -47,7 +47,7 @@ const AuthProvidersForm = () => {
                   We have detected that you have enabled the email provider with the OTP expiry set
                   to more than an hour. It is recommended to set this value to less than an hour.
                 </p>
-                <Button asChild type="default" className="w-min" icon={<ExternalLink size={14} />}>
+                <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
                   <Link href="https://supabase.com/docs/guides/platform/going-into-prod#security">
                     View security recommendations
                   </Link>
@@ -57,14 +57,16 @@ const AuthProvidersForm = () => {
           </Alert_Shadcn_>
         )}
         {isLoading &&
-          PROVIDERS_SCHEMAS.map((provider) => (
-            <div
-              key={`provider_${provider.title}`}
-              className={[...ProviderCollapsibleClasses, 'px-6 py-3'].join(' ')}
-            >
-              <HorizontalShimmerWithIcon />
-            </div>
-          ))}
+          PROVIDERS_SCHEMAS.map((provider) => {
+            return (
+              <div
+                key={`provider_${provider.title}`}
+                className={[...ProviderCollapsibleClasses, 'px-6 py-3'].join(' ')}
+              >
+                <HorizontalShimmerWithIcon />
+              </div>
+            )
+          })}
         {isError && (
           <Alert_Shadcn_ variant="destructive">
             <WarningIcon />
@@ -74,11 +76,15 @@ const AuthProvidersForm = () => {
         )}
         {isSuccess &&
           PROVIDERS_SCHEMAS.map((provider) => {
+            const providerSchema =
+              provider.title === 'Phone'
+                ? { ...provider, validationSchema: getPhoneProviderValidationSchema(authConfig) }
+                : provider
             return (
               <ProviderForm
-                key={`provider_${provider.title}`}
+                key={`provider_${providerSchema.title}`}
                 config={authConfig}
-                provider={provider as any}
+                provider={providerSchema as any}
               />
             )
           })}

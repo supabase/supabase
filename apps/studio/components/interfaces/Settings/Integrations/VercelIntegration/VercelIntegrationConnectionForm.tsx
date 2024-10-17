@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { FormActions } from 'components/ui/Forms/FormActions'
@@ -21,8 +21,6 @@ import {
   Input_Shadcn_,
   Switch,
 } from 'ui'
-
-const VERCEL_CONNECTION_FORM_ID = 'vercel-connection-form'
 
 const VercelIntegrationConnectionForm = ({
   disabled,
@@ -80,10 +78,12 @@ const VercelIntegrationConnectionForm = ({
     })
   }
 
+  const vercelConnectionFormId = `vercel-connection-form-${connection.id}`
+
   return (
     <Form_Shadcn_ {...form}>
       <form
-        id={VERCEL_CONNECTION_FORM_ID}
+        id={vercelConnectionFormId}
         onSubmit={form.handleSubmit(onSubmit)}
         className={'w-full space-y-6'}
       >
@@ -228,7 +228,7 @@ const VercelIntegrationConnectionForm = ({
           )}
 
           <FormActions
-            form={VERCEL_CONNECTION_FORM_ID}
+            form={vercelConnectionFormId}
             hasChanges={form.formState.isDirty}
             isSubmitting={isLoading}
             handleReset={() => form.reset()}

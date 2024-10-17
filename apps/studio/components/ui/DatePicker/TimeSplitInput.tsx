@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import { IconClock } from 'ui'
-
 import { format } from 'date-fns'
+import { Clock } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 
 import type { TimeSplitInputProps, TimeType } from './DatePicker.types'
 
@@ -166,7 +165,7 @@ const TimeSplitInput = ({
     `}
     >
       <div className="mr-1 text-foreground-lighter">
-        <IconClock size={14} strokeWidth={1.5} />
+        <Clock size={14} strokeWidth={1.5} />
       </div>
 
       <input

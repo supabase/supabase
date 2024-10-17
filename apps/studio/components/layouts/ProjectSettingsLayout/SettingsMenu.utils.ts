@@ -13,6 +13,7 @@ export const generateSettingsMenu = (
     storage?: boolean
     invoices?: boolean
     warehouse?: boolean
+    logDrains?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -22,6 +23,7 @@ export const generateSettingsMenu = (
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const warehouseEnabled = features?.warehouse ?? false
+  const logDrainsEnabled = features?.logDrains ?? false
 
   return [
     {
@@ -117,6 +119,16 @@ export const generateSettingsMenu = (
                 name: 'Warehouse',
                 key: 'warehouse',
                 url: `/project/${ref}/settings/warehouse`,
+                items: [],
+              },
+            ]
+          : []),
+        ...(IS_PLATFORM && logDrainsEnabled
+          ? [
+              {
+                name: `Log Drains`,
+                key: `log-drains`,
+                url: `/project/${ref}/settings/log-drains`,
                 items: [],
               },
             ]

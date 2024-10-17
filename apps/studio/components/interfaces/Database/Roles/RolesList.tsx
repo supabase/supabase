@@ -59,7 +59,7 @@ const RolesList = () => {
 
   return (
     <>
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center space-x-4">
           <Input
             size="small"

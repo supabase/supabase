@@ -4,7 +4,7 @@ import { Check, ExternalLink, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import AlertError from 'components/ui/AlertError'
@@ -16,19 +16,16 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconAlertCircle,
   Input_Shadcn_,
   Modal,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 interface CreateBranchModalProps {
   visible: boolean
@@ -205,15 +202,13 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
           <Modal.Separator />
 
-          <Modal.Content className="py-2">
-            <Alert_Shadcn_ variant="warning">
-              <IconAlertCircle strokeWidth={1.5} />
-              <AlertTitle_Shadcn_>Each Preview branch costs $0.32 per day</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Each preview branch costs $0.32 per day until it is removed. This pricing is for
-                Early Access and is subject to change.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+          <Modal.Content className="p-0">
+            <Admonition
+              type="warning"
+              className="rounded-none !mb-0 border-0"
+              title="Each preview branch costs $0.32 per day"
+              description="Each preview branch costs $0.32 per day until it is removed. This pricing is for Early Access and is subject to change."
+            />
           </Modal.Content>
 
           <Modal.Separator />

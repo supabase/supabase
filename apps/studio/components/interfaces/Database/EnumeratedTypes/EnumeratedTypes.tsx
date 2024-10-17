@@ -1,13 +1,5 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
 import { useState } from 'react'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Input,
-} from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
@@ -19,7 +11,16 @@ import {
   EnumeratedType,
   useEnumeratedTypesQuery,
 } from 'data/enumerated-types/enumerated-types-query'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Input,
+} from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'
@@ -28,7 +29,7 @@ import EditEnumeratedTypeSidePanel from './EditEnumeratedTypeSidePanel'
 const EnumeratedTypes = () => {
   const { project } = useProjectContext()
   const [search, setSearch] = useState('')
-  const [selectedSchema, setSelectedSchema] = useState('public')
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [showCreateTypePanel, setShowCreateTypePanel] = useState(false)
   const [selectedTypeToEdit, setSelectedTypeToEdit] = useState<EnumeratedType>()
   const [selectedTypeToDelete, setSelectedTypeToDelete] = useState<EnumeratedType>()
@@ -58,26 +59,25 @@ const EnumeratedTypes = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <SchemaSelector
-            className="w-[260px]"
-            size="small"
-            showError={false}
-            selectedSchemaName={selectedSchema}
-            onSelectSchema={setSelectedSchema}
-          />
-          <Input
-            size="small"
-            value={search}
-            className="w-64"
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search for a type"
-            icon={<Search size={14} />}
-          />
-        </div>
+      <div className="flex items-center gap-2 flex-wrap">
+        <SchemaSelector
+          className="w-[260px]"
+          size="small"
+          showError={false}
+          selectedSchemaName={selectedSchema}
+          onSelectSchema={setSelectedSchema}
+        />
+        <Input
+          size="small"
+          value={search}
+          className="w-64"
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search for a type"
+          icon={<Search size={14} />}
+        />
+
         {!isLocked && (
-          <Button type="primary" onClick={() => setShowCreateTypePanel(true)}>
+          <Button className="ml-auto" type="primary" onClick={() => setShowCreateTypePanel(true)}>
             Create type
           </Button>
         )}

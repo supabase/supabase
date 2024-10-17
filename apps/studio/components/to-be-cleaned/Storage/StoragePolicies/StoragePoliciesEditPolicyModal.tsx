@@ -1,11 +1,11 @@
 import { noop, pull } from 'lodash'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies/Policies.constants'
 import PolicySelection from 'components/interfaces/Auth/Policies/PolicySelection'
 import PolicyTemplates from 'components/interfaces/Auth/Policies/PolicyTemplates'
-import { Button, IconChevronLeft, IconExternalLink, Modal } from 'ui'
+import { Button, Modal } from 'ui'
 import {
   applyBucketIdToTemplateDefinition,
   createPayloadsForAddPolicy,
@@ -14,6 +14,7 @@ import {
 import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
+import { ChevronLeft, ExternalLink } from 'lucide-react'
 
 const newPolicyTemplate: any = {
   name: '',
@@ -172,7 +173,7 @@ const StoragePoliciesEditPolicyModal = ({
               onClick={onSelectBackFromTemplates}
               className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
             >
-              <IconChevronLeft strokeWidth={2} size={14} />
+              <ChevronLeft strokeWidth={2} size={14} />
             </span>
             <h4 className="textlg m-0">Select a template to use for your new policy</h4>
           </div>
@@ -182,7 +183,7 @@ const StoragePoliciesEditPolicyModal = ({
     return (
       <div className="w-full flex items-center justify-between gap-x-2">
         <h4 className="m-0 truncate">{getTitle()}</h4>
-        <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+        <Button asChild type="default" icon={<ExternalLink />}>
           <a
             href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
             target="_blank"

@@ -1,7 +1,7 @@
 import React from 'react'
+import { Loader } from 'lucide-react'
 
 import styleHandler from '../../lib/theme/styleHandler'
-import IconLoader from '../Icon/icons/IconLoader/IconLoader'
 
 interface Props {
   children: React.ReactNode
@@ -23,7 +23,7 @@ export default function Loading({ children, active }: Props) {
   return (
     <div className={classNames.join(' ')}>
       <div className={contentClasses.join(' ')}>{children}</div>
-      {active && <IconLoader size="xlarge" className={spinnerClasses} />}
+      {active && <Loader size={24} className={spinnerClasses.join(' ')} />}
     </div>
   )
 }

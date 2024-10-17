@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -17,7 +17,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { Button, IconInfo, Listbox } from 'ui'
+import { Button, Listbox } from 'ui'
 import { Restriction } from '../BillingSettings/Restriction'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
@@ -57,20 +57,23 @@ const Usage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectRef, isSuccess])
 
-  const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
-  const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
+  const billingCycleStart = useMemo(() => {
+    return dayjs.unix(subscription?.current_period_start ?? 0).utc()
+  }, [subscription])
+
+  const billingCycleEnd = useMemo(() => {
+    return dayjs.unix(subscription?.current_period_end ?? 0).utc()
+  }, [subscription])
 
   const currentBillingCycleSelected = useMemo(() => {
     // Selected by default
-    if (!dateRange?.period_start || !dateRange?.period_end || !subscription) return true
-
-    const { current_period_start, current_period_end } = subscription
+    if (!dateRange?.period_start || !dateRange?.period_end) return true
 
     return (
-      dayjs(dateRange.period_start.date).isSame(new Date(current_period_start * 1000)) &&
-      dayjs(dateRange.period_end.date).isSame(new Date(current_period_end * 1000))
+      dayjs(dateRange.period_start.date).isSame(billingCycleStart) &&
+      dayjs(dateRange.period_end.date).isSame(billingCycleEnd)
     )
-  }, [dateRange, subscription])
+  }, [dateRange, billingCycleStart, billingCycleEnd])
 
   const startDate = useMemo(() => {
     // If end date is in future, set end date to now
@@ -207,7 +210,7 @@ const Usage = () => {
             }
             defaultVisibility
             hideCollapse
-            icon={<IconInfo />}
+            icon={<Info />}
           />
         </ScaffoldContainer>
       ) : (
@@ -225,13 +228,15 @@ const Usage = () => {
         currentBillingCycleSelected={currentBillingCycleSelected}
       />
 
-      <Compute
-        orgSlug={slug as string}
-        projectRef={selectedProjectRef}
-        subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
-      />
+      {subscription?.plan.id !== 'free' && (
+        <Compute
+          orgSlug={slug as string}
+          projectRef={selectedProjectRef}
+          subscription={subscription}
+          startDate={startDate}
+          endDate={endDate}
+        />
+      )}
 
       <Bandwidth
         orgSlug={slug as string}

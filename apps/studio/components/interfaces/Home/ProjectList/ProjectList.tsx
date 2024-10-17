@@ -1,8 +1,10 @@
 import { groupBy } from 'lodash'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
+import PartnerIcon from 'components/ui/PartnerIcon'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import {
@@ -16,7 +18,6 @@ import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-w
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
-import { Plus } from 'lucide-react'
 import type { Organization, ResponseError } from 'types'
 import { Button, cn } from 'ui'
 import ProjectCard from './ProjectCard'
@@ -49,7 +50,7 @@ const ProjectList = ({
     error: permissionsError,
   } = usePermissionsQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery()
-  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery()
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
@@ -186,7 +187,7 @@ const OrganizationProjects = ({
   // [Joshen] Just a UI thing, but we take all projects other than paused as "active"
   const filteredProjectsByStatus =
     filterStatus !== undefined
-      ? filterStatus.includes(PROJECT_STATUS.ACTIVE_HEALTHY)
+      ? filterStatus.length === 2
         ? filteredProjects
         : filteredProjects.filter((project) => filterStatus.includes(project.status))
       : filteredProjects
@@ -222,8 +223,10 @@ const OrganizationProjects = ({
   return (
     <div className="space-y-3" key={organization.slug}>
       <div className="flex space-x-4 items-center">
-        <h4 className="text-lg flex items-center">{organization.name}</h4>
-
+        <div className="flex items-center gap-2">
+          <h4 className="text-lg flex items-center">{organization.name}</h4>{' '}
+          <PartnerIcon organization={organization} />
+        </div>
         {!!overdueInvoices.length && (
           <div>
             <Button asChild type="danger">

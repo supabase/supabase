@@ -62,10 +62,6 @@ const ConfirmationModal = forwardRef<
       }
     }, [visible])
 
-    useEffect(() => {
-      setLoading(loading_)
-    }, [loading_])
-
     const [loading, setLoading] = useState(false)
 
     const onSubmit: MouseEventHandler<HTMLButtonElement> = (e) => {

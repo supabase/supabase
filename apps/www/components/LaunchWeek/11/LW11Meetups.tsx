@@ -111,7 +111,7 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                     className={cn(
                       'h-10 group inline-flex md:hidden items-center flex-wrap text-3xl',
                       'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
-                      meetup.id === activeMeetup.id && '!text-foreground',
+                      meetup.id === activeMeetup?.id && '!text-foreground',
                       liveNow && 'text-foreground-light'
                     )}
                   >
@@ -131,7 +131,7 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                     className={cn(
                       'hidden h-10 group md:inline-flex items-center flex-wrap text-4xl',
                       'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
-                      meetup.id === activeMeetup.id && '!text-foreground',
+                      meetup.id === activeMeetup?.id && '!text-foreground',
                       liveNow && 'text-foreground-light'
                     )}
                   >
@@ -146,7 +146,7 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
             })}
       </div>
       <Link
-        href={activeMeetup.link ?? '#'}
+        href={activeMeetup?.link ?? '#'}
         target="_blank"
         className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl text-sm flex-1 inline-flex flex-wrap items-center gap-1"
       >

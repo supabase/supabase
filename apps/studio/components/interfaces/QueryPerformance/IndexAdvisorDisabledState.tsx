@@ -1,6 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'

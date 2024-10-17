@@ -1,7 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
@@ -140,8 +140,8 @@ You can change the scope of the access for Supabase by configuring
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
       ? 'https://vercel.com/integrations/supabase'
       : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-        ? `https://vercel.com/integrations/supabase-v2-staging`
-        : 'https://vercel.com/integrations/supabase-v2-local'
+        ? `https://vercel.com/integrations/supabase-staging`
+        : 'https://vercel.com/integrations/supabase-local'
 
   let connections =
     (isProjectScoped

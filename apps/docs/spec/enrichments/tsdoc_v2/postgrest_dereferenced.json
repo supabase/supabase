@@ -75,32 +75,17 @@
                         {
                           "title": "Constructors",
                           "kind": 512,
-                          "children": [
-                            610
-                          ]
+                          "children": [610]
                         },
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            618,
-                            621,
-                            616,
-                            626,
-                            614,
-                            617,
-                            619,
-                            620,
-                            615
-                          ]
+                          "children": [618, 621, 616, 626, 614, 617, 619, 620, 615]
                         },
                         {
                           "title": "Methods",
                           "kind": 2048,
-                          "children": [
-                            629,
-                            627
-                          ]
+                          "children": [629, 627]
                         }
                       ],
                       "sources": [
@@ -744,32 +729,17 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            610
-          ]
+          "children": [610]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            618,
-            621,
-            616,
-            626,
-            614,
-            617,
-            619,
-            620,
-            615
-          ]
+          "children": [618, 621, 616, 626, 614, 617, 619, 620, 615]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [
-            629,
-            627
-          ]
+          "children": [629, 627]
         }
       ],
       "sources": [
@@ -1151,11 +1121,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            12,
-                            10,
-                            11
-                          ]
+                          "children": [12, 10, 11]
                         }
                       ]
                     }
@@ -1471,9 +1437,7 @@
                           {
                             "title": "Properties",
                             "kind": 1024,
-                            "children": [
-                              31
-                            ]
+                            "children": [31]
                           }
                         ]
                       }
@@ -1600,9 +1564,7 @@
                           {
                             "title": "Properties",
                             "kind": 1024,
-                            "children": [
-                              37
-                            ]
+                            "children": [37]
                           }
                         ]
                       }
@@ -1815,11 +1777,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            52,
-                            51,
-                            50
-                          ]
+                          "children": [52, 51, 50]
                         }
                       ]
                     }
@@ -2055,28 +2013,17 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            2
-          ]
+          "children": [2]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            20,
-            18,
-            19,
-            17
-          ]
+          "children": [20, 18, 19, 17]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [
-            25,
-            42,
-            38
-          ]
+          "children": [25, 42, 38]
         }
       ],
       "sources": [
@@ -2972,32 +2919,17 @@
                         {
                           "title": "Constructors",
                           "kind": 512,
-                          "children": [
-                            610
-                          ]
+                          "children": [610]
                         },
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            618,
-                            621,
-                            616,
-                            626,
-                            614,
-                            617,
-                            619,
-                            620,
-                            615
-                          ]
+                          "children": [618, 621, 616, 626, 614, 617, 619, 620, 615]
                         },
                         {
                           "title": "Methods",
                           "kind": 2048,
-                          "children": [
-                            629,
-                            627
-                          ]
+                          "children": [629, 627]
                         }
                       ],
                       "sources": [
@@ -4471,14 +4403,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            446,
-                            449,
-                            451,
-                            448,
-                            447,
-                            450
-                          ]
+                          "children": [446, 449, 451, 448, 447, 450]
                         }
                       ]
                     }
@@ -6931,10 +6856,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            419,
-                            420
-                          ]
+                          "children": [419, 420]
                         }
                       ]
                     }
@@ -8131,10 +8053,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            366,
-                            367
-                          ]
+                          "children": [366, 367]
                         }
                       ]
                     }
@@ -8325,11 +8244,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            389,
-                            390,
-                            391
-                          ]
+                          "children": [389, 390, 391]
                         }
                       ]
                     }
@@ -8493,11 +8408,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            396,
-                            397,
-                            398
-                          ]
+                          "children": [396, 397, 398]
                         }
                       ]
                     }
@@ -8673,11 +8584,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            404,
-                            406,
-                            405
-                          ]
+                          "children": [404, 406, 405]
                         }
                       ]
                     }
@@ -8838,11 +8745,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            411,
-                            413,
-                            412
-                          ]
+                          "children": [411, 413, 412]
                         }
                       ]
                     }
@@ -9232,10 +9135,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            427,
-                            428
-                          ]
+                          "children": [427, 428]
                         }
                       ]
                     }
@@ -10691,10 +10591,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            336,
-                            337
-                          ]
+                          "children": [336, 337]
                         }
                       ]
                     }
@@ -10856,10 +10753,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            343,
-                            344
-                          ]
+                          "children": [343, 344]
                         }
                       ]
                     }
@@ -11219,70 +11113,20 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            144
-          ]
+          "children": [144]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            461,
-            464,
-            459,
-            469,
-            457,
-            460,
-            462,
-            463,
-            458
-          ]
+          "children": [461, 464, 459, 469, 457, 460, 462, 463, 458]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            429,
-            273,
-            265,
-            438,
-            152,
-            442,
-            368,
-            440,
-            169,
-            177,
-            225,
-            233,
-            241,
-            257,
-            249,
-            201,
-            209,
-            217,
-            414,
-            185,
-            193,
-            345,
-            435,
-            161,
-            351,
-            361,
-            383,
-            321,
-            421,
-            313,
-            281,
-            289,
-            297,
-            305,
-            454,
-            452,
-            378,
-            432,
-            329,
-            472,
-            470
+            429, 273, 265, 438, 152, 442, 368, 440, 169, 177, 225, 233, 241, 257, 249, 201, 209,
+            217, 414, 185, 193, 345, 435, 161, 351, 361, 383, 321, 421, 313, 281, 289, 297, 305,
+            454, 452, 378, 432, 329, 472, 470
           ]
         }
       ],
@@ -11508,9 +11352,7 @@
                           {
                             "title": "Properties",
                             "kind": 1024,
-                            "children": [
-                              63
-                            ]
+                            "children": [63]
                           }
                         ]
                       }
@@ -11702,11 +11544,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            70,
-                            68,
-                            69
-                          ]
+                          "children": [70, 68, 69]
                         }
                       ]
                     }
@@ -12010,9 +11848,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            136
-                          ]
+                          "children": [136]
                         }
                       ]
                     }
@@ -12188,9 +12024,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            99
-                          ]
+                          "children": [99]
                         }
                       ]
                     }
@@ -12374,10 +12208,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            105,
-                            106
-                          ]
+                          "children": [105, 106]
                         }
                       ]
                     }
@@ -12612,10 +12443,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            92,
-                            91
-                          ]
+                          "children": [92, 91]
                         }
                       ]
                     }
@@ -12794,9 +12622,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            131
-                          ]
+                          "children": [131]
                         }
                       ]
                     }
@@ -13018,11 +12844,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            115,
-                            114,
-                            113
-                          ]
+                          "children": [115, 114, 113]
                         }
                       ]
                     }
@@ -13252,12 +13074,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            123,
-                            124,
-                            122,
-                            121
-                          ]
+                          "children": [123, 124, 122, 121]
                         }
                       ]
                     }
@@ -13310,31 +13127,17 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            57
-          ]
+          "children": [57]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            79,
-            76,
-            77,
-            78,
-            75
-          ]
+          "children": [79, 76, 77, 78, 75]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [
-            132,
-            93,
-            84,
-            125,
-            107
-          ]
+          "children": [132, 93, 84, 125, 107]
         }
       ],
       "sources": [
@@ -13432,9 +13235,7 @@
                   {
                     "title": "Properties",
                     "kind": 1024,
-                    "children": [
-                      141
-                    ]
+                    "children": [141]
                   }
                 ],
                 "sources": [
@@ -14213,32 +14014,17 @@
                         {
                           "title": "Constructors",
                           "kind": 512,
-                          "children": [
-                            610
-                          ]
+                          "children": [610]
                         },
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            618,
-                            621,
-                            616,
-                            626,
-                            614,
-                            617,
-                            619,
-                            620,
-                            615
-                          ]
+                          "children": [618, 621, 616, 626, 614, 617, 619, 620, 615]
                         },
                         {
                           "title": "Methods",
                           "kind": 2048,
-                          "children": [
-                            629,
-                            627
-                          ]
+                          "children": [629, 627]
                         }
                       ],
                       "sources": [
@@ -14980,14 +14766,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            566,
-                            569,
-                            571,
-                            568,
-                            567,
-                            570
-                          ]
+                          "children": [566, 569, 571, 568, 567, 570]
                         }
                       ]
                     }
@@ -15197,10 +14976,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            539,
-                            540
-                          ]
+                          "children": [539, 540]
                         }
                       ]
                     }
@@ -15471,11 +15247,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            509,
-                            510,
-                            511
-                          ]
+                          "children": [509, 510, 511]
                         }
                       ]
                     }
@@ -15634,11 +15406,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            516,
-                            517,
-                            518
-                          ]
+                          "children": [516, 517, 518]
                         }
                       ]
                     }
@@ -15809,11 +15577,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            524,
-                            526,
-                            525
-                          ]
+                          "children": [524, 526, 525]
                         }
                       ]
                     }
@@ -15969,11 +15733,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            531,
-                            533,
-                            532
-                          ]
+                          "children": [531, 533, 532]
                         }
                       ]
                     }
@@ -16137,10 +15897,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            547,
-                            548
-                          ]
+                          "children": [547, 548]
                         }
                       ]
                     }
@@ -16838,44 +16595,17 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            490
-          ]
+          "children": [490]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            581,
-            584,
-            579,
-            589,
-            577,
-            580,
-            582,
-            583,
-            578
-          ]
+          "children": [581, 584, 579, 589, 577, 580, 582, 583, 578]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [
-            549,
-            558,
-            562,
-            560,
-            534,
-            555,
-            503,
-            541,
-            574,
-            572,
-            498,
-            552,
-            592,
-            590
-          ]
+          "children": [549, 558, 562, 560, 534, 555, 503, 541, 574, 572, 498, 552, 592, 590]
         }
       ],
       "sources": [
@@ -17135,12 +16865,7 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [
-                        666,
-                        664,
-                        665,
-                        663
-                      ]
+                      "children": [666, 664, 665, 663]
                     }
                   ],
                   "sources": [
@@ -17204,13 +16929,7 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            647,
-            646,
-            645,
-            648,
-            649
-          ]
+          "children": [647, 646, 645, 648, 649]
         }
       ],
       "sources": [
@@ -17348,13 +17067,7 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            653,
-            652,
-            651,
-            654,
-            655
-          ]
+          "children": [653, 652, 651, 654, 655]
         }
       ],
       "sources": [
@@ -17483,12 +17196,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                666,
-                664,
-                665,
-                663
-              ]
+              "children": [666, 664, 665, 663]
             }
           ],
           "sources": [
@@ -17729,13 +17437,7 @@
               {
                 "title": "Properties",
                 "kind": 1024,
-                "children": [
-                  653,
-                  652,
-                  651,
-                  654,
-                  655
-                ]
+                "children": [653, 652, 651, 654, 655]
               }
             ],
             "sources": [
@@ -17924,12 +17626,7 @@
                           {
                             "title": "Properties",
                             "kind": 1024,
-                            "children": [
-                              666,
-                              664,
-                              665,
-                              663
-                            ]
+                            "children": [666, 664, 665, 663]
                           }
                         ],
                         "sources": [
@@ -17993,13 +17690,7 @@
               {
                 "title": "Properties",
                 "kind": 1024,
-                "children": [
-                  647,
-                  646,
-                  645,
-                  648,
-                  649
-                ]
+                "children": [647, 646, 645, 648, 649]
               }
             ],
             "sources": [
@@ -18024,31 +17715,17 @@
     {
       "title": "Classes",
       "kind": 128,
-      "children": [
-        609,
-        1,
-        143,
-        56,
-        489
-      ]
+      "children": [609, 1, 143, 56, 489]
     },
     {
       "title": "Interfaces",
       "kind": 256,
-      "children": [
-        644,
-        650
-      ]
+      "children": [644, 650]
     },
     {
       "title": "Type Aliases",
       "kind": 4194304,
-      "children": [
-        661,
-        659,
-        642,
-        657
-      ]
+      "children": [661, 659, 642, 657]
     }
   ],
   "sources": [

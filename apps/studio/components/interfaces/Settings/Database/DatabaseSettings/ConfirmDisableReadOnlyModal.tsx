@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Modal } from 'ui'
 
 import { useDisableReadOnlyModeMutation } from 'data/config/project-temp-disable-read-only-mutation'
