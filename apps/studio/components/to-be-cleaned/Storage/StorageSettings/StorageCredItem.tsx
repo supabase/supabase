@@ -25,7 +25,7 @@ export const StorageCredItem = ({
   access_key: string
   onDeleteClick: (id: string) => void
 }) => {
-  const canRemoveAccessKey = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canRemoveAccessKey = useCheckPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
 
   function daysSince(date: string) {
     const now = new Date()
