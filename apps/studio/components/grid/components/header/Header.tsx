@@ -64,7 +64,7 @@ const Header = ({
 
   return (
     <div>
-      <div className="flex h-10 items-center justify-between bg-dash-sidebar px-5 py-1.5 gap-2 overflow-x-auto">
+      <div className="flex h-10 items-center justify-between bg-dash-sidebar px-1.5 py-1.5 gap-2 overflow-x-auto">
         {customHeader ? (
           <>{customHeader}</>
         ) : (
@@ -376,22 +376,6 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
 
   return (
     <div className="flex items-center gap-4">
-      <div className="flex items-center gap-3">
-        <Button type="default" className="px-1" icon={<X />} onClick={deselectRows} />
-        <span className="text-xs text-foreground">
-          {allRowsSelected
-            ? `All rows in table selected`
-            : selectedRows.size > 1
-              ? `${selectedRows.size} rows selected`
-              : `${selectedRows.size} row selected`}
-        </span>
-        {!allRowsSelected && totalRows > allRows.length && (
-          <Button type="link" onClick={() => onSelectAllRows()}>
-            Select all rows in table
-          </Button>
-        )}
-      </div>
-      <div className="h-[20px] border-r border-strong" />
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -419,7 +403,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
               <Button
                 type="default"
                 size="tiny"
-                icon={<Trash />}
+                icon={<Trash className="text-destructive-600" />}
                 onClick={onRowsDelete}
                 disabled={allRowsSelected && isImpersonatingRole}
               >
@@ -430,7 +414,11 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
                     : `Delete ${selectedRows.size} row`}
               </Button>
             </Tooltip.Trigger>
-
+            {!allRowsSelected && totalRows > allRows.length && (
+              <Button type="link" onClick={() => onSelectAllRows()}>
+                Select all rows in table
+              </Button>
+            )}
             {allRowsSelected && isImpersonatingRole && (
               <Tooltip.Portal>
                 <Tooltip.Content side="bottom">
