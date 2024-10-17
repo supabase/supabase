@@ -1,8 +1,12 @@
+import { Download, Move, Trash2, X } from 'lucide-react'
+
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { X, Download, Trash2, Move } from 'lucide-react'
-import { Button } from 'ui'
+import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 const FileExplorerHeaderSelection = () => {
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const storageExplorerStore = useStorageStore()
   const {
     selectedItems,
@@ -39,20 +43,38 @@ const FileExplorerHeaderSelection = () => {
           Download
         </Button>
         <div className="border-r border-green-900 py-3 opacity-50" />
-        <Button
-          icon={<Trash2 size={16} strokeWidth={2} />}
-          type="primary"
-          onClick={() => setSelectedItemsToDelete(selectedItems)}
-        >
-          Delete
-        </Button>
-        <Button
-          icon={<Move size={16} strokeWidth={2} />}
-          type="primary"
-          onClick={() => setSelectedItemsToMove(selectedItems)}
-        >
-          Move
-        </Button>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
+            <Button
+              icon={<Trash2 size={16} strokeWidth={2} />}
+              type="primary"
+              onClick={() => setSelectedItemsToDelete(selectedItems)}
+            >
+              Delete
+            </Button>
+          </TooltipTrigger_Shadcn_>
+          {!canUpdateFiles && (
+            <TooltipContent_Shadcn_ side="bottom">
+              You need additional permissions to delete files
+            </TooltipContent_Shadcn_>
+          )}
+        </Tooltip_Shadcn_>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
+            <Button
+              icon={<Move size={16} strokeWidth={2} />}
+              type="primary"
+              onClick={() => setSelectedItemsToMove(selectedItems)}
+            >
+              Move
+            </Button>
+          </TooltipTrigger_Shadcn_>
+          {!canUpdateFiles && (
+            <TooltipContent_Shadcn_ side="bottom">
+              You need additional permissions to move files
+            </TooltipContent_Shadcn_>
+          )}
+        </Tooltip_Shadcn_>
       </div>
     </div>
   )
