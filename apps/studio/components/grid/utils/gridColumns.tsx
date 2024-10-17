@@ -13,6 +13,8 @@ import { BooleanFormatter } from '../components/formatter/BooleanFormatter'
 import { DefaultFormatter } from '../components/formatter/DefaultFormatter'
 import { ForeignKeyFormatter } from '../components/formatter/ForeignKeyFormatter'
 import { JsonFormatter } from '../components/formatter/JsonFormatter'
+import { TimeFormatter } from '../components/formatter/TimeFormatter'
+import { DateTimeFormatter } from '../components/formatter/DateTimeFormatter'
 import { AddColumn } from '../components/grid/AddColumn'
 import { ColumnHeader } from '../components/grid/ColumnHeader'
 import { SelectColumn } from '../components/grid/SelectColumn'
@@ -205,6 +207,12 @@ function getCellRenderer(
     }
     case 'json': {
       return JsonFormatter
+    }
+    case 'time': {
+      return (p: any) => <TimeFormatter {...p} columnDef={columnDef} />
+    }
+    case 'datetime': {
+      return (p: any) => <DateTimeFormatter {...p} columnDef={columnDef} />
     }
     default: {
       return DefaultFormatter
