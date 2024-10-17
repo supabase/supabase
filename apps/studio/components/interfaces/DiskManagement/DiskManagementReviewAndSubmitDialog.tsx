@@ -34,6 +34,7 @@ import {
 } from './DiskManagement.utils'
 import { DiskMangementCoolDownSection } from './DiskManagementCoolDownSection'
 import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -124,10 +125,15 @@ export const DiskManagementReviewAndSubmitDialog = ({
   loading,
   onSubmit,
 }: DiskSizeMeterProps) => {
+  const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
 
-  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const planId = subscription?.plan.id ?? ''
   const isDirty = Object.keys(form.formState.dirtyFields).length > 0

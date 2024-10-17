@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import {
   useDiskAttributesQuery,
@@ -69,6 +70,7 @@ import {
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 
 export function DiskManagementPanelForm() {
+  const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
 
@@ -76,7 +78,11 @@ export function DiskManagementPanelForm() {
   const [remainingTime, setRemainingTime] = useState(0)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
-  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
