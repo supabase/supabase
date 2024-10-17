@@ -14,7 +14,7 @@ export async function chatSql(
   messages: Message[],
   existingSql?: string,
   entityDefinitions?: string[],
-  context?: 'rls' | 'functions'
+  context?: 'rls-policies' | 'functions'
 ): Promise<ReadableStream<Uint8Array>> {
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
@@ -43,7 +43,7 @@ export async function chatSql(
     // is definitely not optimal at all, but just to get an idea started
     const generateInstructionsBasedOnContext = () => {
       switch (context) {
-        case 'rls':
+        case 'rls-policies':
           return stripIndent`
           You're a Supabase Postgres expert in writing row level security policies. Your purpose is to
           generate a policy with the constraints given by the user. You will be provided a schema
@@ -52,8 +52,10 @@ export async function chatSql(
           return stripIndent`
           You're a Supabase Postgres expert in writing database functions. Your purpose is to generate a
           database function with the constraints given by the user. The output may also include a database trigger
-          if the function returns a type of trigger. If the function returns a trigger type, ensure that it uses
-          security definer, otherwise default to security invoker.
+          if the function returns a type of trigger. When generating functions, do the following:
+          - If the function returns a trigger type, ensure that it uses security definer, otherwise default to security invoker. Include this in the create functions SQL statement.
+          - Ensure to set the search_path configuration parameter as '', include this in the create functions SQL statement.
+          Please make sure that all queries are valid Postgres SQL queries.
           `
       }
     }
@@ -85,8 +87,6 @@ export async function chatSql(
   }
 
   try {
-    console.log({ initMessages })
-
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini-2024-07-18',
       messages: initMessages,

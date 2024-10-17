@@ -132,7 +132,7 @@ export const AIAssistant = ({
   } = useChat({
     id,
     api: `${BASE_PATH}/api/ai/sql/generate-v2`,
-    body: { entityDefinitions },
+    body: { entityDefinitions, context: selectedDatabaseEntity },
   })
 
   const { isLoading: isDebugSqlLoading } = useSqlDebugMutation()
@@ -254,6 +254,7 @@ export const AIAssistant = ({
             >
               <Button
                 type="default"
+                disabled={isLoading}
                 onClick={() => onResetConversation()}
                 className={cn('transition', showEditor ? '' : 'mr-6')}
               >
