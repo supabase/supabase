@@ -188,6 +188,9 @@ export const PostgrestConfig = () => {
 
   const isDataApiEnabledInForm = form.getValues('enableDataApi')
 
+  console.log('form', form)
+  console.log('schema', schema)
+
   return (
     <>
       <Form_Shadcn_ {...form}>
@@ -302,7 +305,7 @@ export const PostgrestConfig = () => {
                                 </div>
                               ) : (
                                 <MultiSelector
-                                  onValuesChange={(values) => field.onChange(values ?? [])}
+                                  onValuesChange={field.onChange}
                                   values={field.value}
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
@@ -316,13 +319,13 @@ export const PostgrestConfig = () => {
                                   />
                                   <MultiSelectorContent>
                                     <MultiSelectorList>
-                                      {schema?.length <= 0 ? (
+                                      {schema.length <= 0 ? (
                                         <MultiSelectorItem key="empty" value="no">
                                           no
                                         </MultiSelectorItem>
                                       ) : (
                                         <>
-                                          {schema?.map((x, i) => (
+                                          {schema.map((x) => (
                                             <MultiSelectorItem
                                               key={x.id + '-' + x.name}
                                               value={x.name}
