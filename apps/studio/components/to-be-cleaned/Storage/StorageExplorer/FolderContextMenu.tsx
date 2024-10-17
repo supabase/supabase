@@ -15,7 +15,7 @@ const FolderContextMenu = ({ id = '' }: FolderContextMenuProps) => {
   const storageExplorerStore = useStorageStore()
   const { openedFolders, downloadFolder, setSelectedItemToRename, setSelectedItemsToDelete } =
     storageExplorerStore
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   return (
     <Menu id={id} animation="fade">
