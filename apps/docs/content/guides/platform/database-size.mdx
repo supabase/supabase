@@ -1,13 +1,14 @@
 ---
-id: 'database-size'
-title: 'Database size'
+id: 'disk-metrics'
+title: 'Understanding Database and Disk Metrics'
 description: 'Understanding how database size applies to your subscription.'
 ---
 
-Database size refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your organization's [billing usage](https://supabase.com/dashboard/org/_/usage) and is updated daily. As you read this document we will refer to "database size" and "disk size":
+Disk metrics refer to the storage usage reported by Postgres. These metrics are updated daily. As you read through this document, we will refer to "database size" and "disk space used":
 
-- "Database size" is the total size of used storage from your database.
-- "Disk Storage size" describes the size of the underlying available storage.
+- _Disk Space Used_: Shows the overall disk space usage, which includes both the database size and additional system files like WAL files and log files. You can view this on the [Database Settings page](https://supabase.com/dashboard/project/_/settings/database).
+
+- _Database Size_: Displays the actual size of the data within your PostgreSQL database. This can be found on the [Database Reports page](https://supabase.com/dashboard/project/_/reports/database).
 
 ## Database space management
 
@@ -77,7 +78,7 @@ Supabase uses network-attached storage to balance performance with scalability. 
 
 Projects on the Pro Plan and above have auto-scaling Disk Storage.
 
-Disk Storage expands automatically when the database reaches 90% of the disk size. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
+Disk Storage expands automatically when the database reaches 90% of the disk space used. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
 
 <Admonition type="note">
 
