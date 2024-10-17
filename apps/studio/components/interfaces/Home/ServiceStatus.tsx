@@ -17,6 +17,7 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
+import { useProjectEventsQuery } from 'data/project-events/project-events-query'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
@@ -30,7 +31,7 @@ const StatusMessage = ({
   isProjectNew: boolean
 }) => {
   if (isLoading) return 'Checking status'
-  if (isProjectNew) return 'Coming up...'
+  if (isProjectNew && !isSuccess) return 'Coming up...'
   if (isSuccess) return 'No issues'
   return 'Unable to connect'
 }
@@ -44,7 +45,9 @@ const StatusIcon = ({
   isSuccess: boolean
   isProjectNew: boolean
 }) => {
-  if (isLoading || isProjectNew) return <Loader2 size={14} className="animate-spin" />
+  if (isLoading) return <Loader2 size={14} className="animate-spin text-foreground-lighter" />
+  if (isProjectNew && !isSuccess)
+    return <Loader2 size={14} className="animate-spin text-foreground-lighter" />
   if (isSuccess) return <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
   return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
 }
@@ -168,32 +171,32 @@ const ServiceStatus = () => {
   const isLoadingChecks = services.some((service) => service.isLoading)
   const allServicesOperational = services.every((service) => service.isSuccess)
 
-  // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
-  const isProjectNew =
+  const [dateRange] = useState<{ startDate: string; endDate: string }>({
+    startDate: dayjs().subtract(30, 'minute').toISOString(),
+    endDate: dayjs().toISOString(),
+  })
+
+  const { data: restoreProjectEvents, isLoading: projectEventsLoading } = useProjectEventsQuery({
+    ref,
+    startDate: dateRange.startDate,
+    endDate: dateRange.endDate,
+    eventTypes: [
+      'project.infra_restart_or_resize_initiated',
+      'project.restore_initiated',
+      'project.restored_from_logical_backup',
+      'project.restored_from_pitr',
+    ],
+  })
+
+  console.log('events', restoreProjectEvents)
+
+  const projectWasRestoredRecently = !projectEventsLoading && !!restoreProjectEvents?.length
+
+  // If the project is less than SERVICE_STATUS_THRESHOLD minutes old, and status is not operational, then it's likely the service is still starting up
+  const isProjectNewOrRestoredRecently =
+    projectWasRestoredRecently ||
     dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < SERVICE_STATUS_THRESHOLD ||
     project?.status === 'COMING_UP'
-
-  useEffect(() => {
-    let timer: any
-
-    if (isProjectNew) {
-      const secondsSinceProjectCreated = dayjs
-        .utc()
-        .diff(dayjs.utc(project?.inserted_at), 'seconds')
-      const remainingTimeTillNextCheck = SERVICE_STATUS_THRESHOLD * 60 - secondsSinceProjectCreated
-
-      timer = setTimeout(() => {
-        refetchServiceStatus()
-        refetchPostgresServiceStatus()
-        refetchEdgeFunctionServiceStatus()
-      }, remainingTimeTillNextCheck * 1000)
-    }
-
-    return () => {
-      clearTimeout(timer)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isProjectNew])
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
@@ -201,7 +204,7 @@ const ServiceStatus = () => {
         <Button
           type="default"
           icon={
-            isLoadingChecks || isProjectNew ? (
+            isLoadingChecks || projectEventsLoading ? (
               <Loader2 className="animate-spin" />
             ) : (
               <div
@@ -226,7 +229,7 @@ const ServiceStatus = () => {
               <StatusIcon
                 isLoading={service.isLoading}
                 isSuccess={!!service.isSuccess}
-                isProjectNew={isProjectNew}
+                isProjectNew={isProjectNewOrRestoredRecently}
               />
               <div className="flex-1">
                 <p>{service.name}</p>
@@ -234,7 +237,7 @@ const ServiceStatus = () => {
                   <StatusMessage
                     isLoading={service.isLoading}
                     isSuccess={!!service.isSuccess}
-                    isProjectNew={isProjectNew}
+                    isProjectNew={isProjectNewOrRestoredRecently}
                   />
                 </p>
               </div>
