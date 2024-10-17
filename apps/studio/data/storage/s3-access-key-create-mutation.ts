@@ -25,19 +25,19 @@ const createS3AccessKeyCredential = async ({
   return data
 }
 
-type S3AccessKeyDeleteData = Awaited<ReturnType<typeof createS3AccessKeyCredential>>
+type S3AccessKeyCreateData = Awaited<ReturnType<typeof createS3AccessKeyCredential>>
 
 export function useS3AccessKeyCreateMutation({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<S3AccessKeyDeleteData, ResponseError, CreateS3AccessKeyCredentialVariables>,
+  UseMutationOptions<S3AccessKeyCreateData, ResponseError, CreateS3AccessKeyCredentialVariables>,
   'mutationFn'
 > = {}) {
   const queryClient = useQueryClient()
 
-  return useMutation<S3AccessKeyDeleteData, ResponseError, CreateS3AccessKeyCredentialVariables>(
+  return useMutation<S3AccessKeyCreateData, ResponseError, CreateS3AccessKeyCredentialVariables>(
     (vars) => createS3AccessKeyCredential(vars),
     {
       async onSuccess(data, variables, context) {

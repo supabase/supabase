@@ -7,8 +7,8 @@ import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/H
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import { SecurityStatus } from 'components/interfaces/Home/SecurityStatus'
 import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
+import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
-import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -54,7 +54,7 @@ const Home: NextPageWithLayout = () => {
           />
         </div>
         <div className="flex items-center gap-x-3">
-          <SecurityStatus />
+          {project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <SecurityStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
         </div>
@@ -117,12 +117,6 @@ const Home: NextPageWithLayout = () => {
   )
 }
 
-Home.getLayout = (page) => (
-  <ProjectLayoutWithAuth>
-    <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-      {page}
-    </main>
-  </ProjectLayoutWithAuth>
-)
+Home.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
 
 export default Home

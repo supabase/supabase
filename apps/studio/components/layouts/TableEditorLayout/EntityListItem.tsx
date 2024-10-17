@@ -279,7 +279,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   return (
     <Link
       title={entity.name}
-      href={`/project/${projectRef}/editor/${entity.id}`}
+      href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
       role="button"
       aria-label={`View ${entity.name}`}
       className={cn(

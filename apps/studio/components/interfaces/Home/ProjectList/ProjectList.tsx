@@ -50,7 +50,7 @@ const ProjectList = ({
     error: permissionsError,
   } = usePermissionsQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery()
-  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery()
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
@@ -187,7 +187,7 @@ const OrganizationProjects = ({
   // [Joshen] Just a UI thing, but we take all projects other than paused as "active"
   const filteredProjectsByStatus =
     filterStatus !== undefined
-      ? filterStatus.includes(PROJECT_STATUS.ACTIVE_HEALTHY)
+      ? filterStatus.length === 2
         ? filteredProjects
         : filteredProjects.filter((project) => filterStatus.includes(project.status))
       : filteredProjects

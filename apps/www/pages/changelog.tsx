@@ -1,18 +1,18 @@
-import { IconGitCommit } from 'ui'
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
+import { createAppAuth } from '@octokit/auth-app'
+import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
+import { Octokit as OctokitRest } from '@octokit/rest'
 import dayjs from 'dayjs'
+import { GitCommit } from 'lucide-react'
+import { GetServerSideProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
+import Link from 'next/link'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+import { deletedDiscussions } from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-import { createAppAuth } from '@octokit/auth-app'
-import { Octokit as OctokitRest } from '@octokit/rest'
-import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
-import { GetServerSideProps } from 'next'
-import Link from 'next/link'
-import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
-import { deletedDiscussions } from '~/lib/changelog.utils'
 
 export type Discussion = {
   id: string
@@ -281,7 +281,7 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
                       >
                         <div className="flex w-full items-baseline gap-6">
                           <div className="bg-border border-muted text-foreground-lighter -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
-                            <IconGitCommit size={14} strokeWidth={1.5} />
+                            <GitCommit size={14} strokeWidth={1.5} />
                           </div>
                           <div className="flex w-full flex-col gap-1">
                             {entry.title && (

@@ -19,7 +19,7 @@ import { SidePanel } from 'ui'
 
 const VERCEL_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 512 512" className="w-6">
-    <path fill-rule="evenodd" d="M256,48,496,464H16Z" />
+    <path fillRule="evenodd" d="M256,48,496,464H16Z" />
   </svg>
 )
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import { cn } from 'ui'
 
-const maxWidthClasses = 'mx-auto w-full max-w-[1600px]'
+const maxWidthClasses = 'mx-auto w-full max-w-[1200px]'
 const paddingClasses = 'px-6 lg:px-14 xl:px-24 2xl:px-32'
 const maxWidthClassesColumn = 'min-w-[420px]'
 

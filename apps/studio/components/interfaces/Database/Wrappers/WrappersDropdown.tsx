@@ -15,7 +15,6 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -38,7 +37,7 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
     return (
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger asChild>
-          <Button disabled type="primary" icon={<IconPlus strokeWidth={1.5} />}>
+          <Button disabled type="primary" icon={<Plus strokeWidth={1.5} />}>
             {buttonText}
           </Button>
         </Tooltip.Trigger>

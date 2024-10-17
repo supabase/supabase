@@ -1,12 +1,13 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
-import type { Dictionary } from 'types'
-import { SidePanel } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import type { Dictionary } from 'types'
+import { SidePanel } from 'ui'
 import ActionBar from '../ActionBar'
+import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import ForeignRowSelector from './ForeignRowSelector/ForeignRowSelector'
 import HeaderTitle from './HeaderTitle'
 import InputField from './InputField'
@@ -19,7 +20,6 @@ import {
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
-import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
@@ -39,7 +39,7 @@ const RowEditor = ({
   updateEditorDirty = noop,
 }: RowEditorProps) => {
   const [errors, setErrors] = useState<Dictionary<any>>({})
-  const [rowFields, setRowFields] = useState<any[]>([])
+  const [rowFields, setRowFields] = useState<RowField[]>([])
 
   const [selectedValueForTextEdit, setSelectedValueForTextEdit] = useState<EditValue>()
   const [selectedValueForJsonEdit, setSelectedValueForJsonEdit] = useState<EditValue>()
@@ -141,6 +141,14 @@ const RowEditor = ({
     }
   }
 
+  // Transform the rowFields to a dictionary of column names to values. Used to pass to the TextEditor
+  const editedRow = useMemo(() => {
+    return rowFields.reduce((acc, field) => {
+      acc[field.name] = field.value
+      return acc
+    }, {} as Dictionary<any>)
+  }, [rowFields])
+
   return (
     <SidePanel
       hideFooter
@@ -166,6 +174,7 @@ const RowEditor = ({
                       errors={errors}
                       onUpdateField={onUpdateField}
                       onEditJson={setSelectedValueForJsonEdit}
+                      onEditText={setSelectedValueForTextEdit}
                       onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                     />
                   )
@@ -203,7 +212,7 @@ const RowEditor = ({
 
             <TextEditor
               visible={isEditingText}
-              row={row}
+              row={editedRow}
               column={selectedValueForTextEdit?.column ?? ''}
               closePanel={() => setSelectedValueForTextEdit(undefined)}
               onSaveField={(value) => {
@@ -213,9 +222,8 @@ const RowEditor = ({
             />
             <JsonEditor
               visible={isEditingJson}
-              row={row}
+              row={editedRow}
               column={selectedValueForJsonEdit?.column ?? ''}
-              jsonString={selectedValueForJsonEdit?.value ?? ''}
               closePanel={() => setSelectedValueForJsonEdit(undefined)}
               onSaveJSON={(value) => {
                 onUpdateField({ [selectedValueForJsonEdit?.column ?? '']: value })

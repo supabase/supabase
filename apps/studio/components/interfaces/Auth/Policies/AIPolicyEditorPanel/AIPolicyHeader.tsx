@@ -2,7 +2,6 @@ import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { ChevronDown, PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import { useState } from 'react'
 
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -26,19 +25,16 @@ export const AIPolicyHeader = ({
   setAssistantVisible: (v: boolean) => void
 }) => {
   const [showDetails, setShowDetails] = useState(false)
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   return (
     <SheetHeader className={cn('py-3 flex flex-row justify-between items-start border-b')}>
-      <div
-        className={`flex flex-row gap-3 max-w-[75%] ${isAiAssistantEnabled ? 'items-start' : 'items-center'}`}
-      >
+      <div className="flex flex-row gap-3 max-w-[75%] items-start">
         <SheetClose
           className={cn(
             'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
             'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
             'transition disabled:pointer-events-none data-[state=open]:bg-secondary',
-            isAiAssistantEnabled ? 'mt-1.5' : ''
+            'mt-1.5'
           )}
         >
           <X className="h-3 w-3" />
@@ -51,7 +47,7 @@ export const AIPolicyHeader = ({
               ? `Update policy: ${selectedPolicy.name}`
               : 'Create a new Row Level Security policy'}
           </SheetTitle>
-          {isAiAssistantEnabled && selectedPolicy !== undefined && (
+          {selectedPolicy !== undefined && (
             <Collapsible_Shadcn_
               className="-mt-1.5 pb-1.5"
               open={showDetails}

@@ -170,6 +170,7 @@ const TableEditorMenu = () => {
         <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
           <InnerSideBarFilters>
             <InnerSideBarFilterSearchInput
+              autoFocus
               name="search-tables"
               aria-labelledby="Search tables"
               onChange={(e) => {

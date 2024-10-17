@@ -155,7 +155,7 @@ const BasicAuthSettingsForm = () => {
 
   return (
     <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
-      {({ handleReset, resetForm, values, initialValues }: any) => {
+      {({ handleReset, resetForm, values, initialValues, setFieldValue }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
         // Form is reset once remote data is loaded in store
         // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -252,7 +252,7 @@ const BasicAuthSettingsForm = () => {
                               asChild
                               type="default"
                               className="w-min"
-                              icon={<ExternalLink size={14} />}
+                              icon={<ExternalLink />}
                             >
                               <Link href="/docs/guides/auth/auth-anonymous#access-control">
                                 View access control docs
@@ -325,6 +325,7 @@ const BasicAuthSettingsForm = () => {
                       ],
                     }}
                     formValues={values}
+                    setFieldValue={setFieldValue}
                   />
                   {!promptProPlanUpgrade ? (
                     <></>
@@ -424,6 +425,7 @@ const BasicAuthSettingsForm = () => {
                           ],
                         }}
                         formValues={values}
+                        setFieldValue={setFieldValue}
                       />
                       <Input
                         id="SECURITY_CAPTCHA_SECRET"

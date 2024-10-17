@@ -1,4 +1,4 @@
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 
 interface CodeSnippetProps {
   selectedLang: 'bash' | 'js'

@@ -85,7 +85,6 @@ const CommandItem = forwardRef<
 >(({ children, className, command: _command, ...props }, ref) => {
   const router = useCrossCompatRouter()
   const setIsOpen = useSetCommandMenuOpen()
-  const query = useQuery()
 
   const command = _command as ICommand // strip the readonly applied from the proxy
 
@@ -103,11 +102,8 @@ const CommandItem = forwardRef<
               }
             : () => {}
       }
-      value={
-        command.forceMount
-          ? `${query} ${command.value ?? command.name}`
-          : command.value ?? command.name
-      }
+      value={command.value ?? command.name}
+      forceMount={command.forceMount}
       className={cn(
         generateCommandClassNames(isRouteCommand(command)),
         className,

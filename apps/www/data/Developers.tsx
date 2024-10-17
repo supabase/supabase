@@ -1,6 +1,6 @@
+import { Calendar } from 'lucide-react'
 import {
   IconBriefcase2,
-  IconCalendar,
   IconChangelog,
   IconDiscussions,
   IconDocumentation,
@@ -66,7 +66,7 @@ export const data = {
         {
           text: 'Events & Webinars',
           url: '/events',
-          icon: IconCalendar,
+          icon: Calendar,
         },
       ],
     },

@@ -14,7 +14,8 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { Button, IconAlertCircle, IconSearch, IconTrash, Input, SidePanel } from 'ui'
+import { AlertCircle, Search, Trash } from 'lucide-react'
+import { Button, Input, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
@@ -102,7 +103,7 @@ const Indexes = () => {
             {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
             {isErrorSchemas && (
               <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
-                <IconAlertCircle strokeWidth={2} size={16} />
+                <AlertCircle strokeWidth={2} size={16} />
                 <p>Failed to load schemas</p>
               </div>
             )}
@@ -121,7 +122,7 @@ const Indexes = () => {
               className="w-64"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search for an index"
-              icon={<IconSearch size={14} />}
+              icon={<Search size={14} />}
             />
 
             {!isLocked && (
@@ -195,7 +196,7 @@ const Indexes = () => {
                               <Button
                                 type="text"
                                 className="px-1"
-                                icon={<IconTrash />}
+                                icon={<Trash />}
                                 onClick={() => setSelectedIndexToDelete(index)}
                               />
                             )}

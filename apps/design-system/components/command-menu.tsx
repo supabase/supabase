@@ -1,15 +1,14 @@
 'use client'
 
-import * as React from 'react'
-import { useRouter } from 'next/navigation'
-import { DialogProps } from '@radix-ui/react-alert-dialog'
 import { CircleIcon, LaptopIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import { useRouter } from 'next/navigation'
+import * as React from 'react'
 
 import { docsConfig } from '@/config/docs'
 import { cn } from '@/lib/utils'
-import { Button } from 'ui'
 import {
+  Button,
   CommandDialog,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -17,6 +16,7 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
+  DialogProps,
 } from 'ui'
 
 export function CommandMenu({ ...props }: DialogProps) {

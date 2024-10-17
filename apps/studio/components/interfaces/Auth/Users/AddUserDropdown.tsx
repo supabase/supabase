@@ -45,7 +45,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
             Add user
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="end">
+        <DropdownMenuContent side="bottom" align="end" className="w-40">
           {inviteEnabled && (
             <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>

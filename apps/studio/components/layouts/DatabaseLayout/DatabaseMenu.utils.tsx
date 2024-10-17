@@ -9,10 +9,11 @@ export const generateDatabaseMenu = (
     pgNetExtensionExists: boolean
     pitrEnabled: boolean
     columnLevelPrivileges: boolean
+    cronUiEnabled: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges } = flags || {}
+  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges, cronUiEnabled } = flags || {}
 
   return [
     {
@@ -115,6 +116,16 @@ export const generateDatabaseMenu = (
                 name: 'Webhooks',
                 key: 'hooks',
                 url: `/project/${ref}/database/hooks`,
+                items: [],
+              },
+            ]
+          : []),
+        ...(!!cronUiEnabled
+          ? [
+              {
+                name: 'Cron Jobs',
+                key: 'cron-jobs',
+                url: `/project/${ref}/database/cron-jobs`,
                 items: [],
               },
             ]

@@ -613,8 +613,8 @@ const SidePanelEditor = ({
       <SchemaEditor visible={snap.sidePanel?.type === 'schema'} closePanel={onClosePanel} />
       <JsonEditor
         visible={snap.sidePanel?.type === 'json'}
+        row={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.row) || {}}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
-        jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.value) || ''}
         backButtonLabel="Cancel"
         applyButtonLabel="Save changes"
         readOnly={!editable}

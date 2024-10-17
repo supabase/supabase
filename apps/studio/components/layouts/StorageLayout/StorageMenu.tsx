@@ -23,7 +23,7 @@ import {
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
-} from 'ui-patterns'
+} from 'ui-patterns/InnerSideMenu'
 import BucketRow from './BucketRow'
 
 const StorageMenu = () => {
@@ -72,7 +72,7 @@ const StorageMenu = () => {
           <ButtonTooltip
             block
             type="default"
-            icon={<Edit size={14} />}
+            icon={<Edit />}
             disabled={!canCreateBuckets}
             style={{ justifyContent: 'start' }}
             onClick={() => setShowCreateBucketModal(true)}

@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { AssistantChatForm } from 'ui-patterns/AssistantChat/AssistantChatForm'
-import { AssistantCommandsPopover } from 'ui-patterns/AssistantChat/AssistantCommandsPopover'
+import { AssistantChatForm, AssistantCommandsPopover } from 'ui-patterns/AssistantChat'
 
 export default function AssistantChatCommands() {
   const [commandsOpen, setCommandsOpen] = useState<boolean>(false)

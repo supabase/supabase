@@ -21,6 +21,7 @@ import { useParams } from 'common'
 import { useDispatch, useTrackedState } from '../../../store/Store'
 import { DropdownControl } from '../../common/DropdownControl'
 import { formatEstimatedCount } from './Pagination.utils'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },
@@ -50,6 +51,13 @@ const Pagination = () => {
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
   const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
   const [isConfirmFetchExactCountModalOpen, setIsConfirmFetchExactCountModalOpen] = useState(false)
+
+  const [value, setValue] = useState<string>(page.toString())
+
+  // keep input value in-sync with actual page
+  useEffect(() => {
+    setValue(String(page))
+  }, [page])
 
   const { data, isLoading, isSuccess, isError, isFetching } = useTableRowsCountQuery(
     {
@@ -122,9 +130,8 @@ const Pagination = () => {
     snap.setPage(nextPage)
   }
 
-  const onPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    const pageNum = Number(value) > maxPages ? maxPages : Number(value)
+  const onPageChange = (page: number) => {
+    const pageNum = page > maxPages ? maxPages : page
     snap.setPage(pageNum || 1)
   }
 
@@ -160,16 +167,25 @@ const Pagination = () => {
               onClick={onPreviousPage}
             />
             <p className="text-xs text-foreground-light">Page</p>
-            <div className="w-12">
-              <InputNumber
-                size="tiny"
-                value={page}
-                onChange={onPageChange}
-                style={{ width: '3rem' }}
-                min={1}
-                max={maxPages}
-              />
-            </div>
+            <Input
+              className="w-12"
+              size="tiny"
+              min={1}
+              max={maxPages}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={(e) => {
+                const parsedValue = Number(value)
+                if (
+                  e.code === 'Enter' &&
+                  !Number.isNaN(parsedValue) &&
+                  parsedValue >= 1 &&
+                  parsedValue <= maxPages
+                ) {
+                  onPageChange(parsedValue)
+                }
+              }}
+            />
 
             <p className="text-xs text-foreground-light">of {totalPages.toLocaleString()}</p>
 

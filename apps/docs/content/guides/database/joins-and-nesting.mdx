@@ -381,12 +381,12 @@ To fetch all the `shifts` with `scan_id_start` and `scan_id_end` related to a sp
 const { data, error } = await supabase.from('shifts').select(
   `
     *,
-    scans:scan_id_start (
+    start_scan:scans!scan_id_start (
       id,
       user_id,
       badge_scan_time
     ),
-   scans:scan_id_end (
+   end_scan:scans!scan_id_end (
      id, 
      user_id,
      badge_scan_time
@@ -401,12 +401,12 @@ const { data, error } = await supabase.from('shifts').select(
 ```dart
 final data = await supabase.from('shifts').select('''
   *,
-  scans:scan_id_start (
+  start_scan:scans!scan_id_start (
     id,
     user_id,
     badge_scan_time
   ),
-scans:scan_id_end (
+end_scan:scans!scan_id_end (
     id,
     user_id,
     badge_scan_time
@@ -449,7 +449,7 @@ let shifts: [Shift] = try await supabase
   .select(
     """
       *,
-      scans:scan_id_start (
+      start_scan:scans!scan_id_start (
         id,
         user_id,
         badge_scan_time
@@ -472,12 +472,12 @@ let shifts: [Shift] = try await supabase
 ```kotlin
 val data = supabase.from("shifts").select(Columns.raw('''
   *,
-  scans:scan_id_start (
+  start_scan:scans!scan_id_start (
     id,
     user_id,
     badge_scan_time
   ),
-scans:scan_id_end (
+end_scan:scans!scan_id_end (
     id,
     user_id,
     badge_scan_time
@@ -491,12 +491,12 @@ scans:scan_id_end (
 ```python
 data = supabase.from_('shifts').select("""
   *,
-  scans:scan_id_start (
+  start_scan:scans!scan_id_start (
     id,
     user_id,
     badge_scan_time
   ),
-  scans:scan_id_end (
+  end_scan:scans!scan_id_end (
     id,
     user_id,
     badge_scan_time

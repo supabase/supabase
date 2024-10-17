@@ -23,7 +23,7 @@ Database backups can be categorized into two types: **logical** and **physical**
 
 As a general rule of thumb, projects will either have logical or physical backups based on plan, database size, and add-ons:
 
-| Plan       | Database Size (0-40GB) | [Database Size (>40GB)](#backup-process-for-large-databases) | [PITR](#point-in-time-recovery) | [Read Replicas](./read-replicas#prerequisites) |
+| Plan       | Database Size (0-15GB) | [Database Size (>15GB)](#backup-process-for-large-databases) | [PITR](#point-in-time-recovery) | [Read Replicas](./read-replicas#prerequisites) |
 | ---------- | ---------------------- | ------------------------------------------------------------ | ------------------------------- | ---------------------------------------------- |
 | Pro        | logical                | physical                                                     | physical                        | physical                                       |
 | Team       | logical                | physical                                                     | physical                        | physical                                       |
@@ -73,13 +73,13 @@ You can access daily backups in the [Scheduled backups](https://supabase.com/das
 
 #### Backup process for large databases
 
-Databases larger than 40GB[^1], if they're on a recent build[^2] of the Supabase platform, get automatically transitioned[^3] to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
+Databases larger than 15GB[^1], if they're on a recent build[^2] of the Supabase platform, get automatically transitioned[^3] to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
 
 This class of physical backups only allows for recovery to a fixed time each day, similar to daily backups. You can upgrade to [PITR](#point-in-time-recovery) for access to more granular recovery options.
 
 Once a database is transitioned to using physical backups, it continues to use physical backups, even if the database size falls back below the threshold for the transition.
 
-[^1]: The threshold for transitioning might be lowered in the future.
+[^1]: The threshold for transitioning will be slowly lowered over time. Eventually, all projects will be transitioned to using physical backups.
 [^2]: Projects created or upgraded after the 14th of July 2022 are eligible.
 [^3]: The transition to physical backups is handled transparently and does not require any user intervention. It involves a single restart of the database to pick up new configuration that can only be loaded at start; the expected downtime for the restart is a few seconds.
 

@@ -1,13 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
+import { ChevronDown, ExternalLink } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-import { useFlag } from 'hooks/ui/useFlag'
-import Telemetry from 'lib/telemetry'
-import { ExternalLink } from 'lucide-react'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import {
   Button,
   FormControl_Shadcn_,
@@ -16,7 +13,6 @@ import {
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   Form_Shadcn_,
-  IconChevronDown,
   Input_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -34,8 +30,8 @@ const FormSchema = z.object({ channel: z.string(), isPrivate: z.boolean() })
 
 export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPopoverProps) => {
   const [open, setOpen] = useState(false)
-  const telemetryProps = useTelemetryProps()
-  const router = useRouter()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -54,15 +50,11 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
 
   const onSubmit = () => {
     setOpen(false)
-    Telemetry.sendEvent(
-      {
-        category: 'realtime_inspector',
-        action: 'started_listening_to_channel_in_input_channel_popover',
-        label: 'realtime_inspector_config',
-      },
-      telemetryProps,
-      router
-    )
+    sendEvent({
+      category: 'realtime_inspector',
+      action: 'started_listening_to_channel_in_input_channel_popover',
+      label: 'realtime_inspector_config',
+    })
     onChangeConfig({
       ...config,
       channelName: form.getValues('channel'),
@@ -74,12 +66,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
   return (
     <Popover_Shadcn_ open={open} onOpenChange={onOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          className="rounded-r-none"
-          type="default"
-          size="tiny"
-          iconRight={<IconChevronDown />}
-        >
+        <Button className="rounded-r-none" type="default" size="tiny" iconRight={<ChevronDown />}>
           <p
             className="max-w-[120px] truncate"
             title={config.channelName.length > 0 ? config.channelName : ''}

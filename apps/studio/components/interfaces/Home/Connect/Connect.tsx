@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Plug } from 'lucide-react'
+import { ExternalLink, Plug } from 'lucide-react'
 import { useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
@@ -20,7 +20,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  IconExternalLink,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
@@ -31,6 +30,7 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
+import Panel from 'components/ui/Panel'
 
 const Connect = () => {
   const { ref: projectRef } = useParams()
@@ -237,11 +237,7 @@ const Connect = () => {
                       )}
                     </div>
                     {connectionObject.find((item) => item.key === selectedParent)?.guideLink && (
-                      <Button
-                        asChild
-                        type="default"
-                        icon={<IconExternalLink size={14} strokeWidth={1.5} />}
-                      >
+                      <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                         <a
                           target="_blank"
                           rel="noreferrer"
@@ -259,7 +255,20 @@ const Connect = () => {
                   <p className="text-xs text-foreground-lighter my-3">
                     Add the following files below to your application
                   </p>
-                  <ConnectTabContent projectKeys={projectKeys} filePath={filePath} />
+                  <ConnectTabContent
+                    projectKeys={projectKeys}
+                    filePath={filePath}
+                    className="rounded-b-none"
+                  />
+                  <Panel.Notice
+                    className="border border-t-0 rounded-lg rounded-t-none"
+                    title="New API keys coming Q4 2024"
+                    description={`
+\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.   
+`}
+                    href="https://github.com/orgs/supabase/discussions/29260"
+                    buttonText="Read the announcement"
+                  />
                 </TabsContent_Shadcn_>
               )
             })}

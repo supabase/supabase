@@ -228,3 +228,4 @@ response = supabase.auth.update_user({
 </Tabs>
 
 The user receives an SMS with a 6-digit pin that you must [verify](#verifying-a-phone-otp) within 60 seconds.
+Use the `phone_change` type when calling `verifyOTP` to update a user’s phone number.

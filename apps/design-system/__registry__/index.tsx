@@ -1952,17 +1952,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "expanding-textarea-demo": {
-      name: "expanding-textarea-demo",
-      type: "docs:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/expanding-textarea-demo")),
-      source: "",
-      files: ["registry/default/example/expanding-textarea-demo.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
     "chart-bar-demo": {
       name: "chart-bar-demo",
       type: "components:example",
@@ -2025,6 +2014,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/chart-tooltip-demo")),
       source: "",
       files: ["registry/default/example/chart-tooltip-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "expanding-textarea-demo": {
+      name: "expanding-textarea-demo",
+      type: "docs:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/expanding-textarea-demo")),
+      source: "",
+      files: ["registry/default/example/expanding-textarea-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

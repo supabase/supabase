@@ -3,6 +3,7 @@ type PostTypes = {
   type: 'casestudy' | 'blog'
   title: string
   date?: string
+  formattedDate?: string
   coverImage?: string
   author?: string
   excerpt?: string

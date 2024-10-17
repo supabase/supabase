@@ -1,13 +1,16 @@
 APIs
 [Aa]uth
+[Bb]aselining
 Berri
 [Cc]hatbots?
 ChatGPT
 Clippy
 Colab
 [Cc]omposable
+[Cc]onfigs?
 CPUs?
 CTEs?
+DBeaver
 [Dd]eclarative(ly)?
 [Dd]eduplicat(e|ion)
 [Dd]eeplinks?
@@ -24,6 +27,7 @@ Hashicorp
 [Gg]eospatial
 GPUs?
 Gradle
+Grafana
 GraphQL
 Groonga
 href
@@ -45,7 +49,9 @@ OpenAI
 [Pp]asscodes?
 [Pp]asswordless
 [Pp]erformant
+pg_plan_filter
 PGAudit
+pgAdmin
 PGroonga
 pgvector
 Pinecone
@@ -65,6 +71,8 @@ RESTful
 Roboflow
 [Ss]crollable
 [Ss]erializ(e|ed|es|ing)
+[Ss]erverless
+[Ss]erverside
 [Ss]igncryption
 [Ss]ignins?
 [Ss]ignouts?
@@ -75,6 +83,7 @@ subqueries
 [Ss]upabase
 Snaplet
 Supavisor
+[Ss]upautils
 [Ss]upersets?
 Terraform
 [Tt]odos?
@@ -85,6 +94,7 @@ unnested
 [Uu]pvot(es|ed|ing)
 Vercel
 Vite
+VM(s)?
 VSCode
 Vue
 [Ww]eb[Ss]ockets?

@@ -23,7 +23,7 @@ import {
   Collapsible_Shadcn_,
   cn,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { IndexAdvisorDisabledState } from './IndexAdvisorDisabledState'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 

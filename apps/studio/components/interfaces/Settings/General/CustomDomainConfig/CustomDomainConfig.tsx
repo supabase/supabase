@@ -34,7 +34,19 @@ const CustomDomainConfig = () => {
     isError,
     isSuccess,
     data,
-  } = useCustomDomainsQuery({ projectRef: ref })
+  } = useCustomDomainsQuery(
+    { projectRef: ref },
+    {
+      refetchInterval(data) {
+        // while setting up the ssl certificate, we want to poll every 5 seconds
+        if (data?.customDomain?.ssl.status) {
+          return 5000
+        }
+
+        return false
+      },
+    }
+  )
 
   const isLoading = isSettingsLoading || isCustomDomainsLoading
 

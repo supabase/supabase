@@ -1,7 +1,7 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
-import { ExternalLink } from 'lucide-react'
+import { Edit2, ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -11,10 +11,14 @@ import { useParams } from 'common'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import {
+  invalidateOrganizationsQuery,
+  useOrganizationsQuery,
+} from 'data/organizations/organizations-query'
+import { useProfile } from 'lib/profile'
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import { Button, IconEdit2, IconHelpCircle, Input, Listbox, Toggle } from 'ui'
+import { Button, Input, Listbox, Toggle } from 'ui'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -44,6 +48,8 @@ interface NewOrgFormProps {
  */
 const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const router = useRouter()
+  const user = useProfile()
+  const { data: organizations, isSuccess } = useOrganizationsQuery()
   const stripe = useStripe()
   const elements = useElements()
   const queryClient = useQueryClient()
@@ -77,10 +83,20 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     router.push({ query })
   }, [dbPricingTierKey, orgName, orgKind, orgSize, isSpendCapEnabled])
 
+  useEffect(() => {
+    if (!orgName && organizations?.length === 0 && !user.isLoading) {
+      const prefilledOrgName = user.profile?.username ? user.profile.username + `'s Org` : 'My Org'
+      setOrgName(prefilledOrgName)
+    }
+  }, [isSuccess])
+
   const { mutate: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org: any) => {
       await invalidateOrganizationsQuery(queryClient)
-      router.push(`/new/${org.slug}`)
+      const prefilledProjectName = user.profile?.username
+        ? user.profile.username + `'s Project`
+        : 'My Project'
+      router.push(`/new/${org.slug}?projectName=${prefilledProjectName}`)
     },
     onError: () => {
       resetPaymentMethod()
@@ -316,7 +332,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 label={
                   <div className="flex space-x-4">
                     <span>Spend Cap</span>
-                    <IconHelpCircle
+                    <HelpCircle
                       size={16}
                       strokeWidth={1.5}
                       className="transition opacity-50 cursor-pointer hover:opacity-100"
@@ -370,7 +386,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 <div>
                   <Button
                     type="outline"
-                    icon={<IconEdit2 />}
+                    icon={<Edit2 />}
                     onClick={() => resetPaymentMethod()}
                     disabled={newOrgLoading}
                     className="hover:border-muted"

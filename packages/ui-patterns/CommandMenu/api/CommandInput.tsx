@@ -1,6 +1,6 @@
 'use client'
 
-import React, { forwardRef, useEffect, useRef } from 'react'
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
 
 import { useBreakpoint } from 'common'
 import { CommandInput_Shadcn_, cn } from 'ui'
@@ -47,15 +47,30 @@ const CommandInput = forwardRef<
   const query = useQuery()
   const setQuery = useSetQuery()
 
+  const [inputValue, setInputValue] = useState(query)
+  useEffect(() => {
+    setInputValue(query)
+  }, [query])
+
+  // To handle CJK input
+  const [imeComposing, setImeComposing] = useState(false)
+  useEffect(() => {
+    if (!imeComposing) {
+      setQuery(inputValue)
+    }
+  }, [inputValue, imeComposing])
+
   return (
     <CommandInput_Shadcn_
       // Focus needs to be manually handled to check breakpoint first, due to
       // delays from useEffect
       autoFocus={false}
       ref={inputRef}
-      value={query}
-      onValueChange={setQuery}
+      value={inputValue}
+      onValueChange={setInputValue}
       placeholder="Type a command or search..."
+      onCompositionStart={() => setImeComposing(true)}
+      onCompositionEnd={() => setImeComposing(false)}
       className={cn(
         'flex h-11 w-full rounded-md bg-transparent px-4 py-7 outline-none',
         'focus:shadow-none focus:ring-transparent',

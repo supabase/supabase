@@ -9,10 +9,10 @@ import {
   RefLink,
   ReferenceNavigationScrollHandler,
 } from '~/features/docs/Reference.navigation.client'
-import { type AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
+import { type AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 
-interface ClientSdkNavigationProps {
-  sdkId: string
+interface ReferenceNavigationProps {
+  libraryId: string
   name: string
   menuData: { icon?: string }
   libPath: string
@@ -20,15 +20,15 @@ interface ClientSdkNavigationProps {
   isLatestVersion: boolean
 }
 
-async function ClientSdkNavigation({
-  sdkId,
+export async function ReferenceNavigation({
+  libraryId,
   name,
   menuData,
   libPath,
   version,
   isLatestVersion,
-}: ClientSdkNavigationProps) {
-  const navSections = await getReferenceSections(sdkId, version)
+}: ReferenceNavigationProps) {
+  const navSections = await getReferenceSections(libraryId, version)
 
   const basePath = `/reference/${libPath}${isLatestVersion ? '' : `/${version}`}`
 
@@ -65,7 +65,7 @@ function RefCategory({
   section,
 }: {
   basePath: string
-  section: AbbrevCommonClientLibSection
+  section: AbbrevApiReferenceSection
 }) {
   if (!('items' in section && section.items.length > 0)) return null
 
@@ -100,6 +100,3 @@ function SideMenuTitle({ children, className }: PropsWithChildren<{ className?: 
     </div>
   )
 }
-
-export { ClientSdkNavigation }
-export type { AbbrevCommonClientLibSection }

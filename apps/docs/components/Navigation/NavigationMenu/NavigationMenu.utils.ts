@@ -109,16 +109,22 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Api
     case pathname.startsWith('auth'):
       return MenuId.Auth
-    case pathname.startsWith('cli'):
-      return MenuId.Cli
+    case pathname.startsWith('local-development'):
+      return MenuId.LocalDevelopment
     case pathname.startsWith('database'):
       return MenuId.Database
+    case pathname.startsWith('deployment'):
+      return MenuId.Deployment
     case pathname.startsWith('functions'):
       return MenuId.Functions
     case pathname.startsWith('getting-started'):
       return MenuId.GettingStarted
     case pathname.startsWith('graphql'):
       return MenuId.Graphql
+    case pathname.startsWith('integrations'):
+      return MenuId.Integrations
+    case pathname.startsWith('monitoring-troubleshooting'):
+      return MenuId.MonitoringTroubleshooting
     case pathname.startsWith('platform'):
       return MenuId.Platform
     case pathname.startsWith('realtime'):

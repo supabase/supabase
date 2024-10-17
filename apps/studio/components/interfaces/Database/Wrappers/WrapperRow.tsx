@@ -3,12 +3,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { Button, Collapsible, IconChevronUp, IconEdit, IconTrash } from 'ui'
+import { Button, Collapsible } from 'ui'
 
 import { useParams } from 'common/hooks'
 import type { FDW } from 'data/fdw/fdws-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Edit, ExternalLink, Trash } from 'lucide-react'
+import { ChevronUp, Edit, ExternalLink, Trash } from 'lucide-react'
 import type { WrapperMeta } from './Wrappers.types'
 
 interface WrapperRowProps {
@@ -54,7 +54,7 @@ const WrapperRow = ({
             className="flex items-center justify-between w-full px-6 py-3 rounded group text-foreground"
           >
             <div className="flex items-center gap-3">
-              <IconChevronUp
+              <ChevronUp
                 className="transition text-border-stronger data-open-parent:rotate-0 data-closed-parent:rotate-180"
                 strokeWidth={2}
                 width={14}

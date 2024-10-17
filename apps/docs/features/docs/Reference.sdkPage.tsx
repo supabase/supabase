@@ -1,11 +1,10 @@
-import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { REFERENCES } from '~/content/navigation.references'
 import { ClientLibHeader } from '~/features/docs/Reference.header'
 import { ClientLibIntroduction, OldVersionAlert } from '~/features/docs/Reference.introduction'
-import { ClientSdkNavigation } from '~/features/docs/Reference.navigation'
+import { ReferenceNavigation } from '~/features/docs/Reference.navigation'
 import { ReferenceContentScrollHandler } from '~/features/docs/Reference.navigation.client'
-import { ClientLibRefSections } from '~/features/docs/Reference.sections'
+import { RefSections } from '~/features/docs/Reference.sections'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 
@@ -28,10 +27,10 @@ export async function ClientSdkReferencePage({ sdkId, libVersion }: ClientSdkRef
       isLatestVersion={isLatestVersion}
     >
       <SidebarSkeleton
-        menuId={MenuId.RefJavaScriptV2}
+        menuId={libraryMeta.meta[libVersion].libId}
         NavigationMenu={
-          <ClientSdkNavigation
-            sdkId={sdkId}
+          <ReferenceNavigation
+            libraryId={sdkId}
             name={menuData.title}
             menuData={menuData}
             libPath={libraryMeta.libPath}
@@ -44,7 +43,7 @@ export async function ClientSdkReferencePage({ sdkId, libVersion }: ClientSdkRef
           {!isLatestVersion && (
             <OldVersionAlert
               libPath={libraryMeta.libPath}
-              className="z-10 fixed top-[calc(var(--header-height)+1rem)] right-4 w-84 max-w-[calc(100vw-2rem)]"
+              className="z-20 fixed top-[calc(var(--header-height)+1rem)] right-4 w-84 max-w-[calc(100vw-2rem)]"
             />
           )}
           <article className="@container/article">
@@ -55,7 +54,7 @@ export async function ClientSdkReferencePage({ sdkId, libVersion }: ClientSdkRef
               version={libVersion}
               isLatestVersion={isLatestVersion}
             />
-            <ClientLibRefSections sdkId={sdkId} version={libVersion} />
+            <RefSections libraryId={sdkId} version={libVersion} />
           </article>
         </LayoutMainContent>
       </SidebarSkeleton>

@@ -89,6 +89,9 @@ When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-sign
 Future<void> signInWithWorkOS() async {
   await supabase.auth.signInWithOAuth(
     OAuthProvider.workos,
+    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+    authScreenLaunchMode:
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
     queryParams: {
       'connection': '<your_connection>',
       'organization': '<your_organization',

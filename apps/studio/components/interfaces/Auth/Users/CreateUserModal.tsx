@@ -45,8 +45,9 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const canCreateUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'create_user')
 
   const { mutate: createUser, isLoading: isCreatingUser } = useUserCreateMutation({
-    async onSuccess(res) {
+    onSuccess(res) {
       toast.success(`Successfully created user: ${res.email}`)
+      form.reset({ email: '', password: '', autoConfirmUser: true })
       setVisible(false)
     },
   })
@@ -57,9 +58,6 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     }
     const { protocol, endpoint, serviceApiKey } = data.autoApiService
     createUser({ projectRef, endpoint, protocol, serviceApiKey, user: values })
-
-    //react-hook-form does not reset field values even after submit. Reset Field data so data does not persist
-    form.reset({ email: '', password: '', autoConfirmUser: true })
   }
 
   const form = useForm<z.infer<typeof CreateUserFormSchema>>({

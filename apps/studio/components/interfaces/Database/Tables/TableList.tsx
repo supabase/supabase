@@ -61,9 +61,11 @@ interface TableListProps {
   onAddTable: () => void
   onEditTable: (table: any) => void
   onDeleteTable: (table: any) => void
+  onDuplicateTable: (table: any) => void
 }
 
 const TableList = ({
+  onDuplicateTable,
   onAddTable = noop,
   onEditTable = noop,
   onDeleteTable = noop,
@@ -71,7 +73,7 @@ const TableList = ({
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [filterString, setFilterString] = useState<string>('')
@@ -179,6 +181,7 @@ const TableList = ({
   const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
     (x) => visibleTypes.includes(x.type)
   )
+
   const isLocked = EXCLUDED_SCHEMAS.includes(selectedSchema)
 
   const error = tablesError || viewsError || materializedViewsError || foreignTablesError
@@ -505,7 +508,9 @@ const TableList = ({
                                       className="space-x-2"
                                       onClick={(e) => {
                                         e.stopPropagation()
-                                        snap.onDuplicateTable()
+                                        if (canUpdateTables) {
+                                          onDuplicateTable(x)
+                                        }
                                       }}
                                     >
                                       <Copy size={12} />

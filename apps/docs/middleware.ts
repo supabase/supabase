@@ -32,6 +32,22 @@ export function middleware(request: NextRequest) {
     }
   } else {
     const [, lib, maybeVersion] = url.pathname.replace(REFERENCE_PATH, '').split('/')
+
+    if (lib === 'cli') {
+      const rewritePath = [REFERENCE_PATH, 'cli'].join('/')
+      return NextResponse.rewrite(new URL(rewritePath, request.url))
+    }
+
+    if (lib === 'api') {
+      const rewritePath = [REFERENCE_PATH, 'api'].join('/')
+      return NextResponse.rewrite(new URL(rewritePath, request.url))
+    }
+
+    if (lib?.startsWith('self-hosting-')) {
+      const rewritePath = [REFERENCE_PATH, lib].join('/')
+      return NextResponse.rewrite(new URL(rewritePath, request.url))
+    }
+
     if (clientSdkIds.includes(lib)) {
       const version = /v\d+/.test(maybeVersion) ? maybeVersion : null
       const rewritePath = [REFERENCE_PATH, lib, version].filter(Boolean).join('/')

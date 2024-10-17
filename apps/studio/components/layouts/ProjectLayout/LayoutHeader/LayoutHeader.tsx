@@ -24,7 +24,15 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const selectedOrganization = useSelectedOrganization()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
-  const { data: orgUsage } = useOrgUsageQuery({ orgSlug: selectedOrganization?.slug })
+  const { data: subscription } = useOrgSubscriptionQuery({
+    orgSlug: selectedOrganization?.slug,
+  })
+
+  // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
+  const { data: orgUsage } = useOrgUsageQuery(
+    { orgSlug: selectedOrganization?.slug },
+    { enabled: subscription?.usage_billing_enabled === false }
+  )
 
   const exceedingLimits = useMemo(() => {
     if (orgUsage) {
@@ -33,17 +41,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
       return false
     }
   }, [orgUsage])
-
-  const { data: subscription } = useOrgSubscriptionQuery({
-    orgSlug: selectedOrganization?.slug,
-  })
-
-  const projectHasNoLimits = subscription?.usage_billing_enabled === true
-
-  const showOverUsageBadge =
-    (subscription?.plan.id === 'free' || subscription?.plan.id === 'pro') &&
-    !projectHasNoLimits &&
-    exceedingLimits
 
   return (
     <div
@@ -77,7 +74,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
                 <ProjectDropdown />
 
-                {showOverUsageBadge && (
+                {exceedingLimits && (
                   <div className="ml-2">
                     <Link href={`/org/${selectedOrganization?.slug}/usage`}>
                       <Badge variant="destructive">Exceeding usage limits</Badge>

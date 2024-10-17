@@ -172,6 +172,12 @@ with check ( (select auth.uid()) = user_id ); -- checks if the new row complies 
 
 If no `with check` expression is defined, then the `using` expression will be used both to determine which rows are visible (normal USING case) and which new rows will be allowed to be added (WITH CHECK case).
 
+<Admonition type="caution">
+
+To perform an `UPDATE` operation, a corresponding [`SELECT` policy](#select-policies) is required. Without a `SELECT` policy, the `UPDATE` operation will not work as expected.
+
+</Admonition>
+
 ### DELETE policies
 
 You can specify delete policies with the `using` clause.

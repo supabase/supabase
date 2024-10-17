@@ -415,3 +415,9 @@ Should you run into this problem, it is most likely a misconfiguration issue **o
 At this time it is not possible to extract the RSA private key used by your project's Supabase Auth server. This is done to keep the private key as secure as possible, given that SAML does not offer an easy way to rotate keys without disrupting service. (Please use a SAML 2.0 Metadata URL whenever possible for this reason!)
 
 If you really need access to the key, please [open a support ticket](https://supabase.com/dashboard/support/new) and we'll try to support you as best as possible.
+
+### Is multi-tenant SSO with SAML supported?
+
+Yes, Supabase supports multi-tenant Single Sign-On (SSO) using SAML 2.0. While the dashboard displays only one SAML field, you can set up multiple SAML connections using the Supabase CLI.
+Each connection is assigned a unique `sso_provider_id`, which is included in the user's JWT and can be used in Row Level Security (RLS) policies. You can configure custom attribute mappings for each connection to include tenant-specific information, such as roles.
+This setup allows you to implement multi-tenant SSO for multiple clients or organizations within a single application. For example, if you have an app with multiple clients using different Azure Active Directories, you can create separate SAML connections for each and use the `sso_provider_id` to manage access and apply appropriate security policies.

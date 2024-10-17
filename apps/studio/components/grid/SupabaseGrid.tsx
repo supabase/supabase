@@ -241,7 +241,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   }, [state.table, props.table, props.schema])
 
   return (
-    <div className="sb-grid">
+    <div className="sb-grid h-full flex flex-col">
       <Header
         table={props.table}
         sorts={sorts}

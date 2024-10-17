@@ -7,7 +7,7 @@ import { memo, useState } from 'react'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
-import { CommandMenuTrigger, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { CommandMenuTrigger } from 'ui-patterns/CommandMenu'
 
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
@@ -17,7 +17,6 @@ const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   return (
     <>
@@ -93,7 +92,7 @@ const TopNavBar: FC = () => {
             )}
             {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
               <Button asChild>
-                <Link href="/__dev-secret-auth">Dev-only secret sign-in</Link>
+                <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>
               </Button>
             )}
             <TopNavDropdown />

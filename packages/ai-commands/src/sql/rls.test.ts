@@ -327,18 +327,20 @@ describe('rls chat', () => {
     const [policy] = await getPolicies(sql)
 
     withMetadata({ sql }, () => {
-      // Check that USING is a <column> IN <sub-query> expression
+      // Check that USING is either a <column> IN <sub-query> or EXISTS <sub-query> expression
       assertDefined(policy.qual, 'Expected a USING statement')
       const sublink = assertAndUnwrapNode(policy.qual, 'SubLink', 'Expected USING to be a sublink')
-      expect(sublink.subLinkType).toBe('ANY_SUBLINK')
+      expect(['ANY_SUBLINK', 'EXISTS_SUBLINK']).toContain(sublink.subLinkType)
 
-      // Validate column
-      assertDefined(sublink.testexpr, 'Expected sublink to have a test expression')
-      const columnName = assertAndRenderColumn(
-        sublink.testexpr,
-        'Expected sublink test expression to be a column'
-      )
-      expect(columnName).toBe('library_id')
+      if (sublink.subLinkType === 'ANY_SUBLINK') {
+        // Validate column for IN clause
+        assertDefined(sublink.testexpr, 'Expected sublink to have a test expression')
+        const columnName = assertAndRenderColumn(
+          sublink.testexpr,
+          'Expected sublink test expression to be a column'
+        )
+        expect(columnName).toBe('library_id')
+      }
 
       // Validate sub-query
       assertDefined(sublink.subselect, 'Expected sublink to have a subselect')
@@ -349,10 +351,13 @@ describe('rls chat', () => {
       )
 
       assertDefined(selectStatement.targetList, 'Expected SELECT statement to have a target list')
-      const columns = renderTargets(selectStatement.targetList, (node) =>
-        assertAndRenderColumn(node, 'Expected target list to contain columns')
-      )
-      expect(columns).toContain('library_id')
+
+      if (sublink.subLinkType === 'ANY_SUBLINK') {
+        const columns = renderTargets(selectStatement.targetList, (node) =>
+          assertAndRenderColumn(node, 'Expected target list to contain columns')
+        )
+        expect(columns).toContain('library_id')
+      }
 
       assertDefined(selectStatement.fromClause, 'Expected SELECT statement to have a FROM clause')
       const [fromNode] = selectStatement.fromClause

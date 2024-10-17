@@ -1,26 +1,34 @@
-import { Button, IconArrowUpRight, IconBriefcase, IconEye, IconLink, IconShield, Image } from 'ui'
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
-import Solutions from 'data/Solutions'
+import { ArrowUpRight, Briefcase, Eye, Link as IconLink, Shield } from 'lucide-react'
 import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import AuthWidgetSection from '~/components/AuthWidget/AuthWidgetSection'
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
-import CTABanner from '~/components/CTABanner'
-import FeatureColumn from '~/components/FeatureColumn'
+import { Button, Image } from 'ui'
+import { useBreakpoint } from 'common'
+
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import APISection from '~/components/Sections/APISection'
-import GithubExamples from '~/components/Sections/GithubExamples'
-import ProductHeader from '~/components/Sections/ProductHeader'
-import AuthProviders from '~/data/auth.json'
 import ProductsNav from '~/components/Products/ProductsNav'
+import ProductHeader from '~/components/Sections/ProductHeader'
+import EventCallout from '~/components/EventCallout'
+
+import Solutions from 'data/Solutions'
 import { PRODUCT_NAMES } from 'shared-data/products'
+import AuthProviders from '~/data/auth.json'
+
+const SplitCodeBlockCarousel = dynamic(
+  () => import('~/components/Carousels/SplitCodeBlockCarousel')
+)
+const CTABanner = dynamic(() => import('~/components/CTABanner'))
+const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
+const APISection = dynamic(() => import('~/components/Sections/APISection'))
+const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
 function AuthPage() {
-  // base path for images
+  const isMobile = useBreakpoint(768)
   const { basePath } = useRouter()
 
   const meta_title = 'Auth | Built-in user management'
@@ -46,6 +54,12 @@ function AuthPage() {
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.AUTHENTICATION} />
         <ProductHeader
+          callout={
+            <EventCallout
+              size={isMobile ? 'tiny' : 'small'}
+              className="mb-4 lg:mb-8 -mt-8 lg:-mt-10"
+            />
+          }
           icon={Solutions['authentication'].icon}
           title={Solutions['authentication'].name}
           h1={[
@@ -125,7 +139,7 @@ function AuthPage() {
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
               <div className="p mb-4">
-                <IconShield />
+                <Shield />
               </div>
               <h4 className="h4">Own your data</h4>
               <p className="p text-base">
@@ -143,30 +157,23 @@ function AuthPage() {
             content={ApiExamples}
             size="large"
             text={[
-              <p key={0}>
-                <p className="text-base lg:text-lg">
-                  APIs that you can understand. With powerful libraries that work on client and
-                  server-side applications.
-                </p>
-                {/* I think less is more here ... */}
-                {/* <p>
-                  With powerful client libraries that work on both client and server-side
-                  applications.
-                </p> */}
+              <p key={0} className="text-base lg:text-lg">
+                APIs that you can understand. With powerful libraries that work on client and
+                server-side applications.
               </p>,
             ]}
             footer={[
               <div className="mt-8 grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16" key={0}>
                 <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
-                    icon={<IconBriefcase />}
+                    icon={<Briefcase />}
                     title="Enterprise logins"
                     text="Support for SAML, Azure. More enterprise providers and SSO coming soon."
                   />
                 </div>
                 <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
-                    icon={<IconEye />}
+                    icon={<Eye />}
                     title="Social login scopes"
                     text="Request additional user data permissions when using social logins."
                   />
@@ -204,14 +211,10 @@ function AuthPage() {
               </p>
               <p className="p">Policies can be written in SQL or using the dashboard online.</p>
 
-              <Button
-                asChild
-                size="small"
-                type="default"
-                className="mt-4"
-                icon={<IconArrowUpRight />}
-              >
-                <Link href="/docs/guides/auth#policy-examples">Explore documentation</Link>
+              <Button asChild size="small" type="default" className="mt-4" icon={<ArrowUpRight />}>
+                <Link href="/docs/guides/database/postgres/row-level-security">
+                  Explore documentation
+                </Link>
               </Button>
             </div>
             <div className="col-span-12 lg:col-span-6 lg:col-start-7">
@@ -222,8 +225,6 @@ function AuthPage() {
             </div>
           </div>
         </SectionContainer>
-
-        <AuthWidgetSection />
 
         <CTABanner />
       </DefaultLayout>

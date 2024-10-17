@@ -6,7 +6,6 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconCopy,
 } from 'ui'
 import { Grid, GridItem } from './grid'
 

@@ -6,8 +6,9 @@ import InformationBox from 'components/ui/InformationBox'
 import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
-import { Button, Form, IconEye, IconEyeOff, IconHelpCircle, Input, Modal } from 'ui'
+import { Button, Form, Input, Modal } from 'ui'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
+import { EyeOff, Eye, HelpCircle } from 'lucide-react'
 
 interface AddNewSecretModalProps {
   visible: boolean
@@ -107,7 +108,7 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
                     <div className="mr-1">
                       <Button
                         type="default"
-                        icon={showSecretValue ? <IconEyeOff /> : <IconEye />}
+                        icon={showSecretValue ? <EyeOff /> : <Eye />}
                         onClick={() => setShowSecretValue(!showSecretValue)}
                       />
                     </div>
@@ -125,7 +126,7 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
                   onSelectKey={setSelectedKeyId}
                 />
                 <InformationBox
-                  icon={<IconHelpCircle size={18} strokeWidth={2} />}
+                  icon={<HelpCircle size={18} strokeWidth={2} />}
                   url="https://github.com/supabase/vault"
                   urlLabel="Vault documentation"
                   title="What is a key?"

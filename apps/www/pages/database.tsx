@@ -1,27 +1,28 @@
 // Import Swiper styles
 import 'swiper/css'
 
-import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Badge, Button, IconArrowUpRight, IconX, Image, Tabs } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { Badge, Button, Image, Tabs } from 'ui'
 
 // data
 import Solutions from 'data/Solutions'
 import ApiExamplesData from 'data/products/database/api-examples'
-import HighlightsCards from '~/data/products/database/highlight-cards'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
+import HighlightsCards from '~/data/products/database/highlight-cards'
 
-import { TweetCard } from 'ui-patterns/TweetCard'
-import ProductHeader from '~/components/Sections/ProductHeader'
-import ProductsNav from '~/components/Products/ProductsNav'
+import { ArrowUpRight, X } from 'lucide-react'
 import { PRODUCT_NAMES } from 'shared-data/products'
+import { TweetCard } from 'ui-patterns/TweetCard'
+import ProductsNav from '~/components/Products/ProductsNav'
+import ProductHeader from '~/components/Sections/ProductHeader'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
 const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
@@ -103,7 +104,7 @@ function Database() {
             <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
               <div className="p mb-4 flex items-center space-x-2">
                 <ProductIcon icon={Solutions['database'].icon} />
-                <IconX />
+                <X />
                 <div className="flex w-fit items-center">
                   <NextImage
                     src={`${basePath}/images/product/database/postgresql-icon.svg`}
@@ -122,7 +123,7 @@ function Database() {
             <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
               <div className="p mb-4 flex items-center space-x-2">
                 <ProductIcon icon={Solutions['database'].icon} />
-                <IconX />
+                <X />
                 <ProductIcon icon={Solutions['authentication'].icon} />
               </div>
 
@@ -136,7 +137,7 @@ function Database() {
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
               <div className="p mb-4 flex items-center space-x-2">
                 <ProductIcon icon={Solutions['database'].icon} />
-                <IconX />
+                <X />
                 <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
               </div>
 
@@ -304,7 +305,7 @@ function Database() {
                 title="40+ preinstalled extensions"
                 text="We only show a few of the extensions supported by Supabase here, but we preinstall many more that you can use right away."
               />
-              <Button asChild size="small" type="default" icon={<IconArrowUpRight />}>
+              <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
                 <Link href="/docs/guides/database">Explore documentation</Link>
               </Button>
             </div>

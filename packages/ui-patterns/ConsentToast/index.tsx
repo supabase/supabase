@@ -11,7 +11,7 @@ import { noop } from 'lodash'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 
 interface ConsentToastProps {
   onAccept: () => void
@@ -22,10 +22,10 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
   const isMobile = useBreakpoint(639)
 
   return (
-    <div className="space-y-3 py-1 flex flex-col w-full">
+    <div className="py-1 flex flex-col gap-y-3 w-full">
       <div>
-        <p className="text-foreground">
-          We only collect analytics essential to ensuring smooth operation of our services.{' '}
+        <p className="text-sm text-foreground">
+          We use first-party cookies to improve our services.
           <Link
             className="inline sm:hidden underline text-light"
             target="_blank"
@@ -92,7 +92,12 @@ export const useConsent = () => {
           id: 'consent-toast',
           position: 'bottom-right',
           duration: Infinity,
-          closeButton: true,
+          closeButton: false,
+          dismissible: false,
+          className: cn(
+            '!w-screen !fixed !border-t !h-auto !left-0 !bottom-0 !top-auto !right-0 !rounded-none !max-w-none !bg-overlay !text',
+            'sm:!w-full sm:!max-w-[356px] sm:!left-auto sm:!right-8 sm:!bottom-8 sm:!rounded-lg sm:border'
+          ),
         }
       )
     }
@@ -110,7 +115,9 @@ export const useConsent = () => {
   }, [])
 
   useEffect(() => {
-    triggerConsentToast()
+    setTimeout(() => {
+      consentValue === null && triggerConsentToast()
+    }, 300)
   }, [consentValue])
 
   return {

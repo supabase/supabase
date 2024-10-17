@@ -73,7 +73,7 @@ const TotalUsage = ({
     if (!usage) return []
 
     const breakdownMetrics = BILLING_BREAKDOWN_METRICS.filter((metric) =>
-      usage.usages.some((usage) => !usage.available_in_plan || usage.metric === metric.key)
+      usage.usages.some((usage) => usage.metric === metric.key)
     ).filter((metric) => {
       if (!METRICS_TO_HIDE_WITH_NO_USAGE.includes(metric.key as PricingMetric)) return true
 

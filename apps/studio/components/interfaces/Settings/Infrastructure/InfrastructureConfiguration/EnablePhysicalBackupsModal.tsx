@@ -123,7 +123,7 @@ export const EnablePhysicalBackupsModal = ({ selectedRegion }: EnablePhysicalBac
         </DialogSection>
         {!enabling && (
           <DialogFooter>
-            <Button asChild type="default" icon={<ExternalLink size={14} />}>
+            <Button asChild type="default" icon={<ExternalLink />}>
               <a
                 target="_blank"
                 rel="noreferrer"

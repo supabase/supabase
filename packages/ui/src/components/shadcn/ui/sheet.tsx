@@ -177,12 +177,15 @@ const SheetContent = React.forwardRef<
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('px-5 py-4 text-center sm:text-left border-b', className)} {...props} />
+  <div
+    className={cn('px-5 py-4 text-center sm:text-left border-b bg-dash-sidebar', className)}
+    {...props}
+  />
 )
 SheetHeader.displayName = 'SheetHeader'
 
 const SheetSection = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('px-content py-content', className)} {...props} />
+  <div className={cn('px-5 py-4', className)} {...props} />
 )
 SheetSection.displayName = 'SheetSection'
 
@@ -202,11 +205,7 @@ const SheetTitle = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
 >(({ className, ...props }, ref) => (
-  <SheetPrimitive.Title
-    ref={ref}
-    className={cn('text-base text-foreground', className)}
-    {...props}
-  />
+  <SheetPrimitive.Title ref={ref} className={cn('text-lg text-foreground', className)} {...props} />
 ))
 SheetTitle.displayName = SheetPrimitive.Title.displayName
 
@@ -216,7 +215,7 @@ const SheetDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-foreground-muted', className)}
+    className={cn('text-sm text-foreground-light', className)}
     {...props}
   />
 ))

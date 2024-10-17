@@ -58,13 +58,16 @@ const PolicyRow = ({
             <Badge color="yellow">Applies to anonymous users</Badge>
           ) : null}
         </div>
-        <div className="flex items-center gap-x-1">
-          <p className="text-foreground-light text-sm">Applied to:</p>
-          {policy.roles.slice(0, 3).map((role, i) => (
-            <code key={`policy-${role}-${i}`} className="text-foreground-light text-xs">
-              {role}
-            </code>
-          ))}
+        <div className="flex items-center gap-x-1 ml-[60px]">
+          <div className="text-foreground-lighter text-sm">
+            Applied to:
+            {policy.roles.slice(0, 3).map((role, i) => (
+              <code key={`policy-${role}-${i}`} className="text-foreground-light text-xs">
+                {role}
+              </code>
+            ))}{' '}
+            role
+          </div>
           {policy.roles.length > 3 && (
             <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>

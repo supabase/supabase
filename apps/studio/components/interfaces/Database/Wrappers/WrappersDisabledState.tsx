@@ -11,7 +11,8 @@ import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/dat
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
-import { Button, IconExternalLink } from 'ui'
+import { Button } from 'ui'
+import { ExternalLink } from 'lucide-react'
 
 const WrappersDisabledState = () => {
   const { ref } = useParams()
@@ -116,7 +117,7 @@ const WrappersDisabledState = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 my-1 ml-[1px]">
-                <Button asChild type="default" icon={<IconExternalLink />}>
+                <Button asChild type="default" icon={<ExternalLink />}>
                   <Link
                     href="https://supabase.com/docs/guides/database/extensions/wrappers/overview"
                     target="_blank"
@@ -129,7 +130,7 @@ const WrappersDisabledState = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <Button asChild type="default" icon={<IconExternalLink />}>
+              <Button asChild type="default" icon={<ExternalLink />}>
                 <Link
                   href="https://supabase.com/docs/guides/database/extensions/wrappers/overview"
                   target="_blank"

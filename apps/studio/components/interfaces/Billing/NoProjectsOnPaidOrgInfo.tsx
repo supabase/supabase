@@ -1,5 +1,5 @@
+import { Info } from 'lucide-react'
 import Link from 'next/link'
-import { IconInfo } from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
 import { useProjectsQuery } from 'data/projects/projects-query'
@@ -30,7 +30,7 @@ const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInfoProps)
       defaultVisibility={true}
       hideCollapse
       title={`Your organization is on the ${orgSubscription.plan.name} plan with no projects running`}
-      icon={<IconInfo strokeWidth={2} />}
+      icon={<Info strokeWidth={2} />}
       description={
         <div>
           The monthly fees for the paid plan still apply. To cancel your subscription, head over to

@@ -6,7 +6,7 @@ import {
   CreditCardIcon,
   ClipboardCheckIcon,
 } from '@heroicons/react/outline'
-import { IconActivity, IconLock, IconSmartphone } from 'ui'
+import { Activity, Lock } from 'lucide-react'
 import Layout from '../layouts/Layout'
 
 export const meta = {
@@ -46,7 +46,7 @@ export const Section = ({ children, icon, img }) => (
 
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-16">
 
-<Section icon={<IconLock strokeWidth={1}/>}>
+<Section icon={<Lock strokeWidth={1}/>}>
 
 ### Multi-factor Authentication
 
@@ -69,7 +69,7 @@ Enterprise and Team customers can access our SOC2 report [on the dashboard](/das
 
 </Section>
 
-<Section icon={<IconActivity strokeWidth={1}/>}>
+<Section icon={<Activity strokeWidth={1}/>}>
 
 ### HIPAA
 

@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
-import dayjs from 'dayjs'
-import Link from 'next/link'
-import { LW_URL, TWEET_TEXT, TWEET_TEXT_PLATINUM, TWEET_TEXT_SECRET } from '~/lib/constants'
-import { Button, cn, IconCheck } from 'ui'
-import { useParams } from '~/hooks/useParams'
-import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useBreakpoint } from 'common'
+import dayjs from 'dayjs'
+import { Check } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
+import { Button, cn } from 'ui'
+import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
+import { useParams } from '~/hooks/useParams'
+import { LW_URL, TWEET_TEXT, TWEET_TEXT_PLATINUM, TWEET_TEXT_SECRET } from '~/lib/constants'
 
 export default function TicketActions2() {
   const { userData, supabase } = useConfData()
@@ -89,14 +90,14 @@ export default function TicketActions2() {
             size={isLessThanMd ? 'tiny' : 'small'}
             className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] opacity-50"
             disabled
-            icon={<IconCheck strokeWidth={3} />}
+            icon={<Check strokeWidth={3} />}
           >
             Ticket claimed
           </Button>
           <Button
             onClick={() => handleShare('twitter')}
             type={userData.shared_on_twitter ? 'secondary' : 'default'}
-            icon={userData.shared_on_twitter && <IconCheck strokeWidth={3} />}
+            icon={userData.shared_on_twitter && <Check strokeWidth={3} />}
             size={isLessThanMd ? 'tiny' : 'small'}
             className="px-2 lg:px-3.5 h-[28px] lg:h-[34px]"
             asChild
@@ -108,7 +109,7 @@ export default function TicketActions2() {
           <Button
             onClick={() => handleShare('linkedin')}
             type={userData.shared_on_linkedin ? 'secondary' : 'default'}
-            icon={userData.shared_on_linkedin && <IconCheck strokeWidth={3} />}
+            icon={userData.shared_on_linkedin && <Check strokeWidth={3} />}
             size={isLessThanMd ? 'tiny' : 'small'}
             className="px-2 lg:px-3.5 h-[28px] lg:h-[34px]"
             asChild

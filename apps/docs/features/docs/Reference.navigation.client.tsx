@@ -1,6 +1,7 @@
 'use client'
 
 import * as Collapsible from '@radix-ui/react-collapsible'
+
 import { debounce } from 'lodash'
 import { ChevronUp } from 'lucide-react'
 import Link from 'next/link'
@@ -10,9 +11,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 
 import { cn } from 'ui'
 
-import { BASE_PATH } from '~/lib/constants'
-import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.navigation'
+import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { isElementInViewport } from '~/features/ui/helpers.dom'
+import { BASE_PATH } from '~/lib/constants'
 
 export const ReferenceContentInitiallyScrolledContext = createContext<boolean>(false)
 
@@ -26,27 +27,27 @@ export function ReferenceContentScrollHandler({
   version: string
   isLatestVersion: boolean
 }>) {
-  const checkedPathnameOnLoad = useRef(false)
   const [initiallyScrolled, setInitiallyScrolled] = useState(false)
 
   const pathname = usePathname()
 
   useEffect(() => {
-    if (!checkedPathnameOnLoad.current) {
+    if (!initiallyScrolled) {
       const initialSelectedSection = pathname.replace(
         `/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}`,
         ''
       )
       if (initialSelectedSection) {
         const section = document.getElementById(initialSelectedSection)
-        section?.scrollIntoView()
-        section?.querySelector('h2')?.focus()
+        if (section) {
+          window.scrollTo(0, section.offsetTop - 60 /* space for header + padding */)
+          section.querySelector('h2')?.focus()
+        }
       }
 
-      checkedPathnameOnLoad.current = true
       setInitiallyScrolled(true)
     }
-  }, [pathname, libPath, version, isLatestVersion])
+  }, [pathname, libPath, version, isLatestVersion, initiallyScrolled])
 
   return (
     <ReferenceContentInitiallyScrolledContext.Provider value={initiallyScrolled}>
@@ -59,14 +60,33 @@ export function ReferenceNavigationScrollHandler({
   children,
   ...rest
 }: PropsWithChildren & HTMLAttributes<HTMLDivElement>) {
+  const parentRef = useRef<HTMLElement>()
   const ref = useRef<HTMLDivElement>()
   const initialScrollHappened = useContext(ReferenceContentInitiallyScrolledContext)
+
+  useEffect(() => {
+    if (!ref.current) return
+
+    let scrollingParent: HTMLElement = ref.current
+
+    while (scrollingParent && !(scrollingParent.scrollHeight > scrollingParent.clientHeight)) {
+      scrollingParent = scrollingParent.parentElement
+    }
+
+    parentRef.current = scrollingParent
+  }, [])
 
   const scrollActiveIntoView = useCallback(() => {
     const currentLink = ref.current?.querySelector('[aria-current=page]') as HTMLElement
     if (currentLink && !isElementInViewport(currentLink)) {
-      currentLink.scrollIntoView({
-        block: 'center',
+      // Calculate the offset of the current link relative to scrollingParent
+      // and scroll the parent to the top of the link.
+      const offsetTop = currentLink.offsetTop
+      const parentOffsetTop = parentRef.current?.offsetTop ?? 0
+      const scrollPosition = offsetTop - parentOffsetTop
+
+      parentRef.current?.scrollTo({
+        top: scrollPosition - 60 /* space for header + padding */,
       })
     }
   }, [])
@@ -91,7 +111,7 @@ export function ReferenceNavigationScrollHandler({
   )
 }
 
-function deriveHref(basePath: string, section: AbbrevCommonClientLibSection) {
+function deriveHref(basePath: string, section: AbbrevApiReferenceSection) {
   return 'slug' in section ? `${basePath}/${section.slug}` : ''
 }
 
@@ -105,6 +125,50 @@ function getLinkStyles(isActive: boolean, className?: string) {
   )
 }
 
+/**
+ * Creates a function that navigates to a reference subsection.
+ *
+ * Since reference "pages" are actually an agglomeration of many "pages", we
+ * don't want to actually complete a full page navigation.
+ *
+ * @param href - The path to the navigation target.
+ * @param sectionSlug - The slug of the section to navigate to.
+ * @returns A function that navigates to the reference subsection.
+ */
+function createReferenceSubsectionNavigator(href: string, sectionSlug?: string) {
+  return function navigateToReferenceSubsection(evt: MouseEvent) {
+    if (sectionSlug) {
+      evt.preventDefault()
+      history.pushState({}, '', `${BASE_PATH}${href}`)
+
+      const domElement = document.getElementById(sectionSlug)
+      domElement?.scrollIntoView()
+      domElement?.querySelector('h2')?.focus()
+    }
+  }
+}
+
+export function RefInternalLink({
+  href,
+  sectionSlug,
+  children,
+}: {
+  href: string
+  sectionSlug?: string
+  children: React.ReactNode
+}) {
+  const onClick = useCallback(
+    (evt: MouseEvent) => createReferenceSubsectionNavigator(href, sectionSlug)(evt),
+    [href, sectionSlug]
+  )
+
+  return (
+    <Link href={href} onClick={onClick}>
+      {children}
+    </Link>
+  )
+}
+
 export function RefLink({
   basePath,
   section,
@@ -112,7 +176,7 @@ export function RefLink({
   className,
 }: {
   basePath: string
-  section: AbbrevCommonClientLibSection
+  section: AbbrevApiReferenceSection
   skipChildren?: boolean
   className?: string
 }) {
@@ -122,6 +186,18 @@ export function RefLink({
   const href = deriveHref(basePath, section)
   const isActive =
     pathname === href || (pathname === basePath && href.replace(basePath, '') === '/introduction')
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.ariaCurrent = isActive ? 'page' : undefined
+      ref.current.className = getLinkStyles(isActive, className)
+    }
+  }, [isActive, className])
+
+  const onClick = useCallback(
+    (evt: MouseEvent) => createReferenceSubsectionNavigator(href, section.slug)(evt),
+    [href, section.slug]
+  )
 
   if (!('title' in section)) return null
 
@@ -134,26 +210,12 @@ export function RefLink({
       ) : (
         <Link
           ref={ref}
+          // We don't use these links because we never do real navigation, so
+          // prefetching just wastes bandwidth
+          prefetch={false}
           href={href}
-          aria-current={isActive ? 'page' : false}
           className={getLinkStyles(isActive, className)}
-          onClick={(evt: MouseEvent) => {
-            /*
-             * We don't actually want to navigate or rerender anything since
-             * links are all to sections on the same page.
-             */
-            evt.preventDefault()
-            history.pushState({}, '', `${BASE_PATH}${href}`)
-
-            if ('slug' in section) {
-              const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-              const domElement = document.getElementById(section.slug)
-              domElement?.scrollIntoView({
-                behavior: reduceMotion ? 'auto' : 'smooth',
-              })
-              domElement?.querySelector('h2')?.focus()
-            }
-          }}
+          onClick={onClick}
         >
           {section.title}
         </Link>
@@ -162,7 +224,7 @@ export function RefLink({
   )
 }
 
-function useCompoundRefLinkActive(basePath: string, section: AbbrevCommonClientLibSection) {
+function useCompoundRefLinkActive(basePath: string, section: AbbrevApiReferenceSection) {
   const [open, _setOpen] = useState(false)
 
   const pathname = usePathname()
@@ -195,7 +257,7 @@ function CompoundRefLink({
   section,
 }: {
   basePath: string
-  section: AbbrevCommonClientLibSection
+  section: AbbrevApiReferenceSection
 }) {
   const { open, setOpen, isActive } = useCompoundRefLinkActive(basePath, section)
 

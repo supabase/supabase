@@ -93,10 +93,16 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     () => entities?.pages.flatMap((page) => page.data.entities) || [],
     [entities?.pages]
   )
+
   const columns = tableColumns?.result[0]?.columns ?? []
-  const columnOptions: MultiSelectOption[] = columns.map((column) => {
-    return { id: column.attname, value: column.attname, name: column.attname, disabled: false }
-  })
+  const columnOptions: MultiSelectOption[] = columns
+    .filter((column): column is NonNullable<typeof column> => column !== null)
+    .map((column) => ({
+      id: column.attname,
+      value: column.attname,
+      name: column.attname,
+      disabled: false,
+    }))
 
   const generatedSQL = `
 CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexType} (${selectedColumns

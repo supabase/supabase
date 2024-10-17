@@ -14,7 +14,10 @@ import { useBackupsQuery } from 'data/database/backups-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { PROJECT_STATUS } from 'lib/constants'
+import { AlertCircle } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -58,6 +61,7 @@ const PITR = () => {
 
   const plan = subscription?.plan?.id
   const isEnabled = backups?.pitr_enabled
+  const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const isPermissionsLoaded = usePermissionsLoaded()
   const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
@@ -72,21 +76,31 @@ const PITR = () => {
       {isError && <AlertError error={error} subject="Failed to retrieve PITR backups" />}
       {isSuccess && (
         <>
-          {isEnabled ? (
-            <>
-              <PITRNotice />
-              <PITRSelection />
-            </>
-          ) : (
+          {!isEnabled ? (
             <UpgradeToPro
               addon="pitr"
               primaryText="Point in Time Recovery is a Pro Plan add-on."
               secondaryText={
                 plan === 'free'
-                  ? 'With PITR, you can roll back to a specific time (to the second!). PITR starts from $100/mo and is available for Pro Plan customers. Note that the Pro Plan already includes daily backups for no extra charge—PITR is an optional upgrade.'
+                  ? 'With PITR, you can roll back to a specific time (to the second!). PITR starts from $100/mo and is available for Pro Plan customers. Note that the Pro Plan already includes daily backups for no extra charge — PITR is an optional upgrade.'
                   : 'Please enable the add-on to enable point in time recovery for your project.'
               }
             />
+          ) : !isActiveHealthy ? (
+            <Alert_Shadcn_>
+              <AlertCircle />
+              <AlertTitle_Shadcn_>
+                Point in Time Recovery is not available while project is offline
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                Your project needs to be online to restore your database with Point in Time Recovery
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          ) : (
+            <>
+              <PITRNotice />
+              <PITRSelection />
+            </>
           )}
         </>
       )}

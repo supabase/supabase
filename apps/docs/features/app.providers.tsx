@@ -3,7 +3,7 @@ import { type PropsWithChildren } from 'react'
 import { ThemeProvider } from 'common'
 import { SonnerToaster } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { PromoToast } from 'ui-patterns/PromoToast'
+// import { PromoToast } from 'ui-patterns/PromoToast'
 import SiteLayout from '~/layouts/SiteLayout'
 import { AuthContainer } from './auth/auth.client'
 import { DocsCommandMenu } from './command'
@@ -25,7 +25,7 @@ function GlobalProviders({ children }: PropsWithChildren) {
           <CommandProvider>
             <div className="flex flex-col">
               <SiteLayout>
-                <PromoToast />
+                {/* <PromoToast /> */}
                 {children}
                 <DocsCommandMenu />
               </SiteLayout>

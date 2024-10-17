@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ChevronRight, Clipboard, Download, Edit, Move, Trash2 } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { IconChevronRight, IconClipboard, IconDownload, IconEdit, IconMove, IconTrash2 } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItemWithColumn } from '../Storage.types'
 import { useCopyUrl } from './useCopyUrl'
@@ -27,7 +27,7 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
   } = storageExplorerStore
   const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
   const isPublic = selectedBucket.public
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const onHandleClick = async (event: any, item: StorageItemWithColumn, expiresIn?: number) => {
     if (item.isCorrupted) return
@@ -50,18 +50,18 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
     <Menu id={id} animation="fade">
       {isPublic ? (
         <Item onClick={({ props }) => onHandleClick('copy', props.item)}>
-          <IconClipboard size="tiny" />
+          <Clipboard size="14" strokeWidth={1} />
           <span className="ml-2 text-xs">Get URL</span>
         </Item>
       ) : (
         <Submenu
           label={
             <div className="flex items-center space-x-2">
-              <IconClipboard size="tiny" />
+              <Clipboard size="14" />
               <span className="text-xs">Get URL</span>
             </div>
           }
-          arrow={<IconChevronRight size="tiny" />}
+          arrow={<ChevronRight size="14" strokeWidth={1} />}
         >
           <Item
             onClick={({ props }) => onHandleClick('copy', props.item, URL_EXPIRY_DURATION.WEEK)}
@@ -85,20 +85,20 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
       )}
       {canUpdateFiles && [
         <Item key="rename-file" onClick={({ props }) => onHandleClick('rename', props.item)}>
-          <IconEdit size="tiny" />
+          <Edit size="14" strokeWidth={1} />
           <span className="ml-2 text-xs">Rename</span>
         </Item>,
         <Item key="move-file" onClick={({ props }) => onHandleClick('move', props.item)}>
-          <IconMove size="tiny" />
+          <Move size="14" strokeWidth={1} />
           <span className="ml-2 text-xs">Move</span>
         </Item>,
         <Item key="download-file" onClick={({ props }) => onHandleClick('download', props.item)}>
-          <IconDownload size="tiny" />
+          <Download size="14" strokeWidth={1} />
           <span className="ml-2 text-xs">Download</span>
         </Item>,
         <Separator key="file-separator" />,
         <Item key="delete-file" onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
-          <IconTrash2 size="tiny" stroke="red" />
+          <Trash2 size="14" strokeWidth={1} stroke="red" />
           <span className="ml-2 text-xs">Delete</span>
         </Item>,
       ]}

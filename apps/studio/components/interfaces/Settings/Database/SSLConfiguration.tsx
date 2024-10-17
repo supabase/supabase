@@ -58,7 +58,11 @@ const SSLConfiguration = () => {
       sslEnforcementConfiguration.currentConfig.database
     : false
 
-  const hasAccessToSSLEnforcement = !sslEnforcementConfiguration?.isNotAllowed
+  const hasAccessToSSLEnforcement = !(
+    sslEnforcementConfiguration !== undefined &&
+    'isNotAllowed' in sslEnforcementConfiguration &&
+    sslEnforcementConfiguration.isNotAllowed
+  )
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
   const hasSSLCertificate =
     projectSettings?.project !== undefined &&
@@ -131,17 +135,20 @@ const SSLConfiguration = () => {
               {isSuccess && (
                 <Tooltip_Shadcn_>
                   <TooltipTrigger_Shadcn_ asChild>
-                    <Switch
-                      size="large"
-                      checked={isEnforced}
-                      disabled={
-                        isLoading ||
-                        isSubmitting ||
-                        !canUpdateSSLEnforcement ||
-                        !hasAccessToSSLEnforcement
-                      }
-                      onCheckedChange={toggleSSLEnforcement}
-                    />
+                    {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                    <div>
+                      <Switch
+                        size="large"
+                        checked={isEnforced}
+                        disabled={
+                          isLoading ||
+                          isSubmitting ||
+                          !canUpdateSSLEnforcement ||
+                          !hasAccessToSSLEnforcement
+                        }
+                        onCheckedChange={toggleSSLEnforcement}
+                      />
+                    </div>
                   </TooltipTrigger_Shadcn_>
                   {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
                     <TooltipContent_Shadcn_ side="bottom" className="w-64 text-center">

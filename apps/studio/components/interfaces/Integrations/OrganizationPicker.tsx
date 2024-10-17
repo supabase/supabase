@@ -15,12 +15,12 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  IconChevronDown,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   cn,
 } from 'ui'
+import { ChevronDown } from 'lucide-react'
 
 export interface OrganizationPickerProps {
   integrationName: IntegrationName
@@ -70,7 +70,7 @@ const OrganizationPicker = ({
             disabled={disabled}
             iconRight={
               <span className="grow flex justify-end">
-                <IconChevronDown />
+                <ChevronDown />
               </span>
             }
           >

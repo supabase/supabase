@@ -44,11 +44,8 @@ const PromoToast = () => {
         visible && 'opacity-100 translate-y-0'
       )}
     >
-      <p className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7">
-        Launch Week 12
-      </p>
+      <p className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"></p>
       <div className="relative z-10 text-foreground-lighter flex flex-col text-sm w-full mb-2">
-        Explore what we shipped
         {/* <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} /> */}
       </div>
 
