@@ -172,7 +172,7 @@ const ServiceStatus = () => {
   const allServicesOperational = services.every((service) => service.isSuccess)
 
   const [dateRange] = useState<{ startDate: string; endDate: string }>({
-    startDate: dayjs().subtract(30, 'minute').toISOString(),
+    startDate: dayjs().subtract(10, 'minute').toISOString(),
     endDate: dayjs().toISOString(),
   })
 
