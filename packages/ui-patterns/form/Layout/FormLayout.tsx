@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority'
+import { motion } from 'framer-motion'
 import React from 'react'
 import {
   FormDescription_Shadcn_,
@@ -8,7 +9,6 @@ import {
   cn,
 } from 'ui'
 import { SIZE } from 'ui/src/lib/constants'
-import { AnimatePresence, motion } from 'framer-motion'
 
 type Props = {
   align?: 'left' | 'right'

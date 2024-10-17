@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
 
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 import { Markdown } from '../Markdown'
 import { ExternalLink } from 'lucide-react'
 

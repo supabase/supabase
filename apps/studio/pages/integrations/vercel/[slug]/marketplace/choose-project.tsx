@@ -63,7 +63,9 @@ const VercelIntegration: NextPageWithLayout = () => {
             project.organization_id === organization?.id &&
             (project.status === PROJECT_STATUS['ACTIVE_HEALTHY'] ||
               project.status === PROJECT_STATUS['COMING_UP'] ||
-              project.status === PROJECT_STATUS['RESTORING'])
+              project.status === PROJECT_STATUS['RESTORING'] ||
+              project.status === PROJECT_STATUS['RESTARTING'] ||
+              project.status === PROJECT_STATUS['RESIZING'])
         )
         .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
     [organization?.id, supabaseProjectsData]

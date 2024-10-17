@@ -29,6 +29,7 @@ interface RLSCodeEditorProps {
 
   editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
   monacoRef?: MutableRefObject<Monaco>
+  editView: 'templates' | 'conversation' // someone help
 }
 
 const RLSCodeEditor = ({
@@ -47,6 +48,7 @@ const RLSCodeEditor = ({
 
   editorRef,
   monacoRef,
+  editView,
 }: RLSCodeEditorProps) => {
   const hasValue = useRef<any>()
   const monaco = useMonaco()
@@ -66,6 +68,9 @@ const RLSCodeEditor = ({
     lineNumbersMinChars: 4,
     folding: undefined,
     scrollBeyondLastLine: false,
+    padding: {
+      top: editView === 'conversation' ? 20 : 0,
+    },
   }
 
   const onMount: OnMount = async (editor, monaco) => {

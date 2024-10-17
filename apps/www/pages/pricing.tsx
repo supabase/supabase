@@ -81,7 +81,7 @@ export default function IndexPage() {
               <br className="block lg:hidden" /> designed to scale
             </h1>
             <p className="p text-lg leading-5">
-              Start building for free, collaborate with your team, then scale to billions of users
+              Start building for free, collaborate with your team, then scale to millions of users
             </p>
           </div>
         </div>

@@ -12,6 +12,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import SettingsLayout from '../SettingsLayout/SettingsLayout'
 import type { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
+import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 
 export interface AccountLayoutProps {
   title: string
@@ -27,9 +28,12 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const selectedOrganization = useSelectedOrganization()
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const enablePostHogTelemetry = useFlag('enablePosthogChanges')
+  const { mutateAsync: sendReset } = useSendResetMutation()
 
   const signOut = useSignOut()
   const onClickLogout = async () => {
+    if (enablePostHogTelemetry) await sendReset()
     await signOut()
     await router.push('/sign-in')
   }

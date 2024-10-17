@@ -7,10 +7,10 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateSettingsMenu } from './SettingsMenu.utils'
-import { useFlag } from 'hooks/ui/useFlag'
 
 interface SettingsLayoutProps {
   title?: string
@@ -65,9 +65,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
       product="Settings"
       productMenu={<ProductMenu page={page} menu={menuRoutes} />}
     >
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+      {children}
     </ProjectLayout>
   )
 }

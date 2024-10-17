@@ -18,7 +18,7 @@ const DatabaseTables: NextPageWithLayout = () => {
     <>
       <ScaffoldContainer>
         <ScaffoldSection>
-          <div className="col-span-12 space-x-2">
+          <div className="col-span-12">
             <FormHeader title="Database Tables" />
             <TableList
               onAddTable={snap.onAddTable}
@@ -29,6 +29,10 @@ const DatabaseTables: NextPageWithLayout = () => {
               onDeleteTable={(table) => {
                 setSelectedTableToEdit(table)
                 snap.onDeleteTable()
+              }}
+              onDuplicateTable={(table) => {
+                setSelectedTableToEdit(table)
+                snap.onDuplicateTable()
               }}
             />
           </div>

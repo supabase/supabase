@@ -4,7 +4,6 @@ Supabase is 100% remote.
 
 Alaister Young
 Aleksi Immonen
-Alex Tasioulis
 Alexander Korotkov
 Amy Q
 Andrew Valleteau
@@ -14,7 +13,6 @@ Ariuna K
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
-Bruno Andrade
 Carel de Waal
 Chandana Anumula
 Charis Lam
@@ -33,11 +31,13 @@ Egor Romanov
 Etienne Stalmans
 Fabrizio Fenoglio
 Francesco Sansalvadore
+Greg P
 Greg Richardson
 Guilherme Souza
 Haydn Maley
 Hieu Pham
 Inian P
+Ivan Vasilov
 Jenny Kibiri
 Jess Shears
 Joel Lee
@@ -56,6 +56,7 @@ Kevin Grüneberg
 Lakshan Perera
 Laura C
 Long Hoang
+Łukasz Niemier
 Margarita Sandomirskaia
 Mark Burggraf
 Monica El Khoury

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { ExternalLink, Info } from 'lucide-react'
 
 import { useParams } from 'common'
 import {
@@ -37,7 +38,6 @@ import {
   SidePanel,
   WarningIcon,
 } from 'ui'
-import { ExternalLink, Info } from 'lucide-react'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()
@@ -68,7 +68,7 @@ const ComputeInstanceSidePanel = () => {
         `Successfully updated compute instance to ${selectedCompute?.name}. Your project is currently being restarted to update its instance`,
         { duration: 8000 }
       )
-      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
+      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
       closePanel()
       router.push(`/project/${projectRef}`)
     },
@@ -82,7 +82,7 @@ const ComputeInstanceSidePanel = () => {
         `Successfully updated compute instance. Your project is currently being restarted to update its instance`,
         { duration: 8000 }
       )
-      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
+      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
       closePanel()
       router.push(`/project/${projectRef}`)
     },

@@ -1,5 +1,6 @@
 APIs
 [Aa]uth
+[Bb]aselining
 Berri
 [Cc]hatbots?
 ChatGPT
@@ -9,6 +10,7 @@ Colab
 [Cc]onfigs?
 CPUs?
 CTEs?
+DBeaver
 [Dd]eclarative(ly)?
 [Dd]eduplicat(e|ion)
 [Dd]eeplinks?
@@ -49,6 +51,7 @@ OpenAI
 [Pp]erformant
 pg_plan_filter
 PGAudit
+pgAdmin
 PGroonga
 pgvector
 Pinecone
@@ -68,6 +71,8 @@ RESTful
 Roboflow
 [Ss]crollable
 [Ss]erializ(e|ed|es|ing)
+[Ss]erverless
+[Ss]erverside
 [Ss]igncryption
 [Ss]ignins?
 [Ss]ignouts?
@@ -89,6 +94,7 @@ unnested
 [Uu]pvot(es|ed|ing)
 Vercel
 Vite
+VM(s)?
 VSCode
 Vue
 [Ww]eb[Ss]ockets?

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { Badge } from 'ui'
 
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 import Table from 'components/to-be-cleaned/Table'
 import type { User } from 'data/auth/users-query'
 import UserDropdown from '../UserDropdown'

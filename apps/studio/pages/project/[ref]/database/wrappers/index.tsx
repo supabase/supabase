@@ -18,7 +18,7 @@ import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const DatabaseWrappers: NextPageWithLayout = () => {
   const { project } = useProjectContext()

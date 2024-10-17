@@ -90,7 +90,7 @@ export default function FetchDataSteps() {
         <Code code={client} />
       </Step>
 
-      <Step title="Build in a weekend and scale to billions!">
+      <Step title="Build in a weekend and scale to millions!">
         <p>You're ready to launch your product to the world! 🚀</p>
       </Step>
     </ol>

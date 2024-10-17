@@ -29,12 +29,12 @@ functions:
       ### OAuth and OTP link verification
 
       [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification. 
-      
+
       **On Desktop platforms (JVM, MacOS\*, Linux)**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login. The success page can be customized via `AuthConfig#httpCallbackConfig` \
       \* If no deeplinks are being used.
 
       *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`* 
-      
+
       **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use [Native Google Auth](/docs/guides/auth/social-login/auth-google?platform=android). \
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically. \
       **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR. 
@@ -3563,7 +3563,7 @@ functions:
         code: |
           ```kotlin
           supabase.auth.linkIdentity(OAuthProvider)
-          
+
           //Example:
           supabase.auth.linkIdentity(Google)
           ```
@@ -3592,10 +3592,10 @@ functions:
           ```kotlin
           //get all identities linked to a user
           val identities = supabase.auth.currentIdentitiesOrNull() ?: emptyList()
-          
+
           //find the google identity linked to the user
           val googleIdentity = identities.first { it.provider == "google" }
-          
+
           //unlink the google identity from the user
           supabase.auth.unlinkIdentity(googleIdentity.identityId!!)
           ```
@@ -4262,51 +4262,51 @@ functions:
     notes: |
       Updates the user data.
     params:
-        - name: uid
-          isOptional: false
-          type: String
-          description: The id of the user you want to update.
-        - name: builder
-          isOptional: false
-          type: AdminUserUpdateBuilder.() -> Unit
-          description: The builder to update the user.
-          subContent:
-            - name: email
-              isOptional: true
-              type: String
-              description: The new email.
-            - name: phone
-              isOptional: true
-              type: String
-              description: The new phone number.
-            - name: password
-              isOptional: true
-              type: String
-              description: The new password.
-            - name: userMetadata
-              isOptional: true
-              type: JsonObject?
-              description: Custom user metadata.
-            - name: appMetadata
-              isOptional: true
-              type: JsonObject?
-              description: Custom app metadata.
-            - name: emailConfirm
-              isOptional: true
-              type: Boolean
-              description: Whether to confirm the user's email.
-            - name: phoneConfirm
-              isOptional: true
-              type: Boolean
-              description: Whether to confirm the user's phone number.
-            - name: banDuration
-              isOptional: true
-              type: String
-              description: The format for the ban duration follows a strict sequence of decimal numbers with a unit suffix. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-            - name: role
-              isOptional: true
-              type: String
-              description: The `role` claim set in the user's access token JWT. When a user signs up, this role is set to `authenticated` by default. You should only modify the `role` if you need to provision several levels of admin access that have different permissions on individual columns in your database.
+      - name: uid
+        isOptional: false
+        type: String
+        description: The id of the user you want to update.
+      - name: builder
+        isOptional: false
+        type: AdminUserUpdateBuilder.() -> Unit
+        description: The builder to update the user.
+        subContent:
+          - name: email
+            isOptional: true
+            type: String
+            description: The new email.
+          - name: phone
+            isOptional: true
+            type: String
+            description: The new phone number.
+          - name: password
+            isOptional: true
+            type: String
+            description: The new password.
+          - name: userMetadata
+            isOptional: true
+            type: JsonObject?
+            description: Custom user metadata.
+          - name: appMetadata
+            isOptional: true
+            type: JsonObject?
+            description: Custom app metadata.
+          - name: emailConfirm
+            isOptional: true
+            type: Boolean
+            description: Whether to confirm the user's email.
+          - name: phoneConfirm
+            isOptional: true
+            type: Boolean
+            description: Whether to confirm the user's phone number.
+          - name: banDuration
+            isOptional: true
+            type: String
+            description: The format for the ban duration follows a strict sequence of decimal numbers with a unit suffix. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+          - name: role
+            isOptional: true
+            type: String
+            description: The `role` claim set in the user's access token JWT. When a user signs up, this role is set to `authenticated` by default. You should only modify the `role` if you need to provision several levels of admin access that have different permissions on individual columns in your database.
     examples:
       - id: updates-a-users-email
         name: Updates a user's email
@@ -4371,10 +4371,10 @@ functions:
     notes: |
       Lists all factors associated to a user.
     params:
-        - name: uid
-          isOptional: false
-          type: String
-          description: The id of the user you want to list factors for.
+      - name: uid
+        isOptional: false
+        type: String
+        description: The id of the user you want to list factors for.
     examples:
       - id: list-factors
         name: List all factors for a user
@@ -4388,14 +4388,14 @@ functions:
     notes: |
       Deletes a factor on a user. This will log the user out of all active sessions if the deleted factor was verified.
     params:
-        - name: uid
-          isOptional: false
-          type: String
-          description: The id of the user you want to delete a factor for.
-        - name: factorId
-          isOptional: false
-          type: String
-          description: The id of the factor you want to delete.
+      - name: uid
+        isOptional: false
+        type: String
+        description: The id of the user you want to delete a factor for.
+      - name: factorId
+        isOptional: false
+        type: String
+        description: The id of the factor you want to delete.
     examples:
       - id: delete-factor
         name: Delete a factor for a user
@@ -4412,22 +4412,22 @@ functions:
     notes: |
       - Requires an Authorization header.
     params:
-        - name: function
-          isOptional: false
-          type: String
-          description: The name of the function to invoke.
-        - name: body
-          isOptional: true
-          type: T
-          description: The body to send with the request. T can be any serializable type.
-        - name: region
-          isOptional: true
-          type: FunctionRegion
-          description: The region where the function is invoked. Defaults to `Functions.Config#defaultRegion`.
-        - name: headers
-          isOptional: true
-          type: Headers
-          description: The headers to send with the request.
+      - name: function
+        isOptional: false
+        type: String
+        description: The name of the function to invoke.
+      - name: body
+        isOptional: true
+        type: T
+        description: The body to send with the request. T can be any serializable type.
+      - name: region
+        isOptional: true
+        type: FunctionRegion
+        description: The region where the function is invoked. Defaults to `Functions.Config#defaultRegion`.
+      - name: headers
+        isOptional: true
+        type: Headers
+        description: The headers to send with the request.
     examples:
       - id: basic-invocation
         name: Basic invocation
@@ -4589,7 +4589,7 @@ functions:
           val channel = supabase.channel("channelId") {
               //optional config
           }
-          
+
           //if you want more control and want to receive the raw data, use the `presenceChangeFlow` method
           val presenceFlow = channel.presenceDataFlow<PresenceState>() 
 
@@ -4635,11 +4635,11 @@ functions:
           val channel = supabase.channel("channelId") {
               //optional config
           }
-          
+
           //This flow will automatically emit the initial data of all messages (which can be restricted by specifying a filter) and then listens for updates.
           //The data is cached automatically by the primary key you specify
           val users: Flow<List<User>> = channel.postgresListDataFlow(schema = "public", table = "users", primaryKey = User::id)
-          
+
           //If you want more control and want to receive the raw data use the `postgresChangeFlow` method:
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
               table = "users"
@@ -4693,7 +4693,7 @@ functions:
           val channel = supabase.channel("channelId") {
               //optional config
           }
-          
+
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
               table = "users"
           }
@@ -4720,7 +4720,7 @@ functions:
           val channel = supabase.channel("channelId") {
               //optional config
           }
-          
+
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
               table = "users"
           }
@@ -4739,13 +4739,13 @@ functions:
           val channel = supabase.channel("channelId") {
              //optional config
           }
-          
+
           //This flow will automatically emit the user's initial data and then emits new values on update. The flow ends on deletion
           val user: Flow<User> = channel.postgresSingleDataFlow(schema = "public", table = "users", primaryKey = User::id) {
               //This is the same filter as used in postgrest, so you could use complex queries, but only one entry is fetched
               eq("id", 1)
           }
-          
+
           //If you want more control, use the `postgresChangeFlow` method which works the same as the other examples
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
               table = "users"
@@ -4942,10 +4942,10 @@ functions:
         - `objects` table permissions: `select` and `delete`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     params:
-        - name: bucketId
-          isOptional: false
-          type: String
-          description: The id of the bucket you want to empty.
+      - name: bucketId
+        isOptional: false
+        type: String
+        description: The id of the bucket you want to empty.
     examples:
       - id: empty-bucket
         name: Empty bucket
@@ -4963,10 +4963,10 @@ functions:
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     params:
-        - name: bucketId
-          isOptional: false
-          type: String
-          description: The id of the bucket you want to delete.
+      - name: bucketId
+        isOptional: false
+        type: String
+        description: The id of the bucket you want to delete.
     examples:
       - id: delete-bucket
         name: Delete bucket

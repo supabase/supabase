@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 11 Jun 2024 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 30 Sep 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/humata</guid>
+  <title>Humata Scales with Supabase - Achieving 4X Cost Savings and Enhanced Performance</title>
+  <link>https://supabase.com/customers/humata</link>
+  <description>By partnering with Supabase, Humata achieved a 4X reduction in vector database costs, streamlined their development, and consolidated their data so they could scale seamlessly.</description>
+  <pubDate>Mon, 30 Sep 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/maergo</guid>
   <title>Maergo&apos;s Express Delivery: How Supabase Helped Achieve Scalability, Speed, and Cost Saving</title>
   <link>https://supabase.com/customers/maergo</link>

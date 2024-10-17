@@ -213,13 +213,17 @@ let data = try await supabase.storage.from("bucket")
 
 ```kotlin
 val data = supabase.storage.from("bucket").downloadAuthenticated("image.jpg") {
-    size(800, 300)
+    transform {
+        size(800, 300)
+    }
 }
 
 //Or on JVM stream directly to a file
 val file = File("image.jpg")
 supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
-    size(800, 300)
+    transform {
+        size(800, 300)
+    }
 }
 ```
 
@@ -308,15 +312,19 @@ let data = try await supabase.storage.from("bucket")
 
 ```kotlin
 val data = supabase.storage.from("bucket").downloadAuthenticated("image.jpg") {
-    size(200, 200)
-	format = "origin"
+    transform {
+        size(200, 200)
+        format = ImageTransformation.Format.ORIGIN
+    }
 }
 
 //Or on JVM stream directly to a file
 val file = File("image.jpg")
 supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
-    size(200, 200)
-	format = "origin"
+    transform {
+        size(200, 200)
+        format = ImageTransformation.Format.ORIGIN
+    }
 }
 ```
 
@@ -431,13 +439,17 @@ let data = try await supabase.storage.from("bucket")
 
 ```kotlin
 val data = supabase.storage["bucket"].downloadAuthenticated("image.jpg") {
-    quality = 50
+    transform {
+        quality = 50
+    }
 }
 
 //Or on JVM stream directly to a file
 val file = File("image.jpg")
 supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
-    quality = 50
+    transform {
+        quality = 50
+    }
 }
 ```
 
@@ -529,15 +541,19 @@ let data = try await supabase.storage.from("bucket")
 
 ```kotlin
 val data = supabase.storage.from("bucket").downloadAuthenticated("image.jpg") {
-    size(800, 300)
-    resize = ImageTransformation.Resize.CONTAIN
+    transform {
+        size(800, 300)
+        resize = ImageTransformation.Resize.CONTAIN
+    }
 }
 
 //Or on JVM stream directly to a file
 val file = File("image.jpg")
 supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
-    size(800, 300)
-    resize = ImageTransformation.Resize.CONTAIN
+    transform {
+        size(800, 300)
+        resize = ImageTransformation.Resize.CONTAIN
+    }
 }
 ```
 

@@ -4,7 +4,6 @@ export * from './src/lib/Markdown'
 
 // GENERAL
 
-export * from 'ui-patterns/admonition'
 export * from './src/components/Button'
 export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
@@ -19,6 +18,7 @@ export * from './src/components/Alert'
 export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
 export * from './src/components/CodeBlock'
+export * from './src/components/SimpleCodeBlock'
 export * from './src/components/TreeView/TreeView'
 
 // NAV

@@ -66,19 +66,19 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
             <Alert_Shadcn_>
               <AlertCircle className="text-foreground-light" strokeWidth={1.5} />
               <AlertTitle_Shadcn_>
-                Remember to restore the original CNAME record from the first step before activating
+                Remember to retain your CNAME record for service continuity after activation
               </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 <p className="col-span-12 text-sm lg:col-span-7 leading-6">
-                  Set up a CNAME record for <code className="text-xs">{customDomain.hostname}</code>
-                  , resolving to{' '}
+                  Your custom domain CNAME record for{' '}
+                  <code className="text-xs">{customDomain.hostname}</code>
+                  should resolve to{' '}
                   {endpoint ? (
                     <code className="text-xs">{endpoint}</code>
                   ) : (
                     "your project's API URL"
                   )}
-                  , with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
-                  disable the proxy option.
+                  . If you're using Cloudflare as your DNS provider, disable the proxy option.
                 </p>
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>

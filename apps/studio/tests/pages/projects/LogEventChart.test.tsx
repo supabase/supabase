@@ -1,7 +1,7 @@
-import { vi } from 'vitest'
+import { afterEach, beforeEach, test, vi } from 'vitest'
 
-import LogEventChart from 'components/interfaces/Settings/Logs/LogEventChart'
 import { screen } from '@testing-library/react'
+import LogEventChart from 'components/interfaces/Settings/Logs/LogEventChart'
 import { render } from '../../helpers'
 
 const { ResizeObserver } = window

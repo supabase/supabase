@@ -2,10 +2,10 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
+import { useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
 
 export type ProjectApiVariables = {
   projectRef?: string
@@ -19,7 +19,6 @@ export type ProjectApiResponse = {
 
 export async function getProjectApi({ projectRef }: ProjectApiVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
-  console.log('SSS')
 
   const { data, error } = await get('/platform/props/project/{ref}/api', {
     params: { path: { ref: projectRef } },
@@ -37,16 +36,12 @@ export const useProjectApiQuery = <TData = ProjectApiData>(
   { projectRef }: ProjectApiVariables,
   { enabled = true, ...options }: UseQueryOptions<ProjectApiData, ProjectApiError, TData> = {}
 ) => {
-  const project = useSelectedProject()
   return useQuery<ProjectApiData, ProjectApiError, TData>(
     configKeys.api(projectRef),
     ({ signal }) => getProjectApi({ projectRef }, signal),
     {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        project?.status === PROJECT_STATUS.ACTIVE_HEALTHY,
-      refetchInterval(data, query) {
+      enabled: enabled && typeof projectRef !== 'undefined',
+      refetchInterval(data) {
         if (!data) {
           return false
         }

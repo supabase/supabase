@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useParams } from 'common'
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import { generateTypes } from 'data/projects/project-type-generation-query'
@@ -16,10 +16,12 @@ export default function GeneratingTypes({ selectedLang }: Props) {
   const { ref } = useParams()
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
+  const { data: config } = useProjectPostgrestConfigQuery({ projectRef: ref })
+
   const onClickGenerateTypes = async () => {
     try {
       setIsGeneratingTypes(true)
-      const res = await generateTypes({ ref })
+      const res = await generateTypes({ ref, included_schemas: config?.db_schema })
       let element = document.createElement('a')
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(res.types))
       element.setAttribute('download', 'supabase.ts')

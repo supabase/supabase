@@ -18,7 +18,7 @@ const LogEventChart = ({ data, onBarClick, className }: LogEventChartProps) => (
     data={data}
     title="Logs / Time"
     onBarClick={(datum: Datum | EventChartData) => {
-      if (!datum.timestamp) return
+      if (!datum?.timestamp) return
       onBarClick(datum.timestamp as string)
     }}
     customDateFormat="MMM D, HH:mm:s"

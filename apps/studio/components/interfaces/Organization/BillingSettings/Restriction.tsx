@@ -7,6 +7,7 @@ import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { CriticalIcon, WarningIcon } from 'ui'
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 
 export const Restriction = () => {
   const org = useSelectedOrganization()
@@ -18,7 +19,10 @@ export const Restriction = () => {
   const hasExceededAnyLimits = Boolean(
     usage?.usages.find(
       (metric) =>
-        !metric.unlimited && metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
+        metric.metric !== PricingMetric.DISK_SIZE_GB_HOURS_GP3 &&
+        !metric.unlimited &&
+        metric.capped &&
+        metric.usage > (metric?.pricing_free_units ?? 0)
     )
   )
 

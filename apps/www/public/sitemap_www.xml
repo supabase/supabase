@@ -67,6 +67,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/enterprise</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/ga-week</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -169,6 +175,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/contact/sales</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/events</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -217,13 +229,13 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/partners/integrations</loc>
+    <loc>https://supabase.com/launch-week/x</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://supabase.com/launch-week/x</loc>
+    <loc>https://supabase.com/partners/integrations</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -1995,6 +2007,36 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/blog/in-browser-semantic-search-pglite</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/flutter-uber-clone</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/edge-functions-faster-smaller</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/local-first-expo-legend-state</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/lw12-hackathon-winners</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/customers/berriai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -2097,7 +2139,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/events/scale-to-billions-generative-ai-humata</loc>
+    <loc>https://supabase.com/events/scale-to-millions-generative-ai-humata</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

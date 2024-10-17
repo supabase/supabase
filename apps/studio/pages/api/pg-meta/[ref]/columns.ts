@@ -3,6 +3,7 @@ import apiWrapper from 'lib/api/apiWrapper'
 import { constructHeaders, toSnakeCase } from 'lib/api/apiHelpers'
 import { PG_META_URL } from 'lib/constants'
 import { delete_, get, patch, post } from 'lib/common/fetch'
+import { getPgMetaRedirectUrl } from './tables'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })
@@ -27,7 +28,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const headers = constructHeaders(req.headers)
-  let response = await get(`${PG_META_URL}/columns`, {
+  let response = await get(getPgMetaRedirectUrl(req, 'columns'), {
     headers,
   })
   if (response.error) {
