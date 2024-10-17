@@ -238,45 +238,6 @@ functions:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
-    overwriteParams:
-      - name: credentials 
-        type: SignUpWithPasswordCredentials
-        subContent:
-          - name: email
-            isOptional: true
-            type: string
-            description: One of `email` or `phone` must be provided.
-          - name: phone
-            isOptional: true
-            type: string
-            description: One of `email` or `phone` must be provided.
-          - name: password
-            type: string
-          - name: options
-            isOptional: true
-            type: object
-            subContent:
-              - name: emailRedirectTo
-                isOptional: true
-                type: string
-                description: >
-                  Only for email signups.
-                  The redirect URL embedded in the email link.
-                  Must be a configured redirect URL for your Supabase instance.
-              - name: data
-                isOptional: true
-                type: object
-                description: >
-                  A custom data object to store additional user metadata.
-              - name: captchaToken
-                isOptional: true
-                type: string
-              - name: channel
-                isOptional: true
-                type: sms | whatsapp
-                description: >
-                  The channel to use for sending messages.
-                  Only for phone signups.
     examples:
       - id: sign-up
         name: Sign up with an email and password
@@ -710,27 +671,6 @@ functions:
   - id: sign-in-with-password
     title: 'signInWithPassword()'
     $ref: '@supabase/auth-js.GoTrueClient.signInWithPassword'
-    overwriteParams:
-      - name: credentials
-        type: SignInWithPasswordCredentials
-        subContent:
-          - name: email
-            isOptional: true
-            type: string
-            description: One of `email` or `phone` must be provided.
-          - name: phone
-            isOptional: true
-            type: string
-            description: One of `email` or `phone` must be provided.
-          - name: password
-            type: string
-          - name: options
-            isOptional: true
-            type: object
-            subContent:
-              - name: captchaToken
-                isOptional: true
-                type: string
     notes: |
       - Requires either an email and password or a phone number and password.
     examples:
@@ -844,49 +784,6 @@ functions:
   - id: sign-in-with-otp
     title: 'signInWithOtp()'
     $ref: '@supabase/auth-js.GoTrueClient.signInWithOtp'
-    overwriteParams:
-      - name: credentials
-        type: SignInWithPasswordlessCredentials
-        subContent:
-          - name: email
-            isOptional: true
-            type: string
-            description: One of `email` or `phone` must be provided.
-          - name: phone
-            isOptional: true
-            type: string
-            description: One of `email` or `phone` must be provided.
-          - name: options
-            isOptional: true
-            type: object
-            subContent:
-              - name: emailRedirectTo
-                isOptional: true
-                type: string
-                description: >
-                  Only for email signups.
-                  The redirect URL embedded in the email link.
-                  Must be a configured redirect URL for your Supabase instance.
-              - name: shouldCreateUser
-                isOptional: true
-                type: boolean
-                description: >
-                  Whether to create the user if they don't already exist.
-                  Defaults to true.
-              - name: data
-                isOptional: true
-                type: object
-                description: >
-                  A custom data object to store additional user metadata.
-              - name: captchaToken
-                isOptional: true
-                type: string
-              - name: channel
-                isOptional: true
-                type: sms | whatsapp
-                description: >
-                  The channel to use for sending messages.
-                  Only for phone signups.
     notes: |
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
@@ -1095,33 +992,6 @@ functions:
   - id: sign-in-with-sso
     title: 'signInWithSSO()'
     $ref: '@supabase/auth-js.GoTrueClient.signInWithSSO'
-    overwriteParams:
-      - name: params
-        type: SignInWithSSO
-        subContent:
-          - name: providerId
-            isOptional: true
-            type: string
-            description: >
-              UUID of the SSO provider.
-              One of `providerId` or `domain` is required.
-          - name: domain
-            isOptional: true
-            type: string
-            description: >
-              Domain name of the organization to use SSO with.
-              One of `providerId` or `domain` is required.
-          - name: options
-            isOptional: true
-            type: object
-            subContent:
-              - name: redirectTo
-                type: string
-                description: >
-                  The URL to redirect the user to after they have signed in.
-                  Must be a configured redirect URL for your Supabase instance.
-              - name: captchaToken
-                type: string
     notes: |
       - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
       - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
@@ -1181,44 +1051,6 @@ functions:
   - id: verify-otp
     title: 'verifyOtp()'
     $ref: '@supabase/auth-js.GoTrueClient.verifyOtp'
-    overwriteParams:
-      - name: params
-        type: VerifyOtpParams
-        subContent:
-          - name: phone
-            isOptional: true
-            type: string
-            description: One of `phone`, `email`, or `token_hash` must be provided.
-          - name: email
-            isOptional: true
-            type: string
-            description: One of `phone`, `email`, or `token_hash` must be provided.
-          - name: token_hash
-            isOptional: true
-            type: string
-            description: >
-              The token hash from the user's email link.
-              One of `phone`, `email`, or `token_hash` must be provided.
-          - name: type
-            type: sms | phone_change | signup | invite | magiclink | recovery | email_change | email
-          - name: token
-            isOptional: true
-            type: string
-            description: The OTP sent to the user. Required if using `phone` or `email`.
-          - name: options
-            isOptional: true
-            type: object
-            subContent:
-              - name: redirectTo
-                isOptional: true
-                type: string
-                description: >
-                  A URL to redirect the user to after they are confirmed.
-                  Must be in your configured redirect URLs.
-              - name: captchaToken
-                isOptional: true
-                type: string
-                description: Deprecated.
     notes: |
       - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `email`, `recovery`, `invite` or `email_change` (`signup` and `magiclink` types are deprecated).
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
@@ -1953,6 +1785,7 @@ functions:
           const { session, user } = data
           ```
         response: |
+          ```json
           {
             "data": {
               "user": {
@@ -2051,6 +1884,7 @@ functions:
             },
             "error": null
           }
+          ```
       - id: refresh-session-using-a-passed-in-session
         name: Refresh session using a refresh token
         isSpotlight: false
@@ -2234,21 +2068,22 @@ functions:
     notes: |
       This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
-      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+      Currently, there is support for time-based one-time password (TOTP) and phone verification code as the 2nd factor. Recovery codes are not supported but users can enroll multiple factors, with an upper limit of 10.
 
-      Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
+      Having a 2nd factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup factor.
   - id: mfa-enroll
     title: 'mfa.enroll()'
     $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'
     notes: |
-      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - Use `totp` or `phone` as the `factorType` and use the returned `id` to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
-      - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/javascript/auth-mfa-challengeandverify).
-      - To generate a QR code for the `totp` secret in nextjs, you can do the following:
+      - To create and verify a TOTP challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/javascript/auth-mfa-challengeandverify).
+      - To generate a QR code for the `totp` secret in Next.js, you can do the following:
       ```html
       <Image src={data.totp.qr_code} alt={data.totp.uri} layout="fill"></Image>
       ```
+      - The `challenge` and `verify` steps are separated when using Phone factors as the user will need time to receive and input the code obtained from the SMS in challenge.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
@@ -2264,6 +2099,7 @@ functions:
           // The challenge can be verified by entering the code generated from the authenticator app.
           // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
           const { id, type, totp: { qr_code, secret, uri }, friendly_name } = data
+          const challenge = await supabase.auth.mfa.challenge({ factorId: id });
           ```
         response: |
           ```json
@@ -2281,12 +2117,41 @@ functions:
             error: null
           }
           ```
+      - id: enroll-phone-factor
+        name: Enroll a Phone Factor
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.enroll({
+            factorType: 'phone',
+            friendlyName: 'your_friendly_name',
+            phone: '+12345678',
+          })
+
+          // Use the id to create a challenge and send an SMS with a code to the user.
+          const { id, type, friendly_name, phone } = data
+
+          const challenge = await supabase.auth.mfa.challenge({ factorId: id });
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'phone',
+              friendly_name?: 'Important app',
+              phone: '+5787123456'
+            },
+            error: null
+          }
+          ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
     $ref: '@supabase/auth-js.GoTrueMFAApi.challenge'
     notes: |
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
+      - A phone factor sends a code to the user upon challenge. The channel defaults to `sms` unless otherwise specified.
     examples:
       - id: create-mfa-challenge
         name: Create a challenge for a factor
@@ -2295,6 +2160,47 @@ functions:
           ```js
           const { data, error } = await supabase.auth.mfa.challenge({
             factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225'
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'totp',
+              expires_at: 1700000000
+            },
+            error: null
+          }
+          ```
+      - id: create-mfa-phone-challenge
+        name: Create a challenge for a phone factor
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'phone',
+              expires_at: 1700000000
+            },
+            error: null
+          }
+          ```
+      - id: create-mfa-phone-challenge-whatsapp
+        name: Create a challenge for a phone factor (WhatsApp)
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            channel: 'whatsapp',
           })
           ```
         response: |
@@ -2387,6 +2293,7 @@ functions:
     title: 'mfa.challengeAndVerify()'
     $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
+      - Intended for use with only TOTP factors.
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
       - Executes [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify) in a single step.
     examples:
@@ -2486,7 +2393,7 @@ functions:
     $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
-      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
+      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP) or Phone factor.
       - If the user has a verified factor, the `nextLevel` field will return `aal2`, else, it will return `aal1`.
     examples:
       - id: get-aal
@@ -3111,7 +3018,7 @@ functions:
             { phone_confirm: true }
           )
           ```
-  - id: mfa-list-factors
+  - id: mfa-list-factors-admin
     title: 'mfa.listFactors()'
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
     examples:
@@ -3413,7 +3320,7 @@ functions:
               from:sender_id(name),
               to:receiver_id(name)
             `)
-          
+
           // To infer types, use the name of the table (in this case `users`) and
           // the name of the foreign key constraint.
           const { data, error } = await supabase
@@ -3470,6 +3377,112 @@ functions:
           If you need to query the same referenced table twice, use the name of the
           joined column to identify which join to use. You can also give each
           column an alias.
+        hideCodeBlock: true
+      - id: query-nested-foreign-tables-through-a-join-table
+        name: Query nested foreign tables through a join table
+        code: |
+          ```ts
+            const { data, error } = await supabase
+              .from('games')
+              .select(`
+                game_id:id,
+                away_team:teams!games_away_team_fkey (
+                  users (
+                    id,
+                    name
+                  )
+                )
+              `)
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text
+              );
+            create table
+              teams (
+                id int8 primary key,
+                name text
+              );
+            -- join table
+            create table
+              users_teams (
+                user_id int8 not null references users,
+                team_id int8 not null references teams,
+
+                primary key (user_id, team_id)
+              );
+            create table
+              games (
+                id int8 primary key,
+                home_team int8 not null references teams,
+                away_team int8 not null references teams,
+                name text
+              );
+
+            insert into users (id, name)
+            values
+              (1, 'Kiran'),
+              (2, 'Evan');
+            insert into
+              teams (id, name)
+            values
+              (1, 'Green'),
+              (2, 'Blue');
+            insert into
+              users_teams (user_id, team_id)
+            values
+              (1, 1),
+              (1, 2),
+              (2, 2);
+            insert into
+              games (id, home_team, away_team, name)
+            values
+              (1, 1, 2, 'Green vs Blue'),
+              (2, 2, 1, 'Blue vs Green');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "game_id": 1,
+                  "away_team": {
+                    "users": [
+                      {
+                        "id": 1,
+                        "name": "Kiran"
+                      },
+                      {
+                        "id": 2,
+                        "name": "Evan"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "game_id": 2,
+                  "away_team": {
+                    "users": [
+                      {
+                        "id": 1,
+                        "name": "Kiran"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          You can use the result of a joined table to gather data in
+          another foreign table. With multiple references to the same foreign
+          table you must specify the column on which to conduct the join.
         hideCodeBlock: true
       - id: filtering-through-referenced-tables
         name: Filtering through referenced tables
@@ -5634,7 +5647,7 @@ functions:
           with advanced operators.
 
           - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
-          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by `<->` operators, as if processed by phraseto_tsquery.
           - `OR`: the word “or” will be converted to the | operator.
           - `-`: a dash will be converted to the ! operator.
 

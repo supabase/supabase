@@ -71,7 +71,7 @@ const DatabaseSelector = ({
             icon={isLoading && <Loader2 className="animate-spin" />}
             iconRight={<ChevronDown className="text-foreground-light" strokeWidth={2} size={12} />}
           >
-            Source:{' '}
+            <span className="text-foreground-muted mr-1">source</span>
             {selectedAdditionalOption ? (
               <span>{selectedAdditionalOption.name}</span>
             ) : (

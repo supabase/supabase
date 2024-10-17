@@ -39,6 +39,16 @@ const ProjectsPage: NextPageWithLayout = () => {
       else if (localStorageSlug && verifiedSlug) router.push(`/org/${localStorageSlug}`)
       else router.push(`/org/${organizations[0].slug}`)
     }
+
+    if (!navLayoutV2 && isSuccess && hasWindowLoaded) {
+      // navigate to new page exactly once
+      const hasNoOrg = organizations.length === 0
+      const hasShownNewPage = localStorage.getItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN)
+      if (hasNoOrg && !hasShownNewPage) {
+        localStorage.setItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN, 'true')
+        router.push('/new')
+      }
+    }
   }, [navLayoutV2, isSuccess, hasWindowLoaded])
 
   return (

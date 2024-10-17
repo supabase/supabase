@@ -5,7 +5,13 @@
   "author": "Supabase, Inc.",
   "license": "Apache-2.0",
   "private": true,
-  "workspaces": ["apps/*", "apps/docs/spec/parser", "tests", "playwright-tests", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "apps/docs/spec/parser",
+    "tests",
+    "playwright-tests",
+    "packages/*"
+  ],
   "scripts": {
     "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
@@ -15,7 +21,6 @@
     "dev:studio": "turbo run dev --filter=studio --parallel",
     "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
-    "dev:database-design": "turbo run dev --filter=database-design --parallel",
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
@@ -52,6 +57,13 @@
     "npm": "^10.0.0",
     "node": "^20.0.0"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
   "packageManager": "npm@10.7.0"
 }

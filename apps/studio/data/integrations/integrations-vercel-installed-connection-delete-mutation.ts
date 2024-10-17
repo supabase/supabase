@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { delete_, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { toast } from 'sonner'
 import type { ResponseError, UserContent } from 'types'
 import { integrationKeys } from './keys'
-import { toast } from 'react-hot-toast'
 
 type DeleteVariables = {
   id: string

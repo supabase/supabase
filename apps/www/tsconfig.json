@@ -4,8 +4,7 @@
     "paths": {
       "contentlayer/generated": ["./.contentlayer/generated"],
       "~/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"],
-      "@ui-patterns/*": ["./../../packages/ui-patterns/*"]
+      "@ui/*": ["./../../packages/ui/src/*"]
     },
     "downlevelIteration": true,
     "target": "ES2021",

@@ -7,8 +7,9 @@ import Table from 'components/to-be-cleaned/Table'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
-import { Alert, Button, IconSearch, Input, SidePanel } from 'ui'
+import { Alert, Button, Input, SidePanel } from 'ui'
 import MigrationsEmptyState from './MigrationsEmptyState'
+import { Search } from 'lucide-react'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
@@ -71,7 +72,7 @@ const Migrations = () => {
                     placeholder="Search for a migration"
                     value={search}
                     onChange={(e: any) => setSearch(e.target.value)}
-                    icon={<IconSearch size="tiny" />}
+                    icon={<Search size="14" />}
                   />
                 </div>
                 <Table

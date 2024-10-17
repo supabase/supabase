@@ -1,19 +1,9 @@
 import { useParams } from 'common'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-import {
-  Alert,
-  Button,
-  Collapsible,
-  Form,
-  IconChevronDown,
-  Input,
-  Listbox,
-  Modal,
-  Toggle,
-  cn,
-} from 'ui'
+import { toast } from 'sonner'
+import { Alert, Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
 
 import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
 import {
@@ -162,7 +152,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                 <Collapsible.Trigger asChild>
                   <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-default">
                     <p className="text-sm">Additional configuration</p>
-                    <IconChevronDown
+                    <ChevronDown
                       size={18}
                       strokeWidth={2}
                       className={cn('text-foreground-light', showConfiguration && 'rotate-180')}

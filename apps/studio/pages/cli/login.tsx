@@ -6,7 +6,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { NextPageWithLayout } from 'types'
 
 const CliLoginPage: NextPageWithLayout = () => {

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 
-import { useQueryClient } from '@tanstack/react-query'
 import { TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
@@ -12,7 +11,6 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
-  const queryClient = useQueryClient()
   const snap = useTableEditorStateSnapshot()
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table>()
 
@@ -31,6 +29,10 @@ const DatabaseTables: NextPageWithLayout = () => {
               onDeleteTable={(table) => {
                 setSelectedTableToEdit(table)
                 snap.onDeleteTable()
+              }}
+              onDuplicateTable={(table) => {
+                setSelectedTableToEdit(table)
+                snap.onDuplicateTable()
               }}
             />
           </div>

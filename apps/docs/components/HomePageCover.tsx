@@ -1,10 +1,11 @@
 'use client'
 
-import Link from 'next/link'
-import { IconBackground, IconPlay } from 'ui'
 import { useBreakpoint } from 'common'
-import DocsCoverLogo from './DocsCoverLogo'
+import Link from 'next/link'
+import { IconBackground } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
+import DocsCoverLogo from './DocsCoverLogo'
+import { Play } from 'lucide-react'
 
 const HomePageCover = (props) => {
   const isXs = useBreakpoint(639)
@@ -77,7 +78,7 @@ const HomePageCover = (props) => {
         <div className="md:max-w-xs shrink w-fit xl:max-w-none">
           <div className="flex items-center gap-3 mb-3">
             <IconBackground>
-              <IconPlay aria-hidden="true" className="text-brand-600 w-4" strokeWidth={2} />
+              <Play aria-hidden="true" className="text-brand-600 w-4" strokeWidth={2} />
             </IconBackground>
             <h2 className="text-2xl m-0 text-foreground">Getting Started</h2>
           </div>

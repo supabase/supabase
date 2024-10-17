@@ -1,9 +1,9 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
 import type { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
 import { Button, Modal } from 'ui'
-import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
 
 export interface ChangePaymentMethodModalProps {
   selectedPaymentMethod?: OrganizationPaymentMethod

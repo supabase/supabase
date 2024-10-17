@@ -5,6 +5,7 @@ import React from 'react'
 import type Author from '~/types/author'
 import type PostTypes from '~/types/post'
 import dayjs from 'dayjs'
+import { Badge } from 'ui'
 
 interface Props {
   post: PostTypes
@@ -23,6 +24,8 @@ const BlogListItem = ({ post }: Props) => {
       )
     }
   }
+
+  const sanitizeCategory = (category: string) => category.replaceAll('-', ' ')
 
   return (
     <Link
@@ -50,22 +53,19 @@ const BlogListItem = ({ post }: Props) => {
           })}
         </div>
         {post.categories && (
-          <div className="hidden xl:flex text-foreground-lighter">
+          <div className="hidden xl:flex text-foreground-lighter group-hover:text-foreground-light">
             {post.categories.map(
               (category, i) =>
                 i === 0 && (
-                  <span
-                    key={category}
-                    className="text-sm border border-muted py-1 px-3 rounded-full text-center w-auto capitalize"
-                  >
-                    {category}
-                  </span>
+                  <Badge key={category} className="group-hover:border-foreground-muted capitalize">
+                    {sanitizeCategory(category)}
+                  </Badge>
                 )
             )}
           </div>
         )}
         {post.date && (
-          <p className="text-foreground-lighter flex-1 lg:text-right w-full">
+          <p className="text-foreground-lighter group-hover:text-foreground-light flex-1 lg:text-right w-full">
             {dayjs(post.date).format('D MMM YYYY')}
           </p>
         )}

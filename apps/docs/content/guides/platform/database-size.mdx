@@ -95,13 +95,7 @@ Due to provider restrictions, disk expansions can occur only once every six hour
 
 </Admonition>
 
-<Admonition type="note">
-
-Disks don't automatically downsize during normal operation. They _will_ automatically "right-size" when a Supabase (or Postgres) update is applied. Their final size after the update is 1.2x the size of the database. For example, if your database is 100GB in size, and you have a 200GB disk, the size after a Supabase update will be 120GB.
-
-</Admonition>
-
-The maximum Disk Storage Size for the Pro/Team Plan is 16TB. If you need more than this, [contact us](https://forms.supabase.com/enterprise) to learn more about the Enterprise Plan.
+The maximum Disk Storage Size for the Pro/Team Plan is 60TB. If you need more than this, [contact us](https://forms.supabase.com/enterprise) to learn more about the Enterprise Plan.
 
 ### Free Plan behavior
 
@@ -137,3 +131,9 @@ Once you have reclaimed space, you can run the following to disable [read-only](
 ```sql
 set default_transaction_read_only = 'off';
 ```
+
+### Reducing disk size
+
+Disks don't automatically downsize during normal operation. Once you have [reduced your database space usage](/docs/guides/platform/database-size#database-space-management), they _will_ automatically "right-size" when a Supabase (or Postgres) update is applied. Their final size after the update is 1.2x the size of the database (min 8 GB). For example, if your database is 100GB in size, and you have a 200GB disk, the size after a Supabase update will be 120GB.
+
+Learn more about [upgrading your project](/docs/guides/platform/migrating-and-upgrading-projects#upgrade-your-project).

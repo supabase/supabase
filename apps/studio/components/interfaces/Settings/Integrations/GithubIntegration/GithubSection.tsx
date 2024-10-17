@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useCallback } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
@@ -22,7 +22,6 @@ import type {
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
@@ -67,8 +66,6 @@ const GitHubSection = () => {
       toast.success('Successfully deleted Github connection')
     },
   })
-
-  const hasAccessToBranching = useFlag<boolean>('branchManagement')
 
   const isBranch = project?.parent_project_ref !== undefined
 
@@ -168,7 +165,7 @@ const GitHubSection = () => {
                     </div>
                   ))}
                 </ul>
-              ) : hasAccessToBranching ? (
+              ) : (
                 <EmptyIntegrationConnection
                   onClick={onAddGitHubConnection}
                   orgSlug={org?.slug}
@@ -177,19 +174,6 @@ const GitHubSection = () => {
                 >
                   Add new project connection
                 </EmptyIntegrationConnection>
-              ) : (
-                <p className="text-sm text-foreground-light">
-                  Access to{' '}
-                  <a
-                    href="https://supabase.com/docs/guides/platform/branching"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-foreground"
-                  >
-                    branching
-                  </a>{' '}
-                  is required to add GitHub connections.
-                </p>
               )}
             </>
           )}

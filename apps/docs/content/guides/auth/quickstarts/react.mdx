@@ -66,7 +66,7 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Set up your login component">
 
-    In `index.js`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
+    In `App.js`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
 
     You can configure the Auth component to display whenever there is no session inside `supabase.auth.getSession()`
 
@@ -74,7 +74,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
 
-      ```js src/index.js
+      ```js src/App.js
         import './index.css'
         import { useState, useEffect } from 'react'
         import { createClient } from '@supabase/supabase-js'

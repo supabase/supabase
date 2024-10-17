@@ -201,6 +201,26 @@ parameters:
       - name: 'PgBouncer Configuration'
         link: https://www.pgbouncer.org/config.html#max_client_conn
 
+  - id: 'db.seed.enabled'
+    title: 'db.seed.enabled'
+    tags: ['database']
+    required: false
+    default: 'true'
+    description: |
+      Enables running seeds when starting or resetting the database.
+    links: []
+
+  - id: 'db.seed.sql_paths'
+    title: 'db.seed.sql_paths'
+    tags: ['database']
+    required: false
+    default: '["./seed.sql"]'
+    description: |
+      An array of files or glob patterns to find seeds in.
+    links:
+      - name: 'Seeding your database'
+        link: 'https://supabase.com/docs/guides/cli/seeding-your-database'
+
   - id: 'realtime.enabled'
     title: 'realtime.enabled'
     tags: ['realtime']
@@ -261,7 +281,7 @@ parameters:
     title: 'inbucket.port'
     tags: ['local']
     required: false
-    default: 'true'
+    default: '54324'
     description: |
       Port to use for the email testing server web interface.
 
@@ -760,6 +780,20 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'functions.function_name.enabled'
+    title: 'functions.<function_name>.enabled'
+    tags: ['edge-functions']
+    required: false
+    default: 'true'
+    description: |
+      Controls whether a function is deployed or served. When set to false,
+      the function will be skipped during deployment and won't be served locally.
+      This is useful for disabling demo functions or temporarily disabling a function
+      without removing its code.
+    links:
+      - name: '`supabase functions` CLI subcommands'
+        link: 'https://supabase.com/docs/reference/cli/supabase-functions'
+
   - id: 'functions.function_name.verify_jwt'
     title: 'functions.<function_name>.verify_jwt'
     tags: ['edge-functions']
@@ -823,7 +857,7 @@ parameters:
     default: '"postgres"'
     description: |
       Configure one of the supported backends:
-      
+
       - `postgres`
       - `bigquery`
     links:

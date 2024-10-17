@@ -1,7 +1,7 @@
 import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { del, handleError } from 'data/fetchers'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { ResponseError } from 'types'
 
 type DeleteBucketObjectParams = {

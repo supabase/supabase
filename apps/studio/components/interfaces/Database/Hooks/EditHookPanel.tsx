@@ -1,7 +1,7 @@
 import type { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
 import Image from 'next/legacy/image'
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -92,7 +92,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     function_type: isEdgeFunction(selectedHook?.function_args?.[0] ?? '')
       ? 'supabase_function'
       : 'http_request',
-    timeout_ms: Number(selectedHook?.function_args?.[4] ?? 1000),
+    timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
   }
 
   useEffect(() => {
@@ -165,8 +165,8 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       }
     }
 
-    if (values.timeout_ms < 1000 || values.timeout_ms > 5000) {
-      errors['timeout_ms'] = 'Timeout should be between 1000ms and 5000ms'
+    if (values.timeout_ms < 1000 || values.timeout_ms > 10_000) {
+      errors['timeout_ms'] = 'Timeout should be between 1000ms and 10,000ms'
     }
 
     if (JSON.stringify(values) !== JSON.stringify(initialValues)) setIsEdited(true)

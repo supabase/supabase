@@ -66,7 +66,6 @@ export interface FileExplorerColumnProps {
   onSelectAllItemsInColumn: (index: number) => void
   onSelectColumnEmptySpace: (index: number) => void
   onColumnLoadMore: (index: number, column: StorageColumn) => void
-  onCopyUrl: (name: string, url: string) => void
 }
 
 const FileExplorerColumn = ({
@@ -82,7 +81,6 @@ const FileExplorerColumn = ({
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,
   onColumnLoadMore = noop,
-  onCopyUrl = noop,
 }: FileExplorerColumnProps) => {
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const fileExplorerColumnRef = useRef<any>(null)
@@ -224,7 +222,6 @@ const FileExplorerColumn = ({
           selectedItems,
           openedFolders,
           selectedFilePreview,
-          onCopyUrl,
         }}
         ItemComponent={FileExplorerRow}
         getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}

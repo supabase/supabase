@@ -87,7 +87,12 @@ When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-sign
 
 ```dart
 Future<void> signInWithZoom() async {
-  await supabase.auth.signInWithOAuth(OAuthProvider.zoom);
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.zoom,
+    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+    authScreenLaunchMode:
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+  );
 }
 ```
 

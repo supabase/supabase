@@ -1,12 +1,12 @@
+import { ChevronLeft, ExternalLink } from 'lucide-react'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
-import { IconChevronLeft, IconExternalLink } from 'ui'
+import { Swiper, SwiperSlide } from 'swiper/react'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
@@ -46,7 +46,7 @@ function Partner({
               href="/partners/experts"
               className="text-foreground hover:text-foreground-lighter flex cursor-pointer items-center transition-colors"
             >
-              <IconChevronLeft style={{ padding: 0 }} />
+              <ChevronLeft style={{ padding: 0 }} />
               Back
             </Link>
 
@@ -191,7 +191,7 @@ function Partner({
                       >
                         <span className="flex items-center space-x-1">
                           <span>Learn</span>
-                          <IconExternalLink size="small" />
+                          <ExternalLink size="18" />
                         </span>
                       </a>
                     </div>

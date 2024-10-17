@@ -97,6 +97,23 @@ try await supabase
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+Insert a record from the Python client:
+
+```python
+supabase.from_('arraytest').insert(
+  [
+    {
+      id: 2,
+      textarray: ["one", "two", "three", "four"]
+    }
+  ]
+)
+.execute()
+```
+
+</TabPanel>
 </Tabs>
 
 ## View the results

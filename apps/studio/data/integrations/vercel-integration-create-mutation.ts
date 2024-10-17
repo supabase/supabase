@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { integrationKeys } from './keys'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
+import { integrationKeys } from './keys'
 
 export type VercelIntegrationCreateVariables = {
   code: string

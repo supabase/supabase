@@ -2,10 +2,9 @@ import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ToastLoader } from 'components/ui/ToastLoader'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -21,6 +20,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary } from 'types'
+import { SonnerProgress } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ColumnEditor from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
@@ -186,20 +186,19 @@ const SidePanelEditor = ({
     }
   }
 
-  const onSaveForeignRow = async (value: any) => {
+  const onSaveForeignRow = async (value?: { [key: string]: any }) => {
     if (selectedTable === undefined || !(snap.sidePanel?.type === 'foreign-row-selector')) return
     const selectedForeignKeyToEdit = snap.sidePanel.foreignKey
 
     try {
-      const { row, column } = selectedForeignKeyToEdit
-      const payload = { [column.name]: value }
+      const { row } = selectedForeignKeyToEdit
       const identifiers = {} as Dictionary<any>
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
 
       const isNewRecord = false
       const configuration = { identifiers, rowIdx: row.idx }
 
-      saveRow(payload, isNewRecord, configuration, () => {})
+      saveRow(value, isNewRecord, configuration, () => {})
     } catch (error) {}
   }
 
@@ -514,7 +513,7 @@ const SidePanelEditor = ({
         selectedHeaders,
         (progress: number) => {
           toast.loading(
-            <ToastLoader
+            <SonnerProgress
               progress={progress}
               message={`Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`}
             />,
@@ -536,7 +535,7 @@ const SidePanelEditor = ({
         selectedHeaders,
         (progress: number) => {
           toast.loading(
-            <ToastLoader
+            <SonnerProgress
               progress={progress}
               message={`Adding ${importContent.rows.length.toLocaleString()} rows to ${
                 selectedTable.name
@@ -614,8 +613,8 @@ const SidePanelEditor = ({
       <SchemaEditor visible={snap.sidePanel?.type === 'schema'} closePanel={onClosePanel} />
       <JsonEditor
         visible={snap.sidePanel?.type === 'json'}
+        row={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.row) || {}}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
-        jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.value) || ''}
         backButtonLabel="Cancel"
         applyButtonLabel="Save changes"
         readOnly={!editable}

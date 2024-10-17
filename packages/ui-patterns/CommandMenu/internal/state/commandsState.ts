@@ -11,6 +11,7 @@ type CommandOptions = {
   deps?: any[]
   enabled?: boolean
   forceMountSection?: boolean
+  sectionMeta?: any
   orderSection?: OrderSectionInstruction
   orderCommands?: OrderCommandsInstruction
 }
@@ -32,6 +33,14 @@ const initCommandsState = () => {
       if (editIndex === -1) editIndex = state.commandSections.length
 
       state.commandSections[editIndex] ??= section$new(sectionName)
+      if (options?.sectionMeta) {
+        const oldMeta = state.commandSections[editIndex].meta
+        if (!!oldMeta && typeof oldMeta === 'object' && typeof options.sectionMeta === 'object') {
+          state.commandSections[editIndex].meta = { ...oldMeta, ...options.sectionMeta }
+        } else {
+          state.commandSections[editIndex].meta = options.sectionMeta
+        }
+      }
 
       if (options?.forceMountSection) state.commandSections[editIndex].forceMount = true
 

@@ -1,6 +1,6 @@
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
@@ -19,7 +19,7 @@ import { SidePanel } from 'ui'
 
 const VERCEL_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 512 512" className="w-6">
-    <path fill-rule="evenodd" d="M256,48,496,464H16Z" />
+    <path fillRule="evenodd" d="M256,48,496,464H16Z" />
   </svg>
 )
 

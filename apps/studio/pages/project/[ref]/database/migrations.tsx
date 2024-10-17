@@ -24,7 +24,7 @@ const MigrationsPage: NextPageWithLayout = () => {
           />
         </ScaffoldSectionContent>
         <ScaffoldSectionDetail className="flex items-center justify-end gap-x-2">
-          <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <a
               target="_blank"
               rel="noreferrer"

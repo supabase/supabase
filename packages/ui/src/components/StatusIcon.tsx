@@ -1,5 +1,5 @@
 import { SVGProps, forwardRef } from 'react'
-import { cn } from 'ui'
+import { cn } from '../lib/utils'
 
 export interface StatusIconProps {
   hideBackground?: boolean
@@ -41,9 +41,9 @@ const InfoIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
       )}
     >
       <path
-        fill-rule="evenodd"
+        fillRule="evenodd"
         d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM9 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.75 8a.75.75 0 0 0 0 1.5h.75v1.75a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8.25 8h-1.5Z"
-        clip-rule="evenodd"
+        clipRule="evenodd"
       />
     </svg>
   )
@@ -101,4 +101,4 @@ const WarningIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
   )
 }
 
-export { WarningIcon, CriticalIcon, InfoIcon }
+export { CriticalIcon, InfoIcon, WarningIcon }

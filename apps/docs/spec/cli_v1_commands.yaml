@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.187.10
+  version: 1.200.3
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -50,6 +50,23 @@ flags:
     name: --network-id <string>
     description: use the specified docker network instead of a generated one
     default_value: ''
+  - id: output
+    name: --output <[ pretty | json | toml | yaml ]>
+    description: output format of status variables
+    default_value: pretty
+    accepted_values:
+      - id: pretty
+        name: pretty
+        type: '[ pretty | json | toml | yaml ]'
+      - id: json
+        name: json
+        type: '[ pretty | json | toml | yaml ]'
+      - id: toml
+        name: toml
+        type: '[ pretty | json | toml | yaml ]'
+      - id: yaml
+        name: yaml
+        type: '[ pretty | json | toml | yaml ]'
   - id: workdir
     name: --workdir <string>
     description: path to a Supabase project directory
@@ -358,13 +375,15 @@ commands:
   - id: supabase-stop
     title: supabase stop
     summary: Stop all local Supabase containers
-    description: |2
+    description: |2-
 
       Stops the Supabase local development stack.
 
       Requires `supabase/config.toml` to be created in your current working directory by running `supabase init`.
 
       All Docker resources are maintained across restarts.  Use `--no-backup` flag to reset your local development data between restarts.
+
+      Use the `--all` flag to stop all local Supabase projects instances on the machine. Use with caution with `--no-backup` as it will delete all supabase local projects data.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -383,6 +402,11 @@ commands:
     usage: supabase stop [flags]
     subcommands: []
     flags:
+      - id: all
+        name: --all
+        description: |
+          Stop all local Supabase instances from all projects across the machine.
+        default_value: 'false'
       - id: no-backup
         name: --no-backup
         description: Deletes all data volumes after stopping.
@@ -600,23 +624,6 @@ commands:
         description: |
           Whether local validation of the SAML 2.0 Metadata URL should not be performed.
         default_value: 'false'
-      - id: output
-        name: -o, --output <[ pretty | json | toml | yaml ]>
-        description: Output format
-        default_value: pretty
-        accepted_values:
-          - id: pretty
-            name: pretty
-            type: '[ pretty | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ pretty | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ pretty | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ pretty | json | toml | yaml ]'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -653,23 +660,6 @@ commands:
         name: --metadata
         description: Show SAML 2.0 XML Metadata only
         default_value: 'false'
-      - id: output
-        name: -o, --output <[ pretty | json | toml | yaml ]>
-        description: Output format
-        default_value: pretty
-        accepted_values:
-          - id: pretty
-            name: pretty
-            type: '[ pretty | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ pretty | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ pretty | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ pretty | json | toml | yaml ]'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -693,23 +683,6 @@ commands:
     usage: supabase sso remove <provider-id>
     subcommands: []
     flags:
-      - id: output
-        name: -o, --output <[ pretty | json | toml | yaml ]>
-        description: Output format
-        default_value: pretty
-        accepted_values:
-          - id: pretty
-            name: pretty
-            type: '[ pretty | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ pretty | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ pretty | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ pretty | json | toml | yaml ]'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -724,23 +697,6 @@ commands:
     usage: supabase sso list
     subcommands: []
     flags:
-      - id: output
-        name: -o, --output <[ pretty | json | toml | yaml ]>
-        description: Output format
-        default_value: pretty
-        accepted_values:
-          - id: pretty
-            name: pretty
-            type: '[ pretty | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ pretty | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ pretty | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ pretty | json | toml | yaml ]'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -761,23 +717,6 @@ commands:
     usage: supabase sso info
     subcommands: []
     flags:
-      - id: output
-        name: -o, --output <[ pretty | json | toml | yaml ]>
-        description: Output format
-        default_value: pretty
-        accepted_values:
-          - id: pretty
-            name: pretty
-            type: '[ pretty | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ pretty | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ pretty | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ pretty | json | toml | yaml ]'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -851,23 +790,6 @@ commands:
           - id: saml
             name: saml
             type: '[ saml ]'
-      - id: output
-        name: -o, --output <[ pretty | json | toml | yaml ]>
-        description: Output format
-        default_value: pretty
-        accepted_values:
-          - id: pretty
-            name: pretty
-            type: '[ pretty | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ pretty | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ pretty | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ pretty | json | toml | yaml ]'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -1133,6 +1055,41 @@ commands:
             type: string
           - id: us-west-2
             name: us-west-2
+            type: string
+      - id: size
+        name: --size <string>
+        description: Select a desired instance size for your project.
+        default_value: ''
+        accepted_values:
+          - id: micro
+            name: micro
+            type: string
+          - id: small
+            name: small
+            type: string
+          - id: medium
+            name: medium
+            type: string
+          - id: large
+            name: large
+            type: string
+          - id: xlarge
+            name: xlarge
+            type: string
+          - id: 2xlarge
+            name: 2xlarge
+            type: string
+          - id: 4xlarge
+            name: 4xlarge
+            type: string
+          - id: 8xlarge
+            name: 8xlarge
+            type: string
+          - id: 12xlarge
+            name: 12xlarge
+            type: string
+          - id: 16xlarge
+            name: 16xlarge
             type: string
   - id: supabase-projects-api-keys
     title: supabase projects api-keys
@@ -2921,7 +2878,7 @@ commands:
 
       Requires the local development stack to be started by running `supabase start`.
 
-      Recreates the local Postgres container and applies all local migrations found in `supabase/migrations` directory. If test data is defined in `supabase/seed.sql`, it will be seeded after the migrations are run. Any other data or schema changes made during local development will be discarded.
+      Recreates the local Postgres container and applies all local migrations found in `supabase/migrations` directory. If test data is defined in `supabase/seed.sql` by default, it will be seeded after the migrations are run. Any other data or schema changes made during local development will be discarded.
 
       Note that since Postgres roles are cluster level entities, those changes will persist between resets. In order to reset custom roles, you need to restart the local development stack.
     examples:
@@ -2952,6 +2909,10 @@ commands:
         name: --local
         description: Resets the local database with local migrations.
         default_value: 'true'
+      - id: no-seed
+        name: --no-seed
+        description: Skip running the seed script after reset.
+        default_value: 'false'
       - id: version
         name: --version <string>
         description: Reset up to the specified version.
@@ -3103,7 +3064,7 @@ commands:
   - id: supabase-db-lint
     title: supabase db lint
     summary: Checks local database for typing error
-    description: |2
+    description: |2-
 
       Lints local database for schema errors.
 
@@ -3112,6 +3073,14 @@ commands:
       Runs `plpgsql_check` extension in the local Postgres container to check for errors in all schemas. The default lint level is `warning` and can be raised to error via the `--level` flag.
 
       To lint against specific schemas only, pass in the `--schema` flag.
+
+      The `--fail-on` flag can be used to control when the command should exit with a non-zero status code. The possible values are:
+
+      - `none` (default): Always exit with a zero status code, regardless of lint results.
+      - `warning`: Exit with a non-zero status code if any warnings or errors are found.
+      - `error`: Exit with a non-zero status code only if errors are found.
+
+      This flag is particularly useful in CI/CD pipelines where you want to fail the build based on certain lint conditions.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -3147,6 +3116,20 @@ commands:
         description: |
           Lints the database specified by the connection string (must be percent-encoded).
         default_value: ''
+      - id: fail-on
+        name: --fail-on <[ none | warning | error ]>
+        description: Error level to exit with non-zero status.
+        default_value: none
+        accepted_values:
+          - id: none
+            name: none
+            type: '[ none | warning | error ]'
+          - id: warning
+            name: warning
+            type: '[ none | warning | error ]'
+          - id: error
+            name: error
+            type: '[ none | warning | error ]'
       - id: level
         name: --level <[ warning | error ]>
         description: Error level to emit.
@@ -3503,10 +3486,34 @@ commands:
         name: --name <string>
         description: Rename the preview branch.
         default_value: ''
+      - id: persistent
+        name: --persistent
+        description: Switch between ephemeral and persistent branch.
+        default_value: 'false'
       - id: reset-on-push
         name: --reset-on-push
         description: Reset the preview branch on git push.
         default_value: 'false'
+      - id: status
+        name: --status <string>
+        description: Override the current branch status.
+        default_value: ''
+        accepted_values:
+          - id: RUNNING_MIGRATIONS
+            name: RUNNING_MIGRATIONS
+            type: string
+          - id: MIGRATIONS_PASSED
+            name: MIGRATIONS_PASSED
+            type: string
+          - id: MIGRATIONS_FAILED
+            name: MIGRATIONS_FAILED
+            type: string
+          - id: FUNCTIONS_DEPLOYED
+            name: FUNCTIONS_DEPLOYED
+            type: string
+          - id: FUNCTIONS_FAILED
+            name: FUNCTIONS_FAILED
+            type: string
       - id: experimental
         name: --experimental
         description: enable experimental features
@@ -3597,6 +3604,10 @@ commands:
     usage: supabase branches create [name] [flags]
     subcommands: []
     flags:
+      - id: persistent
+        name: --persistent
+        description: Whether to create a persistent branch.
+        default_value: 'false'
       - id: region
         name: --region <string>
         description: Select a region to deploy the branch database.
@@ -3697,6 +3708,41 @@ commands:
             type: string
           - id: yyz
             name: yyz
+            type: string
+      - id: size
+        name: --size <string>
+        description: Select a desired instance size for the branch database.
+        default_value: ''
+        accepted_values:
+          - id: micro
+            name: micro
+            type: string
+          - id: small
+            name: small
+            type: string
+          - id: medium
+            name: medium
+            type: string
+          - id: large
+            name: large
+            type: string
+          - id: xlarge
+            name: xlarge
+            type: string
+          - id: 2xlarge
+            name: 2xlarge
+            type: string
+          - id: 4xlarge
+            name: 4xlarge
+            type: string
+          - id: 8xlarge
+            name: 8xlarge
+            type: string
+          - id: 12xlarge
+            name: 12xlarge
+            type: string
+          - id: 16xlarge
+            name: 16xlarge
             type: string
       - id: experimental
         name: --experimental

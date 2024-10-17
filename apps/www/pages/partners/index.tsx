@@ -1,18 +1,18 @@
-import React from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
-import { NextSeo } from 'next-seo'
 import { range } from 'lodash'
+import { NextSeo } from 'next-seo'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import { useBreakpoint } from 'common'
-import { Badge, Button, IconCode, TextLink } from 'ui'
+import { Badge, Button, TextLink } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
-import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
+import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 
 import pageData from '~/data/partners'
+import { Code } from 'lucide-react'
 
 const Partners = () => {
   const router = useRouter()
@@ -190,7 +190,7 @@ const Partners = () => {
                   key={i}
                 >
                   <div className="bg-brand-300 [[data-theme*=dark]_&]:bg-brand-500 text-brand-1200 group-hover:text-brand-800 [[data-theme*=dark]_&]:group-hover:text-brand-1000 flex h-12 w-12 items-center justify-center rounded-md border border-brand transition-all group-hover:scale-105">
-                    {item.icon ? item.icon : <IconCode strokeWidth={2} />}
+                    {item.icon ? item.icon : <Code strokeWidth={2} />}
                   </div>
 
                   <div>

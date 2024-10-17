@@ -1,6 +1,6 @@
 import { ExternalLink, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -123,7 +123,7 @@ export const EnablePhysicalBackupsModal = ({ selectedRegion }: EnablePhysicalBac
         </DialogSection>
         {!enabling && (
           <DialogFooter>
-            <Button asChild type="default" icon={<ExternalLink size={14} />}>
+            <Button asChild type="default" icon={<ExternalLink />}>
               <a
                 target="_blank"
                 rel="noreferrer"

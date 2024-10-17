@@ -1,6 +1,6 @@
+import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
-import { IconArrowUpRight, cn } from 'ui'
+import { cn } from 'ui'
 
 import Panel from '~/components/Panel'
 
@@ -50,7 +50,7 @@ const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
               </div>
               <p className="text-sm flex-1 text-foreground-lighter">{link.description}</p>
               <div className="text-sm w-full flex justify-between text-foreground-lighter mt-2">
-                <IconArrowUpRight className="w-4 stroke-[1.5px]" />
+                <ArrowUpRight className="w-4 stroke-[1.5px]" />
               </div>
             </Panel>
           </Link>

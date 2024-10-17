@@ -3,6 +3,9 @@ import { codeBlock, oneLine, stripIndent } from 'common-tags'
 import type OpenAI from 'openai'
 import { ContextLengthError } from '../errors'
 import type { Message } from '../types'
+import { components } from 'api-types'
+
+type DatabasePoliciesData = components['schemas']['PostgresPolicy']
 
 /**
  * Responds to a conversation about building an RLS policy.
@@ -13,14 +16,15 @@ export async function chatRlsPolicy(
   openai: OpenAI,
   messages: Message[],
   entityDefinitions?: string[],
+  existingPolicies?: DatabasePoliciesData[],
   policyDefinition?: string
 ): Promise<ReadableStream<Uint8Array>> {
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
       role: 'system',
       content: stripIndent`
-        You're a Supabase Postgres expert in writing row level security policies. Your purpose is to 
-        generate a policy with the constraints given by the user. You will be provided a schema 
+        You're a Supabase Postgres expert in writing row level security policies. Your purpose is to
+        generate a policy with the constraints given by the user. You will be provided a schema
         on which the policy should be applied.
 
         The output should use the following instructions:
@@ -36,11 +40,11 @@ export async function chatRlsPolicy(
         - DELETE policies should always have USING but not WITH CHECK
         - Don't use \`FOR ALL\`. Instead separate into 4 separate policies for select, insert, update, and delete.
         - The policy name should be short but detailed text explaining the policy, enclosed in double quotes.
-        - Always put explanations as separate text. Never use inline SQL comments. 
-        - If the user asks for something that's not related to SQL policies, explain to the user 
+        - Always put explanations as separate text. Never use inline SQL comments.
+        - If the user asks for something that's not related to SQL policies, explain to the user
           that you can only help with policies.
         - Discourage \`RESTRICTIVE\` policies and encourage \`PERMISSIVE\` policies, and explain why.
-        
+
         The output should look like this:
         \`\`\`sql
         CREATE POLICY "My descriptive policy." ON books FOR INSERT to authenticated USING ( (select auth.uid()) = author_id ) WITH ( true );
@@ -264,6 +268,29 @@ export async function chatRlsPolicy(
     initMessages.push({
       role: 'user',
       content: oneLine`Here is my database schema for reference: ${definitions}`,
+    })
+  }
+
+  if (existingPolicies !== undefined && existingPolicies.length > 0) {
+    const formattedPolicies = existingPolicies
+      .map(
+        (policy: DatabasePoliciesData) => `
+      Policy Name: "${policy.name}"
+      Action: ${policy.action}
+      Roles: ${policy.roles.join(', ')}
+      Command: ${policy.command}
+      Definition: ${policy.definition}
+      ${policy.check ? `Check: ${policy.check}` : ''}
+    `
+      )
+      .join('\n')
+
+    initMessages.push({
+      role: 'user',
+      content: codeBlock`
+        Here are my existing policy definitions on this table for reference:
+        ${formattedPolicies}
+      `.trim(),
     })
   }
 

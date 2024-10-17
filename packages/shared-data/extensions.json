@@ -229,9 +229,9 @@
     "comment": "Job scheduler for PostgreSQL",
     "tags": ["Utility"],
     "link": "/guides/database/extensions/pg_cron",
-    "github_url": null,
-    "product": null,
-    "product_url": null
+    "github_url": "https://github.com/citusdata/pg_cron",
+    "product": "Supabase Cron Jobs",
+    "product_url": "/project/{ref}/database/cron-jobs"
   },
   {
     "name": "pg_freespacemap",

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { RefreshCw, StopCircle } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'

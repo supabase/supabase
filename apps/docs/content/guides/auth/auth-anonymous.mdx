@@ -30,6 +30,12 @@ See the [Access control section](#access-control) for more details.
 
 </Admonition>
 
+<Admonition type="caution" label="Use Dynamic Rendering with Next.js">
+
+The Supabase team has received reports of user metadata being cached across unique anonymous users as a result of Next.js static page rendering. For the best user experience, utilize dynamic page rendering.
+
+</Admonition>
+
 <Admonition type="note" label="Self hosting and local development">
 
 For self-hosting, you can update your project configuration using the files and environment variables provided. See the [local development docs](/docs/guides/cli/config) for more details.
@@ -78,6 +84,15 @@ Call the [`signInAnonymously()`](/docs/reference/kotlin/auth-signinanonymously) 
 
 ```kotlin
 supabase.auth.signInAnonymously()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+Call the [`sign_in_anonymously()`](/docs/reference/python/auth-signinanonymously) method:
+
+```python
+response = supabase.auth.sign_in_anonymously()
 ```
 
 </TabPanel>
@@ -142,6 +157,25 @@ supabase.auth.modifyUser {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+You can use the [`update_user()`](/docs/reference/python/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
+
+```python
+response = supabase.auth.update_user({
+  'email': 'example@email.com',
+})
+
+# verify the user's email by clicking on the email change link
+# or entering the 6-digit OTP sent to the email address
+
+# once the user has been verified, update the password
+response = supabase.auth.update_user({
+  'password': 'password',
+})
+```
+
+</TabPanel>
 </Tabs>
 
 ### Link an OAuth identity
@@ -186,6 +220,15 @@ You can use the [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity) met
 
 ```kotlin
 supabase.auth.linkIdentity(Google)
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+You can use the [`link_identity()`](/docs/reference/python/auth-linkidentity) method to link an oauth identity to the anonymous user.
+
+```python
+response = supabase.auth.link_identity({'provider': 'google'})
 ```
 
 </TabPanel>

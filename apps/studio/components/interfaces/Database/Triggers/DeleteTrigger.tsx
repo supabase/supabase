@@ -1,8 +1,8 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteTriggerProps {
   trigger?: any

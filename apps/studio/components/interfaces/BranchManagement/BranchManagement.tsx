@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { ExternalLink, MessageCircle } from 'lucide-react'
+import { ExternalLink, Github, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -19,7 +19,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { Button, IconGitHub } from 'ui'
+import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
@@ -193,7 +193,7 @@ const BranchManagement = () => {
                 <div className="flex items-center justify-between space-x-2">
                   <Button
                     type={'text'}
-                    icon={<MessageCircle className="text-muted" size={14} strokeWidth={1} />}
+                    icon={<MessageCircle className="text-muted" strokeWidth={1} />}
                     asChild
                   >
                     <a href="https://github.com/orgs/supabase/discussions/18937" target="_blank">
@@ -240,7 +240,7 @@ const BranchManagement = () => {
                     <div className="border rounded-lg px-6 py-2 flex items-center justify-between">
                       <div className="flex items-center gap-x-4">
                         <div className="w-8 h-8 bg-scale-300 border rounded-md flex items-center justify-center">
-                          <IconGitHub size={18} strokeWidth={2} />
+                          <Github size={18} strokeWidth={2} />
                         </div>
                         <p className="text-sm">GitHub branch workflow</p>
                         <Button asChild type="default" iconRight={<ExternalLink size={14} />}>

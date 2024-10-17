@@ -194,7 +194,7 @@ function getCellRenderer(
       return BooleanFormatter
     }
     case 'foreign_key': {
-      if (columnDef.isPrimaryKey || !columnDef.isUpdatable) {
+      if (!columnDef.isUpdatable) {
         return DefaultFormatter
       } else {
         // eslint-disable-next-line react/display-name

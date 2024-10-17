@@ -2,6 +2,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
+import PartnerIcon from 'components/ui/PartnerIcon'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -11,6 +12,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import SettingsLayout from '../SettingsLayout/SettingsLayout'
 import type { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
+import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 
 export interface AccountLayoutProps {
   title: string
@@ -26,9 +28,12 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const selectedOrganization = useSelectedOrganization()
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const enablePostHogTelemetry = useFlag('enablePosthogChanges')
+  const { mutateAsync: sendReset } = useSendResetMutation()
 
   const signOut = useSignOut()
   const onClickLogout = async () => {
+    if (enablePostHogTelemetry) await sendReset()
     await signOut()
     await router.push('/sign-in')
   }
@@ -46,6 +51,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
       label: organization.name,
       href: `/org/${organization.slug}/general`,
       key: organization.slug,
+      icon: <PartnerIcon organization={organization} />,
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
 
@@ -79,14 +85,12 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
             links: [
               {
                 isActive: router.pathname === `/account/me`,
-                icon: `${router.basePath}/img/user.svg`,
                 label: 'Preferences',
                 href: `/account/me`,
                 key: `/account/me`,
               },
               {
                 isActive: router.pathname === `/account/tokens`,
-                icon: `${router.basePath}/img/user.svg`,
                 label: 'Access Tokens',
                 href: `/account/tokens`,
                 key: `/account/tokens`,
@@ -94,14 +98,12 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
 
               {
                 isActive: router.pathname === `/account/security`,
-                icon: `${router.basePath}/img/user.svg`,
                 label: 'Security',
                 href: `/account/security`,
                 key: `/account/security`,
               },
               {
                 isActive: router.pathname === `/account/audit`,
-                icon: `${router.basePath}/img/user.svg`,
                 label: 'Audit Logs',
                 href: `/account/audit`,
                 key: `/account/audit`,
@@ -116,14 +118,12 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
       links: [
         {
           key: 'ext-guides',
-          icon: `${router.basePath}/img/book.svg`,
           label: 'Guides',
           href: 'https://supabase.com/docs',
           isExternal: true,
         },
         {
           key: 'ext-guides',
-          icon: `${router.basePath}/img/book-open.svg`,
           label: 'API Reference',
           href: 'https://supabase.com/docs/guides/api',
           isExternal: true,
@@ -137,7 +137,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
             links: [
               {
                 key: `logout`,
-                icon: '/icons/feather/power.svg',
                 label: 'Log out',
                 href: undefined,
                 onClick: onClickLogout,

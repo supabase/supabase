@@ -1,3 +1,4 @@
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
@@ -10,7 +11,6 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
-import { Code } from 'lucide-react'
 import type { Organization } from 'types'
 import {
   Button,
@@ -21,14 +21,11 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
-  IconCheck,
-  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { ChevronsUpDown } from 'lucide-react'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -83,7 +80,7 @@ const ProjectLink = ({
     >
       <Link href={href} className="w-full flex items-center justify-between">
         {project.name}
-        {project.ref === ref && <IconCheck />}
+        {project.ref === ref && <Check size={16} />}
       </Link>
     </CommandItem_Shadcn_>
   )
@@ -160,7 +157,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
                         }}
                         className="w-full flex items-center gap-2"
                       >
-                        <IconPlus size={14} strokeWidth={1.5} />
+                        <Plus size={14} strokeWidth={1.5} />
                         <p>New project</p>
                       </Link>
                     </CommandItem_Shadcn_>

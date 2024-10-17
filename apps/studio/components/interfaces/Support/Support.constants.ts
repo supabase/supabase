@@ -124,3 +124,18 @@ export const SERVICE_OPTIONS = [
     disabled: false,
   },
 ]
+
+export const IPV4_MIGRATION_STRINGS = [
+  'ipv4',
+  'ipv6',
+  'supavisor',
+  'pgbouncer',
+  '5432',
+  'ENETUNREACH',
+  'ECONNREFUSED',
+  'P1001',
+  'connect: no route to',
+  'network is unreac',
+  'could not translate host name',
+  'address family not supported by protocol',
+]

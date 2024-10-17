@@ -1,13 +1,15 @@
 import { ChevronRight, Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
+import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { useContentCountQuery } from 'data/content/content-count-query'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { getContentById } from 'data/content/content-id-query'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
@@ -15,13 +17,20 @@ import {
   Snippet,
   SnippetDetail,
   SnippetFolder,
+  getSQLSnippetFolders,
   useSQLSnippetFoldersQuery,
 } from 'data/content/sql-folders-query'
+import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import {
+  useFavoriteSnippets,
+  useSnippetFolders,
+  useSnippets,
+  useSqlEditorV2StateSnapshot,
+} from 'state/sql-editor-v2'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -36,14 +45,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
-import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-
-// Requirements
-// - Asynchronous loading
-// - Directory tree
-// - Multi select
-// - Context menu
 
 interface SQLEditorNavProps {
   searchText: string
@@ -58,6 +59,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const [sort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
 
+  const [mountedId, setMountedId] = useState(false)
   const [showMoveModal, setShowMoveModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRenameModal, setShowRenameModal] = useState(false)
@@ -65,6 +67,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const [showSharedSnippets, setShowSharedSnippets] = useState(false)
   const [showPrivateSnippets, setShowPrivateSnippets] = useState(true)
 
+  const [defaultExpandedFolderIds, setDefaultExpandedFolderIds] = useState<string[]>()
   const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([])
   const [selectedSnippetToShare, setSelectedSnippetToShare] = useState<Snippet>()
   const [selectedSnippetToUnshare, setSelectedSnippetToUnshare] = useState<Snippet>()
@@ -80,19 +83,23 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   // =======================================================
   // [Joshen] Set up favorites, shared, and private snippets
   // =======================================================
-  const folders = Object.values(snapV2.folders).map((x) => x.folder)
-  const contents = snapV2.sortedSnippets.filter((x) =>
+  const snippets = useSnippets(projectRef as string)
+  const folders = useSnippetFolders(projectRef as string)
+  const contents = snippets.filter((x) =>
     searchText.length > 0 ? x.name.toLowerCase().includes(searchText.toLowerCase()) : true
   )
+  const snippet = snapV2.snippets[id as string]?.snippet
 
   const privateSnippets = contents.filter((snippet) => snippet.visibility === 'user')
-  const numPrivateSnippets = Object.keys(snapV2.snippets).length
+  const numPrivateSnippets = snapV2.privateSnippetCount[projectRef as string]
   const privateSnippetsTreeState =
-    folders.length === 0 && numPrivateSnippets === 0
+    folders.length === 0 && snippets.length === 0
       ? [ROOT_NODE]
       : formatFolderResponseForTreeView({ folders, contents: privateSnippets })
 
-  const favoriteSnippets = snapV2.sortedFavoriteSnippets
+  const favoriteSnippets = useFavoriteSnippets(projectRef as string).filter((x) =>
+    searchText.length > 0 ? x.name.toLowerCase().includes(searchText.toLowerCase()) : true
+  )
   const numFavoriteSnippets = favoriteSnippets.length
   const favoritesTreeState =
     numFavoriteSnippets === 0
@@ -109,6 +116,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   // =================================
   // [Joshen] React Queries
   // =================================
+
   useSQLSnippetFoldersQuery(
     { projectRef },
     {
@@ -130,6 +138,17 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
       }
     },
   })
+
+  useContentCountQuery(
+    { projectRef, type: 'sql' },
+    {
+      onSuccess(data) {
+        if (projectRef !== undefined) {
+          snapV2.setPrivateSnippetCount({ projectRef, value: data.count })
+        }
+      },
+    }
+  )
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onError: (error, data) => {
@@ -188,6 +207,13 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     snapV2.shareSnippet(selectedSnippetToShare.id, 'project')
     setSelectedSnippetToShare(undefined)
     setShowSharedSnippets(true)
+
+    if (projectRef !== undefined) {
+      snapV2.setPrivateSnippetCount({
+        projectRef,
+        value: snapV2.privateSnippetCount[projectRef] - 1,
+      })
+    }
   }
 
   const onConfirmUnshare = () => {
@@ -195,6 +221,13 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     snapV2.shareSnippet(selectedSnippetToUnshare.id, 'user')
     setSelectedSnippetToUnshare(undefined)
     setShowPrivateSnippets(true)
+
+    if (projectRef !== undefined) {
+      snapV2.setPrivateSnippetCount({
+        projectRef,
+        value: snapV2.privateSnippetCount[projectRef] + 1,
+      })
+    }
   }
 
   const onSelectCopyPersonal = async (snippet: Snippet) => {
@@ -282,13 +315,24 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   // ======================================
 
   useEffect(() => {
-    if (id !== undefined && snapV2.loaded && snapV2.snippets[id] !== undefined) {
-      const snippet = snapV2.snippets[id].snippet
-      if (snippet.visibility === 'project') {
-        setShowSharedSnippets(true)
+    const loadFolderContents = async (folderId: string) => {
+      const { contents } = await getSQLSnippetFolders({ projectRef, folderId })
+      if (projectRef) {
+        contents?.forEach((snippet) => snapV2.addSnippet({ projectRef, snippet }))
       }
     }
-  }, [id, snapV2.loaded])
+
+    if (snippet !== undefined && !mountedId) {
+      if (snippet.visibility === 'project') setShowSharedSnippets(true)
+      if (snippet.folder_id) {
+        setDefaultExpandedFolderIds([snippet.folder_id])
+        loadFolderContents(snippet.folder_id)
+      }
+
+      // Only want to run this once when loading sql/[id] route
+      setMountedId(true)
+    }
+  }, [snippet, mountedId])
 
   useEffect(() => {
     // Unselect all snippets whenever opening another snippet
@@ -298,62 +342,6 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   return (
     <>
       <Separator />
-
-      {((numFavoriteSnippets === 0 && searchText.length === 0) || numFavoriteSnippets > 0) && (
-        <>
-          <Collapsible_Shadcn_ open={showFavouriteSnippets} onOpenChange={setShowFavouriteSnippets}>
-            <CollapsibleTrigger_Shadcn_ className={COLLAPSIBLE_TRIGGER_CLASS_NAMES}>
-              <ChevronRight size={16} className={COLLAPSIBLE_ICON_CLASS_NAMES} />
-              <span className={COLLASIBLE_HEADER_CLASS_NAMES}>
-                Favorites{numFavoriteSnippets > 0 && ` (${numFavoriteSnippets})`}
-              </span>
-            </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="pt-2">
-              {numFavoriteSnippets === 0 ? (
-                <div className="mx-4">
-                  <Alert_Shadcn_ className="p-3">
-                    <AlertTitle_Shadcn_ className="text-xs">No favorite queries</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_ className="text-xs ">
-                      Save a query to favorites for easy accessbility by clicking the{' '}
-                      <Heart size={12} className="inline-block relative align-center -top-[1px]" />{' '}
-                      icon.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                </div>
-              ) : (
-                <TreeView
-                  data={favoritesTreeState}
-                  aria-label="favorite-snippets"
-                  nodeRenderer={({ element, ...props }) => (
-                    <SQLEditorTreeViewItem
-                      {...props}
-                      element={element}
-                      onSelectDelete={() => {
-                        setShowDeleteModal(true)
-                        setSelectedSnippets([element.metadata as unknown as Snippet])
-                      }}
-                      onSelectRename={() => {
-                        setShowRenameModal(true)
-                        setSelectedSnippetToRename(element.metadata as Snippet)
-                      }}
-                      onSelectDownload={() => {
-                        setSelectedSnippetToDownload(element.metadata as Snippet)
-                      }}
-                      onSelectCopyPersonal={() => {
-                        onSelectCopyPersonal(element.metadata as Snippet)
-                      }}
-                      onSelectUnshare={() => {
-                        setSelectedSnippetToUnshare(element.metadata as Snippet)
-                      }}
-                    />
-                  )}
-                />
-              )}
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
-          <Separator />
-        </>
-      )}
 
       {((numProjectSnippets === 0 && searchText.length === 0) || numProjectSnippets > 0) && (
         <>
@@ -409,6 +397,63 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
         </>
       )}
 
+      {((numFavoriteSnippets === 0 && searchText.length === 0) || numFavoriteSnippets > 0) && (
+        <>
+          <Collapsible_Shadcn_ open={showFavouriteSnippets} onOpenChange={setShowFavouriteSnippets}>
+            <CollapsibleTrigger_Shadcn_ className={COLLAPSIBLE_TRIGGER_CLASS_NAMES}>
+              <ChevronRight size={16} className={COLLAPSIBLE_ICON_CLASS_NAMES} />
+              <span className={COLLASIBLE_HEADER_CLASS_NAMES}>
+                Favorites{numFavoriteSnippets > 0 && ` (${numFavoriteSnippets})`}
+              </span>
+            </CollapsibleTrigger_Shadcn_>
+            <CollapsibleContent_Shadcn_ className="pt-2">
+              {numFavoriteSnippets === 0 ? (
+                <div className="mx-4">
+                  <Alert_Shadcn_ className="p-3">
+                    <AlertTitle_Shadcn_ className="text-xs">No favorite queries</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_ className="text-xs ">
+                      Save a query to favorites for easy accessbility by clicking the{' '}
+                      <Heart size={12} className="inline-block relative align-center -top-[1px]" />{' '}
+                      icon.
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                </div>
+              ) : (
+                <TreeView
+                  data={favoritesTreeState}
+                  aria-label="favorite-snippets"
+                  nodeRenderer={({ element, ...props }) => (
+                    <SQLEditorTreeViewItem
+                      {...props}
+                      element={element}
+                      onSelectDelete={() => {
+                        setShowDeleteModal(true)
+                        setSelectedSnippets([element.metadata as unknown as Snippet])
+                      }}
+                      onSelectRename={() => {
+                        setShowRenameModal(true)
+                        setSelectedSnippetToRename(element.metadata as Snippet)
+                      }}
+                      onSelectDownload={() => {
+                        setSelectedSnippetToDownload(element.metadata as Snippet)
+                      }}
+                      onSelectCopyPersonal={() => {
+                        onSelectCopyPersonal(element.metadata as Snippet)
+                      }}
+                      onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
+                      onSelectUnshare={() => {
+                        setSelectedSnippetToUnshare(element.metadata as Snippet)
+                      }}
+                    />
+                  )}
+                />
+              )}
+            </CollapsibleContent_Shadcn_>
+          </Collapsible_Shadcn_>
+          <Separator />
+        </>
+      )}
+
       <Collapsible_Shadcn_ open={showPrivateSnippets} onOpenChange={setShowPrivateSnippets}>
         <CollapsibleTrigger_Shadcn_ className={COLLAPSIBLE_TRIGGER_CLASS_NAMES}>
           <ChevronRight size={16} className={COLLAPSIBLE_ICON_CLASS_NAMES} />
@@ -439,6 +484,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
               data={privateSnippetsTreeState}
               selectedIds={selectedSnippets.map((x) => x.id)}
               aria-label="private-snippets"
+              expandedIds={defaultExpandedFolderIds}
               nodeRenderer={({ element, ...props }) => (
                 <SQLEditorTreeViewItem
                   {...props}
@@ -488,8 +534,11 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                   onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                   onEditSave={(name: string) => {
                     // [Joshen] Inline editing only for folders for now
-                    if (name.length === 0) snapV2.removeFolder(element.id as string)
-                    else snapV2.saveFolder({ id: element.id as string, name })
+                    if (name.length === 0 && element.id === 'new-folder') {
+                      snapV2.removeFolder(element.id as string)
+                    } else if (name.length > 0) {
+                      snapV2.saveFolder({ id: element.id as string, name })
+                    }
                   }}
                 />
               )}
@@ -536,12 +585,12 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
         }}
       >
         <ul className="text-sm text-foreground-light space-y-5">
-          <li className="flex gap-3">
-            <Eye />
+          <li className="flex gap-3 items-center">
+            <Eye size={16} />
             <span>Project members will have read-only access to this query.</span>
           </li>
-          <li className="flex gap-3">
-            <Unlock />
+          <li className="flex gap-3 items-center">
+            <Unlock size={16} />
             <span>Anyone will be able to duplicate it to their personal snippets.</span>
           </li>
         </ul>

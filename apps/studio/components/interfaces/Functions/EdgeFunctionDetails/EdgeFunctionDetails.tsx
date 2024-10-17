@@ -6,7 +6,7 @@ import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormActions } from 'components/ui/Forms/FormActions'

@@ -1,5 +1,6 @@
 import { noop } from 'lodash'
-import { IconPlus, Input, Listbox, Modal } from 'ui'
+import { Plus } from 'lucide-react'
+import { Input, Listbox, Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
@@ -50,7 +51,7 @@ const EncryptionKeySelector = ({
           id="create-new"
           value="create-new"
           label="Create a new Encryption Key"
-          addOnBefore={() => <IconPlus size={16} strokeWidth={1.5} />}
+          addOnBefore={() => <Plus size={16} strokeWidth={1.5} />}
         >
           Create a new Encryption Key
         </Listbox.Option>

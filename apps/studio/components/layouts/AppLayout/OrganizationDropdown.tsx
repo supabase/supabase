@@ -1,3 +1,4 @@
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -17,14 +18,12 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
-  IconCheck,
-  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { ChevronsUpDown } from 'lucide-react'
+import PartnerIcon from 'components/ui/PartnerIcon'
 
 interface OrganizationDropdownProps {
   isNewNav?: boolean
@@ -48,7 +47,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
   }
 
   return (
-    <div className="flex items-center px-2 py-1">
+    <div className="flex items-center">
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
           <div className="flex items-center space-x-2 cursor-pointer">
@@ -85,8 +84,11 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                         onClick={() => setOpen(false)}
                       >
                         <Link href={href} className="w-full flex items-center justify-between">
-                          {org.name}
-                          {org.slug === slug && <IconCheck />}
+                          <div className="flex items-center gap-2">
+                            <span>{org.name}</span>
+                            <PartnerIcon organization={org} />
+                          </div>
+                          {org.slug === slug && <Check size={16} />}
                         </Link>
                       </CommandItem_Shadcn_>
                     )
@@ -106,7 +108,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                       onClick={() => setOpen(false)}
                     >
                       <Link href="/new" className="flex items-center gap-2 w-full">
-                        <IconPlus size={14} strokeWidth={1.5} />
+                        <Plus size={14} strokeWidth={1.5} />
                         <p>New organization</p>
                       </Link>
                     </CommandItem_Shadcn_>

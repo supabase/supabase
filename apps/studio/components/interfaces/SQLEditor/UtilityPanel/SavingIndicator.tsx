@@ -2,9 +2,7 @@ import { AlertCircle, Check, Loader2, RefreshCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { usePrevious } from 'hooks/deprecated'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ReadOnlyBadge from './ReadOnlyBadge'
@@ -13,15 +11,13 @@ export type SavingIndicatorProps = { id: string }
 
 const SavingIndicator = ({ id }: SavingIndicatorProps) => {
   const { profile } = useProfile()
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const enableFolders = useFlag('sqlFolderOrganization')
 
-  const savingState = enableFolders ? snapV2.savingStates[id] : snap.savingStates[id]
+  const savingState = snapV2.savingStates[id]
   const previousState = usePrevious(savingState)
   const [showSavedText, setShowSavedText] = useState(false)
 
-  const snippet = enableFolders ? snapV2.snippets[id] : snap.snippets[id]
+  const snippet = snapV2.snippets[id]
   const isSnippetOwner = profile?.id === snippet?.snippet.owner_id
 
   useEffect(() => {
@@ -39,7 +35,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
     }
   }, [savingState])
 
-  const retry = () => (enableFolders ? snapV2.addNeedsSaving(id) : snap.addNeedsSaving(id))
+  const retry = () => snapV2.addNeedsSaving(id)
 
   return (
     <>
@@ -48,7 +44,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
           <Button
             type="text"
             size="tiny"
-            icon={<RefreshCcw className="text-gray-1100" size="tiny" strokeWidth={2} />}
+            icon={<RefreshCcw className="text-gray-1100" strokeWidth={2} />}
             onClick={retry}
           >
             Retry

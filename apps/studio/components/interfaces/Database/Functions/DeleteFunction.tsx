@@ -1,9 +1,9 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteFunctionProps {
   func?: DatabaseFunction

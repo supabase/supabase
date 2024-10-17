@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { noop } from 'lodash'
+import { ChevronDown, Edit2, Trash, XCircle } from 'lucide-react'
 import Link from 'next/link'
 
 import type { Bucket } from 'data/storage/buckets-query'
@@ -13,10 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconEdit2,
-  IconTrash,
-  IconXCircle,
   cn,
 } from 'ui'
 
@@ -67,13 +64,7 @@ const BucketRow = ({
       {canUpdateBuckets && isSelected ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              type="text"
-              icon={
-                <IconChevronDown size="tiny" strokeWidth={2} className="text-foreground-light" />
-              }
-              className="mr-1 p-0.5"
-            />
+            <Button type="text" icon={<ChevronDown />} className="mr-1 p-0.5" />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start">
             <DropdownMenuItem
@@ -81,16 +72,16 @@ const BucketRow = ({
               className="space-x-2"
               onClick={() => onSelectEditBucket()}
             >
-              <IconEdit2 size="tiny" />
+              <Edit2 size={14} />
               <p>Edit bucket</p>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              key="delete-bucket"
+              key="empty-bucket"
               className="space-x-2"
               onClick={() => onSelectEmptyBucket()}
             >
-              <IconXCircle size="tiny" />
+              <XCircle size={14} />
               <p>Empty bucket</p>
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -98,7 +89,7 @@ const BucketRow = ({
               className="space-x-2"
               onClick={() => onSelectDeleteBucket()}
             >
-              <IconTrash size="tiny" />
+              <Trash size={14} />
               <p>Delete bucket</p>
             </DropdownMenuItem>
           </DropdownMenuContent>
