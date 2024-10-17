@@ -105,7 +105,7 @@ where end_date is null;
 ## Complex queries and CTEs
 
 - If a query is extremely complex, prefer a CTE. 
-- Make sure the CTE is clear and linear Prefer readability over performance.
+- Make sure the CTE is clear and linear. Prefer readability over performance.
 - Add comments to each block.
 
 ```sql
