@@ -12,6 +12,7 @@ import {
   ScrollArea,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { DropdownScrollArea } from './DropdownScrollArea'
 
 interface EntitiesDropdownMenuProps {
   selectedSchemas: string[]
@@ -65,7 +66,10 @@ export const EntitiesDropdownMenu = ({
         />
         <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
         <CommandGroup_Shadcn_>
-          <ScrollArea className={(entities || []).length > 7 ? 'h-[210px]' : ''}>
+          <DropdownScrollArea
+            id="tables-scroll"
+            className={(entities || []).length > 7 ? 'h-[210px]' : ''}
+          >
             {entities?.map((entity) => (
               <CommandItem_Shadcn_
                 key={entity.id}
@@ -83,7 +87,7 @@ export const EntitiesDropdownMenu = ({
                 ) && <Check className="text-brand" strokeWidth={2} size={16} />}
               </CommandItem_Shadcn_>
             ))}
-          </ScrollArea>
+          </DropdownScrollArea>
         </CommandGroup_Shadcn_>
       </CommandList_Shadcn_>
     </Command_Shadcn_>

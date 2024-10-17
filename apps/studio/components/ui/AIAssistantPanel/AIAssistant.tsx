@@ -1,11 +1,11 @@
-import { useSchemasQuery } from 'data/database/schemas-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { Check, ExternalLink, FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
+import { ExternalLink, FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useChat } from 'ai/react'
 import { MessageWithDebug } from 'components/interfaces/SQLEditor/AiAssistantPanel'
+import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
@@ -19,12 +19,6 @@ import {
   AlertDescription_Shadcn_,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
@@ -35,7 +29,6 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-  ScrollArea,
   SheetHeader,
   SheetSection,
   Tooltip_Shadcn_,
@@ -49,7 +42,7 @@ import { generatePrompt, retrieveDocsUrl } from './AIAssistant.utils'
 import { ContextBadge } from './ContextBadge'
 import { EntitiesDropdownMenu } from './EntitiesDropdownMenu'
 import { Message } from './Message'
-import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
+import { SchemasDropdownMenu } from './SchemasDropdownMenu'
 
 const ANIMATION_DURATION = 0.3
 
@@ -97,12 +90,6 @@ export const AIAssistant = ({
     selectedDatabaseEntity.length === 0 &&
     selectedSchemas.length === 0 &&
     selectedTables.length === 0
-
-  const { data: schemaDatas } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const schemas = (schemaDatas || []).sort((a, b) => a.name.localeCompare(b.name))
 
   const { data } = useEntityDefinitionsQuery(
     {
@@ -396,7 +383,7 @@ export const AIAssistant = ({
                       you need help with
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {editor === undefined && (
+                    {editor === null && (
                       <DropdownMenuSub>
                         <DropdownMenuSubTrigger>
                           <div className="flex flex-col gap-y-1">
@@ -432,43 +419,10 @@ export const AIAssistant = ({
                         </div>
                       </DropdownMenuSubTrigger>
                       <DropdownMenuSubContent className="p-0 w-52">
-                        {/* [Joshen] See if you can figure out the scroll issue here */}
-                        <Command_Shadcn_>
-                          <CommandInput_Shadcn_ autoFocus placeholder="Find schema..." />
-                          <CommandList_Shadcn_>
-                            <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
-                            <CommandGroup_Shadcn_>
-                              <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
-                                {schemas?.map((schema) => (
-                                  <CommandItem_Shadcn_
-                                    key={schema.id}
-                                    value={schema.id.toString()}
-                                    className="justify-between"
-                                    onSelect={() => toggleSchema(schema.name)}
-                                    onClick={() => toggleSchema(schema.name)}
-                                  >
-                                    {schema.name}
-                                    {selectedSchemas.includes(schema.name) && (
-                                      <Check className="text-brand" strokeWidth={2} size={16} />
-                                    )}
-                                  </CommandItem_Shadcn_>
-                                ))}
-                              </ScrollArea>
-                            </CommandGroup_Shadcn_>
-                          </CommandList_Shadcn_>
-                        </Command_Shadcn_>
-                        {/* {schemas.map((schema) => (
-                        <DropdownMenuItem
-                          key={schema.id}
-                          className="w-full flex items-center justify-between w-40"
-                          onClick={() => toggleSchema(schema.name)}
-                        >
-                          {schema.name}
-                          {selectedSchemas.includes(schema.name) && (
-                            <Check className="text-brand" strokeWidth={2} size={16} />
-                          )}
-                        </DropdownMenuItem>
-                      ))} */}
+                        <SchemasDropdownMenu
+                          selectedSchemas={selectedSchemas}
+                          onToggleSchema={toggleSchema}
+                        />
                       </DropdownMenuSubContent>
                     </DropdownMenuSub>
                     {selectedSchemas.length > 0 && (
@@ -497,9 +451,7 @@ export const AIAssistant = ({
                   <ContextBadge
                     label="Entity"
                     value={entityContext.label}
-                    onRemove={
-                      editor === undefined ? () => setSelectedDatabaseEntity('') : undefined
-                    }
+                    onRemove={editor === null ? () => setSelectedDatabaseEntity('') : undefined}
                   />
                 )}
 

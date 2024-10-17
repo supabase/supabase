@@ -57,6 +57,8 @@ export const AiAssistantPanel = () => {
     false
   )
 
+  console.log({ isAcknowledged })
+
   const [chatId, setChatId] = useState(uuidv4())
   const [error, setError] = useState<QueryResponseError>()
   const [results, setResults] = useState<undefined | any[]>(undefined)
@@ -121,6 +123,8 @@ export const AiAssistantPanel = () => {
     setShowWarning(false)
 
     const query = editorRef.current?.getValue() ?? ''
+    if (query.length === 0) return
+
     if (editor !== undefined && !skipValidation) {
       // [Joshen] Some basic validation logic
       const validated = validateQuery(editor, query)
@@ -302,7 +306,7 @@ export const AiAssistantPanel = () => {
               <TooltipContent_Shadcn_ side="bottom">Open in SQL Editor</TooltipContent_Shadcn_>
             </Tooltip_Shadcn_>
           </SheetHeader>
-          {editor === undefined && !isAcknowledged && (
+          {editor === null && !isAcknowledged && (
             <Admonition
               showIcon={false}
               type="default"
@@ -395,7 +399,7 @@ export const AiAssistantPanel = () => {
                 </>
               )}
               {results !== undefined && results.length === 0 && (
-                <div className="flex items-center justify-between border-t bg-surface-100 py-2 pl-2 pr-5">
+                <div className="flex items-center justify-between border-t bg-surface-100 h-[43px] pl-2 pr-5">
                   <p className="text-xs text-foreground-light">Success. No rows returned.</p>
                 </div>
               )}
