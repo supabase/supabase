@@ -12,6 +12,7 @@
     "transform-tokens": "node ./transformTokens.js",
     "extract-design-tokens": "node internals/tokens/extract-design-tokens.js",
     "generate-styles": "npm run extract-design-tokens && npm run transform-tokens && npm run cleanse-css-for-tailwind && npm run generate-demo-tailwind-classes",
+    "clean": "rimraf node_modules",
     "test": "vitest"
   },
   "dependencies": {
