@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { ExternalLink, Info } from 'lucide-react'
 
 import { useParams } from 'common'
 import {
@@ -37,7 +38,6 @@ import {
   SidePanel,
   WarningIcon,
 } from 'ui'
-import { ExternalLink, Info } from 'lucide-react'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()

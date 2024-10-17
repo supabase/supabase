@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
 
-const ResizingState = () => {
+export const ResizingState = () => {
   const { ref } = useParams()
   useProjectDetailQuery(
     { ref },
@@ -27,7 +27,7 @@ const ResizingState = () => {
               <Loader2 className="animate-spin" size={18} />
             </div>
             <div className="space-y-1">
-              <p>Restarting...</p>
+              <p>Resizing project...</p>
               <p className="text-sm text-foreground-light">
                 Your project is being restarted to apply compute size changes. It can take a few
                 minutes. Your project will be offline while it is being restarted.
@@ -39,5 +39,3 @@ const ResizingState = () => {
     </div>
   )
 }
-
-export default ResizingState
