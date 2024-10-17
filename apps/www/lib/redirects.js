@@ -2814,6 +2814,11 @@ module.exports = [
     source: '/docs/guides/resources/examples',
     destination: '/docs/guides/getting-started',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-email-templates',
+    destination: '/docs/guides/local-development/customizing-email-templates',
+  },
 
   // marketing
 
