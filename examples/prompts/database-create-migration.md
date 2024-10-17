@@ -1,4 +1,4 @@
-<!-- SUGGESTION: include the `code-format-sql.md prompt for coding style. -->
+<!-- SUGGESTION: include the `code-format-sql.md` prompt for coding style. -->
 
 # Database: Create migration
 
