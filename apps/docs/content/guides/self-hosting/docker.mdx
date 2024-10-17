@@ -107,14 +107,25 @@ You can add new Functions as `volumes/functions/<FUNCTION_NAME>/index.ts`. Resta
 
 ### Accessing Postgres
 
-You can connect to the Postgres database locally on port `5432`. For example, if you have `psql` on your local machine you can run:
+By default, the Supabase stack runs the [Supavisor](https://supabase.github.io/supavisor/development/docs/) connection pooler. Supavisor provides efficient management of database connections.
+
+You can connect to the Postgres database using the following methods:
+
+1. For session-based connections (equivalent to direct PostgreSQL connections):
 
 ```bash
-psql -h 127.0.0.1 -p 5432 -d postgres -U postgres
+psql 'postgres://postgres.your-tenant-id:your-super-secret-and-long-postgres-password@localhost:5432/postgres'
 ```
 
-The default password is `your-super-secret-and-long-postgres-password`. You should change this as soon as possible using the [instructions below](#update-secrets). By default the database is not accessible from outside the local machine. You can [change this](#exposing-your-postgres-database) by updating the `docker-compose.yml` file.
+2. For pooled transactional connections:
 
+```bash
+psql 'postgres://postgres.your-tenant-id:your-super-secret-and-long-postgres-password@localhost:6543/postgres'
+```
+
+The default tenant ID is `your-tenant-id`, and the default password is `your-super-secret-and-long-postgres-password`. You should change these as soon as possible using the [instructions below](#update-secrets).
+
+By default, the database is not accessible from outside the local machine but the pooler is. You can [change this](#exposing-your-postgres-database) by updating the `docker-compose.yml` file.
 
 ## Securing your services
 
@@ -145,6 +156,7 @@ Update the `.env` file with your own secrets. In particular, these are required:
 - `JWT_SECRET`: used by PostgREST and GoTrue, among others.
 - `SITE_URL`: the base URL of your site.
 - `SMTP_*`: mail server credentials. You can use any SMTP server.
+- `POOLER_TENANT_ID`: the tenant-id that will be used by supavisor pooler for your connection string
 
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 

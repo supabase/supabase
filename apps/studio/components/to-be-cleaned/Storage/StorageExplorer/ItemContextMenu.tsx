@@ -27,7 +27,7 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
   } = storageExplorerStore
   const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
   const isPublic = selectedBucket.public
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const onHandleClick = async (event: any, item: StorageItemWithColumn, expiresIn?: number) => {
     if (item.isCorrupted) return
