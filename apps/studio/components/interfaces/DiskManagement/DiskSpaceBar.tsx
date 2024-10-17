@@ -9,6 +9,7 @@ import {
   TooltipTrigger_Shadcn_,
 } from 'ui'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
+import { Info } from 'lucide-react'
 
 interface DiskSpaceBarProps {
   showNewBar: boolean
@@ -154,8 +155,8 @@ export default function DiskSpaceBar({
               >
                 <Tooltip_Shadcn_>
                   <TooltipTrigger_Shadcn_ asChild>
-                    <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded text-xs text-foreground-light whitespace-nowrap">
-                      Autoscaling
+                    <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
+                      Autoscaling <Info size={12} />
                     </div>
                   </TooltipTrigger_Shadcn_>
                   <TooltipContent_Shadcn_ side="bottom" className="w-[310px] flex flex-col gap-y-1">
@@ -186,6 +187,11 @@ export default function DiskSpaceBar({
           <span>Available space</span>
         </div>
       </div>
+      <p className="text-xs text-foreground-lighter mt-4">
+        <span className="font-semibold">Note:</span> Disk size refers to the total space your
+        project occupies on disk, including the database itself, additional files like the
+        write-ahead log (WAL), and other internal resources.
+      </p>
     </div>
   )
 }
