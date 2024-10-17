@@ -267,7 +267,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               ) : status === REPLICA_STATUS.GOING_DOWN ? (
                 <Badge>Going down</Badge>
               ) : status === REPLICA_STATUS.RESTORING ? (
-                <Badge>Restoring</Badge>
+                <Badge>Restarting</Badge>
               ) : status === REPLICA_STATUS.RESTARTING ? (
                 <Badge>Restarting</Badge>
               ) : status === REPLICA_STATUS.RESIZING ? (
