@@ -4,14 +4,28 @@ import { useEffect, useState } from 'react'
 import { copyToClipboard } from 'lib/helpers'
 import { Button, ButtonProps } from 'ui'
 
-export interface CopyButtonProps extends ButtonProps {
-  text: string
+type CopyButtonBaseProps = {
   iconOnly?: boolean
   copyLabel?: string
   copiedLabel?: string
+  onCopy?: () => Promise<string> | string
 }
+
+type CopyButtonWithText = CopyButtonBaseProps & {
+  text: string
+  asyncText?: never
+}
+
+type CopyButtonWithAsyncText = CopyButtonBaseProps & {
+  text?: never
+  asyncText: () => Promise<string> | string
+}
+
+export type CopyButtonProps = (CopyButtonWithText | CopyButtonWithAsyncText) & ButtonProps
+
 const CopyButton = ({
   text,
+  asyncText,
   iconOnly = false,
   children,
   onClick,
@@ -30,8 +44,13 @@ const CopyButton = ({
   return (
     <Button
       onClick={async (e) => {
+        let textToCopy = text
+        if (asyncText) {
+          textToCopy = await asyncText()
+        }
+        console.log('text', textToCopy)
         setShowCopied(true)
-        await copyToClipboard(text)
+        await copyToClipboard(textToCopy!)
         onClick?.(e)
       }}
       {...props}
@@ -43,4 +62,5 @@ const CopyButton = ({
     </Button>
   )
 }
+
 export default CopyButton

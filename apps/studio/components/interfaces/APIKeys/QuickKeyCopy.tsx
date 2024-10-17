@@ -62,9 +62,6 @@ const QuickKeyCopyContent = ({ selectedFramework }: { selectedFramework: string 
   const dataErrors = projectApiError || apiKeysError
   const permissionErrors = !canReadAPIKeys && !isPermissionsLoading
 
-  console.log('canReadAPIKeys', canReadAPIKeys)
-  console.log('isPermissionsLoading', isPermissionsLoading)
-
   if (isProjectApiLoading || isApiKeysLoading || isPermissionsLoading) {
     return (
       <div className="bg-alternative px-5 py-3 border-t overflow-hidden flex flex-col gap-0 h-20">

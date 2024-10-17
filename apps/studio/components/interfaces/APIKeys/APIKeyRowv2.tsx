@@ -1,18 +1,18 @@
 import { TooltipContent } from '@radix-ui/react-tooltip'
 import CopyButton from 'components/ui/CopyButton'
-import { Eye, EyeOff, Loader2, MoreVertical, TrashIcon } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { Eye, Loader2, MoreVertical, TrashIcon } from 'lucide-react'
+import { useState } from 'react'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input_Shadcn_,
   TableCell,
   TableRow,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  cn,
 } from 'ui'
 
 import { useParams } from 'common'
@@ -22,6 +22,14 @@ import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import api from 'pages/api/props/project/[ref]/api'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-query'
+import { QueryClient, useQueryClient } from '@tanstack/react-query'
+import { apiKeysKeys } from 'data/api-keys/keys'
+import { InputVariants } from '@ui/components/shadcn/ui/input'
+import { toast } from 'sonner'
 
 const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
   const { ref: projectRef } = useParams()
@@ -29,12 +37,12 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
   const [shown, setShown] = useState(!isSecret)
   const [deleteDialogOpen, setDeleteDialogOpenState] = useState(false)
 
-  const hiddenKey = useMemo(
-    () =>
-      apiKey.prefix +
-      Array.from({ length: apiKey.api_key.length - apiKey.prefix.length }, () => '•').join(''),
-    [apiKey.api_key, apiKey.prefix]
-  )
+  // const hiddenKey = useMemo(
+  //   () =>
+  //     apiKey.prefix +
+  //     Array.from({ length: apiKey.api_key.length - apiKey.prefix.length }, () => '•').join(''),
+  //   [apiKey.api_key, apiKey.prefix]
+  // )
 
   const canDeleteAPIKeys = true // todo
 
@@ -44,7 +52,7 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
     deleteAPIKey(
       {
         projectRef,
-        id: apiKey.id,
+        id: apiKey.id as string,
       },
       {
         onSuccess: () => {
@@ -72,33 +80,8 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
       <TableCell className="py-2">{apiKey.description || '/'}</TableCell>
       <TableCell className="py-2">
         <div className="flex flex-row gap-2">
-          {/* <code>{shown ? apiKey.api_key : hiddenKey}</code> */}
-
-          <Input_Shadcn_
-            size="tiny"
-            className="flex-1 grow gap-1 font-mono !rounded-full max-w-60 truncate"
-            value={apiKey.api_key}
-          />
-
-          {isSecret && (
-            <Button
-              type="outline"
-              className="rounded-full px-2"
-              icon={shown ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
-              onClick={() => {
-                setShown((shown) => {
-                  if (!shown) {
-                    setTimeout(() => {
-                      setShown(false)
-                    }, 2000)
-                  }
-
-                  return !shown
-                })
-              }}
-            />
-          )}
-          <CopyButton type="default" text={apiKey.api_key} iconOnly className="rounded-full px-2" />
+          {/* <Input_Shadcn_ apiKey={apiKey} /> */}
+          <Input apiKey={apiKey} />
         </div>
       </TableCell>
 
@@ -160,6 +143,113 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
         />
       </TableCell>
     </MotionTableRow>
+  )
+}
+
+function Input({ apiKey }: { apiKey: APIKeysData[0] }) {
+  // const [shown, setShown] = useState(false)
+  const [show, setShowState] = useState(false)
+  const { ref: projectRef } = useParams()
+  const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
+  const queryClient = useQueryClient()
+
+  const {
+    data,
+    isLoading: isLoadingApiKey,
+    error,
+    refetch: refetchApiKey,
+  } = useAPIKeyIdQuery(
+    {
+      projectRef,
+      id: apiKey.id as string,
+    },
+    {
+      enabled: show,
+      staleTime: 0, // Data is considered stale immediately
+      cacheTime: 0, // Cache is cleared immediately after query becomes stale
+    }
+  )
+
+  async function onSubmitShow() {
+    setShowState(true)
+    // Set a timeout to invalidate the cache after a certain amount of time
+    setTimeout(() => {
+      setShowState(false)
+      queryClient.removeQueries({
+        queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
+        exact: true,
+      })
+    }, 2000) // Destroy query after 2 seconds
+  }
+
+  async function onCopy() {
+    // @ts-expect-error / TODO: fix type error
+    if (data?.api_key) return data?.api_key
+
+    try {
+      const result = await refetchApiKey()
+      // @ts-expect-error / TODO: fix type error
+      if (result?.data?.api_key) return result.data.api_key
+
+      if (error) {
+        toast.error('Failed to copy secret API key')
+      }
+    } catch (error) {
+      console.error('Failed to fetch API key:', error)
+    }
+
+    return apiKey.api_key // Fallback to the masked version
+  }
+
+  const isSecret = apiKey.type === 'secret'
+
+  return (
+    <>
+      <div
+        className={cn(
+          InputVariants({ size: 'tiny' }),
+          'flex-1 grow gap-0 font-mono !rounded-full max-w-60 overflow-hidden'
+        )}
+      >
+        <span>sb_secret_</span>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={show ? 'shown' : 'hidden'}
+            initial={{ opacity: 0, y: show ? 16 : -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: show ? 16 : -8 }}
+            transition={{ duration: 0.12, easings: 'easeIn' }}
+            className="truncate"
+          >
+            {show
+              ? // @ts-expect-error / TODO: fix type error
+                data?.api_key?.replace('sb_secret_', '')
+              : apiKey?.api_key.replace('sb_secret_', '')}
+          </motion.span>
+        </AnimatePresence>
+      </div>
+      {isSecret && (
+        <AnimatePresence>
+          {!show && (
+            <motion.div
+              initial={{ opacity: 0, scale: 1, width: 0 }}
+              animate={{ opacity: 1, scale: 1, width: 'auto' }}
+              exit={{ opacity: 0, scale: 1, width: 0 }}
+              transition={{ duration: 0.12 }}
+              style={{ overflow: 'hidden' }}
+            >
+              <Button
+                type="outline"
+                className="rounded-full px-2"
+                icon={<Eye strokeWidth={2} />}
+                onClick={onSubmitShow}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
+      <CopyButton type="default" asyncText={onCopy} iconOnly className="rounded-full px-2" />
+    </>
   )
 }
 
