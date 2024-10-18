@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
+import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 import { VariantProps, cva } from 'class-variance-authority'
@@ -514,7 +514,6 @@ const MultiSelectorItem = React.forwardRef<
   HTMLDivElement,
   { value: string } & React.ComponentPropsWithoutRef<typeof CommandItem>
 >(({ className, value, children }, ref) => {
-  const id = React.useId()
   const { values: selectedValues, setInputValue, toggleValue, open } = useMultiSelect()
   const isSelected = selectedValues.includes(value)
 
@@ -533,23 +532,26 @@ const MultiSelectorItem = React.forwardRef<
         'px-2 py-1.5 rounded',
         'hover:text-foreground hover:!bg-overlay-hover',
         'w-full flex items-center space-x-2',
-        'peer-data-[Value=true]:bg-overlay-hover peer-data-[Value=true]:text-strong',
+        'peer-data-[value=true]:bg-overlay-hover peer-data-[value=true]:text-strong',
         className
       )}
     >
-      <Checkbox
-        id={`${id}-checkbox-${value}`}
-        checked={isSelected}
-        tabIndex={-1}
-        className="pointer-events-none"
-      />
-      <label
-        htmlFor={`${id}-checkbox-${value}`}
-        className="text-xs flex-grow leading-none pointer-events-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:pointer-events-none peer-disabled:opacity-50"
-        tabIndex={-1}
+      <div
+        className={cn(
+          'flex items-center justify-center',
+          'peer h-4 w-4 shrink-0 rounded border border-control bg-control/25 ring-offset-background',
+          'transition-colors duration-150 ease-in-out',
+          'hover:border-strong',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-foreground data-[state=checked]:text-background',
+          isSelected ? 'bg-foreground text-background' : '[&_svg]:invisible'
+        )}
       >
+        <Check className="h-3 w-3" strokeWidth={4} />
+      </div>
+      <span className="text-xs flex-grow leading-none pointer-events-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:pointer-events-none peer-disabled:opacity-50">
         {children}
-      </label>
+      </span>
     </CommandItem>
   )
 })
