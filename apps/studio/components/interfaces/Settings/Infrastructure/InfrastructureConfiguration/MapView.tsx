@@ -273,6 +273,10 @@ const MapView = ({
                             <Badge>Coming up</Badge>
                           ) : database.status === REPLICA_STATUS.RESTORING ? (
                             <Badge>Restarting</Badge>
+                          ) : database.status === REPLICA_STATUS.RESTARTING ? (
+                            <Badge>Restarting</Badge>
+                          ) : database.status === REPLICA_STATUS.RESIZING ? (
+                            <Badge>Resizing</Badge>
                           ) : (
                             <Badge variant="warning">Unhealthy</Badge>
                           )}

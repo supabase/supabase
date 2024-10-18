@@ -62,69 +62,57 @@ export const CronJobsListing = () => {
 
   return (
     <>
-      {(cronJobs ?? []).length == 0 ? (
-        <div className="flex h-full w-full items-center justify-center">
-          <ProductEmptyState
-            title="Cron Jobs"
-            ctaButtonLabel="Create a new cron job"
-            onClickCta={() =>
-              setCreateCronJobSheetShown({
-                jobname: '',
-                schedule: '',
-                command: '',
-                active: true,
-              })
-            }
-          >
-            <p className="text-sm text-foreground-light">
-              Cron jobs in PostgreSQL allow you to schedule and automate tasks such as running SQL
-              queries or maintenance routines at specified intervals. These jobs are managed using
-              cron-like syntax and are executed directly within the PostgreSQL server, making it
-              easy to schedule recurring tasks without needing an external scheduler.
-            </p>
-          </ProductEmptyState>
-        </div>
-      ) : (
-        <div className="w-full space-y-4">
-          <FormHeader
-            title="Cron jobs"
-            description="Use cron jobs to schedule and automate tasks such as running SQL queries or maintenance routines at specified intervals."
-            actions={
-              <>
-                <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                  <Link
-                    href="https://supabase.com/docs/guides/database/extensions/pg_cron"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Documentation
-                  </Link>
-                </Button>
-                <Button
-                  type="primary"
-                  onClick={() =>
-                    setCreateCronJobSheetShown({
-                      jobname: '',
-                      schedule: '',
-                      command: '',
-                      active: true,
-                    })
-                  }
+      <div className="w-full space-y-4">
+        <FormHeader
+          title="Cron jobs"
+          description="Use cron jobs to schedule and automate tasks such as running SQL queries or maintenance routines at specified intervals."
+          actions={
+            <>
+              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                <Link
+                  href="https://supabase.com/docs/guides/database/extensions/pg_cron"
+                  target="_blank"
+                  rel="noreferrer"
                 >
-                  Create a new cron job
-                </Button>
-              </>
-            }
-          />
-          {cronJobs.map((job) => (
-            <CronJobCard
-              job={job}
-              onEditCronJob={(job) => setCreateCronJobSheetShown(job)}
-              onDeleteCronJob={(job) => setCronJobForDeletion(job)}
-            />
-          ))}
-        </div>
-      )}
+                  Documentation
+                </Link>
+              </Button>
+              <Button
+                type="primary"
+                onClick={() =>
+                  setCreateCronJobSheetShown({
+                    jobname: '',
+                    schedule: '',
+                    command: '',
+                    active: true,
+                  })
+                }
+              >
+                Create a new cron job
+              </Button>
+            </>
+          }
+        />
+        {(cronJobs ?? []).length == 0 ? (
+          <div className="grid text-center h-full w-full items-center justify-center border border-border rounded-md p-4 border-dashed">
+            <p className="text-sm text-foreground">No cron jobs created yet</p>
+            <p className="text-sm text-foreground-lighter">
+              Create one by clicking "Create a new cron job"
+            </p>
+          </div>
+        ) : (
+          <div className="w-full space-y-4">
+            {cronJobs.map((job) => (
+              <CronJobCard
+                job={job}
+                onEditCronJob={(job) => setCreateCronJobSheetShown(job)}
+                onDeleteCronJob={(job) => setCronJobForDeletion(job)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
       <Sheet
         open={!!createCronJobSheetShown}
         onOpenChange={() => setIsClosingCreateCronJobSheet(true)}
@@ -146,7 +134,6 @@ export const CronJobsListing = () => {
         onClose={() => setCronJobForDeletion(undefined)}
         cronJob={cronJobForDeletion!}
       />
-
       <EnableExtensionModal
         visible={showEnableExtensionModal}
         extension={pgCronExtension}

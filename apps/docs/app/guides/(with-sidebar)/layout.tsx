@@ -1,10 +1,12 @@
 import { type PropsWithChildren } from 'react'
 
+import { IS_PLATFORM } from 'common'
+
 import { supabaseMisc } from '~/lib/supabaseMisc'
 import Layout from '~/layouts/guides'
 
 const GuidesLayout = async ({ children }: PropsWithChildren) => {
-  const partners = await getPartners()
+  const partners = IS_PLATFORM ? await getPartners() : []
   const partnerNavItems = partners.map((partner) => ({
     name: partner.title,
     url: `https://supabase.com/partners/integrations/${partner.slug}` as `https://${string}`,

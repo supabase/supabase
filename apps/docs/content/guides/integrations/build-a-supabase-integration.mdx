@@ -147,9 +147,9 @@ postgresql://postgres:[DB-PASSWORD]@db.[REF].supabase.co:5432/postgres
 
 Note that you cannot retrieve the database password via the management API, so for the user's existing projects you will need to collect their database password in your UI.
 
-### Create new organizations and projects
+### Create new projects
 
-If you don't need access to the user's existing project, we recommend creating a new project under a new organization. Use the [`/v1/organizations` endpoint](https://api.supabase.com/api/v1#/organizations/createOrganization) to create a new organization named after your integration, afterward use the [`/v1/projects` endpoint](https://api.supabase.com/api/v1#/projects/createProject) to create a new project.
+Use the [`/v1/projects` endpoint](https://api.supabase.com/api/v1#/projects/createProject) to create a new project.
 
 When creating a new project, you can either ask the user to provide a database password, or you can generate a secure password for them. In any case, make sure to securely store the database password on your end which will allow you to construct the Postgres URI.
 
