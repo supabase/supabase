@@ -30,20 +30,20 @@ export const SelectionDetailedRow = ({
   valueRender?: React.ReactNode
 }) => {
   return (
-    <div className="group flex items-center gap-2 flex-wrap relative">
+    <div className="group flex items-center gap-2 flex-wrap">
       <span className="text-foreground-lighter text-sm col-span-3 whitespace-pre-wrap">
         {label}
       </span>
       <span
         title={value}
-        className="truncate font-mono text-foreground text-sm col-span-8 whitespace-pre-wrap break-all"
+        className="truncate font-mono text-foreground text-sm whitespace-pre-wrap break-all"
       >
         {valueRender ?? value}
       </span>
       <CopyButton
         iconOnly
         text={value}
-        className="group-hover:opacity-100 opacity-0 p-0 h-6 w-6 col-span-1 absolute top-1 right-1"
+        className="group-hover:opacity-100 opacity-0 p-0 h-6 w-6"
         type="text"
         title="Copy to clipboard"
       />
