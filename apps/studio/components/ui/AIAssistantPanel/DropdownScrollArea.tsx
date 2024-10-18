@@ -6,7 +6,7 @@ interface DropdownScrollAreaProps {
   className?: string
 }
 
-// [Joshen] This is a temporary solution to a really odd behaviour i've observed with the components in Shadcn
+// [Joshen] This is a temporary solution to a really odd behavior i've observed with the components in Shadcn
 // Specifically if we're using a ScrollArea (or even just anything with overflow) within a DropdownMenu, within a Sheet
 // The mouse wheel event to scroll in the ScrollArea is somehow getting ignored in this specific context, hence the fix here
 
