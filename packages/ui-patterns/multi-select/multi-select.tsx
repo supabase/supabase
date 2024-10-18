@@ -98,46 +98,25 @@ function MultiSelector({
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      const moveNext = () => {
-        const nextIndex = activeIndex + 1
-        setActiveIndex(nextIndex > values.length - 1 ? (loop ? 0 : -1) : nextIndex)
-      }
-
-      const movePrev = () => {
-        const prevIndex = activeIndex - 1
-        setActiveIndex(prevIndex < 0 ? values.length - 1 : prevIndex)
-      }
-
-      if ((e.key === 'Backspace' || e.key === 'Delete') && values.length > 0) {
-        if (inputValue.length === 0) {
-          if (activeIndex !== -1 && activeIndex < values.length) {
-            onValuesChange(values.filter((item) => item !== values[activeIndex]))
-            const newIndex = activeIndex - 1 < 0 ? 0 : activeIndex - 1
-            setActiveIndex(newIndex)
-          } else {
-            onValuesChange(values.filter((item) => item !== values[values.length - 1]))
+      switch (e.key) {
+        case 'Backspace':
+        case 'Delete':
+          if (values.length > 0 && inputValue.length === 0) {
+            if (activeIndex !== -1 && activeIndex < values.length) {
+              onValuesChange(values.filter((item) => item !== values[activeIndex]))
+              const newIndex = activeIndex - 1 < 0 ? 0 : activeIndex - 1
+              setActiveIndex(newIndex)
+            } else {
+              onValuesChange(values.filter((item) => item !== values[values.length - 1]))
+            }
           }
-        }
-      } else if (e.key === 'Enter') {
-        setOpen(true)
-      } else if (e.key === 'Escape') {
-        if (activeIndex !== -1) {
-          setActiveIndex(-1)
-        } else {
-          setOpen(false)
-        }
-      } else if (dir === 'rtl') {
-        if (e.key === 'ArrowRight') {
-          movePrev()
-        } else if (e.key === 'ArrowLeft' && (activeIndex !== -1 || loop)) {
-          moveNext()
-        }
-      } else {
-        if (e.key === 'ArrowLeft') {
-          movePrev()
-        } else if (e.key === 'ArrowRight' && (activeIndex !== -1 || loop)) {
-          moveNext()
-        }
+          break
+        case 'Escape':
+          activeIndex !== -1 ? setActiveIndex(-1) : setOpen(false)
+          break
+        case 'Enter':
+          setOpen(true)
+          break
       }
     },
     [values, inputValue, activeIndex, loop]
@@ -427,7 +406,7 @@ const MultiSelectorContent = React.forwardRef<HTMLDivElement, React.HTMLAttribut
         className={cn(
           'absolute w-full bg-overlay shadow-md z-10 border border-overlay top-[calc(100%+0.25rem)] rounded-md transition-all -translate-y-4',
           open
-            ? 'opacity-100 translate-y-0 visible duration-100'
+            ? 'opacity-100 translate-y-0 visible duration-150 ease-[.76,0,.23,1]'
             : 'opacity-0 -translate-y-4 invisible duration-0',
           className
         )}
@@ -478,7 +457,7 @@ const MultiSelectorItem = React.forwardRef<
       tabIndex={open ? 0 : -1}
       role="option"
       onSelect={() => {
-        toggleValue(value)
+        open && toggleValue(value)
         setInputValue('')
       }}
       className={cn(
