@@ -16,6 +16,12 @@ export const generateProjectIntegrationsMenu = (
     {
       title: 'Manage',
       items: [
+        {
+          name: 'Wrappers',
+          key: 'wrappers',
+          url: `/project/${ref}/integrations/wrappers`,
+          items: [],
+        },
         ...(!!pgNetExtensionExists
           ? [
               {
@@ -26,12 +32,7 @@ export const generateProjectIntegrationsMenu = (
               },
             ]
           : []),
-        {
-          name: 'Wrappers',
-          key: 'wrappers',
-          url: `/project/${ref}/integrations/wrappers`,
-          items: [],
-        },
+
         ...(!!cronUiEnabled
           ? [
               {
