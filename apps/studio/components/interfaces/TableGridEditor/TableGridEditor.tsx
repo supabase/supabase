@@ -1,4 +1,4 @@
-import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
 import { find, isUndefined } from 'lodash'
@@ -8,14 +8,10 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { SupabaseGrid } from 'components/grid/SupabaseGrid'
-import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { getSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import {
-  ForeignKeyConstraint,
-  useForeignKeyConstraintsQuery,
-} from 'data/database/foreign-key-constraints-query'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
@@ -28,7 +24,7 @@ import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import type { Dictionary, SchemaView } from 'types'
+import type { Dictionary } from 'types'
 import { Button } from 'ui'
 import GridHeaderActions from './GridHeaderActions'
 import { TableGridSkeletonLoader } from './LoadingState'
@@ -148,42 +144,15 @@ const TableGridEditor = ({
   const isViewSelected =
     entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
   const isTableSelected = entityType?.type === ENTITY_TYPE.TABLE
-  const isForeignTableSelected = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
   const isLocked = EXCLUDED_SCHEMAS.includes(entityType?.schema ?? '')
   const canEditViaTableEditor = isTableSelected && !isLocked
 
-  // [Joshen] We can tweak below to eventually support composite keys as the data
-  // returned from foreignKeyMeta should be easy to deal with, rather than pg-meta
-  const formattedRelationships = (
-    ('relationships' in selectedTable && selectedTable.relationships) ||
-    []
-  ).map((relationship: PostgresRelationship) => {
-    const relationshipMeta = foreignKeyMeta.find(
-      (fk: ForeignKeyConstraint) => fk.id === relationship.id
-    )
-    return {
-      ...relationship,
-      deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-    }
+  const gridTable = getSupaTable({
+    encryptedColumns,
+    foreignKeyMeta,
+    selectedTable,
+    entityType: entityType?.type,
   })
-
-  const gridTable =
-    !isViewSelected && !isForeignTableSelected
-      ? parseSupaTable(
-          {
-            table: selectedTable as PostgresTable,
-            columns: (selectedTable as PostgresTable).columns ?? [],
-            primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
-            relationships: formattedRelationships,
-          },
-          encryptedColumns
-        )
-      : parseSupaTable({
-          table: selectedTable as SchemaView,
-          columns: (selectedTable as SchemaView).columns ?? [],
-          primaryKeys: [],
-          relationships: [],
-        })
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`
 
