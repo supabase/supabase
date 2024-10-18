@@ -1,7 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import { CpuIcon, HelpCircle, InfoIcon, Microchip, RotateCcw } from 'lucide-react'
+import {
+  CpuIcon,
+  HelpCircle,
+  InfoIcon,
+  Microchip,
+  RotateCcw,
+  SeparatorVertical,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -418,10 +425,11 @@ export function DiskManagementForm() {
 
   return (
     <div id="disk-management">
-      <FormHeader
+      {/* <FormHeader
         title="Disk Management"
         docsUrl="https://supabase.com/docs/guides/platform/database-size#disk-management"
-      />
+      /> */}
+
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
           <RadioGroupCard className="flex flex-wrap gap-3">
@@ -499,6 +507,8 @@ export function DiskManagementForm() {
           </RadioGroupCard>
           {/* <Card className="bg-surface-100 rounded-b-none">
               <CardContent className="transition-all duration-500 ease-in-out py-10 flex flex-col gap-10 px-8"> */}
+
+          <Separator />
           <FormField_Shadcn_
             name="storageType"
             control={form.control}

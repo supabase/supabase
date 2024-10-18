@@ -12,6 +12,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
+import { Separator } from 'ui'
 
 const AuthSettings: NextPageWithLayout = () => {
   const diskManagementV2 = useFlag('diskManagementV2')
@@ -29,11 +30,14 @@ const AuthSettings: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldHeader>
           <ScaffoldTitle>Compute and Disk</ScaffoldTitle>
-          <ScaffoldDescription>Configure security and user session settings</ScaffoldDescription>
+          <ScaffoldDescription>
+            Configure the compute and disk settings for your project.
+          </ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
         {/* {showNewDiskManagementUI ? <DiskManagementForm /> : null} */}
+        <Separator />
         <DiskManagementForm />
       </ScaffoldContainer>
     </>
