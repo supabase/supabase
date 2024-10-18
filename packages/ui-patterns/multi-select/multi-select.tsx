@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
@@ -362,22 +362,36 @@ const MultiSelectorInput = React.forwardRef<
     wrapperClassName?: string
   }
 >(({ className, wrapperClassName, showCloseIcon, showSearchIcon, ...props }, ref) => {
-  const { setOpen, inputValue, setInputValue, activeIndex, setActiveIndex, size, disabled } =
+  const { open, setOpen, inputValue, setInputValue, activeIndex, setActiveIndex, size, disabled } =
     useMultiSelect()
+  const inputRef = React.useRef<HTMLInputElement>(null)
+
+  // Use the provided ref if available, otherwise use the local ref
+  React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
 
   const handleFocus = () => setOpen(true)
   const handleClick = () => setActiveIndex(-1)
   const handleClose = () => setInputValue('')
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (!inputRef?.current) return
+      if (open) {
+        inputRef.current.focus()
+      }
+    }, 100)
+  }, [open])
+
   return (
     <CommandInput
-      {...props}
-      ref={ref}
+      ref={inputRef}
       value={inputValue}
       onValueChange={activeIndex === -1 ? setInputValue : undefined}
       onFocus={handleFocus}
       onClick={handleClick}
       disabled={disabled}
+      autoFocus={!!open}
+      tabIndex={0}
       showCloseIcon={showCloseIcon}
       showSearchIcon={showSearchIcon}
       handleClose={handleClose}
@@ -388,6 +402,7 @@ const MultiSelectorInput = React.forwardRef<
         activeIndex !== -1 && 'caret-transparent',
         className
       )}
+      {...props}
     />
   )
 })
@@ -403,14 +418,14 @@ const MultiSelectorContent = React.forwardRef<HTMLDivElement, React.HTMLAttribut
       <div
         ref={ref}
         className={cn(
-          'absolute w-full bg-overlay shadow-md z-10 border border-overlay top-[calc(100%+0.25rem)] rounded-md transition-all -translate-y-4',
+          'absolute w-full bg-overlay shadow-md z-10 border border-overlay top-[calc(100%+0.25rem)] rounded-md transition-all -translate-y-3',
           open
             ? 'opacity-100 translate-y-0 visible duration-150 ease-[.76,0,.23,1]'
-            : 'opacity-0 -translate-y-4 invisible duration-0',
+            : 'opacity-0 -translate-y-3 invisible duration-0',
           className
         )}
       >
-        {children}
+        {open && children}
       </div>
     )
   }
