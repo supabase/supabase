@@ -156,13 +156,21 @@ You can see a breakdown of the different types of egress on your [organization u
 ## Disk Size
 
 We differentiate between database space usage and disk size. Database Space is the actual amount of space used by all your database objects, whereas disk size is the size of the underlying provisioned disk. Each database has a provisioned disk.
+
 Free Plan customers are limited to 500 MB of database space.
 
-For paid plan customers, we provision 8 GB of GP3 disk by default. If your database grows close to the underlying disk limit, we autoscale it by 1.5x. The first 8 GB of provisioned disk per project are free of charge. Disk size beyond the first 8 GB costs $0.125/month/GB.
+For paid plan customers:
 
-Disk Size is prorated down to the hour, so your bill will show "Disk Size GB-Hrs". See [Database Size](/docs/guides/platform/database-size) for further information.
+- Each project starts with 8 GB GP3 disk provisioned by default
+- The first 8 GB of provisioned disk per project is free, then $0.125 per additional GB
+- Charges are prorated down to the hour, which is advantageous for short-lived projects and branches
+- Each read replica has a provisioned disk as well, which adds to your disk usage
 
-Read more about [disk management](/docs/guides/platform/database-size#disk-management).
+When your data gets close to the 8 GB disk size limit, we automatically scale it by 50% on paid plans to ensure your project does not run into a read-only mode. Each hour your disk is beyond the included 8 GB, it incurs one GB-Hr of usage. With a 12 GB provisioned disk (4 GB above the limit), this would incur a total monthly cost of $0.5 ($0.125 per GB / $0.000171 per GB-Hr). Disk Size is prorated down to the hour, so your bill will show "Disk Size GB-Hrs".
+
+You can see your project’s disk size in your [project settings](https://supabase.com/dashboard/project/_/settings/database) (Project Settings > Database).
+
+While we automatically scale up your disk, we do not automatically scale down your disk. Read more about [disk management](/docs/guides/platform/database-size#disk-management) and how to [reduce your disk size](/docs/guides/platform/database-size#reducing-disk-size).
 
 ## Free Plan
 

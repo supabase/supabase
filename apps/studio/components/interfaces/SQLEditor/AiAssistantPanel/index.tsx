@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Message as MessageType } from 'ai'
-import { useChat } from 'ai/react'
 import { compact, last } from 'lodash'
 import { Info } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams, useTelemetryProps } from 'common'
+import { Message as MessageType } from 'ai'
+import { useChat } from 'ai/react'
+import { useParams } from 'common'
 import { SchemaComboBox } from 'components/ui/SchemaComboBox'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
@@ -18,7 +18,6 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import Telemetry from 'lib/telemetry'
 import uuidv4 from 'lib/uuid'
 import {
   AiIconAnimation,
@@ -55,12 +54,24 @@ export const AiAssistantPanel = ({
   onClose,
   includeSchemaMetadata,
 }: AiAssistantPanelProps) => {
-  const project = useSelectedProject()
-  const router = useRouter()
   const { ref } = useParams()
   const { profile } = useProfile()
+  const project = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
 
+  const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  const [chatId, setChatId] = useState(uuidv4())
+  const [value, setValue] = useState<string>('')
+  const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
   const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
+
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const [showAiNotOptimizedWarningSetting, setShowAiNotOptimizedWarningSetting] =
+    useLocalStorageQuery(LOCAL_STORAGE_KEYS.SHOW_AI_NOT_OPTIMIZED_WARNING(ref as string), true)
+  const shouldShowNotOptimizedAlert =
+    selectedOrganization && !includeSchemaMetadata && showAiNotOptimizedWarningSetting
 
   const { data } = useEntityDefinitionsQuery(
     {
@@ -74,7 +85,6 @@ export const AiAssistantPanel = ({
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
 
   // Use chat id because useChat doesn't have a reset function to clear all messages
-  const [chatId, setChatId] = useState(uuidv4())
   const {
     messages: chatMessages,
     append,
@@ -97,38 +107,10 @@ export const AiAssistantPanel = ({
     )
   }, [chatMessages])
 
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const telemetryProps = useTelemetryProps()
-
-  const [value, setValue] = useState<string>('')
-  const inputRef = useRef<HTMLTextAreaElement>(null)
-
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
   const pendingReply = isLoading && last(messages)?.role === 'user'
 
-  useEffect(() => {
-    if (!isLoading) {
-      setValue('')
-      if (inputRef.current) inputRef.current.focus()
-    }
-
-    // Try to scroll on each rerender to the bottom
-    setTimeout(
-      () => {
-        if (bottomRef.current) {
-          bottomRef.current.scrollIntoView({ behavior: 'smooth' })
-        }
-      },
-      isLoading ? 100 : 500
-    )
-  }, [isLoading])
-
-  const selectedOrganization = useSelectedOrganization()
-
-  const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
-
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-
+  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const confirmOptInToShareSchemaData = async () => {
@@ -155,11 +137,22 @@ export const AiAssistantPanel = ({
     )
   }
 
-  const [showAiNotOptimizedWarningSetting, setShowAiNotOptimizedWarningSetting] =
-    useLocalStorageQuery(LOCAL_STORAGE_KEYS.SHOW_AI_NOT_OPTIMIZED_WARNING(ref as string), true)
+  useEffect(() => {
+    if (!isLoading) {
+      setValue('')
+      if (inputRef.current) inputRef.current.focus()
+    }
 
-  const shouldShowNotOptimizedAlert =
-    selectedOrganization && !includeSchemaMetadata && showAiNotOptimizedWarningSetting
+    // Try to scroll on each rerender to the bottom
+    setTimeout(
+      () => {
+        if (bottomRef.current) {
+          bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+        }
+      },
+      isLoading ? 100 : 500
+    )
+  }, [isLoading])
 
   return (
     <div className="flex flex-col h-full border-l border-control">
@@ -317,15 +310,11 @@ export const AiAssistantPanel = ({
               role: 'user',
               createdAt: new Date(),
             })
-            Telemetry.sendEvent(
-              {
-                category: 'sql_editor_ai_assistant',
-                action: 'ai_suggestion_asked',
-                label: 'sql-editor-ai-assistant',
-              },
-              telemetryProps,
-              router
-            )
+            sendEvent({
+              category: 'sql_editor_ai_assistant',
+              action: 'ai_suggestion_asked',
+              label: 'sql-editor-ai-assistant',
+            })
           }}
         />
       </div>

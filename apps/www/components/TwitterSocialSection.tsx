@@ -12,10 +12,12 @@ const TwitterSocialSection = () => {
 
   return (
     <>
-      <SectionContainer className="w-full text-center !pb-0">
+      <SectionContainer className="w-full text-center flex flex-col items-center !pb-0">
         <h3 className="h2">Join the community</h3>
-        <p className="p">Discover what our community has to say about their Supabase experience.</p>
-        <div className="my-8 flex justify-center gap-2">
+        <p className="p max-w-[300px] md:max-w-none">
+          Discover what our community has to say about their Supabase experience.
+        </p>
+        <div className="my-4 flex justify-center gap-2">
           <Button asChild size="small" iconRight={<MessageCircle size={14} />} type="default">
             <Link
               href={'https://github.com/supabase/supabase/discussions'}
@@ -33,7 +35,7 @@ const TwitterSocialSection = () => {
         </div>
       </SectionContainer>
       <SectionContainer className="relative w-full !px-0 lg:!px-16 xl:!px-0 !pb-0 mb-16 md:mb-12 lg:mb-12 !pt-6 max-w-[1400px]">
-        <TwitterSocialProofMobile className="lg:hidden -mb-24" tweets={tweets} />
+        <TwitterSocialProofMobile className="lg:hidden -mb-32" tweets={tweets} />
         <TwitterSocialProof className="hidden lg:flex" />
       </SectionContainer>
     </>

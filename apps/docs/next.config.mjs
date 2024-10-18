@@ -60,16 +60,16 @@ const nextConfig = {
       '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     },
   },
-  /**
-   * The SQL to REST API translator relies on libpg-query, which packages a
-   * native Node.js module that wraps the Postgres query parser.
-   *
-   * The default webpack config can't load native modules, so we need a custom
-   * loader for it, which calls process.dlopen to load C++ Addons.
-   *
-   * See https://github.com/eisberg-labs/nextjs-node-loader
-   */
-  webpack: (config) => {
+  webpack: (config, options) => {
+    /**
+     * The SQL to REST API translator relies on libpg-query, which packages a
+     * native Node.js module that wraps the Postgres query parser.
+     *
+     * The default webpack config can't load native modules, so we need a custom
+     * loader for it, which calls process.dlopen to load C++ Addons.
+     *
+     * See https://github.com/eisberg-labs/nextjs-node-loader
+     */
     config.module.rules.push({
       test: /\.node$/,
       use: [

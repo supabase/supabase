@@ -167,6 +167,41 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  <TabPanel id="swift" label="Swift">
+    ```swift
+    let channel = supabase.channel("room-1") {
+      $0.isPrivate = true
+    }
+
+    Task {
+      for await payload in channel.broadcastStream(event: "test") {
+        print(payload)
+      }
+    }
+
+    await channel.subscribe()
+    print("Connected!")
+    ```
+
+  </TabPanel>
+  <TabPanel id="python" label="Python">
+    ```py
+    channel = realtime.channel(
+      "room-1", {"config": {"private": True}}
+    )
+
+    await channel.on_broadcast(
+      "test", callback=lambda payload: print(payload)
+    ).subscribe(
+      lambda state, err: (
+        print("Connected")
+        if state == RealtimeSubscribeStates.SUBSCRIBED
+        else print(err)
+      )
+    )
+    ```
+
+  </TabPanel>
 </Tabs>
 
 #### Allow a user to send a Broadcast message

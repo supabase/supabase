@@ -67,6 +67,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/enterprise</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/ga-week</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -229,13 +235,13 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/partners/experts</loc>
+    <loc>https://supabase.com/partners/integrations</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://supabase.com/partners/integrations</loc>
+    <loc>https://supabase.com/partners/experts</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -2020,6 +2026,12 @@
 
   <url>
     <loc>https://supabase.com/blog/local-first-expo-legend-state</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/lw12-hackathon-winners</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

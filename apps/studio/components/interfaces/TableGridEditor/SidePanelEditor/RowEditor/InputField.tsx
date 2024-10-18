@@ -168,7 +168,7 @@ const InputField = ({
               <DropdownMenuTrigger asChild>
                 <Button type="default" icon={<Edit />} className="px-1.5" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuContent align="end" className="w-28">
                 <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
                   Set to NULL
                 </DropdownMenuItem>
@@ -231,6 +231,7 @@ const InputField = ({
         name={field.name}
         format={field.format}
         value={field.value ?? ''}
+        isNullable={field.isNullable}
         description={
           <>
             {field.defaultValue && <p>Default: {field.defaultValue}</p>}
