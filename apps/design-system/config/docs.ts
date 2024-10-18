@@ -83,6 +83,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Assistant Chat',
+          href: '/docs/fragments/assistant-chat',
+          items: [],
+        },
+        {
           title: 'Modal',
           href: '/docs/fragments/modal',
           items: [],
@@ -174,6 +179,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Chart',
+          href: '/docs/components/chart',
+          items: [],
+        },
+        {
           title: 'Checkbox',
           href: '/docs/components/checkbox',
           items: [],
@@ -191,6 +201,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Command',
           href: '/docs/components/command',
+          items: [],
+        },
+        {
+          title: 'Command Menu (cmdk)',
+          href: '/docs/components/commandmenu',
           items: [],
         },
         {
@@ -372,6 +387,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Tree View',
           href: '/docs/components/tree-view',
+          items: [],
+        },
+        {
+          title: 'Expanding Textarea',
+          href: '/docs/components/expanding-textarea',
           items: [],
         },
       ],

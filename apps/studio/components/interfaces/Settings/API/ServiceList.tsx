@@ -2,7 +2,7 @@ import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-ty
 import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle } from 'lucide-react'
 import { useEffect, useRef } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -21,7 +21,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Badge, Input } from 'ui'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import JWTSettings from './JWTSettings'
-import PostgrestConfig from './PostgrestConfig'
+import { PostgrestConfig } from './PostgrestConfig'
 
 const ServiceList = () => {
   const client = useQueryClient()

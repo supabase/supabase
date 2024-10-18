@@ -2,6 +2,7 @@ import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
 import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.4/mod.ts'
 import CustomerStories from './component/CustomerStories.tsx'
 import Docs from './component/Docs.tsx'
+import Events from './component/Events.tsx'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -48,6 +49,9 @@ export async function handler(req: Request) {
   const type = getParamValue(url, 'type')
   const title = getParamValue(url, 'title', { decodeURI: true })
   const description = getParamValue(url, 'description', { decodeURI: true })
+  const date = getParamValue(url, 'date', { decodeURI: true })
+  const eventType = getParamValue(url, 'eventType')
+  const duration = getParamValue(url, 'duration')
 
   if (!site || !title) {
     return new Response(JSON.stringify({ message: 'missing params' }), {
@@ -89,7 +93,6 @@ export async function handler(req: Request) {
           },
         }
       )
-      break
     case 'customers':
       return new ImageResponse(<CustomerStories title={title} customer={customer} />, {
         width: 1200,
@@ -97,7 +100,7 @@ export async function handler(req: Request) {
         fonts: [
           {
             name: 'Circular',
-            data: fontData,
+            data: CIRCULAR_FONT_DATA,
             style: 'normal',
           },
         ],
@@ -107,12 +110,43 @@ export async function handler(req: Request) {
           'cdn-cache-control': 'max-age=31536000',
         },
       })
-      break
+    case 'events':
+      return new ImageResponse(
+        (
+          <Events
+            title={title}
+            description={description !== 'undefined' ? description : ''}
+            eventType={eventType}
+            date={date}
+            duration={duration ?? ''}
+          />
+        ),
+        {
+          width: 1200,
+          height: 630,
+          fonts: [
+            {
+              name: 'Circular',
+              data: CIRCULAR_FONT_DATA,
+              style: 'normal',
+            },
+            {
+              name: 'SourceCode',
+              data: MONO_FONT_DATA,
+              style: 'mono',
+            },
+          ],
+          headers: {
+            'content-type': 'image/png',
+            'cache-control': 'public, max-age=31536000, s-maxage=31536000, no-transform, immutable',
+            'cdn-cache-control': 'max-age=31536000',
+          },
+        }
+      )
     default:
       return new Response(JSON.stringify({ message: 'site not found' }), {
         headers: { ...corsHeaders },
         status: 404,
       })
-      break
   }
 }

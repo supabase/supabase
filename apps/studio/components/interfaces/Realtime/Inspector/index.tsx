@@ -1,8 +1,7 @@
-import { useParams, useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
+import { useParams } from 'common'
 import { useState } from 'react'
 
-import Telemetry from 'lib/telemetry'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
@@ -13,8 +12,6 @@ import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
  */
 export const RealtimeInspector = () => {
   const { ref } = useParams()
-  const telemetryProps = useTelemetryProps()
-  const router = useRouter()
   const [sendMessageShown, setSendMessageShown] = useState(false)
 
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
@@ -25,6 +22,7 @@ export const RealtimeInspector = () => {
     token: '', // will be filled out by RealtimeTokensPopover
     schema: 'public',
     table: '*',
+    isChannelPrivate: false,
     filter: undefined,
     bearer: null,
     enablePresence: true,
@@ -32,6 +30,7 @@ export const RealtimeInspector = () => {
     enableBroadcast: true,
   })
 
+  const { mutate: sendEvent } = useSendEventMutation()
   const { logData, sendMessage } = useRealtimeMessages(realtimeConfig, setRealtimeConfig)
 
   return (
@@ -51,15 +50,11 @@ export const RealtimeInspector = () => {
         visible={sendMessageShown}
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
-          Telemetry.sendEvent(
-            {
-              category: 'realtime_inspector',
-              action: 'send_broadcast_message',
-              label: 'realtime_inspector_results',
-            },
-            telemetryProps,
-            router
-          )
+          sendEvent({
+            category: 'realtime_inspector',
+            action: 'send_broadcast_message',
+            label: 'realtime_inspector_results',
+          })
           sendMessage(v.message, v.payload, () => setSendMessageShown(false))
         }}
       />

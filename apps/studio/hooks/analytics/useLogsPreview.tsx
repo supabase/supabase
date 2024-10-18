@@ -1,31 +1,37 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
+
 import {
+  LogsTableName,
+  PREVIEWER_DATEPICKER_HELPERS,
+  genQueryParams,
+  getDefaultHelper,
+} from 'components/interfaces/Settings/Logs/Logs.constants'
+import type {
   Count,
   EventChart,
   EventChartData,
   Filters,
-  genChartQuery,
-  genCountQuery,
-  genDefaultQuery,
-  genQueryParams,
-  getDefaultHelper,
   LogData,
   Logs,
   LogsEndpointParams,
-  LogsTableName,
-  PREVIEWER_DATEPICKER_HELPERS,
-} from 'components/interfaces/Settings/Logs'
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
-import { API_URL } from 'lib/constants'
+} from 'components/interfaces/Settings/Logs/Logs.types'
+import {
+  genChartQuery,
+  genCountQuery,
+  genDefaultQuery,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get, isResponseOk } from 'lib/common/fetch'
-import dayjs from 'dayjs'
-import useFillTimeseriesSorted from './useFillTimeseriesSorted'
+import { API_URL } from 'lib/constants'
+import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 
 interface LogsPreviewHook {
   logData: LogData[]
   error: string | Object | null
   newCount: number
+  isSuccess: boolean
   isLoading: boolean
   isLoadingOlder: boolean
   filters: Filters
@@ -37,11 +43,17 @@ interface LogsPreviewHook {
   setFilters: (filters: Filters | ((previous: Filters) => Filters)) => void
   setParams: Dispatch<SetStateAction<LogsEndpointParams>>
 }
-function useLogsPreview(
-  projectRef: string,
-  table: LogsTableName,
+function useLogsPreview({
+  projectRef,
+  table,
+  filterOverride,
+  limit,
+}: {
+  projectRef: string
+  table: LogsTableName
   filterOverride?: Filters
-): LogsPreviewHook {
+  limit?: number
+}): LogsPreviewHook {
   const defaultHelper = getDefaultHelper(PREVIEWER_DATEPICKER_HELPERS)
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
 
@@ -50,7 +62,7 @@ function useLogsPreview(
 
   const [params, setParams] = useState<LogsEndpointParams>({
     project: projectRef,
-    sql: genDefaultQuery(table, filters),
+    sql: genDefaultQuery(table, filters, limit),
     iso_timestamp_start: defaultHelper.calcFrom(),
     iso_timestamp_end: defaultHelper.calcTo(),
   })
@@ -63,10 +75,9 @@ function useLogsPreview(
     refresh()
   }, [JSON.stringify(filters)])
 
-  const queryParamsKey = genQueryParams(params as any)
-
   const {
     data,
+    isSuccess,
     isLoading,
     isRefetching,
     error: rqError,
@@ -74,7 +85,7 @@ function useLogsPreview(
     isFetchingNextPage,
     refetch,
   } = useInfiniteQuery(
-    ['projects', projectRef, 'logs', queryParamsKey],
+    ['projects', projectRef, 'logs', params],
     ({ signal, pageParam }) => {
       const uri = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
         ...params,
@@ -166,7 +177,7 @@ function useLogsPreview(
   )
 
   const refresh = async () => {
-    const generatedSql = genDefaultQuery(table, filters)
+    const generatedSql = genDefaultQuery(table, filters, limit)
     setParams((prev) => ({ ...prev, sql: generatedSql }))
     setLatestRefresh(new Date().toISOString())
     refreshEventChart()
@@ -189,7 +200,7 @@ function useLogsPreview(
     'timestamp'
   )
 
-  const eventChartData = useFillTimeseriesSorted(
+  const { data: eventChartData, error: eventChartError } = useFillTimeseriesSorted(
     normalizedEventChartData,
     'timestamp',
     'count',
@@ -202,9 +213,10 @@ function useLogsPreview(
   return {
     newCount,
     logData,
+    isSuccess,
     isLoading: isLoading || isRefetching,
     isLoadingOlder: isFetchingNextPage,
-    error,
+    error: error || eventChartError,
     filters,
     params,
     oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,

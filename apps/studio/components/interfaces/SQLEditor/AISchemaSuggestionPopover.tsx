@@ -1,9 +1,13 @@
 import * as Popover from '@radix-ui/react-popover'
 import { motion } from 'framer-motion'
-import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
-import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { Info } from 'lucide-react'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { Button, IconInfo } from 'ui'
+
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
+import { Button } from 'ui'
 
 export interface AISchemaSuggestionPopoverProps {
   delay?: number
@@ -16,7 +20,7 @@ const AISchemaSuggestionPopover = ({
   onClickSettings,
 }: PropsWithChildren<AISchemaSuggestionPopoverProps>) => {
   const selectedOrganization = useSelectedOrganization()
-  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const isOptedInToAI = useOrgOptedIntoAi()
   const [hasEnabledAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema', true)
   const [isDelayComplete, setIsDelayComplete] = useState(false)
   const [aiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
@@ -65,8 +69,8 @@ const AISchemaSuggestionPopover = ({
           >
             <Popover.Arrow className="fill-background-surface-300" />
             <div className="flex flex-col gap-2 border border-default rounded-md p-4 bg-surface-100 shadow-xl">
-              <div className="flex flex-row items-center gap-4 max-w-md">
-                <IconInfo className="w-6 h-6" />
+              <div className="flex flex-row gap-4 max-w-sm xl:max-w-xl xl:items-center">
+                <Info size={18} />
                 <p className="text-sm">
                   Generate more relevant queries by including database metadata in your requests.
                 </p>

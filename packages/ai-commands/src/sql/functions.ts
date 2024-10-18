@@ -1,7 +1,7 @@
 import { SchemaBuilder } from '@serafin/schema-builder'
 import { codeBlock, stripIndent } from 'common-tags'
 import { jsonrepair } from 'jsonrepair'
-import OpenAI from 'openai'
+import type OpenAI from 'openai'
 import { ContextLengthError, EmptyResponseError, EmptySqlError } from '../errors'
 
 const debugSqlSchema = SchemaBuilder.emptySchema()
@@ -53,7 +53,7 @@ const completionFunctions = {
     name: 'generateTitle',
     description: stripIndent`
       Generates a short title and summarized description for a Postgres SQL snippet.
-      
+
       The description should describe why this table was created (eg. "Table to track todos")
     `,
     parameters: generateTitleSchema.schema as Record<string, unknown>,
@@ -104,7 +104,7 @@ export async function debugSql(
 
   try {
     const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
+      model: 'gpt-4o-mini-2024-07-18',
       messages: completionMessages,
       max_tokens: 2048,
       temperature: 0,
@@ -164,7 +164,7 @@ export async function titleSql(openai: OpenAI, sql: string) {
 
   try {
     const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
+      model: 'gpt-4o-mini-2024-07-18',
       messages: completionMessages,
       max_tokens: 1024,
       temperature: 0,

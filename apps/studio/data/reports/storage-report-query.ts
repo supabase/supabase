@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { useParams } from 'common'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import { LogsEndpointParams } from 'components/interfaces/Settings/Logs'
+import type { LogsEndpointParams } from 'components/interfaces/Settings/Logs/Logs.types'
 
 export const useStorageReport = () => {
   const { ref: projectRef } = useParams()

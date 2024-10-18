@@ -13,6 +13,7 @@ interface Props {
   shimmerFromColor?: string
   shimmerToColor?: string
   style?: any
+  innerStyle?: any
   hasMotion?: boolean
 }
 
@@ -28,6 +29,7 @@ const Panel = ({
   hasMotion = false,
   children,
   style,
+  innerStyle,
 }: PropsWithChildren<Props>) => {
   const outerRef = useRef(null)
   const innerRef = useRef(null)
@@ -78,7 +80,7 @@ const Panel = ({
     <Component
       ref={outerRef}
       className={cn(
-        'relative rounded-xl p-px bg-surface-100 bg-gradient-to-b from-border to-border/50 dark:to-surface-100 transition-all shadow-md flex items-center justify-center',
+        'group/panel relative rounded-xl p-px bg-surface-75 bg-gradient-to-b from-border to-border/50 dark:to-surface-100 transition-all hover:shadow-md flex items-center justify-center',
         !trackCursor && hasActiveOnHover
           ? activeColor === 'brand'
             ? 'hover:bg-none hover:!bg-brand'
@@ -91,9 +93,10 @@ const Panel = ({
     >
       <div
         className={cn(
-          'relative z-10 w-full h-full rounded-xl bg-surface-100 overflow-hidden text-foreground-light',
+          'relative z-10 w-full h-full rounded-[11px] bg-surface-75 overflow-hidden text-foreground-light',
           innerClassName
         )}
+        style={innerStyle}
       >
         {children}
         <div

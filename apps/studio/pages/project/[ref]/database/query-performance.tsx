@@ -10,11 +10,10 @@ import {
 } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const PRESET_MAP = {
   [QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING]: 'mostTimeConsuming',
@@ -24,7 +23,6 @@ const PRESET_MAP = {
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const router = useRouter()
-  const { project } = useProjectContext()
   const { ref: projectRef, search, sort, order, preset: urlPreset } = useParams()
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]

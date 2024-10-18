@@ -2,6 +2,7 @@
 id: 'auth-ui'
 title: 'Auth UI'
 description: 'A prebuilt, customizable React component for authenticating users.'
+sitemapPriority: 0.5
 ---
 
 <Admonition type="warning">
@@ -42,7 +43,7 @@ This renders the Auth component without any styling.
 We recommend using one of the predefined themes to style the UI.
 Import the theme you want to use and pass it to the `appearance.theme` prop.
 
-```js mark=4,16 /src/index.js
+```js
 import { Auth } from '@supabase/auth-ui-react'
 import {
   // Import predefined theme
@@ -67,7 +68,7 @@ const App = () => (
 
 The Auth component also supports login with [official social providers](../../auth#providers).
 
-```js mark=11 /src/index.js
+```js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
@@ -146,7 +147,7 @@ There are several ways to customize Auth UI:
 
 Auth UI comes with several themes to customize the appearance. Each predefined theme comes with at least two variations, a `default` variation, and a `dark` variation. You can switch between these themes using the `theme` prop. Import the theme you want to use and pass it to the `appearance.theme` prop.
 
-```js mark=3,14 /src/index.js
+```js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
@@ -175,7 +176,7 @@ Currently there is only one predefined theme available, but we plan to add more.
 
 Auth UI comes with two theme variations: `default` and `dark`. You can switch between these themes with the `theme` prop.
 
-```js mark=15 /src/index.js
+```js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
@@ -201,7 +202,7 @@ If you don't pass a value to `theme` it uses the `"default"` theme. You can pass
 
 Auth UI themes can be overridden using variable tokens. See the [list of variable tokens](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/theming/Themes.ts).
 
-```js mark=12:19 /src/index.js
+```js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
@@ -335,7 +336,7 @@ const App = () => (
 
 You can use custom labels with `localization.variables` like so:
 
-```js mark=10:15 /src/index.js
+```js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
@@ -461,7 +462,7 @@ Currently, translating error messages (e.g. "Invalid credentials") is not suppor
 
 You can hide links by setting the `showLinks` prop to `false`
 
-```js mark=9 /src/index.js
+```js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 

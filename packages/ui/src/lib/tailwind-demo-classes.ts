@@ -15,7 +15,9 @@ export default {
     "bg-overlay-hover",
     "bg-muted",
     "bg-button",
-    "bg-dialog"
+    "bg-dialog",
+    "bg-dash-sidebar",
+    "bg-dash-canvas"
   ],
   "border": [
     "border",

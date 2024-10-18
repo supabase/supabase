@@ -1,8 +1,10 @@
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -45,6 +47,7 @@ const SchemaSelector = ({
   onSelectCreateSchema,
 }: SchemaSelectorProps) => {
   const [open, setOpen] = useState(false)
+  const canCreateSchemas = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'schemas')
 
   const { project } = useProjectContext()
   const {
@@ -97,12 +100,18 @@ const SchemaSelector = ({
                 <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
               }
             >
-              <div className="w-full flex gap-1">
-                <p className="text-foreground-lighter">schema:</p>
-                <p className="text-foreground">
-                  {selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}
-                </p>
-              </div>
+              {selectedSchemaName ? (
+                <div className="w-full flex gap-1">
+                  <p className="text-foreground-lighter">schema:</p>
+                  <p className="text-foreground">
+                    {selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}
+                  </p>
+                </div>
+              ) : (
+                <div className="w-full flex gap-1">
+                  <p className="text-foreground-lighter">Choose a schema…</p>
+                </div>
+              )}
             </Button>
           </PopoverTrigger_Shadcn_>
           <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>
@@ -152,7 +161,7 @@ const SchemaSelector = ({
                     ))}
                   </ScrollArea>
                 </CommandGroup_Shadcn_>
-                {onSelectCreateSchema !== undefined && (
+                {onSelectCreateSchema !== undefined && canCreateSchemas && (
                   <>
                     <CommandSeparator_Shadcn_ />
                     <CommandGroup_Shadcn_>

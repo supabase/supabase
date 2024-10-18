@@ -1,6 +1,6 @@
 import { Home } from 'lucide-react'
 
-import { useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { METRICS, METRIC_CATEGORIES } from 'lib/constants/metrics'
 import {
   DropdownMenuCheckboxItem,

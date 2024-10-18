@@ -1,16 +1,12 @@
-import { useState } from 'react'
-import {
-  Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  Modal,
-} from 'ui'
 import { z } from 'zod'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FormControl_Shadcn_, FormField_Shadcn_, FormItem_Shadcn_, Form_Shadcn_, Modal } from 'ui'
+import { Input } from '@ui/components/shadcn/ui/input'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 type CreateWarehouseProps = {
   onSubmit: (values: { description: string }) => void
@@ -33,11 +29,23 @@ const CreateWarehouseAccessToken = ({ onSubmit, loading, open, setOpen }: Create
     },
   })
 
+  const canCreateAccessTokens = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
+
   return (
     <>
-      <Button type="outline" onClick={() => setOpen(true)}>
+      <ButtonTooltip
+        disabled={!canCreateAccessTokens}
+        type="outline"
+        onClick={() => setOpen(true)}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: 'You need additional permissions to create access tokens',
+          },
+        }}
+      >
         Create access token
-      </Button>
+      </ButtonTooltip>
       <Modal
         size="medium"
         onCancel={() => {
@@ -47,27 +55,44 @@ const CreateWarehouseAccessToken = ({ onSubmit, loading, open, setOpen }: Create
         visible={open}
         alignFooter="right"
         loading={loading}
+        onConfirm={() => {
+          form.handleSubmit((data) => {
+            onSubmit(data)
+          })()
+
+          form.reset()
+        }}
       >
-        <Modal.Content className="py-4">
-          <Form_Shadcn_ {...form}>
-            <form
-              id="create-access-token-form"
-              onSubmit={form.handleSubmit((data) => onSubmit(data))}
-            >
+        <Form_Shadcn_ {...form}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              form.handleSubmit((data) => {
+                onSubmit(data)
+              })()
+
+              form.reset()
+            }}
+            id="create-access-token-form"
+          >
+            <Modal.Content className="py-4">
+              <p className="pb-5 text-foreground-light text-sm">
+                Enter a unique description to identify this token.
+              </p>
               <FormField_Shadcn_
                 control={form.control}
                 name="description"
                 render={({ field }) => (
                   <FormItem_Shadcn_>
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ type="text" {...field} />
+                      <Input placeholder="Token" type="text" {...field} />
                     </FormControl_Shadcn_>
                   </FormItem_Shadcn_>
                 )}
               />
-            </form>
-          </Form_Shadcn_>
-        </Modal.Content>
+            </Modal.Content>
+          </form>
+        </Form_Shadcn_>
       </Modal>
     </>
   )

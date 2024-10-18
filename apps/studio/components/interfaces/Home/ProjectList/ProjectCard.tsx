@@ -1,6 +1,7 @@
 import { GitBranch, Github } from 'lucide-react'
 
 import CardButton from 'components/ui/CardButton'
+import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import type { ProjectInfo } from 'data/projects/projects-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
@@ -42,7 +43,8 @@ const ProjectCard = ({
           <div className="w-full justify-between space-y-1.5 px-5">
             <p className="flex-shrink truncate text-sm pr-4">{name}</p>
             <span className="text-sm lowercase text-foreground-light">{desc}</span>
-            <div className="flex items-center space-x-1.5">
+            <div className="flex items-center gap-x-1.5">
+              {project.status !== 'INACTIVE' && <ComputeBadgeWrapper project={project} />}
               {isVercelIntegrated && (
                 <div className="w-fit p-1 border rounded-md flex items-center text-black dark:text-white">
                   <InlineSVG

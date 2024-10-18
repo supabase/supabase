@@ -1,5 +1,5 @@
 ---
-title: 'Organization-based Billing, Project Transfers, Team plan'
+title: 'Organization-based Billing, Project Transfers, Team Plan'
 description: Introducing the new Organization-based Billing
 author: paul_copplestone,kevcodez
 image: 2023-08-31-org-billing/org-billing-thumb.png
@@ -48,13 +48,13 @@ With Organization-based Billing, the quotas and features will be granted across 
 
 As the plan is set for your entire organization, upgrading your organization to a paid plan means that you unlock the benefits of the paid plan for **all** projects inside your organizations. For example, if you upgrade to the Pro Plan you get email support for every project inside that org rather than just a single project.
 
-You can launch as many organizations as you want. For example, you can create two organizations on the Pro plan for $25 each and launch a single project in each. This provides the same quotas and pricing that you'd receive today. Importantly, each subsequent database inside that Organization will cost $0.01344/hour (roughly $10 per month), rather than $25.
+You can launch as many organizations as you want. For example, you can create two organizations on the Pro Plan for $25 each and launch a single project in each. This provides the same quotas and pricing that you'd receive today. Importantly, each subsequent database inside that Organization will cost $0.01344/hour (roughly $10 per month), rather than $25.
 
 Read more about quotas and Organization-based Billing including examples in our [docs](https://supabase.com/docs/guides/platform/org-based-billing).
 
-## Free plan
+## Free Plan
 
-Most importantly, there is only one change that affects the free plan: you receive an extra 1GB of egress for free.
+Most importantly, there is only one change that affects the Free Plan: you receive an extra 1GB of egress for free.
 
 | Usage Item                | Old plan (project based)         | New plan (org based)                         |
 | ------------------------- | -------------------------------- | -------------------------------------------- |
@@ -79,11 +79,11 @@ This should be done before the end of October, but don't worry - we'll give you 
 
 ## No more upfront payments for databases
 
-Currently, plans include one Starter Compute instance. When you upgrade the [Compute Add-On](https://supabase.com/docs/guides/platform/compute-add-ons), you immediately prepay the prorated amount (days remaining in your current billing cycle), and then pay upfront for the entire month when your billing cycle resets. When you downgrade, you get the appropriate credits for unused time.
+Currently, plans include one Micro Compute instance. When you upgrade the [Compute Add-On](https://supabase.com/docs/guides/platform/compute-add-ons), you immediately prepay the prorated amount (days remaining in your current billing cycle), and then pay upfront for the entire month when your billing cycle resets. When you downgrade, you get the appropriate credits for unused time.
 
 Full-month upfront payments are annoying, especially when you just want to do a temporary upgrade. We've heard your feedback and are moving billing for compute to hourly usage.
 
-With Organization-based Billing you won't get an immediate charge upfront when changing compute, instead we'll bill you based on compute runtime hours when your billing cycle resets.
+With Organization-based Billing you won't get an immediate charge upfront when changing compute, instead we'll bill you based on compute hours when your billing cycle resets.
 
 If you launch a second or third instance on your paid plan, it just adds additional compute hours that we'll bill you on.
 
@@ -92,13 +92,13 @@ If you launch a second or third instance on your paid plan, it just adds additio
   compute usage.
 </div>
 
-To read more about usage-based billing for compute, head over to the [docs](https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute).
+To read more about usage-based billing for compute, head over to the [docs](https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours).
 
 ## Unified Egress
 
-With Project-based billing, you have different quotas for each service. For example, on the Pro plan you get 50GB of database egress and 200GB of storage egress included. If you're not using storage at all, you're missing out on the included quota.
+With Project-based billing, you have different quotas for each service. For example, on the Pro Plan you get 50GB of database egress and 200GB of storage egress included. If you're not using storage at all, you're missing out on the included quota.
 
-In an effort to provide a more fair egress quota for all users, we are unifying egress to be a single usage-based item. You get a total quota, i.e. 250GB on the Pro plan, that you can use for anything - Storage, Realtime, Auth or Database. You can still see a breakdown of the different types of egress on your organization usage page.
+In an effort to provide a more fair egress quota for all users, we are unifying egress to be a single usage-based item. You get a total quota, i.e. 250GB on the Pro Plan, that you can use for anything - Storage, Realtime, Auth or Database. You can still see a breakdown of the different types of egress on your organization usage page.
 
 <div>
   <Img
@@ -134,7 +134,7 @@ Read more about [Project Transfers](https://supabase.com/docs/guides/platform/pr
 
 ## Self-Serve Team Plan
 
-We did a soft launch of the [Team Plan](https://supabase.com/pricing) in June. With the previous billing, it required manual adjustments of the subscriptions as all projects are supposed to be covered by the Team plan, whereas you're only paying $599 for the plan once. This required Supabase intervention to communicate the confusing state of billing and also do the adjustments. With Organization-based Billing the Team Plan becomes fully self-serve. Users can upgrade a Free/Pro organization to Team plan or downgrade to a Pro/Free plan from a Team plan organization. The main benefits of the Team plan include:
+We did a soft launch of the [Team Plan](https://supabase.com/pricing) in June. With the previous billing, it required manual adjustments of the subscriptions as all projects are supposed to be covered by the Team Plan, whereas you're only paying $599 for the plan once. This required Supabase intervention to communicate the confusing state of billing and also do the adjustments. With Organization-based Billing the Team Plan becomes fully self-serve. Users can upgrade a Free/Pro organization to Team Plan or downgrade to a Pro/Free Plan from a Team Plan organization. The main benefits of the Team Plan include:
 
 - Additional Organization member roles
 - Daily backups stored for 14 days
@@ -144,12 +144,6 @@ We did a soft launch of the [Team Plan](https://supabase.com/pricing) in June. W
 - 28-day Log retention
 - SOC2 Certifications
 - HIPAA add-on capability
-
-## Account-based Billing for Enterprise
-
-For our Enterprise customers, we offer Account-based Billing, so multiple organizations can point to a single Enterprise subscription, further simplifying billing.
-
-Read more about [Account-based Billing](https://supabase.com/docs/guides/platform/enterprise-billing).
 
 ## Customer Migration Plan
 
@@ -184,9 +178,9 @@ There is much much more and we're determined to make billing as seamless, fricti
 ## FAQs
 
 <details className="cursor-default mb-2">
-  <summary className="cursor-pointer"><span className="pl-2">What happens to the 2 free plan projects?</span></summary>
+  <summary className="cursor-pointer"><span className="pl-2">What happens to the 2 Free Plan projects?</span></summary>
 
-We are not changing your 2 free project limit. You can have two organizations on a free plan with one project each.
+We are not changing your 2 free project limit. You can have two organizations on a Free Plan with one project each.
 
 </details>
 
@@ -200,7 +194,7 @@ The spend cap still exists, it's just set on the organization-level and not per 
 <details className="cursor-default mb-2">
   <summary className="cursor-pointer"><span className="pl-2">Am I going to pay a different amount?</span></summary>
 
-Most customers will pay less because we are offering more egress for free and it's cheaper to have multiple projects on the Pro plan in a single organization. We're very conscious about the current users and use-cases. Check our docs for more [detailed breakdown and some examples](/docs/guides/platform/org-based-billing#legacy-vs-organization-based-billing).
+Most customers will pay less because we are offering more egress for free and it's cheaper to have multiple projects on the Pro Plan in a single organization. We're very conscious about the current users and use-cases. Check our docs for more [detailed breakdown and some examples](/docs/guides/platform/org-based-billing).
 
 </details>
 

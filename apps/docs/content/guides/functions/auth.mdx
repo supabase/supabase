@@ -11,8 +11,8 @@ Edge Functions work seamlessly with [Supabase Auth](/docs/guides/auth).
 
 When a user makes a request to an Edge Function, you can use the Authorization header to set the Auth context in the Supabase client:
 
-```js mark=9
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+```js
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 Deno.serve(async (req: Request) => {
 
@@ -32,8 +32,8 @@ Importantly, this is done _inside_ the `Deno.serve()` callback argument, so that
 
 After initializing a Supabase client with the Auth context, you can use `getUser()` to fetch the user object, and run queries in the context of the user with [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) policies enforced.
 
-```js mark=12:13
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+```js
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 Deno.serve(async (req: Request) => {
 
@@ -60,8 +60,8 @@ Deno.serve(async (req: Request) => {
 
 After initializing a Supabase client with the Auth context, all queries will be executed with the context of the user. For database queries, this means [Row Level Security](/docs/guides/database/postgres/row-level-security) will be enforced.
 
-```js mark=12
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+```js
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 Deno.serve(async (req: Request) => {
 

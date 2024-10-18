@@ -142,7 +142,7 @@ const Repos = ({ tabs }: Props) => {
                     : SWIPER_STATE.MIDDLE
               )
             }
-            className="relative flex md:hidden justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
+            className="relative flex md:!hidden justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
           >
             <div
               className={cn(

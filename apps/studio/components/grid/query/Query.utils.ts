@@ -1,4 +1,4 @@
-import { format, ident, literal } from '@scaleleap/pg-format'
+import { format, ident, literal } from '@supabase/pg-meta/src/pg-format'
 import type { Dictionary } from 'types'
 import type { Filter, QueryPagination, QueryTable, Sort } from '../types'
 
@@ -221,6 +221,7 @@ function applySorts(query: string, sorts: Sort[]) {
   if (sorts.length === 0) return query
   query += ` order by ${sorts
     .map((x) => {
+      if (!x.column) return null
       const order = x.ascending ? 'asc' : 'desc'
       const nullOrder = x.nullsFirst ? 'nulls first' : 'nulls last'
       return `${ident(x.table)}.${ident(x.column)} ${order} ${nullOrder}`

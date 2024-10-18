@@ -78,17 +78,16 @@ const supabase: Handle = async ({ event, resolve }) => {
    */
   event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {
-      get: (key) => event.cookies.get(key),
+      getAll: () => event.cookies.getAll(),
       /**
        * SvelteKit's cookies API requires `path` to be explicitly set in
        * the cookie options. Setting `path` to `/` replicates previous/
        * standard behavior.
        */
-      set: (key, value, options) => {
-        event.cookies.set(key, value, { ...options, path: '/' })
-      },
-      remove: (key, options) => {
-        event.cookies.delete(key, { ...options, path: '/' })
+      setAll: (cookiesToSet) => {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          event.cookies.set(name, value, { ...options, path: '/' })
+        })
       },
     },
   })
@@ -135,11 +134,11 @@ const authGuard: Handle = async ({ event, resolve }) => {
   event.locals.user = user
 
   if (!event.locals.session && event.url.pathname.startsWith('/private')) {
-    return redirect(303, '/auth')
+    redirect(303, '/auth')
   }
 
   if (event.locals.session && event.url.pathname === '/auth') {
-    return redirect(303, '/private')
+    redirect(303, '/private')
   }
 
   return resolve(event)
@@ -174,7 +173,9 @@ declare global {
       session: Session | null
       user: User | null
     }
-    // interface PageData {}
+    interface PageData {
+      session: Session | null
+    }
     // interface PageState {}
     // interface Platform {}
   }
@@ -200,10 +201,8 @@ Create a Supabase client in your root `+layout.ts`. This client can be used to a
 <CH.Code>
 
 ```ts src/routes/+layout.ts
-import { createBrowserClient, createServerClient, isBrowser, parse } from '@supabase/ssr'
-
+import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr'
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
-
 import type { LayoutLoad } from './$types'
 
 export const load: LayoutLoad = async ({ data, depends, fetch }) => {
@@ -218,20 +217,14 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
         global: {
           fetch,
         },
-        cookies: {
-          get(key) {
-            const cookie = parse(document.cookie)
-            return cookie[key]
-          },
-        },
       })
     : createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
         global: {
           fetch,
         },
         cookies: {
-          get() {
-            return JSON.stringify(data.session)
+          getAll() {
+            return data.cookies
           },
         },
       })
@@ -256,9 +249,11 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 ```ts src/routes/+layout.server.ts
 import type { LayoutServerLoad } from './$types'
 
-export const load: LayoutServerLoad = async ({ locals: { session } }) => {
+export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cookies }) => {
+  const { session } = await safeGetSession()
   return {
     session,
+    cookies: cookies.getAll(),
   }
 }
 ```
@@ -281,7 +276,7 @@ Set up a listener for Auth events on the client, to handle session refreshes and
 
 ```svelte src/routes/+layout.svelte
 <script>
-	import { goto, invalidate } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
 
 	export let data;
@@ -289,15 +284,6 @@ Set up a listener for Auth events on the client, to handle session refreshes and
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
-			if (!newSession) {
-				/**
-				 * Queue this as a task so the navigation won't prevent the
-				 * triggering function from completing
-				 */
-				setTimeout(() => {
-					goto('/', { invalidateAll: true });
-				});
-			}
 			if (newSession?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth');
 			}
@@ -367,7 +353,7 @@ If you have email confirmation turned on (the default), a new user will receive 
 
 Change the email template to support a server-side authentication flow.
 
-Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
 
 </StepHikeCompact.Details>
 
@@ -399,9 +385,9 @@ export const actions: Actions = {
     const { error } = await supabase.auth.signUp({ email, password })
     if (error) {
       console.error(error)
-      return redirect(303, '/auth/error')
+      redirect(303, '/auth/error')
     } else {
-      return redirect(303, '/')
+      redirect(303, '/')
     }
   },
   login: async ({ request, locals: { supabase } }) => {
@@ -412,9 +398,9 @@ export const actions: Actions = {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       console.error(error)
-      return redirect(303, '/auth/error')
+      redirect(303, '/auth/error')
     } else {
-      return redirect(303, '/private')
+      redirect(303, '/private')
     }
   },
 }
@@ -464,7 +450,7 @@ Finish the signup flow by creating the API route to handle email verification.
 
 <StepHikeCompact.Code>
 
-```ts src/routes/api/auth/confirm/+server.ts
+```ts src/routes/auth/confirm/+server.ts
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 
@@ -489,12 +475,12 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
       redirectTo.searchParams.delete('next')
-      return redirect(303, redirectTo)
+      redirect(303, redirectTo)
     }
   }
 
   redirectTo.pathname = '/auth/error'
-  return redirect(303, redirectTo)
+  redirect(303, redirectTo)
 }
 ```
 

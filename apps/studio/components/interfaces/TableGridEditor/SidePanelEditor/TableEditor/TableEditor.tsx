@@ -1,7 +1,7 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Alert, Badge, Button, Checkbox, Input, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -17,15 +17,16 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { ExternalLink } from 'lucide-react'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { SpreadsheetImport } from '../'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import type { ColumnField } from '../SidePanelEditor.types'
+import SpreadsheetImport from '../SpreadsheetImport/SpreadsheetImport'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import HeaderTitle from './HeaderTitle'
@@ -38,6 +39,7 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -77,8 +79,17 @@ const TableEditor = ({
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
   const { project } = useProjectContext()
+  const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+
+  const [params, setParams] = useUrlState()
+  useEffect(() => {
+    if (params.create === 'table' && snap.ui.open === 'none') {
+      snap.onAddTable()
+      setParams({ ...params, create: undefined })
+    }
+  }, [snap, params, setParams])
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
@@ -178,7 +189,7 @@ const TableEditor = ({
       if (isEmpty(errors)) {
         const payload = {
           name: tableFields.name.trim(),
-          schema: snap.selectedSchemaName,
+          schema: selectedSchema,
           comment: tableFields.comment?.trim(),
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
         }
@@ -238,9 +249,7 @@ const TableEditor = ({
       size="large"
       key="TableEditor"
       visible={visible}
-      header={
-        <HeaderTitle schema={snap.selectedSchemaName} table={table} isDuplicating={isDuplicating} />
-      }
+      header={<HeaderTitle schema={selectedSchema} table={table} isDuplicating={isDuplicating} />}
       className={`transition-all duration-100 ease-in ${isImportingSpreadsheet ? ' mr-32' : ''}`}
       onCancel={closePanel}
       onConfirm={() => (resolve: () => void) => onSaveChanges(resolve)}

@@ -52,6 +52,8 @@
   --border-overlay: var(--colors-gray-light-500);
   --border-secondary: var(--colors-gray-light-400);
   --border-muted: var(--colors-gray-light-400);
+  --background-dash-canvas: var(--colors-gray-light-200);
+  --background-dash-sidebar: var(--colors-gray-light-100);
   --background-button-default: var(--colors-gray-light-100);
   --background-overlay-hover: var(--colors-gray-light-300);
   --background-overlay-default: var(--colors-gray-light-100);

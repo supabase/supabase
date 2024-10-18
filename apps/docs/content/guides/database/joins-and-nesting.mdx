@@ -165,6 +165,13 @@ val data = supabase.from("countries").select(Columns.raw("id, name, cities(id, n
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.from_('countries').select('id, name, cities(id, name)').execute()
+```
+
+</TabPanel>
 <TabPanel id="graphql" label="GraphQL">
 
 ```javascript
@@ -284,6 +291,20 @@ val data = supabase.from("teams").select(Columns.raw("id, team_name, users(id, n
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.from_('teams').select('id, team_name, users(id, name)').execute()
+```
+
+</TabPanel>
+<TabPanel id="graphql" label="GraphQL">
+
+````javascript
+const Query = `
+  query {
+
+</TabPanel>
 <TabPanel id="graphql" label="GraphQL">
 
 ```javascript
@@ -293,9 +314,9 @@ const Query = `
       edges {
         node {
           id
-          team_name 
+          team_name
           users {
-            id, 
+            id,
             name
           }
         }
@@ -303,7 +324,7 @@ const Query = `
     }
   }
 `
-```
+````
 
 </TabPanel>
 <TabPanel id="url" label="URL">
@@ -343,9 +364,9 @@ create table shifts (
 );
 ```
 
-In this case, you need to explicitly define the join because the joining column on `shifts` is ambiguous.
+In this case, you need to explicitly define the join because the joining column on `shifts` is ambiguous as they are both referencing the `scans` table.
 
-To fetch all the `shifts` with `scan_id_start` related to a specific `scan`, use the following syntax:
+To fetch all the `shifts` with `scan_id_start` and `scan_id_end` related to a specific `scan`, use the following syntax:
 
 <Tabs
   scrollable
@@ -360,10 +381,15 @@ To fetch all the `shifts` with `scan_id_start` related to a specific `scan`, use
 const { data, error } = await supabase.from('shifts').select(
   `
     *,
-    scans:scan_id_start (
+    start_scan:scans!scan_id_start (
       id,
       user_id,
       badge_scan_time
+    ),
+   end_scan:scans!scan_id_end (
+     id, 
+     user_id,
+     badge_scan_time
     )
   `
 )
@@ -375,7 +401,12 @@ const { data, error } = await supabase.from('shifts').select(
 ```dart
 final data = await supabase.from('shifts').select('''
   *,
-  scans:scan_id_start (
+  start_scan:scans!scan_id_start (
+    id,
+    user_id,
+    badge_scan_time
+  ),
+end_scan:scans!scan_id_end (
     id,
     user_id,
     badge_scan_time
@@ -418,15 +449,88 @@ let shifts: [Shift] = try await supabase
   .select(
     """
       *,
-      scans:scan_id_start (
+      start_scan:scans!scan_id_start (
         id,
         user_id,
         badge_scan_time
-      )
+      ),
+     scans: scan_id_end (
+        id,
+        user_id,
+        badge_scan_time
+     )
     """
   )
   .execute()
   .value
+```
+
+</TabPanel>
+
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("shifts").select(Columns.raw('''
+  *,
+  start_scan:scans!scan_id_start (
+    id,
+    user_id,
+    badge_scan_time
+  ),
+end_scan:scans!scan_id_end (
+    id,
+    user_id,
+    badge_scan_time
+  )
+'''));
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.from_('shifts').select("""
+  *,
+  start_scan:scans!scan_id_start (
+    id,
+    user_id,
+    badge_scan_time
+  ),
+  end_scan:scans!scan_id_end (
+    id,
+    user_id,
+    badge_scan_time
+  )
+""").execute()
+```
+
+</TabPanel>
+<TabPanel id="graphql" label="GraphQL">
+
+```javascript
+const Query = `
+  query {
+    shiftsCollection {
+      edges {
+        node {
+          id
+          user_id
+          attendance_status
+          scan_id_start {
+            id
+            user_id
+            badge_scan_time
+          }
+          scan_id_end {
+            id
+            user_id
+            badge_scan_time
+          }
+        }
+      }
+    }
+  }
+`
 ```
 
 </TabPanel>

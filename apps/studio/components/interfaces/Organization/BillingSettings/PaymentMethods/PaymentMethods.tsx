@@ -1,22 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import {
-  Alert,
-  Badge,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  IconCreditCard,
-  IconMoreHorizontal,
-  IconPlus,
-} from 'ui'
+import { toast } from 'sonner'
 
 import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 import {
@@ -25,21 +11,25 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { getURL } from 'lib/helpers'
+import { CreditCardIcon, Plus } from 'lucide-react'
+import { Alert, Button } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
+import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
-  const queryClient = useQueryClient()
+  const selectedOrganization = useSelectedOrganization()
   const [selectedMethodForUse, setSelectedMethodForUse] = useState<any>()
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
@@ -69,13 +59,21 @@ const PaymentMethods = () => {
           <div className="sticky space-y-2 top-12">
             <p className="text-foreground text-base m-0">Payment Methods</p>
             <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
-              After adding a payment method, make sure to mark it as active to use it for billing.
-              You can remove unused cards.
+              Payments for your subscription are made using the default card.
             </p>
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadPaymentMethods ? (
+          {selectedOrganization?.managed_by !== undefined &&
+          selectedOrganization?.managed_by !== 'supabase' ? (
+            <PartnerManagedResource
+              partner={selectedOrganization?.managed_by}
+              resource="Payment Methods"
+              cta={{
+                installationId: selectedOrganization?.partner_id,
+              }}
+            />
+          ) : !canReadPaymentMethods ? (
             <NoPermission resourceText="view this organization's payment methods" />
           ) : (
             <>
@@ -127,7 +125,7 @@ const PaymentMethods = () => {
                         )}
                         <Button
                           type="default"
-                          icon={<IconPlus />}
+                          icon={<Plus />}
                           disabled={!canUpdatePaymentMethods}
                           onClick={() => setShowAddPaymentMethodModal(true)}
                         >
@@ -139,70 +137,22 @@ const PaymentMethods = () => {
                     <FormSection>
                       <FormSectionContent fullWidth loading={false}>
                         {(paymentMethods?.data?.length ?? 0) === 0 ? (
-                          <div className="flex items-center space-x-2 opacity-50">
-                            <IconCreditCard />
+                          <div className="flex items-center gap-2 opacity-50">
+                            <CreditCardIcon size={16} strokeWidth={1.5} />
                             <p className="text-sm">No payment methods</p>
                           </div>
                         ) : (
                           <div className="space-y-3">
-                            {paymentMethods?.data?.map((paymentMethod) => {
-                              const isActive = paymentMethod.is_default
-
-                              if (!paymentMethod.card) return null
-
-                              return (
-                                <div
-                                  key={paymentMethod.id}
-                                  className="flex items-center justify-between"
-                                >
-                                  <div className="flex items-center space-x-8">
-                                    <img
-                                      alt="Credit card brand"
-                                      src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
-                                        .replace(' ', '-')
-                                        .toLowerCase()}.png`}
-                                      width="32"
-                                    />
-                                    <p className="prose text-sm font-mono">
-                                      **** **** **** {paymentMethod.card!.last4}
-                                    </p>
-                                    <p className="text-sm tabular-nums">
-                                      Expires: {paymentMethod.card.exp_month}/
-                                      {paymentMethod.card.exp_year}
-                                    </p>
-                                  </div>
-                                  {isActive && <Badge variant="brand">Active</Badge>}
-                                  {canUpdatePaymentMethods && !isActive ? (
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button type="outline" className="hover:border-muted px-1">
-                                          <IconMoreHorizontal />
-                                        </Button>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent align="end">
-                                        {subscription?.payment_method_type === 'card' && (
-                                          <>
-                                            <DropdownMenuItem
-                                              key="make-default"
-                                              onClick={() => setSelectedMethodForUse(paymentMethod)}
-                                            >
-                                              <p>Use this card</p>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                          </>
-                                        )}
-                                        <DropdownMenuItem
-                                          key="delete-method"
-                                          onClick={() => setSelectedMethodToDelete(paymentMethod)}
-                                        >
-                                          <p>Delete card</p>
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  ) : null}
-                                </div>
-                              )
-                            })}
+                            {paymentMethods?.data?.map((paymentMethod) => (
+                              <CreditCard
+                                key={paymentMethod.id}
+                                paymentMethod={paymentMethod}
+                                canUpdatePaymentMethods={canUpdatePaymentMethods}
+                                paymentMethodType={subscription?.payment_method_type}
+                                setSelectedMethodForUse={setSelectedMethodForUse}
+                                setSelectedMethodToDelete={setSelectedMethodToDelete}
+                              />
+                            ))}
                           </div>
                         )}
                       </FormSectionContent>
@@ -219,11 +169,11 @@ const PaymentMethods = () => {
         visible={showAddPaymentMethodModal}
         returnUrl={`${getURL()}/org/${slug}/billing`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
-        onConfirm={async () => {
+        onConfirm={() => {
           setShowAddPaymentMethodModal(false)
           toast.success('Successfully added new payment method')
-          await queryClient.invalidateQueries(organizationKeys.paymentMethods(slug))
         }}
+        showSetDefaultCheckbox={true}
       />
 
       <ChangePaymentMethodModal

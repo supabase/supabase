@@ -1,12 +1,13 @@
 import { useParams } from 'common'
 import { ReactNode, useEffect } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-query'
-import { useSelectedProject, withAuth } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { ProjectLayout } from '../'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import StorageMenu from './StorageMenu'
 
 export interface StorageLayoutProps {

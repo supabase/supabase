@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { Home, User } from 'icons'
 import { isUndefined } from 'lodash'
 import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
@@ -7,6 +6,15 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useFlag } from 'hooks/ui/useFlag'
+import { useSignOut } from 'lib/auth'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { detectOS } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   DropdownMenu,
@@ -21,16 +29,9 @@ import {
   Separator,
   Theme,
   cn,
-  themes,
+  singleThemes,
 } from 'ui'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useSignOut } from 'lib/auth'
-import { IS_PLATFORM } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
@@ -40,6 +41,9 @@ import {
 } from './NavigationBar.utils'
 import { NavigationIconButton } from './NavigationIconButton'
 import NavigationIconLink from './NavigationIconLink'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -51,7 +55,7 @@ const NavigationBar = () => {
   const { project } = useProjectContext()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const { setIsOpen } = useCommandMenu()
+  const setCommandMenuOpen = useSetCommandMenuOpen()
   const snap = useAppStateSnapshot()
 
   const signOut = useSignOut()
@@ -59,6 +63,11 @@ const NavigationBar = () => {
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
+
+  const [allowNavPanelToExpand] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
+    true
+  )
 
   const {
     projectAuthAll: authEnabled,
@@ -71,6 +80,13 @@ const NavigationBar = () => {
     'project_storage:all',
     'realtime:all',
   ])
+
+  const { data } = useProjectLintsQuery({
+    projectRef: project?.ref,
+  })
+
+  const securityLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
+  const errorLints = securityLints.filter((lint) => lint.level === 'ERROR')
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project)
@@ -92,22 +108,95 @@ const NavigationBar = () => {
     )
   }
 
+  const SearchButton = (
+    <NavigationIconButton
+      size="tiny"
+      onClick={() => {
+        setCommandMenuOpen(true)
+        snap.setNavigationPanelOpen(false)
+      }}
+      type="text"
+      icon={<Search size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+      rightText={
+        <div
+          className={cn(
+            'flex items-center gap-1',
+            'h-6 py-1.5 px-2 leading-none',
+            'bg-surface-100 text-foreground-lighter',
+            'border border-default rounded-md',
+            'shadow-xs shadow-background-surface-100'
+          )}
+        >
+          {os === 'macos' || true ? ( // todo: issue with `os` and hydration fail
+            <Command size={11.5} strokeWidth={1.5} />
+          ) : (
+            <p className="text-xs">CTRL</p>
+          )}
+          <p className="text-xs">K</p>
+        </div>
+      }
+    >
+      Search
+    </NavigationIconButton>
+  )
+
+  const UserAccountButton = (
+    <Button
+      type="text"
+      size="tiny"
+      className={cn(
+        'mt-3 h-10 [&>span]:relative [&>span]:flex [&>span]:w-full [&>span]:h-full p-0'
+      )}
+      block
+    >
+      <div className="relative w-full h-full flex items-center justify-center">
+        <figure className="absolute left-1.5 min-h-6 min-w-6 bg-foreground rounded-full flex items-center justify-center">
+          <User size={ICON_SIZE - 2} strokeWidth={ICON_STROKE_WIDTH} className="text-background" />
+        </figure>
+        <span
+          className={cn(
+            'w-[8rem] flex flex-col items-start text-sm truncate',
+            'absolute left-7 group-data-[state=expanded]:left-10',
+            'group-data-[state=collapsed]:opacity-0 group-data-[state=expanded]:opacity-100',
+            'transition-all'
+          )}
+        >
+          {profile && IS_PLATFORM && (
+            <>
+              <span title={profile.username} className="w-full text-left text-foreground truncate">
+                {profile.username}
+              </span>
+              {profile.primary_email !== profile.username && (
+                <span
+                  title={profile.primary_email}
+                  className="w-full text-left text-foreground-light text-xs truncate"
+                >
+                  {profile.primary_email}
+                </span>
+              )}
+            </>
+          )}
+        </span>
+      </div>
+    </Button>
+  )
+
   return (
     <div className="w-14 h-full flex flex-col">
       <nav
         data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
         className={cn(
           'group py-2 z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
-          'border-r bg-studio border-default data-[state=expanded]:shadow-xl',
+          'border-r bg-dash-sidebar border-default data-[state=expanded]:shadow-xl',
           'transition-width duration-200',
           'hide-scrollbar flex flex-col justify-between overflow-y-auto'
         )}
-        onMouseEnter={() => snap.setNavigationPanelOpen(true)}
+        onMouseEnter={() => allowNavPanelToExpand && snap.setNavigationPanelOpen(true)}
         onMouseLeave={() => {
-          if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
+          if (!userDropdownOpen && allowNavPanelToExpand) snap.setNavigationPanelOpen(false)
         }}
       >
-        <ul className="flex flex-col gap-y-1 justify-start px-2">
+        <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
           {(!navLayoutV2 || !IS_PLATFORM) && (
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
@@ -149,6 +238,7 @@ const NavigationBar = () => {
               onClick={onCloseNavigationIconLink}
             />
           ))}
+
           <Separator className="my-1 bg-border-muted" />
           {otherRoutes.map((route) => {
             if (route.key === 'api' && isNewAPIDocsEnabled) {
@@ -163,6 +253,25 @@ const NavigationBar = () => {
                 >
                   Project API
                 </NavigationIconButton>
+              )
+            } else if (route.key === 'advisors') {
+              return (
+                <div className="relative" key={route.key}>
+                  {securityLints.length > 0 && (
+                    <div
+                      className={cn(
+                        'absolute flex h-2 w-2 left-6 top-2 z-10 rounded-full',
+                        errorLints.length > 0 ? 'bg-destructive-600' : 'bg-warning-600'
+                      )}
+                    />
+                  )}
+
+                  <NavigationIconLink
+                    route={route}
+                    isActive={activeRoute === route.key}
+                    onClick={onCloseNavigationIconLink}
+                  />
+                </div>
               )
             } else if (route.key === 'logs') {
               // TODO: Undo this when warehouse flag is removed
@@ -200,35 +309,17 @@ const NavigationBar = () => {
           ))}
 
           {IS_PLATFORM && (
-            <NavigationIconButton
-              size="tiny"
-              onClick={() => {
-                setIsOpen(true)
-                snap.setNavigationPanelOpen(false)
-              }}
-              type="text"
-              icon={<Search size={ICON_SIZE} strokeWidth={2} />}
-              rightText={
-                <div
-                  className={cn(
-                    'flex items-center gap-1',
-                    'h-6 py-1.5 px-2 leading-none',
-                    'bg-surface-100 text-foreground-lighter',
-                    'border border-default rounded-md',
-                    'shadow-xs shadow-background-surface-100'
-                  )}
-                >
-                  {os === 'macos' || true ? ( // todo: issue with `os` and hydration fail
-                    <Command size={11.5} strokeWidth={1.5} />
-                  ) : (
-                    <p className="text-xs">CTRL</p>
-                  )}
-                  <p className="text-xs">K</p>
-                </div>
-              }
-            >
-              Search
-            </NavigationIconButton>
+            <>
+              {!allowNavPanelToExpand && (
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>{SearchButton}</TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ side="right">
+                    <span>Search</span>
+                  </TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
+              )}
+              {allowNavPanelToExpand && SearchButton}
+            </>
           )}
 
           <DropdownMenu
@@ -238,53 +329,19 @@ const NavigationBar = () => {
               if (open === false) snap.setNavigationPanelOpen(false)
             }}
           >
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="text"
-                size="tiny"
-                className={cn(
-                  'mt-3 h-10 [&>span]:relative [&>span]:flex [&>span]:w-full [&>span]:h-full p-0'
-                )}
-                block
-              >
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <figure className="absolute left-1.5 min-h-6 min-w-6 bg-foreground rounded-full flex items-center justify-center">
-                    <User
-                      size={ICON_SIZE - 2}
-                      strokeWidth={ICON_STROKE_WIDTH}
-                      className="text-background"
-                    />
-                  </figure>
-                  <span
-                    className={cn(
-                      'w-[8rem] flex flex-col items-start text-sm truncate',
-                      'absolute left-7 group-data-[state=expanded]:left-10',
-                      'group-data-[state=collapsed]:opacity-0 group-data-[state=expanded]:opacity-100',
-                      'transition-all'
-                    )}
-                  >
-                    {profile && IS_PLATFORM && (
-                      <>
-                        <span
-                          title={profile.username}
-                          className="w-full text-left text-foreground truncate"
-                        >
-                          {profile.username}
-                        </span>
-                        {profile.primary_email !== profile.username && (
-                          <span
-                            title={profile.primary_email}
-                            className="w-full text-left text-foreground-light text-xs truncate"
-                          >
-                            {profile.primary_email}
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </span>
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
+            {allowNavPanelToExpand ? (
+              <DropdownMenuTrigger asChild>{UserAccountButton}</DropdownMenuTrigger>
+            ) : (
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
+                  <DropdownMenuTrigger asChild>{UserAccountButton}</DropdownMenuTrigger>
+                </TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_ side="right">
+                  <span>Account settings</span>
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
+            )}
+
             <DropdownMenuContent side="top" align="start">
               {IS_PLATFORM && (
                 <>
@@ -312,7 +369,7 @@ const NavigationBar = () => {
                   <DropdownMenuGroup>
                     <DropdownMenuItem className="flex gap-2" asChild>
                       <Link href="/account/me">
-                        <Settings size={14} strokeWidth={1.5} className="text-foreground-muted" />
+                        <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                         Account preferences
                       </Link>
                     </DropdownMenuItem>
@@ -321,7 +378,11 @@ const NavigationBar = () => {
                       onClick={() => snap.setShowFeaturePreviewModal(true)}
                       onSelect={() => snap.setShowFeaturePreviewModal(true)}
                     >
-                      <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-muted" />
+                      <FlaskConical
+                        size={14}
+                        strokeWidth={1.5}
+                        className="text-foreground-lighter"
+                      />
                       Feature previews
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -336,15 +397,11 @@ const NavigationBar = () => {
                     setTheme(value)
                   }}
                 >
-                  {themes
-                    .filter(
-                      (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
-                    )
-                    .map((theme: Theme) => (
-                      <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                        {theme.name}
-                      </DropdownMenuRadioItem>
-                    ))}
+                  {singleThemes.map((theme: Theme) => (
+                    <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                      {theme.name}
+                    </DropdownMenuRadioItem>
+                  ))}
                 </DropdownMenuRadioGroup>
               </DropdownMenuGroup>
               {IS_PLATFORM && (

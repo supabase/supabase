@@ -1,9 +1,10 @@
+import { Check, ExternalLink, Mail, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, IconCheck, IconExternalLink, IconMail, IconSearch, Input, Separator } from 'ui'
 
-import { CATEGORY_OPTIONS } from './Support.constants'
 import { useProfile } from 'lib/profile'
+import { Button, Input, Separator } from 'ui'
+import { CATEGORY_OPTIONS } from './Support.constants'
 
 interface SuccessProps {
   sentCategory?: string
@@ -30,12 +31,12 @@ const Success = ({
   return (
     <div className="mt-10 w-[620px] flex flex-col items-center space-y-4">
       <div className="relative">
-        <IconMail strokeWidth={1.5} size={60} className="text-brand" />
+        <Mail strokeWidth={1.5} size={60} className="text-brand" />
         <div className="h-6 w-6 rounded-full bg-brand absolute bottom-1 -right-1.5 flex items-center justify-center">
-          <IconCheck strokeWidth={4} size={18} />
+          <Check strokeWidth={4} size={18} />
         </div>
       </div>
-      <div className="flex items-center flex-col space-y-2">
+      <div className="flex items-center flex-col space-y-2 text-center p-4">
         <h3 className="text-xl">Support request successfully sent!</h3>
         <p className="text-sm text-foreground-light">
           We will reach out to you at <span className="text-foreground">{respondToEmail}</span>.
@@ -53,9 +54,9 @@ const Success = ({
           <div className="!my-10 w-full">
             <Separator />
           </div>
-          <div className="flex flex-col items-center px-12 space-y-2">
+          <div className="flex flex-col items-center px-12 space-y-2 text-center">
             <p>In the meantime, tap into our community</p>
-            <p className="text-sm text-foreground-light text-center">
+            <p className="text-sm text-foreground-light">
               Find the answers you need with fellow developers building with Supabase by joining our
               GitHub discussions or on Discord - build the next best thing together
             </p>
@@ -64,14 +65,14 @@ const Success = ({
             <Input
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              icon={<IconSearch size={16} strokeWidth={1.5} />}
+              icon={<Search size={16} strokeWidth={1.5} />}
               actions={[
                 <Button
-                  key="search"
                   asChild
+                  key="search"
                   className="mr-1"
                   type="default"
-                  icon={<IconExternalLink size={16} strokeWidth={1.5} />}
+                  icon={<ExternalLink />}
                 >
                   <Link
                     href={`https://github.com/supabase/supabase/discussions?discussions_q=${searchValue}`}

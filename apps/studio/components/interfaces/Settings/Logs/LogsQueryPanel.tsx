@@ -1,5 +1,14 @@
+import Link from 'next/link'
+import React, { ReactNode, useState } from 'react'
+
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM } from 'common'
+import Table from 'components/to-be-cleaned/Table'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useFlag } from 'hooks/ui/useFlag'
+import { copyToClipboard } from 'lib/helpers'
+import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
+import { logConstants } from 'shared-data'
 import {
   Alert,
   Badge,
@@ -8,37 +17,26 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconBookOpen,
-  IconCheck,
-  IconChevronDown,
-  IconClipboard,
-  IconExternalLink,
-  IconX,
   Popover,
   SidePanel,
   Tabs,
 } from 'ui'
-
-import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
-import { useProfile } from 'lib/profile'
-import Link from 'next/link'
-import React, { useState } from 'react'
 import {
   EXPLORER_DATEPICKER_HELPERS,
-  LogsTableName,
-  LogsWarning,
   LOGS_SOURCE_DESCRIPTION,
-  LogTemplate,
-} from '.'
+  LogsTableName,
+} from './Logs.constants'
 import DatePickers from './Logs.DatePickers'
-import Table from 'components/to-be-cleaned/Table'
-import { logConstants } from 'shared-data'
-import { copyToClipboard } from 'lib/helpers'
+import { LogTemplate, LogsWarning, WarehouseCollection } from './Logs.types'
+import { WarehouseQueryTemplate } from './Warehouse.utils'
 
+export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
+  warehouseTemplates?: WarehouseQueryTemplate[]
   onSelectTemplate: (template: LogTemplate) => void
-  onSelectSource: (source: LogsTableName) => void
+  onSelectWarehouseTemplate: (template: WarehouseQueryTemplate) => void
+  onSelectSource: (source: string) => void
   onClear: () => void
   onSave?: () => void
   hasEditorValue: boolean
@@ -47,18 +45,35 @@ export interface LogsQueryPanelProps {
   defaultTo: string
   defaultFrom: string
   warnings: LogsWarning[]
+  warehouseCollections: WarehouseCollection[]
+  dataSource: SourceType
+  onDataSourceChange: (sourceType: SourceType) => void
+}
+
+function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: string }) {
+  return (
+    <div className="grid gap-1">
+      <div className="font-mono font-bold">{name}</div>
+      {desc && <div className="text-foreground-light">{desc}</div>}
+    </div>
+  )
 }
 
 const LogsQueryPanel = ({
   templates = [],
+  warehouseTemplates = [],
   onSelectTemplate,
+  onSelectWarehouseTemplate,
   onSelectSource,
   defaultFrom,
   defaultTo,
   onDateChange,
   warnings,
+  warehouseCollections,
+  dataSource,
+  onDataSourceChange,
 }: LogsQueryPanelProps) => {
-  const [showReference, setShowReference] = React.useState(false)
+  const [showReference, setShowReference] = useState(false)
 
   const {
     projectAuthAll: authEnabled,
@@ -66,67 +81,137 @@ const LogsQueryPanel = ({
     projectEdgeFunctionAll: edgeFunctionsEnabled,
   } = useIsFeatureEnabled(['project_auth:all', 'project_storage:all', 'project_edge_function:all'])
 
+  const warehouseEnabled = useFlag('warehouse')
+
   const logsTableNames = Object.entries(LogsTableName)
     .filter(([key]) => {
       if (key === 'AUTH') return authEnabled
       if (key === 'STORAGE') return storageEnabled
       if (key === 'FN_EDGE') return edgeFunctionsEnabled
+      if (key === 'WAREHOUSE') return false
       return true
     })
     .map(([, value]) => value)
 
   return (
-    <div className="rounded rounded-bl-none rounded-br-none border border-overlay bg-surface-100">
+    <div className="border-b bg-surface-100">
       <div className="flex w-full items-center justify-between px-5 py-2">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<IconChevronDown />}>
-                  Insert source
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="start">
-                {logsTableNames
-                  .sort((a, b) => a.localeCompare(b))
-                  .map((source) => (
-                    <DropdownMenuItem key={source} onClick={() => onSelectSource(source)}>
-                      <div className="flex flex-col gap-1">
-                        <span className="font-mono font-bold">{source}</span>
-                        <span className="text-foreground-light">
-                          {LOGS_SOURCE_DESCRIPTION[source]}
+            {warehouseEnabled && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" iconRight={<ChevronDown />}>
+                    Data source{' '}
+                    <span className="ml-2 font-mono opacity-50">
+                      {dataSource === 'warehouse' ? 'collections' : 'logs'}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom" align="start">
+                  <DropdownMenuItem onClick={() => onDataSourceChange('logs')}>
+                    <DropdownMenuItemContent name="Logs" desc="Logs for all Supabase products" />
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onDataSourceChange('warehouse')}>
+                    <DropdownMenuItemContent
+                      name={
+                        <span>
+                          Collections <Badge variant="warning">NEW</Badge>
                         </span>
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                      }
+                      desc="Query your collections"
+                    />
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<IconChevronDown />}>
-                  Templates
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="start">
-                {templates
-                  .sort((a, b) => a.label!.localeCompare(b.label!))
-                  .map((template) => (
+            {dataSource === 'warehouse' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" iconRight={<ChevronDown />}>
+                    Templates
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="max-h-96 overflow-auto" side="bottom" align="start">
+                  {warehouseTemplates.map((template) => (
                     <DropdownMenuItem
-                      key={template.label}
-                      onClick={() => onSelectTemplate(template)}
+                      key={template.name}
+                      onClick={() => onSelectWarehouseTemplate(template)}
                     >
-                      <p>{template.label}</p>
+                      <DropdownMenuItemContent name={template.name} desc={template.description} />
                     </DropdownMenuItem>
                   ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DatePickers
-              to={defaultTo}
-              from={defaultFrom}
-              onChange={onDateChange}
-              helpers={EXPLORER_DATEPICKER_HELPERS}
-            />
+                  {warehouseCollections.length === 0 && (
+                    <DropdownMenuItem className="hover:bg-transparent cursor-default">
+                      <DropdownMenuItemContent
+                        name="No collections found"
+                        desc="You can create collections in the left sidebar."
+                      />
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {dataSource === 'logs' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" iconRight={<ChevronDown />}>
+                    Insert source
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="bottom"
+                  align="start"
+                  className="max-h-[70vh] overflow-auto"
+                >
+                  {dataSource === 'logs' &&
+                    logsTableNames
+                      .sort((a, b) => a.localeCompare(b))
+                      .map((source) => (
+                        <DropdownMenuItem key={source} onClick={() => onSelectSource(source)}>
+                          <DropdownMenuItemContent
+                            name={source}
+                            desc={LOGS_SOURCE_DESCRIPTION[source]}
+                          />
+                        </DropdownMenuItem>
+                      ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {dataSource === 'logs' && IS_PLATFORM && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" iconRight={<ChevronDown />}>
+                    Templates
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom" align="start">
+                  {templates
+                    .sort((a, b) => a.label!.localeCompare(b.label!))
+                    .map((template) => (
+                      <DropdownMenuItem
+                        key={template.label}
+                        onClick={() => onSelectTemplate(template)}
+                      >
+                        <p>{template.label}</p>
+                      </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {dataSource === 'logs' && (
+              <DatePickers
+                to={defaultTo}
+                from={defaultFrom}
+                onChange={onDateChange}
+                helpers={EXPLORER_DATEPICKER_HELPERS}
+              />
+            )}
+
             <div className="overflow-hidden">
               <div
                 className={` transition-all duration-300 ${
@@ -156,96 +241,93 @@ const LogsQueryPanel = ({
               </div>
             </div>
           </div>
-          <div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <SidePanel
-                  size="large"
-                  header={
-                    <div className="flex flex-row justify-between items-center">
-                      <h3>Field Reference</h3>
-                      <Button
-                        type="text"
-                        className="px-1"
-                        onClick={() => setShowReference(false)}
-                        icon={<IconX size={18} strokeWidth={1.5} />}
-                      />
-                    </div>
-                  }
-                  visible={showReference}
-                  cancelText="Close"
-                  onCancel={() => setShowReference(false)}
-                  hideFooter
-                  triggerElement={
-                    <Button
-                      asChild // ?: we don't want a button inside a button
-                      type="default"
-                      onClick={() => setShowReference(true)}
-                      icon={<IconBookOpen strokeWidth={1.5} />}
-                    >
-                      <span>Field Reference</span>
-                    </Button>
-                  }
+          {dataSource === 'logs' && (
+            <SidePanel
+              size="large"
+              header={
+                <div className="flex flex-row justify-between items-center">
+                  <h3>Field Reference</h3>
+                  <Button
+                    type="text"
+                    className="px-1"
+                    onClick={() => setShowReference(false)}
+                    icon={<X />}
+                  />
+                </div>
+              }
+              visible={showReference}
+              cancelText="Close"
+              onCancel={() => setShowReference(false)}
+              hideFooter
+              triggerElement={
+                <Button
+                  asChild // ?: we don't want a button inside a button
+                  type="text"
+                  onClick={() => setShowReference(true)}
+                  icon={<BookOpen />}
+                  className="px-2"
                 >
-                  <SidePanel.Content>
-                    <div className="pt-4 pb-2 space-y-1">
-                      <p className="text-sm">
-                        The following table shows all the available paths that can be queried from
-                        each respective source. Do note that to access nested keys, you would need
-                        to perform the necessary{' '}
-                        <Link
-                          href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-brand"
-                        >
-                          unnesting joins
-                          <IconExternalLink
-                            size="tiny"
-                            className="ml-1 inline -translate-y-[2px]"
-                            strokeWidth={1.5}
-                          />
-                        </Link>
-                      </p>
-                    </div>
-                  </SidePanel.Content>
-                  <SidePanel.Separator />
-                  <Tabs
-                    scrollable
-                    size="small"
-                    type="underlined"
-                    defaultActiveId="edge_logs"
-                    listClassNames="px-2"
+                  <span>Field Reference</span>
+                </Button>
+              }
+            >
+              <SidePanel.Content>
+                <div className="pt-4 pb-2 space-y-1">
+                  <p className="text-sm">
+                    The following table shows all the available paths that can be queried from each
+                    respective source. Do note that to access nested keys, you would need to perform
+                    the necessary{' '}
+                    <Link
+                      href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand"
+                    >
+                      unnesting joins
+                      <ExternalLink
+                        size="14"
+                        className="ml-1 inline -translate-y-[2px]"
+                        strokeWidth={1.5}
+                      />
+                    </Link>
+                  </p>
+                </div>
+              </SidePanel.Content>
+              <SidePanel.Separator />
+              <Tabs
+                scrollable
+                size="small"
+                type="underlined"
+                defaultActiveId="edge_logs"
+                listClassNames="px-2"
+              >
+                {logConstants.schemas.map((schema) => (
+                  <Tabs.Panel
+                    key={schema.reference}
+                    id={schema.reference}
+                    label={schema.name}
+                    className="px-4 pb-4"
                   >
-                    {logConstants.schemas.map((schema) => (
-                      <Tabs.Panel
-                        key={schema.reference}
-                        id={schema.reference}
-                        label={schema.name}
-                        className="px-4 pb-4"
-                      >
-                        <Table
-                          head={[
-                            <Table.th className="text-xs !p-2" key="path">
-                              Path
-                            </Table.th>,
-                            <Table.th key="type" className="text-xs !p-2">
-                              Type
-                            </Table.th>,
-                          ]}
-                          body={schema.fields
-                            .sort((a: any, b: any) => a.path - b.path)
-                            .map((field) => (
-                              <Field key={field.path} field={field} />
-                            ))}
-                        />
-                      </Tabs.Panel>
-                    ))}
-                  </Tabs>
-                </SidePanel>
-              </div>
-            </div>
-          </div>
+                    <Table
+                      head={[
+                        <Table.th className="text-xs !p-2" key="path">
+                          Path
+                        </Table.th>,
+                        <Table.th key="type" className="text-xs !p-2">
+                          Type
+                        </Table.th>,
+                      ]}
+                      body={schema.fields
+                        .sort((a: any, b: any) => a.path - b.path)
+                        .map((field) => (
+                          <Field key={field.path} field={field} />
+                        ))}
+                    />
+                  </Tabs.Panel>
+                ))}
+              </Tabs>
+            </SidePanel>
+          )}
         </div>
       </div>
     </div>
@@ -277,7 +359,7 @@ const Field = ({
         {isCopied ? (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
-              <IconCheck size={14} strokeWidth={3} className="text-brand" />
+              <Check size={14} strokeWidth={3} className="text-brand" />
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">
@@ -296,7 +378,7 @@ const Field = ({
         ) : (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
-              <IconClipboard size="tiny" strokeWidth={1.5} />
+              <Clipboard size={14} strokeWidth={1.5} />
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">

@@ -1,21 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { ArrowDown, ArrowUp, RefreshCw, User } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconArrowDown,
-  IconArrowUp,
-  IconRefreshCw,
-  IconUser,
-} from 'ui'
 
 import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
@@ -23,6 +13,7 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DatePicker } from 'components/ui/DatePicker'
 import { FilterPopover } from 'components/ui/FilterPopover'
+import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import {
   AuditLog,
@@ -32,6 +23,15 @@ import { useOrganizationMembersQuery } from 'data/organizations/organization-mem
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  WarningIcon,
+} from 'ui'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -53,6 +53,8 @@ const AuditLogs = () => {
     projects: [], // project_ref[]
   })
 
+  const canReadAuditLogs = useCheckPermissions(PermissionAction.READ, 'notifications')
+
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
@@ -65,8 +67,9 @@ const AuditLogs = () => {
         iso_timestamp_end: dateRange.to,
       },
       {
+        enabled: canReadAuditLogs,
         retry(_failureCount, error) {
-          if (error.message.endsWith('upgrade to team or enterprise plan to access audit logs.')) {
+          if (error.message.endsWith('upgrade to Team or Enterprise Plan to access audit logs.')) {
             return false
           }
           return true
@@ -120,6 +123,14 @@ const AuditLogs = () => {
 
   const currentOrganization = organizations?.find((o) => o.slug === slug)
 
+  if (!canReadAuditLogs) {
+    return (
+      <ScaffoldContainerLegacy>
+        <NoPermission resourceText="view organization audit logs" />
+      </ScaffoldContainerLegacy>
+    )
+  }
+
   return (
     <>
       <ScaffoldContainerLegacy>
@@ -133,13 +144,13 @@ const AuditLogs = () => {
           )}
 
           {isError ? (
-            error.message.endsWith('upgrade to team or enterprise plan to access audit logs.') ? (
+            error.message.endsWith('upgrade to Team or Enterprise Plan to access audit logs.') ? (
               <Alert_Shadcn_
                 variant="default"
                 title="Organization Audit Logs are not available on Free or Pro plans"
               >
-                <IconAlertTriangle className="h-4 w-4 mt-3" />
-                <div className="flex flex-row pt-3 pb-2">
+                <WarningIcon />
+                <div className="flex flex-row pt-1">
                   <div className="grow">
                     <AlertTitle_Shadcn_>
                       Organization Audit Logs are not available on Free or Pro plans
@@ -241,7 +252,7 @@ const AuditLogs = () => {
                 <Button
                   type="default"
                   disabled={isLoading || isRefetching}
-                  icon={<IconRefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+                  icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
                   onClick={() => refetch()}
                 >
                   {isRefetching ? 'Refreshing' : 'Refresh'}
@@ -280,9 +291,9 @@ const AuditLogs = () => {
                               className="px-1"
                               icon={
                                 dateSortDesc ? (
-                                  <IconArrowDown strokeWidth={1.5} size={14} />
+                                  <ArrowDown strokeWidth={1.5} size={14} />
                                 ) : (
-                                  <IconArrowUp strokeWidth={1.5} size={14} />
+                                  <ArrowUp strokeWidth={1.5} size={14} />
                                 )
                               }
                               onClick={() => setDateSortDesc(!dateSortDesc)}
@@ -329,7 +340,7 @@ const AuditLogs = () => {
                           </div>
                         ) : user?.invited_id || user?.username === user?.primary_email ? (
                           <div className="flex h-[30px] w-[30px] items-center justify-center border-2 rounded-full border-strong">
-                            <IconUser size={18} strokeWidth={2} />
+                            <User size={18} strokeWidth={2} />
                           </div>
                         ) : (
                           <Image

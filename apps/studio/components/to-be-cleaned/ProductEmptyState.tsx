@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { ExternalLink } from 'lucide-react'
 import { PropsWithChildren } from 'react'
-import { Button, IconExternalLink } from 'ui'
+import { Button } from 'ui'
 
 interface ProductEmptyStateProps {
   title?: string
@@ -68,7 +69,7 @@ const ProductEmptyState = ({
                   </Tooltip.Root>
                 )}
                 {infoButtonUrl && infoButtonLabel ? (
-                  <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+                  <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <a target="_blank" rel="noreferrer" href={infoButtonUrl}>
                       {infoButtonLabel}
                     </a>

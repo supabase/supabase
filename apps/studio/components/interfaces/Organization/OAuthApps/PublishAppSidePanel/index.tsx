@@ -1,7 +1,7 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
@@ -20,16 +20,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Form,
-  IconEdit,
-  IconExternalLink,
-  IconUpload,
   Input,
   Modal,
   SidePanel,
+  Upload,
   cn,
 } from 'ui'
 import AuthorizeRequesterDetails from '../AuthorizeRequesterDetails'
 import { ScopesPanel } from './Scopes'
+import { Edit, ExternalLink } from 'lucide-react'
 
 export interface PublishAppSidePanelProps {
   visible: boolean
@@ -237,7 +236,7 @@ const PublishAppSidePanel = ({
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button type="default" className="px-1">
-                                      <IconEdit />
+                                      <Edit />
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end" side="bottom">
@@ -274,7 +273,7 @@ const PublishAppSidePanel = ({
                                   (uploadButtonRef.current as any).click()
                               }}
                             >
-                              <IconUpload size={18} strokeWidth={1.5} className="text-foreground" />
+                              <Upload size={18} strokeWidth={1.5} className="text-foreground" />
                               <p className="text-xs text-foreground-light">Upload logo</p>
                             </div>
                           )}
@@ -338,7 +337,7 @@ const PublishAppSidePanel = ({
                             of its projects.
                           </span>
                         </div>
-                        <Button asChild type="default" icon={<IconExternalLink />}>
+                        <Button asChild type="default" icon={<ExternalLink />}>
                           <Link
                             href="https://supabase.com/docs/guides/platform/oauth-apps/oauth-scopes"
                             target="_blank"

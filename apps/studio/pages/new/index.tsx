@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useState } from 'react'
 
 import { NewOrgForm } from 'components/interfaces/Organization'
-import { WizardLayout } from 'components/layouts'
+import WizardLayout from 'components/layouts/WizardLayout'
 import { useSetupIntent } from 'data/stripe/setup-intent-mutation'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'

@@ -3,15 +3,16 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, map as lodashMap, uniqBy } from 'lodash'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, IconExternalLink, IconSearch, Input } from 'ui'
+import { Button, Input } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { noop } from 'lib/void'
+import { ExternalLink, Search } from 'lucide-react'
 import HooksListEmpty from './HooksListEmpty'
 import SchemaTable from './SchemaTable'
 
@@ -49,13 +50,13 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
         <Input
           placeholder="Search for a webhook"
           size="small"
-          icon={<IconSearch size="tiny" />}
+          icon={<Search size="14" />}
           value={filterString}
           className="w-64"
           onChange={(e) => setFilterString(e.target.value)}
         />
         <div className="flex items-center space-x-2">
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://supabase.com/docs/guides/database/webhooks"
               target="_blank"

@@ -1,31 +1,28 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
+import { ChevronLeft, Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import useTable from 'hooks/misc/useTable'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconEdit,
-  IconMoreVertical,
-  IconPlus,
-  IconSearch,
-  IconTrash,
   Input,
 } from 'ui'
-
-import { useParams } from 'common'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useCheckPermissions } from 'hooks'
-import useTable from 'hooks/misc/useTable'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { ChevronLeft } from 'lucide-react'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {
@@ -42,6 +39,7 @@ const ColumnList = ({
   const { id, ref } = useParams()
   const [filterString, setFilterString] = useState<string>('')
   const { data: selectedTable, error, isError, isLoading, isSuccess } = useTable(Number(id))
+  const isTableEntity = 'live_rows_estimate' in ((selectedTable as PostgresTable) || {})
 
   const columns =
     (filterString.length === 0
@@ -55,12 +53,7 @@ const ColumnList = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            asChild
-            type="outline"
-            icon={<ChevronLeft size={14} />}
-            style={{ padding: '5px' }}
-          >
+          <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
             <Link href={`/project/${ref}/database/tables`} />
           </Button>
           <Input
@@ -68,40 +61,23 @@ const ColumnList = ({
             placeholder="Filter columns"
             value={filterString}
             onChange={(e: any) => setFilterString(e.target.value)}
-            icon={<IconSearch size="tiny" />}
+            icon={<Search size={12} />}
           />
         </div>
-        {!isLocked && (
-          <div>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  disabled={!canUpdateColumns}
-                  icon={<IconPlus />}
-                  onClick={() => onAddColumn()}
-                >
-                  New column
-                </Button>
-              </Tooltip.Trigger>
-              {!canUpdateColumns && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to create columns
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
-          </div>
+        {!isLocked && isTableEntity && (
+          <ButtonTooltip
+            icon={<Plus />}
+            disabled={!canUpdateColumns}
+            onClick={() => onAddColumn()}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to create columns',
+              },
+            }}
+          >
+            New column
+          </ButtonTooltip>
         )}
       </div>
 
@@ -128,12 +104,8 @@ const ColumnList = ({
                   <Table.th key="description" className="hidden lg:table-cell">
                     Description
                   </Table.th>,
-                  <Table.th key="type" className="hidden xl:table-cell">
-                    Data Type
-                  </Table.th>,
-                  <Table.th key="format" className="hidden xl:table-cell">
-                    Format
-                  </Table.th>,
+                  <Table.th key="type">Data Type</Table.th>,
+                  <Table.th key="format">Format</Table.th>,
                   <Table.th key="buttons"></Table.th>,
                 ]}
                 body={columns.map((x: any, i: number) => (
@@ -141,7 +113,7 @@ const ColumnList = ({
                     <Table.td>
                       <p>{x.name}</p>
                     </Table.td>
-                    <Table.td className="break-all whitespace-normal">
+                    <Table.td className="break-all whitespace-normal hidden xl:table-cell">
                       {x.comment !== null ? (
                         <p title={x.comment}>{x.comment}</p>
                       ) : (
@@ -155,12 +127,10 @@ const ColumnList = ({
                       <code className="text-xs">{x.format}</code>
                     </Table.td>
                     <Table.td className="text-right">
-                      {!isLocked && (
+                      {!isLocked && isTableEntity && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button type="default" className="px-1">
-                              <IconMoreVertical />
-                            </Button>
+                            <Button type="default" className="px-1" icon={<MoreVertical />} />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="bottom" align="end" className="w-32">
                             <DropdownMenuItem
@@ -169,7 +139,7 @@ const ColumnList = ({
                             >
                               <Tooltip.Root delayDuration={0}>
                                 <Tooltip.Trigger className="flex items-center space-x-2">
-                                  <IconEdit size="tiny" />
+                                  <Edit size={12} />
                                   <p>Edit column</p>
                                 </Tooltip.Trigger>
                                 {!canUpdateColumns && (
@@ -198,7 +168,7 @@ const ColumnList = ({
                             >
                               <Tooltip.Root delayDuration={0}>
                                 <Tooltip.Trigger className="flex items-center space-x-2">
-                                  <IconTrash stroke="red" size="tiny" />
+                                  <Trash stroke="red" size={12} />
                                   <p>Delete column</p>
                                 </Tooltip.Trigger>
                                 {!canUpdateColumns && (

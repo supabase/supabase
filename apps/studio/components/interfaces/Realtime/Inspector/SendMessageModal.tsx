@@ -1,8 +1,8 @@
-import { Input, Modal } from 'ui'
-
-import { CodeEditor } from 'components/ui/CodeEditor'
 import { useEffect, useState } from 'react'
+
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { tryParseJson } from 'lib/helpers'
+import { Input, Modal } from 'ui'
 
 interface SendMessageModalProps {
   visible: boolean

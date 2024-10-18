@@ -11,13 +11,19 @@ The Supabase team regularly monitors the status of backups. In case of any issue
 
 </Admonition>
 
+<Admonition type="note">
+
+Once a project is deleted all associated data will be permanently removed, including any backups stored in S3. This action is irreversible and should be carefully considered before proceeding.
+
+</Admonition>
+
 ## Types of backups
 
 Database backups can be categorized into two types: **logical** and **physical**. You can learn more about them [here](https://supabase.com/blog/postgresql-physical-logical-backups).
 
 As a general rule of thumb, projects will either have logical or physical backups based on plan, database size, and add-ons:
 
-| Plan       | Database Size (0-40GB) | [Database Size (>40GB)](#backup-process-for-large-databases) | [PITR](#point-in-time-recovery) | [Read Replicas](./read-replicas#prerequisites) |
+| Plan       | Database Size (0-15GB) | [Database Size (>15GB)](#backup-process-for-large-databases) | [PITR](#point-in-time-recovery) | [Read Replicas](./read-replicas#prerequisites) |
 | ---------- | ---------------------- | ------------------------------------------------------------ | ------------------------------- | ---------------------------------------------- |
 | Pro        | logical                | physical                                                     | physical                        | physical                                       |
 | Team       | logical                | physical                                                     | physical                        | physical                                       |
@@ -51,7 +57,7 @@ Database backups do not include objects stored via the Storage API, as the datab
 
 ## Daily backups
 
-All Pro and Enterprise plan Supabase projects are backed up automatically on a daily basis. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data if disaster hits at the most inopportune time. If a lower RPO is required, enabling Point-in-Time Recovery should be considered.
+All Pro, Team and Enterprise Plan Supabase projects are backed up automatically on a daily basis. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data if disaster hits at the most inopportune time. If a lower RPO is required, enabling Point-in-Time Recovery should be considered.
 
 <Admonition type="note">
 
@@ -63,17 +69,17 @@ For security purposes, passwords for custom roles are not stored in daily backup
 
 The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-pg-dumpall.html) is used to perform daily backups. An SQL file is generated, zipped up, and sent to our storage servers for safe keeping.
 
-You can access daily backups in the [Scheduled backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) settings in the Dashboard. Pro plan projects can access the last 7 days' worth of daily backups while Enterprise plan projects can access up to 30 days' worth of daily backups. Users can restore their project to any one of the backups. If you wish to generate a logical backup on your own, you can do so through the [Supabase CLI](/docs/reference/cli/supabase-db-dump).
+You can access daily backups in the [Scheduled backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) settings in the Dashboard. Pro Plan projects can access the last 7 days' worth of daily backups. Team Plan projects can access the last 14 days' worth of daily backups, while Enterprise Plan projects can access up to 30 days' worth of daily backups. Users can restore their project to any one of the backups. If you wish to generate a logical backup on your own, you can do so through the [Supabase CLI](/docs/reference/cli/supabase-db-dump).
 
 #### Backup process for large databases
 
-Databases larger than 40GB[^1], if they're on a recent build[^2] of the Supabase platform, get automatically transitioned[^3] to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
+Databases larger than 15GB[^1], if they're on a recent build[^2] of the Supabase platform, get automatically transitioned[^3] to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
 
 This class of physical backups only allows for recovery to a fixed time each day, similar to daily backups. You can upgrade to [PITR](#point-in-time-recovery) for access to more granular recovery options.
 
 Once a database is transitioned to using physical backups, it continues to use physical backups, even if the database size falls back below the threshold for the transition.
 
-[^1]: The threshold for transitioning might be lowered in the future.
+[^1]: The threshold for transitioning will be slowly lowered over time. Eventually, all projects will be transitioned to using physical backups.
 [^2]: Projects created or upgraded after the 14th of July 2022 are eligible.
 [^3]: The transition to physical backups is handled transparently and does not require any user intervention. It involves a single restart of the database to pick up new configuration that can only be loaded at start; the expected downtime for the restart is a few seconds.
 
@@ -93,7 +99,7 @@ Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter i
 
 <Admonition type="note">
 
-This feature is available to all Enterprise plan projects. Pro and Team plan projects can enable PITR as an add-on.
+Pro, Team and Enterprise Plan projects can enable PITR as an add-on.
 
 Projects interested in PITR will also need to use at least a Small compute add-on, in order to ensure smooth functioning.
 
@@ -128,3 +134,27 @@ A date and time picker will be provided upon pressing the `Start a restore` butt
 ![PITR: Confirmation modal](/docs/img/backups-pitr-confirmation-modal.png)
 
 After locking in the desired point in time to recover to, The Dashboard will then prompt for a review and confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot for downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the latest physical backup available is downloaded to the project and the database is partially restored. WAL files generated after this physical backup up to the specified point-in-time are then downloaded. The underlying records of transactions in these files are replayed against the database to complete the restoration. The Dashboard will display a notification once the restoration completes.
+
+## Troubleshooting
+
+### Logical backups
+
+#### search_path issues
+
+During the `pg_restore` process, the `search_path` is set to an empty string for predictability, and security. Using unqualified references to functions or relations can cause restorations using logical backups to fail, as the database will not be able to locate the function or relation being referenced. This can happen even if the database functions without issues during normal operations, as the `search_path` is usually set to include several schemas during normal operations. Therefore, you should always use schema-qualified names within your SQL code.
+
+You can refer to [an example PR](https://github.com/supabase/supabase/pull/28393/files) on how to update SQL code to use schema-qualified names.
+
+#### Invalid check constraints
+
+Postgres requires that [check constraints](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-CHECK-CONSTRAINTS) be:
+
+1. immutable
+1. not reference table data other than the new or updated row being checked
+
+Violating these requirements can result in numerous failure scenarios, including during logical restorations.
+
+Common examples of check constraints that can result in such failures are:
+
+- validating against the current time, e.g. that the row being inserted references a future event
+- validating the contents of a row against the contents of another table

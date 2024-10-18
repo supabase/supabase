@@ -16,46 +16,6 @@ Sonner is built and maintained by [emilkowalski\_](https://twitter.com/emilkowal
 
 ## Installation
 
-<Tabs defaultValue="cli">
-
-<TabsList>
-  <TabsTrigger value="cli">CLI</TabsTrigger>
-  <TabsTrigger value="manual">Manual</TabsTrigger>
-</TabsList>
-<TabsContent value="cli">
-
-<Steps>
-
-<Step>Run the following command:</Step>
-
-```bash
-npx shadcn-ui@latest add sonner
-```
-
-<Step>Add the Toaster component</Step>
-
-```tsx title="app/layout.tsx" {1,9}
-import { Toaster } from '@/components/ui/sonner'
-
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
-      <head />
-      <body>
-        <main>{children}</main>
-        <Toaster />
-      </body>
-    </html>
-  )
-}
-```
-
-</Steps>
-
-</TabsContent>
-
-<TabsContent value="manual">
-
 <Steps>
 
 <Step>Install the following dependencies:</Step>
@@ -88,10 +48,6 @@ export default function RootLayout({ children }) {
 
 </Steps>
 
-</TabsContent>
-
-</Tabs>
-
 ## Usage
 
 ```tsx
@@ -101,3 +57,41 @@ import { toast } from 'sonner'
 ```tsx
 toast('Event has been created.')
 ```
+
+## Expand
+
+You can change the amount of toasts visible through the visibleToasts prop.
+
+```tsx
+<Toaster expand={true | false} />
+```
+
+You can use the Input below to try it out.
+
+<SonnerExpandConfig />
+
+## Position
+
+You can change the amount of toasts visible through the visibleToasts prop.
+
+```tsx
+<Toaster
+  position={
+    'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top-center' | 'bottom-center'
+  }
+/>
+```
+
+You can use the Input below to try it out.
+
+<SonnerPositionConfig />
+
+## Types
+
+You can customize the type of toast you want to render, and pass an options object as the second argument.
+
+<ComponentPreview name="sonner-types" />
+
+## Upload example
+
+<ComponentPreview name="sonner-upload" />

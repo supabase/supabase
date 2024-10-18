@@ -1,4 +1,4 @@
-import { StorageLayout } from 'components/layouts'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import type { NextPageWithLayout } from 'types'
 
 const Storage: NextPageWithLayout = () => {

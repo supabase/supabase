@@ -1,13 +1,14 @@
-import { useParams } from 'common'
 import Link from 'next/link'
-import { Button, IconClock } from 'ui'
 
+import { useParams } from 'common'
 import RecentQueriesItem from 'components/interfaces/Settings/Logs/RecentQueriesItem'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
-import { useLocalStorage } from 'hooks'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
+import { Button } from 'ui'
+import { Clock } from 'lucide-react'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -41,7 +42,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
       {recent.length === 0 && (
         <>
           <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
-            <IconClock className="animate-bounce" />
+            <Clock className="animate-bounce" />
             <h3 className="text-lg text-foreground">No Recent Queries Yet</h3>
             <p className="text-sm text-foreground-lighter">
               Your recent queries run from the{' '}

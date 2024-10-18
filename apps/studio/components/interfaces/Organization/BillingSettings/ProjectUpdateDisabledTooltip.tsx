@@ -18,7 +18,7 @@ const ProjectUpdateDisabledTooltip = ({
   return (
     <Tooltip_Shadcn_>
       <TooltipTrigger_Shadcn_ asChild>{children}</TooltipTrigger_Shadcn_>
-      {projectUpdateDisabled && (
+      {showTooltip && (
         <TooltipContent_Shadcn_ side="bottom" className="w-72 text-center">
           {projectUpdateDisabled
             ? tooltip ||

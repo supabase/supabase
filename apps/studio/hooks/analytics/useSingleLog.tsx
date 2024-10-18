@@ -1,15 +1,14 @@
-import {
-  genQueryParams,
-  genSingleLogQuery,
+import { useQuery } from '@tanstack/react-query'
+import { LOGS_TABLES, genQueryParams } from 'components/interfaces/Settings/Logs/Logs.constants'
+import type {
   LogData,
   Logs,
   LogsEndpointParams,
-  LOGS_TABLES,
   QueryType,
-} from 'components/interfaces/Settings/Logs'
-import { API_URL } from 'lib/constants'
+} from 'components/interfaces/Settings/Logs/Logs.types'
+import { genSingleLogQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'lib/common/fetch'
-import { useQuery } from '@tanstack/react-query'
+import { API_URL } from 'lib/constants'
 
 interface SingleLogHook {
   logData: LogData | undefined

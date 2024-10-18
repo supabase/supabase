@@ -1,9 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
-import { toast } from 'react-hot-toast'
-import { Button, toast as UiToast } from 'ui'
+import { toast } from 'sonner'
+import { Button } from 'ui'
 
-import { Query, SupaRow } from 'components/grid'
+import { Query } from 'components/grid/query/Query'
+import type { SupaRow } from 'components/grid/types'
 import { Markdown } from 'components/interfaces/Markdown'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
@@ -98,12 +99,7 @@ export const useTableRowDeleteMutation = ({
               : `Unable to delete row as it is currently referenced by a foreign key constraint from the table \`${referencingTable}\`.`
             const resolutionCTA = `Set an on delete behavior on the foreign key relation \`${fkName}\` in the \`${referencingTable}\` table to automatically respond when row(s) are being deleted in the \`${sourceTable}\` table.`
 
-            UiToast({
-              variant: 'default',
-              style: { flexDirection: 'column' },
-              title: (
-                <Markdown content={initialMessage} className="text-foreground [&>p]:m-0" />
-              ) as any,
+            toast(initialMessage, {
               description: <Markdown content={resolutionCTA} className="[&>p]:m-0" />,
               action: (
                 <div className="w-full flex gap-x-2 !mx-0 mt-3">
@@ -126,32 +122,24 @@ export const useTableRowDeleteMutation = ({
               ),
             })
           } else if (isPkError) {
-            UiToast({
-              variant: 'default',
-              style: { flexDirection: 'column' },
-              title: (
-                <Markdown
-                  className="text-foreground [&>p]:m-0"
-                  content="Unable to delete row(s) as table has no primary keys"
-                />
-              ) as any,
+            toast('Unable to delete row(s) as table has no primary keys', {
               description: (
-                <Markdown
-                  className="[&>p]:m-0"
-                  content="Add a primary key column to your table first to serve as a unique identifier for each row before updating or deleting the row."
-                />
-              ),
-              action: (
-                <div className="w-full flex gap-x-2 !mx-0 mt-3">
-                  <Button asChild type="outline" icon={<ExternalLink />}>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/database/tables#primary-keys"
-                    >
-                      Documentation
-                    </a>
-                  </Button>
+                <div>
+                  <p className="text-sm text-foreground-light">
+                    Add a primary key column to your table first to serve as a unique identifier for
+                    each row before updating or deleting the row.
+                  </p>
+                  <div className="mt-3">
+                    <Button asChild type="outline" icon={<ExternalLink />}>
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href="https://supabase.com/docs/guides/database/tables#primary-keys"
+                      >
+                        Documentation
+                      </a>
+                    </Button>
+                  </div>
                 </div>
               ),
             })

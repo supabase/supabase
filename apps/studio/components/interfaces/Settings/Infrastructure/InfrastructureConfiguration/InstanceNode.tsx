@@ -1,11 +1,19 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { Handle, NodeProps, Position } from 'reactflow'
 
 import { useParams } from 'common'
+import SparkBar from 'components/ui/SparkBar'
+import {
+  DatabaseInitEstimations,
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from 'data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -27,13 +35,6 @@ import {
   REPLICA_STATUS,
   Region,
 } from './InstanceConfiguration.constants'
-import {
-  DatabaseInitEstimations,
-  ReplicaInitializationStatus,
-  useReadReplicasStatusesQuery,
-} from 'data/read-replicas/replicas-status-query'
-import { ReadReplicaSetupError, ReadReplicaSetupProgress } from '@supabase/shared-types/out/events'
-import SparkBar from 'components/ui/SparkBar'
 import { formatSeconds } from './InstanceConfiguration.utils'
 
 interface NodeData {
@@ -178,6 +179,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
   } = data
   const { ref } = useParams()
   const created = dayjs(inserted_at).format('DD MMM YYYY')
+  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
 
   const { data: databaseStatuses } = useReadReplicasStatusesQuery({ projectRef: ref })
   const { replicaInitializationStatus } =
@@ -205,6 +207,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
         REPLICA_STATUS.COMING_UP,
         REPLICA_STATUS.GOING_DOWN,
         REPLICA_STATUS.RESTORING,
+        REPLICA_STATUS.RESTARTING,
+        REPLICA_STATUS.RESIZING,
         REPLICA_STATUS.INIT_READ_REPLICA,
       ] as string[]
     ).includes(status) || initStatus === ReplicaInitializationStatus.InProgress
@@ -264,6 +268,10 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 <Badge>Going down</Badge>
               ) : status === REPLICA_STATUS.RESTORING ? (
                 <Badge>Restarting</Badge>
+              ) : status === REPLICA_STATUS.RESTARTING ? (
+                <Badge>Restarting</Badge>
+              ) : status === REPLICA_STATUS.RESIZING ? (
+                <Badge>Resizing</Badge>
               ) : initStatus === ReplicaInitializationStatus.Completed &&
                 status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
                 <Badge variant="brand">Healthy</Badge>
@@ -358,9 +366,24 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem> */}
-            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDropReplica()}>
-              Drop replica
-            </DropdownMenuItem>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <DropdownMenuItem
+                  className="gap-x-2 !pointer-events-auto"
+                  disabled={!canManageReplicas}
+                  onClick={() => {
+                    if (canManageReplicas) onSelectDropReplica()
+                  }}
+                >
+                  Drop replica
+                </DropdownMenuItem>
+              </TooltipTrigger_Shadcn_>
+              {!canManageReplicas && (
+                <TooltipContent_Shadcn_ side="left">
+                  You need additional permissions to drop replicas
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -3,10 +3,10 @@ import { isEmpty } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { PolicyTableRow } from 'components/interfaces/Auth/Policies'
+import PolicyTableRow from 'components/interfaces/Auth/Policies/PolicyTableRow'
 import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
@@ -145,7 +145,7 @@ const Policies = ({
             <section key={table.id}>
               <PolicyTableRow
                 table={table}
-                isLocked={isLocked}
+                isLocked={schema === 'realtime' ? true : isLocked}
                 onSelectToggleRLS={onSelectToggleRLS}
                 onSelectCreatePolicy={() => onSelectCreatePolicy(table.name)}
                 onSelectEditPolicy={onSelectEditPolicy}

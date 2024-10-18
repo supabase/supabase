@@ -1,4 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { Maximize2 } from 'lucide-react'
+import { ChangeEvent, InputHTMLAttributes, SyntheticEvent } from 'react'
 import {
   CalculatedColumn,
   RenderCellProps,
@@ -6,12 +8,11 @@ import {
   RenderHeaderCellProps,
   useRowSelection,
 } from 'react-data-grid'
-import { Button, IconMaximize2 } from 'ui'
 
+import { Button } from 'ui'
 import { SELECT_COLUMN_KEY } from '../../constants'
-import { useTrackedState } from '../../store'
+import { useTrackedState } from '../../store/Store'
 import type { SupaRow } from '../../types'
-import { ChangeEvent, InputHTMLAttributes, SyntheticEvent } from 'react'
 
 export const SelectColumn: CalculatedColumn<any, any> = {
   key: SELECT_COLUMN_KEY,
@@ -144,7 +145,7 @@ function SelectCellFormatter({
               type="text"
               size="tiny"
               className="rdg-row__select-column__edit-action"
-              icon={<IconMaximize2 size="tiny" strokeWidth={1.5} className="text-foreground" />}
+              icon={<Maximize2 />}
               onClick={onEditClick}
               style={{ padding: '3px' }}
             />

@@ -23,7 +23,14 @@ There are a few important differences from a spreadsheet, but it's a good starti
 
 When creating a table, it's best practice to add columns at the same time.
 
-![Tables and columns](/docs/img/guides/database/tables-columns.png)
+<Image
+  alt="Tables and columns"
+  zoomable
+  src={{
+    dark: '/docs/img/database/managing-tables/creating-tables.png',
+    light: '/docs/img/database/managing-tables/creating-tables--light.png',
+  }}
+/>
 
 You must define the "data type" of each column when it is created. You can add and remove columns at any time after creating a table.
 
@@ -252,6 +259,22 @@ try await supabase.from("movies")
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+client.from_("movies").insert([
+    {
+        "name": "The Empire Strikes Back",
+        "description": "After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda."
+    },
+    {
+        "name": "Return of the Jedi",
+        "description": "After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star."
+    }
+]).execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -306,7 +329,14 @@ If you receive an error `FATAL:  password authentication failed for user "postgr
 
 Tables can be "joined" together using Foreign Keys.
 
-![Foreign Keys](/docs/img/guides/database/foreign-keys.png)
+<Image
+  alt="Foreign Keys"
+  zoomable
+  src={{
+    dark: '/docs/img/database/managing-tables/joining-tables.png',
+    light: '/docs/img/database/managing-tables/joining-tables--light.png',
+  }}
+/>
 
 This is where the "Relational" naming comes from, as data typically forms some sort of relationship.
 
@@ -377,7 +407,14 @@ create table performances (
 
 Tables belong to `schemas`. Schemas are a way of organizing your tables, often for security reasons.
 
-![Schemas and tables](/docs/img/guides/database/schema-tables.png)
+<Image
+  alt="Schemas and tables"
+  zoomable
+  src={{
+    dark: '/docs/img/database/managing-tables/schemas.png',
+    light: '/docs/img/database/managing-tables/schemas--light.png',
+  }}
+/>
 
 If you don't explicitly pass a schema when creating a table, Postgres will assume that you want to create the table in the `public` schema.
 

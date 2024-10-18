@@ -1,15 +1,20 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, Webhook } from 'lucide-react'
-import { Badge, Button, Input } from 'ui'
+import { Badge, Input } from 'ui'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { copyToClipboard } from 'lib/helpers'
 import { Hook } from './hooks.constants'
 
 interface HookCardProps {
   hook: Hook
-  canUpdateConfig: boolean
-  onToggle: (enabled: boolean) => void
   onSelect: () => void
 }
 
-export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCardProps) => {
+export const HookCard = ({ hook, onSelect }: HookCardProps) => {
+  const canUpdateAuthHook = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
+
   return (
     <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
       <div className="">
@@ -34,7 +39,9 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
                   disabled
                   className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
                   value={hook.method.schema}
-                  onCopy={() => {}}
+                  onCopy={() =>
+                    hook.method.type === 'postgres' && copyToClipboard(hook.method.schema)
+                  }
                 />
               </div>
               <div className="flex flex-row items-center">
@@ -46,7 +53,9 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
                   disabled
                   className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
                   value={hook.method.functionName}
-                  onCopy={() => {}}
+                  onCopy={() =>
+                    hook.method.type === 'postgres' && copyToClipboard(hook.method.functionName)
+                  }
                 />
               </div>
             </div>
@@ -65,7 +74,7 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
                   disabled
                   className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
                   value={hook.method.url}
-                  onCopy={() => {}}
+                  onCopy={() => hook.method.type === 'https' && copyToClipboard(hook.method.url)}
                 />
               </div>
               <div className="flex flex-row items-center">
@@ -84,21 +93,31 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
           )}
         </div>
         <div className="flex flex-row gap-2">
-          <Button type="default" disabled={!canUpdateConfig} onClick={() => onSelect()}>
+          <ButtonTooltip
+            type="default"
+            disabled={!canUpdateAuthHook}
+            onClick={() => onSelect()}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to configure auth hooks',
+              },
+            }}
+          >
             Configure hook
-          </Button>
+          </ButtonTooltip>
         </div>
       </div>
       <div className="flex-1">
         {hook.enabled ? (
-          <Badge className="space-x-1" size="large" variant="brand">
+          <Badge className="space-x-1" variant="brand">
             <div className="h-3.5 w-3.5 bg-brand rounded-full flex justify-center items-center">
               <Check className="h-2 w-2 text-background-overlay " strokeWidth={6} />
             </div>
             <span>Enabled</span>
           </Badge>
         ) : (
-          <Badge variant="warning" size="large">
+          <Badge variant="warning">
             <span>Disabled</span>
           </Badge>
         )}

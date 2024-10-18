@@ -96,7 +96,7 @@ Let’s step through a small demo where we accept some text, convert it into an 
 ```ts
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { env, pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.5.0'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 // Preparation for Deno runtime
 env.useBrowserCache = false

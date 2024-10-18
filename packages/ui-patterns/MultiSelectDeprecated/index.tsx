@@ -1,12 +1,8 @@
 import clsx from 'clsx'
 import { filter, orderBy, without } from 'lodash'
+import { AlertCircle, Check, ChevronDown, Plus, Search } from 'lucide-react'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import {
-  IconAlertCircle,
-  IconCheck,
-  IconChevronDown,
-  IconPlus,
-  IconSearch,
   Input,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -170,7 +166,7 @@ export default function MultiSelect({
                 }
               })}
               <div className="absolute inset-y-0 right-0 pl-3 pr-2 flex space-x-1 items-center cursor-pointer ">
-                <IconChevronDown size={16} strokeWidth={2} className="text-foreground-lighter" />
+                <ChevronDown size={16} strokeWidth={2} className="text-foreground-lighter" />
               </div>
             </div>
           </PopoverTrigger_Shadcn_>
@@ -182,7 +178,7 @@ export default function MultiSelect({
           >
             <Input
               className="[&>div>div>div>input]:!rounded-b-none [&>div>div>div>input]:!pl-9"
-              icon={<IconSearch size={16} />}
+              icon={<Search size={16} />}
               placeholder={searchPlaceholder}
               value={searchString}
               onChange={(e) => setSearchString(e.target.value)}
@@ -221,7 +217,7 @@ export default function MultiSelect({
                         )}
                       </div>
                       {active && (
-                        <IconCheck
+                        <Check
                           size={16}
                           strokeWidth={3}
                           className={`cursor-pointer transition ${active ? 'text-brand' : ''}`}
@@ -229,7 +225,7 @@ export default function MultiSelect({
                       )}
                       {allowDuplicateSelection && (
                         <div className="flex items-center opacity-0 group-hover:opacity-100 transition space-x-1">
-                          <IconPlus size={14} />
+                          <Plus size={14} />
                           <p className="text-sm">Add value</p>
                         </div>
                       )}
@@ -247,11 +243,7 @@ export default function MultiSelect({
                     emptyMessage
                   ) : (
                     <div className="flex w-full items-center space-x-2">
-                      <IconAlertCircle
-                        strokeWidth={1.5}
-                        size={18}
-                        className="text-foreground-light"
-                      />
+                      <AlertCircle strokeWidth={1.5} size={18} className="text-foreground-light" />
                       <p className="text-sm text-foreground-light">No options available</p>
                     </div>
                   )}

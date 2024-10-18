@@ -26,7 +26,7 @@ async function getProjectApi({ projectRef }: ProjectApiVariables, signal?: Abort
   return data
 }
 
-type ProjectApiData = Awaited<ReturnType<typeof getProjectApi>>
+export type ProjectApiData = Awaited<ReturnType<typeof getProjectApi>>
 type ProjectApiError = ResponseError
 
 export function useProjectApiQuery<TData = ProjectApiData>(

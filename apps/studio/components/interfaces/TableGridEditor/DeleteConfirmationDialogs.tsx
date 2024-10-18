@@ -1,10 +1,9 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
+import { toast } from 'sonner'
 
-import type { SupaRow } from 'components/grid'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
+import type { SupaRow } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
@@ -12,11 +11,13 @@ import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-muta
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
 import { useGetTables } from 'data/tables/tables-query'
-import { useUrlState } from 'hooks'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import type { TableLike } from 'hooks/misc/useTable'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { noop } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type DeleteConfirmationDialogsProps = {
@@ -30,6 +31,7 @@ const DeleteConfirmationDialogs = ({
 }: DeleteConfirmationDialogsProps) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+  const { selectedSchema } = useQuerySchemaState()
 
   const [{ filter }, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
   const filters = formatFilterURLParams(filter as string[])
@@ -76,7 +78,7 @@ const DeleteConfirmationDialogs = ({
   })
   const { mutate: deleteTable } = useTableDeleteMutation({
     onSuccess: async () => {
-      const tables = await getTables(snap.selectedSchemaName)
+      const tables = await getTables(selectedSchema)
       onAfterDeleteTable(tables)
       toast.success(`Successfully deleted table "${selectedTable?.name}"`)
     },

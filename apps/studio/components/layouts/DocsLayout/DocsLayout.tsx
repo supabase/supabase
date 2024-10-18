@@ -6,9 +6,11 @@ import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeatureP
 import Error from 'components/ui/Error'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
-import { useIsFeatureEnabled, useSelectedProject, withAuth } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
-import { ProjectLayout } from '../'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDocsMenu } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
@@ -30,9 +32,9 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   const getPage = () => {
     if (router.pathname.endsWith('graphiql')) return 'graphiql'
 
-    const { page, resource } = router.query
-    if (!page && !resource) return 'introduction'
-    return (page || resource || '') as string
+    const { page, rpc, resource } = router.query
+    if (!page && !resource && !rpc) return 'introduction'
+    return (page || rpc || resource || '') as string
   }
 
   if (error) {

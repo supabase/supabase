@@ -1,25 +1,26 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import {
-  SmtpForm,
-  BasicAuthSettingsForm,
   AdvancedAuthSettingsForm,
+  BasicAuthSettingsForm,
+  SmtpForm,
+  ThirdPartyAuthForm,
 } from 'components/interfaces/Auth'
-import { SettingsLayout } from 'components/layouts'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
   ScaffoldHeader,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const AuthSettings: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
+  // TODO: check if these permissions cover third party auth as well
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
   return (
@@ -40,6 +41,7 @@ const AuthSettings: NextPageWithLayout = () => {
             <BasicAuthSettingsForm />
             <SmtpForm />
             <AdvancedAuthSettingsForm />
+            <ThirdPartyAuthForm />
           </>
         )}
       </ScaffoldContainer>

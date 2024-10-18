@@ -1,3 +1,4 @@
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
@@ -6,7 +7,9 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
-import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Organization } from 'types'
 import {
@@ -18,9 +21,6 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
-  IconCheck,
-  IconCode,
-  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -41,9 +41,11 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
     // [Joshen] Ideally we shouldn't use hard coded numbers, but temp workaround
     // for storage bucket route since its longer
     const isStorageBucketRoute = 'bucketId' in routerQueries
+    const isSecurityAdvisorRoute = 'preset' in routerQueries
+
     return route
       .split('/')
-      .slice(0, isStorageBucketRoute ? 5 : 4)
+      .slice(0, isStorageBucketRoute || isSecurityAdvisorRoute ? 5 : 4)
       .join('/')
   } else {
     return route
@@ -78,7 +80,7 @@ const ProjectLink = ({
     >
       <Link href={href} className="w-full flex items-center justify-between">
         {project.name}
-        {project.ref === ref && <IconCheck />}
+        {project.ref === ref && <Check size={16} />}
       </Link>
     </CommandItem_Shadcn_>
   )
@@ -118,13 +120,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
     <div className="flex items-center px-2">
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            type="text"
-            className="pr-2"
-            iconRight={
-              <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
-            }
-          >
+          <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
             <div className="flex items-center space-x-2">
               <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</p>
             </div>
@@ -161,7 +157,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
                         }}
                         className="w-full flex items-center gap-2"
                       >
-                        <IconPlus size={14} strokeWidth={1.5} />
+                        <Plus size={14} strokeWidth={1.5} />
                         <p>New project</p>
                       </Link>
                     </CommandItem_Shadcn_>

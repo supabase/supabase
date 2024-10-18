@@ -1,50 +1,46 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { isArray } from 'lodash'
+import { Check, ChevronRight, ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import type { OrgPlan, SubscriptionTier } from 'data/subscriptions/types'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import {
-  Button,
-  IconCheck,
-  IconChevronRight,
-  IconExternalLink,
-  IconInfo,
-  Modal,
-  SidePanel,
-  cn,
-} from 'ui'
+import { Button, Modal, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
-import UpgradeSurveyModal from './UpgradeModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
-import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import UpgradeSurveyModal from './UpgradeModal'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
+
+  const queryClient = useQueryClient()
 
   const originalPlanRef = useRef<string>()
 
@@ -120,18 +116,6 @@ const PlanUpdateSidePanel = () => {
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Change Subscription Plan',
-            section: 'Subscription plan',
-          },
-          ...(slug && { orgSlug: slug }),
-        },
-        router
-      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
@@ -158,6 +142,20 @@ const PlanUpdateSidePanel = () => {
       return toast.error('Please select a payment method')
     }
 
+    if (selectedPaymentMethod) {
+      queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          defaultPaymentMethodId: selectedPaymentMethod,
+          data: prev.data.map((pm: any) => ({
+            ...pm,
+            is_default: pm.id === selectedPaymentMethod,
+          })),
+        }
+      })
+    }
+
     // If the user is downgrading from team, should have spend cap disabled by default
     const tier =
       subscription?.plan?.id === 'team' && selectedTier === PRICING_TIER_PRODUCT_IDS.PRO
@@ -181,7 +179,7 @@ const PlanUpdateSidePanel = () => {
         header={
           <div className="flex items-center justify-between">
             <h4>Change subscription plan for {selectedOrganization?.name}</h4>
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
                 Pricing
               </Link>
@@ -248,56 +246,25 @@ const PlanUpdateSidePanel = () => {
                         Current plan
                       </Button>
                     ) : (
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger asChild>
-                          <div>
-                            <Button
-                              block
-                              disabled={
-                                // No self-serve downgrades from Enterprise
-                                subscription?.plan?.id === 'enterprise' || !canUpdateSubscription
-                              }
-                              type={isDowngradeOption ? 'default' : 'primary'}
-                              onClick={() => {
-                                setSelectedTier(plan.id as any)
-                                Telemetry.sendActivity(
-                                  {
-                                    activity: 'Popup Viewed',
-                                    source: 'Dashboard',
-                                    data: {
-                                      title: isDowngradeOption
-                                        ? 'Downgrade'
-                                        : 'Upgrade' + ' to ' + plan.name,
-                                      section: 'Subscription plan',
-                                    },
-                                    ...(slug && { orgSlug: slug }),
-                                  },
-                                  router
-                                )
-                              }}
-                            >
-                              {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
-                            </Button>
-                          </div>
-                        </Tooltip.Trigger>
-                        {!canUpdateSubscription ? (
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">
-                                  You do not have permission to change the subscription plan.
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        ) : null}
-                      </Tooltip.Root>
+                      <ButtonTooltip
+                        block
+                        type={isDowngradeOption ? 'default' : 'primary'}
+                        disabled={subscription?.plan?.id === 'enterprise' || !canUpdateSubscription}
+                        onClick={() => setSelectedTier(plan.id as any)}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text:
+                              subscription?.plan?.id === 'enterprise'
+                                ? 'Reach out to us via support to update your plan from Enterprise'
+                                : !canUpdateSubscription
+                                  ? 'You do not have permission to change the subscription plan'
+                                  : undefined,
+                          },
+                        }}
+                      >
+                        {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
+                      </ButtonTooltip>
                     )}
 
                     <div className="border-t my-4" />
@@ -309,7 +276,7 @@ const PlanUpdateSidePanel = () => {
                           className="flex py-2"
                         >
                           <div className="w-[12px]">
-                            <IconCheck
+                            <Check
                               className="h-3 w-3 text-brand translate-y-[2.5px]"
                               aria-hidden="true"
                               strokeWidth={3}
@@ -400,7 +367,7 @@ const PlanUpdateSidePanel = () => {
                                 type="text"
                                 className="!pl-0 !pr-1"
                                 icon={
-                                  <IconChevronRight
+                                  <ChevronRight
                                     className={cn(
                                       'transition',
                                       usageFeesExpanded.includes(item.description) && 'rotate-90'
@@ -474,7 +441,7 @@ const PlanUpdateSidePanel = () => {
               <InformationBox
                 className="mt-4"
                 title="Usage-billing for Compute"
-                icon={<IconInfo />}
+                icon={<Info />}
                 defaultVisibility={true}
                 hideCollapse={true}
                 description={
@@ -489,13 +456,13 @@ const PlanUpdateSidePanel = () => {
                     {subscription?.plan?.id === 'free' && (
                       <p className="text-sm mt-2">
                         Mixing paid and non-paid projects in a single organization is not possible.
-                        If you want projects to be on the free plan, use self-serve project
+                        If you want projects to be on the Free Plan, use self-serve project
                         transfers.
                       </p>
                     )}
 
                     <div className="space-x-3 mt-2">
-                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                      <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                         <Link
                           href="https://supabase.com/docs/guides/platform/org-based-billing"
                           target="_blank"
@@ -505,11 +472,7 @@ const PlanUpdateSidePanel = () => {
                         </Link>
                       </Button>
                       {subscription?.plan?.id === 'free' && (
-                        <Button
-                          asChild
-                          type="default"
-                          icon={<IconExternalLink strokeWidth={1.5} />}
-                        >
+                        <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                           <Link
                             href="https://supabase.com/docs/guides/platform/project-transfer"
                             target="_blank"

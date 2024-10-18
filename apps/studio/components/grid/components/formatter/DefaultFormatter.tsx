@@ -1,8 +1,8 @@
 import * as React from 'react'
 import type { RenderCellProps } from 'react-data-grid'
 import type { SupaRow } from '../../types'
-import { NullValue } from '../common'
 import { EmptyValue } from '../common/EmptyValue'
+import { NullValue } from '../common/NullValue'
 
 export const DefaultFormatter = (p: React.PropsWithChildren<RenderCellProps<SupaRow, unknown>>) => {
   let value = p.row[p.column.key]

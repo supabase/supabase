@@ -45,8 +45,7 @@ export const generateTableFieldFromPostgresTable = (
     id: table.id,
     name: isDuplicating ? `${table.name}_duplicate` : table.name,
     comment: isDuplicating ? `This is a duplicate of ${table.name}` : table?.comment ?? '',
-    // @ts-ignore
-    columns: (table?.columns ?? []).map((column: PostgresColumn) => {
+    columns: (table.columns ?? []).map((column: PostgresColumn) => {
       return generateColumnFieldFromPostgresColumn(column, table, foreignKeys)
     }),
     isRLSEnabled: table.rls_enabled,

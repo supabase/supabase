@@ -1,4 +1,4 @@
-import { IconX } from 'ui'
+import { X } from 'lucide-react'
 
 /**
  * @deprecated Use ./multi-select instead
@@ -34,7 +34,7 @@ export const BadgeSelected = ({
     onClick={(e: any) => e.preventDefault()}
   >
     <span>{name}</span>
-    <IconX
+    <X
       size={12}
       className="cursor-pointer opacity-50 transition hover:opacity-100"
       onClick={(e: any) => {

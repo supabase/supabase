@@ -57,9 +57,9 @@ At the callback endpoint, handle the code exchange to save the user session.
 Create a new file at `app/auth/callback/route.ts` and populate with the following:
 
 ```ts app/auth/callback/route.ts
-import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { type CookieOptions, createServerClient } from '@supabase/ssr'
+// The client you created from the Server-Side Auth instructions
+import { createClient } from '@/utils/supabase/server'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -68,27 +68,19 @@ export async function GET(request: Request) {
   const next = searchParams.get('next') ?? '/'
 
   if (code) {
-    const cookieStore = cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          },
-          set(name: string, value: string, options: CookieOptions) {
-            cookieStore.set({ name, value, ...options })
-          },
-          remove(name: string, options: CookieOptions) {
-            cookieStore.delete({ name, ...options })
-          },
-        },
-      }
-    )
+    const supabase = createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
+      const isLocalEnv = process.env.NODE_ENV === 'development'
+      if (isLocalEnv) {
+        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
+        return NextResponse.redirect(`${origin}${next}`)
+      } else if (forwardedHost) {
+        return NextResponse.redirect(`https://${forwardedHost}${next}`)
+      } else {
+        return NextResponse.redirect(`${origin}${next}`)
+      }
     }
   }
 
@@ -132,7 +124,7 @@ export const GET = async (event) => {
 Create a new file at `src/pages/auth/callback.ts` and populate with the following:
 
 ```ts src/pages/auth/callback.ts
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
 import { type APIRoute } from 'astro'
 
 export const GET: APIRoute = async ({ request, cookies, redirect }) => {
@@ -146,14 +138,13 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
       import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
       {
         cookies: {
-          get(key) {
-            return cookies.get(key)?.value
+          getAll() {
+            return parseCookieHeader(Astro.request.headers.get('Cookie') ?? '')
           },
-          set(key, value, options) {
-            cookies.set(key, value, options)
-          },
-          remove(key, options) {
-            cookies.delete(key, options)
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              Astro.cookies.set(name, value, options)
+            )
           },
         },
       }
@@ -179,7 +170,7 @@ Create a new file at `app/routes/auth.callback.tsx` and populate with the follow
 
 ```ts app/routes/auth.callback.tsx
 import { redirect, type LoaderFunctionArgs } from '@remix-run/node'
-import { createServerClient, parse, serialize } from '@supabase/ssr'
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url)
@@ -191,14 +182,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const cookies = parse(request.headers.get('Cookie') ?? '')
     const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
       cookies: {
-        get(key) {
-          return cookies[key]
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
         },
-        set(key, value, options) {
-          headers.append('Set-Cookie', serialize(key, value, options))
-        },
-        remove(key, options) {
-          headers.append('Set-Cookie', serialize(key, '', options))
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          )
         },
       },
     })
@@ -227,7 +217,20 @@ app.get("/auth/callback", async function (req, res) {
   const next = req.query.next ?? "/"
 
   if (code) {
-    const supabase = createClient({ req, res })
+    const supabase = createServerClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_ANON_KEY, {
+    cookies: {
+      getAll() {
+        return parseCookieHeader(context.req.headers.cookie ?? '')
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value, options))
+        )
+      },
+    },
+  })
     await supabase.auth.exchangeCodeForSession(code)
   }
 

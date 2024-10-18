@@ -1,4 +1,5 @@
-import { prettyDOM, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import { test } from 'vitest'
 
 import { ApiReport } from 'pages/project/[ref]/reports/api-overview'
 import { render } from '../../../helpers'

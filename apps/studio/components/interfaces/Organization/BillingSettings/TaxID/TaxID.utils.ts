@@ -1,7 +1,7 @@
 import { TAX_IDS } from './TaxID.constants'
 
-export const sanitizeTaxIdValue = (taxId: { type: string; value: string }) => {
-  const selectedTaxId = TAX_IDS.find((option) => option.type === taxId.type)
+export const sanitizeTaxIdValue = (taxId: { name: string; value: string }) => {
+  const selectedTaxId = TAX_IDS.find((option) => option.name === taxId.name)
 
   const vatIdPrefix = selectedTaxId?.vatPrefix
 

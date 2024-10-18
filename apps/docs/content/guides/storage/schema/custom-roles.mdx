@@ -6,7 +6,7 @@ subtitle: 'Learn about using custom roles with storage schema'
 sidebar_label: 'Schema'
 ---
 
-In this guide, you will learn how to create and use custom roles with Storage to manage role-based access to objects and buckets.
+In this guide, you will learn how to create and use custom roles with Storage to manage role-based access to objects and buckets. The same approach can be used to use custom roles with any other Supabase service.
 
 Supabase Storage uses the same role-based access control system as any other Supabase service using RLS (Row Level Security).
 
@@ -32,7 +32,7 @@ on storage.objects
 for select
 to manager
 using (
- bucker_id = 'teams'
+ bucket_id = 'teams'
 );
 ```
 

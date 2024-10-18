@@ -1,16 +1,22 @@
 import createGlobe from 'cobe'
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useTheme } from 'next-themes'
+import { debounce } from 'lodash'
 
 const Globe = () => {
   const { resolvedTheme } = useTheme()
   const canvasRef = useRef<any>()
 
+  let rotation: number = 0
+  let width: number = 0
+  const onResize = useCallback(
+    () => canvasRef.current && (width = canvasRef.current.offsetWidth),
+    [resolvedTheme]
+  )
+
   useEffect(() => {
-    let rotation: number = 0
-    let width: number = 0
-    const onResize = () => canvasRef.current && (width = canvasRef.current.offsetWidth)
-    window.addEventListener('resize', onResize)
+    const debouncedResize = debounce(onResize, 10)
+    window.addEventListener('resize', debouncedResize)
     onResize()
     const cobe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
@@ -50,24 +56,17 @@ const Globe = () => {
         state.height = width * 2
       },
     })
-    setTimeout(() => (canvasRef.current.style.opacity = '1'))
+    setTimeout(() => (canvasRef.current.style.opacity = '0.8'), 10)
     return () => {
-      cobe.destroy()
       window.removeEventListener('resize', onResize)
+      cobe.destroy()
     }
   }, [resolvedTheme])
 
   return (
     <canvas
       ref={canvasRef}
-      style={{
-        width: '100%',
-        height: '100%',
-        contain: 'layout paint size',
-        opacity: 0,
-        transition: 'opacity 1s ease',
-        borderRadius: '100%',
-      }}
+      className="absolute inset-0 w-full h-full opacity-0 transition-opacity object-contain"
     />
   )
 }

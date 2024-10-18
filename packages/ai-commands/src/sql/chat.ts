@@ -1,8 +1,8 @@
 import { OpenAIStream } from 'ai'
 import { codeBlock, oneLine, stripIndent } from 'common-tags'
-import OpenAI from 'openai'
+import type OpenAI from 'openai'
 import { ContextLengthError } from '../errors'
-import { Message } from '../types'
+import type { Message } from '../types'
 
 /**
  * Responds to a conversation about writing a SQL query.
@@ -58,7 +58,7 @@ export async function chatSql(
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
+      model: 'gpt-4o-mini-2024-07-18',
       messages: initMessages,
       max_tokens: 1024,
       temperature: 0,

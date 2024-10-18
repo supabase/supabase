@@ -1,11 +1,12 @@
 'use client'
 
 import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { DialogProps } from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import * as React from 'react'
 
-import { cn } from '../../../lib/utils/cn'
 import { VariantProps, cva } from 'class-variance-authority'
+import { cn } from '../../../lib/utils/cn'
 
 export const DIALOG_PADDING_Y_SMALL = 'py-4'
 export const DIALOG_PADDING_X_SMALL = 'px-5'
@@ -42,7 +43,7 @@ const DialogOverlay = React.forwardRef<
     ref={ref}
     className={cn(
       'bg-black/40 backdrop-blur-sm',
-      'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-open:animate-overlay-show data-closed:animate-overlay-hide',
+      'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-closed:animate-overlay-hide',
       className
     )}
     {...props}
@@ -54,12 +55,12 @@ const DialogContentVariants = cva(
   cn(
     'my-8',
     'relative z-50 grid w-full border shadow-md dark:shadow-sm duration-200',
-    'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+    'data-[state=open]:animate-in data-[state=closed]:animate-out',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-    'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%',
+    'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',
     'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
     'sm:rounded-lg md:w-full',
-    'bg-200'
+    'bg-dash-sidebar'
   ),
   {
     variants: {
@@ -188,7 +189,11 @@ const DialogSection = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof DialogPaddingVariants>
 >(({ className, children, padding, ...props }, ref) => (
-  <div ref={ref} {...props} className={cn(DialogPaddingVariants({ padding }), className)}>
+  <div
+    ref={ref}
+    {...props}
+    className={cn(DialogPaddingVariants({ padding }), 'overflow-hidden', className)}
+  >
     {children}
   </div>
 ))
@@ -204,13 +209,14 @@ DialogSectionSeparator.displayName = 'DialogSectionSeparator'
 
 export {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
-  DialogClose,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger,
   DialogSection,
   DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+  type DialogProps,
 }

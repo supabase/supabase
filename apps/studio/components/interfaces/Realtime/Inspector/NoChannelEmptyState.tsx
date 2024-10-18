@@ -1,4 +1,5 @@
-import { Button, IconExternalLink } from 'ui'
+import { ExternalLink } from 'lucide-react'
+import { Button } from 'ui'
 
 const NoChannelEmptyState = () => {
   return (
@@ -17,7 +18,7 @@ const NoChannelEmptyState = () => {
           <p className="text-foreground">Not sure what to do?</p>
           <p className="text-foreground-lighter text-xs">Browse our documentation</p>
         </div>
-        <Button type="default" iconRight={<IconExternalLink />}>
+        <Button type="default" iconRight={<ExternalLink />}>
           <a href="https://supabase.com/docs/guides/realtime" target="_blank" rel="noreferrer">
             Documentation
           </a>

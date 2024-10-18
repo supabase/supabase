@@ -3,8 +3,9 @@ import { type ICommand } from './Command'
 type ICommandSection = {
   id: string
   name: string
-  forceMount: boolean
   commands: Array<ICommand>
+  forceMount?: boolean
+  meta?: any
 }
 
 const toSectionId = (str: string) => str.toLowerCase().replace(/\s+/g, '-')

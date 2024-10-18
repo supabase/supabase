@@ -2,6 +2,9 @@
 /packages/shared-data/plans.ts @roryw10 @kevcodez
 
 /apps/studio/ @supabase/Dashboard
-/apps/www/ @supabase/Website
-/apps/www/_blog
+
+/apps/www/ @supabase/marketing
+/apps/www/public/images/blog @supabase/marketing
+/apps/www/lib/redirects.js
+
 /docker/ @supabase/cli

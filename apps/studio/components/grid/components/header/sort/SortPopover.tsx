@@ -1,12 +1,12 @@
-import { useUrlState } from 'hooks'
 import update from 'immutability-helper'
 import { isEqual } from 'lodash'
 import { ChevronDown, List } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
-import { DropdownControl } from 'components/grid/components/common'
+import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import type { Sort, SupaTable } from 'components/grid/types'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -42,10 +42,7 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type={(sorts || []).length > 0 ? 'link' : 'text'}
-          icon={<List strokeWidth={1.5} className="text-foreground-light" />}
-        >
+        <Button type={(sorts || []).length > 0 ? 'link' : 'text'} icon={<List />}>
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
@@ -72,6 +69,11 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayPr
   const [sorts, setSorts] = useState<Sort[]>(initialSorts)
 
   const columns = table.columns!.filter((x) => {
+    // exclude json/jsonb columns from sorting. Sorting by json fields in PG is only possible if you provide key from
+    // the JSON object.
+    if (x.dataType === 'json' || x.dataType === 'jsonb') {
+      return false
+    }
     const found = sorts.find((y) => y.column == x.name)
     return !found
   })

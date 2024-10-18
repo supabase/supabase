@@ -53,25 +53,9 @@ Any table **without RLS enabled** in the `public` schema will be accessible to t
 
 </Admonition>
 
-## Safeguards towards accidental deletes and updates
+## Disable the API or restrict to custom schema
 
-By default, all projects have the [safeupdate](https://github.com/eradman/pg-safeupdate) Postgres extension enabled for API queries. This ensures that `delete()` and `update()` requests will fail if there are no filters provided.
-
-To confirm that safeupdate is enabled for API queries, run the following query:
-
-```sql
-select
-  usename,
-  useconfig
-from pg_shadow
-where usename = 'authenticator';
-```
-
-The expected value for `useconfig` should be:
-
-```javascript
-;['session_preload_libraries=supautils, safeupdate']
-```
+If you don't use the Data API, or if you don't want to expose the `public` schema, you can either disable it entirely or change the automatically exposed schema to one of your choice. See **[Hardening the Data API](/docs/guides/database/hardening-data-api)** for instructions.
 
 ## Enforce additional rules on each request
 

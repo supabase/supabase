@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { type ICommandSection, section$new } from '../CommandSection'
 import { initCommandsState, orderSectionFirst, type ICommandsState } from './commandsState'
 

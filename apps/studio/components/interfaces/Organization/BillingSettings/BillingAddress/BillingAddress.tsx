@@ -1,8 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect } from 'react'
-import toast from 'react-hot-toast'
-import { Form, Input, Listbox } from 'ui'
+import { toast } from 'sonner'
 
 import {
   ScaffoldSection,
@@ -10,24 +9,22 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { Form, Input, Listbox } from 'ui'
 import { COUNTRIES } from './BillingAddress.constants'
 
 const BillingAddress = () => {
   const { slug } = useParams()
-  const { data, error, isLoading, isSuccess, isError } = useOrganizationCustomerProfileQuery({
-    slug,
-  })
-  const { mutate: updateCustomerProfile, isLoading: isUpdating } =
-    useOrganizationCustomerProfileUpdateMutation()
-
-  const formId = 'billing-address-form'
-  const { city, country, line1, line2, postal_code, state } = data?.address ?? {}
+  const selectedOrganization = useSelectedOrganization()
 
   const canReadBillingAddress = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -38,6 +35,15 @@ const BillingAddress = () => {
     'stripe.customer'
   )
 
+  const { data, error, isLoading, isSuccess, isError } = useOrganizationCustomerProfileQuery(
+    { slug },
+    { enabled: canReadBillingAddress }
+  )
+  const { mutate: updateCustomerProfile, isLoading: isUpdating } =
+    useOrganizationCustomerProfileUpdateMutation()
+
+  const formId = 'billing-address-form'
+  const { city, country, line1, line2, postal_code, state } = data?.address ?? {}
   const initialValues = { city, country, line1, line2, postal_code, state }
 
   const validate = (values: any) => {
@@ -84,7 +90,16 @@ const BillingAddress = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!canReadBillingAddress ? (
+        {selectedOrganization?.managed_by !== undefined &&
+        selectedOrganization?.managed_by !== 'supabase' ? (
+          <PartnerManagedResource
+            partner={selectedOrganization?.managed_by}
+            resource="Billing Addresses"
+            cta={{
+              installationId: selectedOrganization?.partner_id,
+            }}
+          />
+        ) : !canReadBillingAddress ? (
           <NoPermission resourceText="view this organization's billing address" />
         ) : (
           <>

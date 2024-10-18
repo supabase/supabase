@@ -1,12 +1,14 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { organizationKeys } from './keys'
-import type { ResponseError } from 'types'
-import { get, handleError } from 'data/fetchers'
+
 import { components } from 'api-types'
+import { get, handleError } from 'data/fetchers'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import type { ResponseError } from 'types'
+import { organizationKeys } from './keys'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
-export type OrganizationPaymentMethodsResponse = components['schemas']['PaymentsResponseV2']
-export type OrganizationPaymentMethod = components['schemas']['PaymentV2']
+export type OrganizationPaymentMethod = components['schemas']['Payment']
 
 export async function getOrganizationPaymentMethods(
   { slug }: OrganizationPaymentMethodsVariables,
@@ -25,11 +27,9 @@ export async function getOrganizationPaymentMethods(
     },
     signal,
   })
-  if (error) handleError(error)
 
-  // Due to API versioning, this is not correctly recognized until the old endpoint is removed
-  // @ts-ignore
-  return data as OrganizationPaymentMethodsResponse
+  if (error) handleError(error)
+  return data
 }
 
 export type OrganizationPaymentMethodsData = Awaited<
@@ -43,9 +43,14 @@ export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMe
     enabled = true,
     ...options
   }: UseQueryOptions<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData> = {}
-) =>
-  useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>(
+) => {
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.payment_methods'
+  )
+  return useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>(
     organizationKeys.paymentMethods(slug),
     ({ signal }) => getOrganizationPaymentMethods({ slug }, signal),
-    { enabled: enabled, ...options }
+    { enabled: enabled && typeof slug !== 'undefined' && canReadSubscriptions, ...options }
   )
+}

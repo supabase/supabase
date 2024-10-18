@@ -1,7 +1,8 @@
 import ColumnType from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnType'
 import useLatest from 'hooks/misc/useLatest'
+import { X } from 'lucide-react'
 import { useEffect, useReducer } from 'react'
-import { Button, IconX, Input } from 'ui'
+import { Button, Input } from 'ui'
 
 export type SimpleColumn = {
   id: number
@@ -130,16 +131,15 @@ const WrapperDynamicColumns = ({
                   value={column.type}
                   enumTypes={[]}
                   onOptionSelect={(value) => onUpdateValue(column.id, 'type', value)}
-                  layout="vertical"
                   className="[&_label]:!p-0"
                 />
               </div>
 
               <Button
-                onClick={() => onRemoveColumn(column.id)}
-                icon={<IconX size={14} strokeWidth={1.5} />}
                 type="outline"
-                className="self-end -translate-y-1 !px-2 !py-2"
+                icon={<X strokeWidth={1.5} />}
+                onClick={() => onRemoveColumn(column.id)}
+                className="self-end -translate-y-1.5 px-1.5"
               />
             </div>
 

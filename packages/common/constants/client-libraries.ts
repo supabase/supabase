@@ -136,8 +136,8 @@ export const CLIENT_LIBRARIES = [
         url: 'https://github.com/supabase-community/supabase-kt/tree/master/Postgrest',
       },
       {
-        name: 'gotrue-kt',
-        url: 'https://github.com/supabase-community/supabase-kt/tree/master/GoTrue',
+        name: 'auth-kt',
+        url: 'https://github.com/supabase-community/supabase-kt/tree/master/Auth',
       },
       {
         name: 'storage-kt',
@@ -156,31 +156,31 @@ export const CLIENT_LIBRARIES = [
   {
     language: 'Python',
     key: 'python',
-    is_officially_supported: false,
+    is_officially_supported: true,
     libraries: [
       {
         name: 'supabase-py',
-        url: 'https://github.com/supabase-community/supabase-py',
+        url: 'https://github.com/supabase/supabase-py',
       },
       {
         name: 'postgrest-py',
-        url: 'https://github.com/supabase-community/postgrest-py',
+        url: 'https://github.com/supabase/postgrest-py',
       },
       {
         name: 'gotrue-py',
-        url: 'https://github.com/supabase-community/gotrue-py',
+        url: 'https://github.com/supabase/gotrue-py',
       },
       {
         name: 'realtime-py',
-        url: 'https://github.com/supabase-community/realtime-py',
+        url: 'https://github.com/supabase/realtime-py',
       },
       {
         name: 'storage-py',
-        url: 'https://github.com/supabase-community/storage-py',
+        url: 'https://github.com/supabase/storage-py',
       },
       {
         name: 'functions-py',
-        url: 'https://github.com/supabase-community/functions-py',
+        url: 'https://github.com/supabase/functions-py',
       },
     ],
   },

@@ -41,6 +41,9 @@ import express from 'npm:express@4.18.2'
 
 const app = express()
 app.use(express.json())
+// If you want a payload larger than 100kb, then you can tweak it here:
+// app.use( express.json({ limit : "300kb" }));
+
 const port = 3000
 
 app.get('/hello-world', (req, res) => {

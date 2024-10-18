@@ -1,4 +1,4 @@
-import { ident, literal } from 'pg-format'
+import { ident, literal } from './pg-format'
 import { z } from 'zod'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
@@ -213,7 +213,7 @@ function _generateCreateFunctionSql(
         ? Object.entries(config_params)
             .map(
               ([param, value]: string[]) =>
-                `SET ${param} ${value[0] === 'FROM CURRENT' ? 'FROM CURRENT' : 'TO ' + value}`
+                `SET ${param} ${value[0] === 'FROM CURRENT' ? 'FROM CURRENT' : 'TO ' + (value === '""' ? "''" : value)}`
             )
             .join('\n')
         : ''

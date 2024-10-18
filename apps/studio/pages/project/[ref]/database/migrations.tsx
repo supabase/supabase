@@ -1,16 +1,16 @@
 import { ExternalLink } from 'lucide-react'
 
 import Migrations from 'components/interfaces/Database/Migrations/Migrations'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
-import { FormHeader } from 'components/ui/Forms'
 
 const MigrationsPage: NextPageWithLayout = () => {
   return (
@@ -24,7 +24,7 @@ const MigrationsPage: NextPageWithLayout = () => {
           />
         </ScaffoldSectionContent>
         <ScaffoldSectionDetail className="flex items-center justify-end gap-x-2">
-          <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <a
               target="_blank"
               rel="noreferrer"

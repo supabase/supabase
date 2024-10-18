@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
@@ -13,7 +11,7 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -44,15 +42,18 @@ const InfrastructureInfo = () => {
     projectRef: ref,
   })
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
-  const { current_app_version, latest_app_version, requires_manual_intervention } = data || {}
+  const { current_app_version, current_app_version_release_channel, latest_app_version } =
+    data || {}
   const isOnLatestVersion = current_app_version === latest_app_version
   const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
+  const isOnNonGenerallyAvailableReleaseChannel =
+    current_app_version_release_channel && current_app_version_release_channel !== 'ga'
+      ? current_app_version_release_channel
+      : undefined
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
-  const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
-  const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
 
   return (
     <>
@@ -110,6 +111,19 @@ const InfrastructureInfo = () => {
                       value={currentPgVersion}
                       label="Postgres version"
                       actions={[
+                        isOnNonGenerallyAvailableReleaseChannel && (
+                          <Tooltip_Shadcn_>
+                            <TooltipTrigger_Shadcn_>
+                              <Badge variant="warning" className="mr-1 capitalize">
+                                {isOnNonGenerallyAvailableReleaseChannel}
+                              </Badge>
+                            </TooltipTrigger_Shadcn_>
+                            <TooltipContent_Shadcn_ side="bottom" className="w-44 text-center">
+                              This project uses a {isOnNonGenerallyAvailableReleaseChannel} database
+                              version release
+                            </TooltipContent_Shadcn_>
+                          </Tooltip_Shadcn_>
+                        ),
                         isOnLatestVersion && (
                           <Tooltip_Shadcn_>
                             <TooltipTrigger_Shadcn_>
@@ -131,30 +145,8 @@ const InfrastructureInfo = () => {
                           A new version of Postgres is available for your project
                         </AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_>
-                          You will need to remove all read replicas first prior to upgrading your
-                          Postgrest version to the latest available ({latestPgVersion}).
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
-                    {!data?.eligible && data?.requires_manual_intervention && (
-                      <Alert_Shadcn_ title="A new version of Postgres is available for your project">
-                        <AlertTitle_Shadcn_>
-                          A new version of Postgres is available for your project
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          <p className="mb-3">
-                            Please reach out to us via our support form if you are keen to upgrade
-                            your Postgres version to the latest available ({latestPgVersion}).
-                          </p>
-                          <Button size="tiny" type="default" asChild>
-                            <Link
-                              href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              Contact support
-                            </Link>
-                          </Button>
+                          You will need to remove all read replicas prior to upgrading your Postgres
+                          version to the latest available ({latestPgVersion}).
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
                     )}

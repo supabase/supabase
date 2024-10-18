@@ -1,15 +1,15 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
-import { Button, IconArrowRight } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableQuery } from 'data/tables/table-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 import type { SupaRow } from '../../types'
-import { NullValue } from '../common'
+import { NullValue } from '../common/NullValue'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
   projectRef?: string
@@ -18,7 +18,7 @@ interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
 
 export const ForeignKeyFormatter = (props: Props) => {
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+  const { selectedSchema } = useQuerySchemaState()
 
   const { projectRef, tableId, row, column } = props
   const id = tableId ? Number(tableId) : undefined
@@ -53,40 +53,24 @@ export const ForeignKeyFormatter = (props: Props) => {
         {value === null ? <NullValue /> : value}
       </span>
       {relationship !== undefined && targetTable !== undefined && value !== null && (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
+        <Tooltip_Shadcn_ delayDuration={0}>
+          <TooltipTrigger_Shadcn_ asChild>
             <Button
+              asChild
               type="default"
               size="tiny"
               className="translate-y-[2px]"
-              onClick={() => {}}
               style={{ padding: '3px' }}
-              asChild
             >
               <Link
-                href={`/project/${projectRef}/editor/${targetTable?.id}?filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
-                onClick={() => snap.setSelectedSchemaName(relationship.target_table_schema)}
+                href={`/project/${projectRef}/editor/${targetTable?.id}?schema=${selectedSchema}&filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
               >
-                <IconArrowRight size="tiny" />
+                <ArrowRight size={14} />
               </Link>
             </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">View referencing record</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">View referencing record</TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
       )}
     </div>
   )

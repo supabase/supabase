@@ -5,21 +5,21 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Raminder Singh at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 10 Apr 2024 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Wed, 10 Apr 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-raminder_singh-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/postgres-roles-and-privileges</guid>
   <title>Postgres Roles and Privileges</title>
   <link>https://supabase.com/blog/postgres-roles-and-privileges</link>
   <description>A guide to Postgres roles and privileges</description>
-  <pubDate>Wed, 10 Apr 2024 16:00:00 GMT</pubDate>
+  <pubDate>Wed, 10 Apr 2024 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/how-pg-graphql-works</guid>
   <title>How pg_graphql works</title>
   <link>https://supabase.com/blog/how-pg-graphql-works</link>
   <description>An insight into the internals of GraphQL in Postgres using pg_graphql, and how you can contribute.</description>
-  <pubDate>Tue, 23 Jan 2024 16:00:00 GMT</pubDate>
+  <pubDate>Tue, 23 Jan 2024 23:00:00 GMT</pubDate>
 </item>
 
     </channel>

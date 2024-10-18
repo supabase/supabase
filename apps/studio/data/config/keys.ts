@@ -11,4 +11,16 @@ export const configKeys = {
     ['projects', projectRef, 'upgrade-eligibility'] as const,
   upgradeStatus: (projectRef: string | undefined) =>
     ['projects', projectRef, 'upgrade-status'] as const,
+  diskAttributes: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'disk-attributes'] as const,
+  diskUtilization: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'disk-utilization'] as const,
+  projectCreationPostgresVersions: (
+    organizationSlug: string | undefined,
+    cloudProvider: string,
+    dbRegion: string
+  ) =>
+    ['projects', organizationSlug, cloudProvider, dbRegion, 'available-creation-versions'] as const,
+  projectUnpausePostgresVersions: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'available-unpause-versions'] as const,
 }

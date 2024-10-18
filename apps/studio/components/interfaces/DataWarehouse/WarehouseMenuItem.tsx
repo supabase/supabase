@@ -1,38 +1,32 @@
-import { EllipsisHorizontalIcon } from '@heroicons/react/16/solid'
-import { useParams } from 'common'
-import { useDeleteCollectionMutation, useUpdateCollection } from 'data/analytics'
-import { EditIcon, TrashIcon } from 'lucide-react'
-import Link from 'next/link'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Database, EditIcon, TrashIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
+
+import { useParams } from 'common'
+import { useDeleteCollectionMutation } from 'data/analytics/warehouse-collections-delete-mutation'
+import { useUpdateCollection } from 'data/analytics/warehouse-collections-update-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
-  Button,
-  Checkbox_Shadcn_,
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormLabel_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
   Modal,
-  cn,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { FormMessage } from '@ui/components/shadcn/ui/form'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { LogsSidebarItem } from '../Settings/Logs/SidebarV2/SidebarItem'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { CollectionForm } from './CollectionForm'
 
 type Props = {
   item: {
     id: number
     token: string
     name: string
+    retention_days: number
   }
 }
 
@@ -43,6 +37,8 @@ export const WarehouseMenuItem = ({ item }: Props) => {
 
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const [showDeleteDialog, setDeleteDialog] = useState(false)
+
+  const canUpdateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
 
   const updateCollection = useUpdateCollection({
     onSuccess: () => {
@@ -63,75 +59,57 @@ export const WarehouseMenuItem = ({ item }: Props) => {
 
   const isLoading = updateCollection.isLoading || deleteCollection.isLoading
 
-  const UpdateFormSchema = z.object({
-    name: z.string().min(1, {
-      message: 'Collection name is required',
-    }),
-  })
-
-  const updateForm = useForm<z.infer<typeof UpdateFormSchema>>({
-    resolver: zodResolver(UpdateFormSchema),
-  })
-
-  const DeleteFormSchema = z.object({
-    confirm: z.boolean(),
-  })
-
-  const deleteForm = useForm<z.infer<typeof DeleteFormSchema>>({
-    resolver: zodResolver(DeleteFormSchema),
-  })
-
   return (
     <>
-      <Link
-        className={cn(
-          'pr-1 h-7 pl-3 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
-          'flex items-center justify-between rounded-md group relative',
-          item.token === router.query.collectionToken
-            ? 'bg-surface-300 text-foreground'
-            : 'hover:bg-surface-200'
-        )}
-        key={item.token + '-collection-item'}
+      <LogsSidebarItem
+        isActive={item.token === collectionToken}
+        label={item.name}
+        icon={<Database size="14" className="text-foreground-light" />}
         href={`/project/${projectRef}/logs/collections/${item.token}`}
-      >
-        <div>{item.name}</div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              loading={isLoading}
-              type="text"
-              className="px-1 opacity-50 hover:opacity-100 !bg-transparent"
-              icon={<EllipsisHorizontalIcon />}
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            onClick={(e) => {
-              e.stopPropagation()
-            }}
-            align="start"
-            className="w-52 *:space-x-2"
-          >
-            <DropdownMenuItem
-              onClick={() => {
-                setShowUpdateDialog(true)
-              }}
-            >
-              <EditIcon size="14" />
-              <div>Rename</div>
-            </DropdownMenuItem>
+        dropdownItems={
+          <>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <DropdownMenuItem
+                  disabled={!canUpdateCollection}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setShowUpdateDialog(true)
+                  }}
+                >
+                  <EditIcon className="mr-2" size={14} />
+                  <div>Update collection</div>
+                </DropdownMenuItem>
+              </TooltipTrigger_Shadcn_>
+              {!canUpdateCollection && (
+                <TooltipContent_Shadcn_ side="right">
+                  You need additional permissions to update collections
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={async () => {
-                setDeleteDialog(true)
-              }}
-            >
-              <TrashIcon size="14" />
-              <div>Delete</div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </Link>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <DropdownMenuItem
+                  disabled={!canUpdateCollection}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setDeleteDialog(true)
+                  }}
+                >
+                  <TrashIcon className="mr-2" size={14} />
+                  <div>Delete collection</div>
+                </DropdownMenuItem>
+              </TooltipTrigger_Shadcn_>
+              {!canUpdateCollection && (
+                <TooltipContent_Shadcn_ side="right">
+                  You need additional permissions to delete collections
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
+          </>
+        }
+      ></LogsSidebarItem>
 
       <Modal
         size="medium"
@@ -140,105 +118,37 @@ export const WarehouseMenuItem = ({ item }: Props) => {
         hideFooter
         header={`Update collection "${item.name}"`}
       >
-        <Form_Shadcn_ {...updateForm}>
-          <form
-            id="update-collection-form"
-            onSubmit={updateForm.handleSubmit((data) =>
-              updateCollection.mutate({
-                projectRef,
-                collectionToken: item.token,
-                name: data.name,
-              })
-            )}
-          >
-            <Modal.Content className="space-y-6 py-6">
-              <FormField_Shadcn_
-                control={updateForm.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItemLayout label="Collection name">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ type="text" {...field} />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </Modal.Content>
-            <FormMessage />
-            <div className="flex gap-2 justify-end p-3 border-t">
-              <Button
-                disabled={isLoading}
-                type="outline"
-                onClick={() => {
-                  setShowUpdateDialog(false)
-                }}
-                htmlType="reset"
-              >
-                Cancel
-              </Button>
-              <Button htmlType="submit" loading={isLoading}>
-                Update collection
-              </Button>
-            </div>
-          </form>
-        </Form_Shadcn_>
+        <CollectionForm
+          onCancelClick={() => setShowUpdateDialog(false)}
+          isLoading={isLoading}
+          initialValues={{ name: item.name, retention_days: item.retention_days }}
+          onSubmit={({ name, retention_days }) => {
+            updateCollection.mutate({
+              projectRef,
+              collectionToken: item.token,
+              name,
+              retention_days,
+            })
+          }}
+        />
       </Modal>
-      <Modal
+      <ConfirmationModal
+        variant="destructive"
         visible={showDeleteDialog}
         onCancel={() => setDeleteDialog(false)}
-        hideFooter
-        header={`Remove collection "${item.name}"`}
+        confirmLabel="Delete collection"
+        title={`Delete collection "${item.name}"`}
         size="small"
+        onConfirm={() => {
+          deleteCollection.mutate({ projectRef, collectionToken: item.token })
+        }}
       >
-        <Form_Shadcn_ {...deleteForm}>
-          <form
-            id="delete-collection-form"
-            onSubmit={deleteForm.handleSubmit(() => {
-              deleteCollection.mutate({ projectRef, collectionToken: item.token })
-            })}
-          >
-            <div className="p-3 space-y-4">
-              <p className="text-sm text-foreground-light">
-                Are you sure you want to delete the selected collection?
-                <br /> This action cannot be undone.
-              </p>
-              <div className="flex items-center my-2">
-                <FormField_Shadcn_
-                  control={deleteForm.control}
-                  name="confirm"
-                  render={({ field }) => (
-                    <FormItemLayout>
-                      <FormControl_Shadcn_>
-                        <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl_Shadcn_>
-                      <FormLabel_Shadcn_ className="p-2">
-                        Yes, I want to delete <span className="font-medium">{item.name}</span>.
-                      </FormLabel_Shadcn_>
-                      <FormMessage />
-                    </FormItemLayout>
-                  )}
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-2 justify-end p-3 border-t">
-              <Button
-                disabled={isLoading}
-                type="outline"
-                onClick={() => {
-                  setDeleteDialog(false)
-                }}
-                htmlType="reset"
-              >
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit" loading={isLoading}>
-                Delete
-              </Button>
-            </div>
-          </form>
-        </Form_Shadcn_>
-      </Modal>
+        <p className="text-sm text-foreground-light">
+          All data in this collection will be deleted.
+          <br />
+          <div className="mt-2">This action cannot be undone.</div>
+        </p>
+      </ConfirmationModal>
     </>
   )
 }

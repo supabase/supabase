@@ -1,10 +1,9 @@
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
+import { X } from 'lucide-react'
 import { useMemo } from 'react'
-import { Button, IconX, cn } from 'ui'
 
 import CopyButton from 'components/ui/CopyButton'
-import Telemetry from 'lib/telemetry'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { Button, cn } from 'ui'
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
 
@@ -14,22 +13,21 @@ export interface MessageSelectionProps {
 }
 
 const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
-  const telemetryProps = useTelemetryProps()
-  const router = useRouter()
-
   const selectionText = useMemo(() => {
     return JSON.stringify(log, null, 2)
   }, [log])
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   return (
     <div
       className={cn(
-        'relative flex h-full flex-grow flex-col border-l border-t-2 overflow-y-scroll bg-gray-200'
+        'relative flex h-full flex-grow flex-col border-l border-t-2 overflow-y-scroll bg-200'
       )}
     >
       <div
         className={cn(
-          'absolute flex h-full w-full flex-col items-center justify-center gap-2 bg-scale-200 text-center opacity-0 transition-all',
+          'absolute flex h-full w-full flex-col items-center justify-center gap-2 bg-200 text-center opacity-0 transition-all',
           log ? 'z-0 opacity-0' : 'z-10 opacity-100'
         )}
       >
@@ -59,7 +57,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <h3 className="text-sm text-foreground">Select an message</h3>
+            <h3 className="text-sm text-foreground">Select a message</h3>
             <p className="text-xs text-foreground-lighter">
               Click on a message on the left to view details.
             </p>
@@ -75,15 +73,11 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
                 type="default"
                 title="Copy log to clipboard"
                 onClick={() => {
-                  Telemetry.sendEvent(
-                    {
-                      category: 'realtime_inspector',
-                      action: 'copied_message',
-                      label: 'realtime_inspector_results',
-                    },
-                    telemetryProps,
-                    router
-                  )
+                  sendEvent({
+                    category: 'realtime_inspector',
+                    action: 'copied_message',
+                    label: 'realtime_inspector_results',
+                  })
                 }}
               />
             </div>
@@ -92,7 +86,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
               className="cursor-pointer transition hover:text-scale-1200 h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
-              <IconX size={14} strokeWidth={2} className="text-scale-900" />
+              <X size={14} strokeWidth={2} className="text-scale-900" />
             </Button>
           </div>
           <div className="h-px w-full bg-scale-600 rounded" />

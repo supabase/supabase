@@ -7,7 +7,7 @@ export function deepClone(obj: unknown) {
 }
 
 export function formatClipboardValue(value: any) {
-  if (value === null) return ''
+  if (!value) return ''
   if (typeof value == 'object' || Array.isArray(value)) {
     return JSON.stringify(value)
   }

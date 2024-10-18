@@ -1,5 +1,5 @@
 import { cn, CodeBlock } from 'ui'
-import { PreviewLogData } from '..'
+import type { PreviewLogData } from '../Logs.types'
 import { SelectionDetailedTimestampRow } from '../LogsFormatters'
 
 const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => (

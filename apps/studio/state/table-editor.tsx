@@ -1,13 +1,13 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import type { SupaRow } from 'components/grid'
-import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
-import { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import type { SupaRow } from 'components/grid/types'
+import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
+import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { PropsWithChildren, createContext, useContext, useRef } from 'react'
 import type { Dictionary } from 'types'
 import { proxy, useSnapshot } from 'valtio'
 
-type ForeignKey = {
-  foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+type ForeignKeyState = {
+  foreignKey: ForeignKey
   row: Dictionary<any>
   column: PostgresColumn
 }
@@ -21,7 +21,7 @@ export type SidePanel =
   | { type: 'json'; jsonValue: EditValue }
   | {
       type: 'foreign-row-selector'
-      foreignKey: ForeignKey
+      foreignKey: ForeignKeyState
     }
   | { type: 'csv-import' }
 
@@ -54,9 +54,9 @@ export type UIState =
 
 export const createTableEditorState = () => {
   const state = proxy({
-    selectedSchemaName: 'public',
-    setSelectedSchemaName: (schemaName: string) => {
-      state.selectedSchemaName = schemaName
+    enforceExactCount: false,
+    setEnforceExactCount: (value: boolean) => {
+      state.enforceExactCount = value
     },
 
     page: 1,
@@ -177,7 +177,7 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'cell', value: { column, row } },
       }
     },
-    onEditForeignKeyColumnValue: (foreignKey: ForeignKey) => {
+    onEditForeignKeyColumnValue: (foreignKey: ForeignKeyState) => {
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'foreign-row-selector', foreignKey },

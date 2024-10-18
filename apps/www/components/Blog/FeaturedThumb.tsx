@@ -22,7 +22,7 @@ function FeaturedThumb(blog: PostTypes) {
     <div key={blog.slug} className="w-full">
       <Link
         href={`${blog.path}`}
-        className="grid gap-4 lg:grid-cols-7 lg:gap-8 xl:gap-12 hover:bg-overlay border border-transparent hover:border-overlay p-2 sm:p-4 rounded-xl"
+        className="grid gap-4 lg:grid-cols-7 lg:gap-8 xl:gap-12 hover:bg-surface-200 dark:hover:bg-surface-75 p-2 sm:p-4 rounded-xl"
       >
         <div className="relative w-full aspect-[2/1] lg:col-span-3 lg:aspect-[3/2] overflow-auto rounded-lg border">
           <Image
@@ -36,7 +36,7 @@ function FeaturedThumb(blog: PostTypes) {
         </div>
         <div className="flex flex-col space-y-2 lg:col-span-4 xl:justify-center max-w-xl">
           <div className="text-lighter flex space-x-2 text-sm">
-            <span>{blog.date}</span>
+            <span>{blog.formattedDate}</span>
             <span>•</span>
             <span>{blog.readingTime}</span>
           </div>

@@ -3,6 +3,7 @@ id: 'sveltekit'
 title: 'Supabase Auth with SvelteKit'
 description: 'Convenience helpers for implementing user authentication in SvelteKit.'
 sidebar_label: 'SvelteKit'
+sitemapPriority: 0.5
 ---
 
 <Admonition type="caution">
@@ -20,7 +21,7 @@ We generally recommend using the new `@supabase/ssr` package instead of `auth-he
   className="text-foreground-light border-b mt-8 pb-2"
   >
   
-  <Accordion.Item
+  <AccordionItem
         header="See legacy docs"
         id="legacy-docs"
       >
@@ -2031,6 +2032,6 @@ export const GET: RequestHandler = withAuth(async ({ session, getSupabaseClient 
 - [Auth Helpers Source code](https://github.com/supabase/auth-helpers)
 - [SvelteKit example](https://github.com/supabase/auth-helpers/tree/main/examples/sveltekit)
 
-</Accordion.Item>
+</AccordionItem>
 
 </Accordion>
