@@ -42,7 +42,10 @@ const PolicyTableRowHeader = ({
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
       <div className="flex gap-x-4 text-left">
-        <Link href={`/project/${ref}/editor/${table.id}?schema=${table.schema}`}> className="flex items-center gap-x-2">
+        <Link
+          href={`/project/${ref}/editor/${table.id}?schema=${table.schema}`}
+          className="flex items-center gap-x-2"
+        >
           {table.rls_enabled ? (
             <div className="flex items-center gap-x-1 text-xs">
               <Lock size={14} strokeWidth={2} className="text-brand" />
