@@ -20,7 +20,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
   const [flags, setFlags] = useState({
     [LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT]: false,
     [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: false,
-    [LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT]: false,
     [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: false,
   })
 
@@ -31,8 +30,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
           localStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT) === 'true',
         [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]:
           localStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL) === 'true',
-        [LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT]:
-          localStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT) === 'true',
         [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]:
           localStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS) === 'true',
       })
@@ -58,11 +55,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
 export const useIsAPIDocsSidePanelEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]
-}
-
-export const useIsRLSAIAssistantEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT]
 }
 
 export const useIsColumnLevelPrivilegesEnabled = () => {

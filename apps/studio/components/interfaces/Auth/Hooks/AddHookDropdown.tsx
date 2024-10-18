@@ -37,7 +37,7 @@ export const AddHookDropdown = ({
     { enabled: IS_PLATFORM }
   )
   const { data: authConfig } = useAuthConfigQuery({ projectRef })
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateAuthHook = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
 
   const hooks: Hook[] = HOOKS_DEFINITIONS.map((definition) => {
     return {
@@ -56,7 +56,7 @@ export const AddHookDropdown = ({
   const isTeamsOrEnterprisePlan =
     subscription?.plan.id === 'team' || subscription?.plan.id === 'enterprise'
 
-  if (!canUpdateConfig) {
+  if (!canUpdateAuthHook) {
     return (
       <ButtonTooltip
         disabled
@@ -77,54 +77,53 @@ export const AddHookDropdown = ({
           {buttonText}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-76 p-0" align="end">
-        <div className="p-1">
+      <DropdownMenuContent className="w-76" align="end">
+        <div>
           {nonEnterpriseHookOptions.map((h) => (
             <DropdownMenuItem key={h.title} onClick={() => onSelectHook(h.title)}>
               {h.title}
             </DropdownMenuItem>
           ))}
         </div>
-        {nonEnterpriseHookOptions.length > 0 && <DropdownMenuSeparator />}
 
-        <div className="bg-surface-200 p-1 -mt-2">
-          {!isTeamsOrEnterprisePlan && (
-            <DropdownMenuLabel className="grid gap-1 bg-surface-200">
-              <p className="text-foreground-light">Team or Enterprise Plan required</p>
-              <p className="text-foreground-lighter text-xs">
-                The following hooks are not available on{' '}
-                <a
-                  target="_href"
-                  href={`https://supabase.com/dashboard/org/${organization?.slug ?? '_'}/billing`}
-                  className="underline"
-                >
-                  your plan
-                </a>
-                .
-              </p>
-            </DropdownMenuLabel>
-          )}
-          {enterpriseHookOptions.map((h) =>
-            isTeamsOrEnterprisePlan ? (
-              <DropdownMenuItem
-                key={h.title}
-                disabled={!isTeamsOrEnterprisePlan}
-                className=""
-                onClick={() => onSelectHook(h.title)}
+        <DropdownMenuSeparator />
+
+        {!isTeamsOrEnterprisePlan && (
+          <DropdownMenuLabel className="grid gap-1 bg-surface-200">
+            <p className="text-foreground-light">Team or Enterprise Plan required</p>
+            <p className="text-foreground-lighter text-xs">
+              The following hooks are not available on{' '}
+              <a
+                target="_href"
+                href={`https://supabase.com/dashboard/org/${organization?.slug ?? '_'}/billing`}
+                className="underline"
               >
-                {h.title}
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem
-                key={h.title}
-                disabled={!isTeamsOrEnterprisePlan}
-                onClick={() => onSelectHook(h.title)}
-              >
-                {h.title}
-              </DropdownMenuItem>
-            )
-          )}
-        </div>
+                your plan
+              </a>
+              .
+            </p>
+          </DropdownMenuLabel>
+        )}
+        {enterpriseHookOptions.map((h) =>
+          isTeamsOrEnterprisePlan ? (
+            <DropdownMenuItem
+              key={h.title}
+              disabled={!isTeamsOrEnterprisePlan}
+              className=""
+              onClick={() => onSelectHook(h.title)}
+            >
+              {h.title}
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem
+              key={h.title}
+              disabled={!isTeamsOrEnterprisePlan}
+              onClick={() => onSelectHook(h.title)}
+            >
+              {h.title}
+            </DropdownMenuItem>
+          )
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

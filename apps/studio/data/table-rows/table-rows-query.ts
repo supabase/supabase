@@ -21,8 +21,8 @@ import {
   useExecuteSqlQuery,
 } from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
-import { formatFilterValue } from './utils'
 import { THRESHOLD_COUNT } from './table-rows-count-query'
+import { formatFilterValue } from './utils'
 
 type GetTableRowsArgs = {
   table?: SupaTable
@@ -70,7 +70,16 @@ export const fetchAllTableRows = async ({
   const rows: any[] = []
   const query = new Query()
 
-  let queryChains = query.from(table.name, table.schema ?? undefined).select()
+  const arrayBasedColumns = table.columns
+    .filter(
+      (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+    )
+    .map((column) => `"${column.name}"::text[]`)
+
+  let queryChains = query
+    .from(table.name, table.schema ?? undefined)
+    .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
+
   filters
     .filter((filter) => filter.value && filter.value !== '')
     .forEach((filter) => {
@@ -224,8 +233,8 @@ export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
       isRoleImpersonationEnabled,
     },
     {
-      select(data) {
-        const rows = data.result.map((x: any, index: number) => {
+      select(data: { result: Record<string, any>[] }) {
+        const rows = data.result.map((x, index) => {
           return { idx: index, ...x } as SupaRow
         })
 

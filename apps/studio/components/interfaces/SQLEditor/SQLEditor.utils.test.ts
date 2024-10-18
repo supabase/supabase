@@ -5,6 +5,7 @@ import {
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
+import { describe, test, expect, it } from 'vitest'
 
 describe('SQLEditor.utils.ts:checkIfAppendLimitRequired', () => {
   test('Should return false if limit passed is <= 0', () => {

@@ -201,6 +201,26 @@ parameters:
       - name: 'PgBouncer Configuration'
         link: https://www.pgbouncer.org/config.html#max_client_conn
 
+  - id: 'db.seed.enabled'
+    title: 'db.seed.enabled'
+    tags: ['database']
+    required: false
+    default: 'true'
+    description: |
+      Enables running seeds when starting or resetting the database.
+    links: []
+
+  - id: 'db.seed.sql_paths'
+    title: 'db.seed.sql_paths'
+    tags: ['database']
+    required: false
+    default: '["./seed.sql"]'
+    description: |
+      An array of files or glob patterns to find seeds in.
+    links:
+      - name: 'Seeding your database'
+        link: 'https://supabase.com/docs/guides/cli/seeding-your-database'
+
   - id: 'realtime.enabled'
     title: 'realtime.enabled'
     tags: ['realtime']

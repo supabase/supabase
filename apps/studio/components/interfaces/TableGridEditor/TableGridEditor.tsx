@@ -11,7 +11,6 @@ import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { Loading } from 'components/ui/Loading'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import {
   ForeignKeyConstraint,
@@ -32,6 +31,7 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary, SchemaView } from 'types'
 import { Button } from 'ui'
 import GridHeaderActions from './GridHeaderActions'
+import { TableGridSkeletonLoader } from './LoadingState'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import { useEncryptedColumns } from './SidePanelEditor/SidePanelEditor.utils'
@@ -138,7 +138,7 @@ const TableGridEditor = ({
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable) {
-    return <Loading />
+    return <TableGridSkeletonLoader />
   }
 
   if (isUndefined(selectedTable)) {

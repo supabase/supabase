@@ -6,10 +6,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { Prism, themes, Highlight, Language } from 'prism-react-renderer'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import { Button, copyToClipboard } from 'ui'
 import { useTheme } from 'next-themes'
+import { Highlight, Language, Prism, themes } from 'prism-react-renderer'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { copyToClipboard } from '../../lib/utils'
+import { Button } from '../Button'
 import { dart } from './prism'
 
 dart(Prism)

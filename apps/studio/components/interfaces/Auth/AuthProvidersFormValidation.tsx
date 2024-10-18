@@ -177,7 +177,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
   })
 }
 
-const PROVIDER_PHONE = {
+export const PROVIDER_PHONE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Phone',
@@ -1383,7 +1383,7 @@ const PROVIDER_SAML = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'SAML 2.0',
-  link: 'https://supabase.com/docs/guides/auth/enterprise-sso',
+  link: 'https://supabase.com/docs/guides/auth/enterprise-sso/auth-sso-saml',
   properties: {
     SAML_ENABLED: {
       title: 'Enable SAML 2.0 Single Sign-on',

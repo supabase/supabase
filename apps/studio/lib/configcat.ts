@@ -18,5 +18,8 @@ function getClient() {
 }
 
 export async function getFlags(user?: User) {
-  return getClient().getAllValuesAsync(new configcat.User(user?.email ?? ''))
+  if (user) {
+    return getClient().getAllValuesAsync(new configcat.User(user?.email ?? ''))
+  }
+  return []
 }

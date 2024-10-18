@@ -48,6 +48,7 @@ import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
+import { useContentUpdateMutation } from 'data/content/content-update-mutation'
 
 const PLACEHOLDER_WAREHOUSE_QUERY =
   '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
@@ -145,7 +146,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       })
       setWarehouseEditorValue(q)
     }
-  }, [])
+  }, [q])
 
   useEffect(() => {
     let newWarnings = []
@@ -260,6 +261,21 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   function handleOnSave() {
+    // if we have a queryId, we are editing a saved query
+    const queryId = router.query.queryId as string
+    if (queryId) {
+      updateContent({
+        projectRef: projectRef!,
+        id: queryId,
+        type: 'log_sql',
+        content: {
+          sql: editorValue,
+        },
+      })
+
+      return
+    }
+
     setSaveModalOpen(!saveModalOpen)
   }
 
@@ -291,6 +307,19 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     onSuccess: (values) => {
       setSaveModalOpen(false)
       toast.success(`Saved "${values[0].name}" log query`)
+    },
+  })
+
+  const { mutate: updateContent } = useContentUpdateMutation({
+    onError: (e) => {
+      const error = e as { message: string }
+      console.error(error)
+      setSaveModalOpen(false)
+      toast.error(`Failed to update query: ${error.message}`)
+    },
+    onSuccess: (values) => {
+      setSaveModalOpen(false)
+      toast.success(`Updated "${values[0].name}" log query`)
     },
   })
 

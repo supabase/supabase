@@ -1,6 +1,6 @@
 import type { Content, Paragraph, Root } from 'mdast'
 import type { MdxJsxFlowElement } from 'mdast-util-mdx'
-import type { AdmonitionProps } from 'ui'
+import type { AdmonitionProps } from 'ui-patterns/admonition'
 import type { Node } from 'unist'
 import { visit } from 'unist-util-visit'
 

@@ -1,12 +1,12 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { del, handleError } from 'data/fetchers'
+import { sqlKeys } from 'data/sql/keys'
+import { useFlag } from 'hooks/ui/useFlag'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 import type { User } from './users-query'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export type UserDeleteVariables = {
   projectRef: string
@@ -14,9 +14,12 @@ export type UserDeleteVariables = {
 }
 
 export async function deleteUser({ projectRef, user }: UserDeleteVariables) {
-  const response = await delete_(`${API_URL}/auth/${projectRef}/users`, user)
-  if (response.error) throw response.error
-  return response
+  const { data, error } = await del('/platform/auth/{ref}/users', {
+    params: { path: { ref: projectRef } },
+    body: user,
+  })
+  if (error) handleError(error)
+  return data
 }
 
 type UserDeleteData = Awaited<ReturnType<typeof deleteUser>>
@@ -39,7 +42,12 @@ export const useUserDeleteMutation = ({
         const { projectRef } = variables
 
         if (userManagementV2) {
-          await queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))
+          await Promise.all([
+            queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
+            queryClient.invalidateQueries(
+              sqlKeys.query(projectRef, authKeys.usersCount(projectRef))
+            ),
+          ])
         } else {
           await queryClient.invalidateQueries(authKeys.users(projectRef))
         }

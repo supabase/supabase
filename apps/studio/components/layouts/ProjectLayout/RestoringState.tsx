@@ -97,40 +97,43 @@ const RestoringState = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-6 py-6">
-            <div className="flex px-8 space-x-8">
-              <div className="mt-1">
-                <Loader className="animate-spin" size={18} />
-              </div>
-              <div className="space-y-1">
-                <p>Restoration in progress</p>
-                <p className="text-sm text-foreground-light">
-                  Restoration can take from a few minutes up to several hours depending on the size
-                  of your database. Your project will be offline while the restoration is running.
-                </p>
+          <>
+            <div className="space-y-6 py-6">
+              <div className="flex px-8 space-x-8">
+                <div className="mt-1">
+                  <Loader className="animate-spin" size={18} />
+                </div>
+                <div className="space-y-1">
+                  <p>Restoration in progress</p>
+                  <p className="text-sm text-foreground-light">
+                    Restoration can take from a few minutes up to several hours depending on the
+                    size of your database. Your project will be offline while the restoration is
+                    running.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+            <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
+              <Button asChild type="default">
+                <Link
+                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
+                >
+                  Contact support
+                </Link>
+              </Button>
+              <ButtonTooltip
+                type="default"
+                icon={<Download />}
+                loading={isDownloading}
+                disabled={backups.length === 0}
+                tooltip={{ content: { side: 'bottom', text: 'No available backups to download' } }}
+                onClick={onClickDownloadBackup}
+              >
+                Download backup
+              </ButtonTooltip>
+            </div>
+          </>
         )}
-        <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
-          <Button asChild type="default">
-            <Link
-              href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
-            >
-              Contact support
-            </Link>
-          </Button>
-          <ButtonTooltip
-            type="default"
-            icon={<Download />}
-            loading={isDownloading}
-            disabled={backups.length === 0}
-            tooltip={{ content: { side: 'bottom', text: 'No available backups to download' } }}
-            onClick={onClickDownloadBackup}
-          >
-            Download backup
-          </ButtonTooltip>
-        </div>
       </div>
     </div>
   )
