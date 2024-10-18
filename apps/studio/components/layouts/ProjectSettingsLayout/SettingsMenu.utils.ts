@@ -35,6 +35,16 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Compute and Disk',
+                key: 'compute-and-disk',
+                url: `/project/${ref}/settings/compute-and-disk`,
+                items: [],
+              },
+            ]
+          : []),
         {
           name: 'Infrastructure',
           key: 'infrastructure',
@@ -51,14 +61,12 @@ export const generateSettingsMenu = (
               },
             ]
           : []),
-        ...[
-          {
-            name: 'Add Ons',
-            key: 'addons',
-            url: `/project/${ref}/settings/addons`,
-            items: [],
-          },
-        ],
+        {
+          name: 'Add Ons',
+          key: 'addons',
+          url: `/project/${ref}/settings/addons`,
+          items: [],
+        },
         {
           name: 'Vault',
           key: 'vault',

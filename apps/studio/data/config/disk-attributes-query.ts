@@ -7,6 +7,7 @@ import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { COOLDOWN_DURATION } from './disk-attributes-update-mutation'
 import { configKeys } from './keys'
+import database from 'mime-db'
 
 export type DiskAttributesVariables = {
   projectRef?: string
