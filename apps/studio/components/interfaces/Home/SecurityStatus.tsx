@@ -82,11 +82,11 @@ export const SecurityStatus = () => {
                 return (
                   lints.length > 0 && (
                     <>
-                      <Link href={`/project/${ref}/database/security-advisor?preset=${level}`}>
-                        <div
-                          key={level}
-                          className="group flex items-center justify-between w-full px-3 py-3 transition hover:bg-surface-300"
-                        >
+                      <Link
+                        key={level}
+                        href={`/project/${ref}/database/security-advisor?preset=${level}`}
+                      >
+                        <div className="group flex items-center justify-between w-full px-3 py-3 transition hover:bg-surface-300">
                           <div className="flex gap-x-3">
                             <div>
                               <StatusDot level={level} />
