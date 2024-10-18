@@ -31,14 +31,18 @@ To get started:
 You can use the `get` subcommand of the CLI to check whether SSL is currently being enforced:
 
 ```bash
-> supabase ssl-enforcement --project-ref {ref} get --experimental
+supabase ssl-enforcement --project-ref {ref} get --experimental
+```
+
+Response if SSL is being enforced:
+
+```bash
 SSL is being enforced.
 ```
 
-Or similarly, if SSL is not being enforced, you will see:
+Response if SSL is not being enforced:
 
 ```bash
-> supabase ssl-enforcement --project-ref {ref} get --experimental
 SSL is *NOT* being enforced.
 ```
 
@@ -47,15 +51,13 @@ SSL is *NOT* being enforced.
 The `update` subcommand is used to change the SSL enforcement status for your project:
 
 ```bash
-> supabase ssl-enforcement --project-ref {ref} update --enable-db-ssl-enforcement --experimental
-SSL is now being enforced.
+supabase ssl-enforcement --project-ref {ref} update --enable-db-ssl-enforcement --experimental
 ```
 
 Similarly, to disable SSL enforcement:
 
 ```bash
-> supabase ssl-enforcement --project-ref {ref} update --disable-db-ssl-enforcement --experimental
-SSL is *NOT* being enforced.
+supabase ssl-enforcement --project-ref {ref} update --disable-db-ssl-enforcement --experimental
 ```
 
 ### A note about Postgres SSL modes
@@ -67,11 +69,11 @@ The strongest mode offered by Postgres is `verify-full` and this is the mode you
 Once the CA certificate has been downloaded, add it to the certificate authority list used by Postgres.
 
 ```bash
-> cat {location of downloaded prod-ca-2021.crt} >> ~/.postgres/root.crt
+cat {location of downloaded prod-ca-2021.crt} >> ~/.postgres/root.crt
 ```
 
 With the CA certificate added to the trusted certificate authorities list, use `psql` or your client library to connect to Supabase:
 
 ```bash
-> psql "postgresql://aws-0-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=verify-full" -U postgres.<user>
+psql "postgresql://aws-0-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=verify-full" -U postgres.<user>
 ```
