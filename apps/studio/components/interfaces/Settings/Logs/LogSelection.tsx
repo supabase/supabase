@@ -119,9 +119,8 @@ const LogSelection = ({
         return <AuthSelectionRenderer log={fullLog} />
 
       case 'workflow_run':
-        if (!fullLog) return null
-        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
-        return <WorkflowRunSelectionRenderer log={fullLog} />
+        if (!partialLog) return null
+        return <WorkflowRunSelectionRenderer log={partialLog} />
 
       default:
         if (queryType && fullLog && isDefaultLogPreviewFormat(fullLog)) {
