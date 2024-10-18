@@ -5,17 +5,12 @@
   "author": "Supabase, Inc.",
   "license": "Apache-2.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "apps/docs/spec/parser",
-    "tests",
-    "playwright-tests",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "tests", "playwright-tests", "packages/*"],
   "scripts": {
     "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
     "build:design-system": "turbo run build --filter=design-system",
+    "clean": "turbo run clean --parallel && rimraf node_modules",
     "dev": "turbo run dev --parallel",
     "dev:reference": "turbo run dev --filter=reference --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
@@ -45,6 +40,7 @@
     "eslint": "^8.57.0",
     "prettier": "^4.0.0-alpha.8",
     "prettier-plugin-sql-cst": "^0.11.0",
+    "rimraf": "^6.0.0",
     "sass": "^1.72.0",
     "supabase": "^1.151.1",
     "turbo": "2.0.4"
@@ -57,13 +53,6 @@
     "npm": "^10.0.0",
     "node": "^20.0.0"
   },
-  "keywords": [
-    "postgres",
-    "firebase",
-    "storage",
-    "functions",
-    "database",
-    "auth"
-  ],
+  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "packageManager": "npm@10.7.0"
 }
