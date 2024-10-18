@@ -6,7 +6,7 @@ import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 import { VariantProps, cva } from 'class-variance-authority'
 
-import { cn, Badge, Checkbox_Shadcn_ as Checkbox, useOnClickOutside } from 'ui'
+import { cn, Badge, useOnClickOutside } from 'ui'
 import {
   Command,
   CommandEmpty,
@@ -96,58 +96,6 @@ function MultiSelector({
     }
   })
 
-  // const handleKeyDown = React.useCallback(
-  //   (e: React.KeyboardEvent<HTMLDivElement>) => {
-  //     const moveNext = () => {
-  //       const nextIndex = activeIndex + 1
-  //       setActiveIndex(nextIndex > values.length - 1 ? (loop ? 0 : -1) : nextIndex)
-  //     }
-
-  //     const movePrev = () => {
-  //       const prevIndex = activeIndex - 1
-  //       setActiveIndex(prevIndex < 0 ? values.length - 1 : prevIndex)
-  //     }
-
-  //     if ((e.key === 'Backspace' || e.key === 'Delete') && values.length > 0) {
-  //       if (inputValue.length === 0) {
-  //         if (activeIndex !== -1 && activeIndex < values.length) {
-  //           onValuesChange(values.filter((item) => item !== values[activeIndex]))
-  //           const newIndex = activeIndex - 1 < 0 ? 0 : activeIndex - 1
-  //           setActiveIndex(newIndex)
-  //         } else {
-  //           onValuesChange(values.filter((item) => item !== values[values.length - 1]))
-  //         }
-  //       }
-  //     } else if (e.key === 'Enter') {
-  //       if (open) {
-  //         inputValue.length !== 0 && setInputValue('')
-  //       } else {
-  //         setOpen(true)
-  //       }
-  //     } else if (e.key === 'Escape') {
-  //       if (activeIndex !== -1) {
-  //         setActiveIndex(-1)
-  //       } else {
-  //         setOpen(false)
-  //       }
-  //     } else if (dir === 'rtl') {
-  //       // !open && setOpen(true)
-  //       if (e.key === 'ArrowRight') {
-  //         movePrev()
-  //       } else if (e.key === 'ArrowLeft' && (activeIndex !== -1 || loop)) {
-  //         moveNext()
-  //       }
-  //     } else {
-  //       // !open && setOpen(true)
-  //       if (e.key === 'ArrowLeft') {
-  //         movePrev()
-  //       } else if (e.key === 'ArrowRight' && (activeIndex !== -1 || loop)) {
-  //         moveNext()
-  //       }
-  //     }
-  //   },
-  //   [values, inputValue, activeIndex, loop]
-  // )
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       const moveNext = () => {
@@ -265,51 +213,52 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
 
     const IS_BADGE_LIMIT_AUTO = badgeLimit === 'auto'
     const IS_BADGE_LIMIT_WRAP = badgeLimit === 'wrap'
+    const IS_NUMERIC_LIMIT = typeof badgeLimit === 'number'
     const IS_INLINE_MODE = mode === 'inline-combobox'
 
-    // const calculateVisibleBadges = React.useCallback(() => {
-    //   if (!inputRef?.current || !badgesRef.current) return
+    const calculateVisibleBadges = React.useCallback(() => {
+      if (!inputRef?.current || !badgesRef.current) return
 
-    //   const inputWidth = inputRef.current.offsetWidth
+      const inputWidth = inputRef.current.offsetWidth
 
-    //   const badgesContainer = badgesRef.current
-    //   const badges = Array.from(badgesContainer.children) as HTMLElement[]
-    //   let totalWidth = 0
-    //   let visibleCount = 0
+      const badgesContainer = badgesRef.current
+      const badges = Array.from(badgesContainer.children) as HTMLElement[]
+      let totalWidth = 0
+      let visibleCount = 0
 
-    //   const availableWidth = inputWidth - (showIcon ? 40 : 80)
-    //   for (let i = 0; i < values.length; i++) {
-    //     if (i < badges.length) {
-    //       totalWidth += badges[i].offsetWidth + 8 // 8px for gap
-    //     } else {
-    //       // Estimate width for badges not yet rendered
-    //       totalWidth += 0 // Approximate width of a badge
-    //     }
-    //     if (totalWidth > availableWidth) {
-    //       break
-    //     }
-    //     visibleCount++
-    //   }
-    //   setVisibleBadges(values.slice(0, visibleCount))
-    //   setExtraBadgesCount(Math.max(0, values.length - visibleCount))
-    // }, [values])
+      const availableWidth = inputWidth - (showIcon ? 40 : 80)
+      for (let i = 0; i < values.length; i++) {
+        if (i < badges.length) {
+          totalWidth += badges[i].offsetWidth + 8 // 8px for gap
+        } else {
+          // Estimate width for badges not yet rendered
+          totalWidth += 0 // Approximate width of a badge
+        }
+        if (totalWidth > availableWidth) {
+          break
+        }
+        visibleCount++
+      }
+      setVisibleBadges(values.slice(0, visibleCount))
+      setExtraBadgesCount(Math.max(0, values.length - visibleCount))
+    }, [values])
 
-    // React.useEffect(() => {
-    //   if (!inputRef?.current || !badgesRef.current) return
+    React.useEffect(() => {
+      if (!inputRef?.current || !badgesRef.current) return
 
-    //   if (IS_BADGE_LIMIT_AUTO) {
-    //     calculateVisibleBadges()
-    //     window.addEventListener('resize', calculateVisibleBadges)
-    //   } else if (IS_BADGE_LIMIT_WRAP) {
-    //     setVisibleBadges(values)
-    //     setExtraBadgesCount(0)
-    //   } else {
-    //     setVisibleBadges(values.slice(0, badgeLimit))
-    //     setExtraBadgesCount(Math.max(0, values.length - badgeLimit))
-    //   }
+      if (IS_BADGE_LIMIT_AUTO) {
+        calculateVisibleBadges()
+        window.addEventListener('resize', calculateVisibleBadges)
+      } else if (IS_BADGE_LIMIT_WRAP) {
+        setVisibleBadges(values)
+        setExtraBadgesCount(0)
+      } else {
+        setVisibleBadges(values.slice(0, badgeLimit))
+        setExtraBadgesCount(Math.max(0, values.length - badgeLimit))
+      }
 
-    //   return () => window.removeEventListener('resize', calculateVisibleBadges)
-    // }, [values, badgeLimit])
+      return () => window.removeEventListener('resize', calculateVisibleBadges)
+    }, [values, badgeLimit])
 
     const badgeClasses = 'rounded shrink-0 px-1.5'
 
@@ -355,7 +304,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
               'overflow-x-scroll scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
           )}
         >
-          {values.map((value) => (
+          {visibleBadges.map((value) => (
             <Badge key={value} className={badgeClasses}>
               {value}
               {deletableBadge && (
@@ -373,7 +322,13 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
               )}
             </Badge>
           ))}
-          {extraBadgesCount > 0 && <Badge className={badgeClasses}>+{extraBadgesCount}</Badge>}
+          {extraBadgesCount > 0 && (
+            <Badge className={badgeClasses}>
+              {IS_NUMERIC_LIMIT && badgeLimit < 1
+                ? `${extraBadgesCount} item${extraBadgesCount > 1 ? 's' : ''} selected`
+                : `+${extraBadgesCount}`}
+            </Badge>
+          )}
           {!IS_INLINE_MODE && (persistLabel || values.length === 0) && (
             <span className="text-foreground-muted whitespace-nowrap leading-[1.375rem] ml-1">
               {label}
