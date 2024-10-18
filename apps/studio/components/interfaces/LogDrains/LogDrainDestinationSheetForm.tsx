@@ -38,6 +38,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { urlRegex } from '../Auth/Auth.constants'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -62,6 +63,11 @@ const formUnion = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('bigquery'),
+  }),
+  z.object({
+    type: z.literal('loki'),
+    url: z.string().min(1, { message: 'Loki URL is required' }),
+    headers: z.record(z.string(), z.string()),
   }),
 ])
 
@@ -128,6 +134,7 @@ export function LogDrainDestinationSheetForm({
   onSubmit: (values: z.infer<typeof formSchema>) => void
   mode: 'create' | 'update'
 }) {
+  const lokiLogDrainsEnabled = useFlag('lokilogdrains')
   const CREATE_DEFAULT_HEADERS = {
     'Content-Type': 'application/json',
   }
@@ -197,6 +204,16 @@ export function LogDrainDestinationSheetForm({
     }
   }, [mode, open, form])
 
+  function getHeadersSectionDescription() {
+    if (type === 'webhook') {
+      return 'Set custom headers when draining logs to the Endpoint URL'
+    }
+    if (type === 'loki') {
+      return 'Set custom headers when draining logs to the Loki HTTP(S) endpoint'
+    }
+    return ''
+  }
+
   return (
     <Sheet
       open={open}
@@ -260,16 +277,18 @@ export function LogDrainDestinationSheetForm({
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
                       </SelectTrigger_Shadcn_>
                       <SelectContent_Shadcn_>
-                        {LOG_DRAIN_TYPES.map((type) => (
-                          <SelectItem_Shadcn_
-                            value={type.value}
-                            key={type.value}
-                            id={type.value}
-                            className="text-left"
-                          >
-                            {type.name}
-                          </SelectItem_Shadcn_>
-                        ))}
+                        {LOG_DRAIN_TYPES.map((type) =>
+                          type.value === 'loki' && !lokiLogDrainsEnabled ? null : (
+                            <SelectItem_Shadcn_
+                              value={type.value}
+                              key={type.value}
+                              id={type.value}
+                              className="text-left"
+                            >
+                              {type.name}
+                            </SelectItem_Shadcn_>
+                          )
+                        )}
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
                   </FormItemLayout>
@@ -309,7 +328,6 @@ export function LogDrainDestinationSheetForm({
                                 </FormItem_Shadcn_>
                               </RadioGroupCard>
                             </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
                           </FormItemLayout>
                         )}
                       />
@@ -332,36 +350,6 @@ export function LogDrainDestinationSheetForm({
                         </FormItem_Shadcn_>
                       )}
                     />
-
-                    <div className="border-t">
-                      <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
-                        <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
-                        <p className="text-xs text-foreground-lighter">
-                          Set custom headers when draining logs to the Endpoint URL
-                        </p>
-                      </div>
-                      <div className="divide-y">
-                        {hasHeaders &&
-                          Object.keys(headers || {})?.map((headerKey) => (
-                            <div
-                              className="flex text-sm px-content text-foreground items-center font-mono py-1.5 group"
-                              key={headerKey}
-                            >
-                              <div className="w-full">{headerKey}</div>
-                              <div className="w-full truncate" title={headers?.[headerKey]}>
-                                {headers?.[headerKey]}
-                              </div>
-                              <Button
-                                className="justify-self-end opacity-0 group-hover:opacity-100 w-7"
-                                type="text"
-                                title="Remove"
-                                icon={<TrashIcon />}
-                                onClick={() => removeHeader(headerKey)}
-                              ></Button>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
                   </>
                 )}
                 {type === 'datadog' && (
@@ -429,45 +417,90 @@ export function LogDrainDestinationSheetForm({
                     />
                   </div>
                 )}
+                {type === 'loki' && (
+                  <div className="grid gap-4 px-content">
+                    <LogDrainFormItem
+                      type="url"
+                      value="url"
+                      label="Loki URL"
+                      formControl={form.control}
+                      description="The Loki HTTP(S) endpoint to send events."
+                    />
+                  </div>
+                )}
+                <FormMessage_Shadcn_ />
               </div>
             </form>
           </Form_Shadcn_>
 
           {/* This form needs to be outside the <Form_Shadcn_> */}
-          {type === 'webhook' && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                addHeader()
-              }}
-              className="flex border-t py-4 gap-4 items-center px-content"
-            >
-              <label className="sr-only" htmlFor="header-name">
-                Header name
-              </label>
-              <Input_Shadcn_
-                id="header-name"
-                type="text"
-                placeholder="x-header-name"
-                value={newCustomHeader.name}
-                onChange={(e) => setNewCustomHeader({ ...newCustomHeader, name: e.target.value })}
-              />
-              <label className="sr-only" htmlFor="header-value">
-                Header value
-              </label>
-              <Input_Shadcn_
-                id="header-value"
-                type="text"
-                placeholder="Header value"
-                value={newCustomHeader.value}
-                onChange={(e) => setNewCustomHeader({ ...newCustomHeader, value: e.target.value })}
-              />
+          {(type === 'webhook' || type === 'loki') && (
+            <>
+              <div className="border-t mt-4">
+                <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
+                  <h2 className="text-sm text-foreground">Custom Headers</h2>
+                  <p className="text-xs text-foreground-lighter">
+                    {getHeadersSectionDescription()}
+                  </p>
+                </div>
+                <div className="divide-y">
+                  {hasHeaders &&
+                    Object.keys(headers || {})?.map((headerKey) => (
+                      <div
+                        className="flex text-sm px-content text-foreground items-center font-mono py-1.5 group"
+                        key={headerKey}
+                      >
+                        <div className="w-full">{headerKey}</div>
+                        <div className="w-full truncate" title={headers?.[headerKey]}>
+                          {headers?.[headerKey]}
+                        </div>
+                        <Button
+                          className="justify-self-end opacity-0 group-hover:opacity-100 w-7"
+                          type="text"
+                          title="Remove"
+                          icon={<TrashIcon />}
+                          onClick={() => removeHeader(headerKey)}
+                        ></Button>
+                      </div>
+                    ))}
+                </div>
+              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  addHeader()
+                }}
+                className="flex border-t py-4 gap-4 items-center px-content"
+              >
+                <label className="sr-only" htmlFor="header-name">
+                  Header name
+                </label>
+                <Input_Shadcn_
+                  id="header-name"
+                  type="text"
+                  placeholder="x-header-name"
+                  value={newCustomHeader.name}
+                  onChange={(e) => setNewCustomHeader({ ...newCustomHeader, name: e.target.value })}
+                />
+                <label className="sr-only" htmlFor="header-value">
+                  Header value
+                </label>
+                <Input_Shadcn_
+                  id="header-value"
+                  type="text"
+                  placeholder="Header value"
+                  value={newCustomHeader.value}
+                  onChange={(e) =>
+                    setNewCustomHeader({ ...newCustomHeader, value: e.target.value })
+                  }
+                />
 
-              <Button htmlType="submit" type="outline">
-                Add
-              </Button>
-            </form>
+                <Button htmlType="submit" type="outline">
+                  Add
+                </Button>
+              </form>
+            </>
           )}
         </SheetSection>
 
