@@ -38,6 +38,9 @@ export default function MultiSelectDemo() {
               {fruit}
             </MultiSelectorItem>
           ))}
+          <MultiSelectorItem value="Potato" disabled>
+            Potato
+          </MultiSelectorItem>
         </MultiSelectorList>
       </MultiSelectorContent>
     </MultiSelector>

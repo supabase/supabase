@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { Check, ChevronsUpDown, CornerDownLeft, X as RemoveIcon } from 'lucide-react'
+import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 import { VariantProps, cva } from 'class-variance-authority'
@@ -56,7 +56,6 @@ type MultiSelectorProps = {
   mode?: MultiSelectorMode
   values: string[]
   onValuesChange: (value: string[]) => void
-  loop?: boolean
   disabled?: boolean
 } & React.ComponentPropsWithoutRef<typeof Command> &
   VariantProps<typeof MultiSelectorVariants>
@@ -65,7 +64,6 @@ function MultiSelector({
   values = [],
   onValuesChange,
   disabled,
-  loop = false,
   dir,
   size,
   className,
@@ -123,7 +121,7 @@ function MultiSelector({
           break
       }
     },
-    [values, inputValue, activeIndex, loop]
+    [values, inputValue, activeIndex]
   )
 
   return (
@@ -440,7 +438,7 @@ MultiSelector.List = MultiSelectorList
 const MultiSelectorItem = React.forwardRef<
   HTMLDivElement,
   { value: string } & React.ComponentPropsWithoutRef<typeof CommandItem>
->(({ className, value, children }, ref) => {
+>(({ className, value, children, ...props }, ref) => {
   const { values: selectedValues, setInputValue, toggleValue, open } = useMultiSelect()
   const isSelected = selectedValues.includes(value)
 
@@ -462,6 +460,7 @@ const MultiSelectorItem = React.forwardRef<
         'peer-data-[value=true]:bg-overlay-hover peer-data-[value=true]:text-strong',
         className
       )}
+      {...props}
     >
       <div
         className={cn(
@@ -476,9 +475,9 @@ const MultiSelectorItem = React.forwardRef<
       >
         <Check className="h-3 w-3" strokeWidth={4} />
       </div>
-      <span className="text-xs flex-grow leading-none pointer-events-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:pointer-events-none peer-disabled:opacity-50">
+      <div className="text-xs flex-grow leading-none pointer-events-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:pointer-events-none peer-disabled:opacity-50">
         {children}
-      </span>
+      </div>
     </CommandItem>
   )
 })
