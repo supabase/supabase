@@ -9,6 +9,7 @@
     "export": "next export",
     "start": "next start",
     "lint": "next lint",
+    "clean": "rimraf node_modules",
     "typecheck": "npm run content:build && tsc --noEmit",
     "content:build": "contentlayer2 build",
     "prettier": "prettier --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\"",

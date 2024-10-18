@@ -4,7 +4,9 @@
   "description": "Data shared between Supabase apps",
   "main": "./index.ts",
   "types": "./index.ts",
-  "scripts": {},
+  "scripts": {
+    "clean": "rimraf node_modules"
+  },
   "author": "",
   "license": "MIT"
 }
