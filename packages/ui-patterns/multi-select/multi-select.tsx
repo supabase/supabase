@@ -17,7 +17,7 @@ import {
 
 interface MultiSelectContextProps {
   values: string[]
-  onValuesChange: OnValuesChangeType
+  onValuesChange: (value: string[]) => void
   toggleValue: (values: string) => void
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -51,12 +51,11 @@ const MultiSelectorVariants = cva('', {
 })
 
 type MultiSelectorMode = 'combobox' | 'inline-combobox'
-type OnValuesChangeType = (value: string[]) => void
 
 type MultiSelectorProps = {
   mode?: MultiSelectorMode
   values: string[]
-  onValuesChange: OnValuesChangeType
+  onValuesChange: (value: string[]) => void
   loop?: boolean
   disabled?: boolean
 } & React.ComponentPropsWithoutRef<typeof Command> &
