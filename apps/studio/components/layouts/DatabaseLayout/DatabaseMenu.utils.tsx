@@ -101,7 +101,8 @@ export const generateDatabaseMenu = (
         {
           name: 'Wrappers',
           key: 'wrappers',
-          url: `/project/${ref}/database/wrappers`,
+          url: `/project/${ref}/integrations/wrappers`,
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },
         {
@@ -115,17 +116,8 @@ export const generateDatabaseMenu = (
               {
                 name: 'Webhooks',
                 key: 'hooks',
-                url: `/project/${ref}/database/hooks`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(!!cronUiEnabled
-          ? [
-              {
-                name: 'Cron Jobs',
-                key: 'cron-jobs',
-                url: `/project/${ref}/database/cron-jobs`,
+                url: `/project/${ref}/integrations/hooks`,
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
                 items: [],
               },
             ]
