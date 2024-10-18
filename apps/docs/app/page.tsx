@@ -1,13 +1,12 @@
-import { type Metadata, type ResolvingMetadata } from 'next'
-import Link from 'next/link'
-import { IconBackground, TextLink } from 'ui'
-import { IconPanel } from 'ui-patterns/IconPanel'
-
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import { GlassPanelWithIconPicker } from '~/features/ui/GlassPanelWithIconPicker'
 import { IconPanelWithIconPicker } from '~/features/ui/IconPanelWithIconPicker'
 import HomeLayout from '~/layouts/HomeLayout'
 import { BASE_PATH } from '~/lib/constants'
+import { Metadata, ResolvingMetadata, type, type } from 'next'
+import Link from 'next/link'
+import { IconBackground, TextLink } from 'ui'
+import { IconPanel } from 'ui-patterns/IconPanel'
 
 const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata> => {
   const parentAlternates = (await parent).alternates
@@ -111,6 +110,11 @@ const migrationGuides = [
     title: 'Postgres',
     icon: '/docs/img/icons/postgres-icon',
     href: '/guides/resources/migrating-to-supabase/postgres',
+  },
+  {
+    title: 'Vercel Postgres',
+    icon: '/docs/img/icons/postgres-icon',
+    href: '/guides/resources/migrating-to-supabase/vercel-postgres',
   },
   {
     title: 'MySQL',
