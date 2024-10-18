@@ -11,16 +11,16 @@ export default function MultiSelectDemo() {
   const [selectedValues, setSelectedValues] = useState<string[]>([])
 
   const fruits = [
-    'Apple',
-    'Banana',
-    'Cherry',
-    'Date',
-    'Elderberrie',
-    'Fig',
-    'Grape',
-    'Kiwi',
-    'Mango',
-    'Strawberry',
+    { value: 'Apple', isDisabled: false },
+    { value: 'Banana', isDisabled: false },
+    { value: 'Cherry', isDisabled: false },
+    { value: 'Date', isDisabled: false },
+    { value: 'Elderberrie', isDisabled: false },
+    { value: 'Fig', isDisabled: false },
+    { value: 'Grape', isDisabled: false },
+    { value: 'Kiwi', isDisabled: true },
+    { value: 'Mango', isDisabled: false },
+    { value: 'Strawberry', isDisabled: false },
   ]
 
   return (
@@ -33,14 +33,11 @@ export default function MultiSelectDemo() {
       />
       <MultiSelectorContent>
         <MultiSelectorList>
-          {fruits.map((fruit) => (
-            <MultiSelectorItem key={fruit} value={fruit}>
-              {fruit}
+          {fruits.map(({ value, isDisabled }) => (
+            <MultiSelectorItem key={value} value={value} disabled={isDisabled}>
+              {value}
             </MultiSelectorItem>
           ))}
-          <MultiSelectorItem value="Potato" disabled>
-            Potato
-          </MultiSelectorItem>
         </MultiSelectorList>
       </MultiSelectorContent>
     </MultiSelector>
