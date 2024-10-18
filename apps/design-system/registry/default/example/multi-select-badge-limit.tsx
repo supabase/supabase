@@ -1,6 +1,6 @@
 import { Minus, Plus } from 'lucide-react'
 import { useState } from 'react'
-import { Button, Input_Shadcn_ as Input } from 'ui'
+import { Button } from 'ui'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -16,7 +16,7 @@ export default function MultiSelectDemo() {
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="flex items-center gap-2">
-        <Button size="tiny" type="default" onClick={() => setLimit(limit - 1)}>
+        <Button size="tiny" type="default" onClick={() => setLimit(limit - 1)} disabled={limit < 1}>
           <Minus size={12} />
         </Button>
         <span className="text-sm text-foreground/90 peer-checked:line-through font-semibold hover:cursor-pointer">

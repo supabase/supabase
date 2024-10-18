@@ -154,7 +154,7 @@ export interface MultiSelectorTriggerProps extends React.HTMLAttributes<HTMLButt
   label?: string
   persistLabel?: boolean
   className?: string
-  badgeLimit?: number | 'auto' | 'wrap'
+  badgeLimit?: number | 'wrap'
   deletableBadge?: boolean
   showIcon?: boolean
   mode?: MultiSelectorMode
@@ -189,53 +189,20 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     const [extraBadgesCount, setExtraBadgesCount] = React.useState(0)
     const [isDeleteHovered, setIsDeleteHovered] = React.useState(false)
 
-    const IS_BADGE_LIMIT_AUTO = badgeLimit === 'auto'
     const IS_BADGE_LIMIT_WRAP = badgeLimit === 'wrap'
     const IS_NUMERIC_LIMIT = typeof badgeLimit === 'number'
     const IS_INLINE_MODE = mode === 'inline-combobox'
 
-    const calculateVisibleBadges = React.useCallback(() => {
-      if (!inputRef?.current || !badgesRef.current) return
-
-      const inputWidth = inputRef.current.offsetWidth
-
-      const badgesContainer = badgesRef.current
-      const badges = Array.from(badgesContainer.children) as HTMLElement[]
-      let totalWidth = 0
-      let visibleCount = 0
-
-      const availableWidth = inputWidth - (showIcon ? 40 : 80)
-      for (let i = 0; i < values.length; i++) {
-        if (i < badges.length) {
-          totalWidth += badges[i].offsetWidth + 8 // 8px for gap
-        } else {
-          // Estimate width for badges not yet rendered
-          totalWidth += 0 // Approximate width of a badge
-        }
-        if (totalWidth > availableWidth) {
-          break
-        }
-        visibleCount++
-      }
-      setVisibleBadges(values.slice(0, visibleCount))
-      setExtraBadgesCount(Math.max(0, values.length - visibleCount))
-    }, [values])
-
     React.useEffect(() => {
       if (!inputRef?.current || !badgesRef.current) return
 
-      if (IS_BADGE_LIMIT_AUTO) {
-        calculateVisibleBadges()
-        window.addEventListener('resize', calculateVisibleBadges)
-      } else if (IS_BADGE_LIMIT_WRAP) {
+      if (IS_BADGE_LIMIT_WRAP) {
         setVisibleBadges(values)
         setExtraBadgesCount(0)
       } else {
         setVisibleBadges(values.slice(0, badgeLimit))
         setExtraBadgesCount(Math.max(0, values.length - badgeLimit))
       }
-
-      return () => window.removeEventListener('resize', calculateVisibleBadges)
     }, [values, badgeLimit])
 
     const badgeClasses = 'rounded shrink-0 px-1.5'
@@ -307,11 +274,16 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                 : `+${extraBadgesCount}`}
             </Badge>
           )}
-          {!IS_INLINE_MODE && (persistLabel || values.length === 0) && (
-            <span className="text-foreground-muted whitespace-nowrap leading-[1.375rem] ml-1">
-              {label}
-            </span>
-          )}
+          <span
+            className={cn(
+              'text-foreground-muted whitespace-nowrap leading-[1.375rem] ml-1 opacity-0 transition-opacity hidden',
+              !IS_INLINE_MODE &&
+                (persistLabel || values.length === 0) &&
+                'opacity-100 visible inline'
+            )}
+          >
+            {label}
+          </span>
           {IS_INLINE_MODE && (
             <MultiSelectorInput
               ref={inlineInputRef}
