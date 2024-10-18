@@ -71,7 +71,9 @@ const GraphiQLPage: NextPageWithLayout = () => {
         ...opts,
         headers: {
           ...opts?.headers,
-          Authorization: `Bearer ${accessToken}`,
+          ...(accessToken && {
+            Authorization: `Bearer ${accessToken}`,
+          }),
           'x-graphql-authorization':
             opts?.headers?.['Authorization'] ??
             opts?.headers?.['authorization'] ??
