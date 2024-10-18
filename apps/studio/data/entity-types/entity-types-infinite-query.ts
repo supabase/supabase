@@ -1,4 +1,4 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
 import type { Entity } from './entity-type-query'
 import { entityTypeKeys } from './keys'
@@ -146,3 +146,25 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
       ...options,
     }
   )
+
+export function prefetchEntityTypes(
+  client: QueryClient,
+  {
+    projectRef,
+    connectionString,
+    schema = 'public',
+    search,
+    limit = 100,
+    sort,
+    filterTypes,
+  }: Omit<EntityTypesVariables, 'page'>
+) {
+  return client.prefetchInfiniteQuery(
+    entityTypeKeys.list(projectRef, { schema, search, sort, limit, filterTypes }),
+    ({ signal, pageParam }) =>
+      getEntityTypes(
+        { projectRef, connectionString, schema, search, limit, page: pageParam, sort, filterTypes },
+        signal
+      )
+  )
+}

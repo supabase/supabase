@@ -1,5 +1,11 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { sqlKeys } from 'data/sql/keys'
+import {
+  executeSql,
+  ExecuteSqlData,
+  ExecuteSqlError,
+  useExecuteSqlQuery,
+} from '../sql/execute-sql-query'
 import { ENTITY_TYPE } from './entity-type-constants'
 
 type EntityTypeArgs = {
@@ -75,3 +81,24 @@ export const useEntityTypeQuery = <TData extends EntityTypeData = EntityTypeData
       ...options,
     }
   )
+
+export function prefetchEntityType(
+  client: QueryClient,
+  { projectRef, connectionString, id }: EntityTypeVariables
+) {
+  const key = sqlKeys.query(projectRef, ['entity-type', id])
+
+  return client
+    .prefetchQuery(key, () =>
+      executeSql({
+        projectRef,
+        connectionString,
+        sql: entityTypeSqlQuery({ id }),
+        queryKey: ['entity-type', id],
+      })
+    )
+    .then(
+      () =>
+        client.getQueryData<{ result: EntityTypeData[] }>(key, { exact: true })?.result?.[0] ?? null
+    )
+}

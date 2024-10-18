@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
@@ -29,6 +30,7 @@ const EmptyState = ({}: EmptyStateProps) => {
     connectionString: project?.connectionString,
     schema: selectedSchema,
     sort,
+    filterTypes: Object.values(ENTITY_TYPE),
   })
 
   const totalCount = data?.pages?.[0].data.count ?? 0
