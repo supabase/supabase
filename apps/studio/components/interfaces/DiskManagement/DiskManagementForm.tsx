@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import { HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
+import { CpuIcon, HelpCircle, InfoIcon, Microchip, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -69,6 +69,10 @@ import {
 } from './DiskManagementReadReplicas'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
+import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
+import { ComputeBadge } from 'ui-patterns'
+import { components } from 'api-types'
 
 export function DiskManagementForm() {
   const { project } = useProjectContext()
@@ -88,6 +92,7 @@ export function DiskManagementForm() {
   /**
    * Queries for form data
    */
+
   const {
     data: databases,
     isLoading: isReadReplicasLoading,
@@ -152,11 +157,66 @@ export function DiskManagementForm() {
   })
 
   /**
+   * Handle compute instances
+   */
+  const availableAddons = useMemo(() => {
+    return addons?.available_addons ?? []
+  }, [addons])
+
+  const hasMicroOptionFromApi = useMemo(() => {
+    return (
+      availableAddons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
+    ).some((variant) => variant.identifier === 'ci_micro')
+  }, [availableAddons])
+
+  const availableOptions = useMemo(() => {
+    const computeOptions =
+      availableAddons
+        .find((addon) => addon.type === 'compute_instance')
+        ?.variants.filter((option) => {
+          if (!project?.cloud_provider) {
+            return true
+          }
+
+          const meta = option.meta as ProjectAddonVariantMeta
+
+          return (
+            !meta.supported_cloud_providers ||
+            meta.supported_cloud_providers.includes(project.cloud_provider)
+          )
+        }) ?? []
+
+    // Backwards comp until API is deployed
+    // if (!hasMicroOptionFromApi) {
+    //   // Unshift to push to start of array
+    //   computeOptions.unshift({
+    //     identifier: 'ci_micro',
+    //     name: 'Micro',
+    //     price_description: '$0.01344/hour (~$10/month)',
+    //     price: 0.01344,
+    //     price_interval: 'hourly',
+    //     price_type: 'usage',
+    //     // @ts-ignore API types it as Record<string, never>
+    //     meta: {
+    //       cpu_cores: INSTANCE_MICRO_SPECS.cpu_cores,
+    //       cpu_dedicated: INSTANCE_MICRO_SPECS.cpu_dedicated,
+    //       memory_gb: INSTANCE_MICRO_SPECS.memory_gb,
+    //       baseline_disk_io_mbs: INSTANCE_MICRO_SPECS.baseline_disk_io_mbs,
+    //       max_disk_io_mbs: INSTANCE_MICRO_SPECS.max_disk_io_mbs,
+    //       connections_direct: INSTANCE_MICRO_SPECS.connections_direct,
+    //       connections_pooler: INSTANCE_MICRO_SPECS.connections_pooler,
+    //     } as ProjectAddonVariantMeta,
+    //   })
+    // }
+
+    return computeOptions
+  }, [availableAddons, hasMicroOptionFromApi])
+
+  /**
    * Handle default values
    */
   // @ts-ignore [Joshen TODO] check whats happening here
   const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
-
   const defaultValues = {
     storageType: type ?? 'gp3',
     provisionedIOPS: iops,
@@ -364,6 +424,79 @@ export function DiskManagementForm() {
       />
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
+          <RadioGroupCard className="flex flex-wrap gap-3">
+            {availableOptions.map((compute) => {
+              const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
+
+              return (
+                <RadioGroupCardItem
+                  // label={compute.name}
+                  disabled={disableInput}
+                  showIndicator={false}
+                  value={compute.identifier}
+                  className="text-sm text-left flex flex-col gap-0 px-0 py-3 overflow-hidden [&_label]:w-full group] min-w-[250px]"
+                  // @ts-ignore
+                  label={
+                    <div className="w-full flex flex-col gap-3">
+                      <div className="px-3 opacity-50 group-data-[state=checked]:opacity-100 flex justify-between">
+                        <ComputeBadge
+                          className="inline-flex font-semibold"
+                          infraComputeSize={compute.name as components['schemas']['DbInstanceSize']}
+                        />
+                        <div className="flex items-center space-x-1">
+                          <span className="text-foreground text-sm font-semibold">
+                            {/* Price needs to be exact here */}${compute.price}
+                          </span>
+                          <span className="text-foreground-light translate-y-[1px]">
+                            {' '}
+                            / {compute.price_interval === 'monthly' ? 'month' : 'hour'}
+                          </span>
+                        </div>
+                      </div>
+                      {/* <Separator className="bg-border group-data-[state=checked]:bg-foreground-muted" /> */}
+                      <div className="w-full">
+                        <div className="px-3 text-sm flex flex-col gap-1">
+                          <div className="text-foreground-light flex gap-2 items-center">
+                            <Microchip
+                              strokeWidth={1}
+                              size={14}
+                              className="text-foreground-lighter"
+                            />
+                            <span>{compute.meta?.memory_gb ?? 0} GB memory</span>
+                          </div>
+                          <div className="text-foreground-light flex gap-2 items-center">
+                            <CpuIcon
+                              strokeWidth={1}
+                              size={14}
+                              className="text-foreground-lighter"
+                            />
+                            <span>
+                              {compute.meta?.cpu_cores ?? 0}-core {cpuArchitecture} CPU
+                            </span>
+                          </div>
+                        </div>
+                        {/* <div className="px-2">
+                      <span>{compute.meta?.cpu_dedicated ? 'Dedicated' : 'Shared'}</span>
+                    </div> */}
+
+                        {/* <div className="px-3 py-1">
+                          <div className="flex items-center space-x-1">
+                            <span className="text-foreground text-sm">
+                              ${compute.price}
+                            </span>
+                            <span className="text-foreground-light translate-y-[1px]">
+                              {' '}
+                              / {compute.price_interval === 'monthly' ? 'month' : 'hour'}
+                            </span>
+                          </div>
+                        </div> */}
+                      </div>
+                    </div>
+                  }
+                ></RadioGroupCardItem>
+              )
+            })}
+          </RadioGroupCard>
           {/* <Card className="bg-surface-100 rounded-b-none">
               <CardContent className="transition-all duration-500 ease-in-out py-10 flex flex-col gap-10 px-8"> */}
           <FormField_Shadcn_
