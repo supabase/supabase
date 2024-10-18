@@ -57,8 +57,6 @@ export const AiAssistantPanel = () => {
     false
   )
 
-  console.log({ isAcknowledged })
-
   const [chatId, setChatId] = useState(uuidv4())
   const [error, setError] = useState<QueryResponseError>()
   const [results, setResults] = useState<undefined | any[]>(undefined)

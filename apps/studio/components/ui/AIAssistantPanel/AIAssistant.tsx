@@ -69,7 +69,6 @@ export const AIAssistant = ({
 
   const { aiAssistantPanel } = useAppStateSnapshot()
   const { editor } = aiAssistantPanel
-  const showEditor = !!editor
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -239,12 +238,7 @@ export const AIAssistant = ({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <Button
-                type="default"
-                disabled={isLoading}
-                onClick={() => onResetConversation()}
-                className={cn('transition', showEditor ? '' : 'mr-6')}
-              >
+              <Button type="default" disabled={isLoading} onClick={() => onResetConversation()}>
                 Reset conversation
               </Button>
             </motion.div>
@@ -374,10 +368,7 @@ export const AIAssistant = ({
                       </TooltipContent_Shadcn_>
                     </Tooltip_Shadcn_>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align={showEditor ? 'start' : 'center'}
-                    className="w-[310px]"
-                  >
+                  <DropdownMenuContent align="start" className="w-[310px]">
                     <DropdownMenuLabel>
                       Improve the output quality of the assistant by giving it context about what
                       you need help with
