@@ -108,7 +108,8 @@
                         "PAUSING",
                         "RESTORING",
                         "RESTORE_FAILED",
-                        "PAUSE_FAILED"
+                        "PAUSE_FAILED",
+                        "RESIZING"
                       ],
                       "type": "string"
                     },
@@ -446,7 +447,8 @@
                           "PAUSING",
                           "RESTORING",
                           "RESTORE_FAILED",
-                          "PAUSE_FAILED"
+                          "PAUSE_FAILED",
+                          "RESIZING"
                         ],
                         "type": "string"
                       }
@@ -627,7 +629,8 @@
                         "PAUSING",
                         "RESTORING",
                         "RESTORE_FAILED",
-                        "PAUSE_FAILED"
+                        "PAUSE_FAILED",
+                        "RESIZING"
                       ],
                       "type": "string"
                     }
@@ -3130,6 +3133,111 @@
       }
     },
     "/v1/projects/{ref}": {
+      "get": {
+        "operationId": "v1-get-project",
+        "summary": "Gets a specific project that belongs to the authenticated user",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Id of your project"
+                    },
+                    "organization_id": {
+                      "type": "string",
+                      "description": "Slug of your organization"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Name of your project"
+                    },
+                    "region": {
+                      "type": "string",
+                      "description": "Region of your project",
+                      "example": "us-east-1"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "description": "Creation timestamp",
+                      "example": "2023-03-29T16:32:59Z"
+                    },
+                    "database": {
+                      "type": "object",
+                      "properties": {
+                        "host": {
+                          "type": "string",
+                          "description": "Database host"
+                        },
+                        "version": {
+                          "type": "string",
+                          "description": "Database version"
+                        },
+                        "postgres_engine": {
+                          "type": "string",
+                          "description": "Database engine"
+                        },
+                        "release_channel": {
+                          "type": "string",
+                          "description": "Release channel"
+                        }
+                      },
+                      "required": ["host", "version", "postgres_engine", "release_channel"]
+                    },
+                    "status": {
+                      "enum": [
+                        "ACTIVE_HEALTHY",
+                        "ACTIVE_UNHEALTHY",
+                        "COMING_UP",
+                        "GOING_DOWN",
+                        "INACTIVE",
+                        "INIT_FAILED",
+                        "REMOVED",
+                        "RESTARTING",
+                        "UNKNOWN",
+                        "UPGRADING",
+                        "PAUSING",
+                        "RESTORING",
+                        "RESTORE_FAILED",
+                        "PAUSE_FAILED",
+                        "RESIZING"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to retrieve project"
+          }
+        },
+        "tags": ["Projects"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
       "delete": {
         "operationId": "v1-delete-a-project",
         "summary": "Deletes the given project",
@@ -4598,6 +4706,9 @@
                   "work_mem": {
                     "type": "string"
                   },
+                  "restart_database": {
+                    "type": "boolean"
+                  },
                   "session_replication_role": {
                     "enum": ["origin", "replica", "local"],
                     "type": "string"
@@ -4695,6 +4806,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": ""
           },
           "500": {
             "description": "Failed to update project's Postgres config"
@@ -9577,7 +9691,8 @@
               "PAUSING",
               "RESTORING",
               "RESTORE_FAILED",
-              "PAUSE_FAILED"
+              "PAUSE_FAILED",
+              "RESIZING"
             ],
             "type": "string"
           },
@@ -9798,7 +9913,8 @@
               "PAUSING",
               "RESTORING",
               "RESTORE_FAILED",
-              "PAUSE_FAILED"
+              "PAUSE_FAILED",
+              "RESIZING"
             ],
             "type": "string"
           }
@@ -11634,6 +11750,9 @@
           },
           "work_mem": {
             "type": "string"
+          },
+          "restart_database": {
+            "type": "boolean"
           },
           "session_replication_role": {
             "enum": ["origin", "replica", "local"],
