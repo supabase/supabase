@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
+import { Check, ChevronsUpDown, CornerDownLeft, X as RemoveIcon } from 'lucide-react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 import { VariantProps, cva } from 'class-variance-authority'
@@ -109,9 +109,14 @@ function MultiSelector({
               onValuesChange(values.filter((item) => item !== values[values.length - 1]))
             }
           }
+          console.log('Esc  ')
           break
         case 'Escape':
           activeIndex !== -1 ? setActiveIndex(-1) : setOpen(false)
+          if (ref.current) {
+            const button = (ref.current as HTMLDivElement).querySelector('button[role="combobox"]')
+            button && (button as HTMLButtonElement).focus()
+          }
           break
         case 'Enter':
           setOpen(true)
@@ -175,8 +180,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     },
     ref
   ) => {
-    const { activeIndex, values, setInputValue, toggleValue, disabled, open, setOpen } =
-      useMultiSelect()
+    const { activeIndex, values, setInputValue, toggleValue, disabled, setOpen } = useMultiSelect()
 
     const inputRef = React.useRef<HTMLButtonElement>(null)
 
@@ -352,6 +356,10 @@ const MultiSelectorInput = React.forwardRef<
         inputRef.current.focus()
       }
     }, 100)
+
+    if (!open) {
+      inputRef.current?.blur()
+    }
   }, [open])
 
   return (
@@ -361,6 +369,7 @@ const MultiSelectorInput = React.forwardRef<
       onValueChange={activeIndex === -1 ? setInputValue : undefined}
       onFocus={handleFocus}
       onClick={handleClick}
+      tabIndex={open ? 0 : -1}
       disabled={disabled}
       showCloseIcon={showCloseIcon}
       showSearchIcon={showSearchIcon}
