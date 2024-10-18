@@ -47,7 +47,7 @@ const TableSelector = ({
     projectRef: project?.ref,
     search: searchInput,
     connectionString: project?.connectionString,
-    schema: selectedSchemaName,
+    schemas: [selectedSchemaName],
   })
   useEffect(() => {
     if (!initiallyLoaded && isSuccess) {

@@ -3,30 +3,11 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Button, Modal, ScrollArea, cn } from 'ui'
-import APISidePanelPreview from './APISidePanelPreview'
-import CLSPreview from './CLSPreview'
-import { useFeaturePreviewContext } from './FeaturePreviewContext'
+import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
+import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 
 const FeaturePreviewModal = () => {
-  // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
-  const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUrl?: string }[] = [
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-      name: 'Project API documentation',
-      content: <APISidePanelPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
-      name: 'Column-level privileges',
-      content: <CLSPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
-    },
-  ]
-
   const snap = useAppStateSnapshot()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
@@ -103,8 +84,11 @@ const FeaturePreviewModal = () => {
           </div>
           <div className="flex-grow max-h-[550px] p-4 space-y-3 overflow-y-auto">
             <div className="flex items-center justify-between">
-              <p>{selectedFeature?.name}</p>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-x-2">
+                <p>{selectedFeature?.name}</p>
+                {selectedFeature?.isNew && <Badge color="green">New</Badge>}
+              </div>
+              <div className="flex items-center gap-x-2">
                 {selectedFeature?.discussionsUrl !== undefined && (
                   <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <Link href={selectedFeature.discussionsUrl} target="_blank" rel="noreferrer">
