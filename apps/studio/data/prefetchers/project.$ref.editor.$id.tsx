@@ -4,7 +4,12 @@ import { useRouter } from 'next/router'
 import { ComponentProps, PropsWithChildren, useCallback } from 'react'
 
 import { loadTableEditorSortsAndFiltersFromLocalStorage } from 'components/grid/SupabaseGrid'
-import { getSupaTable } from 'components/grid/SupabaseGrid.utils'
+import {
+  formatFilterURLParams,
+  formatSortURLParams,
+  getSupaTable,
+} from 'components/grid/SupabaseGrid.utils'
+import { Filter, Sort } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ForeignKeyConstraintsData,
@@ -31,7 +36,7 @@ export function usePrefetchEditorTablePage() {
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   return useCallback(
-    ({ id: _id }: { id?: string }) => {
+    ({ id: _id, filters, sorts }: { id?: string; filters?: Filter[]; sorts?: Sort[] }) => {
       const id = _id ? Number(_id) : undefined
       if (!project || !id || isNaN(id)) return
 
@@ -115,7 +120,7 @@ export function usePrefetchEditorTablePage() {
               entityType: entity.type,
             })
 
-            const { sorts = [], filters = [] } =
+            const { sorts: localSorts = [], filters: localFilters = [] } =
               loadTableEditorSortsAndFiltersFromLocalStorage(
                 project.ref,
                 entity.name,
@@ -127,8 +132,8 @@ export function usePrefetchEditorTablePage() {
               projectRef: project?.ref,
               connectionString: project?.connectionString,
               table: supaTable,
-              sorts,
-              filters,
+              sorts: sorts ?? formatSortURLParams(supaTable.name, localSorts),
+              filters: filters ?? formatFilterURLParams(localFilters),
               page: 1,
               limit: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
               impersonatedRole: roleImpersonationState.role,
@@ -145,14 +150,18 @@ type LinkProps = ComponentProps<typeof Link>
 interface EditorTablePageLinkProps extends Omit<LinkProps, 'href'> {
   projectRef?: string
   id?: string
+  sorts?: Sort[]
+  filters?: Filter[]
   href?: LinkProps['href']
 }
 
 export function EditorTablePageLink({
   projectRef,
   id,
-  children,
+  sorts,
+  filters,
   href,
+  children,
   ...props
 }: PropsWithChildren<EditorTablePageLinkProps>) {
   const prefetch = usePrefetchEditorTablePage()
@@ -160,7 +169,7 @@ export function EditorTablePageLink({
   return (
     <Link
       href={href || `/project/${projectRef}/editor/${id}`}
-      onMouseEnter={() => prefetch({ id })}
+      onMouseEnter={() => prefetch({ id, sorts, filters })}
       {...props}
     >
       {children}
