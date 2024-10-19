@@ -10,6 +10,13 @@ Disk metrics refer to the storage usage reported by Postgres. These metrics are 
 
 - _Database Size_: Displays the actual size of the data within your PostgreSQL database. This can be found on the [Database Reports page](https://supabase.com/dashboard/project/_/reports/database).
 
+<Admonition type="note">
+  Note: Disk size refers to the total storage capacity of your database’s disk, and it does not
+  include file storage. File storage is managed separately using S3, with no scaling limitations.
+  For more details on storage quotas and limits across different plans, see our [pricing
+  page](https://supabase.com/pricing).
+</Admonition>
+
 ## Database space management
 
 ### Database size

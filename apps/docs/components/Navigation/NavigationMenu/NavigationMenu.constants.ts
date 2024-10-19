@@ -1895,7 +1895,7 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Regions', url: '/guides/platform/regions' },
-        { name: 'Database Size', url: '/guides/platform/database-size' },
+        { name: 'Disk Size', url: '/guides/platform/database-size' },
         { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
         {
           name: 'Network Restrictions',
