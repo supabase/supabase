@@ -145,13 +145,16 @@ export function prefetchForeignKeyConstraints(
   const key = sqlKeys.query(projectRef, ['foreign-key-constraints', schema])
 
   return client
-    .prefetchQuery(key, () =>
-      executeSql({
-        projectRef,
-        connectionString,
-        sql: getForeignKeyConstraintsQuery({ schema }),
-        queryKey: ['foreign-key-constraints', schema],
-      })
+    .prefetchQuery(key, ({ signal }) =>
+      executeSql(
+        {
+          projectRef,
+          connectionString,
+          sql: getForeignKeyConstraintsQuery({ schema }),
+          queryKey: ['foreign-key-constraints', schema],
+        },
+        signal
+      )
     )
     .then(() => select(client.getQueryData(key, { exact: true })) as ForeignKeyConstraintsData)
 }

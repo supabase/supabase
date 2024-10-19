@@ -49,12 +49,15 @@ export function prefetchSchemas(
   client: QueryClient,
   { projectRef, connectionString }: SchemasVariables
 ) {
-  return client.prefetchQuery(sqlKeys.query(projectRef, ['schemas', 'list']), () =>
-    executeSql({
-      projectRef,
-      connectionString,
-      sql: pgMetaSchemasList.sql,
-      queryKey: ['schemas', 'list'],
-    })
+  return client.prefetchQuery(sqlKeys.query(projectRef, ['schemas', 'list']), ({ signal }) =>
+    executeSql(
+      {
+        projectRef,
+        connectionString,
+        sql: pgMetaSchemasList.sql,
+        queryKey: ['schemas', 'list'],
+      },
+      signal
+    )
   )
 }

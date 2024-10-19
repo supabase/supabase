@@ -265,16 +265,19 @@ export function prefetchTableRows(
     getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args })
   )
 
-  return client.prefetchQuery(key, () =>
-    executeSql({
-      projectRef,
-      connectionString,
-      sql: wrapWithRoleImpersonation(getTableRowsSqlQuery({ table, ...args }), {
-        projectRef: projectRef ?? 'ref',
-        role: impersonatedRole,
-      }),
-      queryKey: getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args }),
-      isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
-    })
+  return client.prefetchQuery(key, ({ signal }) =>
+    executeSql(
+      {
+        projectRef,
+        connectionString,
+        sql: wrapWithRoleImpersonation(getTableRowsSqlQuery({ table, ...args }), {
+          projectRef: projectRef ?? 'ref',
+          role: impersonatedRole,
+        }),
+        queryKey: getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args }),
+        isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+      },
+      signal
+    )
   )
 }

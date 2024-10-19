@@ -89,13 +89,16 @@ export function prefetchEntityType(
   const key = sqlKeys.query(projectRef, ['entity-type', id])
 
   return client
-    .prefetchQuery(key, () =>
-      executeSql({
-        projectRef,
-        connectionString,
-        sql: entityTypeSqlQuery({ id }),
-        queryKey: ['entity-type', id],
-      })
+    .prefetchQuery(key, ({ signal }) =>
+      executeSql(
+        {
+          projectRef,
+          connectionString,
+          sql: entityTypeSqlQuery({ id }),
+          queryKey: ['entity-type', id],
+        },
+        signal
+      )
     )
     .then(
       () =>
