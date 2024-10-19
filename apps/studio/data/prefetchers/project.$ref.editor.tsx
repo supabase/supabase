@@ -39,8 +39,11 @@ export function usePrefetchEditorIndexPage() {
   }, [entityTypesSort, project, queryClient, router])
 }
 
-interface EditorIndexPageLinkProps extends ComponentProps<typeof Link> {
+type LinkProps = ComponentProps<typeof Link>
+
+interface EditorIndexPageLinkProps extends Omit<LinkProps, 'href'> {
   projectRef?: string
+  href?: LinkProps['href']
 }
 
 export function EditorIndexPageLink({

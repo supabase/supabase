@@ -15,6 +15,7 @@ import { prefetchTable, TableData } from 'data/tables/table-query'
 import { useRouter } from 'next/router'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from 'state/table-editor'
+import { prefetchEncryptedColumns } from 'data/encrypted-columns/encrypted-columns-query'
 
 export function usePrefetchEditorTablePage() {
   const router = useRouter()
@@ -48,8 +49,12 @@ export function usePrefetchEditorTablePage() {
               connectionString: project.connectionString,
               schema: entity?.schema,
             }),
-            // TODO(alaister): Convert encrypted columns to react-query
-            Promise.resolve([] as string[]),
+            prefetchEncryptedColumns(queryClient, {
+              projectRef: project.ref,
+              connectionString: project.connectionString,
+              schema: entity?.schema,
+              tableName: entity?.name,
+            }),
             undefined,
           ]
 
@@ -91,9 +96,12 @@ export function usePrefetchEditorTablePage() {
   )
 }
 
-interface EditorTablePageLinkProps extends ComponentProps<typeof Link> {
+type LinkProps = ComponentProps<typeof Link>
+
+interface EditorTablePageLinkProps extends Omit<LinkProps, 'href'> {
   projectRef?: string
   id?: string
+  href?: LinkProps['href']
 }
 
 export function EditorTablePageLink({
