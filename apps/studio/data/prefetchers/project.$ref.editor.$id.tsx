@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ComponentProps, PropsWithChildren, useCallback } from 'react'
 
 import { loadTableEditorSortsAndFiltersFromLocalStorage } from 'components/grid/SupabaseGrid'
@@ -12,9 +13,14 @@ import {
 import { prefetchEncryptedColumns } from 'data/encrypted-columns/encrypted-columns-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity, prefetchEntityType } from 'data/entity-types/entity-type-query'
+import { ForeignTableData, prefetchForeignTable } from 'data/foreign-tables/foreign-table-query'
+import {
+  MaterializedViewData,
+  prefetchMaterializedView,
+} from 'data/materialized-views/materialized-view-query'
 import { prefetchTableRows } from 'data/table-rows/table-rows-query'
 import { prefetchTable, TableData } from 'data/tables/table-query'
-import { useRouter } from 'next/router'
+import { prefetchView, ViewData } from 'data/views/view-query'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from 'state/table-editor'
 
@@ -25,8 +31,9 @@ export function usePrefetchEditorTablePage() {
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   return useCallback(
-    ({ id }: { id?: string }) => {
-      if (!project || !id) return
+    ({ id: _id }: { id?: string }) => {
+      const id = _id ? Number(_id) : undefined
+      if (!project || !id || isNaN(id)) return
 
       // Prefetch the code
       router.prefetch(`/project/${project.ref}/editor/${id}`)
@@ -35,14 +42,17 @@ export function usePrefetchEditorTablePage() {
       prefetchEntityType(queryClient, {
         projectRef: project.ref,
         connectionString: project.connectionString,
-        id: Number(id),
+        id,
       })
         .then((entity) => {
           let promises: [
             Promise<Entity | null>,
             Promise<ForeignKeyConstraintsData>,
             Promise<string[]>,
-            Promise<TableData | undefined> | undefined,
+            (
+              | Promise<TableData | ViewData | MaterializedViewData | ForeignTableData | undefined>
+              | undefined
+            ),
           ] = [
             Promise.resolve(entity),
             prefetchForeignKeyConstraints(queryClient, {
@@ -59,12 +69,39 @@ export function usePrefetchEditorTablePage() {
             undefined,
           ]
 
-          if (entity?.type === ENTITY_TYPE.TABLE) {
-            promises[3] = prefetchTable(queryClient, {
-              projectRef: project.ref,
-              connectionString: project.connectionString,
-              id: Number(id),
-            })
+          switch (entity?.type) {
+            case ENTITY_TYPE.TABLE:
+            case ENTITY_TYPE.PARTITIONED_TABLE:
+              promises[3] = prefetchTable(queryClient, {
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                id,
+              })
+              break
+
+            case ENTITY_TYPE.VIEW:
+              promises[3] = prefetchView(queryClient, {
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                id,
+              })
+              break
+
+            case ENTITY_TYPE.MATERIALIZED_VIEW:
+              promises[3] = prefetchMaterializedView(queryClient, {
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                id,
+              })
+              break
+
+            case ENTITY_TYPE.FOREIGN_TABLE:
+              promises[3] = prefetchForeignTable(queryClient, {
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                id,
+              })
+              break
           }
 
           return Promise.all(promises)
@@ -78,11 +115,12 @@ export function usePrefetchEditorTablePage() {
               entityType: entity.type,
             })
 
-            const { sorts, filters } = loadTableEditorSortsAndFiltersFromLocalStorage(
-              project.ref,
-              entity.name,
-              entity.schema
-            ) ?? { sorts: [], filters: [] }
+            const { sorts = [], filters = [] } =
+              loadTableEditorSortsAndFiltersFromLocalStorage(
+                project.ref,
+                entity.name,
+                entity.schema
+              ) ?? {}
 
             prefetchTableRows(queryClient, {
               queryKey: [supaTable.schema, supaTable.name],

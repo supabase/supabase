@@ -57,27 +57,6 @@ export const useTableQuery = <TData = TableData>(
     }
   )
 
-/**
- * useGetTable
- * Tries to get a table from the react-query cache, or loads it from the server if it's not cached.
- */
-export function useGetTable({
-  projectRef,
-  connectionString,
-}: Pick<TableVariables, 'projectRef' | 'connectionString'>) {
-  const queryClient = useQueryClient()
-
-  return useCallback(
-    (id: NonNullable<TableVariables['id']>) => {
-      return queryClient.fetchQuery({
-        queryKey: tableKeys.table(projectRef, id),
-        queryFn: ({ signal }) => getTable({ id, projectRef, connectionString }, signal),
-      })
-    },
-    [connectionString, projectRef, queryClient]
-  )
-}
-
 export function prefetchTable(
   client: QueryClient,
   { projectRef, connectionString, id }: TableVariables
