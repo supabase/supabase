@@ -56,7 +56,7 @@ parameters:
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     required: true
     description: |
-      A comma separated list of URIs (e.g. `"https://foo.example.com,https://*.foo.example.com,https://bar.example.com"`) which are permitted as valid `redirect_to` destinations. Defaults to []. Supports wildcard matching through globbing. e.g. `https://*.foo.example.com` will allow `https://a.foo.example.com` and `https://b.foo.example.com` to be accepted. Globbing is also supported on subdomains. e.g. `https://foo.example.com/*` will allow `https://foo.example.com/page1` and `https://foo.example.com/page2` to be accepted.
+      A comma separated list of URIs (e.g. `"https://foo.example.com,https://*.foo.example.com,https://bar.example.com"`) which are permitted as valid `redirect_to` destinations.
   - id: 'GOTRUE_JWT_EXP' # {string} A unique identifier for this param.
     title: 'GOTRUE_JWT_EXP' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
