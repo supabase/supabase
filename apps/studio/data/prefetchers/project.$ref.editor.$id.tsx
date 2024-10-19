@@ -2,12 +2,14 @@ import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { ComponentProps, PropsWithChildren, useCallback } from 'react'
 
+import { loadTableEditorSortsAndFiltersFromLocalStorage } from 'components/grid/SupabaseGrid'
 import { getSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ForeignKeyConstraintsData,
   prefetchForeignKeyConstraints,
 } from 'data/database/foreign-key-constraints-query'
+import { prefetchEncryptedColumns } from 'data/encrypted-columns/encrypted-columns-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity, prefetchEntityType } from 'data/entity-types/entity-type-query'
 import { prefetchTableRows } from 'data/table-rows/table-rows-query'
@@ -15,7 +17,6 @@ import { prefetchTable, TableData } from 'data/tables/table-query'
 import { useRouter } from 'next/router'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from 'state/table-editor'
-import { prefetchEncryptedColumns } from 'data/encrypted-columns/encrypted-columns-query'
 
 export function usePrefetchEditorTablePage() {
   const router = useRouter()
@@ -77,14 +78,19 @@ export function usePrefetchEditorTablePage() {
               entityType: entity.type,
             })
 
+            const { sorts, filters } = loadTableEditorSortsAndFiltersFromLocalStorage(
+              project.ref,
+              entity.name,
+              entity.schema
+            ) ?? { sorts: [], filters: [] }
+
             prefetchTableRows(queryClient, {
               queryKey: [supaTable.schema, supaTable.name],
               projectRef: project?.ref,
               connectionString: project?.connectionString,
               table: supaTable,
-              // TODO(alaister): Can these be pulled from local storage?
-              sorts: [],
-              filters: [],
+              sorts,
+              filters,
               page: 1,
               limit: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
               impersonatedRole: roleImpersonationState.role,
