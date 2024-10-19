@@ -51,8 +51,8 @@ parameters:
     required: false
     description: |
       The URI a OAuth2 provider will redirect to with the `code` and `state` values.
-  - id: 'URI_ALLOW_LIST' # {string} A unique identifier for this param.
-    title: 'URI_ALLOW_LIST' # {string} Any name.
+  - id: 'GOTRUE_URI_ALLOW_LIST' # {string} A unique identifier for this param.
+    title: 'GOTRUE_URI_ALLOW_LIST' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     required: true
     description: |
