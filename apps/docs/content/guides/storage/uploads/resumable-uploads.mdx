@@ -119,6 +119,22 @@ When uploading using the resumable upload endpoint, the storage server creates a
 
 This unique upload URL will be valid for **up to 24 hours**. If the upload is not completed within 24 hours, the URL will expire and you'll need to start the upload again. TUS client libraries typically create a new URL if the previous one expires.
 
+### Metadata
+
+You can provide metadata when uploading a file. This metadata will be stored in the database and can be used to filter and search for files. The metadata object can contain any key-value pairs.
+
+```javascript
+new tus.Upload(file, {
+    ...,
+    metadata: {
+        bucketName: bucketName,
+        objectName: fileName,
+        contentType: 'image/png',
+        cacheControl: 3600,
+        matadata: JSON.stringify({ key: 'value' }),
+    },
+```
+
 ### Concurrency
 
 When two or more clients upload to the same upload URL only one of them will succeed. The other clients will receive a `409 Conflict` error. Only 1 client can upload to the same upload URL at a time which prevents data corruption.
