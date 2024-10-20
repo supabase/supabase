@@ -1,0 +1,125 @@
+---
+title: 'Magic Link authentication for Python Flask apps'
+description: A step-by-step guide on building Login with Magic Link into your Python apps.
+categories:
+  - engineering
+tags:
+  - python
+  - auth
+date: '2024-01-19'
+toc_depth: 3
+author: andrew_smith
+image: oauth2-login-python-flask-apps/OG-image.jpg
+thumb: oauth2-login-python-flask-apps/OG-image.jpg
+---
+
+<Admonition type="note" label="Python series">
+
+This is the second part of a Python series - see part one: [GitHub OAuth in your Python Flask app](/blog/oauth2-login-python-flask-apps)
+
+</Admonition>
+
+In this guide we'll learn how to setup magic link authentication into a simple Flask app using supabase-py. This will enable your users to login to your web app using only their email address.
+
+## Prerequisites
+
+This article assumes you have read the [previous article](/blog/oauth2-login-python-flask-apps) where we covered installing the Supabase python package, setting up your session storage, and initiating the Supabase client in Flask.
+
+We'll use the following tools:
+
+- [Flask](https://flask.palletsprojects.com/en/3.0.x/) - we used version 2.3.3 for this article
+- Supabase Dashboard - [create an account](https://database.new/) if you don't have one already
+
+## Create sign in route
+
+Inside of our application code `app.py` we can create the sign with otp route to trigger the one time password (OTP) email request.
+
+```python
+from flask import render_template, flash
+from gotrue.errors import AuthApiError
+...
+...
+...
+@app.route("/signin/otp")
+def signin_with_otp():
+	try:
+	    supabase.auth.sign_in_with_otp({"email": "hello@example.com"})
+	    flash(
+			"Please check your email for a magic link to log into the website.",
+			"info",
+		)
+	except AuthApiError as message:
+		flash(messgae, "error")
+
+```
+
+<Admonition type="note">
+
+For brevity we've hardcoded the email address into the example code above.
+
+</Admonition>
+
+### Create confirm route
+
+Let's add another route to our `app.py` file for the confirm endpoint specified in our sign in route.
+
+```python
+@app.route("/confirm")
+def confirm():
+    token_hash = request.args.get("token_hash")
+    auth_type = request.args.get("type", "email")
+    next = request.args.get("next", "dashboard")
+
+    if token_hash and auth_type:
+        supabase.auth.verify_otp({
+	        "token_hash": token_hash,
+	        "type": auth_type
+	    })
+
+    return redirect(url_for(next))
+
+```
+
+Here we are getting the `token_hash` query parameter from the request object along with the `type` and `next` query parameter which has default values, if the `token_hash` is available we then call the `verify_otp` with the `token_hash` and `type` to sign the user. Under the hood, the `supabase` python library will store this session (JWT) into a cookie and sign the user in.
+
+### Email template update
+
+<Admonition type="note" label="Built-in email service">
+
+At present, you can trial the Supabase platform by sending up to 3 emails per hour via the built-in service. [Configure a Custom SMTP](/docs/guides/auth/auth-smtp)
+
+</Admonition>
+
+We will need to update the email templates to handle the sign in from the server side.
+
+**Confirm signup template**
+
+```html
+<h2>Confirm your signup</h2>
+
+<p>Follow this link to confirm your user:</p>
+<p>
+  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Confirm your mail</a>
+</p>
+```
+
+**Magic Link template**
+
+```html
+<h2>Magic Link</h2>
+
+<p>Follow this link to login:</p>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Log In</a></p>
+```
+
+Both of these now point to the `auth/confirm` endpoint we created earlier and the two query parameters we require. The `{{ .TokenHash }}` variable is provided by Supabase Auth itself.
+
+### Conclusion
+
+In this post, we explained how to set up an API endpoint to handle verifying a token hash and signing a user in with the Supabase Python library. We learned to update the email templates to use the same path as the API endpoint we created.
+
+## More Resources
+
+- [supabase-py reference docs](https://supabase.com/docs/reference/python/installing)
+- [supabase-py GitHub repo](https://github.com/supabase-community/supabase-py)
+- [Deep Dive series on auth concepts in Supabase](https://supabase.com/docs/learn/auth-deep-dive/auth-deep-dive-jwts)
