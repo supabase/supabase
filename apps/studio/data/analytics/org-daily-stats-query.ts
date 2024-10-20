@@ -40,6 +40,8 @@ export enum PricingMetric {
   DISK_THROUGHPUT_GP3 = 'DISK_THROUGHPUT_GP3',
   LOG_DRAIN = 'LOG_DRAIN',
   LOG_DRAIN_EVENTS = 'LOG_DRAIN_EVENTS',
+  AUTH_MFA_PHONE = 'AUTH_MFA_PHONE',
+  AUTH_MFA_WEB_AUTHN = 'AUTH_MFA_WEB_AUTHN',
 }
 
 export enum ComputeUsageMetric {
