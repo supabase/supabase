@@ -46,6 +46,9 @@ export const billingMetricUnit = (pricingMetric: PricingMetric) => {
       PricingMetric.PITR_7,
       PricingMetric.PITR_14,
       PricingMetric.PITR_28,
+      PricingMetric.LOG_DRAIN,
+      PricingMetric.AUTH_MFA_PHONE,
+      PricingMetric.AUTH_MFA_WEB_AUTHN,
     ].includes(pricingMetric)
   ) {
     return 'Hours'
