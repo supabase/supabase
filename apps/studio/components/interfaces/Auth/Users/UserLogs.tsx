@@ -103,7 +103,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
             <div className="border border-b-0 rounded-t divide-y">
               {authLogs.map((log) => {
                 const status = ((log.status ?? '-') as any).toString()
-                const formattedTime = dayjs(log.timestamp).format('DD MMM HH:mm:ss')
+                const formattedTime = dayjs(log.timestamp / 1000).format('DD MMM HH:mm:ss')
                 const is400 = status.startsWith('4')
                 const is500 = status.startsWith('5')
 
