@@ -1036,9 +1036,34 @@ export const examples: Registry = [
     files: ['example/multi-select-demo.tsx'],
   },
   {
-    name: 'multi-select-form',
+    name: 'multi-select-disabled',
     type: 'components:example',
-    files: ['example/multi-select-form.tsx'],
+    files: ['example/multi-select-disabled.tsx'],
+  },
+  {
+    name: 'multi-select-badge-limit-wrap',
+    type: 'components:example',
+    files: ['example/multi-select-badge-limit-wrap.tsx'],
+  },
+  {
+    name: 'multi-select-badge-limit',
+    type: 'components:example',
+    files: ['example/multi-select-badge-limit.tsx'],
+  },
+  {
+    name: 'multi-select-combobox',
+    type: 'components:example',
+    files: ['example/multi-select-combobox.tsx'],
+  },
+  {
+    name: 'multi-select-deletable-badge',
+    type: 'components:example',
+    files: ['example/multi-select-deletable-badge.tsx'],
+  },
+  {
+    name: 'multi-select-inline-search-input',
+    type: 'components:example',
+    files: ['example/multi-select-inline-search-input.tsx'],
   },
   {
     name: 'tree-view-demo',
