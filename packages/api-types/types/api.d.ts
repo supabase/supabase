@@ -3464,6 +3464,10 @@ export interface paths {
     /** Creates a sink */
     post: operations['ReplicationSinksController_createSink']
   }
+  '/platform/replication/{ref}/sinks/{sink_id}': {
+    /** Deletes a sink */
+    delete: operations['ReplicationSinksController_deleteSink']
+  }
   '/platform/replication/{ref}/sources': {
     /** Gets replication sources */
     get: operations['ReplicationSourcesController_getSources']
@@ -22506,6 +22510,26 @@ export interface operations {
         content: never
       }
       /** @description Failed to create sink */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes a sink */
+  ReplicationSinksController_deleteSink: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Sink id */
+        sink_id: number
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete sink */
       500: {
         content: never
       }
