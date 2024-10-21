@@ -79,7 +79,9 @@ export const ReplicationPublications = () => {
                   body={
                     publications.length === 0 ? (
                       <Table.tr>
-                        <Table.td colSpan={4}>No publications</Table.td>
+                        <Table.td align="center" colSpan={4}>
+                          No publications
+                        </Table.td>
                       </Table.tr>
                     ) : (
                       publications.map((pub) => (
@@ -87,7 +89,14 @@ export const ReplicationPublications = () => {
                           <Table.td>{pub.name}</Table.td>
                           <Table.td>{pub.tables.length}</Table.td>
                           <Table.td>
-                            <Button type="default">Edit</Button>
+                            <Button
+                              type="default"
+                              onClick={() => {
+                                toast.info('Editing a publication is not yet implemented')
+                              }}
+                            >
+                              Edit
+                            </Button>
                           </Table.td>
                           <Table.td>
                             <Button
