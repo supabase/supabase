@@ -7832,7 +7832,7 @@
     },
     "/v1/projects/{ref}/functions": {
       "post": {
-        "operationId": "createFunction",
+        "operationId": "v1-create-a-function",
         "summary": "Create a function",
         "description": "Creates a function and adds it to the specified project.",
         "parameters": [
