@@ -118,8 +118,11 @@ const WrapperRow = ({
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {wrapper.tables ? (
-                          wrapper.tables.map((table: any) => (
-                            <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
+                          wrapper.tables.map((table) => (
+                            <Link
+                              key={table.id}
+                              href={`/project/${ref}/editor/${table.id}?schema=${table.schema}`}
+                            >
                               <div className="text-sm border rounded px-2 py-1 transition bg-surface-200 hover:bg-overlay-hover">
                                 {table.name}
                               </div>
