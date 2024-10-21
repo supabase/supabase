@@ -19,7 +19,7 @@ const FeaturePreviewModal = () => {
 
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
   const isNotReleased =
-    selectedFeatureKey === 'supabase-ui-functions-assistant' && enableFunctionsAssistant
+    selectedFeatureKey === 'supabase-ui-functions-assistant' && !enableFunctionsAssistant
 
   // this modal can be triggered on other pages
   // Update local state when valtio state changes
