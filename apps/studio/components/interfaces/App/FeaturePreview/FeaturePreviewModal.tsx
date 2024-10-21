@@ -6,16 +6,20 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const FeaturePreviewModal = () => {
   const snap = useAppStateSnapshot()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
+  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
 
   const selectedFeaturePreview =
     snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
 
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
+  const isNotReleased =
+    selectedFeatureKey === 'supabase-ui-functions-assistant' && enableFunctionsAssistant
 
   // this modal can be triggered on other pages
   // Update local state when valtio state changes
@@ -96,9 +100,15 @@ const FeaturePreviewModal = () => {
                     </Link>
                   </Button>
                 )}
-                <Button type="default" onClick={() => toggleFeature()}>
-                  {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
-                </Button>
+                {isNotReleased ? (
+                  <Button disabled type="default">
+                    Coming soon
+                  </Button>
+                ) : (
+                  <Button type="default" onClick={() => toggleFeature()}>
+                    {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
+                  </Button>
+                )}
               </div>
             </div>
             {selectedFeature?.content}
