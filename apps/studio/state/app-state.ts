@@ -1,3 +1,4 @@
+import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
@@ -7,6 +8,12 @@ const EMPTY_DASHBOARD_HISTORY: {
 } = {
   sql: undefined,
   editor: undefined,
+}
+
+type AiAssistantPanelType = {
+  open: boolean
+  editor?: SupportedAssistantEntities | null
+  content?: string
 }
 
 export const appState = proxy({
@@ -91,6 +98,11 @@ export const appState = proxy({
   },
   setNavigationPanelJustClosed: (value: boolean) => {
     appState.navigationPanelJustClosed = value
+  },
+
+  aiAssistantPanel: { open: false, editor: null, content: '' } as AiAssistantPanelType,
+  setAiAssistantPanel: (value: AiAssistantPanelType) => {
+    appState.aiAssistantPanel = { ...appState.aiAssistantPanel, ...value }
   },
 })
 

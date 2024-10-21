@@ -12,15 +12,15 @@ import {
 } from 'ui'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { DiffType } from '../SQLEditor.types'
+import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 
-interface AiMessagePreProps {
+interface MessagePreProps {
   onDiff: (type: DiffType, s: string) => void
   children: string[]
   className?: string
 }
 
-export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps) => {
+export const MessagePre = ({ onDiff, children, className }: MessagePreProps) => {
   const [copied, setCopied] = useState(false)
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -68,9 +68,9 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
               onClick={() => {
                 onDiff(DiffType.Addition, formatted)
                 sendEvent({
-                  category: 'sql_editor_ai_assistant',
+                  category: 'sql_editor_ai_assistant_v2',
+                  label: 'sql-editor-ai-assistant-v2',
                   action: 'ai_suggestion_inserted',
-                  label: 'sql-editor-ai-assistant',
                 })
               }}
             >
@@ -88,33 +88,11 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
               type="text"
               size="tiny"
               onClick={() => {
-                onDiff(DiffType.Modification, formatted)
-                sendEvent({
-                  category: 'sql_editor_ai_assistant',
-                  action: 'ai_suggestion_replaced',
-                  label: 'sql-editor-ai-assistant',
-                })
-              }}
-            >
-              <ReplaceCode className="h-4 w-4 text-foreground-light" strokeWidth={1.5} />
-            </Button>
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom" className="font-sans">
-            Replace code
-          </TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
-
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
-            <Button
-              type="text"
-              size="tiny"
-              onClick={() => {
                 handleCopy(formatted)
                 sendEvent({
-                  category: 'sql_editor_ai_assistant',
+                  category: 'sql_editor_ai_assistant_v2',
+                  label: 'sql-editor-ai-assistant-v2',
                   action: 'ai_suggestion_copied',
-                  label: 'sql-editor-ai-assistant',
                 })
               }}
             >
