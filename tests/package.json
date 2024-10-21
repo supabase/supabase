@@ -11,7 +11,7 @@
     "test:prod": "jest --detectOpenHandles",
     "allure:generate": "rm -rf allure-report && node_modules/allure-commandline/bin/allure generate",
     "allure:serve": "node_modules/allure-commandline/bin/allure serve",
-    "test:report": "npm run allure:generate && npm run allure:serve",
+    "test:report": "pnpm run allure:generate && pnpm run allure:serve",
     "clean": "rimraf node_modules",
     "format": "prettier --write \"./**/*.{js,jsx,ts,tsx,css,md}\""
   },

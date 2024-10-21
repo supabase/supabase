@@ -15,18 +15,18 @@
     "@supabase/supabase-js": "*",
     "ai": "^3.4.33",
     "common-tags": "^1.8.2",
-    "config": "*",
+    "config": "workspace:*",
     "js-tiktoken": "^1.0.10",
     "jsonrepair": "^3.5.0",
     "openai": "^4.26.1"
   },
   "devDependencies": {
-    "api-types": "*",
     "@ai-sdk/openai": "^0.0.72",
     "@babel/core": "^7.23.6",
     "@babel/preset-env": "^7.23.6",
     "@jest/globals": "^29.7.0",
     "@types/common-tags": "^1.8.4",
+    "api-types": "workspace:*",
     "babel-jest": "^29.7.0",
     "babel-plugin-transform-import-meta": "^2.2.1",
     "chalk": "^5.3.0",
@@ -36,7 +36,7 @@
     "mdast-util-from-markdown": "^2.0.0",
     "sql-formatter": "^15.0.2",
     "ts-jest": "^29.1.1",
-    "tsconfig": "*",
+    "tsconfig": "workspace:*",
     "typescript": "~5.5.0"
   }
 }

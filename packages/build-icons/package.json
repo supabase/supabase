@@ -8,6 +8,9 @@
   "bin": {
     "build-icons": "src/main.mjs"
   },
+  "scripts": {
+    "clean": "rimraf node_modules"
+  },
   "engines": {
     "node": ">= 16"
   },

@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "env:setup": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generate-env.js",
-    "pretest": "npm run env:setup",
+    "pretest": "pnpm run env:setup",
     "test": "playwright test",
     "posttest": "supabase stop --no-backup",
-    "codegen:setup": "npm run env:setup && NODE_ENV=test npm --prefix ../apps/studio run dev",
+    "codegen:setup": "pnpm run env:setup && NODE_ENV=test pnpm --prefix ../apps/studio run dev",
     "codegen": "playwright codegen http://localhost:8082/project/default",
     "clean": "rimraf node_modules"
   },
