@@ -88,6 +88,7 @@ export type QueryType =
   | 'supavisor'
   | 'postgrest'
   | 'warehouse'
+  | 'workflow_run'
 
 export type Mode = 'simple' | 'custom'
 

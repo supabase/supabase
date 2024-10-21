@@ -2,7 +2,6 @@ import { MousePointerClick, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { Loading } from 'components/ui/Loading'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
 import useSingleLog from 'hooks/analytics/useSingleLog'
 import {
@@ -14,6 +13,7 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
 import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
 import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
@@ -21,9 +21,9 @@ import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExp
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
+import WorkflowRunSelectionRenderer from './LogSelectionRenderers/WorkflowRunSelectionRenderer'
 import type { LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat, isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface LogSelectionProps {
   log: LogData | null
@@ -117,6 +117,11 @@ const LogSelection = ({
         if (!fullLog) return null
         if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <AuthSelectionRenderer log={fullLog} />
+
+      case 'workflow_run':
+        if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
+        return <WorkflowRunSelectionRenderer log={fullLog} />
 
       default:
         if (queryType && fullLog && isDefaultLogPreviewFormat(fullLog)) {
