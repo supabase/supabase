@@ -9,6 +9,7 @@ import { useReplicationPublicationsQuery } from 'data/replication/publications-q
 import { Button } from 'ui'
 import { useState } from 'react'
 import CreatePublicationModal from './CreatePublicationModal'
+import { toast } from 'sonner'
 
 export const ReplicationPublications = () => {
   const { ref } = useParams()
@@ -26,18 +27,18 @@ export const ReplicationPublications = () => {
       if (source_id === null) {
         source_id = source.id
       } else {
-        throw new Error(`multiple sources for ref ${ref}`)
+        toast.error('failed to load sources for ref')
       }
     }
   }
 
   if (source_id === null) {
-    throw new Error(`no sources for ref ${ref}`)
+    toast.error('failed to load sources for ref')
   }
 
   const { data: pub_data } = useReplicationPublicationsQuery({
     projectRef: ref,
-    sourceId: source_id,
+    sourceId: source_id!,
   })
 
   const publications = pub_data ?? []
