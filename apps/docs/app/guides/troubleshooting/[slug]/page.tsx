@@ -4,6 +4,10 @@ import TroubleshootingPage from '~/features/docs/Troubleshooting.page'
 import { getAllTroubleshootingEntries, getArticleSlug } from '~/features/docs/Troubleshooting.utils'
 import { PROD_URL } from '~/lib/constants'
 
+// 60 seconds/minute * 60 minutes/hour * 24 hours/day
+export const revalidate = 86_400
+export const dynamicParams = false
+
 export default async function TroubleshootingEntryPage({
   params: { slug },
 }: {
