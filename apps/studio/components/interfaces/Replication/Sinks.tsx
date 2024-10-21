@@ -9,6 +9,7 @@ import { useState } from 'react'
 import CreateSinkModal from './CreateSinkModal'
 import { Button } from 'ui'
 import { toast } from 'sonner'
+import { DeleteSinkModal } from './DeleteSinkModal'
 
 export const ReplicationSinks = () => {
   const { ref } = useParams()
@@ -16,6 +17,8 @@ export const ReplicationSinks = () => {
     projectRef: ref,
   })
   const [showCreateSinkModal, setShowCreateSinkModal] = useState(false)
+  const [showDeleteSinkModal, setShowDeleteSinkModal] = useState(false)
+  const [sinkIdToDelete, setSinkIdToDelete] = useState(-1)
 
   const sinks = sinks_data ?? []
 
@@ -73,7 +76,8 @@ export const ReplicationSinks = () => {
                             <Button
                               type="danger"
                               onClick={() => {
-                                toast.info('Deleting a sink is not yet implemented')
+                                setSinkIdToDelete(sink.id)
+                                setShowDeleteSinkModal(true)
                               }}
                             >
                               Delete
@@ -92,6 +96,12 @@ export const ReplicationSinks = () => {
       <CreateSinkModal
         visible={showCreateSinkModal}
         onClose={() => setShowCreateSinkModal(false)}
+      />
+      <DeleteSinkModal
+        visible={showDeleteSinkModal}
+        title={`Delete sink with id ${sinkIdToDelete}?`}
+        sinkId={sinkIdToDelete}
+        onClose={() => setShowDeleteSinkModal(false)}
       />
     </>
   )
