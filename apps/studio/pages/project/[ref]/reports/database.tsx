@@ -54,10 +54,7 @@ const DatabaseUsage = () => {
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-  const showNewDiskManagementUI =
-    subscription?.usage_based_billing_project_addons &&
-    diskManagementV2 &&
-    project?.cloud_provider === 'AWS'
+  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
 
   const report = useDatabaseReport()
   const { data } = useDatabaseSizeQuery({

@@ -25,10 +25,7 @@ const ProjectSettings: NextPageWithLayout = () => {
   const selectedOrg = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
-  const showNewDiskManagementUI =
-    diskManagementV2 &&
-    project?.cloud_provider === 'AWS' &&
-    subscription?.usage_based_billing_project_addons
+  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
 
   return (
     <>
