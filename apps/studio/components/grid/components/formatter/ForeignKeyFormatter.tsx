@@ -1,9 +1,9 @@
 import { ArrowRight } from 'lucide-react'
-import Link from 'next/link'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableQuery } from 'data/tables/table-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
@@ -62,11 +62,20 @@ export const ForeignKeyFormatter = (props: Props) => {
               className="translate-y-[2px]"
               style={{ padding: '3px' }}
             >
-              <Link
+              <EditorTablePageLink
                 href={`/project/${projectRef}/editor/${targetTable?.id}?schema=${selectedSchema}&filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
+                projectRef={projectRef}
+                id={targetTable && String(targetTable?.id)}
+                filters={[
+                  {
+                    column: relationship.target_column_name,
+                    operator: '=',
+                    value: String(value),
+                  },
+                ]}
               >
                 <ArrowRight size={14} />
-              </Link>
+              </EditorTablePageLink>
             </Button>
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_ side="bottom">View referencing record</TooltipContent_Shadcn_>

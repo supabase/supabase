@@ -12,10 +12,10 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useTableQuery } from 'data/tables/table-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import useTable from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -96,15 +96,7 @@ const TableEditorMenu = () => {
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
-  const { data: selectedTable } = useTableQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      id: Number(id),
-    },
-    // only run if we have a selected table
-    { enabled: Boolean(id) }
-  )
+  const { data: selectedTable } = useTable(id !== undefined ? Number(id) : undefined)
 
   useEffect(() => {
     if (selectedTable) {

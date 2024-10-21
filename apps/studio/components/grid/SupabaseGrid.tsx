@@ -28,8 +28,12 @@ import { InitialStateType } from './store/reducers'
 import type { SupabaseGridProps } from './types'
 import { getGridColumns } from './utils/gridColumns'
 
-function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
-  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
+export function loadTableEditorSortsAndFiltersFromLocalStorage(
+  projectRef: string,
+  tableName: string,
+  schema?: string | null
+) {
+  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   const jsonStr = localStorage.getItem(storageKey)
   if (!jsonStr) return
   const json = JSON.parse(jsonStr)
@@ -45,7 +49,11 @@ async function initTable(
   filter?: string[] // Comes directly from URL param
 ): Promise<{ savedState: { sorts?: string[]; filters?: string[] } }> {
   const savedState = props.projectRef
-    ? onLoadStorage(props.projectRef, props.table.name, props.table.schema)
+    ? loadTableEditorSortsAndFiltersFromLocalStorage(
+        props.projectRef,
+        props.table.name,
+        props.table.schema
+      )
     : undefined
 
   // Check for saved state on initial load and also, load sort and filters via URL param only if given

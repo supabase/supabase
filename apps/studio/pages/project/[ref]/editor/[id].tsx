@@ -31,7 +31,7 @@ const TableEditorPage: NextPageWithLayout = () => {
           if (tables.length > 0) {
             router.push(`/project/${projectRef}/editor/${tables[0].id}`)
           } else {
-            router.push(`/project/${projectRef}/editor/`)
+            router.push(`/project/${projectRef}/editor`)
           }
         }}
       />

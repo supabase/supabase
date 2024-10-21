@@ -13,13 +13,13 @@ import RefreshButton from 'components/grid/components/header/RefreshButton'
 import FilterPopover from 'components/grid/components/header/filter/FilterPopover'
 import { SortPopover } from 'components/grid/components/header/sort'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useEncryptedColumnsQuery } from 'data/encrypted-columns/encrypted-columns-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useTableQuery } from 'data/tables/table-query'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { SidePanel } from 'ui'
 import ActionBar from '../../ActionBar'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
-import { useEncryptedColumns } from '../../SidePanelEditor.utils'
 import Pagination from './Pagination'
 import SelectorGrid from './SelectorGrid'
 
@@ -47,7 +47,12 @@ const ForeignRowSelector = ({
     id: tableId,
   })
 
-  const encryptedColumns = useEncryptedColumns({ schemaName, tableName })
+  const { data: encryptedColumns } = useEncryptedColumnsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: schemaName,
+    tableName,
+  })
 
   const supaTable =
     table &&

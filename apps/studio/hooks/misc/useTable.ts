@@ -25,18 +25,7 @@ function useTable(id?: number) {
       id: entity?.id,
     },
     {
-      enabled: entity?.type === ENTITY_TYPE.TABLE,
-    }
-  )
-
-  const partitionTableResult = useTableQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      id: entity?.id,
-    },
-    {
-      enabled: entity?.type === ENTITY_TYPE.PARTITIONED_TABLE,
+      enabled: entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE,
     }
   )
 
@@ -75,9 +64,8 @@ function useTable(id?: number) {
 
   switch (entity?.type) {
     case ENTITY_TYPE.TABLE:
-      return tableResult
     case ENTITY_TYPE.PARTITIONED_TABLE:
-      return partitionTableResult
+      return tableResult
     case ENTITY_TYPE.VIEW:
       return viewResult
     case ENTITY_TYPE.MATERIALIZED_VIEW:
