@@ -44,7 +44,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (!isLoadingOrganizations) {
-      setSelectedOrgSlug(organizations?.[0].slug ?? undefined)
+      setSelectedOrgSlug(organizations?.[0]?.slug ?? undefined)
     }
   }, [isLoadingOrganizations])
 
@@ -113,7 +113,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   if (isApproved) {
     const approvedOrganization = organizations?.find(
-      (org) => org.slug === requester.approved_organization_slug
+      (org) => org?.slug === requester.approved_organization_slug
     )
 
     return (
@@ -184,9 +184,9 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           >
             {(organizations ?? []).map((organization) => (
               <Listbox.Option
-                key={organization.slug}
-                label={organization.name}
-                value={organization.slug}
+                key={organization?.slug}
+                label={organization?.name}
+                value={organization?.slug}
               >
                 {organization.name}
               </Listbox.Option>
