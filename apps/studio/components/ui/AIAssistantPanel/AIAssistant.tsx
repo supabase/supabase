@@ -1,9 +1,11 @@
+import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
 import { ExternalLink, FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { useChat } from 'ai/react'
+import { CreateMessage, useChat } from 'ai/react'
+import type { Message as MessageType } from 'ai/react'
 import { MessageWithDebug } from 'components/interfaces/SQLEditor/AiAssistantPanel'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
@@ -43,6 +45,7 @@ import { ContextBadge } from './ContextBadge'
 import { EntitiesDropdownMenu } from './EntitiesDropdownMenu'
 import { Message } from './Message'
 import { SchemasDropdownMenu } from './SchemasDropdownMenu'
+import { useParams } from 'common'
 
 const ANIMATION_DURATION = 0.3
 
@@ -63,6 +66,7 @@ export const AIAssistant = ({
   onDiff,
   onResetConversation,
 }: AIAssistantProps) => {
+  const { ref } = useParams()
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
@@ -82,6 +86,9 @@ export const AIAssistant = ({
   const [contextHistory, setContextHistory] = useState<{
     [key: string]: { entity: string; schemas: string[]; tables: string[] }
   }>({})
+  // [Joshen] Mainly for error handling on useChat - cause last sent messages will be voided
+  const [assistantError, setAssistantError] = useState<string>()
+  const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
 
   const docsUrl = retrieveDocsUrl(selectedDatabaseEntity as SupportedAssistantEntities)
   const entityContext = ASSISTANT_SUPPORT_ENTITIES.find((x) => x.id === selectedDatabaseEntity)
@@ -119,29 +126,41 @@ export const AIAssistant = ({
     id,
     api: `${BASE_PATH}/api/ai/sql/generate-v2`,
     body: { entityDefinitions, context: selectedDatabaseEntity },
+    onError: (error) => setAssistantError(JSON.parse(error.message).error),
   })
 
   const { isLoading: isDebugSqlLoading } = useSqlDebugMutation()
   const isLoading = isChatLoading || isDebugSqlLoading
 
   const messages = useMemo(() => {
-    const merged = [...debugThread, ...chatMessages.map((m) => ({ ...m, isDebug: false }))]
+    const merged = [
+      ...debugThread,
+      ...chatMessages.map((m) => ({ ...m, isDebug: false })),
+      ...(assistantError !== undefined && lastSentMessage !== undefined ? [lastSentMessage] : []),
+    ]
 
     return merged.sort(
       (a, b) =>
         (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0) ||
         a.role.localeCompare(b.role)
     )
-  }, [chatMessages, debugThread])
+  }, [chatMessages, debugThread, assistantError, lastSentMessage])
 
   const hasMessages = messages.length > 0
   const lastMessage = last(messages)
   const pendingChatReply = isLoading && lastMessage?.role === 'user'
   const pendingDebugReply =
-    lastMessage?.isDebug &&
+    (lastMessage as MessageWithDebug)?.isDebug &&
     lastMessage?.role === 'assistant' &&
     lastMessage.content === 'Thinking...'
   const pendingReply = pendingChatReply || pendingDebugReply
+
+  const sendMessageToAssistant = (content: string) => {
+    const payload = { role: 'user', createdAt: new Date(), content } as MessageType
+    append(payload)
+    setAssistantError(undefined)
+    setLastSentMessage(payload)
+  }
 
   const toggleSchema = (schema: string) => {
     if (selectedSchemas.includes(schema)) {
@@ -173,7 +192,7 @@ export const AIAssistant = ({
     })
     if (prompt) {
       setValue(prompt)
-      append({ role: 'user', createdAt: new Date(), content: prompt })
+      sendMessageToAssistant(prompt)
     }
   }
 
@@ -270,7 +289,7 @@ export const AIAssistant = ({
                   role={m.role}
                   content={m.content}
                   createdAt={new Date(m.createdAt || new Date()).getTime()}
-                  isDebug={m.isDebug}
+                  isDebug={(m as MessageWithDebug).isDebug}
                   context={contextHistory[m.id]}
                   onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
                   // isSelected={selectedMessage === m.id}
@@ -305,7 +324,26 @@ export const AIAssistant = ({
                 </Message>
               )
             })}
-            {!isLoading && !pendingReply && (
+            {assistantError !== undefined && (
+              <Message
+                key="assistant-error"
+                role="assistant"
+                variant="warning"
+                createdAt={new Date().getTime()}
+                content={`Sorry! We ran into the following error while trying to respond to your message: ${assistantError}. Please try again shortly or reach out to us via support if the issue still persists!`}
+              >
+                <Button asChild type="default" className="w-min">
+                  <Link
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`/support/new?ref=${ref}&category=dashboard_bug&subject=Error%20with%20assistant%20response&message=Assistant%20error:%20${assistantError}`}
+                  >
+                    Contact support
+                  </Link>
+                </Button>
+              </Message>
+            )}
+            {!isLoading && !pendingReply && assistantError === undefined && (
               <p className="px-content text-xs text-right text-foreground-lighter pb-2">
                 Please verify all responses as the Assistant can make mistakes
               </p>
@@ -515,11 +553,7 @@ export const AIAssistant = ({
                 onValueChange={(e) => setValue(e.target.value)}
                 onSubmit={(event) => {
                   event.preventDefault()
-                  append({
-                    content: value,
-                    role: 'user',
-                    createdAt: new Date(),
-                  })
+                  sendMessageToAssistant(value)
                 }}
               />
             </div>

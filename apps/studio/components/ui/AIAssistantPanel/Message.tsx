@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { PropsWithChildren, memo, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { AiIconAnimation, Badge, cn, markdownComponents } from 'ui'
+import { AiIconAnimation, Badge, cn, markdownComponents, WarningIcon } from 'ui'
 
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { useProfile } from 'lib/profile'
@@ -20,6 +20,7 @@ interface MessageProps {
   action?: React.ReactNode
   context?: { entity: string; schemas: string[]; tables: string[] }
   onDiff?: (type: DiffType, s: string) => void
+  variant?: 'default' | 'warning'
 }
 
 export const Message = memo(function Message({
@@ -32,6 +33,7 @@ export const Message = memo(function Message({
   context,
   children,
   action = <></>,
+  variant = 'default',
   onDiff = noop,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
@@ -59,6 +61,7 @@ export const Message = memo(function Message({
   const formattedContext =
     context !== undefined
       ? Object.entries(context)
+          .filter(([_, value]) => value.length > 0)
           .map(([key, value]) => {
             return `${key.charAt(0).toUpperCase() + key.slice(1)}: ${Array.isArray(value) ? value.join(', ') : value}`
           })
@@ -71,18 +74,26 @@ export const Message = memo(function Message({
     <div
       className={cn(
         'flex flex-col py-4 gap-4 px-5 text-foreground-light text-sm border-t first:border-0',
+        variant === 'warning' && 'bg-warning-200',
         isUser && 'bg-default'
       )}
     >
       <div className="flex justify-between items-center">
         <div className="flex gap-x-3 items-center">
-          {icon}
+          {variant === 'warning' ? <WarningIcon className="w-6 h-6" /> : icon}
 
           <div className="flex flex-col -gap-y-1">
             <div className="flex items-center gap-x-3">
               <span className="text-sm">{!isUser ? 'Assistant' : name ? name : 'You'}</span>
               {createdAt && (
-                <span className="text-xs text-foreground-muted">{dayjs(createdAt).fromNow()}</span>
+                <span
+                  className={cn(
+                    'text-xs text-foreground-muted',
+                    variant === 'warning' && 'text-warning-500'
+                  )}
+                >
+                  {dayjs(createdAt).fromNow()}
+                </span>
               )}
             </div>
             {role === 'user' && context !== undefined && (
