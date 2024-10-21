@@ -154,6 +154,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               return (
                 <Row
                   {...props}
+                  key={`qp-row-${props.rowIdx}`}
                   onClick={() => {
                     if (typeof idx === 'number' && idx >= 0) {
                       setSelectedRow(idx)

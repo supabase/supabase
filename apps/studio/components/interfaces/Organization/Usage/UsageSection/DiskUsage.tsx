@@ -169,7 +169,10 @@ const DiskUsage = ({
                   const totalDiskUsage = primaryDiskUsage + replicaDiskUsage
 
                   return (
-                    <div className={idx !== relevantProjects.length - 1 ? 'border-b pb-2' : ''}>
+                    <div
+                      key={`usage-project-${project.ref}`}
+                      className={idx !== relevantProjects.length - 1 ? 'border-b pb-2' : ''}
+                    >
                       <div className="flex justify-between">
                         <span className="text-foreground-light flex items-center gap-2">
                           {project.name}
