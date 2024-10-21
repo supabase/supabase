@@ -43,13 +43,7 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
   const isSubmitting = isUpdating || isSubmittingFeedback
 
   const projectsWithComputeDowngrade = projects.filter((project) => {
-    const computeSizesThatDoNotResultInComputeDowngrade = ['nano']
-
-    if (subscription?.nano_enabled === false) {
-      computeSizesThatDoNotResultInComputeDowngrade.push('micro')
-    }
-
-    return !computeSizesThatDoNotResultInComputeDowngrade.includes(project.infra_compute_size!)
+    return project.infra_compute_size! !== 'nano'
   })
 
   const hasProjectsWithComputeDowngrade = projectsWithComputeDowngrade.length > 0
