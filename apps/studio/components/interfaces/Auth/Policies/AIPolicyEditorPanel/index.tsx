@@ -924,10 +924,12 @@ export const AIPolicyEditorPanel = memo(function ({
         confirmLabel="Discard"
         onCancel={() => {
           setIsClosingPolicyEditorPanel(false)
+          clearHistory()
         }}
         onConfirm={() => {
           onSelectCancel()
           setIsClosingPolicyEditorPanel(false)
+          clearHistory()
           setEditView(null)
         }}
       >
