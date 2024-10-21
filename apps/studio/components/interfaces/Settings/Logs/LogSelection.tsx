@@ -2,7 +2,6 @@ import { MousePointerClick, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { Loading } from 'components/ui/Loading'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
 import useSingleLog from 'hooks/analytics/useSingleLog'
 import {
@@ -22,11 +21,12 @@ import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPrev
 import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import type { LogData, LogsEndpointParams, QueryType } from './Logs.types'
-import { isDefaultLogPreviewFormat, isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
+import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface LogSelectionProps {
-  log: LogData | null
+  partialLog: LogData | null
+  logId?: string
   onClose: () => void
   queryType?: QueryType
   projectRef: string
@@ -36,7 +36,8 @@ export interface LogSelectionProps {
 
 const LogSelection = ({
   projectRef,
-  log: partialLog,
+  partialLog,
+  logId,
   onClose,
   queryType,
   params = {},
@@ -46,7 +47,7 @@ const LogSelection = ({
     projectRef,
     queryType,
     params,
-    partialLog?.id
+    partialLog?.id || logId
   )
   const [sql, setSql] = useState('')
 
@@ -70,10 +71,10 @@ const LogSelection = ({
 
   useEffect(() => {
     const newSql = `select id, timestamp, event_message, metadata from \`${collectionName}\`
-    where id = '${partialLog?.id}' and timestamp > '2024-01-01' limit 1`
+    where id = '${partialLog?.id || logId}' and timestamp > '2024-01-01' limit 1`
 
     setSql(newSql)
-  }, [collectionName, partialLog?.id])
+  }, [collectionName, partialLog?.id, logId])
 
   useEffect(() => {
     if (queryType === 'warehouse') {
@@ -84,6 +85,7 @@ const LogSelection = ({
     collectionName,
     projectRef,
     partialLog?.id,
+    logId,
     refetchWarehouseData,
     queryType,
   ])
@@ -130,22 +132,6 @@ const LogSelection = ({
     }
   }
 
-  const selectionText = useMemo(() => {
-    if (fullLog && queryType) {
-      return `Log ID
-  ${fullLog.id}\n
-  Log Timestamp (UTC)
-  ${isUnixMicro(fullLog.timestamp) ? unixMicroToIsoTimestamp(fullLog.timestamp) : fullLog.timestamp}\n
-  Log Event Message
-  ${fullLog.event_message}\n
-  Log Metadata
-  ${JSON.stringify(fullLog.metadata, null, 2)}
-  `
-    }
-
-    return JSON.stringify(fullLog || partialLog, null, 2)
-  }, [fullLog, partialLog, queryType])
-
   const rawLog = useMemo(() => {
     if (queryType === 'warehouse') {
       return warehouseQueryData?.result?.[0] || {}
@@ -164,8 +150,8 @@ const LogSelection = ({
         className={cn(
           'absolute flex h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-studio text-center opacity-0 transition-all',
           {
-            'z-0 opacity-0': partialLog,
-            'z-10 opacity-100': !partialLog,
+            'z-0 opacity-0': partialLog || logId,
+            'z-10 opacity-100': !partialLog && !logId,
           }
         )}
       >

@@ -15,7 +15,13 @@ dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 
 beforeAll(() => {
-  vi.mock('next/router', () => require('next-router-mock'))
+  vi.mock('next/router', () => import('next-router-mock'))
+  vi.mock('nuqs', async () => {
+    let queryValue = 'example'
+    return {
+      useQueryState: () => [queryValue, (v: string) => (queryValue = v)],
+    }
+  })
 })
 
 test.skip('can display log data', async () => {
