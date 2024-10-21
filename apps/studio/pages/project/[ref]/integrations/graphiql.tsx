@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
-import DocsLayout from 'components/layouts/DocsLayout/DocsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Loading } from 'components/ui/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
@@ -18,6 +17,7 @@ import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import type { NextPageWithLayout } from 'types'
+import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 
 const GraphiQLPage: NextPageWithLayout = () => {
   const { resolvedTheme } = useTheme()
@@ -111,6 +111,8 @@ const GraphiQLPage: NextPageWithLayout = () => {
   return <GraphiQL fetcher={fetcher} theme={currentTheme} />
 }
 
-GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
+GraphiQLPage.getLayout = (page) => (
+  <ProjectIntegrationsLayout title="GraphiQL">{page}</ProjectIntegrationsLayout>
+)
 
 export default GraphiQLPage
