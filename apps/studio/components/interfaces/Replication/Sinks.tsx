@@ -4,14 +4,20 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Plus } from 'lucide-react'
 import Table from 'components/to-be-cleaned/Table'
 import { useParams } from 'common'
-import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useReplicationSinksQuery } from 'data/replication/sinks-query'
+import { useState } from 'react'
+import CreateSinkModal from './CreateSinkModal'
+import { Button } from 'ui'
+import { toast } from 'sonner'
 
 export const ReplicationSinks = () => {
   const { ref } = useParams()
-  const { data: sinks } = useReplicationSinksQuery({
+  const { data: sinks_data } = useReplicationSinksQuery({
     projectRef: ref,
   })
+  const [showCreateSinkModal, setShowCreateSinkModal] = useState(false)
+
+  const sinks = sinks_data ?? []
 
   return (
     <>
@@ -30,6 +36,7 @@ export const ReplicationSinks = () => {
                       text: 'Create a sink',
                     },
                   }}
+                  onClick={() => setShowCreateSinkModal(true)}
                 >
                   New Sink
                 </ButtonTooltip>
@@ -42,16 +49,38 @@ export const ReplicationSinks = () => {
                     <Table.th key="delete">Delete</Table.th>,
                   ]}
                   body={
-                    sinks?.length === 0 ? (
+                    sinks.length === 0 ? (
                       <Table.tr>
                         <Table.td align="center" colSpan={3}>
                           No sinks
                         </Table.td>
                       </Table.tr>
                     ) : (
-                      <Table.tr>
-                        <Table.td colSpan={3}>Some sinks</Table.td>
-                      </Table.tr>
+                      sinks.map((sink) => (
+                        <Table.tr key={sink.id}>
+                          <Table.td>{sink.id}</Table.td>
+                          <Table.td>
+                            <Button
+                              type="default"
+                              onClick={() => {
+                                toast.info('Editing a sink is not yet implemented')
+                              }}
+                            >
+                              Edit
+                            </Button>
+                          </Table.td>
+                          <Table.td>
+                            <Button
+                              type="danger"
+                              onClick={() => {
+                                toast.info('Deleting a sink is not yet implemented')
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </Table.td>
+                        </Table.tr>
+                      ))
                     )
                   }
                 ></Table>
@@ -60,6 +89,10 @@ export const ReplicationSinks = () => {
           </div>
         </ScaffoldSection>
       </ScaffoldContainer>
+      <CreateSinkModal
+        visible={showCreateSinkModal}
+        onClose={() => setShowCreateSinkModal(false)}
+      />
     </>
   )
 }
