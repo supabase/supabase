@@ -18,20 +18,25 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' && (github.event.label.name == 'autofix') }}
     steps:
-
       - uses: actions/checkout@v4
         with:
           sparse-checkout: apps
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9.10.0
+          run_install: false
 
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
 
       - name: Install required dependencies
-        run: npm ci
+        run: pnpm i
 
       - name: Run Prettier in fix mode
-        run: npm run format
+        run: pnpm run format
 
       - name: Commit changes and push to existing branch
         run: |
@@ -39,7 +44,7 @@ jobs:
           git config --global user.email 'github-tidy-bot@supabase.com'
           if [[ `git status --porcelain` ]]; then
             echo "[bot] Changes detected, committing."
-       
+
             echo "[bot] Running in non-squash mode."
             git commit -am "ci: Autofix updates from GitHub workflow"
             git push

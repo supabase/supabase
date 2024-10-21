@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "typescript": "~5.5.0",
-    "@supabase/build-icons": "*"
+    "@supabase/build-icons": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.2.24"
