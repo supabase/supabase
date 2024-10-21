@@ -10,6 +10,7 @@ import { Button } from 'ui'
 import { useState } from 'react'
 import CreatePublicationModal from './CreatePublicationModal'
 import { toast } from 'sonner'
+import { DeletePublicationModal } from './DeletePublicationModal'
 
 export const ReplicationPublications = () => {
   const { ref } = useParams()
@@ -17,6 +18,8 @@ export const ReplicationPublications = () => {
     projectRef: ref,
   })
   const [showCreatePublicationModal, setShowCreatePublicationModal] = useState(false)
+  const [showDeletePublicationModal, setShowDeletePublicationModal] = useState(false)
+  const [publicationToDelete, setPublicationToDelete] = useState('')
 
   const sources = data ?? []
   let source_id = null
@@ -84,10 +87,18 @@ export const ReplicationPublications = () => {
                           <Table.td>{pub.name}</Table.td>
                           <Table.td>{pub.tables.length}</Table.td>
                           <Table.td>
-                            <Button>Edit</Button>
+                            <Button type="default">Edit</Button>
                           </Table.td>
                           <Table.td>
-                            <Button>Delete</Button>
+                            <Button
+                              type="danger"
+                              onClick={() => {
+                                setPublicationToDelete(pub.name)
+                                setShowDeletePublicationModal(true)
+                              }}
+                            >
+                              Delete
+                            </Button>
                           </Table.td>
                         </Table.tr>
                       ))
@@ -101,8 +112,15 @@ export const ReplicationPublications = () => {
       </ScaffoldContainer>
       <CreatePublicationModal
         visible={showCreatePublicationModal}
-        sourceId={source_id}
+        sourceId={source_id!}
         onClose={() => setShowCreatePublicationModal(false)}
+      />
+      <DeletePublicationModal
+        visible={showDeletePublicationModal}
+        title={`Delete publication "${publicationToDelete}"`}
+        publicationName={publicationToDelete}
+        sourceId={source_id!}
+        onClose={() => setShowDeletePublicationModal(false)}
       />
     </>
   )

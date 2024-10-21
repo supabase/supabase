@@ -783,6 +783,10 @@ export interface paths {
     /** Lists project's warehouse queries from logflare */
     get: operations['v1-list-all-warehouse-queries']
   }
+  '/platform/projects/{ref}/analytics/warehouse/query/parse': {
+    /** Parses a warehouse query */
+    get: operations['v1-parse-warehouse-query']
+  }
   '/platform/projects/{ref}/analytics/warehouse/tenant': {
     /** Gets project's warehouse tenant from logflare */
     get: operations['v1-provision-a-warehouse-tenant']
@@ -1014,6 +1018,10 @@ export interface paths {
     get: operations['ReplicationSourcesController_getPublications']
     /** Creates a publication */
     post: operations['ReplicationSourcesController_createPublication']
+  }
+  '/platform/replication/{ref}/sources/{source_id}/publications/{publication_name}': {
+    /** Deletes a publication */
+    delete: operations['ReplicationSourcesController_deletePublication']
   }
   '/platform/replication/{ref}/sources/{source_id}/tables': {
     /** Gets source tables */
@@ -1717,6 +1725,10 @@ export interface paths {
   '/v0/projects/{ref}/analytics/warehouse/query': {
     /** Lists project's warehouse queries from logflare */
     get: operations['v1-list-all-warehouse-queries']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/query/parse': {
+    /** Parses a warehouse query */
+    get: operations['v1-parse-warehouse-query']
   }
   '/v0/projects/{ref}/analytics/warehouse/tenant': {
     /** Gets project's warehouse tenant from logflare */
@@ -2988,7 +3000,6 @@ export interface components {
       publish_update?: boolean
       tables?: string[] | null
     }
-    CreatePublicationResponse: Record<string, never>
     CreateReplicationPublicationBody: {
       /** @description Publication name */
       name: string
@@ -12064,6 +12075,27 @@ export interface operations {
       }
     }
   }
+  /** Parses a warehouse query */
+  'v1-parse-warehouse-query': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to parse warehouse query */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets project's warehouse tenant from logflare */
   'v1-provision-a-warehouse-tenant': {
     parameters: {
@@ -13493,11 +13525,31 @@ export interface operations {
     }
     responses: {
       201: {
-        content: {
-          'application/json': components['schemas']['CreatePublicationResponse']
-        }
+        content: never
       }
       /** @description Failed to create publication */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes a publication */
+  ReplicationSourcesController_deletePublication: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Source id */
+        source_id: number
+        /** @description Publication name */
+        publication_name: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete publication */
       500: {
         content: never
       }
