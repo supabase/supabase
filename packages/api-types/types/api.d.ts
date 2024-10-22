@@ -1678,6 +1678,8 @@ export interface paths {
     }
     /** Gets the given organization's tax ID */
     get: operations['TaxIdsController_getTaxId']
+    /** Gets the given organization's tax ID */
+    get: operations['TaxIdsController_getTaxId']
     /** Creates or updates a tax ID for the given organization */
     put: operations['TaxIdsController_updateTaxId']
     post?: never
@@ -3335,6 +3337,16 @@ export interface paths {
     head?: never
     patch?: never
     trace?: never
+  }
+  '/platform/replication/{ref}/pipelines': {
+    /** Gets replication pipelines */
+    get: operations['ReplicationPipelinesController_getPipelines']
+    /** Creates a pipeline */
+    post: operations['ReplicationPipelinesController_createPipeline']
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}': {
+    /** Deletes a pipeline */
+    delete: operations['ReplicationPipelinesController_deletePipeline']
   }
   '/platform/replication/{ref}/sinks': {
     /** Gets replication sinks */
@@ -8407,6 +8419,16 @@ export interface components {
       publish_update?: boolean
       tables?: string[] | null
     }
+    CreateReplicationPipelineBody: {
+      /** @description Pipeline config */
+      config: components['schemas']['ReplicationPipelineConfig']
+      /** @description Publication name */
+      publication_name: string
+      /** @description Sink id */
+      sink_id: number
+      /** @description Source id */
+      source_id: number
+    }
     CreateReplicationPublicationBody: {
       /** @description Publication name */
       name: string
@@ -8889,10 +8911,26 @@ export interface components {
     RemoveReadReplicaBody: {
       database_identifier: string
     }
+    ReplicationBatchConfig: {
+      max_fill_secs: number
+      max_size: number
+    }
     ReplicationBigQueryConfig: {
       dataset_id: string
       project_id: string
       service_account_key: string
+    }
+    ReplicationPipelineConfig: {
+      config: components['schemas']['ReplicationBatchConfig']
+    }
+    ReplicationPipelinesResponse: {
+      config: components['schemas']['ReplicationPipelineConfig']
+      id: number
+      publication_name: string
+      replicator_id: number
+      sink_id: number
+      source_id: number
+      tenant_id: string
     }
     ReplicationPostgresConfig: {
       host: string
@@ -13506,6 +13544,8 @@ export interface operations {
     }
   }
   TaxIdsController_getTaxId: {
+  /** Gets the given organization's tax ID */
+  TaxIdsController_getTaxId: {
     parameters: {
       query?: never
       header?: never
@@ -13531,6 +13571,7 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Failed to retrieve the organization's tax ID */
       /** @description Failed to retrieve the organization's tax ID */
       500: {
         headers: {
@@ -13561,6 +13602,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
+          'application/json': components['schemas']['TaxIdResponse']
           'application/json': components['schemas']['TaxIdResponse']
         }
       }
@@ -18730,6 +18772,69 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's settings */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets replication pipelines */
+  ReplicationPipelinesController_getPipelines: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ReplicationPipelinesResponse'][]
+        }
+      }
+      /** @description Failed to get replication pipeline */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates a pipeline */
+  ReplicationPipelinesController_createPipeline: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationPipelineBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create pipeline */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes a pipeline */
+  ReplicationPipelinesController_deletePipeline: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Pipeline id */
+        pipeline_id: number
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete pipelin */
       500: {
         content: never
       }
