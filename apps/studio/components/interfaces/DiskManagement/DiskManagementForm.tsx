@@ -595,6 +595,104 @@ export function DiskManagementForm() {
               </FormItemLayout>
             )}
           />
+          <div>
+            <FormField_Shadcn_
+              name="totalSize"
+              control={control}
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Disk Size"
+                  layout="horizontal"
+                  description={
+                    includedDiskGB > 0 &&
+                    `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`
+                  }
+                  labelOptional={
+                    <BillingChangeBadge
+                      beforePrice={Number(diskSizePrice.oldPrice)}
+                      afterPrice={Number(diskSizePrice.newPrice)}
+                      show={
+                        formState.isDirty &&
+                        !formState.errors.totalSize &&
+                        diskSizePrice.oldPrice !== diskSizePrice.newPrice
+                      }
+                    />
+                  }
+                >
+                  <div className="mt-1 relative flex gap-2 items-center">
+                    <div className="flex -space-x-px max-w-48">
+                      <FormControl_Shadcn_>
+                        <Input
+                          type="number"
+                          step="1"
+                          {...field}
+                          disabled={disableInput}
+                          className="flex-grow font-mono rounded-r-none"
+                          onWheel={(e) => e.currentTarget.blur()}
+                          onChange={(e) => {
+                            setValue('totalSize', e.target.valueAsNumber, {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            })
+                            trigger('provisionedIOPS')
+                            trigger('throughput')
+                          }}
+                          min={includedDiskGB}
+                        />
+                      </FormControl_Shadcn_>
+                      <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
+                        <span className="text-foreground-lighter text-xs font-mono">GB</span>
+                      </div>
+                    </div>
+                    <AnimatePresence initial={false}>
+                      {isAllocatedStorageDirty && (
+                        <motion.div
+                          key="reset-disksize"
+                          initial={{ opacity: 0, scale: 0.95, x: -2 }}
+                          animate={{ opacity: 1, scale: 1, x: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, x: -2 }}
+                          transition={{ duration: 0.15 }}
+                        >
+                          <Button
+                            htmlType="button"
+                            type="default"
+                            size="small"
+                            className="px-2"
+                            onClick={() => form.resetField('totalSize')}
+                          >
+                            <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                          </Button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </FormItemLayout>
+              )}
+            />
+            <div className="grid grid-cols-12 gap-3">
+              {/* You can add additional content in the remaining 4 columns if needed */}
+              <div className="col-span-4">
+                {/* Additional content or information can go here */}
+              </div>
+              <div className="col-span-8 space-y-6 mt-6">
+                <DiskSpaceBar
+                  showNewBar={form.formState.dirtyFields.totalSize !== undefined}
+                  totalSize={size_gb}
+                  usedSize={mainDiskUsed}
+                  newTotalSize={watchedTotalSize}
+                />
+                <DiskManagementDiskSizeReadReplicas
+                  isDirty={form.formState.dirtyFields.totalSize !== undefined}
+                  totalSize={size_gb * 1.25}
+                  usedSize={mainDiskUsed}
+                  newTotalSize={watchedTotalSize * 1.25}
+                  oldStorageType={form.formState.defaultValues?.storageType as DiskType}
+                  newStorageType={form.getValues('storageType') as DiskType}
+                />
+              </div>
+            </div>
+          </div>
+
           <FormField_Shadcn_
             control={form.control}
             name="provisionedIOPS"
@@ -819,99 +917,7 @@ export function DiskManagementForm() {
             )}
           </AnimatePresence>
           {/* </CardContent> */}
-          <Separator />
-
-          <FormField_Shadcn_
-            name="totalSize"
-            control={control}
-            render={({ field }) => (
-              <FormItemLayout
-                label="Disk Size"
-                layout="horizontal"
-                description={
-                  includedDiskGB > 0 &&
-                  `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`
-                }
-              >
-                <div className="mt-1 relative flex gap-2 items-center">
-                  <div className="flex -space-x-px max-w-48">
-                    <FormControl_Shadcn_>
-                      <Input
-                        type="number"
-                        step="1"
-                        {...field}
-                        disabled={disableInput}
-                        className="flex-grow font-mono rounded-r-none"
-                        onWheel={(e) => e.currentTarget.blur()}
-                        onChange={(e) => {
-                          setValue('totalSize', e.target.valueAsNumber, {
-                            shouldDirty: true,
-                            shouldValidate: true,
-                          })
-                          trigger('provisionedIOPS')
-                          trigger('throughput')
-                        }}
-                        min={includedDiskGB}
-                      />
-                    </FormControl_Shadcn_>
-                    <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
-                      <span className="text-foreground-lighter text-xs font-mono">GB</span>
-                    </div>
-                  </div>
-                  <AnimatePresence initial={false}>
-                    {isAllocatedStorageDirty && (
-                      <motion.div
-                        key="reset-disksize"
-                        initial={{ opacity: 0, scale: 0.95, x: -2 }}
-                        animate={{ opacity: 1, scale: 1, x: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, x: -2 }}
-                        transition={{ duration: 0.15 }}
-                      >
-                        <Button
-                          htmlType="button"
-                          type="default"
-                          size="small"
-                          className="px-2"
-                          onClick={() => form.resetField('totalSize')}
-                        >
-                          <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                        </Button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                  <BillingChangeBadge
-                    beforePrice={Number(diskSizePrice.oldPrice)}
-                    afterPrice={Number(diskSizePrice.newPrice)}
-                    show={
-                      formState.isDirty &&
-                      !formState.errors.totalSize &&
-                      diskSizePrice.oldPrice !== diskSizePrice.newPrice
-                    }
-                  />
-                </div>
-              </FormItemLayout>
-            )}
-          />
-          <div className="grid grid-cols-12 gap-3">
-            {/* You can add additional content in the remaining 4 columns if needed */}
-            <div className="col-span-4">{/* Additional content or information can go here */}</div>
-            <div className="col-span-8 space-y-6 mt-6">
-              <DiskSpaceBar
-                showNewBar={form.formState.dirtyFields.totalSize !== undefined}
-                totalSize={size_gb}
-                usedSize={mainDiskUsed}
-                newTotalSize={watchedTotalSize}
-              />
-              <DiskManagementDiskSizeReadReplicas
-                isDirty={form.formState.dirtyFields.totalSize !== undefined}
-                totalSize={size_gb * 1.25}
-                usedSize={mainDiskUsed}
-                newTotalSize={watchedTotalSize * 1.25}
-                oldStorageType={form.formState.defaultValues?.storageType as DiskType}
-                newStorageType={form.getValues('storageType') as DiskType}
-              />
-            </div>
-          </div>
+          {/* <Separator /> */}
 
           {/* </Card> */}
 

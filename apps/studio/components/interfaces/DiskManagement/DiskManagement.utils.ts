@@ -47,10 +47,8 @@ export const calculateComputeSizePrice = ({
   oldComputeSize: string
   newComputeSize: string
 }) => {
-  console.log('newComputeSize', newComputeSize)
-
-  const oldPrice = availableOptions.find((x) => x.identifier === oldComputeSize)?.price * 720
-  const newPrice = availableOptions.find((x) => x.identifier === newComputeSize)?.price * 720
+  const oldPrice = availableOptions?.find((x) => x.identifier === oldComputeSize)?.price * 720
+  const newPrice = availableOptions?.find((x) => x.identifier === newComputeSize)?.price * 720
 
   return {
     oldPrice,
