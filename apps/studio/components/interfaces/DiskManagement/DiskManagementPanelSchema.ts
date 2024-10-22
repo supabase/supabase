@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { DISK_LIMITS, DiskType } from './DiskManagement.constants'
+import { calculateMaxIopsAllowed } from './DiskManagement.utils'
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
@@ -15,9 +16,12 @@ const baseSchema = z.object({
 export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
   const { storageType, totalSize, provisionedIOPS, throughput, computeSize } = data
 
+  // if(computeSize)
+
   if (storageType === 'io2') {
     // Validation rules for io2
-    const maxIOPS = Math.min(1000 * totalSize, 256000)
+    const maxIOPS = calculateMaxIopsAllowed(totalSize)
+
     if (provisionedIOPS < 100) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -34,11 +38,12 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
       } else {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Invalid IOPS value due to invalid disk size`,
+          message: `Invalid IOPS value due to small disk size`,
           path: ['provisionedIOPS'],
         })
       }
     }
+
     if (throughput !== undefined) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -46,6 +51,7 @@ export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
         path: ['throughput'],
       })
     }
+
     if (totalSize > DISK_LIMITS[DiskType.IO2].maxStorage) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

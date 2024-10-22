@@ -1,19 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import {
-  CpuIcon,
-  HelpCircle,
-  InfoIcon,
-  Microchip,
-  RotateCcw,
-  SeparatorVertical,
-} from 'lucide-react'
+import { CpuIcon, InfoIcon, Microchip, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -47,20 +39,21 @@ import {
   RadioGroupCard,
   RadioGroupCardItem,
   Separator,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskCountdownRadial } from './DiskCountdownRadial'
 import {
-  COMPUTE_SIZE_MAX_IOPS,
-  COMPUTE_SIZE_MAX_THROUGHPUT,
+  COMPUTE_BASELINE_IOPS,
+  COMPUTE_BASELINE_THROUGHPUT,
+  COMPUTE_MAX_IOPS,
+  COMPUTE_MAX_THROUGHPUT,
   DiskType,
   IOPS_RANGE,
   PLAN_DETAILS,
+  RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
+  RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
   THROUGHPUT_RANGE,
 } from './DiskManagement.constants'
 import {
@@ -78,12 +71,13 @@ import {
   DiskManagementThroughputReadReplicas,
 } from './DiskManagementReadReplicas'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
-import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
-import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { ComputeBadge } from 'ui-patterns'
 import { components } from 'api-types'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
+import { InputPostTab } from './InputPostTab'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { InputResetButton } from './InputResetButton'
 
 export function DiskManagementForm() {
   const { project } = useProjectContext()
@@ -223,15 +217,6 @@ export function DiskManagementForm() {
 
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
 
-  const currentCompute = (addons?.selected_addons ?? []).find((x) => x.type === 'compute_instance')
-    ?.variant
-  const maxIopsBasedOnCompute =
-    COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
-  const maxThroughputBasedOnCompute =
-    COMPUTE_SIZE_MAX_THROUGHPUT[
-      (currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_THROUGHPUT
-    ]
-
   const planId = subscription?.plan.id ?? 'free'
   const isPlanUpgradeRequired =
     subscription?.plan.id === 'pro' && !subscription.usage_billing_enabled
@@ -239,17 +224,39 @@ export function DiskManagementForm() {
   const mainDiskUsed = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
 
   const { watch, setValue, trigger, control, formState } = form
+  const { dirtyFields } = formState
 
+  const watchedComputeSize = watch('computeSize')
   const watchedStorageType = watch('storageType')
   const watchedTotalSize = watch('totalSize')
   const watchedIOPS = watch('provisionedIOPS')
-  const { dirtyFields } = formState // Destructure dirtyFields from formState
-  const isAllocatedStorageDirty = !!dirtyFields.totalSize // Check if 'allocatedStorage' is dirty
+
+  const isAllocatedStorageDirty = !!dirtyFields.totalSize
+
   const disableInput =
     isRequestingChanges ||
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
     !canUpdateDiskConfiguration
+
+  /** Disable IOPS if:
+   *  1. baseline IOPS of compute is lower than min required IOPS for storage type
+   *  2. compute is less than large
+   *
+   * */
+  const disableIopsInput =
+    RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(watchedComputeSize) && watchedStorageType === 'gp3'
+
+  const disableThroughputInput =
+    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(watchedComputeSize) &&
+    watchedStorageType === 'gp3'
+
+  const currentCompute = (addons?.selected_addons ?? []).find((x) => x.type === 'compute_instance')
+    ?.variant
+  const maxIopsBasedOnCompute =
+    COMPUTE_MAX_IOPS[watchedComputeSize as keyof typeof COMPUTE_MAX_IOPS]
+  const maxThroughputBasedOnCompute =
+    COMPUTE_MAX_THROUGHPUT[watchedComputeSize as keyof typeof COMPUTE_MAX_THROUGHPUT]
 
   const { includedDiskGB: includedDiskGBMeta } =
     PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
@@ -430,6 +437,31 @@ export function DiskManagementForm() {
                         shouldDirty: true,
                         shouldValidate: true,
                       })
+
+                      /**
+                       * If IOPS hasn't been set yet, auto add recommeneded IOPS
+                       */
+                      // if (
+                      //   !form.formState.dirtyFields.provisionedIOPS &&
+                      //   !RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(value)
+                      // ) {
+                      //   setValue(
+                      //     'provisionedIOPS',
+                      //     COMPUTE_BASELINE_IOPS[value as keyof typeof COMPUTE_BASELINE_IOPS],
+                      //     {
+                      //       // shouldDirty: true,
+                      //       // shouldValidate: true,
+                      //     }
+                      //   )
+                      // } else if (
+                      //   !form.formState.dirtyFields.provisionedIOPS &&
+                      //   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(value)
+                      // ) {
+                      //   setValue('provisionedIOPS', IOPS_RANGE[watchedStorageType].min, {
+                      //     // shouldDirty: true,
+                      //     // shouldValidate: true,
+                      //   })
+                      // }
                     }}
                     defaultValue={field.value}
                     value={field.value}
@@ -484,21 +516,6 @@ export function DiskManagementForm() {
                                     </span>
                                   </div>
                                 </div>
-                                {/* <div className="px-2">
-                      <span>{compute.meta?.cpu_dedicated ? 'Dedicated' : 'Shared'}</span>
-                    </div> */}
-
-                                {/* <div className="px-3 py-1">
-                          <div className="flex items-center space-x-1">
-                            <span className="text-foreground text-sm">
-                              ${compute.price}
-                            </span>
-                            <span className="text-foreground-light translate-y-[1px]">
-                              {' '}
-                              / {compute.price_interval === 'monthly' ? 'month' : 'hour'}
-                            </span>
-                          </div>
-                        </div> */}
                               </div>
                             </div>
                           }
@@ -510,10 +527,9 @@ export function DiskManagementForm() {
               </>
             )}
           />
-          {/* <Card className="bg-surface-100 rounded-b-none">
-              <CardContent className="transition-all duration-500 ease-in-out py-10 flex flex-col gap-10 px-8"> */}
 
           <Separator />
+
           <FormField_Shadcn_
             name="storageType"
             control={form.control}
@@ -532,64 +548,46 @@ export function DiskManagementForm() {
                     defaultValue={field.value}
                     disabled={disableInput}
                   >
-                    <FormItem_Shadcn_ asChild>
-                      <FormControl_Shadcn_>
-                        <RadioGroupCardItem
-                          className="grow p-3 px-5"
-                          disabled={disableInput}
-                          value="gp3"
-                          showIndicator={false}
-                          // @ts-ignore
-                          label={
-                            <div className="flex flex-col gap-1">
-                              <div className="flex gap-3 items-center">
-                                <span className="text-sm">General Purpose SSD</span>{' '}
-                                <div>
-                                  <Badge
-                                    variant={'outline'}
-                                    className="font-mono bg-alternative bg-opacity-100"
-                                  >
-                                    gp3
-                                  </Badge>
+                    {[
+                      {
+                        type: 'gp3',
+                        name: 'General Purpose SSD',
+                        description: 'gp3 provides a balance between price and performance',
+                      },
+                      {
+                        type: 'io2',
+                        name: 'Provisioned IOPS SSD',
+                        description: 'io2 offers high IOPS for mission-critical applications.',
+                      },
+                    ].map((item) => (
+                      <FormItem_Shadcn_ key={item.type} asChild>
+                        <FormControl_Shadcn_>
+                          <RadioGroupCardItem
+                            className="grow p-3 px-5"
+                            disabled={disableInput}
+                            value={item.type}
+                            showIndicator={false}
+                            // @ts-expect-error
+                            label={
+                              <div className="flex flex-col gap-1">
+                                <div className="flex gap-3 items-center">
+                                  <span className="text-sm">{item.name}</span>{' '}
+                                  <div>
+                                    <Badge
+                                      variant={'outline'}
+                                      className="font-mono bg-alternative bg-opacity-100"
+                                    >
+                                      {item.type}
+                                    </Badge>
+                                  </div>
                                 </div>
+                                <p className="text-foreground-light">{item.description}</p>
                               </div>
-                              <p className="text-foreground-light">
-                                gp3 provides a balance between price and performance
-                              </p>
-                            </div>
-                          }
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItem_Shadcn_>
-                    <FormItem_Shadcn_ asChild>
-                      <FormControl_Shadcn_>
-                        <RadioGroupCardItem
-                          className="grow p-3 px-5"
-                          disabled={disableInput}
-                          value="io2"
-                          showIndicator={false}
-                          // @ts-ignore
-                          label={
-                            <div className="flex flex-col gap-1">
-                              <div className="flex gap-3 items-center">
-                                <span className="text-sm">Provisioned IOPS SSD</span>{' '}
-                                <div>
-                                  <Badge
-                                    variant={'outline'}
-                                    className="font-mono bg-alternative bg-opacity-100"
-                                  >
-                                    io2
-                                  </Badge>
-                                </div>
-                              </div>
-                              <p className="text-foreground-light">
-                                io2 offers high IOPS for mission-critical applications.
-                              </p>
-                            </div>
-                          }
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItem_Shadcn_>
+                            }
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItem_Shadcn_>
+                    ))}
                   </RadioGroupCard>
                 </FormControl_Shadcn_>
               </FormItemLayout>
@@ -620,7 +618,7 @@ export function DiskManagementForm() {
                   }
                 >
                   <div className="mt-1 relative flex gap-2 items-center">
-                    <div className="flex -space-x-px max-w-48">
+                    <InputPostTab label="GB">
                       <FormControl_Shadcn_>
                         <Input
                           type="number"
@@ -640,31 +638,11 @@ export function DiskManagementForm() {
                           min={includedDiskGB}
                         />
                       </FormControl_Shadcn_>
-                      <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
-                        <span className="text-foreground-lighter text-xs font-mono">GB</span>
-                      </div>
-                    </div>
-                    <AnimatePresence initial={false}>
-                      {isAllocatedStorageDirty && (
-                        <motion.div
-                          key="reset-disksize"
-                          initial={{ opacity: 0, scale: 0.95, x: -2 }}
-                          animate={{ opacity: 1, scale: 1, x: 0 }}
-                          exit={{ opacity: 0, scale: 0.95, x: -2 }}
-                          transition={{ duration: 0.15 }}
-                        >
-                          <Button
-                            htmlType="button"
-                            type="default"
-                            size="small"
-                            className="px-2"
-                            onClick={() => form.resetField('totalSize')}
-                          >
-                            <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                          </Button>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    </InputPostTab>
+                    <InputResetButton
+                      isDirty={isAllocatedStorageDirty}
+                      onClick={() => form.resetField('totalSize')}
+                    />
                   </div>
                 </FormItemLayout>
               )}
@@ -702,57 +680,48 @@ export function DiskManagementForm() {
                 label="IOPS"
                 description={
                   <div className="flex flex-col gap-y-2">
-                    <div>
+                    <div className="flex items-center gap-x-2">
                       {watchedStorageType === 'io2' ? (
-                        <div className="flex items-center gap-x-2">
+                        <>
                           <span>
                             IOPS must be{' '}
                             {watchedTotalSize >= 8
                               ? `between ${minIOPS} and ${maxIOPS.toLocaleString()} based on your disk size.`
                               : `at least ${minIOPS}`}
                           </span>
-                          <Tooltip_Shadcn_>
-                            <TooltipTrigger_Shadcn_ asChild>
-                              <HelpCircle size={14} className="transition hover:text-foreground" />
-                            </TooltipTrigger_Shadcn_>
-                            <TooltipContent_Shadcn_ side="bottom">
-                              For io2 storage type, min IOPS is at {minIOPS}, while max IOPS is at
-                              1000 * disk size in GB or{' '}
-                              {IOPS_RANGE[DiskType.IO2].max.toLocaleString()}, whichever is lower
-                            </TooltipContent_Shadcn_>
-                          </Tooltip_Shadcn_>
-                        </div>
+                          <InfoTooltip>
+                            For io2 storage type, min IOPS is at {minIOPS}, while max IOPS is at
+                            1000 * disk size in GB or{' '}
+                            {IOPS_RANGE[DiskType.IO2].max.toLocaleString()}, whichever is lower
+                          </InfoTooltip>
+                        </>
                       ) : (
-                        <div className="flex items-center gap-x-2">
+                        <>
                           <span>
                             IOPS must be{' '}
                             {watchedTotalSize >= 8
                               ? `between ${minIOPS.toLocaleString()} and ${maxIOPS.toLocaleString()} based on your disk size.`
                               : `at least ${minIOPS.toLocaleString()}`}
                           </span>
-                          <Tooltip_Shadcn_>
-                            <TooltipTrigger_Shadcn_ asChild>
-                              <HelpCircle size={14} className="transition hover:text-foreground" />
-                            </TooltipTrigger_Shadcn_>
-                            <TooltipContent_Shadcn_ side="bottom" className="w-64">
-                              For gp3 storage type, min IOPS is at {minIOPS} while max IOPS is at
-                              500 * disk size in GB or{' '}
-                              {IOPS_RANGE[DiskType.GP3].max.toLocaleString()}, whichever is lower
-                            </TooltipContent_Shadcn_>
-                          </Tooltip_Shadcn_>
-                        </div>
+                          <InfoTooltip>
+                            For gp3 storage type, min IOPS is at {minIOPS} while max IOPS is at 500
+                            * disk size in GB or {IOPS_RANGE[DiskType.GP3].max.toLocaleString()},
+                            whichever is lower
+                          </InfoTooltip>
+                        </>
                       )}
-                      {!form.formState.errors.provisionedIOPS &&
-                        field.value > maxIopsBasedOnCompute && (
-                          <p>
-                            Note: Final usable IOPS will be at{' '}
-                            <span className="text-foreground">
-                              {maxIopsBasedOnCompute.toLocaleString()}
-                            </span>{' '}
-                            based on your current compute size of {currentCompute?.name}
-                          </p>
-                        )}
                     </div>
+                    {!form.formState.errors.provisionedIOPS &&
+                      field.value > maxIopsBasedOnCompute && (
+                        <p>
+                          Note: Final usable IOPS will be at{' '}
+                          <span className="text-foreground">
+                            {maxIopsBasedOnCompute.toLocaleString()}
+                          </span>{' '}
+                          based on your current compute size of {currentCompute?.name}
+                        </p>
+                      )}
+
                     {!form.formState.errors.provisionedIOPS && (
                       <DiskManagementIOPSReadReplicas
                         isDirty={form.formState.dirtyFields.provisionedIOPS !== undefined}
@@ -776,35 +745,35 @@ export function DiskManagementForm() {
                       afterPrice={Number(iopsPrice.newPrice)}
                       className="mb-2"
                     />
-                    <p>
-                      Input/output operations per second. Higher IOPS is suitable for applications
-                      requiring high throughput.
-                    </p>
+                    <p>Input/output operations per second.</p>
+                    <p>Higher IOPS for high-throughput apps.</p>
                   </>
                 }
               >
-                <div className="flex gap-3 items-center">
-                  <div className="flex -space-x-px">
-                    <FormControl_Shadcn_>
-                      <Input
-                        id="provisionedIOPS"
-                        type="number"
-                        className="flex-grow font-mono rounded-r-none max-w-32"
-                        {...field}
-                        disabled={disableInput}
-                        onChange={(e) => {
-                          setValue('provisionedIOPS', e.target.valueAsNumber, {
-                            shouldDirty: true,
-                            shouldValidate: true,
-                          })
-                        }}
-                      />
-                    </FormControl_Shadcn_>
-                    <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
-                      <span className="text-foreground-lighter text-xs font-mono">IOPS</span>
-                    </div>
-                  </div>
-                </div>
+                <InputPostTab label="IOPS">
+                  <FormControl_Shadcn_>
+                    <Input
+                      id="provisionedIOPS"
+                      type="number"
+                      className="flex-grow font-mono rounded-r-none max-w-32"
+                      {...field}
+                      value={
+                        disableIopsInput
+                          ? COMPUTE_BASELINE_IOPS[
+                              watchedComputeSize as keyof typeof COMPUTE_BASELINE_IOPS
+                            ]
+                          : field.value
+                      }
+                      disabled={disableInput || disableIopsInput}
+                      onChange={(e) => {
+                        setValue('provisionedIOPS', e.target.valueAsNumber, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }}
+                    />
+                  </FormControl_Shadcn_>
+                </InputPostTab>
               </FormItemLayout>
             )}
           />
@@ -833,18 +802,10 @@ export function DiskManagementForm() {
                                 Throughput must be between {minThroughput.toLocaleString()} and{' '}
                                 {maxThroughput?.toLocaleString()} MB/s based on your IOPS.
                               </span>
-                              <Tooltip_Shadcn_>
-                                <TooltipTrigger_Shadcn_ asChild>
-                                  <HelpCircle
-                                    size={14}
-                                    className="transition hover:text-foreground"
-                                  />
-                                </TooltipTrigger_Shadcn_>
-                                <TooltipContent_Shadcn_ side="bottom" className="w-64">
-                                  Min throughput is at 125MB/s, while max throughput is at 0.25MB/s
-                                  * IOPS or 1,000, whichever is lower
-                                </TooltipContent_Shadcn_>
-                              </Tooltip_Shadcn_>
+                              <InfoTooltip>
+                                Min throughput is at 125MB/s, while max throughput is at 0.25MB/s *
+                                IOPS or 1,000, whichever is lower
+                              </InfoTooltip>
                             </div>
                             {!form.formState.errors.throughput &&
                               field.value !== undefined &&
@@ -881,45 +842,42 @@ export function DiskManagementForm() {
                             afterPrice={Number(throughputPrice.newPrice)}
                             className="mb-2"
                           />
-                          <p>
-                            Throughput is the amount of data that can be read or written to the disk
-                            per second. Higher throughput is suitable for applications requiring
-                            high throughput.
-                          </p>
+                          <p>Amount of data read/written to the disk per second.</p>
+                          <p>Higher throughput suits applications with high data transfer needs.</p>
                         </>
                       }
                     >
-                      <div className="flex gap-3 items-center">
-                        <div className="flex -space-x-px">
-                          <FormControl_Shadcn_>
-                            <Input
-                              type="number"
-                              {...field}
-                              onChange={(e) => {
-                                setValue('throughput', e.target.valueAsNumber, {
-                                  shouldDirty: true,
-                                  shouldValidate: true,
-                                })
-                              }}
-                              className="flex-grow font-mono rounded-r-none max-w-32"
-                              disabled={disableInput || watchedStorageType === 'io2'}
-                            />
-                          </FormControl_Shadcn_>
-                          <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
-                            <span className="text-foreground-lighter text-xs font-mono">MB/s</span>
-                          </div>
-                        </div>
-                      </div>
+                      <InputPostTab label="MB/s">
+                        <FormControl_Shadcn_>
+                          <Input
+                            type="number"
+                            {...field}
+                            value={
+                              disableIopsInput
+                                ? COMPUTE_BASELINE_THROUGHPUT[
+                                    watchedComputeSize as keyof typeof COMPUTE_BASELINE_THROUGHPUT
+                                  ]
+                                : field.value
+                            }
+                            onChange={(e) => {
+                              setValue('throughput', e.target.valueAsNumber, {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              })
+                            }}
+                            className="flex-grow font-mono rounded-r-none max-w-32"
+                            disabled={
+                              disableInput || disableIopsInput || watchedStorageType === 'io2'
+                            }
+                          />
+                        </FormControl_Shadcn_>
+                      </InputPostTab>
                     </FormItemLayout>
                   )}
                 />
               </motion.div>
             )}
           </AnimatePresence>
-          {/* </CardContent> */}
-          {/* <Separator /> */}
-
-          {/* </Card> */}
 
           {isRequestingChanges ? (
             <Card className="px-2 rounded-none">
@@ -940,9 +898,6 @@ export function DiskManagementForm() {
 
           {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />}
         </ScaffoldContainer>
-
-        {/* <Card className="bg-surface-100 rounded-t-none">
-              <CardContent className="flex items-center pb-0 py-3 px-8 gap-3 justify-end"> */}
 
         <AnimatePresence>
           {isDirty ? (

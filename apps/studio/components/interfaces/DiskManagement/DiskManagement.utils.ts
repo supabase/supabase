@@ -182,3 +182,24 @@ export function getAvailableComputeOptions(availableAddons: any[], projectCloudP
 
   return computeOptions
 }
+
+export const calculateMaxIopsAllowed = (totalSize: number) => {
+  if (!totalSize) throw Error('Total size is required')
+  return Math.min(1000 * totalSize, 256000)
+}
+
+export const calculateDiskSizeRequiredForIops = (provisionedIOPS: number): number => {
+  if (provisionedIOPS === undefined || provisionedIOPS === null) {
+    throw new Error('Provisioned IOPS is required')
+  }
+
+  if (typeof provisionedIOPS !== 'number' || isNaN(provisionedIOPS) || provisionedIOPS < 0) {
+    throw new Error('Provisioned IOPS must be a non-negative number')
+  }
+
+  if (provisionedIOPS > 256000) {
+    throw new Error('Maximum allowed IOPS is 256000')
+  }
+
+  return Math.max(1, Math.ceil(provisionedIOPS / 1000))
+}
