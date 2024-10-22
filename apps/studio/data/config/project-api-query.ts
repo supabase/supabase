@@ -6,6 +6,8 @@ import { useProjectByRef } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export type ProjectApiVariables = {
   projectRef?: string
@@ -36,20 +38,20 @@ export const useProjectApiQuery = <TData = ProjectApiData>(
   { projectRef }: ProjectApiVariables,
   { enabled = true, ...options }: UseQueryOptions<ProjectApiData, ProjectApiError, TData> = {}
 ) => {
+  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
+
   return useQuery<ProjectApiData, ProjectApiError, TData>(
     configKeys.api(projectRef),
     ({ signal }) => getProjectApi({ projectRef }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       refetchInterval(data) {
-        if (!data) {
-          return false
-        }
+        if (!data) return false
 
         const { autoApiService } = data as unknown as ProjectApiData
 
         const apiKeys = autoApiService?.service_api_keys ?? []
-        const interval = apiKeys.length === 0 ? 2000 : 0
+        const interval = canReadAPIKeys && apiKeys.length === 0 ? 2000 : 0
 
         return interval
       },
