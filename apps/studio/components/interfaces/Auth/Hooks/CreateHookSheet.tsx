@@ -56,7 +56,6 @@ export function generateAuthHookSecret() {
 }
 
 const FORM_ID = 'create-edit-auth-hook'
-const SUPPORTED_FN_RETURN_TYPES = ['json', 'jsonb', 'void']
 
 const FormSchema = z
   .object({
@@ -123,6 +122,11 @@ export const CreateHookSheet = ({
     () => HOOKS_DEFINITIONS.find((d) => d.title === title) || HOOKS_DEFINITIONS[0],
     [title]
   )
+
+  const supportedReturnTypes =
+    definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED'
+      ? ['json', 'jsonb', 'void']
+      : ['json', 'jsonb']
 
   const hook: Hook = useMemo(() => {
     return {
@@ -394,7 +398,7 @@ export const CreateHookSheet = ({
                               onChange={field.onChange}
                               disabled={field.disabled}
                               filterFunction={(func) => {
-                                if (SUPPORTED_FN_RETURN_TYPES.includes(func.return_type)) {
+                                if (supportedReturnTypes.includes(func.return_type)) {
                                   const { value } = convertArgumentTypes(func.argument_types)
                                   if (value.length !== 1) return false
                                   return value[0].type === 'json' || value[0].type === 'jsonb'
@@ -405,7 +409,11 @@ export const CreateHookSheet = ({
                                 <span>
                                   No function with a single JSON/B argument
                                   <br />
-                                  and JSON/B or void return type found in this schema.
+                                  and JSON/B
+                                  {definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED'
+                                    ? ' or void'
+                                    : ''}{' '}
+                                  return type found in this schema.
                                 </span>
                               }
                             />
