@@ -9,7 +9,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { User } from 'data/auth/users-query'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { Button, cn, CriticalIcon, Separator } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition, TimestampInfo } from 'ui-patterns'
 import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './UserPanel'
 
@@ -21,7 +21,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
   const { ref } = useParams()
 
   const {
-    logData: authLogs,
+    // logData: authLogs,
     isSuccess: isSuccessAuthLogs,
     isLoading: isLoadingAuthLogs,
     filters,
@@ -33,6 +33,31 @@ export const UserLogs = ({ user }: UserLogsProps) => {
     filterOverride: { search_query: user.id },
     limit: 5,
   })
+
+  const authLogs = [
+    {
+      error: null,
+      event_message:
+        '{"action":"login","instance_id":"00000000-0000-0000-0000-000000000000","level":"info","login_method":"password","metering":true,"msg":"Login","time":"2024-10-21T18:28:32Z","user_id":"a63206a3-d3d7-49a1-a6b2-f2ab8380577c"}',
+      id: '68e7e768-89d0-4c8a-880f-9335e96c2c02',
+      level: 'info',
+      msg: 'Login',
+      path: null,
+      status: null,
+      timestamp: 1729535312000000,
+    },
+    {
+      error: null,
+      event_message:
+        '{"auth_event":{"action":"login","actor_id":"a63206a3-d3d7-49a1-a6b2-f2ab8380577c","actor_username":"example@gmail.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}},"component":"api","duration":94824175,"level":"info","method":"POST","msg":"request completed","path":"/token","referer":"http://localhost:3000","remote_addr":"159.2.122.228","request_id":"8d634ed9056c5e7a-EWR","status":200,"time":"2024-10-21T18:28:32Z"}',
+      id: '145b40ee-dea1-4ef2-82da-80c611614b4a',
+      level: 'info',
+      msg: 'request completed',
+      path: '/token',
+      status: '200',
+      timestamp: 1729535312000000,
+    },
+  ]
 
   useEffect(() => {
     if (user.id) setFilters({ ...filters, search_query: user.id })
@@ -103,7 +128,6 @@ export const UserLogs = ({ user }: UserLogsProps) => {
             <div className="border border-b-0 rounded-t divide-y">
               {authLogs.map((log) => {
                 const status = ((log.status ?? '-') as any).toString()
-                const formattedTime = dayjs(log.timestamp / 1000).format('DD MMM HH:mm:ss')
                 const is400 = status.startsWith('4')
                 const is500 = status.startsWith('5')
 
@@ -112,8 +136,8 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                     key={log.id}
                     className="flex items-center transition font-mono px-2 py-1.5 bg-surface-100 divide-x"
                   >
-                    <p className="text-xs text-foreground-light min-w-[120px] w-[120px] px-1">
-                      {formattedTime}
+                    <p className="text-xs text-foreground-light min-w-[125px] w-[125px] px-1">
+                      <TimestampInfo value={log.timestamp / 1000} />
                     </p>
                     <div className="flex items-center text-xs text-foreground-light h-[22px] min-w-[70px] w-[70px] px-2">
                       <div
