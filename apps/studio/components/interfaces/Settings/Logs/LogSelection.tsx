@@ -50,6 +50,8 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
 
       case 'auth':
         return <AuthSelectionRenderer log={log} />
+      default:
+        return <DefaultPreviewSelectionRenderer log={log} />
     }
   }
 
