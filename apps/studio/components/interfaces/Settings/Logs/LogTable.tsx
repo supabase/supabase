@@ -31,16 +31,17 @@ import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewCol
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import LogSelection, { LogSelectionProps } from './LogSelection'
-import type { LogData, LogQueryError, QueryType } from './Logs.types'
+import type { LogData, LogQueryError, LogsEndpointParams, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
 import { useRouter } from 'next/router'
 import { useQueryState } from 'nuqs'
+import useSingleLog from 'hooks/analytics/useSingleLog'
 
 interface Props {
-  data?: Array<LogData | Object>
+  data?: LogData[]
   onHistogramToggle?: () => void
   isHistogramShowing?: boolean
   isLoading?: boolean
@@ -48,11 +49,10 @@ interface Props {
   showDownload?: boolean
   queryType?: QueryType
   projectRef: string
-  params: LogSelectionProps['params']
+  params: LogsEndpointParams
   onRun?: () => void
   onSave?: () => void
   hasEditorValue?: boolean
-  maxHeight?: string
   className?: string
   collectionName?: string // Used for warehouse queries
   warehouseError?: string
@@ -79,7 +79,6 @@ const LogTable = ({
   onRun,
   onSave,
   hasEditorValue,
-  maxHeight,
   className,
   collectionName,
   EmptyState,
@@ -90,22 +89,27 @@ const LogTable = ({
   const { show: showContextMenu } = useContextMenu()
 
   const [cellPosition, setCellPosition] = useState<any>()
-  const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
-  const [focusedLogId, setFocusedLogId] = useQueryState('log')
-  const router = useRouter()
+  const [selectedLogId, setSelectedLogId] = useQueryState('log')
+
+  const { data: selectedLog, isLoading: isSelectedLogLoading } = useSingleLog({
+    projectRef,
+    id: selectedLogId ?? undefined,
+    queryType,
+    paramsToMerge: params,
+  })
 
   const canCreateLogQuery = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'log_sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
 
-  const firstRow: LogData | undefined = data?.[0] as LogData
+  const firstRow = data[0]
 
   // move timestamp to the first column, if it exists
   function getFirstRow() {
     if (!firstRow) return {}
 
-    const { timestamp, ...rest } = firstRow || {}
+    const { timestamp, ...rest } = firstRow
 
     if (!timestamp) return firstRow
 
@@ -176,46 +180,21 @@ const LogTable = ({
     }
   }
 
-  const stringData = JSON.stringify(data)
+  const stringData = useMemo(() => JSON.stringify(data), [data])
   const [dedupedData, logMap] = useMemo<[LogData[], LogMap]>(() => {
     const deduped = [...new Set(data)] as LogData[]
 
     if (!hasId) {
-      return [deduped, {} as LogMap]
+      return [deduped, {}]
     }
 
     const map = deduped.reduce((acc: LogMap, d: LogData) => {
       acc[d.id] = d
       return acc
-    }, {}) as LogMap
+    }, {})
 
     return [deduped, map]
   }, [data, hasId])
-
-  useEffect(() => {
-    if (!data) return
-    const found = data.find((datum) => isEqual(datum, focusedLog))
-    if (!found) {
-      // close selection panel if not found in dataset
-      setFocusedLog(null)
-    }
-  }, [data, focusedLog, stringData])
-
-  // If we have a log id in the query, set the focused log
-  useEffect(() => {
-    if (focusedLogId) {
-      const log = data.find((log) => {
-        if (typeof log === 'object' && log !== null && 'id' in log) {
-          return log.id === router.query.log
-        }
-        return false
-      })
-      if (log && 'id' in log && (!focusedLog || focusedLog.id !== log.id)) {
-        setFocusedLog(log)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   const logDataRows = useMemo(() => {
     if (hasId && hasTimestamp) {
@@ -373,7 +352,7 @@ const LogTable = ({
       {!queryType && <LogsExplorerTableHeader />}
 
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel defaultSize={focusedLog ? 60 : 100}>
+        <ResizablePanel defaultSize={selectedLogId ? 20 : 100}>
           <DataGrid
             role="table"
             style={{ height: '100%' }}
@@ -384,19 +363,15 @@ const LogTable = ({
             rowHeight={40}
             headerRowHeight={queryType ? 0 : 28}
             onSelectedCellChange={(row) => {
-              setFocusedLog(row.row as LogData)
+              setSelectedLogId(row.row.id)
               setCellPosition(row)
-
-              if (row.row?.id) {
-                setFocusedLogId(row.row.id)
-              }
             }}
             selectedRows={new Set([])}
             columns={columns}
             rowClass={(row: LogData) =>
               [
                 'font-mono tracking-tight',
-                isEqual(row, focusedLog) || row.id === focusedLogId
+                isEqual(row.id, selectedLogId)
                   ? '!bg-surface-300 rdg-row--focused'
                   : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
               ].join(' ')
@@ -429,22 +404,19 @@ const LogTable = ({
             )}
         </ResizablePanel>
         <ResizableHandle />
-        {(focusedLog || focusedLogId) && (
-          <ResizablePanel defaultSize={40}>
-            <LogSelection
-              projectRef={projectRef}
-              onClose={() => {
-                setFocusedLog(null)
-                setFocusedLogId(null)
-              }}
-              partialLog={focusedLog}
-              logId={focusedLogId ?? undefined}
-              queryType={queryType}
-              params={params}
-              collectionName={collectionName}
-            />
-          </ResizablePanel>
-        )}
+
+        <ResizablePanel defaultSize={80}>
+          <LogSelection
+            isLoading={isSelectedLogLoading}
+            projectRef={projectRef}
+            onClose={() => {
+              setSelectedLogId(null)
+            }}
+            log={selectedLog}
+            queryType={queryType}
+            collectionName={collectionName}
+          />
+        </ResizablePanel>
       </ResizablePanelGroup>
     </section>
   )
