@@ -8,6 +8,8 @@ import Table from 'components/to-be-cleaned/Table'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
+import { DeletePipelineModal } from './DeletePipepineModal'
+import CreatePipelineModal from './CreatePipelineModal'
 
 export const ReplicationPipelines = () => {
   const { ref } = useParams()
@@ -94,6 +96,16 @@ export const ReplicationPipelines = () => {
           </div>
         </ScaffoldSection>
       </ScaffoldContainer>
+      <CreatePipelineModal
+        visible={showCreatePipelineModal}
+        onClose={() => setShowCreatePipelineModal(false)}
+      />
+      <DeletePipelineModal
+        visible={showDeletePipelineModal}
+        title={`Delete pipeline with id ${pipelineIdToDelete}?`}
+        pipelineId={pipelineIdToDelete}
+        onClose={() => setShowDeletePipelineModal(false)}
+      />
     </>
   )
 }
