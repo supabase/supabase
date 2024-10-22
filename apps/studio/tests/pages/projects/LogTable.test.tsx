@@ -28,6 +28,8 @@ const BASE_PARAMS = {
   project: 'ref',
 }
 
+const fakeMicroTimestamp = dayjs().unix() * 1000
+
 test.skip('can display log data', async () => {
   render(
     <>
@@ -141,7 +143,6 @@ test('dedupes log lines with exact id', async () => {
 })
 
 test('can display standard preview table columns', async () => {
-  const fakeMicroTimestamp = dayjs().unix() * 1000
   render(
     <LogTable
       params={BASE_PARAMS}
@@ -161,7 +162,7 @@ test("closes the selection if the selected row's data changes", async () => {
       projectRef="ref"
       params={BASE_PARAMS}
       queryType="auth"
-      data={[{ id: '1', event_message: 'some event message' }]}
+      data={[{ id: '1', event_message: 'some event message', timestamp: fakeMicroTimestamp }]}
     />
   )
   const text = await screen.findByText(/some event message/)
@@ -172,7 +173,7 @@ test("closes the selection if the selected row's data changes", async () => {
       params={BASE_PARAMS}
       projectRef="ref"
       queryType="auth"
-      data={[{ id: '2', event_message: 'some other message' }]}
+      data={[{ id: '2', event_message: 'some other message', timestamp: fakeMicroTimestamp }]}
     />
   )
   await expect(screen.findByText(/some event message/)).rejects.toThrow()

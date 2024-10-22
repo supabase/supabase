@@ -249,7 +249,7 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
               projectRef={projectRef}
               isLoading={isLoading}
               data={results}
-              params={{ sql }}
+              params={{ sql, project: projectRef }}
               showHeader={false}
               EmptyState={
                 <ProductEmptyState title="No events found" size="large">
