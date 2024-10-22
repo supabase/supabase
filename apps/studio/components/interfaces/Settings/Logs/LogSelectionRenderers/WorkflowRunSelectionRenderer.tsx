@@ -16,7 +16,6 @@ const WorkflowRunSelectionRenderer = ({
     workflow_run?: string
   }
 }) => {
-  console.log('log:', log)
   return (
     <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-6`}>
       <div className="flex flex-col gap-3">
