@@ -29,7 +29,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { GB } from 'lib/constants'
+import { GB, INSTANCE_MICRO_SPECS } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -38,6 +38,7 @@ import {
   Button,
   Card,
   CardContent,
+  cn,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -63,9 +64,11 @@ import {
   THROUGHPUT_RANGE,
 } from './DiskManagement.constants'
 import {
+  calculateComputeSizePrice,
   calculateDiskSizePrice,
   calculateIOPSPrice,
   calculateThroughputPrice,
+  getAvailableComputeOptions,
 } from './DiskManagement.utils'
 import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
@@ -80,6 +83,7 @@ import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { ComputeBadge } from 'ui-patterns'
 import { components } from 'api-types'
+import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
 
 export function DiskManagementForm() {
   const { project } = useProjectContext()
@@ -170,54 +174,12 @@ export function DiskManagementForm() {
     return addons?.available_addons ?? []
   }, [addons])
 
-  const hasMicroOptionFromApi = useMemo(() => {
-    return (
-      availableAddons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
-    ).some((variant) => variant.identifier === 'ci_micro')
-  }, [availableAddons])
+  const selectedAddons = addons?.selected_addons ?? []
+  const subscriptionCompute = selectedAddons.find((addon) => addon.type === 'compute_instance')
 
   const availableOptions = useMemo(() => {
-    const computeOptions =
-      availableAddons
-        .find((addon) => addon.type === 'compute_instance')
-        ?.variants.filter((option) => {
-          if (!project?.cloud_provider) {
-            return true
-          }
-
-          const meta = option.meta as ProjectAddonVariantMeta
-
-          return (
-            !meta.supported_cloud_providers ||
-            meta.supported_cloud_providers.includes(project.cloud_provider)
-          )
-        }) ?? []
-
-    // Backwards comp until API is deployed
-    // if (!hasMicroOptionFromApi) {
-    //   // Unshift to push to start of array
-    //   computeOptions.unshift({
-    //     identifier: 'ci_micro',
-    //     name: 'Micro',
-    //     price_description: '$0.01344/hour (~$10/month)',
-    //     price: 0.01344,
-    //     price_interval: 'hourly',
-    //     price_type: 'usage',
-    //     // @ts-ignore API types it as Record<string, never>
-    //     meta: {
-    //       cpu_cores: INSTANCE_MICRO_SPECS.cpu_cores,
-    //       cpu_dedicated: INSTANCE_MICRO_SPECS.cpu_dedicated,
-    //       memory_gb: INSTANCE_MICRO_SPECS.memory_gb,
-    //       baseline_disk_io_mbs: INSTANCE_MICRO_SPECS.baseline_disk_io_mbs,
-    //       max_disk_io_mbs: INSTANCE_MICRO_SPECS.max_disk_io_mbs,
-    //       connections_direct: INSTANCE_MICRO_SPECS.connections_direct,
-    //       connections_pooler: INSTANCE_MICRO_SPECS.connections_pooler,
-    //     } as ProjectAddonVariantMeta,
-    //   })
-    // }
-
-    return computeOptions
-  }, [availableAddons, hasMicroOptionFromApi])
+    return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
+  }, [availableAddons, project?.cloud_provider])
 
   /**
    * Handle default values
@@ -229,9 +191,8 @@ export function DiskManagementForm() {
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
+    computeSize: subscriptionCompute?.variant.identifier ?? 'ci_micro',
   }
-
-  console.log('type', type)
 
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(DiskStorageSchema),
@@ -311,6 +272,12 @@ export function DiskManagementForm() {
   /**
    * Price calculations
    */
+
+  const computeSizePrice = calculateComputeSizePrice({
+    availableOptions: availableOptions,
+    oldComputeSize: form.formState.defaultValues?.computeSize || 'ci_micro',
+    newComputeSize: form.getValues('computeSize'),
+  })
   const diskSizePrice = calculateDiskSizePrice({
     planId,
     oldSize: form.formState.defaultValues?.totalSize || 0,
@@ -423,71 +390,105 @@ export function DiskManagementForm() {
 
   // return <></>
 
+  const isDirty = !!Object.keys(form.formState.dirtyFields).length
+
   return (
-    <div id="disk-management">
-      {/* <FormHeader
-        title="Disk Management"
-        docsUrl="https://supabase.com/docs/guides/platform/database-size#disk-management"
-      /> */}
+    <Form_Shadcn_ {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
+        <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
+          {/* {showNewDiskManagementUI ? <DiskManagementForm /> : null} */}
+          <Separator />
 
-      <Form_Shadcn_ {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
-          <RadioGroupCard className="flex flex-wrap gap-3">
-            {availableOptions.map((compute) => {
-              const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
+          <FormField_Shadcn_
+            name="computeSize"
+            control={form.control}
+            render={({ field }) => (
+              <>
+                <FormItemLayout
+                  layout="horizontal"
+                  label={'Compute size'}
+                  labelOptional={
+                    <>
+                      <BillingChangeBadge
+                        className={'mb-2'}
+                        show={
+                          formState.isDirty &&
+                          formState.dirtyFields.computeSize &&
+                          !formState.errors.computeSize
+                        }
+                        beforePrice={Number(computeSizePrice.oldPrice)}
+                        afterPrice={Number(computeSizePrice.newPrice)}
+                      />
+                      <p>hardware resources allocated to your postgres database</p>
+                    </>
+                  }
+                >
+                  <RadioGroupCard
+                    className="grid grid-cols-3 flex-wrap gap-3"
+                    onValueChange={(value) => {
+                      setValue('computeSize', value, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }}
+                    defaultValue={field.value}
+                    value={field.value}
+                  >
+                    {availableOptions.map((compute) => {
+                      const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
 
-              return (
-                <RadioGroupCardItem
-                  // label={compute.name}
-                  disabled={disableInput}
-                  showIndicator={false}
-                  value={compute.identifier}
-                  className="text-sm text-left flex flex-col gap-0 px-0 py-3 overflow-hidden [&_label]:w-full group] min-w-[250px]"
-                  // @ts-ignore
-                  label={
-                    <div className="w-full flex flex-col gap-3">
-                      <div className="px-3 opacity-50 group-data-[state=checked]:opacity-100 flex justify-between">
-                        <ComputeBadge
-                          className="inline-flex font-semibold"
-                          infraComputeSize={compute.name as components['schemas']['DbInstanceSize']}
-                        />
-                        <div className="flex items-center space-x-1">
-                          <span className="text-foreground text-sm font-semibold">
-                            {/* Price needs to be exact here */}${compute.price}
-                          </span>
-                          <span className="text-foreground-light translate-y-[1px]">
-                            {' '}
-                            / {compute.price_interval === 'monthly' ? 'month' : 'hour'}
-                          </span>
-                        </div>
-                      </div>
-                      {/* <Separator className="bg-border group-data-[state=checked]:bg-foreground-muted" /> */}
-                      <div className="w-full">
-                        <div className="px-3 text-sm flex flex-col gap-1">
-                          <div className="text-foreground-light flex gap-2 items-center">
-                            <Microchip
-                              strokeWidth={1}
-                              size={14}
-                              className="text-foreground-lighter"
-                            />
-                            <span>{compute.meta?.memory_gb ?? 0} GB memory</span>
-                          </div>
-                          <div className="text-foreground-light flex gap-2 items-center">
-                            <CpuIcon
-                              strokeWidth={1}
-                              size={14}
-                              className="text-foreground-lighter"
-                            />
-                            <span>
-                              {compute.meta?.cpu_cores ?? 0}-core {cpuArchitecture} CPU
-                            </span>
-                          </div>
-                        </div>
-                        {/* <div className="px-2">
+                      return (
+                        <RadioGroupCardItem
+                          showIndicator={false}
+                          value={compute.identifier}
+                          className="text-sm text-left flex flex-col gap-0 px-0 py-3 overflow-hidden [&_label]:w-full group] w-full"
+                          // @ts-ignore
+                          label={
+                            <div className="w-full flex flex-col gap-3">
+                              <div className="px-3 opacity-50 group-data-[state=checked]:opacity-100 flex justify-between">
+                                <ComputeBadge
+                                  className="inline-flex font-semibold"
+                                  infraComputeSize={
+                                    compute.name as components['schemas']['DbInstanceSize']
+                                  }
+                                />
+                                <div className="flex items-center space-x-1">
+                                  <span className="text-foreground text-sm font-semibold">
+                                    {/* Price needs to be exact here */}${compute.price}
+                                  </span>
+                                  <span className="text-foreground-light translate-y-[1px]">
+                                    {' '}
+                                    / {compute.price_interval === 'monthly' ? 'month' : 'hour'}
+                                  </span>
+                                </div>
+                              </div>
+                              {/* <Separator className="bg-border group-data-[state=checked]:bg-foreground-muted" /> */}
+                              <div className="w-full">
+                                <div className="px-3 text-sm flex flex-col gap-1">
+                                  <div className="text-foreground-light flex gap-2 items-center">
+                                    <Microchip
+                                      strokeWidth={1}
+                                      size={14}
+                                      className="text-foreground-lighter"
+                                    />
+                                    <span>{compute.meta?.memory_gb ?? 0} GB memory</span>
+                                  </div>
+                                  <div className="text-foreground-light flex gap-2 items-center">
+                                    <CpuIcon
+                                      strokeWidth={1}
+                                      size={14}
+                                      className="text-foreground-lighter"
+                                    />
+                                    <span>
+                                      {compute.meta?.cpu_cores ?? 0}-core {cpuArchitecture} CPU
+                                    </span>
+                                  </div>
+                                </div>
+                                {/* <div className="px-2">
                       <span>{compute.meta?.cpu_dedicated ? 'Dedicated' : 'Shared'}</span>
                     </div> */}
 
-                        {/* <div className="px-3 py-1">
+                                {/* <div className="px-3 py-1">
                           <div className="flex items-center space-x-1">
                             <span className="text-foreground text-sm">
                               ${compute.price}
@@ -498,13 +499,17 @@ export function DiskManagementForm() {
                             </span>
                           </div>
                         </div> */}
-                      </div>
-                    </div>
-                  }
-                ></RadioGroupCardItem>
-              )
-            })}
-          </RadioGroupCard>
+                              </div>
+                            </div>
+                          }
+                        ></RadioGroupCardItem>
+                      )
+                    })}
+                  </RadioGroupCard>
+                </FormItemLayout>
+              </>
+            )}
+          />
           {/* <Card className="bg-surface-100 rounded-b-none">
               <CardContent className="transition-all duration-500 ease-in-out py-10 flex flex-col gap-10 px-8"> */}
 
@@ -661,7 +666,24 @@ export function DiskManagementForm() {
                     )}
                   </div>
                 }
-                labelOptional="Input/output operations per second. Higher IOPS is suitable for applications requiring high throughput."
+                labelOptional={
+                  <>
+                    <BillingChangeBadge
+                      show={
+                        (watchedStorageType !== type ||
+                          (watchedStorageType === 'gp3' && field.value !== iops)) &&
+                        !formState.errors.provisionedIOPS
+                      }
+                      beforePrice={Number(iopsPrice.oldPrice)}
+                      afterPrice={Number(iopsPrice.newPrice)}
+                      className="mb-2"
+                    />
+                    <p>
+                      Input/output operations per second. Higher IOPS is suitable for applications
+                      requiring high throughput.
+                    </p>
+                  </>
+                }
               >
                 <div className="flex gap-3 items-center">
                   <div className="flex -space-x-px">
@@ -684,15 +706,6 @@ export function DiskManagementForm() {
                       <span className="text-foreground-lighter text-xs font-mono">IOPS</span>
                     </div>
                   </div>
-                  <BillingChangeBadge
-                    show={
-                      (watchedStorageType !== type ||
-                        (watchedStorageType === 'gp3' && field.value !== iops)) &&
-                      !formState.errors.provisionedIOPS
-                    }
-                    beforePrice={Number(iopsPrice.oldPrice)}
-                    afterPrice={Number(iopsPrice.newPrice)}
-                  />
                 </div>
               </FormItemLayout>
             )}
@@ -758,6 +771,25 @@ export function DiskManagementForm() {
                           )}
                         </div>
                       }
+                      labelOptional={
+                        <>
+                          <BillingChangeBadge
+                            show={
+                              formState.isDirty &&
+                              formState.dirtyFields.throughput &&
+                              !formState.errors.throughput
+                            }
+                            beforePrice={Number(throughputPrice.oldPrice)}
+                            afterPrice={Number(throughputPrice.newPrice)}
+                            className="mb-2"
+                          />
+                          <p>
+                            Throughput is the amount of data that can be read or written to the disk
+                            per second. Higher throughput is suitable for applications requiring
+                            high throughput.
+                          </p>
+                        </>
+                      }
                     >
                       <div className="flex gap-3 items-center">
                         <div className="flex -space-x-px">
@@ -779,15 +811,6 @@ export function DiskManagementForm() {
                             <span className="text-foreground-lighter text-xs font-mono">MB/s</span>
                           </div>
                         </div>
-                        <BillingChangeBadge
-                          show={
-                            formState.isDirty &&
-                            formState.dirtyFields.throughput &&
-                            !formState.errors.throughput
-                          }
-                          beforePrice={Number(throughputPrice.oldPrice)}
-                          afterPrice={Number(throughputPrice.newPrice)}
-                        />
                       </div>
                     </FormItemLayout>
                   )}
@@ -910,28 +933,48 @@ export function DiskManagementForm() {
           )}
 
           {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />}
+        </ScaffoldContainer>
 
-          {/* <Card className="bg-surface-100 rounded-t-none">
+        {/* <Card className="bg-surface-100 rounded-t-none">
               <CardContent className="flex items-center pb-0 py-3 px-8 gap-3 justify-end"> */}
-          <FormFooterChangeBadge formState={formState} />
-          <div className="flex gap-2">
-            <Button type="default" onClick={() => form.reset()} disabled={!form.formState.isDirty}>
-              Cancel
-            </Button>
-            <DiskManagementReviewAndSubmitDialog
-              loading={isUpdatingDiskConfiguration}
-              form={form}
-              numReplicas={readReplicas.length}
-              isDialogOpen={isDialogOpen}
-              isWithinCooldown={disableInput}
-              onSubmit={onSubmit}
-              setIsDialogOpen={setIsDialogOpen}
-            />
-          </div>
-          {/* </CardContent> */}
-          {/* </Card> */}
-        </form>
-      </Form_Shadcn_>
-    </div>
+
+        <AnimatePresence>
+          {isDirty ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.1, delay: 0.4 }}
+              className="z-10 w-full left-0 right-0 sticky bottom-0 bg-surface-100 border-t h-16 items-center flex"
+            >
+              <div
+                className={cn(
+                  MAX_WIDTH_CLASSES,
+                  PADDING_CLASSES,
+                  'flex items-center gap-3 justify-end'
+                )}
+              >
+                <FormFooterChangeBadge formState={formState} />
+                <Button type="default" onClick={() => form.reset()} disabled={!isDirty}>
+                  Cancel
+                </Button>
+                <DiskManagementReviewAndSubmitDialog
+                  loading={isUpdatingDiskConfiguration}
+                  form={form}
+                  numReplicas={readReplicas.length}
+                  isDialogOpen={isDialogOpen}
+                  isWithinCooldown={disableInput}
+                  onSubmit={onSubmit}
+                  setIsDialogOpen={setIsDialogOpen}
+                />
+              </div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+
+        {/* </CardContent> */}
+        {/* </Card> */}
+      </form>
+    </Form_Shadcn_>
   )
 }

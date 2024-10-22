@@ -1,4 +1,8 @@
+import { components } from 'api-types'
 import { DISK_LIMITS, DISK_PRICING, DiskType, PLAN_DETAILS } from './DiskManagement.constants'
+import { INSTANCE_MICRO_SPECS } from 'lib/constants'
+import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { useMemo } from 'react'
 
 // Included disk size only applies to primary, not replicas
 export const calculateDiskSizePrice = ({
@@ -28,6 +32,29 @@ export const calculateDiskSizePrice = ({
   return {
     oldPrice: (oldPrice + numReplicas * oldPriceReplica).toFixed(2),
     newPrice: (newPrice + numReplicas * newPriceReplica).toFixed(2),
+  }
+}
+
+export const calculateComputeSizePrice = ({
+  availableOptions,
+  oldComputeSize,
+  newComputeSize,
+}: {
+  availableOptions: {
+    identifier: string
+    price: number
+  }[]
+  oldComputeSize: string
+  newComputeSize: string
+}) => {
+  console.log('newComputeSize', newComputeSize)
+
+  const oldPrice = availableOptions.find((x) => x.identifier === oldComputeSize)?.price * 720
+  const newPrice = availableOptions.find((x) => x.identifier === newComputeSize)?.price * 720
+
+  return {
+    oldPrice,
+    newPrice,
   }
 }
 
@@ -108,4 +135,52 @@ export const calculateThroughputPrice = ({
     }
   }
   return { oldPrice: '0.00', newPrice: '0.00' }
+}
+
+export function getAvailableComputeOptions(availableAddons: any[], projectCloudProvider?: string) {
+  const computeOptions =
+    availableAddons
+      .find((addon) => addon.type === 'compute_instance')
+      ?.variants.filter((option) => {
+        if (!projectCloudProvider) {
+          return true
+        }
+
+        const meta = option.meta as ProjectAddonVariantMeta
+
+        return (
+          !meta.supported_cloud_providers ||
+          meta.supported_cloud_providers.includes(projectCloudProvider)
+        )
+      }) ?? []
+
+  function hasMicroOptionFromApi() {
+    return (
+      availableAddons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
+    ).some((variant: any) => variant.identifier === 'ci_micro')
+  }
+
+  // Backwards comp until API is deployed
+  if (!hasMicroOptionFromApi) {
+    // Unshift to push to start of array
+    computeOptions.unshift({
+      identifier: 'ci_micro',
+      name: 'Micro',
+      price_description: '$0.01344/hour (~$10/month)',
+      price: 0.01344,
+      price_interval: 'hourly',
+      price_type: 'usage',
+      meta: {
+        cpu_cores: INSTANCE_MICRO_SPECS.cpu_cores,
+        cpu_dedicated: INSTANCE_MICRO_SPECS.cpu_dedicated,
+        memory_gb: INSTANCE_MICRO_SPECS.memory_gb,
+        baseline_disk_io_mbs: INSTANCE_MICRO_SPECS.baseline_disk_io_mbs,
+        max_disk_io_mbs: INSTANCE_MICRO_SPECS.max_disk_io_mbs,
+        connections_direct: INSTANCE_MICRO_SPECS.connections_direct,
+        connections_pooler: INSTANCE_MICRO_SPECS.connections_pooler,
+      } as ProjectAddonVariantMeta,
+    })
+  }
+
+  return computeOptions
 }

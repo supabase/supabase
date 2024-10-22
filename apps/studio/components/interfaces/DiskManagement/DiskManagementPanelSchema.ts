@@ -9,10 +9,11 @@ const baseSchema = z.object({
     .describe('Allocated disk size in GB'),
   provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
   throughput: z.number().optional().describe('Throughput in MB/s for gp3'),
+  computeSize: z.string().describe('Compute size'),
 })
 
 export const DiskStorageSchema = baseSchema.superRefine((data, ctx) => {
-  const { storageType, totalSize, provisionedIOPS, throughput } = data
+  const { storageType, totalSize, provisionedIOPS, throughput, computeSize } = data
 
   if (storageType === 'io2') {
     // Validation rules for io2

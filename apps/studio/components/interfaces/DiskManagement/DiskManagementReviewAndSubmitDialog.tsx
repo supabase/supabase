@@ -28,13 +28,17 @@ import {
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskType } from './DiskManagement.constants'
 import {
+  calculateComputeSizePrice,
   calculateDiskSizePrice,
   calculateIOPSPrice,
   calculateThroughputPrice,
+  getAvailableComputeOptions,
 } from './DiskManagement.utils'
 import { DiskMangementCoolDownSection } from './DiskManagementCoolDownSection'
 import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useMemo } from 'react'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -127,7 +131,17 @@ export const DiskManagementReviewAndSubmitDialog = ({
 }: DiskSizeMeterProps) => {
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
+
+  /**
+   * Queries
+   * */
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const {
+    data: addons,
+    isLoading: isAddonsLoading,
+    error: addonsError,
+    isSuccess: isAddonsSuccess,
+  } = useProjectAddonsQuery({ projectRef: project?.ref })
 
   const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
@@ -136,9 +150,25 @@ export const DiskManagementReviewAndSubmitDialog = ({
   })
 
   const planId = subscription?.plan.id ?? ''
-  const isDirty = Object.keys(form.formState.dirtyFields).length > 0
-
+  const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const replicaTooltipText = `Price change includes primary database and ${numReplicas} replica${numReplicas > 1 ? 's' : ''}`
+
+  /**
+   * Handle compute instances
+   */
+  const availableAddons = useMemo(() => {
+    return addons?.available_addons ?? []
+  }, [addons])
+
+  const availableOptions = useMemo(() => {
+    return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
+  }, [availableAddons, project?.cloud_provider])
+
+  const computeSizePrice = calculateComputeSizePrice({
+    availableOptions,
+    oldComputeSize: form.formState.defaultValues?.computeSize || 'ci_micro',
+    newComputeSize: form.getValues('computeSize'),
+  })
 
   const diskSizePrice = calculateDiskSizePrice({
     planId,
@@ -190,7 +220,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
           Review changes
         </ButtonTooltip>
       </DialogTrigger>
-      <DialogContent size="large">
+      <DialogContent className="min-w-[620px]">
         <DialogHeader>
           <DialogTitle>Review changes</DialogTitle>
           <DialogDescription>
@@ -204,6 +234,14 @@ export const DiskManagementReviewAndSubmitDialog = ({
             <TableHeaderRow />
           </TableHeader>
           <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
+            <TableDataRow
+              attribute="Compute size"
+              defaultValue={form.formState.defaultValues?.computeSize ?? ''}
+              newValue={form.getValues('computeSize')}
+              unit="-"
+              beforePrice={computeSizePrice.oldPrice}
+              afterPrice={computeSizePrice.newPrice}
+            />
             <TableDataRow
               hidePrice
               attribute="Storage Type"

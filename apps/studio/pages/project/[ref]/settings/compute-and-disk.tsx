@@ -35,11 +35,8 @@ const AuthSettings: NextPageWithLayout = () => {
           </ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
-        {/* {showNewDiskManagementUI ? <DiskManagementForm /> : null} */}
-        <Separator />
-        <DiskManagementForm />
-      </ScaffoldContainer>
+
+      <DiskManagementForm />
     </>
   )
 }
