@@ -19,6 +19,7 @@ import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPe
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 
 const DatabaseWrappers: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -80,6 +81,8 @@ const DatabaseWrappers: NextPageWithLayout = () => {
   )
 }
 
-DatabaseWrappers.getLayout = (page) => <DatabaseLayout title="Wrappers">{page}</DatabaseLayout>
+DatabaseWrappers.getLayout = (page) => (
+  <ProjectIntegrationsLayout title="Wrappers">{page}</ProjectIntegrationsLayout>
+)
 
 export default DatabaseWrappers

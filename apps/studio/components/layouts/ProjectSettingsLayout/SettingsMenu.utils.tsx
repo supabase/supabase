@@ -2,6 +2,7 @@ import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.typ
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import type { Organization } from 'types'
+import { ArrowUpRight } from 'lucide-react'
 
 export const generateSettingsMenu = (
   ref?: string,
@@ -62,8 +63,9 @@ export const generateSettingsMenu = (
         {
           name: 'Vault',
           key: 'vault',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/vault/secrets`,
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/secrets`,
           items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           label: 'BETA',
         },
       ],
