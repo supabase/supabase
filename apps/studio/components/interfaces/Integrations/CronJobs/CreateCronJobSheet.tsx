@@ -31,7 +31,7 @@ import {
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import EnableExtensionModal from '../Extensions/EnableExtensionModal'
+
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
 import { buildCronQuery, buildHttpRequestCommand, parseCronJobCommand } from './CronJobs.utils'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
@@ -41,6 +41,7 @@ import { HTTPParameterFieldsSection } from './HttpParameterFieldsSection'
 import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 
 export interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>

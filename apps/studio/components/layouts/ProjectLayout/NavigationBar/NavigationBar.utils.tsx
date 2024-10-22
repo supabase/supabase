@@ -12,7 +12,7 @@ import {
   TableEditor,
 } from 'icons'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
-import { Settings, FileText, List, Lightbulb } from 'lucide-react'
+import { Settings, FileText, List, Lightbulb, Blocks } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -137,6 +137,12 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       label: 'API Docs',
       icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
+    },
+    {
+      key: 'integrations',
+      label: 'Integrations',
+      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/wrappers`),
     },
   ]
 }
