@@ -344,10 +344,6 @@ export interface paths {
     /** Preview subscription changes */
     post: operations['SubscriptionController_previewSubscriptionChange']
   }
-  '/platform/organizations/{slug}/billing/subscription/schedule': {
-    /** Deletes any upcoming subscription schedule */
-    delete: operations['SubscriptionController_deleteSubscriptionSchedule']
-  }
   '/platform/organizations/{slug}/customer': {
     /** Gets the Stripe customer */
     get: operations['CustomerController_getCustomer']
@@ -480,12 +476,10 @@ export interface paths {
     get: operations['OrganizationRolesController_getAllRolesV2']
   }
   '/platform/organizations/{slug}/tax-ids': {
-    /** Gets the given organization's tax IDs */
-    get: operations['TaxIdsController_getTaxIds']
+    /** Gets the given organization's tax ID */
+    get: operations['TaxIdsController_getTaxId']
     /** Creates or updates a tax ID for the given organization */
     put: operations['TaxIdsController_updateTaxId']
-    /** Creates a tax ID for the given organization */
-    post: operations['TaxIdsController_createTaxId']
     /** Delete the tax ID with the given ID */
     delete: operations['TaxIdsController_deleteTaxId']
   }
@@ -1006,6 +1000,16 @@ export interface paths {
      * @deprecated
      */
     get: operations['PropsSettingsController_getProjectApi']
+  }
+  '/platform/replication/{ref}/pipelines': {
+    /** Gets replication pipelines */
+    get: operations['ReplicationPipelinesController_getPipelines']
+    /** Creates a pipeline */
+    post: operations['ReplicationPipelinesController_createPipeline']
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}': {
+    /** Deletes a pipeline */
+    delete: operations['ReplicationPipelinesController_deletePipeline']
   }
   '/platform/replication/{ref}/sinks': {
     /** Gets replication sinks */
@@ -3010,6 +3014,16 @@ export interface components {
       publish_update?: boolean
       tables?: string[] | null
     }
+    CreateReplicationPipelineBody: {
+      /** @description Pipeline config */
+      config: components['schemas']['ReplicationPipelineConfig']
+      /** @description Publication name */
+      publication_name: string
+      /** @description Sink id */
+      sink_id: number
+      /** @description Source id */
+      source_id: number
+    }
     CreateReplicationPublicationBody: {
       /** @description Publication name */
       name: string
@@ -3078,13 +3092,6 @@ export interface components {
     }
     CreateTaxIdBody: {
       country?: string
-      type: string
-      value: string
-    }
-    CreateTaxIdResponse: {
-      country: string
-      created: number
-      id: string
       type: string
       value: string
     }
@@ -3350,9 +3357,6 @@ export interface components {
       id: string
       saml?: components['schemas']['SamlDescriptor']
       updated_at?: string
-    }
-    DeleteTaxIdBody: {
-      id: string
     }
     DeleteVercelConnectionResponse: {
       id: string
@@ -3662,7 +3666,6 @@ export interface components {
       plan: components['schemas']['BillingSubscriptionPlan']
       project_addons: components['schemas']['BillingProjectAddonResponse'][]
       scheduled_plan_change: components['schemas']['ScheduledPlanChange'] | null
-      usage_based_billing_project_addons: boolean
       usage_billing_enabled: boolean
     }
     GetUserContentByIdResponse: {
@@ -5116,10 +5119,26 @@ export interface components {
     RemoveReadReplicaBody: {
       database_identifier: string
     }
+    ReplicationBatchConfig: {
+      max_fill_secs: number
+      max_size: number
+    }
     ReplicationBigQueryConfig: {
       dataset_id: string
       project_id: string
       service_account_key: string
+    }
+    ReplicationPipelineConfig: {
+      config: components['schemas']['ReplicationBatchConfig']
+    }
+    ReplicationPipelinesResponse: {
+      config: components['schemas']['ReplicationPipelineConfig']
+      id: number
+      publication_name: string
+      replicator_id: number
+      sink_id: number
+      source_id: number
+      tenant_id: string
     }
     ReplicationPostgresConfig: {
       host: string
@@ -5748,20 +5767,11 @@ export interface components {
     }
     TaxId: {
       country: string
-      id: string
       type: string
       value: string
     }
     TaxIdResponse: {
-      data: components['schemas']['TaxId'][]
-    }
-    TaxIdV2: {
-      country: string
-      type: string
-      value: string
-    }
-    TaxIdV2Response: {
-      tax_id: components['schemas']['TaxIdV2'] | null
+      tax_id: components['schemas']['TaxId'] | null
     }
     TelemetryEventBody: {
       action: string
@@ -5874,8 +5884,6 @@ export interface components {
       addon_type: components['schemas']['ProjectAddonType']
       addon_variant: components['schemas']['AddonVariantId']
       price_id?: string
-      /** @enum {string} */
-      proration_behaviour?: 'prorate_and_invoice_end_of_cycle' | 'prorate_and_invoice_now'
       skip_outstanding_invoice_check?: boolean
     }
     UpdateAddonBody: {
@@ -8736,27 +8744,6 @@ export interface operations {
       }
     }
   }
-  /** Deletes any upcoming subscription schedule */
-  SubscriptionController_deleteSubscriptionSchedule: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to delete upcoming subscription schedule */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets the Stripe customer */
   CustomerController_getCustomer: {
     parameters: {
@@ -9573,8 +9560,8 @@ export interface operations {
       }
     }
   }
-  /** Gets the given organization's tax IDs */
-  TaxIdsController_getTaxIds: {
+  /** Gets the given organization's tax ID */
+  TaxIdsController_getTaxId: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -9590,7 +9577,7 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to retrieve the organization's tax IDs */
+      /** @description Failed to retrieve the organization's tax ID */
       500: {
         content: never
       }
@@ -9612,35 +9599,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['TaxIdV2Response']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to create the tax ID */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Creates a tax ID for the given organization */
-  TaxIdsController_createTaxId: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateTaxIdBody']
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['CreateTaxIdResponse']
+          'application/json': components['schemas']['TaxIdResponse']
         }
       }
       403: {
@@ -9660,13 +9619,8 @@ export interface operations {
         slug: string
       }
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DeleteTaxIdBody']
-      }
-    }
     responses: {
-      200: {
+      204: {
         content: never
       }
       403: {
@@ -13471,6 +13425,69 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's settings */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets replication pipelines */
+  ReplicationPipelinesController_getPipelines: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ReplicationPipelinesResponse'][]
+        }
+      }
+      /** @description Failed to get replication pipeline */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates a pipeline */
+  ReplicationPipelinesController_createPipeline: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationPipelineBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create pipeline */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes a pipeline */
+  ReplicationPipelinesController_deletePipeline: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Pipeline id */
+        pipeline_id: number
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete pipelin */
       500: {
         content: never
       }
