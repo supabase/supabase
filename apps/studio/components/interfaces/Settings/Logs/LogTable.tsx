@@ -91,7 +91,11 @@ const LogTable = ({
   const [cellPosition, setCellPosition] = useState<any>()
   const [selectedLogId, setSelectedLogId] = useQueryState('log')
 
-  const { data: selectedLog, isLoading: isSelectedLogLoading } = useSingleLog({
+  const {
+    data: selectedLog,
+    isLoading: isSelectedLogLoading,
+    error: selectedLogError,
+  } = useSingleLog({
     projectRef,
     id: selectedLogId ?? undefined,
     queryType,
@@ -356,7 +360,7 @@ const LogTable = ({
           <DataGrid
             role="table"
             style={{ height: '100%' }}
-            className={cn('flex-1 flex-grow h-full', {
+            className={cn('flex-1 flex-grow h-full border-none', {
               'data-grid--simple-logs': queryType,
               'data-grid--logs-explorer': !queryType,
             })}
@@ -403,9 +407,9 @@ const LogTable = ({
               document.body
             )}
         </ResizablePanel>
-        <ResizableHandle />
+        <ResizableHandle withHandle />
 
-        <ResizablePanel defaultSize={80}>
+        <ResizablePanel defaultSize={80} hidden={!selectedLogId}>
           <LogSelection
             isLoading={isSelectedLogLoading}
             projectRef={projectRef}
@@ -413,6 +417,7 @@ const LogTable = ({
               setSelectedLogId(null)
             }}
             log={selectedLog}
+            error={selectedLogError ?? undefined}
             queryType={queryType}
             collectionName={collectionName}
           />

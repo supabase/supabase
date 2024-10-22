@@ -24,10 +24,12 @@ export interface LogSelectionProps {
   projectRef: string
   collectionName?: string
   isLoading: boolean
+  error?: string | object
 }
 
-const LogSelection = ({ log, onClose, queryType, isLoading }: LogSelectionProps) => {
+const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectionProps) => {
   const LogDetails = () => {
+    if (error) return <LogErrorState error={error} />
     if (!log) return <LogDetailEmptyState />
     if (!log.metadata) return <DefaultPreviewSelectionRenderer log={log} />
 
@@ -52,7 +54,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading }: LogSelectionProps)
   }
 
   return (
-    <div className="relative flex h-full flex-grow flex-col overflow-y-scroll bg-surface-100">
+    <div className="relative flex h-full flex-grow flex-col overflow-y-scroll bg-surface-100 border-t">
       <div className="relative flex-grow flex flex-col h-full">
         <Tabs_Shadcn_ defaultValue="details" className="flex flex-col h-full">
           <TabsList_Shadcn_ className="px-2 pt-2">
@@ -131,4 +133,8 @@ function LogDetailEmptyState({
       </div>
     </div>
   )
+}
+
+function LogErrorState({ error }: { error?: string | object }) {
+  return <pre>{JSON.stringify(error, null, 2)}</pre>
 }
