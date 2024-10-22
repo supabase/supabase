@@ -382,7 +382,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         <ResizablePanel collapsible minSize={5} className="overflow-auto">
           <LoadingOpacity active={isLoading}>
             <LogTable
-              maxHeight="100%"
               showHistogramToggle={false}
               onRun={handleRun}
               onSave={handleOnSave}

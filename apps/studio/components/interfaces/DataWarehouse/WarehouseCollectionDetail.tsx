@@ -250,7 +250,6 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
               isLoading={isLoading}
               data={results}
               params={{ sql }}
-              maxHeight="calc(100vh - 139px)"
               showHeader={false}
               EmptyState={
                 <ProductEmptyState title="No events found" size="large">
