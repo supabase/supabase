@@ -9,7 +9,9 @@ export default {
 export const Functions = (args: any) => (
   <div>
     <LogTable
-      params={{}}
+      params={{
+        project: '123',
+      }}
       queryType="functions"
       projectRef="123"
       data={[
