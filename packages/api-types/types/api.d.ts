@@ -3348,6 +3348,10 @@ export interface paths {
     /** Deletes a pipeline */
     delete: operations['ReplicationPipelinesController_deletePipeline']
   }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/status': {
+    /** Gets status of a pipeline */
+    get: operations['ReplicationPipelinesController_getPipelineStatus']
+  }
   '/platform/replication/{ref}/sinks': {
     /** Gets replication sinks */
     get: operations['ReplicationSinksController_getSinks']
@@ -18834,7 +18838,27 @@ export interface operations {
       200: {
         content: never
       }
-      /** @description Failed to delete pipelin */
+      /** @description Failed to delete pipeline */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets status of a pipeline */
+  ReplicationPipelinesController_getPipelineStatus: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Pipeline id */
+        pipeline_id: number
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to get pipeline status */
       500: {
         content: never
       }
