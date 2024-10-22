@@ -16,7 +16,7 @@ import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mut
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-query'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
@@ -76,7 +76,9 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const [isDeleteFactorsModalOpen, setIsDeleteFactorsModalOpen] = useState(false)
 
   const { data } = useAuthConfigQuery({ projectRef })
-  const { data: apiData } = useProjectApiQuery({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  console.log(settings)
+
   const mailerOtpExpiry = data?.MAILER_OTP_EXP ?? 0
   const minutes = Math.floor(mailerOtpExpiry / 60)
   const seconds = Math.floor(mailerOtpExpiry % 60)
@@ -142,16 +144,23 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   }
 
   const handleUnban = () => {
-    if (!apiData) {
+    if (!settings) {
       return toast.error(`Failed to ban user: Error loading project config`)
     } else if (user.id === undefined) {
       return toast.error(`Failed to ban user: User ID not found`)
     }
 
-    const { protocol, endpoint, serviceApiKey } = apiData.autoApiService
+    const endpoint = settings.app_config?.endpoint
+    const serviceApiKey = (settings?.service_api_keys ?? []).find(
+      (key) => key.tags === 'service_role'
+    )?.api_key
+
+    if (!endpoint) return toast.error(`Failed to unban user: Unable to retrieve API endpoint`)
+    if (!serviceApiKey) return toast.error(`Failed to unban user: Unable to retrieve API key`)
+
     updateUser({
       projectRef,
-      protocol,
+      protocol: 'https',
       endpoint,
       serviceApiKey,
       userId: user.id,

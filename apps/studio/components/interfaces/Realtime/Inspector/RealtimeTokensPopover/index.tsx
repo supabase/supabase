@@ -2,8 +2,8 @@ import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
@@ -16,18 +16,13 @@ interface RealtimeTokensPopoverProps {
 }
 
 export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokensPopoverProps) => {
-  const { data: settings } = useProjectApiQuery({ projectRef: config.projectRef })
+  const snap = useRoleImpersonationStateSnapshot()
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: config.projectRef })
+  const anonRoleKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'anon')?.api_key
+  const serviceRoleKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'service_role')
+    ?.api_key
 
-  const apiService = settings?.autoApiService
-  const serviceRoleKey = apiService?.service_api_keys.find((x) => x.name === 'service_role key')
-    ? apiService.serviceApiKey
-    : undefined
-
-  const anonRoleKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.defaultApiKey
-    : undefined
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
     {
       projectRef: config.projectRef,
@@ -36,10 +31,11 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   )
   const jwtSecret = postgrestConfig?.jwt_secret
 
-  const snap = useRoleImpersonationStateSnapshot()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   // only send a telemetry event if the user changes the role. Don't send an event during initial render.
   const isMounted = useRef(false)
+
   useEffect(() => {
     if (isMounted.current) {
       sendEvent({
