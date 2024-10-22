@@ -356,7 +356,7 @@ const LogTable = ({
       {!queryType && <LogsExplorerTableHeader />}
 
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel defaultSize={selectedLogId ? 20 : 100}>
+        <ResizablePanel defaultSize={selectedLogId ? 60 : 100}>
           <DataGrid
             role="table"
             style={{ height: '100%' }}
@@ -409,7 +409,7 @@ const LogTable = ({
         </ResizablePanel>
         <ResizableHandle withHandle />
 
-        <ResizablePanel defaultSize={80} hidden={!selectedLogId}>
+        <ResizablePanel defaultSize={40} hidden={!selectedLogId}>
           <LogSelection
             isLoading={isSelectedLogLoading}
             projectRef={projectRef}
