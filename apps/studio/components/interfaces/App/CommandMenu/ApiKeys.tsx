@@ -1,7 +1,7 @@
 import { Key } from 'lucide-react'
 import { useMemo } from 'react'
 
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { copyToClipboard } from 'lib/helpers'
 import { Badge } from 'ui'
@@ -23,14 +23,15 @@ export function useApiKeysCommands() {
   const setPage = useSetPage()
 
   const project = useSelectedProject()
-  const { data: settings } = useProjectApiQuery(
+  const { data: settings } = useProjectSettingsV2Query(
     { projectRef: project?.ref },
     { enabled: !!project }
   )
   const ref = project?.ref || '_'
 
-  const anonKey = settings?.autoApiService?.defaultApiKey ?? undefined
-  const serviceKey = settings?.autoApiService?.serviceApiKey ?? undefined
+  const anonKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'anon')?.api_key
+  const serviceKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'service_role')
+    ?.api_key
 
   const commands = useMemo(
     () =>

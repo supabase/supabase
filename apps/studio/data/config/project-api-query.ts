@@ -34,6 +34,7 @@ export async function getProjectApi({ projectRef }: ProjectApiVariables, signal?
 export type ProjectApiData = Awaited<ReturnType<typeof getProjectApi>>
 export type ProjectApiError = ResponseError
 
+/** @deprecated */
 export const useProjectApiQuery = <TData = ProjectApiData>(
   { projectRef }: ProjectApiVariables,
   { enabled = true, ...options }: UseQueryOptions<ProjectApiData, ProjectApiError, TData> = {}

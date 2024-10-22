@@ -1,25 +1,28 @@
 import Link from 'next/link'
 
-import type { AutoApiService } from 'data/config/project-api-query'
+import { useParams } from 'common'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import CodeSnippet from './CodeSnippet'
 import Snippets from './Snippets'
 
 interface AuthenticationProps {
-  autoApiService: AutoApiService
   selectedLang: 'bash' | 'js'
   showApiKey: string
 }
 
-const Authentication = ({ autoApiService, selectedLang, showApiKey }: AuthenticationProps) => {
+const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
+  const { ref: projectRef } = useParams()
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const anonKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'anon')?.api_key
+  const serviceKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'service_role')
+    ?.api_key
+  const endpoint = settings?.app_config?.endpoint ?? ''
+
   // [Joshen] ShowApiKey should really be a boolean, its confusing
   const defaultApiKey =
-    showApiKey !== 'SUPABASE_KEY'
-      ? autoApiService?.defaultApiKey ?? 'SUPABASE_CLIENT_API_KEY'
-      : 'SUPABASE_CLIENT_API_KEY'
+    showApiKey !== 'SUPABASE_KEY' ? anonKey ?? 'SUPABASE_CLIENT_API_KEY' : 'SUPABASE_CLIENT_API_KEY'
   const serviceApiKey =
-    showApiKey !== 'SUPABASE_KEY'
-      ? autoApiService?.serviceApiKey ?? 'SUPABASE_SERVICE_KEY'
-      : 'SUPABASE_SERVICE_KEY'
+    showApiKey !== 'SUPABASE_KEY' ? serviceKey ?? 'SUPABASE_SERVICE_KEY' : 'SUPABASE_SERVICE_KEY'
 
   return (
     <>
@@ -53,8 +56,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
           <p>
             We have provided you a Client Key to get started. You will soon be able to add as many
             keys as you like. You can find the <code>anon</code> key in the{' '}
-            <Link href={`/project/${autoApiService.project.ref}/settings/api`}>API Settings</Link>{' '}
-            page.
+            <Link href={`/project/${projectRef}/settings/api`}>API Settings</Link> page.
           </p>
         </article>
         <article className="code">
@@ -64,7 +66,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
           />
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authKeyExample(defaultApiKey, autoApiService.endpoint, {
+            snippet={Snippets.authKeyExample(defaultApiKey, endpoint, {
               showBearer: false,
             })}
           />
@@ -85,8 +87,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
           <p>
             We have provided you with a Service Key to get started. Soon you will be able to add as
             many keys as you like. You can find the <code>service_role</code> in the{' '}
-            <Link href={`/project/${autoApiService.project.ref}/settings/api`}>API Settings</Link>{' '}
-            page.
+            <Link href={`/project/${projectRef}/settings/api`}>API Settings</Link> page.
           </p>
         </article>
         <article className="code">
@@ -96,9 +97,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
           />
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authKeyExample(serviceApiKey, autoApiService.endpoint, {
-              keyName: 'SERVICE_KEY',
-            })}
+            snippet={Snippets.authKeyExample(serviceApiKey, endpoint, { keyName: 'SERVICE_KEY' })}
           />
         </article>
       </div>
