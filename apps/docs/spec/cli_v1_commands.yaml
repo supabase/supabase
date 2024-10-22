@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.204.3
+  version: 1.207.8
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1128,6 +1128,10 @@ commands:
         name: --config <strings>
         description: Config overrides specified as a 'key=value' pair
         default_value: '[]'
+      - id: no-restart
+        name: --no-restart
+        description: Do not restart the database after updating config.
+        default_value: 'false'
       - id: replace-existing-overrides
         name: --replace-existing-overrides
         description: |
