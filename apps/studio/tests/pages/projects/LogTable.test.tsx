@@ -24,12 +24,16 @@ beforeAll(() => {
   })
 })
 
+const BASE_PARAMS = {
+  project: 'ref',
+}
+
 test.skip('can display log data', async () => {
   render(
     <>
       <LogTable
         projectRef="projectRef"
-        params={{}}
+        params={BASE_PARAMS}
         data={[
           {
             id: 'some-uuid',
@@ -62,7 +66,7 @@ test('can run if no queryType provided', async () => {
 
   render(
     <LogTable
-      params={{}}
+      params={BASE_PARAMS}
       projectRef="projectRef"
       data={[
         {
@@ -99,7 +103,7 @@ test('can run if no queryType provided', async () => {
         },
       ]}
       projectRef="abcd"
-      params={{}}
+      params={BASE_PARAMS}
       onRun={mockRun}
     />
   )
@@ -114,7 +118,7 @@ test('dedupes log lines with exact id', async () => {
   render(
     <LogTable
       projectRef="projectRef"
-      params={{}}
+      params={BASE_PARAMS}
       data={[
         {
           id: 'some-uuid',
@@ -140,7 +144,7 @@ test('can display standard preview table columns', async () => {
   const fakeMicroTimestamp = dayjs().unix() * 1000
   render(
     <LogTable
-      params={{}}
+      params={BASE_PARAMS}
       projectRef="ref"
       queryType="auth"
       data={[{ id: '12345', event_message: 'some event message', timestamp: fakeMicroTimestamp }]}
@@ -155,7 +159,7 @@ test("closes the selection if the selected row's data changes", async () => {
   const { rerender } = render(
     <LogTable
       projectRef="ref"
-      params={{}}
+      params={BASE_PARAMS}
       queryType="auth"
       data={[{ id: '1', event_message: 'some event message' }]}
     />
@@ -165,7 +169,7 @@ test("closes the selection if the selected row's data changes", async () => {
 
   rerender(
     <LogTable
-      params={{}}
+      params={BASE_PARAMS}
       projectRef="ref"
       queryType="auth"
       data={[{ id: '2', event_message: 'some other message' }]}
@@ -242,7 +246,7 @@ test.each([
     excludes: [/\{/, /\}/],
   },
 ])('table col renderer for $queryType', async ({ queryType, data, includes, excludes }) => {
-  render(<LogTable projectRef="ref" params={{}} queryType={queryType} data={data} />)
+  render(<LogTable projectRef="ref" params={BASE_PARAMS} queryType={queryType} data={data} />)
 
   await Promise.all([
     ...includes.map((text) => screen.findByText(text)),
@@ -252,17 +256,17 @@ test.each([
 
 test('error message handling', async () => {
   // Render LogTable with error as a string
-  render(<LogTable projectRef="ref" params={{}} error={'some error message'} />)
+  render(<LogTable projectRef="ref" params={BASE_PARAMS} error={'some error message'} />)
 
   expect(screen.getByText(`some error message`)).toBeTruthy()
 
   // Rerender LogTable with error as null
-  render(<LogTable projectRef="ref" params={{}} error={null} />)
+  render(<LogTable projectRef="ref" params={BASE_PARAMS} error={null} />)
   // Add any additional assertions if LogTable behaves differently when error is null
 })
 
 test('no results message handling', async () => {
-  render(<LogTable projectRef="ref" params={{}} data={[]} />)
+  render(<LogTable projectRef="ref" params={BASE_PARAMS} data={[]} />)
   await screen.findByText(/No results/)
   await screen.findByText(/Try another search/)
 })
@@ -286,7 +290,9 @@ test('custom error message: Resources exceeded during query execution', async ()
   }
 
   // logs explorer, custom query
-  const { rerender } = render(<LogTable projectRef="ref" params={{}} error={errorFromLogflare} />)
+  const { rerender } = render(
+    <LogTable projectRef="ref" params={BASE_PARAMS} error={errorFromLogflare} />
+  )
 
   // prompt user to reduce selected tables
   await screen.findByText(/This query requires too much memory to be executed/)
@@ -295,7 +301,9 @@ test('custom error message: Resources exceeded during query execution', async ()
   )
 
   // previewer, prompt to reduce time range
-  rerender(<LogTable params={{}} projectRef="ref" queryType="api" error={errorFromLogflare} />)
+  rerender(
+    <LogTable params={BASE_PARAMS} projectRef="ref" queryType="api" error={errorFromLogflare} />
+  )
   await screen.findByText(/This query requires too much memory to be executed/)
   await screen.findByText(/Avoid querying across a large datetime range/)
   await screen.findByText(/Please contact support if this error persists/)
