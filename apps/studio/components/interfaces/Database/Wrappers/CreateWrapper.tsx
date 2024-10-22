@@ -52,7 +52,7 @@ const CreateWrapper = () => {
       const hasNewSchema = newTables.some((table) => table.is_new_schema)
       if (hasNewSchema) invalidateSchemasQuery(queryClient, ref)
 
-      router.push(`/project/${ref}/database/wrappers`)
+      router.push(`/project/${ref}/integrations/wrappers`)
     },
   })
 
@@ -89,7 +89,7 @@ const CreateWrapper = () => {
           </p>
         </div>
         <Button asChild type="default">
-          <Link href={`/project/${ref}/database/wrappers`}>Head back</Link>
+          <Link href={`/project/${ref}/integrations/wrappers`}>Head back</Link>
         </Button>
       </div>
     )
