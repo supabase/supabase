@@ -70,8 +70,9 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
 
     const durationHours = data.unit === 'hours' ? Number(data.value) : Number(data.value) * 24
     const endpoint = settings.app_config?.endpoint
-    const serviceApiKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'service_role')
-      ?.api_key
+    const serviceApiKey = (settings?.service_api_keys ?? []).find(
+      (x) => x.tags === 'service_role'
+    )?.api_key
 
     if (!endpoint) return toast.error(`Failed to ban user: Unable to retrieve API endpoint`)
     if (!serviceApiKey) return toast.error(`Failed to ban user: Unable to retrieve API key`)

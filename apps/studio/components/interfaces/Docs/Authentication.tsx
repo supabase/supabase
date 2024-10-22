@@ -14,8 +14,9 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   const { ref: projectRef } = useParams()
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const anonKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'anon')?.api_key
-  const serviceKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'service_role')
-    ?.api_key
+  const serviceKey = (settings?.service_api_keys ?? []).find(
+    (x) => x.tags === 'service_role'
+  )?.api_key
   const endpoint = settings?.app_config?.endpoint ?? ''
 
   // [Joshen] ShowApiKey should really be a boolean, its confusing

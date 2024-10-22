@@ -30,8 +30,9 @@ export function useApiKeysCommands() {
   const ref = project?.ref || '_'
 
   const anonKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'anon')?.api_key
-  const serviceKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'service_role')
-    ?.api_key
+  const serviceKey = (settings?.service_api_keys ?? []).find(
+    (x) => x.tags === 'service_role'
+  )?.api_key
 
   const commands = useMemo(
     () =>
