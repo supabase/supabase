@@ -19,14 +19,16 @@ export const ReplicationPipelines = () => {
   const [showCreatePipelineModal, setShowCreatePipelineModal] = useState(false)
   const [showDeletePipelineModal, setShowDeletePipelineModal] = useState(false)
   const [pipelineIdToDelete, setPipelineIdToDelete] = useState(-1)
+  const [pipelineIdToStatus, setPipelineIdToStatus] = useState({ idToStatus: new Map() })
 
   const pipelines = pipelines_data ?? []
+
   return (
     <>
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <FormHeader title="Sinks"></FormHeader>
+            <FormHeader title="Pipelines"></FormHeader>
             <div className="space-y-4">
               <div className="flex items-center gap-2 flex-wrap">
                 <ButtonTooltip
@@ -49,6 +51,7 @@ export const ReplicationPipelines = () => {
                     <Table.th key="id">Id</Table.th>,
                     <Table.th key="source_id">Source Id</Table.th>,
                     <Table.th key="sink_id">Sink Id</Table.th>,
+                    <Table.th key="action">Action</Table.th>,
                     <Table.th key="edit">Edit</Table.th>,
                     <Table.th key="delete">Delete</Table.th>,
                   ]}
@@ -60,34 +63,55 @@ export const ReplicationPipelines = () => {
                         </Table.td>
                       </Table.tr>
                     ) : (
-                      pipelines.map((pipeline) => (
-                        <Table.tr key={pipeline.id}>
-                          <Table.td>{pipeline.id}</Table.td>
-                          <Table.td>{pipeline.source_id}</Table.td>
-                          <Table.td>{pipeline.sink_id}</Table.td>
-                          <Table.td>
-                            <Button
-                              type="default"
-                              onClick={() => {
-                                toast.info('Editing a pipeline is not yet implemented')
-                              }}
-                            >
-                              Edit
-                            </Button>
-                          </Table.td>
-                          <Table.td>
-                            <Button
-                              type="danger"
-                              onClick={() => {
-                                setPipelineIdToDelete(pipeline.id)
-                                setShowDeletePipelineModal(true)
-                              }}
-                            >
-                              Delete
-                            </Button>
-                          </Table.td>
-                        </Table.tr>
-                      ))
+                      pipelines.map((pipeline) => {
+                        const status = pipelineIdToStatus.idToStatus.get(pipeline.id)
+                        const actionButtonLoading = !status
+                        const pipelineStopped = !status || status === 'Stopped'
+                        const actionButtonLabel = actionButtonLoading
+                          ? 'Getting Status'
+                          : pipelineStopped
+                            ? 'Start'
+                            : 'Stop'
+                        return (
+                          <Table.tr key={pipeline.id}>
+                            <Table.td>{pipeline.id}</Table.td>
+                            <Table.td>{pipeline.source_id}</Table.td>
+                            <Table.td>{pipeline.sink_id}</Table.td>
+                            <Table.td>
+                              <Button
+                                onClick={() => {
+                                  toast.info('Starting a pipeline is not yet implemented')
+                                }}
+                                loading={actionButtonLoading}
+                              >
+                                {actionButtonLabel}
+                              </Button>
+                            </Table.td>
+                            <Table.td>
+                              {}
+                              <Button
+                                type="default"
+                                onClick={() => {
+                                  toast.info('Editing a pipeline is not yet implemented')
+                                }}
+                              >
+                                Edit
+                              </Button>
+                            </Table.td>
+                            <Table.td>
+                              <Button
+                                type="danger"
+                                onClick={() => {
+                                  setPipelineIdToDelete(pipeline.id)
+                                  setShowDeletePipelineModal(true)
+                                }}
+                              >
+                                Delete
+                              </Button>
+                            </Table.td>
+                          </Table.tr>
+                        )
+                      })
                     )
                   }
                 ></Table>
