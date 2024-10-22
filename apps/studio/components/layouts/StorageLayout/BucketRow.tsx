@@ -34,7 +34,7 @@ const BucketRow = ({
   onSelectDeleteBucket = noop,
   onSelectEditBucket = noop,
 }: BucketRowProps) => {
-  const canUpdateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   return (
     <div
