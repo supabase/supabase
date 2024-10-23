@@ -343,6 +343,12 @@ const LogTable = ({
 
   if (!data) return null
 
+  // In log explorer, we don't know if there will be an id column, so we compare the whole row
+  function isSameRow(row1: LogData, row2?: LogData) {
+    if (hasId) return isEqual(row1.id, row2?.id)
+    return isEqual(JSON.stringify(row1), JSON.stringify(row2))
+  }
+
   return (
     <section className={'h-full flex w-full flex-col flex-1'}>
       {!queryType && <LogsExplorerTableHeader />}
@@ -362,12 +368,11 @@ const LogTable = ({
               onSelectedLogChange?.(row.row)
               setCellPosition(row)
             }}
-            selectedRows={new Set([])}
             columns={columns}
             rowClass={(row: LogData) =>
               [
                 'font-mono tracking-tight',
-                isEqual(row.id, selectedLog?.id)
+                isSameRow(row, selectedLog)
                   ? '!bg-surface-300 rdg-row--focused'
                   : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
               ].join(' ')
