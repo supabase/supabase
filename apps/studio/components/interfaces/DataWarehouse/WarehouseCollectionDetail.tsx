@@ -268,7 +268,6 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
               selectedLogError={selectedLogDetailError ?? undefined}
               isSelectedLogLoading={!!selectedLogId && selectedLogDetailLoading}
               data={results}
-              params={{ sql, project: projectRef }}
               showHeader={false}
               EmptyState={
                 <ProductEmptyState title="No events found" size="large">
