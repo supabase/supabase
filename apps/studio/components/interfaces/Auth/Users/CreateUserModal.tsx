@@ -7,7 +7,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useUserCreateMutation } from 'data/auth/user-create-mutation'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
@@ -61,14 +61,19 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
       return toast.error(`Failed to create user: Error loading project config`)
     }
     const endpoint = settings?.app_config?.endpoint
-    const serviceApiKey = (settings?.service_api_keys ?? []).find(
-      (key) => key.tags === 'service_role'
-    )?.api_key
+    const { serviceKey } = getAPIKeys(settings)
 
     if (!endpoint) return toast.error(`Failed to create user: Unable to retrieve API endpoint`)
-    if (!serviceApiKey) return toast.error(`Failed to create user: Unable to retrieve API key`)
+    if (!serviceKey?.api_key)
+      return toast.error(`Failed to create user: Unable to retrieve API key`)
 
-    createUser({ projectRef, endpoint, protocol: 'https', serviceApiKey, user: values })
+    createUser({
+      projectRef,
+      endpoint,
+      protocol: 'https',
+      serviceApiKey: serviceKey.api_key,
+      user: values,
+    })
   }
 
   const form = useForm<z.infer<typeof CreateUserFormSchema>>({

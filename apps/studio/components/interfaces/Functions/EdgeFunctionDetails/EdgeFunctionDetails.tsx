@@ -13,7 +13,7 @@ import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
@@ -53,9 +53,8 @@ const EdgeFunctionDetails = () => {
   const formId = 'edge-function-update-form'
   const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
-  const anonKey =
-    (settings?.service_api_keys ?? []).find((key) => key.tags === 'anon')?.api_key ??
-    '[YOUR ANON KEY]'
+  const { anonKey } = getAPIKeys(settings)
+  const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
 
   const endpoint = settings?.app_config?.endpoint ?? ''
   const functionUrl =
@@ -66,7 +65,7 @@ const EdgeFunctionDetails = () => {
   const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
     selectedFunction,
     functionUrl,
-    anonKey
+    apiKey
   )
 
   const onUpdateFunction = async (values: any, { resetForm }: any) => {

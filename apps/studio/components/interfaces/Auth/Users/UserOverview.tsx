@@ -16,7 +16,7 @@ import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mut
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
@@ -150,18 +150,16 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     }
 
     const endpoint = settings.app_config?.endpoint
-    const serviceApiKey = (settings?.service_api_keys ?? []).find(
-      (key) => key.tags === 'service_role'
-    )?.api_key
+    const { serviceKey } = getAPIKeys(settings)
 
     if (!endpoint) return toast.error(`Failed to unban user: Unable to retrieve API endpoint`)
-    if (!serviceApiKey) return toast.error(`Failed to unban user: Unable to retrieve API key`)
+    if (!serviceKey?.api_key) return toast.error(`Failed to unban user: Unable to retrieve API key`)
 
     updateUser({
       projectRef,
       protocol: 'https',
       endpoint,
-      serviceApiKey,
+      serviceApiKey: serviceKey.api_key,
       userId: user.id,
       banDuration: 'none',
     })

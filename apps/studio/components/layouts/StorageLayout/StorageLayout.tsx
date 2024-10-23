@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { ReactNode, useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -22,16 +22,16 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
 
   const { data: settings, isLoading } = useProjectSettingsV2Query({ projectRef })
   const endpoint = settings?.app_config?.endpoint
-  const serviceApiKey = (settings?.service_api_keys ?? []).find(
-    (key) => key.tags === 'service_role'
-  )?.api_key
+  const { serviceKey } = getAPIKeys(settings)
 
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   useEffect(() => {
-    if (!isLoading && endpoint && serviceApiKey) initializeStorageStore(endpoint, serviceApiKey)
+    if (!isLoading && endpoint && serviceKey?.api_key) {
+      initializeStorageStore(endpoint, serviceKey.api_key)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, projectRef, endpoint, serviceApiKey])
+  }, [isLoading, projectRef, endpoint, serviceKey?.api_key])
 
   const initializeStorageStore = async (endpoint: string, serviceApiKey: string) => {
     if (isPaused) return

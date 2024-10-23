@@ -5,7 +5,7 @@ import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'reac
 import { useParams } from 'common'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import {
   Button,
@@ -32,9 +32,8 @@ const TerminalInstructions = forwardRef<
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
-  const anonKey =
-    (settings?.service_api_keys ?? []).find((key) => key.tags === 'anon')?.api_key ??
-    '[YOUR ANON KEY]'
+  const { anonKey } = getAPIKeys(settings)
+  const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
   const endpoint = settings?.app_config?.endpoint ?? ''
   const functionsEndpoint =
     customDomainData?.customDomain?.status === 'active'
@@ -73,7 +72,7 @@ const TerminalInstructions = forwardRef<
     },
     {
       command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' -H 'Authorization: Bearer ${
-        anonKey ?? '[YOUR ANON KEY]'
+        apiKey ?? '[YOUR ANON KEY]'
       }' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
       jsx: () => {
