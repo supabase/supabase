@@ -3348,9 +3348,17 @@ export interface paths {
     /** Deletes a pipeline */
     delete: operations['ReplicationPipelinesController_deletePipeline']
   }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/start': {
+    /** Starts a pipeline */
+    post: operations['ReplicationPipelinesController_startPipeline']
+  }
   '/platform/replication/{ref}/pipelines/{pipeline_id}/status': {
     /** Gets status of a pipeline */
     get: operations['ReplicationPipelinesController_getPipelineStatus']
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/stop': {
+    /** Stops a pipeline */
+    post: operations['ReplicationPipelinesController_stopPipeline']
   }
   '/platform/replication/{ref}/sinks': {
     /** Gets replication sinks */
@@ -18848,6 +18856,26 @@ export interface operations {
       }
     }
   }
+  /** Starts a pipeline */
+  ReplicationPipelinesController_startPipeline: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Pipeline id */
+        pipeline_id: number
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to start pipeline */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets status of a pipeline */
   ReplicationPipelinesController_getPipelineStatus: {
     parameters: {
@@ -18865,6 +18893,26 @@ export interface operations {
         }
       }
       /** @description Failed to get pipeline status */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Stops a pipeline */
+  ReplicationPipelinesController_stopPipeline: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Pipeline id */
+        pipeline_id: number
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to stop pipeline */
       500: {
         content: never
       }
