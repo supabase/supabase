@@ -371,11 +371,14 @@ const LogTable = ({
               onRowClick(row.row)
             }}
             columns={columns}
-            rowClass={(row: LogData) =>
-              cn('font-mono tracking-tight !bg-studio hover:!bg-surface-100 cursor-pointer', {
-                '!bg-surface-200 rdg-row--focused': row === selectedRow,
-              })
-            }
+            rowClass={(row: LogData) => {
+              return cn(
+                'font-mono tracking-tight !bg-studio hover:!bg-surface-100 cursor-pointer',
+                {
+                  '!bg-surface-200 rdg-row--focused': isEqual(row, selectedRow),
+                }
+              )
+            }}
             rows={logDataRows}
             rowKeyGetter={(r) => {
               if (!hasId) return JSON.stringify(r)
