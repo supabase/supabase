@@ -8936,6 +8936,10 @@ export interface components {
       source_id: number
       tenant_id: string
     }
+    ReplicationPipelinesStatusResponse: {
+      pipeline_id: number
+      status: string
+    }
     ReplicationPostgresConfig: {
       host: string
       name: string
@@ -18856,7 +18860,9 @@ export interface operations {
     }
     responses: {
       200: {
-        content: never
+        content: {
+          'application/json': components['schemas']['ReplicationPipelinesStatusResponse']
+        }
       }
       /** @description Failed to get pipeline status */
       500: {
