@@ -5,10 +5,9 @@ import { useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import Panel from 'components/ui/Panel'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import {
   Button,
   DIALOG_PADDING_X,
@@ -30,7 +29,6 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
-import Panel from 'components/ui/Panel'
 
 const Connect = () => {
   const { ref: projectRef } = useParams()
@@ -45,6 +43,9 @@ const Connect = () => {
       .find((item) => item.key === selectedParent)
       ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
+
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
 
   const handleParentChange = (value: string) => {
     setSelectedParent(value)
@@ -127,32 +128,12 @@ const Connect = () => {
     return []
   }
 
-  const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
-
-  const { data: apiSettings } = useProjectApiQuery({
-    projectRef,
-  })
-
-  // Get the API service
-  const apiService = (projectSettings?.services ?? []).find(
-    (x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
-  )
-
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
-
-  // Get the API service
-  const apiHost = canReadAPIKeys
-    ? `${apiSettings?.autoApiService?.protocol ?? 'https'}://${
-        apiSettings?.autoApiService?.endpoint ?? '-'
-      }`
-    : ''
+  const endpoint = settings?.app_config?.endpoint
+  const apiHost = canReadAPIKeys ? `https://${endpoint ?? '-'}` : ''
   const apiUrl = canReadAPIKeys ? apiHost : null
 
-  const anonKey = canReadAPIKeys
-    ? apiService?.service_api_keys.find((key) => key.tags === 'anon')?.api_key ?? null
-    : null
-
-  const projectKeys = { apiUrl, anonKey }
+  const { anonKey } = canReadAPIKeys ? getAPIKeys(settings) : { anonKey: null }
+  const projectKeys = { apiUrl, anonKey: anonKey?.api_key ?? null }
 
   const filePath = getContentFilePath({
     connectionObject,

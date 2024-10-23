@@ -5,16 +5,19 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 
 import CodeSnippet from './CodeSnippet'
 import PublicSchemaNotEnabledAlert from './PublicSchemaNotEnabledAlert'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 
 interface Props {
-  autoApiService: AutoApiService
   selectedLang: 'bash' | 'js'
 }
 
-export default function Introduction({ autoApiService, selectedLang }: Props) {
+export default function Introduction({ selectedLang }: Props) {
   const { ref: projectRef } = useParams()
 
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
+
+  const endpoint = settings?.app_config?.endpoint ?? ''
 
   const isPublicSchemaEnabled = config?.db_schema
     .split(',')
@@ -24,7 +27,7 @@ export default function Introduction({ autoApiService, selectedLang }: Props) {
   return (
     <div className="doc-section doc-section--client-libraries">
       <article className="code">
-        <CodeSnippet selectedLang={selectedLang} snippet={Snippets.init(autoApiService.endpoint)} />
+        <CodeSnippet selectedLang={selectedLang} snippet={Snippets.init(endpoint)} />
 
         {!isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
       </article>
