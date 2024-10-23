@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
 import { ExternalLink, FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { Message as MessageType } from 'ai/react'
@@ -38,6 +38,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Input_Shadcn_,
   SheetHeader,
   SheetSection,
   Tooltip_Shadcn_,
@@ -98,6 +99,8 @@ export const AIAssistant = ({
   const [assistantError, setAssistantError] = useState<string>()
   const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
+  const [webUrl, setWebUrl] = useState('')
+  const [webContent, setWebContent] = useState('')
 
   const docsUrl = retrieveDocsUrl(selectedDatabaseEntity as SupportedAssistantEntities)
   const entityContext = ASSISTANT_SUPPORT_ENTITIES.find((x) => x.id === selectedDatabaseEntity)
@@ -134,7 +137,7 @@ export const AIAssistant = ({
   } = useChat({
     id,
     api: `${BASE_PATH}/api/ai/sql/generate-v2`,
-    body: { entityDefinitions, context: selectedDatabaseEntity },
+    body: { entityDefinitions, context: selectedDatabaseEntity, webContent },
     onError: (error) => setAssistantError(JSON.parse(error.message).error),
   })
 
@@ -275,6 +278,35 @@ export const AIAssistant = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length])
 
+  async function handleWebSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+
+    if (!webUrl) return
+
+    try {
+      const response = await fetch(`${BASE_PATH}/api/ai/web-url/get-url-content`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: webUrl }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch web content')
+      }
+
+      const data = await response.json()
+      console.log('Fetched web content:', data.content)
+
+      setWebContent(data.content)
+    } catch (error) {
+      console.error('Error fetching web content:', error)
+      toast.error('Failed to fetch web content. Please try again.')
+    }
+
+    // setWebUrl('')
+  }
   return (
     <>
       <div className={cn('flex flex-col', className)}>
@@ -508,6 +540,27 @@ export const AIAssistant = ({
                               </DropdownMenuSubContent>
                             </DropdownMenuSub>
                           )}
+                          <DropdownMenuSub>
+                            <DropdownMenuSubTrigger className="gap-x-2">
+                              <div className="flex flex-col gap-y-1">
+                                <p>Web</p>
+                                <p className="text-foreground-lighter">
+                                  Add a link to a website to help the assistant answer your question
+                                </p>
+                              </div>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent className="p-0 w-72">
+                              <div className="flex flex-col gap-y-1 p-4 ">
+                                <form onSubmit={handleWebSubmit}>
+                                  <Input_Shadcn_
+                                    placeholder="https://example.com/docs"
+                                    value={webUrl}
+                                    onChange={(e) => setWebUrl(e.target.value)}
+                                  />
+                                </form>
+                              </div>
+                            </DropdownMenuSubContent>
+                          </DropdownMenuSub>
                         </>
                       )}
                     </DropdownMenuContent>
@@ -568,6 +621,25 @@ export const AIAssistant = ({
                                   {x.schema}.{x.name}
                                 </li>
                               ))}
+                            </ul>
+                          </>
+                        ) : undefined
+                      }
+                    />
+                  )}
+                  {webUrl.length > 0 && (
+                    <ContextBadge
+                      label="Web"
+                      value={webContent.length > 0 ? webContent.slice(0, 20) + '...' : webUrl}
+                      onRemove={() => setWebUrl('')}
+                      tooltip={
+                        webContent.length > 20 ? (
+                          <>
+                            <p className="text-foreground-light">
+                              {webContent.length} site selected:
+                            </p>
+                            <ul className="list-disc pl-4">
+                              <li>{webUrl}</li>
                             </ul>
                           </>
                         ) : undefined
