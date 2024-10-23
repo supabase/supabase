@@ -1862,6 +1862,12 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
     hasLightIcon: true,
   },
   {
+    name: 'Neon',
+    icon: '/docs/img/icons/neon-icon',
+    url: '/guides/platform/migrating-to-supabase/neon',
+    hasLightIcon: true,
+  },
+  {
     name: 'MySQL',
     icon: '/docs/img/icons/mysql-icon',
     url: '/guides/platform/migrating-to-supabase/mysql',
