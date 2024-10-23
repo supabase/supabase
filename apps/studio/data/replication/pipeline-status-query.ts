@@ -10,7 +10,7 @@ type ReplicationPipelinesStatusesParams = { projectRef?: string; pipelineIds: nu
 async function fetchReplicationPipelineStatus(
   { projectRef, pipelineId }: ReplicationPipelinesStatusParams,
   signal?: AbortSignal
-): Promise<{ status: string }> {
+) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get('/platform/replication/{ref}/pipelines/{pipeline_id}/status', {
