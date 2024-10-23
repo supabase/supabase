@@ -5,7 +5,6 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import CodeSnippet from './CodeSnippet'
 import PublicSchemaNotEnabledAlert from './PublicSchemaNotEnabledAlert'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 
 interface Props {
   selectedLang: 'bash' | 'js'
