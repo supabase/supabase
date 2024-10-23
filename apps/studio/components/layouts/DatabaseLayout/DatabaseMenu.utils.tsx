@@ -99,16 +99,16 @@ export const generateDatabaseMenu = (
             ]
           : []),
         {
+          name: 'Migrations',
+          key: 'migrations',
+          url: `/project/${ref}/database/migrations`,
+          items: [],
+        },
+        {
           name: 'Wrappers',
           key: 'wrappers',
           url: `/project/${ref}/integrations/wrappers`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          items: [],
-        },
-        {
-          name: 'Migrations',
-          key: 'migrations',
-          url: `/project/${ref}/database/migrations`,
           items: [],
         },
         ...(!!pgNetExtensionExists
