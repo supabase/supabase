@@ -211,9 +211,9 @@ export function getAvatarUrl(user: User): string | undefined {
     profileImageUrl ||
     profileImageURL ||
     profile_image_url ||
-    '') as string | undefined
+    '') as unknown
 
-  if (url === undefined) return undefined
+  if (typeof url !== 'string') return undefined
   const isSupported = SUPPORTED_CSP_AVATAR_URLS.some((x) => url.startsWith(x))
   return isSupported ? url : undefined
 }
