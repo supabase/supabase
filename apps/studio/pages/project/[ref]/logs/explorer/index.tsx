@@ -386,7 +386,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               onRun={handleRun}
               onSave={handleOnSave}
               hasEditorValue={Boolean(editorValue)}
-              params={params}
               data={sourceType === 'warehouse' ? warehouseResults?.result : logData}
               error={error}
               projectRef={projectRef}
