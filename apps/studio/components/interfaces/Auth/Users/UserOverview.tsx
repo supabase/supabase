@@ -77,7 +77,6 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
 
   const { data } = useAuthConfigQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  console.log(settings)
 
   const mailerOtpExpiry = data?.MAILER_OTP_EXP ?? 0
   const minutes = Math.floor(mailerOtpExpiry / 60)
