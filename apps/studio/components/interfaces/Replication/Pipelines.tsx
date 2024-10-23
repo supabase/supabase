@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { Button } from 'ui'
 import { DeletePipelineModal } from './DeletePipepineModal'
 import CreatePipelineModal from './CreatePipelineModal'
+import { useReplicationPipelinesStatuesQuery } from 'data/replication/pipeline-status-query'
 
 export const ReplicationPipelines = () => {
   const { ref } = useParams()
@@ -22,6 +23,13 @@ export const ReplicationPipelines = () => {
   const [pipelineIdToStatus, setPipelineIdToStatus] = useState({ idToStatus: new Map() })
 
   const pipelines = pipelines_data ?? []
+
+  const res = useReplicationPipelinesStatuesQuery({
+    projectRef: ref,
+    pipelineIds: pipelines.map((pipeline) => pipeline.id),
+  })
+
+  console.log(`DATA: ${JSON.stringify(res)}`)
 
   return (
     <>
