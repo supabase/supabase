@@ -341,14 +341,14 @@ const LogTable = ({
     else return <LogsTableEmptyState />
   }
 
-  if (!data) return null
+  const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
 
-  // In log explorer, we don't know if there will be an id column, so we compare the whole row
-  function isSameRow(row1: LogData, row2?: LogData) {
-    if (hasId) return isEqual(row1.id, row2?.id)
-    return isEqual(JSON.stringify(row1), JSON.stringify(row2))
+  function onRowClick(row: LogData) {
+    setSelectedRow(row)
+    onSelectedLogChange?.(row)
   }
 
+  if (!data) return null
   return (
     <section className={'h-full flex w-full flex-col flex-1'}>
       {!queryType && <LogsExplorerTableHeader />}
@@ -365,17 +365,16 @@ const LogTable = ({
             rowHeight={40}
             headerRowHeight={queryType ? 0 : 28}
             onSelectedCellChange={(row) => {
-              onSelectedLogChange?.(row.row)
               setCellPosition(row)
+            }}
+            onCellClick={(row) => {
+              onRowClick(row.row)
             }}
             columns={columns}
             rowClass={(row: LogData) =>
-              [
-                'font-mono tracking-tight',
-                isSameRow(row, selectedLog)
-                  ? '!bg-surface-300 rdg-row--focused'
-                  : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
-              ].join(' ')
+              cn('font-mono tracking-tight !bg-studio hover:!bg-surface-100 cursor-pointer', {
+                '!bg-surface-200 rdg-row--focused': row === selectedRow,
+              })
             }
             rows={logDataRows}
             rowKeyGetter={(r) => {
