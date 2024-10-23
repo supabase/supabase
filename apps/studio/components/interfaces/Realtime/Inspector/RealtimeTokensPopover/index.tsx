@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
@@ -19,10 +19,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   const snap = useRoleImpersonationStateSnapshot()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: config.projectRef })
-  const anonRoleKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'anon')?.api_key
-  const serviceRoleKey = (settings?.service_api_keys ?? []).find(
-    (x) => x.tags === 'service_role'
-  )?.api_key
+  const { anonKey, serviceKey } = getAPIKeys(settings)
 
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
     {
@@ -59,12 +56,12 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
         snap.role !== undefined &&
         snap.role.type === 'postgrest'
       ) {
-        token = anonRoleKey
+        token = anonKey?.api_key
         await getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
           .then((b) => (bearer = b))
           .catch((err) => toast.error(`Failed to get JWT for role: ${err.message}`))
       } else {
-        token = serviceRoleKey
+        token = serviceKey?.api_key
       }
       if (token) {
         onChangeConfig({ ...config, token, bearer })
@@ -72,7 +69,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     }
 
     triggerUpdateTokenBearer()
-  }, [snap.role, anonRoleKey, serviceRoleKey])
+  }, [snap.role, anonKey, serviceKey])
 
   return <RoleImpersonationPopover align="start" variant="connected-on-both" />
 }

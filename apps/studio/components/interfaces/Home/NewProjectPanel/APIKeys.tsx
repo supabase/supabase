@@ -55,16 +55,16 @@ const APIKeys = () => {
 
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
 
-  const apiKeys = settings?.service_api_keys ?? []
-
-  // API keys should not be empty. However it can be populated with a delay on project creation
-  const isApiKeysEmpty = apiKeys.length === 0
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
 
   const endpoint = settings?.app_config?.endpoint
   const apiUrl = `https://${endpoint ?? '-'}`
+  const apiKeys = settings?.service_api_keys ?? []
   const { anonKey } = getAPIKeys(settings)
+
+  // API keys should not be empty. However it can be populated with a delay on project creation
+  const isApiKeysEmpty = apiKeys.length === 0
 
   const clientInitSnippet: any = generateInitSnippet(apiUrl)
   const selectedLanguageSnippet = clientInitSnippet[selectedLanguage.key] ?? 'No snippet available'

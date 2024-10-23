@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, SidePanel } from 'ui'
 
 import { useParams } from 'common'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -45,9 +45,9 @@ const ProjectAPIDocs = () => {
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
 
+  const { anonKey } = getAPIKeys(settings)
   const apikey = showKeys
-    ? (settings?.service_api_keys ?? []).find((key) => key.tags === 'anon')?.api_key ??
-      'SUPABASE_CLIENT_ANON_KEY'
+    ? anonKey?.api_key ?? 'SUPABASE_CLIENT_ANON_KEY'
     : 'SUPABASE_CLIENT_ANON_KEY'
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
