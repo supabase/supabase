@@ -37,7 +37,7 @@ const StorageMenu = () => {
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
   const [selectedBucketToEmpty, setSelectedBucketToEmpty] = useState<StorageBucket>()
   const [selectedBucketToDelete, setSelectedBucketToDelete] = useState<StorageBucket>()
-  const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'created-at'>(
     'storage-explorer-sort',
