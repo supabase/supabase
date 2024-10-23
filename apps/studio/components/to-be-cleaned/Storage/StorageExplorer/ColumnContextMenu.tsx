@@ -60,15 +60,13 @@ const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
 
   return (
     <Menu id={id} animation="fade">
-      {canUpdateFiles && (
-        <>
-          <Item onClick={({ props }) => onSelectCreateFolder(props.index)}>
-            <FolderPlus size="14" strokeWidth={1} />
-            <span className="ml-2 text-xs">New folder</span>
-          </Item>
-          <Separator />
-        </>
-      )}
+      {canUpdateFiles && [
+        <Item key="create-folder" onClick={({ props }) => onSelectCreateFolder(props.index)}>
+          <FolderPlus size="14" strokeWidth={1} />
+          <span className="ml-2 text-xs">New folder</span>
+        </Item>,
+        <Separator key="create-folder-separator" />,
+      ]}
       <Item onClick={({ props }) => onSelectAllItemsInColumn(props.index)}>
         <Clipboard size="14" strokeWidth={1} />
         <span className="ml-2 text-xs">Select all items</span>

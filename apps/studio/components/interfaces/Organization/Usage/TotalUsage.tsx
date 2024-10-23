@@ -114,8 +114,8 @@ const TotalUsage = ({
         section={{
           name: 'Usage Summary',
           description: isUsageBillingEnabled
-            ? `Your plan includes a limited amount of usage. If exceeded, you will be charged for the overages. It may take up to ${subscription?.usage_based_billing_project_addons ? '1 hour' : '24 hours'} for usage stats to update.`
-            : `Your plan includes a limited amount of usage. If exceeded, you may experience restrictions, as you are currently not billed for overages. It may take up to ${subscription?.usage_based_billing_project_addons ? '1 hour' : '24 hours'} for usage stats to update.`,
+            ? `Your plan includes a limited amount of usage. If exceeded, you will be charged for the overages. It may take up to 1 hour to refresh.`
+            : `Your plan includes a limited amount of usage. If exceeded, you may experience restrictions, as you are currently not billed for overages. It may take up to 1 hour to refresh.`,
           links: [
             {
               name: 'How billing works',

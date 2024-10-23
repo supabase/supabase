@@ -394,6 +394,36 @@ const nextConfig = {
         source: '/project/:ref/database/performance-advisor',
         destination: '/project/:ref/advisors/performance',
       },
+      {
+        permanent: true,
+        source: '/project/:ref/database/webhooks',
+        destination: '/project/:ref/integrations/webhooks',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/wrappers',
+        destination: '/project/:ref/integrations/wrappers',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/.....',
+        destination: '/project/:ref/integrations/cron-jobs',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/api/graphiql',
+        destination: '/project/:ref/integrations/graphiql',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/vault/secrets',
+        destination: '/project/:ref/integrations/vault/secrets',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/vault/keys',
+        destination: '/project/:ref/integrations/vault/keys',
+      },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {

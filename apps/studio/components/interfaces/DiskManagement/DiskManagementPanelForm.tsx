@@ -123,7 +123,7 @@ export function DiskManagementPanelForm() {
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const currentCompute = (addons?.selected_addons ?? []).find(
-    (x) => x.type === 'compute_instance'
+    (x: { type: string }) => x.type === 'compute_instance'
   )?.variant
   const maxIopsBasedOnCompute =
     COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
@@ -135,7 +135,7 @@ export function DiskManagementPanelForm() {
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
   })
-  const planId = subscription?.plan.id ?? ''
+  const planId = subscription?.plan.id ?? 'free'
   const isPlanUpgradeRequired =
     subscription?.plan.id === 'pro' && !subscription.usage_billing_enabled
 
@@ -156,7 +156,7 @@ export function DiskManagementPanelForm() {
     })
 
   const defaultValues = {
-    storageType: type,
+    storageType: type || DiskType.GP3,
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
@@ -180,8 +180,7 @@ export function DiskManagementPanelForm() {
     isWithinCooldownWindow ||
     !canUpdateDiskConfiguration
 
-  const { includedDiskGB: includedDiskGBMeta } =
-    PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
+  const { includedDiskGB: includedDiskGBMeta } = PLAN_DETAILS[planId]
   const includedDiskGB = includedDiskGBMeta[watchedStorageType]
 
   const minIOPS = IOPS_RANGE[watchedStorageType]?.min ?? 0
@@ -201,12 +200,21 @@ export function DiskManagementPanelForm() {
     updateDiskConfigurationRQ({ ref: projectRef, ...data })
   }
 
+  // i hate typescript enums
+  // gotta clean this up but it allows me to remove type casts for now
+  function getEnumFromFormValue(value: string) {
+    if (value === 'io2') return DiskType.IO2
+    if (value === 'gp3') return DiskType.GP3
+    return DiskType.IO2
+  }
+
+  const newStorageType = form.getValues('storageType')
   const diskSizePrice = calculateDiskSizePrice({
     planId,
     oldSize: form.formState.defaultValues?.totalSize || 0,
-    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
+    oldStorageType: getEnumFromFormValue(form.formState.defaultValues?.storageType || 'io2'),
     newSize: form.getValues('totalSize'),
-    newStorageType: form.getValues('storageType') as DiskType,
+    newStorageType: getEnumFromFormValue(newStorageType),
   })
 
   const iopsPrice = calculateIOPSPrice({

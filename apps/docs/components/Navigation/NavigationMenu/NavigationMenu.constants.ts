@@ -1,3 +1,7 @@
+import type { ComponentProps } from 'react'
+
+import type { IconPanel } from 'ui-patterns/IconPanel'
+
 import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
@@ -1809,23 +1813,64 @@ export const local_development: NavMenuConstant = {
   ],
 }
 
-export const MIGRATION_PAGES: Partial<NavMenuSection>[] = [
-  { name: 'Amazon RDS', url: '/guides/platform/migrating-to-supabase/amazon-rds' },
-  { name: 'Auth0', url: '/guides/platform/migrating-to-supabase/auth0' },
-  { name: 'Firebase Auth', url: '/guides/platform/migrating-to-supabase/firebase-auth' },
+export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof IconPanel>>[] = [
   {
-    name: 'Firebase Firestore',
+    name: 'Auth0',
+    icon: '/docs/img/icons/auth0-icon',
+    url: '/guides/platform/migrating-to-supabase/auth0',
+    hasLightIcon: true,
+  },
+  {
+    name: 'Firebase Auth',
+    icon: '/docs/img/icons/firebase-icon',
+    url: '/guides/platform/migrating-to-supabase/firebase-auth',
+  },
+  {
+    name: 'Firestore Data',
+    icon: '/docs/img/icons/firebase-icon',
     url: '/guides/platform/migrating-to-supabase/firestore-data',
   },
   {
     name: 'Firebase Storage',
+    icon: '/docs/img/icons/firebase-icon',
     url: '/guides/platform/migrating-to-supabase/firebase-storage',
   },
-  { name: 'Heroku Postgres', url: '/guides/platform/migrating-to-supabase/heroku' },
-  { name: 'MySQL', url: '/guides/platform/migrating-to-supabase/mysql' },
-  { name: 'MSSQL', url: '/guides/platform/migrating-to-supabase/mssql' },
-  { name: 'Postgres', url: '/guides/platform/migrating-to-supabase/postgres' },
-  { name: 'Render', url: '/guides/platform/migrating-to-supabase/render' },
+  {
+    name: 'Heroku',
+    icon: '/docs/img/icons/heroku-icon',
+    url: '/guides/platform/migrating-to-supabase/heroku',
+  },
+  {
+    name: 'Render',
+    icon: '/docs/img/icons/render-icon',
+    url: '/guides/platform/migrating-to-supabase/render',
+  },
+  {
+    name: 'Amazon RDS',
+    icon: '/docs/img/icons/aws-rds-icon',
+    url: '/guides/platform/migrating-to-supabase/amazon-rds',
+  },
+  {
+    name: 'Postgres',
+    icon: '/docs/img/icons/postgres-icon',
+    url: '/guides/platform/migrating-to-supabase/postgres',
+  },
+  {
+    name: 'Vercel Postgres',
+    icon: '/docs/img/icons/vercel-icon',
+    url: '/guides/platform/migrating-to-supabase/vercel-postgres',
+    hasLightIcon: true,
+  },
+  {
+    name: 'MySQL',
+    icon: '/docs/img/icons/mysql-icon',
+    url: '/guides/platform/migrating-to-supabase/mysql',
+  },
+  {
+    name: 'MSSQL',
+    icon: '/docs/img/icons/mssql-icon',
+    url: '/guides/platform/migrating-to-supabase/mssql',
+  },
 ]
 
 export const platform: NavMenuConstant = {
