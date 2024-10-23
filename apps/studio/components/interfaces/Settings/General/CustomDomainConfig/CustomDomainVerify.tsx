@@ -2,8 +2,9 @@ import { AlertCircle, ExternalLink, HelpCircle, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
+import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
-import type { ProjectApiResponse } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
@@ -19,13 +20,14 @@ import DNSRecord from './DNSRecord'
 import { DNSTableHeaders } from './DNSTableHeaders'
 
 export type CustomDomainVerifyProps = {
-  projectRef?: string
   customDomain: CustomDomainResponse
-  settings?: ProjectApiResponse
 }
 
-const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomainVerifyProps) => {
+const CustomDomainVerify = ({ customDomain }: CustomDomainVerifyProps) => {
+  const { ref: projectRef } = useParams()
   const [isNotVerifiedYet, setIsNotVerifiedYet] = useState(false)
+
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
   const { mutate: reverifyCustomDomain, isLoading: isReverifyLoading } =
     useCustomDomainReverifyMutation({
@@ -152,7 +154,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
               <DNSRecord
                 type="CNAME"
                 name={customDomain.hostname}
-                value={settings?.autoApiService.endpoint ?? 'Loading...'}
+                value={settings?.app_config?.endpoint ?? 'Loading...'}
               />
             )}
 
