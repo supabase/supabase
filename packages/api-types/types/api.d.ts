@@ -3764,11 +3764,6 @@ export interface components {
       sender_id: number
       user_id: number
     }
-    GoogleAnalyticBody: {
-      language?: string
-      screen_resolution?: string
-      session_id: string
-    }
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
       DB_MAX_POOL_SIZE: number | null
@@ -3968,18 +3963,6 @@ export interface components {
     }
     HealthResponse: {
       healthy: boolean
-    }
-    IdentifyUserBody: {
-      auth0_id?: string
-      first_name?: string
-      free_project_limit?: number
-      gotrue_id: string
-      id: number
-      is_alpha_user?: boolean
-      last_name?: string
-      mobile?: string
-      primary_email: string
-      username?: string
     }
     IntegrationConnectionVercel: {
       foreign_project_id: string
@@ -5144,6 +5127,10 @@ export interface components {
       source_id: number
       tenant_id: string
     }
+    ReplicationPipelinesStatusResponse: {
+      pipeline_id: number
+      status: string
+    }
     ReplicationPostgresConfig: {
       host: string
       name: string
@@ -5777,16 +5764,6 @@ export interface components {
     TaxIdResponse: {
       tax_id: components['schemas']['TaxId'] | null
     }
-    TelemetryEventBody: {
-      action: string
-      category: string
-      ga?: components['schemas']['GoogleAnalyticBody']
-      label?: Record<string, never>
-      page_location?: string
-      page_referrer?: string
-      page_title?: string
-      value?: string
-    }
     TelemetryEventBodyV2: {
       action: string
       custom_properties: Record<string, never>
@@ -5811,20 +5788,10 @@ export interface components {
       reset_organization?: boolean
       reset_project?: boolean
     }
-    TelemetryIdentifyBody: {
-      ga?: components['schemas']['GoogleAnalyticBody']
-      user: components['schemas']['IdentifyUserBody']
-    }
     TelemetryIdentifyBodyV2: {
       organization_slug?: string
       project_ref?: string
       user_id: string
-    }
-    TelemetryPageBody: {
-      ga?: components['schemas']['GoogleAnalyticBody']
-      referrer: string
-      route?: string
-      title: string
     }
     TelemetryPageBodyV2: {
       page_title: string
@@ -13509,7 +13476,9 @@ export interface operations {
     }
     responses: {
       200: {
-        content: never
+        content: {
+          'application/json': components['schemas']['ReplicationPipelinesStatusResponse']
+        }
       }
       /** @description Failed to get pipeline status */
       500: {

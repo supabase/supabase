@@ -20,16 +20,24 @@ export const ReplicationPipelines = () => {
   const [showCreatePipelineModal, setShowCreatePipelineModal] = useState(false)
   const [showDeletePipelineModal, setShowDeletePipelineModal] = useState(false)
   const [pipelineIdToDelete, setPipelineIdToDelete] = useState(-1)
-  const [pipelineIdToStatus, setPipelineIdToStatus] = useState({ idToStatus: new Map() })
 
   const pipelines = pipelines_data ?? []
 
-  const res = useReplicationPipelinesStatuesQuery({
+  const replicationStatuses = useReplicationPipelinesStatuesQuery({
     projectRef: ref,
     pipelineIds: pipelines.map((pipeline) => pipeline.id),
   })
 
-  console.log(`DATA: ${JSON.stringify(res)}`)
+  const pipelineIdToStatus = new Map<string, string>()
+  for (const status of replicationStatuses) {
+    if (status.error) {
+      toast.error('Failed to fetch pipeline status')
+    }
+
+    if (status.data) {
+      pipelineIdToStatus.set(`${status.data.pipeline_id}`, status.data.status)
+    }
+  }
 
   return (
     <>
@@ -72,12 +80,11 @@ export const ReplicationPipelines = () => {
                       </Table.tr>
                     ) : (
                       pipelines.map((pipeline) => {
-                        const status = pipelineIdToStatus.idToStatus.get(pipeline.id)
+                        const status = pipelineIdToStatus.get(`${pipeline.id}`)
                         const actionButtonLoading = !status
-                        const pipelineStopped = !status || status === 'Stopped'
                         const actionButtonLabel = actionButtonLoading
                           ? 'Getting Status'
-                          : pipelineStopped
+                          : status === 'Stopped'
                             ? 'Start'
                             : 'Stop'
                         return (
