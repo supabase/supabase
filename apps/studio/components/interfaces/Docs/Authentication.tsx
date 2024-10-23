@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import CodeSnippet from './CodeSnippet'
 import Snippets from './Snippets'
 
@@ -13,17 +13,19 @@ interface AuthenticationProps {
 const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   const { ref: projectRef } = useParams()
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const anonKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'anon')?.api_key
-  const serviceKey = (settings?.service_api_keys ?? []).find(
-    (x) => x.tags === 'service_role'
-  )?.api_key
+
+  const { anonKey, serviceKey } = getAPIKeys(settings)
   const endpoint = settings?.app_config?.endpoint ?? ''
 
   // [Joshen] ShowApiKey should really be a boolean, its confusing
   const defaultApiKey =
-    showApiKey !== 'SUPABASE_KEY' ? anonKey ?? 'SUPABASE_CLIENT_API_KEY' : 'SUPABASE_CLIENT_API_KEY'
+    showApiKey !== 'SUPABASE_KEY'
+      ? anonKey?.api_key ?? 'SUPABASE_CLIENT_API_KEY'
+      : 'SUPABASE_CLIENT_API_KEY'
   const serviceApiKey =
-    showApiKey !== 'SUPABASE_KEY' ? serviceKey ?? 'SUPABASE_SERVICE_KEY' : 'SUPABASE_SERVICE_KEY'
+    showApiKey !== 'SUPABASE_KEY'
+      ? serviceKey?.api_key ?? 'SUPABASE_SERVICE_KEY'
+      : 'SUPABASE_SERVICE_KEY'
 
   return (
     <>
