@@ -294,20 +294,18 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
       </LoadingOpacity>
 
       {!isError && (
-        <div className="border-t flex flex-row justify-between p-2">
-          <div className="flex items-center gap-2">
+        <div className="border-t flex flex-row justify-between">
+          <div className="flex items-center gap-2 p-2">
             {results.length > 0 && (
-              <>
-                <Button
-                  onClick={loadMore}
-                  icon={<Rewind />}
-                  type="default"
-                  loading={isLoading}
-                  disabled={isLoading}
-                >
-                  Load more
-                </Button>
-              </>
+              <Button
+                onClick={loadMore}
+                icon={<Rewind />}
+                type="default"
+                loading={isLoading}
+                disabled={isLoading}
+              >
+                Load more
+              </Button>
             )}
             {filters.offset !== 0 && (
               <>
