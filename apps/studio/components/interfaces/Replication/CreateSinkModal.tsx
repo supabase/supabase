@@ -30,7 +30,6 @@ const CreateSinkModal = ({ visible, onClose }: CreateSinkModalProps) => {
     return errors
   }
   const onSubmit = (values: any) => {
-    console.log('onSubmit')
     createSink({
       projectRef: ref!,
       project_id: values.project_id,
