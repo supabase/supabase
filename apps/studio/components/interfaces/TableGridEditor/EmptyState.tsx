@@ -27,7 +27,7 @@ const EmptyState = ({}: EmptyStateProps) => {
   const { data } = useEntityTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: selectedSchema,
+    schemas: [selectedSchema],
     sort,
   })
 

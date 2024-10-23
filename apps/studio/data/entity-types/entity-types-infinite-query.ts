@@ -5,7 +5,7 @@ import { entityTypeKeys } from './keys'
 
 export type EntityTypesVariables = {
   projectRef?: string
-  schema?: string
+  schemas?: string[]
   search?: string
   limit?: number
   page?: number
@@ -24,7 +24,7 @@ export async function getEntityTypes(
   {
     projectRef,
     connectionString,
-    schema = 'public',
+    schemas = ['public'],
     search,
     limit = 100,
     page = 0,
@@ -67,7 +67,7 @@ export async function getEntityTypes(
           )
           or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
         )
-        and nc.nspname = '${schema}'
+        and nc.nspname in (${schemas.map((x) => `'${x}'`)})
         ${search ? `and c.relname ilike '%${search}%'` : ''}
       order by ${innerOrderBy}
       limit ${limit}
@@ -111,7 +111,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   {
     projectRef,
     connectionString,
-    schema = 'public',
+    schemas = ['public'],
     search,
     limit = 100,
     sort,
@@ -123,10 +123,19 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   }: UseInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
 ) =>
   useInfiniteQuery<EntityTypesData, EntityTypesError, TData>(
-    entityTypeKeys.list(projectRef, { schema, search, sort, limit, filterTypes }),
+    entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
     ({ signal, pageParam }) =>
       getEntityTypes(
-        { projectRef, connectionString, schema, search, limit, page: pageParam, sort, filterTypes },
+        {
+          projectRef,
+          connectionString,
+          schemas,
+          search,
+          limit,
+          page: pageParam,
+          sort,
+          filterTypes,
+        },
         signal
       ),
     {
