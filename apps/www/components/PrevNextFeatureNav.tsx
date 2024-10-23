@@ -1,6 +1,7 @@
-import { PropsWithChildren } from 'react'
-import Link from 'next/link'
-import { ArrowLeft, ArrowRight, ChevronRight, List } from 'lucide-react'
+import { PropsWithChildren, useEffect, useState } from 'react'
+import Link, { LinkProps } from 'next/link'
+import { useRouter } from 'next/router'
+import { ArrowLeft, ArrowRight, List } from 'lucide-react'
 import {
   cn,
   DropdownMenu,
@@ -33,71 +34,86 @@ const PrevNextFeatureNav: React.FC<Props> = ({
   prevLink,
   nextLink,
   ...props
-}) => (
-  <div
-    className={cn(
-      'h-full w-full max-w-2xl absolute mx-auto inset-0 pointer-events-none',
-      wrapperClassName
-    )}
-    {...props}
-  >
+}) => {
+  const [open, setOpen] = useState(false)
+  const router = useRouter()
+
+  useEffect(() => {
+    function handleRouteChange() {
+      setOpen(false)
+    }
+
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [router.events])
+
+  return (
     <div
       className={cn(
-        'absolute top-9 w-fit pointer-events-auto flex items-center text-sm gap-1 text-foreground-light right-8 md:right-0',
-        className
+        'h-full w-full max-w-2xl absolute mx-auto inset-0 pointer-events-none',
+        wrapperClassName
       )}
+      {...props}
     >
-      <ButtonLink href={prevLink} className="text-right pl-2">
-        <ArrowLeft className={iconClassName} />
-        <span className="sr-only">Previous feature</span>
-      </ButtonLink>
-      <DropdownMenu>
-        <DropdownMenuTrigger className={cn(buttonClassName, 'p-0')}>
-          <List className={iconClassName} />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" alignOffset={-38} className="pb-0">
-          <DropdownMenuLabel className="text-foreground-lighter p-0">
-            <Link
-              href="/features"
-              className="group/link flex items-center gap-2 px-2 py-1.5 w-full hover:text-foreground"
-            >
-              <span className="truncate flex-grow">All Features</span>
-              <ChevronRight className="w-3 h-3 text-foreground-lighter group-hover/link:text-foreground transition-colors" />
-            </Link>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator className="mb-0" />
-          <DropdownMenuGroup className="max-h-[400px] overflow-y-scroll py-1">
-            {features
-              .sort((a, b) => {
-                if (a['title'] < b['title']) return -1
-                if (a['title'] > b['title']) return 1
-                return 0
-              })
-              .map((feature) => (
-                <DropdownMenuItem key={feature.slug} className="p-0">
-                  <Link
-                    href={`/features/${feature.slug}`}
-                    className="group/link flex items-center gap-2 px-2 py-1.5 w-full hover:text-foreground"
-                  >
-                    <feature.icon className="w-3 h-3 text-foreground-lighter group-hover:text-foreground transition-colors" />
-                    <span className="line-clamp-1 flex-grow">{feature.title}</span>
-                    <ChevronRight className="w-3 h-3 transition-opacity opacity-0 group-hover/link:opacity-100" />
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <ButtonLink href={nextLink}>
-        <span className="sr-only">Next feature</span>
-        <ArrowRight className={iconClassName} />
-      </ButtonLink>
+      <div
+        className={cn(
+          'absolute top-9 w-fit pointer-events-auto flex items-center text-sm gap-1 text-foreground-light right-8 md:right-0',
+          className
+        )}
+      >
+        <ButtonLink href={prevLink} className="text-right pl-2">
+          <ArrowLeft className={iconClassName} />
+          <span className="sr-only">Previous feature</span>
+        </ButtonLink>
+        <DropdownMenu open={open} onOpenChange={setOpen}>
+          <DropdownMenuTrigger className={cn(buttonClassName, 'p-0')}>
+            <List className={iconClassName} />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" alignOffset={-38} className="pb-0">
+            <DropdownMenuLabel className="text-foreground-lighter p-0">
+              <Link
+                href="/features"
+                as="/features"
+                className="group/link flex items-center gap-2 px-2 py-1.5 w-full hover:text-foreground"
+              >
+                <span className="truncate flex-grow">All Features</span>
+              </Link>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="mb-0" />
+            <DropdownMenuGroup className="max-h-[400px] overflow-y-scroll py-1">
+              {features
+                .sort((a, b) => {
+                  if (a['title'] < b['title']) return -1
+                  if (a['title'] > b['title']) return 1
+                  return 0
+                })
+                .map((feature) => (
+                  <DropdownMenuItem key={feature.slug} className="p-0">
+                    <Link
+                      href={`/features/${feature.slug}`}
+                      as={`/features/${feature.slug}`}
+                      className="group/link flex items-center gap-2 px-2 py-1.5 w-full hover:text-foreground"
+                    >
+                      <feature.icon className="w-3 h-3 text-foreground-lighter group-hover:text-foreground transition-colors" />
+                      <span className="line-clamp-1 flex-grow">{feature.title}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <ButtonLink href={nextLink}>
+          <span className="sr-only">Next feature</span>
+          <ArrowRight className={iconClassName} />
+        </ButtonLink>
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
-interface ButtonLinkProps {
-  href: string
+interface ButtonLinkProps extends LinkProps {
   className?: string
 }
 

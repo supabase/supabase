@@ -3,18 +3,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { motion } from 'framer-motion'
-import { Search, X as CloseIcon } from 'lucide-react'
+import { Search } from 'lucide-react'
 import debounce from 'lodash/debounce'
 
-import { useBreakpoint } from 'common'
 import { Button, Checkbox, cn, Input } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
 
 import { features } from '~/data/features'
-
-const products = Array.from(new Set(features.flatMap((feature) => feature.products)))
 
 function FeaturesPage() {
   const router = useRouter()
@@ -23,6 +20,8 @@ function FeaturesPage() {
   const [selectedProducts, setSelectedProducts] = useState<string[]>(
     (query.products as string)?.split(',') || []
   )
+
+  const products = Array.from(new Set(features.flatMap((feature) => feature.products)))
 
   // Debounced function to update URL params
   const updateQueryParamsDebounced = useCallback(
@@ -129,27 +128,29 @@ function FeaturesPage() {
               <div className="hidden md:flex flex-col gap-4">
                 <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
                 <div className="flex flex-col gap-2.5">
-                  {products.map((product) => (
-                    <button
-                      key={product}
-                      className="flex items-center gap-2 text-foreground-light hover:text-foreground !cursor-pointer hover:!cursor-pointer transition-colors"
-                    >
-                      <Checkbox
-                        id={product}
-                        checked={selectedProducts.includes(product)}
-                        onChange={() => handleProductChange(product)}
-                        className="[&_input]:m-0"
-                      />
-                      <label
-                        htmlFor={product}
-                        className="text-sm !leading-none capitalize flex-1 text-left"
+                  {products
+                    .sort((a, b) => (a > b ? 1 : -1))
+                    .map((product) => (
+                      <button
+                        key={product}
+                        className="flex items-center gap-2 text-foreground-light hover:text-foreground !cursor-pointer hover:!cursor-pointer transition-colors"
                       >
-                        {product}
-                      </label>
-                    </button>
-                  ))}
+                        <Checkbox
+                          id={product}
+                          checked={selectedProducts.includes(product)}
+                          onChange={() => handleProductChange(product)}
+                          className="[&_input]:m-0"
+                        />
+                        <label
+                          htmlFor={product}
+                          className="text-sm !leading-none capitalize flex-1 text-left"
+                        >
+                          {product}
+                        </label>
+                      </button>
+                    ))}
                 </div>
-                <div className="text-foreground-lighter text-xs">
+                <div className="text-foreground-muted text-xs">
                   Features selected: {filteredFeatures.length}
                 </div>
               </div>
@@ -176,30 +177,32 @@ function FeaturesPage() {
               </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
-                {filteredFeatures.map((feature) => (
-                  <Panel
-                    key={feature.title}
-                    hasActiveOnHover
-                    innerClassName="flex flex-col justify-start items-stretch"
-                  >
-                    <Link
-                      href={`/features/${feature.slug}`}
-                      className="p-2 group cursor-pointer transition flex md:flex-col gap-3 sm:gap-2 h-full items-start"
+                {filteredFeatures
+                  .sort((a, b) => (a.title > b.title ? 1 : -1))
+                  .map((feature) => (
+                    <Panel
+                      key={feature.title}
+                      hasActiveOnHover
+                      innerClassName="flex flex-col justify-start items-stretch"
                     >
-                      <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:!aspect-video bg-alternative flex items-center justify-center shadow-inner border border-muted">
-                        <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
-                      </div>
-                      <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto flex-grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
-                        <h3 className="text-sm md:text-base text-foreground !leading-5">
-                          {feature.title}
-                        </h3>
-                        <p className="text-foreground-light text-sm line-clamp-2">
-                          {feature.subtitle}
-                        </p>
-                      </div>
-                    </Link>
-                  </Panel>
-                ))}
+                      <Link
+                        href={`/features/${feature.slug}`}
+                        className="p-2 group cursor-pointer transition flex md:flex-col gap-3 sm:gap-2 h-full items-start"
+                      >
+                        <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:!aspect-video bg-alternative flex items-center justify-center shadow-inner border border-muted">
+                          <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
+                        </div>
+                        <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto flex-grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                          <h3 className="text-sm md:text-base text-foreground !leading-5">
+                            {feature.title}
+                          </h3>
+                          <p className="text-foreground-light text-sm line-clamp-2">
+                            {feature.subtitle}
+                          </p>
+                        </div>
+                      </Link>
+                    </Panel>
+                  ))}
               </div>
             )}
           </div>

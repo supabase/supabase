@@ -1,11 +1,10 @@
 import { ChevronLeft, ChevronRight, LucideIcon } from 'lucide-react'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 
-import { Badge, Button } from 'ui'
+import { Badge, Button, cn, Image } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -107,7 +106,11 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                 <div className="flex gap-1 flex-wrap mb-2">
                   {feature.products.map((product) => (
                     <Link href={`/features?products=${product}`} passHref>
-                      <Badge key={product} className="capitalize" size="small">
+                      <Badge
+                        key={product}
+                        className="capitalize hover:border-foreground-lighter"
+                        size="small"
+                      >
                         {product}
                       </Badge>
                     </Link>
@@ -117,24 +120,67 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                 <p>{feature.subtitle}</p>
               </div>
               <div
-                className="
-                  relative w-full aspect-video bg-surface-100 overflow-hidden
-                  border shadow-lg rounded-lg
-                  mx-auto max-w-2xl
-                  flex items-center justify-center
-                "
+                className={cn(
+                  'relative w-full bg-brand',
+                  'border rounded-lg overflow-hidden',
+                  'mx-auto max-w-3xl',
+                  'flex items-center justify-center',
+                  feature.heroImage.includes('.mp4') ? 'h-fit' : 'aspect-video'
+                )}
               >
                 {!!feature.heroImage ? (
-                  <Image
-                    src={feature.heroImage}
-                    fill
-                    sizes="100%"
-                    quality={100}
-                    alt={`${feature.title} thumbnail`}
-                    className="absolute inset-0 object-cover object-center"
-                  />
+                  feature.heroImage.includes('.mp4') ? (
+                    <video
+                      width="100%"
+                      muted
+                      autoPlay
+                      playsInline
+                      controls
+                      loop
+                      className="relative inset-0"
+                    >
+                      <source src={feature.heroImage} type="video/mp4" />
+                    </video>
+                  ) : feature.heroImage.includes('.youtube') ? (
+                    <div className="video-container !rounded-none !border-none">
+                      <iframe
+                        className="w-full"
+                        src={feature.heroImage}
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <Image
+                        src={feature.heroImage}
+                        fill
+                        sizes="(max-width: 768px) 200vw, (max-width: 1200px) 120vw, 300vw"
+                        quality={100}
+                        zoomable
+                        priority
+                        alt={`${feature.title} thumbnail`}
+                        containerClassName={cn(
+                          'absolute inset-0 object-cover object-center',
+                          feature.heroImageLight && 'hidden dark:block'
+                        )}
+                      />
+                      {feature.heroImageLight && (
+                        <Image
+                          src={feature.heroImageLight}
+                          fill
+                          sizes="(max-width: 768px) 200vw, (max-width: 1200px) 120vw, 300vw"
+                          quality={100}
+                          priority
+                          zoomable
+                          alt={`${feature.title} thumbnail`}
+                          containerClassName="absolute inset-0 object-cover object-center dark:hidden"
+                        />
+                      )}
+                    </>
+                  )
                 ) : (
-                  <Icon className="w-8 h-8 md:w-10 md:h-10 text-foreground" />
+                  <Icon className="w-8 h-8 md:w-10 md:h-10 text-background" />
                 )}
               </div>
             </SectionContainer>

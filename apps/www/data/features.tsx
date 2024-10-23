@@ -70,6 +70,10 @@ export type FeatureType = {
    */
   heroImage: string
   /**
+   * heroImage can either be an absolute path to an image or to a video
+   */
+  heroImageLight?: string
+  /**
    * url to docs page for this feature
    */
   docsUrl?: string
@@ -96,7 +100,8 @@ It's 100% portable, which means you can easily migrate your data to and from oth
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: '/images/features/postgres-database.png',
+    heroImageLight: '/images/features/postgres-database-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/overview',
     slug: 'postgres-database',
   },
@@ -117,7 +122,7 @@ Supabase provides an open source toolkit for developing AI applications using Po
 `,
     icon: ChartScatter,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/ibzlEQmgPPY',
     docsUrl: 'https://supabase.com/docs/guides/ai',
     slug: 'vector-database',
   },
@@ -138,7 +143,8 @@ Supabase automatically generates a comprehensive RESTful API from your database 
 `,
     icon: FileCode2,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: '/images/features/auto-generated-rest-api.png',
+    heroImageLight: '/images/features/auto-generated-rest-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/api#rest-api-overview',
     slug: 'auto-generated-rest-api',
   },
@@ -166,7 +172,8 @@ Supabase offers lightning-fast GraphQL APIs through its custom-built Postgres Gr
 `,
     icon: Braces,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: '/images/features/auto-generated-graphql-api.png',
+    heroImageLight: '/images/features/auto-generated-graphql-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/graphql/api',
     slug: 'auto-generated-graphql-api',
   },
@@ -200,7 +207,8 @@ Supabase's backup solutions provide a balance of security, flexibility, and ease
 `,
     icon: DatabaseBackup,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: '/images/features/backups.png',
+    heroImageLight: '/images/features/backups-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/backups',
     slug: 'database-backups',
   },
@@ -224,7 +232,8 @@ By using custom domains, you create a more cohesive brand experience and gain fl
 `,
     icon: Globe,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: '/images/features/custom-domains.png',
+    heroImageLight: '/images/features/custom-domains-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/custom-domains',
     slug: 'custom-domains',
   },
@@ -256,7 +265,8 @@ By implementing Network Restrictions, you create a more secure environment for y
 `,
     icon: UserX,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: '/images/features/network-restrictions.png',
+    heroImageLight: '/images/features/network-restrictions-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/network-restrictions',
     slug: 'network-restrictions',
   },
@@ -290,7 +300,8 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
 `,
     icon: ShieldCheck,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: '/images/features/ssl-enforcement.png',
+    heroImageLight: '/images/features/ssl-enforcement-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/ssl-enforcement',
     slug: 'ssl-enforcement',
   },
@@ -321,7 +332,8 @@ Supabase Branching allows you to create and test changes in separate, temporary 
 `,
     icon: GitBranch,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: '/images/features/branching.png',
+    heroImageLight: '/images/features/branching-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/branching',
     slug: 'branching',
   },
@@ -356,7 +368,8 @@ By adopting the Supabase Terraform provider, teams can implement GitOps practice
 `,
     icon: Package,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: '/images/features/terraform-provider.png',
+    heroImageLight: '/images/features/terraform-provider-light.png',
     docsUrl: 'https://supabase.com/docs/guides/deployment/terraform',
     slug: 'terraform-provider',
   },
@@ -464,7 +477,8 @@ By leveraging these extensions, you can implement complex features more easily, 
 `,
     icon: Puzzle,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: '/images/features/postgres-extensions.png',
+    heroImageLight: '/images/features/postgres-extensions-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions',
     slug: 'postgres-extensions',
   },
@@ -485,7 +499,8 @@ This feature is particularly useful for developers looking to automate workflows
 `,
     icon: Cloud,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: '/images/features/database-webhooks.png',
+    heroImageLight: '/images/features/database-webhooks-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/webhooks',
     slug: 'database-webhooks',
   },
@@ -506,7 +521,7 @@ This feature is particularly useful for teams looking to enhance their security 
 `,
     icon: Lock,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: '',
+    heroImage: 'https://supabase.com/docs/img/guides/database/vault-hello-compressed.mp4',
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
     slug: 'vault',
   },
@@ -527,7 +542,7 @@ This feature is particularly valuable for teams looking to optimize their databa
 `,
     icon: Zap,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/ogYNmJOFEpk',
     docsUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
     slug: 'supavisor',
   },
@@ -562,7 +577,7 @@ Supabase's Postgres Changes feature provides a powerful tool for creating respon
 `,
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.REALTIME],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/2rUjcmgZDwQ',
     docsUrl: 'https://supabase.com/docs/guides/realtime/postgres-changes',
     slug: 'realtime-postgres-changes',
   },
@@ -599,7 +614,7 @@ Supabase's Broadcast feature provides a powerful tool for creating responsive, r
 `,
     icon: MessageCircle,
     products: [PRODUCT_SHORTNAMES.REALTIME],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast',
     slug: 'realtime-broadcast',
   },
@@ -635,7 +650,7 @@ Supabase's Presence feature provides a powerful tool for creating interactive, r
 `,
     icon: Users,
     products: [PRODUCT_SHORTNAMES.REALTIME],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
     docsUrl: 'https://supabase.com/docs/guides/realtime/presence',
     slug: 'realtime-presence',
   },
@@ -670,7 +685,8 @@ Supabase's Email Login provides a robust foundation for user authentication, all
 `,
     icon: Mail,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
-    heroImage: '',
+    heroImage: '/images/features/email-login.png',
+    heroImageLight: '/images/features/email-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/passwords',
     slug: 'email-login',
   },
@@ -704,7 +720,8 @@ Supabase's Social Login feature allows you to improve user experience and potent
 `,
     icon: Users,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
-    heroImage: '',
+    heroImage: '/images/features/social-login.png',
+    heroImageLight: '/images/features/social-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/social-login',
     slug: 'social-login',
   },
@@ -737,7 +754,8 @@ Supabase's Phone Login feature enables a seamless authentication experience, par
 `,
     icon: Smartphone,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
-    heroImage: '',
+    heroImage: '/images/features/phone-login.png',
+    heroImageLight: '/images/features/phone-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/phone-login',
     slug: 'phone-logins',
   },
@@ -774,7 +792,7 @@ Supabase's Magic Links feature offers a secure and user-friendly authentication 
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-email-passwordless',
-    slug: 'passwordless-login',
+    slug: 'passwordless-login-via-magicklink',
   },
   {
     title: 'Multi-Factor Authentication (MFA)',
@@ -842,7 +860,7 @@ Supabase's RLS feature provides a powerful tool for implementing sophisticated a
 `,
     icon: Lock,
     products: [PRODUCT_SHORTNAMES.DATABASE, PRODUCT_SHORTNAMES.AUTHENTICATION],
-    heroImage: '',
+    heroImage: `https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-rls.mp4`,
     docsUrl: 'https://supabase.com/docs/guides/auth/row-level-security',
     slug: 'row-level-security',
   },
@@ -876,9 +894,10 @@ Supabase's Captcha Protection feature provides a powerful tool for enhancing app
 `,
     icon: RectangleEllipsis,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
-    heroImage: '',
+    heroImage: '/images/features/auth-captcha-protection.png',
+    heroImageLight: '/images/features/auth-captcha-protection-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-captcha',
-    slug: 'captcha-protection',
+    slug: 'auth-captcha-protection',
   },
   {
     title: 'Server-side Auth',
@@ -946,7 +965,8 @@ Supabase Storage simplifies adding robust file management to your applications, 
 `,
     icon: Folders,
     products: [PRODUCT_SHORTNAMES.STORAGE],
-    heroImage: '',
+    heroImage: '/images/features/file-storage.png',
+    heroImageLight: '/images/features/file-storage-light.png',
     docsUrl: 'https://supabase.com/docs/guides/storage',
     slug: 'file-storage',
   },
@@ -1016,7 +1036,7 @@ Supabase's Smart CDN optimizes both performance and content accuracy, providing 
 `,
     icon: Cloud,
     products: [PRODUCT_SHORTNAMES.STORAGE],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/NpEl20iuOtg',
     docsUrl: 'https://supabase.com/docs/guides/storage/cdn/smart-cdn',
     slug: 'smart-cdn',
   },
@@ -1052,7 +1072,7 @@ Supabase's Image Transformations feature enables you to efficiently manage and s
 `,
     icon: Image,
     products: [PRODUCT_SHORTNAMES.STORAGE],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/dLqSmxX3r7I',
     docsUrl: 'https://supabase.com/docs/guides/storage/image-transformations',
     slug: 'image-transformations',
   },
@@ -1088,7 +1108,7 @@ Supabase's Resumable Uploads feature significantly improves the reliability and 
 `,
     icon: UploadCloud,
     products: [PRODUCT_SHORTNAMES.STORAGE],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/pT2PcZFq_M0',
     docsUrl: 'https://supabase.com/docs/guides/storage/uploads/resumable-uploads',
     slug: 'resumable-uploads',
   },
@@ -1124,7 +1144,8 @@ Supabase's S3 compatibility allows seamless integration with existing workflows 
 `,
     icon: UploadCloud,
     products: [PRODUCT_SHORTNAMES.STORAGE],
-    heroImage: '',
+    heroImage: '/images/features/s3-compatibility.png',
+    heroImageLight: '/images/features/s3-compatibility-light.png',
     docsUrl: 'https://supabase.com/docs/guides/storage/s3/compatibility',
     slug: 's3-compatibility',
   },
@@ -1163,7 +1184,7 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
 `,
     icon: FileCode2,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/5OWH9c4u68M',
     docsUrl: 'https://supabase.com/docs/guides/functions',
     slug: 'deno-edge-functions',
   },
@@ -1192,10 +1213,10 @@ Supabase's Regional Invocations feature allows you to execute Edge Functions in 
 
 By leveraging Supabase's Regional Invocations, you can significantly enhance the performance of your database-centric serverless functions. This feature allows you to build more responsive applications, especially those requiring frequent or complex database interactions, by ensuring that your Edge Functions operate as close as possible to your Supabase database.
 `,
-    icon: Cloud,
+    icon: Globe,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/functions/regional-invocations',
+    docsUrl: 'https://supabase.com/docs/guides/functions/regional-invocation',
     slug: 'regional-invocations',
   },
   {
@@ -1225,8 +1246,8 @@ By leveraging NPM Compatibility in Supabase Edge Functions, you can take advanta
 `,
     icon: FileCode2,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
-    heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/functions/npm-compatibility',
+    heroImage: 'https://www.youtube-nocookie.com/embed/eCbiywoDORw',
+    docsUrl: 'https://supabase.com/blog/edge-functions-node-npm',
     slug: 'npm-compatibility',
   },
   // Vector
@@ -1257,8 +1278,8 @@ By leveraging Supabase's AI Integrations, you can rapidly develop and deploy sop
 `,
     icon: Brain,
     products: [PRODUCT_SHORTNAMES.VECTOR],
-    heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/ai',
+    heroImage: 'https://www.youtube-nocookie.com/embed/OgnYxRkxEUw',
+    docsUrl: 'https://supabase.com/docs/guides/ai/examples/huggingface-image-captioning',
     slug: 'ai-integrations',
   },
   // Platform
@@ -1289,8 +1310,9 @@ By leveraging the Supabase CLI, you can significantly improve your development w
 `,
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/project-management/cli',
+    heroImage: 'https://www.youtube-nocookie.com/embed/vyHyYpvjaks',
+    docsUrl:
+      'https://supabase.com/docs/guides/local-development?queryGroups=package-manager&package-manager=pnpm',
     slug: 'cli',
   },
   {
@@ -1320,7 +1342,8 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
 `,
     icon: FileCode2,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: '',
+    heroImage: '/images/features/management-api.png',
+    heroImageLight: '/images/features/management-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/project-management/api',
     slug: 'management-api',
   },
@@ -1351,17 +1374,17 @@ Supabase's Role-Based Access Control (RBAC) feature provides a powerful and flex
 By leveraging Role-Based Access Control, you can create a secure, scalable, and easily manageable access control system for your application. This feature allows you to implement complex permission structures with ease, ensuring that users only have access to the resources and functionalities appropriate for their role within the system.
 `,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/kwoKmi6inAw',
     docsUrl:
       'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
     slug: 'role-based-access-control',
   },
   // Analytics
   {
-    title: 'Analytics',
+    title: 'Reports & Metrics',
     subtitle: "Monitor your project's health with usage insights.",
     description: `
-Supabase Analytics provides comprehensive insights into your project's performance, usage patterns, and overall health. This feature offers a detailed view of various metrics, helping you optimize your application, troubleshoot issues, and make data-driven decisions about resource allocation and scaling.
+Supabase Reports provide comprehensive insights into your project's performance, usage patterns, and overall health. This feature offers a detailed view of various metrics, helping you optimize your application, troubleshoot issues, and make data-driven decisions about resource allocation and scaling.
 
 ## Key benefits
 1. Performance monitoring: Track query performance, API response times, and overall system health.
@@ -1370,9 +1393,8 @@ Supabase Analytics provides comprehensive insights into your project's performan
 4. Trend analysis: Observe usage patterns over time to predict future needs and potential issues.
 5. Security overview: Monitor authentication attempts, failed queries, and other security-related metrics.
 6. Customizable dashboards: Create tailored views of the metrics most important to your team.
-7. Alerting capabilities: Set up notifications for unusual activity or performance thresholds.
 
-## Analytics is particularly valuable for:
+## Reports are particularly valuable for:
 - Development teams needing to optimize application performance
 - DevOps professionals monitoring system health and resource utilization
 - Project managers tracking usage growth and planning for scaling
@@ -1380,13 +1402,14 @@ Supabase Analytics provides comprehensive insights into your project's performan
 - Security personnel monitoring for unusual activity or potential threats
 - Any stakeholder requiring insights into the project's operational status
 
-By leveraging Supabase Analytics, you gain a comprehensive understanding of your project's performance and usage patterns. This feature empowers you to make informed decisions about scaling, optimization, and resource allocation, ensuring that your application runs efficiently and cost-effectively. Whether you're troubleshooting issues, planning for growth, or optimizing costs, Supabase Analytics provides the insights you need to manage your project effectively.
+By leveraging Supabase Reports, you gain a understanding of your project's performance and usage patterns. This feature empowers you to make informed decisions about scaling, optimization, and resource allocation, ensuring that your application runs efficiently and cost-effectively. Whether you're troubleshooting issues, planning for growth, or optimizing costs, Supabase Reports provides the insights you need to manage your project effectively.
 `,
     icon: BarChart,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/platform/analytics',
-    slug: 'analytics',
+    heroImage: '/images/features/reports-and-metrics.png',
+    heroImageLight: '/images/features/reports-and-metrics-light.png',
+    docsUrl: 'https://supabase.com/blog/supabase-reports-and-metrics',
+    slug: 'reports-and-metrics',
   },
   {
     title: 'SOC 2 Compliance',
@@ -1443,8 +1466,9 @@ This feature is especially beneficial for teams looking to improve their databas
 `,
     icon: Brain,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: '',
-    docsUrl: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/hu2SQjvCXIw',
+    docsUrl:
+      'https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant',
     slug: 'ai-query-assistance',
   },
   {
@@ -1464,8 +1488,9 @@ This feature is particularly valuable for teams looking to enhance their applica
 `,
     icon: Activity,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: '',
-    docsUrl: '',
+    heroImage: '/images/features/logs-analytics.png',
+    heroImageLight: '/images/features/logs-analytics-light.png',
+    docsUrl: 'https://supabase.com/docs/guides/monitoring-troubleshooting/logs',
     slug: 'logs-analytics',
   },
   {
@@ -1485,8 +1510,9 @@ This feature is particularly valuable for teams engaged in agile development pro
 `,
     icon: RectangleEllipsis,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: '',
-    docsUrl: '',
+    heroImage: '/images/features/visual-schema-designer.png',
+    heroImageLight: '/images/features/visual-schema-designer-light.png',
+    docsUrl: 'https://supabase.com/blog/supabase-studio-3-0#schema-visualizer',
     slug: 'visual-schema-designer',
   },
   {
@@ -1506,72 +1532,10 @@ This feature is essential for organizations looking to maintain robust security 
 `,
     icon: ShieldPlus,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: '',
+    heroImage: '/images/features/policy-templates.png',
+    heroImageLight: '/images/features/policy-templates-light.png',
     docsUrl: '',
     slug: 'policy-templates',
-  },
-  {
-    title: 'Automated Performance Monitoring',
-    subtitle: 'Keep track of your database performance effortlessly.',
-    description: `
-Automated Performance Monitoring provides users with real-time insights into their database's performance metrics, helping them identify potential bottlenecks and optimize resource utilization. This feature continuously tracks key performance indicators (KPIs) and alerts users when anomalies are detected.
-
-## Key benefits
-1. Proactive Management: Enables early detection of performance issues before they impact application functionality.
-2. Data-Driven Decisions: Provides actionable insights that help inform optimization strategies.
-3. User-Friendly Dashboard: Presents performance data in an easily digestible format within Supabase Studio.
-4. Historical Analysis: Allows users to review past performance trends for informed decision-making.
-5. Integration with Alerts: Users can set up notifications for critical performance thresholds.
-
-This feature is particularly useful for teams managing high-traffic applications that require constant monitoring to ensure optimal performance levels.
-`,
-    icon: Activity,
-    products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: '',
-    docsUrl: '',
-    slug: 'automated-performance-monitoring',
-  },
-  {
-    title: 'Customizable Dashboard Widgets',
-    subtitle: 'Tailor your dashboard for personalized insights.',
-    description: `
-Customizable Dashboard Widgets allow users to create personalized views within their Supabase Studio by adding or removing widgets according to their specific needs. This flexibility enhances user experience by enabling individuals to focus on metrics that matter most to them.
-
-## Key benefits
-1. Personalization: Users can curate their dashboard layout based on personal preferences or project requirements.
-2. Enhanced Visibility: Important metrics are easily accessible at a glance, improving decision-making speed.
-3. Dynamic Updates: Widgets reflect real-time data changes, ensuring users have the latest information available.
-4. User Engagement: Encourages active use of the dashboard by allowing customization that fits individual workflows.
-5. Collaboration Features: Teams can share customized dashboards with colleagues, fostering better communication regarding project status.
-
-This feature is especially beneficial for teams working on diverse projects requiring different metrics and insights tailored to various roles within the organization.
-`,
-    icon: Folders,
-    products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: '',
-    docsUrl: '',
-    slug: 'customizable-dashboard-widgets',
-  },
-  {
-    title: 'Integrated CI/CD Pipelines',
-    subtitle: 'Streamline your deployment workflow seamlessly.',
-    description: `
-Integrated CI/CD Pipelines enable developers to automate their deployment processes directly within Supabase Studio, facilitating continuous integration and delivery of applications without manual intervention. This feature supports a smooth workflow from code changes to production deployment.
-
-## Key benefits
-1. Automation: Reduces manual steps in deployment processes, minimizing human error and increasing efficiency.
-2. Version Control Integration: Works seamlessly with popular version control systems like GitHub for streamlined workflows.
-3. Rollback Capabilities: Easily revert deployments if issues arise, ensuring stability in production environments.
-4. Visibility into Deployments: Provides clear insights into deployment history and current application status within the dashboard.
-5. Team Collaboration: Facilitates better coordination among team members working on deployment tasks.
-
-This feature is particularly valuable for development teams adopting agile methodologies who need rapid iteration cycles without compromising quality or reliability in their deployments.
-`,
-    icon: Cloud,
-    products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: '',
-    docsUrl: '',
-    slug: 'integrated-ci-cd-pipelines',
   },
   {
     title: 'SQL Editor',
@@ -1590,7 +1554,8 @@ This feature is particularly valuable for developers looking to streamline their
 `,
     icon: FileCode2,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: '',
+    heroImage: '/images/features/sql-editor.png',
+    heroImageLight: '/images/features/sql-editor-light.png',
     docsUrl: '',
     slug: 'sql-editor',
   },
@@ -1611,9 +1576,32 @@ This feature is essential for organizations aiming to maintain high security sta
 `,
     icon: ShieldPlus,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: '',
-    docsUrl: 'https://supabase.com/blog/security-performance-advisor',
-    slug: 'security-performance-advisor',
+    heroImage: '/images/features/security-and-performance-advisor.png',
+    heroImageLight: '/images/features/security-and-performance-advisor-light.png',
+    docsUrl: 'https://supabase.com/blog/security-and-performance-advisor',
+    slug: 'security-and-performance-advisor',
+  },
+  {
+    title: 'Postgres Roles',
+    subtitle: 'Managing access to your Postgres database and configuring permissions.',
+    description: `
+Postgres Roles are a fundamental aspect of managing access permissions within your Supabase database. Roles can function as individual users or groups of users, allowing for flexible permission management. This feature is essential for setting up secure access to your database while enabling efficient collaboration among team members.
+
+Key benefits:
+1. Granular Access Control: Configure permissions for various database objects, including tables, views, and functions, using the GRANT command.
+2. Role Hierarchy: Organize roles in a hierarchy to simplify permission management, allowing child roles to inherit permissions from parent roles.
+3. Secure User Management: Create roles with specific login privileges and strong passwords to ensure secure access to your database.
+4. Revocation of Permissions: Easily revoke permissions using the REVOKE command, providing control over who has access to what within your database.
+5. Predefined Roles: Supabase extends Postgres with a set of predefined roles, simplifying the initial setup for new projects.
+
+This feature is particularly valuable for teams looking to implement robust security measures while maintaining flexibility in how users interact with their database.
+`,
+    icon: Users,
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '/images/features/postgres-roles.png',
+    heroImageLight: '/images/features/postgres-roles-light.png',
+    docsUrl: 'https://supabase.com/docs/guides/database/postgres/roles',
+    slug: 'postgres-roles',
   },
   {
     title: 'Foreign Key Selector',
@@ -1632,7 +1620,8 @@ This feature is particularly beneficial for developers working with complex data
 `,
     icon: DatabaseZap,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: '',
+    heroImage:
+      'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/fk-lookup.mp4',
     docsUrl: 'https://supabase.com/blog/supabase-studio-2.0#foreign-key-selector',
     slug: 'foreign-key-selector',
   },
@@ -1653,7 +1642,7 @@ This feature is particularly useful for teams seeking to enhance their observabi
 `,
     icon: Activity,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
     docsUrl: 'https://supabase.com/blog/log-drains',
     slug: 'log-drains',
   },
