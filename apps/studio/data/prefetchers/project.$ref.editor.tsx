@@ -7,12 +7,14 @@ import { prefetchSchemas } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { prefetchEntityTypes } from 'data/entity-types/entity-types-infinite-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useRouter } from 'next/router'
 
 export function usePrefetchEditorIndexPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
+  const tableEditorPrefetchingEnabled = useFlag('tableEditorPrefetching')
 
   const [entityTypesSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
@@ -20,7 +22,7 @@ export function usePrefetchEditorIndexPage() {
   )
 
   return useCallback(() => {
-    if (!project) return
+    if (!tableEditorPrefetchingEnabled || !project) return
 
     // Prefetch code
     router.prefetch(`/project/${project.ref}/editor`)
