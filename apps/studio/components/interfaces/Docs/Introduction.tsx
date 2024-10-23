@@ -1,11 +1,10 @@
 import { useParams } from 'common'
 import Snippets from 'components/interfaces/Docs/Snippets'
-import type { AutoApiService } from 'data/config/project-api-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import CodeSnippet from './CodeSnippet'
 import PublicSchemaNotEnabledAlert from './PublicSchemaNotEnabledAlert'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 
 interface Props {
   selectedLang: 'bash' | 'js'
