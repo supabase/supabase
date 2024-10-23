@@ -1,15 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { AlertCircle, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
 import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AlertCircle, Loader } from 'lucide-react'
 import { Input } from 'ui'
 
 const generateInitSnippet = (endpoint: string) => ({
@@ -64,7 +64,7 @@ const APIKeys = () => {
 
   const endpoint = settings?.app_config?.endpoint
   const apiUrl = `https://${endpoint ?? '-'}`
-  const anonKey = apiKeys.find((key) => key.tags === 'anon')
+  const { anonKey } = getAPIKeys(settings)
 
   const clientInitSnippet: any = generateInitSnippet(apiUrl)
   const selectedLanguageSnippet = clientInitSnippet[selectedLanguage.key] ?? 'No snippet available'

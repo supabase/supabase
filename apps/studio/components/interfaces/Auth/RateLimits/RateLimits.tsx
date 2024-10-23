@@ -53,7 +53,7 @@ const RateLimits = () => {
   })
 
   const canUpdateEmailLimit = authConfig?.EXTERNAL_EMAIL_ENABLED && isSmtpEnabled(authConfig)
-  const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED && !authConfig?.SMS_AUTOCONFIRM
+  const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED
   const canUpdateAnonymousUsersRateLimit = authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED
 
   const FormSchema = z.object({
