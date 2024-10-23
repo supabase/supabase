@@ -3,7 +3,7 @@ import { Key } from 'lucide-react'
 
 import { useParams } from 'common'
 import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
@@ -35,10 +35,7 @@ const LangSelector = ({
   )
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const anonApiKey =
-    (settings?.service_api_keys ?? []).find((x) => x.tags === 'anon')?.api_key ?? ''
-  const serviceApiKey =
-    (settings?.service_api_keys ?? []).find((x) => x.tags === 'service_role')?.api_key ?? ''
+  const { anonKey: anonApiKey, serviceKey: serviceApiKey } = getAPIKeys(settings)
 
   return (
     <div className="p-1 w-1/2 ml-auto">
@@ -85,7 +82,7 @@ const LangSelector = ({
                       key="anon"
                       onClick={() =>
                         setShowApiKey({
-                          key: anonApiKey,
+                          key: anonApiKey.api_key ?? '-',
                           name: 'anon (public)',
                         })
                       }
@@ -98,7 +95,7 @@ const LangSelector = ({
                       key="service"
                       onClick={() =>
                         setShowApiKey({
-                          key: serviceApiKey,
+                          key: serviceApiKey?.api_key ?? '-',
                           name: 'service_role (secret)',
                         })
                       }
