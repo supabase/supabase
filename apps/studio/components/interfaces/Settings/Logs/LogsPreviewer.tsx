@@ -266,7 +266,6 @@ export const LogsPreviewer = ({
             queryType={queryType}
             isHistogramShowing={showChart}
             onHistogramToggle={() => setShowChart(!showChart)}
-            params={params}
             error={error}
             EmptyState={EmptyState}
             onSelectedLogChange={(log) => setSelectedLogId(log?.id ?? null)}

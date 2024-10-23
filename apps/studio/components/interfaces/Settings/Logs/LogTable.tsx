@@ -30,8 +30,8 @@ import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresC
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
-import LogSelection, { LogSelectionProps } from './LogSelection'
-import type { LogData, LogQueryError, LogsEndpointParams, QueryType } from './Logs.types'
+import LogSelection from './LogSelection'
+import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
@@ -47,7 +47,6 @@ interface Props {
   showDownload?: boolean
   queryType?: QueryType
   projectRef: string
-  params: LogsEndpointParams
   onRun?: () => void
   onSave?: () => void
   hasEditorValue?: boolean
@@ -77,7 +76,6 @@ const LogTable = ({
   isLoading,
   error,
   projectRef,
-  params,
   onRun,
   onSave,
   hasEditorValue,
