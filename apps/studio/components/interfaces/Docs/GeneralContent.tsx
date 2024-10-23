@@ -4,26 +4,19 @@ import TablesIntroduction from 'components/interfaces/Docs/Pages/Tables/Introduc
 import UserManagement from 'components/interfaces/Docs/Pages/UserManagement'
 import RpcIntroduction from 'components/interfaces/Docs/Pages/Rpc/Introduction'
 
-const GeneralContent = ({ autoApiService, selectedLang, page, showApiKey }: any) => {
+interface GeneralContentProps {
+  page?: string
+  selectedLang: 'bash' | 'js'
+  showApiKey: string
+}
+
+const GeneralContent = ({ selectedLang, page, showApiKey }: GeneralContentProps) => {
   let selected = page?.toLowerCase()
-  if (selected == 'intro' || selected == null)
-    return <Introduction autoApiService={autoApiService} selectedLang={selectedLang} />
+  if (selected == 'intro' || selected == null) return <Introduction selectedLang={selectedLang} />
   if (selected == 'auth')
-    return (
-      <Authentication
-        autoApiService={autoApiService}
-        selectedLang={selectedLang}
-        showApiKey={showApiKey}
-      />
-    )
+    return <Authentication selectedLang={selectedLang} showApiKey={showApiKey} />
   if (selected == 'users')
-    return (
-      <UserManagement
-        autoApiService={autoApiService}
-        selectedLang={selectedLang}
-        showApiKey={showApiKey}
-      />
-    )
+    return <UserManagement selectedLang={selectedLang} showApiKey={showApiKey} />
   if (selected == 'tables-intro') return <TablesIntroduction selectedLang={selectedLang} />
   if (selected == 'rpc-intro') return <RpcIntroduction />
   else

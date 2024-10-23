@@ -1,14 +1,14 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
+import { ChevronUp, Edit, ExternalLink, Trash } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { Button, Collapsible } from 'ui'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { FDW } from 'data/fdw/fdws-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { ChevronUp, Edit, ExternalLink, Trash } from 'lucide-react'
+import { Collapsible } from 'ui'
 import type { WrapperMeta } from './Wrappers.types'
 
 interface WrapperRowProps {
@@ -131,72 +131,41 @@ const WrapperRow = ({
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    {canManageWrappers ? (
-                      <Link href={`/project/${ref}/database/wrappers/${wrapper.id}`}>
-                        <Button
-                          type="default"
-                          icon={<Edit strokeWidth={1.5} />}
-                          className="px-1.5"
-                        />
+                  <div className="flex items-center gap-x-2">
+                    <ButtonTooltip
+                      asChild
+                      disabled={!canManageWrappers}
+                      type="default"
+                      icon={<Edit strokeWidth={1.5} />}
+                      className="px-1.5 space-x-0"
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: !canManageWrappers
+                            ? 'You need additional permissions to edit wrappers'
+                            : 'Edit wrapper',
+                        },
+                      }}
+                    >
+                      <Link href={`/project/${ref}/integrations/wrappers/${wrapper.id}`}>
+                        <span className="sr-only">Edit</span>
                       </Link>
-                    ) : (
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger asChild>
-                          <Button
-                            disabled
-                            type="default"
-                            icon={<Edit strokeWidth={1.5} />}
-                            className="px-1.5"
-                          />
-                        </Tooltip.Trigger>
-                        {!canManageWrappers && (
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">
-                                  You need additional permissions to edit wrappers
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        )}
-                      </Tooltip.Root>
-                    )}
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger asChild>
-                        <Button
-                          type="default"
-                          disabled={!canManageWrappers}
-                          icon={<Trash strokeWidth={1.5} />}
-                          className="px-1.5"
-                          onClick={() => onSelectDelete(wrapper)}
-                        />
-                      </Tooltip.Trigger>
-                      {!canManageWrappers && (
-                        <Tooltip.Portal>
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                'border border-background',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs text-foreground">
-                                You need additional permissions to add wrappers
-                              </span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Portal>
-                      )}
-                    </Tooltip.Root>
+                    </ButtonTooltip>
+                    <ButtonTooltip
+                      type="default"
+                      disabled={!canManageWrappers}
+                      icon={<Trash strokeWidth={1.5} />}
+                      className="px-1.5"
+                      onClick={() => onSelectDelete(wrapper)}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: !canManageWrappers
+                            ? 'You need additional permissions to delete wrappers'
+                            : 'Delete wrapper',
+                        },
+                      }}
+                    />
                   </div>
                 </div>
               )

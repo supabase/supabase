@@ -26,7 +26,6 @@ import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 
@@ -53,11 +52,7 @@ const DatabaseUsage = () => {
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-  const showNewDiskManagementUI =
-    subscription?.usage_based_billing_project_addons &&
-    diskManagementV2 &&
-    project?.cloud_provider === 'AWS'
+  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
 
   const report = useDatabaseReport()
   const { data } = useDatabaseSizeQuery({

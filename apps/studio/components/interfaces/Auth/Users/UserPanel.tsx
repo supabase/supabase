@@ -5,6 +5,7 @@ import { useState } from 'react'
 import {
   Button,
   cn,
+  Input_Shadcn_,
   ResizableHandle,
   ResizablePanel,
   Tabs_Shadcn_,
@@ -24,6 +25,22 @@ export const PANEL_PADDING = 'px-5 py-5'
 
 export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
   const [view, setView] = useState<'overview' | 'raw' | 'logs'>('overview')
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredProperties = selectedUser
+    ? Object.entries(selectedUser)
+        .filter(
+          ([key, value]) =>
+            key.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (typeof value === 'string' && value.toLowerCase().includes(searchQuery.toLowerCase()))
+        )
+        .reduce((obj, [key, value]) => {
+          if (value !== undefined) {
+            obj[key as keyof User] = value as any
+          }
+          return obj
+        }, {} as Partial<User>)
+    : {}
 
   return (
     <>
@@ -76,8 +93,26 @@ export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
             value="raw"
             className={cn('mt-0 flex-grow min-h-0 overflow-y-auto', PANEL_PADDING)}
           >
+            <div className="flex items-center mb-2">
+              <Input_Shadcn_
+                autoFocus
+                type="text"
+                placeholder="Filter..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="mr-2"
+              />
+              <Button
+                type="text"
+                disabled={!searchQuery}
+                onClick={() => setSearchQuery('')}
+                className="text-xs"
+              >
+                Clear
+              </Button>
+            </div>
             <SimpleCodeBlock className="javascript">
-              {JSON.stringify(selectedUser, null, 2)}
+              {JSON.stringify(filteredProperties, null, 2)}
             </SimpleCodeBlock>
           </TabsContent_Shadcn_>
         </Tabs_Shadcn_>

@@ -1,7 +1,12 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { formatCurrency } from 'lib/helpers'
 import {
   Badge,
   Button,
@@ -21,17 +26,15 @@ import {
   TableRow,
 } from 'ui'
 import BillingChangeBadge from './BillingChangeBadge'
-import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
-import { DiskMangementCoolDownSection } from './DiskManagementCoolDownSection'
+import { DiskType } from './DiskManagement.constants'
 import {
   calculateDiskSizePrice,
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { DiskType } from './DiskManagement.constants'
-import { formatCurrency } from 'lib/helpers'
+import { DiskMangementCoolDownSection } from './DiskManagementCoolDownSection'
+import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -122,8 +125,15 @@ export const DiskManagementReviewAndSubmitDialog = ({
   loading,
   onSubmit,
 }: DiskSizeMeterProps) => {
+  const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+
+  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const planId = subscription?.plan.id ?? ''
   const isDirty = Object.keys(form.formState.dirtyFields).length > 0
@@ -169,9 +179,11 @@ export const DiskManagementReviewAndSubmitDialog = ({
           tooltip={{
             content: {
               side: 'bottom',
-              text: isWithinCooldown
-                ? 'Currently within cooldown period from previous disk change'
-                : undefined,
+              text: !canUpdateDiskConfiguration
+                ? 'You need additional permissions to update disk configuration'
+                : isWithinCooldown
+                  ? 'Currently within cooldown period from previous disk change'
+                  : undefined,
             },
           }}
         >

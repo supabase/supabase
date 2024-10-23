@@ -67,7 +67,7 @@ const TableEditorMenu = () => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schemas: [selectedSchema],
       search: searchText.trim() || undefined,
       sort,
       filterTypes: visibleTypes,

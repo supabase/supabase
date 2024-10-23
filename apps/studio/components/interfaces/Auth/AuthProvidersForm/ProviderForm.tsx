@@ -1,18 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Check, ChevronUp, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
-import Link from 'next/link'
 import {
   Alert,
   Alert_Shadcn_,
@@ -109,8 +109,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
     }
   }
 
-  const { data: settings } = useProjectApiQuery({ projectRef })
-  const apiUrl = `${settings?.autoApiService.protocol}://${settings?.autoApiService.endpoint}`
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const apiUrl = `https://${settings?.app_config?.endpoint}`
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
@@ -238,7 +238,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         validationSchema={provider.validationSchema}
         onSubmit={onSubmit}
       >
-        {({ handleReset, initialValues, values }: any) => {
+        {({ handleReset, initialValues, values, setFieldValue }: any) => {
           const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
@@ -249,6 +249,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                     <FormField
                       key={x}
                       name={x}
+                      setFieldValue={setFieldValue}
                       properties={provider.properties[x]}
                       formValues={values}
                       disabled={

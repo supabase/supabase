@@ -366,7 +366,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               language="pgsql" // its bq sql but monaco doesn't have a language for it
               defaultValue={warehouseEditorValue}
               onInputChange={(v) => setWarehouseEditorValue(v || '')}
-              onInputRun={handleRun}
+              actions={{ runQuery: { enabled: true, callback: handleRun } }}
             />
           ) : (
             <CodeEditor
@@ -374,7 +374,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               language="pgsql"
               defaultValue={editorValue}
               onInputChange={(v) => setEditorValue(v || '')}
-              onInputRun={handleRun}
+              actions={{ runQuery: { enabled: true, callback: handleRun } }}
             />
           )}
         </ResizablePanel>
