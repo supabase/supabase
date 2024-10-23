@@ -142,7 +142,7 @@ const CreateWrapper = () => {
               'absolute -left-20 top-1 opacity-75 hover:opacity-100',
             ].join(' ')}
           >
-            <Link href={`/project/${ref}/database/wrappers`}>
+            <Link href={`/project/${ref}/integrations/wrappers`}>
               <div className="flex items-center space-x-2">
                 <ArrowLeft strokeWidth={1.5} size={14} />
                 <p className="text-sm">Back</p>

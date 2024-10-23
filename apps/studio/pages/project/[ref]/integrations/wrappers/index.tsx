@@ -3,7 +3,7 @@ import { ExternalLink } from 'lucide-react'
 
 import { Wrappers } from 'components/interfaces/Database'
 import WrappersDropdown from 'components/interfaces/Database/Wrappers/WrappersDropdown'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
@@ -19,7 +19,6 @@ import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPe
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 
 const DatabaseWrappers: NextPageWithLayout = () => {
   const { project } = useProjectContext()

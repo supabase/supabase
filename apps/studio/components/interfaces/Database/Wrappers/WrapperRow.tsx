@@ -133,7 +133,7 @@ const WrapperRow = ({
                   </div>
                   <div className="flex items-center space-x-2">
                     {canManageWrappers ? (
-                      <Link href={`/project/${ref}/database/wrappers/${wrapper.id}`}>
+                      <Link href={`/project/${ref}/integrations/wrappers/${wrapper.id}`}>
                         <Button
                           type="default"
                           icon={<Edit strokeWidth={1.5} />}
