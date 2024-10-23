@@ -19,6 +19,8 @@ import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './L
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { ensureNoTimestampConflict, maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
+import useSingleLog from 'hooks/analytics/useSingleLog'
 
 /**
  * Acts as a container component for the entire log display
@@ -72,6 +74,18 @@ export const LogsPreviewer = ({
     refresh,
     setParams,
   } = useLogsPreview({ projectRef, table, filterOverride })
+
+  const [selectedLogId, setSelectedLogId] = useSelectedLog()
+  const {
+    data: selectedLog,
+    isLoading: isSelectedLogLoading,
+    error: selectedLogError,
+  } = useSingleLog({
+    projectRef,
+    id: selectedLogId ?? undefined,
+    queryType,
+    paramsToMerge: params,
+  })
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
@@ -255,6 +269,10 @@ export const LogsPreviewer = ({
             params={params}
             error={error}
             EmptyState={EmptyState}
+            onSelectedLogChange={(log) => setSelectedLogId(log?.id ?? null)}
+            selectedLog={selectedLog}
+            isSelectedLogLoading={isSelectedLogLoading}
+            selectedLogError={selectedLogError ?? undefined}
           />
         </LoadingOpacity>
       </div>

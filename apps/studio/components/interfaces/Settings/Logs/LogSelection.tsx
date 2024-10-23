@@ -16,6 +16,7 @@ import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionI
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import type { LogData, QueryType } from './Logs.types'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { WarehouseSelectionRenderer } from './LogSelectionRenderers/WarehouseSelectionRenderer'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -31,11 +32,11 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
   const LogDetails = () => {
     if (error) return <LogErrorState error={error} />
     if (!log) return <LogDetailEmptyState />
-    if (!log.metadata) return <DefaultPreviewSelectionRenderer log={log} />
+    // if (!log.metadata) return <DefaultPreviewSelectionRenderer log={log} />
 
     switch (queryType) {
       case 'warehouse':
-        return <DefaultPreviewSelectionRenderer log={log} />
+        return <WarehouseSelectionRenderer log={log} />
       case 'api':
         return <DatabaseApiSelectionRender log={log} />
 

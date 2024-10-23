@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { isEqual } from 'lodash'
 import { ChevronDown, Clipboard, Download, Eye, EyeOff, Play } from 'lucide-react'
-import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Key, ReactNode, useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
@@ -36,9 +36,7 @@ import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
-import { useRouter } from 'next/router'
-import { useQueryState } from 'nuqs'
-import useSingleLog from 'hooks/analytics/useSingleLog'
+import { ResponseError } from 'types'
 
 interface Props {
   data?: LogData[]
@@ -59,6 +57,10 @@ interface Props {
   EmptyState?: ReactNode
   showHeader?: boolean
   showHistogramToggle?: boolean
+  selectedLog?: LogData
+  isSelectedLogLoading?: boolean
+  selectedLogError?: LogQueryError | ResponseError
+  onSelectedLogChange?: (log: LogData | null) => void
 }
 type LogMap = { [id: string]: LogData }
 
@@ -84,23 +86,15 @@ const LogTable = ({
   EmptyState,
   showHeader = true,
   showHistogramToggle = true,
+  selectedLog,
+  isSelectedLogLoading,
+  selectedLogError,
+  onSelectedLogChange,
 }: Props) => {
   const { profile } = useProfile()
   const { show: showContextMenu } = useContextMenu()
 
   const [cellPosition, setCellPosition] = useState<any>()
-  const [selectedLogId, setSelectedLogId] = useQueryState('log')
-
-  const {
-    data: selectedLog,
-    isLoading: isSelectedLogLoading,
-    error: selectedLogError,
-  } = useSingleLog({
-    projectRef,
-    id: selectedLogId ?? undefined,
-    queryType,
-    paramsToMerge: params,
-  })
 
   const canCreateLogQuery = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'log_sql', owner_id: profile?.id },
@@ -356,7 +350,7 @@ const LogTable = ({
       {!queryType && <LogsExplorerTableHeader />}
 
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel defaultSize={selectedLogId ? 60 : 100}>
+        <ResizablePanel defaultSize={selectedLog ? 60 : 100}>
           <DataGrid
             role="table"
             style={{ height: '100%' }}
@@ -367,7 +361,7 @@ const LogTable = ({
             rowHeight={40}
             headerRowHeight={queryType ? 0 : 28}
             onSelectedCellChange={(row) => {
-              setSelectedLogId(row.row.id)
+              onSelectedLogChange?.(row.row)
               setCellPosition(row)
             }}
             selectedRows={new Set([])}
@@ -375,7 +369,7 @@ const LogTable = ({
             rowClass={(row: LogData) =>
               [
                 'font-mono tracking-tight',
-                isEqual(row.id, selectedLogId)
+                isEqual(row.id, selectedLog?.id)
                   ? '!bg-surface-300 rdg-row--focused'
                   : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
               ].join(' ')
@@ -409,15 +403,15 @@ const LogTable = ({
         </ResizablePanel>
         <ResizableHandle withHandle />
 
-        <ResizablePanel defaultSize={40} hidden={!selectedLogId}>
+        <ResizablePanel defaultSize={40}>
           <LogSelection
-            isLoading={isSelectedLogLoading}
+            isLoading={isSelectedLogLoading || false}
             projectRef={projectRef}
             onClose={() => {
-              setSelectedLogId(null)
+              onSelectedLogChange?.(null)
             }}
             log={selectedLog}
-            error={selectedLogError ?? undefined}
+            error={selectedLogError}
             queryType={queryType}
             collectionName={collectionName}
           />

@@ -19,6 +19,8 @@ import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import dayjs from 'dayjs'
 import { useKeyboardShortcuts } from 'components/grid/components/common/Hooks'
+import { useWarehouseLogDetailQuery } from 'data/analytics/warehouse-collection-log-detail-query'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 
 const INTERVALS: DatetimeHelper[] = [
   {
@@ -154,6 +156,19 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
       </span>
     )
   }
+
+  // Selected Log Detail
+  const [selectedLogId, setSelectedLogId] = useSelectedLog()
+  const {
+    data: selectedLogDetail,
+    isLoading: selectedLogDetailLoading,
+    error: selectedLogDetailError,
+  } = useWarehouseLogDetailQuery({
+    ref: projectRef,
+    collectionName: collection?.name,
+    logId: selectedLogId ?? undefined,
+  })
+
   return (
     <div className="relative flex flex-col flex-grow h-full">
       <ShimmerLine active={isLoading} />
@@ -248,6 +263,10 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
               hasEditorValue={false}
               projectRef={projectRef}
               isLoading={isLoading}
+              onSelectedLogChange={(log) => setSelectedLogId(log?.id ?? null)}
+              selectedLog={selectedLogDetail?.result[0] ?? undefined}
+              selectedLogError={selectedLogDetailError ?? undefined}
+              isSelectedLogLoading={!!selectedLogId && selectedLogDetailLoading}
               data={results}
               params={{ sql, project: projectRef }}
               showHeader={false}

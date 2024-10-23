@@ -280,11 +280,11 @@ export function LogsSidebarMenuV2() {
           <InnerSideBarEmptyPanel
             className="mx-4"
             title="No queries created yet"
-            description="Create a collection to start sending your logs to Supabase"
+            description="Create and save your queries to use them in the explorer"
             actions={
-              <Button type="default" onClick={() => setCreateCollectionOpen(true)}>
-                Create collection
-              </Button>
+              <Link href={`/project/${ref}/logs/explorer`}>
+                <Button type="default">Create query</Button>
+              </Link>
             }
           />
         )}
