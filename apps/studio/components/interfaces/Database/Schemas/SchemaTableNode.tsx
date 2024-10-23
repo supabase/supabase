@@ -62,11 +62,7 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
             </div>
             {data.id && (
               <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`/project/${data.ref}/editor/${data.id}`}
-                >
+                <Link href={`/project/${data.ref}/editor/${data.id}`}>
                   <ExternalLink size={10} className="text-foreground-light" />
                 </Link>
               </Button>
