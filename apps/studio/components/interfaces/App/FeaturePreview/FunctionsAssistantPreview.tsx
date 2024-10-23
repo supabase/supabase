@@ -1,8 +1,9 @@
+import Image from 'next/image'
+
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { BASE_PATH } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import Image from 'next/image'
 
 export const FunctionsAssistantPreview = () => {
   const os = detectOS()
@@ -32,7 +33,7 @@ export const FunctionsAssistantPreview = () => {
         feature preview proves itself to benefit most of our users, so as usual please do feel free
         to let us know what you think if the attached GitHub discussion above!
       </p>
-      <div className="space-y-2 !mt-4">
+      <div className="flex flex-col gap-y-2">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>

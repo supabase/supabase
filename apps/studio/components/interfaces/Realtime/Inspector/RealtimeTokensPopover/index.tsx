@@ -20,8 +20,9 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: config.projectRef })
   const anonRoleKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'anon')?.api_key
-  const serviceRoleKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'service_role')
-    ?.api_key
+  const serviceRoleKey = (settings?.service_api_keys ?? []).find(
+    (x) => x.tags === 'service_role'
+  )?.api_key
 
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
     {
