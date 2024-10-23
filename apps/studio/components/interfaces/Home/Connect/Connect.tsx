@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import Panel from 'components/ui/Panel'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
@@ -132,11 +132,8 @@ const Connect = () => {
   const apiHost = canReadAPIKeys ? `https://${endpoint ?? '-'}` : ''
   const apiUrl = canReadAPIKeys ? apiHost : null
 
-  const anonKey = canReadAPIKeys
-    ? (settings?.service_api_keys ?? []).find((key) => key.tags === 'anon')?.api_key ?? null
-    : null
-
-  const projectKeys = { apiUrl, anonKey }
+  const { anonKey } = canReadAPIKeys ? getAPIKeys(settings) : { anonKey: null }
+  const projectKeys = { apiUrl, anonKey: anonKey?.api_key ?? null }
 
   const filePath = getContentFilePath({
     connectionObject,

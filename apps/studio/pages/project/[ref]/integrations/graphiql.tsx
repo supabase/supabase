@@ -11,7 +11,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { Loading } from 'components/ui/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
@@ -34,9 +34,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
   const { data: settings, isFetched } = useProjectSettingsV2Query({ projectRef })
 
-  const serviceRoleKey = (settings?.service_api_keys ?? []).find(
-    (x) => x.name === 'service_role key'
-  )?.api_key
+  const { serviceKey } = getAPIKeys(settings)
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const jwtSecret = config?.jwt_secret
@@ -77,13 +75,13 @@ const GraphiQLPage: NextPageWithLayout = () => {
             opts?.headers?.['Authorization'] ??
             opts?.headers?.['authorization'] ??
             userAuthorization ??
-            `Bearer ${serviceRoleKey}`,
+            `Bearer ${serviceKey?.api_key}`,
         },
       })
     }
 
     return customFetcher
-  }, [projectRef, getImpersonatedRole, jwtSecret, accessToken, serviceRoleKey])
+  }, [projectRef, getImpersonatedRole, jwtSecret, accessToken, serviceKey])
 
   if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
     return <Loading />

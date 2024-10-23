@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { uuidv4 } from 'lib/helpers'
 import {
@@ -52,9 +52,8 @@ const HTTPRequestFields = ({
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
 
   const edgeFunctions = functions ?? []
-  const apiKey =
-    (settings?.service_api_keys ?? []).find((key) => key.tags === 'service_role')?.api_key ??
-    '[YOUR API KEY]'
+  const { serviceKey } = getAPIKeys(settings)
+  const apiKey = serviceKey?.api_key ?? '[YOUR API KEY]'
 
   return (
     <>

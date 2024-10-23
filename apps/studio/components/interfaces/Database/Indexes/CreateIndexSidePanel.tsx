@@ -61,7 +61,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     connectionString: project?.connectionString,
   })
   const { data: entities, isLoading: isLoadingEntities } = useEntityTypesQuery({
-    schema: selectedSchema,
+    schemas: [selectedSchema],
     sort: 'alphabetical',
     search: searchTerm,
     projectRef: project?.ref,

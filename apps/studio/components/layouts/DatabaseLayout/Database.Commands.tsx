@@ -91,7 +91,7 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         id: 'nav-database-wrappers',
         name: 'Wrappers',
         value: 'Database: Wrappers',
-        route: `/project/${ref}/database/wrappers`,
+        route: `/project/${ref}/integrations/wrappers`,
         defaultHidden: true,
       },
       {

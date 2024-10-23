@@ -8,7 +8,7 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import {
   Button,
   cn,
@@ -70,18 +70,16 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
 
     const durationHours = data.unit === 'hours' ? Number(data.value) : Number(data.value) * 24
     const endpoint = settings.app_config?.endpoint
-    const serviceApiKey = (settings?.service_api_keys ?? []).find(
-      (x) => x.tags === 'service_role'
-    )?.api_key
+    const { serviceKey } = getAPIKeys(settings)
 
     if (!endpoint) return toast.error(`Failed to ban user: Unable to retrieve API endpoint`)
-    if (!serviceApiKey) return toast.error(`Failed to ban user: Unable to retrieve API key`)
+    if (!serviceKey?.api_key) return toast.error(`Failed to ban user: Unable to retrieve API key`)
 
     updateUser({
       projectRef,
       protocol: 'https',
       endpoint,
-      serviceApiKey,
+      serviceApiKey: serviceKey.api_key,
       userId: user.id,
       banDuration: durationHours,
     })
