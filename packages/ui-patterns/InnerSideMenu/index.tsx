@@ -39,7 +39,13 @@ const InnerSideMenuCollapsible = forwardRef<
   ElementRef<typeof Collapsible_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof Collapsible_Shadcn_>
 >(({ ...props }, ref) => {
-  return <Collapsible_Shadcn_ ref={ref} {...props} className={cn('w-full px-2', props.className)} />
+  return (
+    <Collapsible_Shadcn_
+      ref={ref}
+      {...props}
+      className={cn('w-full px-2 group', props.className)}
+    />
+  )
 })
 
 const InnerSideMenuCollapsibleTrigger = forwardRef<
@@ -51,7 +57,7 @@ const InnerSideMenuCollapsibleTrigger = forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        'w-full flex gap-1 items-center group px-3 text-xs font-normal font-mono uppercase text-lighter tracking-wide',
+        'w-full flex gap-1 items-center group px-3 text-sm font-normal font-mono uppercase text-lighter tracking-wide',
         props.className
       )}
     >
