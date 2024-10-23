@@ -30,7 +30,7 @@ const Message = memo(function Message({
   isSelected = false,
   onDiff = noop,
   children,
-  action = <></>,
+  action = null,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
 
