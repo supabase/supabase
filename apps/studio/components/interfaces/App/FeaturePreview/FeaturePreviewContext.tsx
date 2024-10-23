@@ -44,7 +44,7 @@ const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
 export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
-  const [flags, setFlags] = useState(
+  const [flags, setFlags] = useState(() =>
     FEATURE_PREVIEWS.reduce((a, b) => {
       return { ...a, [b.key]: false }
     }, {})

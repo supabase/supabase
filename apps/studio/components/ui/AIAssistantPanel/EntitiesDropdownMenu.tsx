@@ -13,6 +13,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { DropdownScrollArea } from './DropdownScrollArea'
+import { Admonition } from 'ui-patterns'
 
 interface EntitiesDropdownMenuProps {
   selectedSchemas: string[]
@@ -32,8 +33,10 @@ export const EntitiesDropdownMenu = ({
   // I reckon users will opt to just search if there's many tables here given the small real estate
   const {
     data: entitiesData,
+    error,
     isLoading,
     isFetching,
+    isError,
   } = useEntityTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -47,6 +50,18 @@ export const EntitiesDropdownMenu = ({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const searchInputHandler = useCallback(debounce(setSearch, 1000), [])
+
+  if (isError) {
+    return (
+      <Admonition
+        type="default"
+        className="m-0 rounded-none border-0 [&>h5]:text-xs [&>div]:text-xs"
+        showIcon={false}
+        title="Failed to retrieve tables"
+        description={`Error: ${(error as any)?.message ?? 'Unknown'}`}
+      />
+    )
+  }
 
   return (
     <Command_Shadcn_>
