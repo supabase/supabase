@@ -11,11 +11,24 @@ import { Button } from 'ui'
 import { DeletePipelineModal } from './DeletePipepineModal'
 import CreatePipelineModal from './CreatePipelineModal'
 import { useReplicationPipelinesStatuesQuery } from 'data/replication/pipeline-status-query'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
+import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 
 export const ReplicationPipelines = () => {
   const { ref } = useParams()
   const { data: pipelines_data } = useReplicationPipelinesQuery({
     projectRef: ref,
+  })
+
+  const { mutate: startPipeline, isLoading: isStartingPipeline } = useStartPipelineMutation({
+    onSuccess: (res) => {
+      toast.success('Successfully started pipeline')
+    },
+  })
+  const { mutate: stopPipeline, isLoading: isStoppingPipeline } = useStopPipelineMutation({
+    onSuccess: (res) => {
+      toast.success('Successfully stopped pipeline')
+    },
   })
   const [showCreatePipelineModal, setShowCreatePipelineModal] = useState(false)
   const [showDeletePipelineModal, setShowDeletePipelineModal] = useState(false)
@@ -81,12 +94,22 @@ export const ReplicationPipelines = () => {
                     ) : (
                       pipelines.map((pipeline) => {
                         const status = pipelineIdToStatus.get(`${pipeline.id}`)
-                        const actionButtonLoading = !status
-                        const actionButtonLabel = actionButtonLoading
-                          ? 'Getting Status'
-                          : status === 'Stopped'
-                            ? 'Start'
-                            : 'Stop'
+                        const actionButtonLoading =
+                          !status ||
+                          status === 'Starting' ||
+                          status === 'Stopping' ||
+                          isStartingPipeline ||
+                          isStoppingPipeline
+                        const actionButtonLabel =
+                          isStartingPipeline || status === 'Starting'
+                            ? 'Starting Pipeline'
+                            : isStoppingPipeline || status === 'Stopping'
+                              ? 'Stopping Pipeline'
+                              : actionButtonLoading
+                                ? 'Getting Status'
+                                : status === 'Stopped'
+                                  ? 'Start'
+                                  : 'Stop'
                         return (
                           <Table.tr key={pipeline.id}>
                             <Table.td>{pipeline.id}</Table.td>
@@ -95,7 +118,11 @@ export const ReplicationPipelines = () => {
                             <Table.td>
                               <Button
                                 onClick={() => {
-                                  toast.info('Starting a pipeline is not yet implemented')
+                                  if (actionButtonLabel === 'Start') {
+                                    startPipeline({ projectRef: ref!, pipeline_id: pipeline.id })
+                                  } else if (actionButtonLabel === 'Stop') {
+                                    stopPipeline({ projectRef: ref!, pipeline_id: pipeline.id })
+                                  }
                                 }}
                                 loading={actionButtonLoading}
                               >
