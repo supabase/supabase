@@ -32,7 +32,7 @@ export const Message = memo(function Message({
   isSelected = false,
   context,
   children,
-  action = <></>,
+  action = null,
   variant = 'default',
   onDiff = noop,
 }: PropsWithChildren<MessageProps>) {
