@@ -38,7 +38,6 @@ const CreatePipelineModal = ({ visible, onClose }: CreatePipelineModalProps) => 
   }
 
   const onSubmit = (values: any) => {
-    console.log('onSubmit')
     createPipeline({
       projectRef: ref!,
       source_id: Number(values.source_id),
