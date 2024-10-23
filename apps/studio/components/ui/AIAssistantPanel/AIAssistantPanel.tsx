@@ -293,7 +293,7 @@ export const AiAssistantPanel = () => {
                 <Button
                   type="outline"
                   icon={<SqlEditor />}
-                  className="px-1"
+                  className="h-[24px] w-[24px] px-1"
                   onClick={() => {
                     const content = editorRef.current?.getValue() ?? ''
                     router.push(`/project/${ref}/sql/new?content=${encodeURIComponent(content)}`)
