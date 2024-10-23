@@ -1,0 +1,97 @@
+---
+title: 'Migrate from Vercel Postgres to Supabase'
+description: 'Migrate your existing Vercel Postgres database to Supabase.'
+subtitle: 'Migrate your existing Vercel Postgres database to Supabase.'
+---
+
+This guide demonstrates how to migrate your Vercel Postgres database to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
+
+## Retrieve your Vercel Postgres database credentials [#retrieve-credentials]
+
+1. Log in to your Vercel Dashboard [https://vercel.com/login](https://vercel.com/login).
+1. Click on the **Storage** tab.
+1. Click on your Postgres Database.
+1. Under the **Quickstart** section, select **psql** then click **Show Secret** to reveal your database password.
+1. Copy the string after `psql ` to the clipboard.
+
+Example:
+
+```bash
+psql "postgres://default:xxxxxxxxxxxx@yy-yyyyy-yyyyyy-yyyyyyy.us-west-2.aws.neon.tech:5432/verceldb?sslmode=require"
+```
+
+Copy this part to your clipboard:
+
+```bash
+"postgres://default:xxxxxxxxxxxx@yy-yyyyy-yyyyyy-yyyyyyy.us-west-2.aws.neon.tech:5432/verceldb?sslmode=require"
+```
+
+## Set your OLD_DB_URL environment variable
+
+Set the **OLD_DB_URL** environment variable at the command line using your Vercel Postgres Database credentials.
+
+Example:
+
+```bash
+export OLD_DB_URL="postgres://default:xxxxxxxxxxxx@yy-yyyyy-yyyyyy-yyyyyyy.us-west-2.aws.neon.tech:5432/verceldb?sslmode=require"
+```
+
+## Retrieve your Supabase connection string [#retrieve-supabase-connection-string]
+
+1. If you're new to Supabase, [create a project](https://supabase.com/dashboard).
+   Make a note of your password, you will need this later. If you forget it, you can [reset it here](https://supabase.com/dashboard/project/_/settings/database).
+
+1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
+1. Under **Connection string**, select **URI**, make sure **Display connection pooler** is checked, and **Mode: Session** is set.
+1. Click the **Copy** button to the right of your connection string to copy it to the clipboard.
+
+## Set your NEW_DB_URL environment variable
+
+Set the **NEW_DB_URL** environment variable at the command line using your Supabase connection string. You will need to replace `[YOUR-PASSWORD]` with your actual database password.
+
+Example:
+
+```bash
+export NEW_DB_URL="postgresql://postgres.xxxxxxxxxxxxxxxxxxxx:[YOUR-PASSWORD]@aws-0-us-west-1.pooler.supabase.com:5432/postgres"
+```
+
+## Migrate the database
+
+You will need the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools, which are included in a full [PostgreSQL installation](https://www.postgresql.org/download).
+
+1. Export your database to a file in console
+
+   Use `pg_dump` with your Postgres credentials to export your database to a file (e.g., `dump.sql`).
+
+```bash
+pg_dump "$OLD_DB_URL" \
+  --clean \
+  --if-exists \
+  --quote-all-identifiers \
+  --no-owner \
+  --no-privileges \
+  > dump.sql
+```
+
+2. Import the database to your Supabase project
+
+   Use `psql` to import the Postgres database file to your Supabase project.
+
+   ```bash
+   psql -d "$NEW_DB_URL" -f dump.sql
+   ```
+
+Additional options
+
+- To only migrate a single database schema, add the `--schema=PATTERN` parameter to your `pg_dump` command.
+- To exclude a schema: `--exclude-schema=PATTERN`.
+- To only migrate a single table: `--table=PATTERN`.
+- To exclude a table: `--exclude-table=PATTERN`.
+
+Run `pg_dump --help` for a full list of options.
+
+<MigrationWarnings />
+
+## Enterprise
+
+[Contact us](https://forms.supabase.com/enterprise) if you need more help migrating your project.

@@ -7,17 +7,17 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
-import DocsLayout from 'components/layouts/DocsLayout/DocsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Loading } from 'components/ui/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import type { NextPageWithLayout } from 'types'
+import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 
 const GraphiQLPage: NextPageWithLayout = () => {
   const { resolvedTheme } = useTheme()
@@ -32,12 +32,11 @@ const GraphiQLPage: NextPageWithLayout = () => {
   const pgGraphqlExtension = (data ?? []).find((ext) => ext.name === 'pg_graphql')
 
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
-  const { data: settings, isFetched } = useProjectApiQuery({ projectRef })
+  const { data: settings, isFetched } = useProjectSettingsV2Query({ projectRef })
 
-  const apiService = settings?.autoApiService
-  const serviceRoleKey = apiService?.service_api_keys.find((x) => x.name === 'service_role key')
-    ? apiService.serviceApiKey
-    : undefined
+  const serviceRoleKey = (settings?.service_api_keys ?? []).find(
+    (x) => x.name === 'service_role key'
+  )?.api_key
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const jwtSecret = config?.jwt_secret
@@ -111,6 +110,8 @@ const GraphiQLPage: NextPageWithLayout = () => {
   return <GraphiQL fetcher={fetcher} theme={currentTheme} />
 }
 
-GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
+GraphiQLPage.getLayout = (page) => (
+  <ProjectIntegrationsLayout title="GraphiQL">{page}</ProjectIntegrationsLayout>
+)
 
 export default GraphiQLPage

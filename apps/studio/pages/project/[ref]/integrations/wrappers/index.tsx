@@ -3,7 +3,7 @@ import { ExternalLink } from 'lucide-react'
 
 import { Wrappers } from 'components/interfaces/Database'
 import WrappersDropdown from 'components/interfaces/Database/Wrappers/WrappersDropdown'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
@@ -80,6 +80,8 @@ const DatabaseWrappers: NextPageWithLayout = () => {
   )
 }
 
-DatabaseWrappers.getLayout = (page) => <DatabaseLayout title="Wrappers">{page}</DatabaseLayout>
+DatabaseWrappers.getLayout = (page) => (
+  <ProjectIntegrationsLayout title="Wrappers">{page}</ProjectIntegrationsLayout>
+)
 
 export default DatabaseWrappers

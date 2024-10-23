@@ -42,6 +42,7 @@ export async function getProjectSettings(
 export type ProjectSettingsData = Awaited<ReturnType<typeof getProjectSettings>>
 export type ProjectSettingsError = ResponseError
 
+/** @deprecated */
 export const useProjectSettingsQuery = <TData = ProjectSettingsData>(
   { projectRef }: ProjectSettingsVariables,
   {

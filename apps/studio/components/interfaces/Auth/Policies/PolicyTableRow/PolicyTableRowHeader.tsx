@@ -115,7 +115,7 @@ const PolicyTableRowHeader = ({
                   <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
                 </Button>
               </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="top">
+              <TooltipContent_Shadcn_ side="bottom">
                 {!canToggleRLS
                   ? 'You need additional permissions to create RLS policies'
                   : 'Create with Supabase Assistant'}
