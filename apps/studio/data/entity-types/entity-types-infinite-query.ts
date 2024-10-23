@@ -161,7 +161,7 @@ export function prefetchEntityTypes(
   {
     projectRef,
     connectionString,
-    schema = 'public',
+    schemas = ['public'],
     search,
     limit = 100,
     sort,
@@ -169,10 +169,19 @@ export function prefetchEntityTypes(
   }: Omit<EntityTypesVariables, 'page'>
 ) {
   return client.prefetchInfiniteQuery(
-    entityTypeKeys.list(projectRef, { schema, search, sort, limit, filterTypes }),
+    entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
     ({ signal, pageParam }) =>
       getEntityTypes(
-        { projectRef, connectionString, schema, search, limit, page: pageParam, sort, filterTypes },
+        {
+          projectRef,
+          connectionString,
+          schemas,
+          search,
+          limit,
+          page: pageParam,
+          sort,
+          filterTypes,
+        },
         signal
       )
   )
