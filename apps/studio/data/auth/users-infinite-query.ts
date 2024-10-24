@@ -104,7 +104,6 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
       )
     },
     {
-      staleTime: 0,
       enabled: enabled && typeof projectRef !== 'undefined',
 
       getNextPageParam(lastPage, pages) {

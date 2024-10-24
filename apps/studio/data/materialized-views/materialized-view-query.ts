@@ -56,7 +56,6 @@ export const useMaterializedViewQuery = <TData = MaterializedViewData>(
     ({ signal }) => getMaterializedView({ projectRef, connectionString, id }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
-      staleTime: 0,
       ...options,
     }
   )

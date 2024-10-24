@@ -42,8 +42,7 @@ export const useDatabaseHooksQuery = <TData = DatabaseTriggersData>(
     databaseTriggerKeys.list(projectRef),
     ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
     {
-      staleTime: 0,
-      // @ts-ignore
+      // @ts-expect-error - select typings are funky
       select(data) {
         return (data as PostgresTrigger[]).filter(
           (trigger) =>
