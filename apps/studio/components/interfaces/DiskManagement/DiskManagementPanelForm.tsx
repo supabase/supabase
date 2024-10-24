@@ -180,7 +180,7 @@ export function DiskManagementPanelForm() {
   const disableInput =
     isRequestingChanges ||
     isPlanUpgradeRequired ||
-    // isWithinCooldownWindow ||
+    isWithinCooldownWindow ||
     !canUpdateDiskConfiguration
 
   const { includedDiskGB: includedDiskGBMeta } = PLAN_DETAILS[planId]
@@ -253,9 +253,7 @@ export function DiskManagementPanelForm() {
   }, [watchedStorageType, watchedTotalSize, setValue, form])
 
   useEffect(() => {
-    if (initialRemainingTime > 0) {
-      // setRemainingTime(initialRemainingTime)
-    }
+    if (initialRemainingTime > 0) setRemainingTime(initialRemainingTime)
   }, [initialRemainingTime])
 
   useEffect(() => {
