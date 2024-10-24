@@ -87,7 +87,7 @@ export const ReplicationPipelines = () => {
                   body={
                     pipelines.length === 0 ? (
                       <Table.tr>
-                        <Table.td align="center" colSpan={5}>
+                        <Table.td align="center" colSpan={6}>
                           No pipelines
                         </Table.td>
                       </Table.tr>
