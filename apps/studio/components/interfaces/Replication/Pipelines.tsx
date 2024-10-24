@@ -20,25 +20,36 @@ export const ReplicationPipelines = () => {
     projectRef: ref,
   })
 
-  const { mutate: startPipeline, isLoading: isStartingPipeline } = useStartPipelineMutation({
+  const { mutate: startPipeline } = useStartPipelineMutation({
     onSuccess: (res) => {
-      toast.success('Successfully started pipeline')
+      toast.success('Start pipeline request submitted. Pipeline will start shortly')
     },
   })
-  const { mutate: stopPipeline, isLoading: isStoppingPipeline } = useStopPipelineMutation({
+  const { mutate: stopPipeline } = useStopPipelineMutation({
     onSuccess: (res) => {
-      toast.success('Successfully stopped pipeline')
+      toast.success('Stop pipeline request submitted. Pipeline will stop shortly')
     },
   })
   const [showCreatePipelineModal, setShowCreatePipelineModal] = useState(false)
   const [showDeletePipelineModal, setShowDeletePipelineModal] = useState(false)
   const [pipelineIdToDelete, setPipelineIdToDelete] = useState(-1)
+  const [requestStatuses, setRequestStatuses] = useState(
+    new Map<number, 'None' | 'StartRequested' | 'StopRequested'>()
+  )
+  const [refetchIntervals, setRefetchIntervals] = useState(new Map<number, number | false>())
 
   const pipelines = pipelines_data ?? []
 
   const replicationStatuses = useReplicationPipelinesStatuesQuery({
     projectRef: ref,
-    pipelineIds: pipelines.map((pipeline) => pipeline.id),
+    statusParams: pipelines.map((pipeline) => {
+      let interval = refetchIntervals.get(pipeline.id)
+      let refetchInterval = interval === undefined ? false : interval
+      return {
+        pipelineId: pipeline.id,
+        refetchInterval,
+      }
+    }),
   })
 
   const pipelineIdToStatus = new Map<string, string>()
@@ -93,22 +104,27 @@ export const ReplicationPipelines = () => {
                     ) : (
                       pipelines.map((pipeline) => {
                         const status = pipelineIdToStatus.get(`${pipeline.id}`)
+                        const requestStatus = requestStatuses.get(pipeline.id)
                         const actionButtonLoading =
-                          !status ||
-                          status === 'Starting' ||
-                          status === 'Stopping' ||
-                          isStartingPipeline ||
-                          isStoppingPipeline
+                          requestStatus === 'StartRequested' || requestStatus === 'StopRequested'
                         const actionButtonLabel =
-                          isStartingPipeline || status === 'Starting'
-                            ? 'Starting Pipeline'
-                            : isStoppingPipeline || status === 'Stopping'
-                              ? 'Stopping Pipeline'
-                              : actionButtonLoading
-                                ? 'Getting Status'
+                          requestStatus === 'StartRequested'
+                            ? 'Starting'
+                            : requestStatus === 'StopRequested'
+                              ? 'Stopping'
+                              : status === 'Started'
+                                ? 'Stop'
                                 : status === 'Stopped'
                                   ? 'Start'
-                                  : 'Stop'
+                                  : 'Unknown'
+
+                        if (
+                          (requestStatus === 'StartRequested' && status === 'Started') ||
+                          (requestStatus === 'StopRequested' && status === 'Stopped')
+                        ) {
+                          setRefetchIntervals(new Map(refetchIntervals).set(pipeline.id, false))
+                          setRequestStatuses(new Map(requestStatuses).set(pipeline.id, 'None'))
+                        }
                         return (
                           <Table.tr key={pipeline.id}>
                             <Table.td>This project</Table.td>
@@ -118,9 +134,18 @@ export const ReplicationPipelines = () => {
                                 onClick={() => {
                                   if (actionButtonLabel === 'Start') {
                                     startPipeline({ projectRef: ref!, pipeline_id: pipeline.id })
+                                    setRequestStatuses(
+                                      new Map(requestStatuses).set(pipeline.id, 'StartRequested')
+                                    )
                                   } else if (actionButtonLabel === 'Stop') {
                                     stopPipeline({ projectRef: ref!, pipeline_id: pipeline.id })
+                                    setRequestStatuses(
+                                      new Map(requestStatuses).set(pipeline.id, 'StopRequested')
+                                    )
                                   }
+                                  setRefetchIntervals(
+                                    new Map(refetchIntervals).set(pipeline.id, 3000)
+                                  )
                                 }}
                                 loading={actionButtonLoading}
                               >
