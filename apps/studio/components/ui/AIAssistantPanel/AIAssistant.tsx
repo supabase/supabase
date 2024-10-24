@@ -15,13 +15,21 @@ import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import {
+  BASE_PATH,
+  IS_PLATFORM,
+  OPT_IN_TAGS,
+  TELEMETRY_ACTIONS,
+  TELEMETRY_CATEGORIES,
+  TELEMETRY_LABELS,
+} from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   AiIconAnimation,
@@ -127,6 +135,15 @@ export const AIAssistant = ({
           .map((def) => def.sql.trim())
     : undefined
 
+  const { mutate: sendEvent } = useSendEventMutation()
+  const sendTelemetryEvent = (action: string) => {
+    sendEvent({
+      action,
+      category: TELEMETRY_CATEGORIES.AI_ASSISTANT,
+      label: TELEMETRY_LABELS.QUICK_SQL_EDITOR,
+    })
+  }
+
   const {
     messages: chatMessages,
     isLoading: isChatLoading,
@@ -172,6 +189,7 @@ export const AIAssistant = ({
     append(payload)
     setAssistantError(undefined)
     setLastSentMessage(payload)
+    sendTelemetryEvent(TELEMETRY_ACTIONS.PROMPT_SUBMITTED)
   }
 
   const toggleSchema = (schema: string) => {
@@ -180,6 +198,7 @@ export const AIAssistant = ({
     } else {
       const newSelectedSchemas = [...selectedSchemas, schema].sort((a, b) => a.localeCompare(b))
       setSelectedSchemas(newSelectedSchemas)
+      sendTelemetryEvent(TELEMETRY_ACTIONS.SCHEMA_CONTEXT_ADDED)
     }
   }
 
@@ -192,6 +211,7 @@ export const AIAssistant = ({
         (a, b) => a.schema.localeCompare(b.schema) || a.name.localeCompare(b.name)
       )
       setSelectedTables(newselectedTables)
+      sendTelemetryEvent(TELEMETRY_ACTIONS.TABLE_CONTEXT_ADDED)
     }
   }
 
@@ -205,6 +225,7 @@ export const AIAssistant = ({
     if (prompt) {
       setValue(prompt)
       sendMessageToAssistant(prompt)
+      sendTelemetryEvent(TELEMETRY_ACTIONS.QUICK_PROMPT_SELECTED(type))
     }
   }
 

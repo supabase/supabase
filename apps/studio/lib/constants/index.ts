@@ -86,3 +86,22 @@ export const OPT_IN_TAGS = {
 export const GB = 1024 * 1024 * 1024
 export const MB = 1024 * 1024
 export const KB = 1024
+
+// [Joshen] Just adding these to start consolidating our telemetry configs
+// may change depending on how we choose to standardize across all apps
+export enum TELEMETRY_CATEGORIES {
+  AI_ASSISTANT = 'ai-assistant',
+}
+
+export enum TELEMETRY_LABELS {
+  QUICK_SQL_EDITOR = 'quick-sql-editor',
+}
+
+export const TELEMETRY_ACTIONS = {
+  PROMPT_SUBMITTED: 'prompt-submitted',
+  QUICK_PROMPT_SELECTED: (type: string) => `quick-prompt-selected-${type}`,
+  SCHEMA_CONTEXT_ADDED: 'schema-context-added',
+  TABLE_CONTEXT_ADDED: 'table-context-added',
+  FIX_WITH_ASSISTANT: 'fix-with-assistant',
+  EXPLAIN_CODE: 'explain-code',
+}
