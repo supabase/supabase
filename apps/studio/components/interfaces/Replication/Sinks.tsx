@@ -19,6 +19,7 @@ export const ReplicationSinks = () => {
   const [showCreateSinkModal, setShowCreateSinkModal] = useState(false)
   const [showDeleteSinkModal, setShowDeleteSinkModal] = useState(false)
   const [sinkIdToDelete, setSinkIdToDelete] = useState(-1)
+  const [sinkNameToDelete, setSinkNameToDelete] = useState('')
 
   const sinks = sinks_data ?? []
 
@@ -47,7 +48,7 @@ export const ReplicationSinks = () => {
               <div className="my-4 w-full">
                 <Table
                   head={[
-                    <Table.th key="id">Id</Table.th>,
+                    <Table.th key="name">Name</Table.th>,
                     <Table.th key="edit">Edit</Table.th>,
                     <Table.th key="delete">Delete</Table.th>,
                   ]}
@@ -60,8 +61,8 @@ export const ReplicationSinks = () => {
                       </Table.tr>
                     ) : (
                       sinks.map((sink) => (
-                        <Table.tr key={sink.id}>
-                          <Table.td>{sink.id}</Table.td>
+                        <Table.tr key={sink.name}>
+                          <Table.td>{sink.name}</Table.td>
                           <Table.td>
                             <Button
                               type="default"
@@ -77,6 +78,7 @@ export const ReplicationSinks = () => {
                               type="danger"
                               onClick={() => {
                                 setSinkIdToDelete(sink.id)
+                                setSinkNameToDelete(sink.name)
                                 setShowDeleteSinkModal(true)
                               }}
                             >
@@ -99,7 +101,7 @@ export const ReplicationSinks = () => {
       />
       <DeleteSinkModal
         visible={showDeleteSinkModal}
-        title={`Delete sink with id ${sinkIdToDelete}?`}
+        title={`Delete sink '${sinkNameToDelete}'?`}
         sinkId={sinkIdToDelete}
         onClose={() => setShowDeleteSinkModal(false)}
       />
